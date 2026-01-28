@@ -45,15 +45,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { api } from '@/lib/api/client';
 import {
   RefreshCw,
-  Settings,
   Database,
   Network,
   Search,
   Plus,
   Trash2,
-  GitMerge,
   Activity,
-  Zap,
   Brain,
   FileText,
   Users,
@@ -86,7 +83,7 @@ export default function CortexGraphRagPage() {
   const queryClient = useQueryClient();
 
   // Fetch dashboard data
-  const { data: dashboard, isLoading, error, refetch } = useQuery({
+  const { data: dashboard, isLoading, error: _error, refetch } = useQuery({
     queryKey: ['cortex-dashboard', selectedTenant],
     queryFn: async () => {
       if (!selectedTenant) return null;
@@ -120,7 +117,7 @@ export default function CortexGraphRagPage() {
       toast({ title: 'Configuration updated' });
       queryClient.invalidateQueries({ queryKey: ['cortex-dashboard'] });
     },
-    onError: (error: any) => {
+    onError: (_error: any) => {
       toast({ title: 'Failed to update configuration', variant: 'destructive' });
     },
   });
@@ -137,7 +134,7 @@ export default function CortexGraphRagPage() {
       queryClient.invalidateQueries({ queryKey: ['cortex-entities'] });
       queryClient.invalidateQueries({ queryKey: ['cortex-dashboard'] });
     },
-    onError: (error: any) => {
+    onError: (_error: any) => {
       toast({ title: 'Failed to create entity', variant: 'destructive' });
     },
   });

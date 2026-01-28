@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import {
-  User, Brain, Target, Heart, Zap, TrendingUp, RefreshCw,
-  ChevronRight, MessageSquare, Lightbulb, Clock, Activity,
+  User, Brain, Target, Heart, TrendingUp, RefreshCw,
+  ChevronRight, MessageSquare, Lightbulb, Activity,
   ThumbsUp, ThumbsDown, AlertTriangle, Smile, Frown, Meh,
   BookOpen, Settings, Eye, BarChart3
 } from 'lucide-react';
@@ -119,7 +119,8 @@ export default function UserModelsPage() {
     loadData();
   }, []);
 
-  const [error, setError] = useState<string | null>(null);
+  const [_error, setError] = useState<string | null>(null);
+  void _error; // Reserved for error display
 
   async function loadData() {
     setLoading(true);

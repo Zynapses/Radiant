@@ -7,7 +7,7 @@ import {
 } from '@tanstack/react-query';
 import { providersApi } from '@/lib/api/endpoints';
 import type { Provider } from '@/lib/api/types';
-import type { PaginationParams, ApiResponse } from '@/lib/api/client';
+import type { PaginationParams } from '@/lib/api/client';
 
 // Query keys
 export const providerKeys = {

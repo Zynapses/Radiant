@@ -46,13 +46,14 @@ const STATUS_CONFIG = {
 
 export function DiffEditorView({ 
   data, 
-  projectId,
-  sessionId, 
-  mode,
+  projectId: _projectId,
+  sessionId: _sessionId, 
+  mode: _mode,
   domainHint,
-  onUpdateView,
-  onEscalate 
+  onUpdateView: _onUpdateView,
+  onEscalate: _onEscalate 
 }: ViewComponentProps) {
+  void _projectId; void _sessionId; void _mode; void _onUpdateView; void _onEscalate; // Reserved for view operations
   const [content, setContent] = useState('');
   const [claims, setClaims] = useState<ClaimVerification[]>([]);
   const [sources, setSources] = useState<SourceDocument[]>([]);

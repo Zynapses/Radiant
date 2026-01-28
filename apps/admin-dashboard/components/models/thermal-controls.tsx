@@ -21,13 +21,14 @@ interface ThermalControlsProps {
 }
 
 export function ThermalControls({
-  modelId,
+  modelId: _modelId,
   modelName,
   currentState,
   warmupTimeSeconds,
   hourlyInstanceCost,
   onStateChange,
 }: ThermalControlsProps) {
+  void _modelId; // Reserved for model-specific operations
   const [targetState, setTargetState] = useState<ThermalState>(currentState);
   const [autoEnabled, setAutoEnabled] = useState(currentState === 'AUTOMATIC');
   const [warmDurationMinutes, setWarmDurationMinutes] = useState(30);

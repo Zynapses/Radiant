@@ -68,7 +68,6 @@ import {
   Play,
   Save,
   Search,
-  Link2,
 } from 'lucide-react';
 
 // ============================================================================
@@ -406,7 +405,8 @@ export default function OrchestrationPatternEditorPage() {
   const [selectedStep, setSelectedStep] = useState<string | null>(null);
   const [selectedConnection, setSelectedConnection] = useState<string | null>(null);
   const [methodSearch, setMethodSearch] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
+  const [_isLoading, setIsLoading] = useState(true);
+  void _isLoading; // Reserved for loading state display
   const canvasRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

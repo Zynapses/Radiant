@@ -24,8 +24,7 @@ import type {
   ViewType, 
   ExecutionMode, 
   ViewState as SharedViewState,
-  PolymorphicRouteDecision as SharedPolymorphicRouteDecision,
-  DomainHint
+  PolymorphicRouteDecision as SharedPolymorphicRouteDecision
 } from '@radiant/shared';
 
 // Import view components
@@ -114,7 +113,8 @@ export function ViewRouter({
   });
   
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [showGearbox, setShowGearbox] = useState(true);
+  const [showGearbox, _setShowGearbox] = useState(true);
+  void _setShowGearbox; // Reserved for gearbox toggle
 
   // Handle view state changes
   const updateViewState = useCallback((newState: Partial<ViewState>) => {

@@ -11,18 +11,12 @@
  */
 
 import React, { useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   GitBranch,
   GitMerge,
   Trophy,
-  X,
-  ChevronLeft,
-  ChevronRight,
   Eye,
-  MousePointer,
-  Clock,
-  DollarSign,
   Sparkles,
   ArrowLeftRight,
   Maximize2,

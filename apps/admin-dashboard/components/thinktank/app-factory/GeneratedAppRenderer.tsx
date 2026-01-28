@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import { Sparkles, ExternalLink, ThumbsUp, ThumbsDown, Share2 } from 'lucide-react';
+import { Sparkles, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { GeneratedCalculator } from './GeneratedCalculator';
 import { AppViewToggle, ViewTransition } from './AppViewToggle';
 
@@ -294,7 +294,8 @@ function ChartComponent({ component }: { component: UIComponentSchema }) {
  */
 function TableComponent({ component }: { component: UIComponentSchema }) {
   const data = component.data as { headers?: string[]; rows?: Record<string, unknown>[] };
-  const config = component.config as { sortable?: boolean; filterable?: boolean };
+  const _config = component.config as { sortable?: boolean; filterable?: boolean };
+  void _config; // Reserved for table configuration
   const headers = data?.headers || [];
   const rows = data?.rows || [];
 

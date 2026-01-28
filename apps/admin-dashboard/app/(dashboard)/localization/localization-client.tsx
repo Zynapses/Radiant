@@ -6,8 +6,6 @@ import {
   Globe, 
   Languages, 
   CheckCircle, 
-  Clock, 
-  AlertCircle,
   Search,
   Plus,
   Wand2,

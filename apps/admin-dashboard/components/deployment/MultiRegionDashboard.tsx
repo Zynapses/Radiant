@@ -16,16 +16,13 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Globe,
-  Server,
   Activity,
   CheckCircle,
   XCircle,
   AlertTriangle,
   RefreshCw,
   Play,
-  Pause,
   RotateCcw,
-  Zap,
   Clock,
   MapPin,
 } from 'lucide-react';

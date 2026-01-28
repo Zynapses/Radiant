@@ -8,13 +8,11 @@ import {
   DollarSign, 
   Activity, 
   Clock, 
-  TrendingUp,
   TrendingDown,
   AlertTriangle,
   CheckCircle,
   XCircle,
   RefreshCw,
-  Settings,
   Play,
   Square,
   ArrowUpDown,
@@ -149,12 +147,13 @@ const TIER_ICONS = {
   off: Power,
 };
 
-const TIER_COLORS = {
+const _TIER_COLORS = {
   hot: 'bg-red-500',
   warm: 'bg-orange-500',
   cold: 'bg-blue-500',
   off: 'bg-gray-500',
 };
+void _TIER_COLORS; // Reserved for component styling
 
 const TIER_BADGES = {
   hot: 'destructive',

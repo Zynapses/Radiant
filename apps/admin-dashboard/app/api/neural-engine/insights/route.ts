@@ -51,7 +51,8 @@ export const GET = withAuth(async (request: AuthenticatedRequest) => {
 // POST /api/neural-engine/insights - Trigger analysis
 export const POST = withAuth(async (request: AuthenticatedRequest) => {
   try {
-    const body = await request.json();
+    const _body = await request.json();
+    void _body; // Reserved for analysis configuration
 
     return NextResponse.json({
       message: 'Analysis triggered',

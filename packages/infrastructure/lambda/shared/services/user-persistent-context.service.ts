@@ -80,6 +80,25 @@ class UserPersistentContextService {
   // ============================================================================
 
   /**
+   * Create a new context entry for a user (alias for addContext)
+   */
+  async createContext(
+    tenantId: string,
+    userId: string,
+    contextType: UserContextType,
+    content: string,
+    options?: {
+      importance?: number;
+      confidence?: number;
+      source?: 'explicit' | 'inferred' | 'conversation';
+      sourceConversationId?: string;
+      expiresAt?: Date;
+    }
+  ): Promise<string> {
+    return this.addContext(tenantId, userId, contextType, content, options);
+  }
+
+  /**
    * Add or update a context entry for a user
    */
   async addContext(

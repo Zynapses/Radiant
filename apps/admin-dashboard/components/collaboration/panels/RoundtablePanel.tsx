@@ -22,7 +22,8 @@ interface RoundtablePanelProps {
   currentUserId: string;
 }
 
-export function RoundtablePanel({ session, currentUserId }: RoundtablePanelProps) {
+export function RoundtablePanel({ session, currentUserId: _currentUserId }: RoundtablePanelProps) {
+  void _currentUserId; // Reserved for user-specific roundtable operations
   const [showCreateRoundtable, setShowCreateRoundtable] = useState(false);
   const queryClient = useQueryClient();
 

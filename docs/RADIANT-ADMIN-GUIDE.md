@@ -7722,6 +7722,132 @@ A customer who has used RADIANT for two years doesn't just have more data—they
 
 > **Think Tank Impact**: See [THINKTANK-ADMIN-GUIDE-V2.md Section 22 (Cato Persistent Memory)](#) for user-facing memory behavior and relationship continuity settings.
 
+### 31A.8 Unified AGI Architecture: Brain, Genesis, Cortex, and Cato (v5.52.29)
+
+RADIANT's AGI capabilities are built on **four interconnected subsystems** that work together to provide intelligent, safe, and enterprise-ready AI orchestration.
+
+#### The Four Subsystems
+
+| System | Purpose | Admin Location | Key Service |
+|--------|---------|----------------|-------------|
+| **Brain** | AGI planning, cognitive mesh, model orchestration | Brain → Plans | `agi-brain-planner.service.ts` |
+| **Genesis** | Developmental gates, capability unlocking, maturity stages | Cato → Genesis | `cato/genesis.service.ts` |
+| **Cortex** | Tiered memory (Hot/Warm/Cold), knowledge graph, Graph-RAG | Cortex → Overview | `cortex-intelligence.service.ts` |
+| **Cato** | Safety pipeline, CBFs, governance presets, HITL checkpoints | Cato → Safety | `cato/safety-pipeline.service.ts` |
+
+#### System Integration Flow
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           USER PROMPT                                        │
+└───────────────────────────────┬─────────────────────────────────────────────┘
+                                │
+                                ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          AGI BRAIN PLANNER                                   │
+│  Coordinates: Domain Detection → Model Selection → Response Generation       │
+└──────────────────────────────────────────────────────────────────────────────┘
+         │                    │                    │                    │
+         ▼                    ▼                    ▼                    ▼
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│   GENESIS   │     │    CATO     │     │   CORTEX    │     │   BRAIN     │
+│             │     │             │     │             │     │             │
+│ Maturity    │     │ Safety      │     │ Knowledge   │     │ Cognitive   │
+│ Gates G1-G5 │     │ Pipeline    │     │ Graph       │     │ Mesh        │
+│             │     │             │     │             │     │             │
+│ Capabilities│     │ CBFs        │     │ Three Tiers │     │ LoRA        │
+│ Restrictions│     │ Checkpoints │     │ Golden Rules│     │ Adapters    │
+└─────────────┘     └─────────────┘     └─────────────┘     └─────────────┘
+         │                    │                    │                    │
+         └────────────────────┴────────────────────┴────────────────────┘
+                                      │
+                                      ▼
+                         ┌────────────────────────┐
+                         │   CATO-CORTEX BRIDGE   │
+                         │  Memory Sync + GDPR    │
+                         └────────────────────────┘
+```
+
+#### How They Work Together
+
+1. **Brain** receives user prompt and coordinates plan generation
+2. **Cortex** provides knowledge density insights to boost domain detection confidence (+0% to +30%)
+3. **Genesis** checks maturity stage (G1-G5) and applies capability restrictions
+4. **Cato** runs 6-step safety pipeline (Sensory Veto → Precision Governor → Perception → CBFs → Entropy → Fracture)
+5. **Brain** selects model using Cortex recommendations and tri-layer LoRA adapters (Global → Tenant → User)
+6. **Cato-Cortex Bridge** syncs memories between systems and handles GDPR cascaded erasure
+
+#### Governance Presets (Adjustable per Tenant)
+
+| Preset | Friction | Auto-Approve | HITL Checkpoints | Best For |
+|--------|----------|--------------|------------------|----------|
+| **PARANOID** 🛡️ | 1.0 | 0.0 | All ALWAYS | Healthcare, Finance |
+| **BALANCED** ⚖️ | 0.5 | 0.3 | CONDITIONAL | General Enterprise |
+| **COWBOY** 🚀 | 0.1 | 0.8 | NEVER/NOTIFY | Internal R&D |
+
+**Configure at**: Cato → Governance → Preset Selection
+
+#### Genesis Maturity Stages
+
+| Stage | Gate | Capabilities Unlocked | Restrictions |
+|-------|------|----------------------|--------------|
+| `EMBRYONIC` | G1 | Basic chat | No external actions |
+| `NASCENT` | G2 | Context retention | Limited autonomy |
+| `DEVELOPING` | G3 | Ethics checks | Requires checkpoints |
+| `MATURING` | G4 | Checkpoint system | Some autonomous actions |
+| `MATURE` | G5 | Full capability | Minimal restrictions |
+
+**Configure at**: Cato → Genesis → Maturity Gates
+
+#### Cortex Memory Tier Administration
+
+| Tier | Storage | Latency | Retention | Admin Action |
+|------|---------|---------|-----------|--------------|
+| **Hot** | Redis + DynamoDB | <10ms | 0-24 hours | Real-time session data |
+| **Warm** | Neptune/pgvector | <100ms | 1-90 days | Knowledge graph, Golden Rules |
+| **Cold** | S3 Iceberg | 1-10s | 90d-7 years | Archive, Zero-Copy mounts |
+
+**Configure at**: Cortex → Tier Configuration
+
+#### Cato Safety Pipeline Steps
+
+| Step | Component | Purpose | Admin Override |
+|------|-----------|---------|----------------|
+| 1 | Sensory Veto | Immediate halt signals | Cannot disable |
+| 2 | Precision Governor | Limits confidence based on uncertainty | Gamma threshold |
+| 3 | Redundant Perception | PHI/PII detection | Sensitivity levels |
+| 4 | Control Barrier Functions | Hard safety constraints (NEVER relax) | Add custom barriers |
+| 5 | Semantic Entropy | Deception/uncertainty detection | Threshold config |
+| 6 | Fracture Detection | Alignment verification | Recovery settings |
+
+**Configure at**: Cato → Safety Pipeline
+
+#### Control Barrier Functions (CBFs) - Immutable Safety
+
+CBFs are **hard constraints that never relax**, regardless of governance preset:
+
+| CBF | Type | Action |
+|-----|------|--------|
+| PHI Protection | `phi` | Block PHI in responses |
+| PII Protection | `pii` | Redact personal data |
+| Cost Ceiling | `cost` | Halt when budget exceeded |
+| Authorization | `auth` | Verify permissions |
+| BAA Required | `custom` | Enforce HIPAA agreements |
+
+**Add Custom CBFs at**: Cato → Safety → Control Barriers → Add Barrier
+
+#### Key Admin API Endpoints
+
+| Endpoint | Purpose |
+|----------|---------|
+| `GET /api/admin/brain/plans` | View AGI plan history |
+| `GET /api/admin/cato/genesis/state` | Check maturity stage |
+| `GET /api/admin/cortex/overview` | Memory tier health |
+| `GET /api/admin/cato/pipeline/status` | Safety pipeline status |
+| `PUT /api/admin/cato/governance/preset` | Change governance preset |
+
+**Full Engineering Reference**: See [ENGINEERING-IMPLEMENTATION-VISION.md Section 21](./ENGINEERING-IMPLEMENTATION-VISION.md#21-unified-agi-architecture-brain-genesis-cortex-and-cato-v55229)
+
 ---
 
 ## 32. Cato Global Consciousness Service

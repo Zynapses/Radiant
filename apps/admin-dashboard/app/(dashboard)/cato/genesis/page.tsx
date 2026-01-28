@@ -17,10 +17,8 @@ import {
   Shield,
   Brain,
   Zap,
-  Activity,
   CheckCircle2,
   AlertTriangle,
-  Settings,
   Eye,
   Lock,
   Unlock,
@@ -88,7 +86,7 @@ export default function CatoGenesisPage() {
   });
 
   // Fetch genesis metrics
-  const { data: metrics = defaultMetrics, isLoading: metricsLoading, refetch: refetchMetrics } = useQuery({
+  const { data: metrics = defaultMetrics, isLoading: _metricsLoading, refetch: refetchMetrics } = useQuery({
     queryKey: ['cato', 'genesis', 'metrics'],
     queryFn: () => apiClient.get<GenesisMetrics>('/api/admin/cato/genesis/metrics'),
     refetchInterval: 30000, // Refresh every 30 seconds

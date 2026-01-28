@@ -58,7 +58,6 @@ import {
   Shield,
   Cpu,
   Users,
-  Activity,
   AlertTriangle,
   CheckCircle,
   XCircle,
@@ -66,7 +65,6 @@ import {
   EyeOff,
   Trash2,
   RotateCcw,
-  Settings,
   Clock,
 } from 'lucide-react';
 
@@ -152,13 +150,13 @@ export default function ApiKeysPage() {
   const queryClient = useQueryClient();
 
   // Fetch dashboard
-  const { data: dashboard, isLoading: dashboardLoading } = useQuery<Dashboard>({
+  const { data: dashboard, isLoading: _dashboardLoading } = useQuery<Dashboard>({
     queryKey: ['api-keys-dashboard'],
     queryFn: () => fetch(`${API_BASE}/dashboard`).then(r => r.json()),
   });
 
   // Fetch keys
-  const { data: keysData, isLoading: keysLoading } = useQuery<{ keys: ApiKey[] }>({
+  const { data: keysData, isLoading: _keysLoading } = useQuery<{ keys: ApiKey[] }>({
     queryKey: ['api-keys', interfaceFilter],
     queryFn: () => {
       const url = interfaceFilter && interfaceFilter !== 'all'

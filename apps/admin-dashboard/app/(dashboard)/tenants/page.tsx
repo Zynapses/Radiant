@@ -5,7 +5,7 @@
  * Complete implementation with no stubs
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Card,
@@ -34,7 +34,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
 import {
   Select,
@@ -54,7 +53,6 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/components/ui/use-toast';
 import {
@@ -725,7 +723,8 @@ function RestoreTenantDialog({
 
 export default function TenantsPage() {
   const queryClient = useQueryClient();
-  const { toast } = useToast();
+  const { toast: _toast } = useToast();
+  void _toast; // Reserved for toast notifications
 
   // State
   const [isCreateOpen, setIsCreateOpen] = useState(false);

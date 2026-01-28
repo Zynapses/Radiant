@@ -16,8 +16,6 @@ import {
   CheckCircle,
   AlertTriangle,
   XCircle,
-  Link,
-  ExternalLink,
   Clock,
   Zap,
 } from 'lucide-react';

@@ -11,12 +11,9 @@ import {
   approvalsApi,
 } from '@/lib/api/endpoints';
 import type {
-  Administrator,
-  Invitation,
-  ApprovalRequest,
   AdminRole,
 } from '@/lib/api/types';
-import type { PaginationParams, ApiResponse } from '@/lib/api/client';
+import type { PaginationParams } from '@/lib/api/client';
 
 export const adminKeys = {
   all: ['administrators'] as const,

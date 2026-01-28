@@ -20,8 +20,6 @@ import {
   Settings,
   RefreshCw,
   AlertTriangle,
-  CheckCircle,
-  Clock,
   Activity,
   Zap,
 } from 'lucide-react';

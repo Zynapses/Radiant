@@ -13,8 +13,7 @@ import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Map, Plus, ZoomIn, ZoomOut, Move, Link2, Lightbulb, AlertTriangle, Check, X } from 'lucide-react';
+import { Map, Plus, ZoomIn, ZoomOut, Lightbulb, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ViewComponentProps } from '../view-router';
 
@@ -47,12 +46,13 @@ const TOPIC_COLORS: Record<string, string> = {
 
 export function MindMapView({ 
   data, 
-  projectId,
-  sessionId, 
-  mode, 
-  onUpdateView,
-  onEscalate 
+  projectId: _projectId,
+  sessionId: _sessionId, 
+  mode: _mode, 
+  onUpdateView: _onUpdateView,
+  onEscalate: _onEscalate 
 }: ViewComponentProps) {
+  void _projectId; void _sessionId; void _mode; void _onUpdateView; void _onEscalate;
   const [nodes, setNodes] = useState<MindMapNode[]>([]);
   const [connections, setConnections] = useState<MindMapConnection[]>([]);
   const [zoom, setZoom] = useState(1);

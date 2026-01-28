@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -50,7 +49,7 @@ function getStateIcon(state: ServiceState) {
 }
 
 export function ServicesClient() {
-  const { data: servicesData = [], isLoading, refetch } = useQuery<ServiceDisplayData[]>({
+  const { data: servicesData = [], isLoading, refetch: _refetch } = useQuery<ServiceDisplayData[]>({
     queryKey: ['services'],
     queryFn: async () => {
       const apiServices = await servicesApi.list();

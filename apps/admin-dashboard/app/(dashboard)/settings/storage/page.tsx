@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Database, Server, Cloud, Zap, DollarSign, AlertTriangle, Check, RefreshCw } from 'lucide-react';
+import { Database, Server, Cloud, Zap, AlertTriangle, Check, RefreshCw } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 
 interface StorageTierConfig {

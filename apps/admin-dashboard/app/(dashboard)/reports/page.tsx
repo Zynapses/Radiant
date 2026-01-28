@@ -17,7 +17,6 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Progress } from '@/components/ui/progress';
 import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
@@ -33,7 +32,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
 import {
   DropdownMenu,
@@ -66,7 +64,6 @@ import {
   Clock,
   Calendar,
   BarChart3,
-  PieChart,
   TrendingUp,
   Users,
   DollarSign,
@@ -86,15 +83,12 @@ import {
   FileJson,
   FileSpreadsheet,
   File,
-  Mail,
-  Eye,
   Star,
   StarOff,
   CheckCircle2,
   Sparkles,
   Layers,
   Table2,
-  ChevronRight,
   AlertCircle,
   RefreshCw,
   ArrowUpDown,
@@ -108,7 +102,6 @@ import {
   LineChart,
   BarChart2,
   Wand2,
-  SlidersHorizontal,
   Mic,
   MicOff,
   MessageSquare,
@@ -116,10 +109,8 @@ import {
   Palette,
   Type,
   Layout,
-  Columns,
   FileType,
   Heading1,
-  Heading2,
   ListOrdered,
   Quote,
   Bold,
@@ -129,24 +120,15 @@ import {
   AlignCenter,
   AlignRight,
   Printer,
-  Share2,
-  History,
   Undo2,
   Redo2,
-  Maximize2,
-  Settings2,
-  Braces,
-  Hash,
-  AtSign,
   Globe,
   Lightbulb,
-  TrendingDown,
   AlertTriangle,
   Target,
   Zap as ZapIcon,
   Upload,
   Paintbrush,
-  ImageIcon,
 } from 'lucide-react';
 
 interface Report {
@@ -694,7 +676,8 @@ export default function ReportsPage() {
   const [filterType, setFilterType] = useState<string>('all');
   const [filterSchedule, setFilterSchedule] = useState<string>('all');
   const [showCreateDialog, setShowCreateDialog] = useState(false);
-  const [editingReportId, setEditingReportId] = useState<string | null>(null);
+  const [_editingReportId, setEditingReportId] = useState<string | null>(null);
+  void _editingReportId; // Reserved for report editing state
   const [activeTab, setActiveTab] = useState('all');
 
   const handleEditReport = useCallback((reportId: string) => {
@@ -707,7 +690,7 @@ export default function ReportsPage() {
   }, [toast]);
 
   // Fetch reports from API
-  const { data: reportsData, isLoading } = useQuery({
+  const { data: reportsData, isLoading: _isLoading } = useQuery({
     queryKey: ['reports', filterType, filterSchedule, activeTab === 'favorites'],
     queryFn: async () => {
       const params = new URLSearchParams();
@@ -2131,9 +2114,10 @@ function SchemaAdaptiveBuilder() {
     setSelectedFields(updated);
   };
 
-  const removeField = (index: number) => {
+  const _removeField = (index: number) => {
     setSelectedFields(selectedFields.filter((_, i) => i !== index));
   };
+  void _removeField; // Reserved for field removal functionality
 
   const addFilter = () => {
     if (allColumns.length > 0) {

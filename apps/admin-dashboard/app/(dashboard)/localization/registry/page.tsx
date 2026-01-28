@@ -7,15 +7,10 @@ import {
   Languages,
   Search,
   Shield,
-  ShieldOff,
   Edit,
-  Trash2,
   RefreshCw,
   CheckCircle,
-  AlertCircle,
   Info,
-  Filter,
-  ChevronDown,
   Lock,
   Unlock,
   RotateCcw,
@@ -54,12 +49,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import {
   Tooltip,
   TooltipContent,

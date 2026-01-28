@@ -93,7 +93,7 @@ export const addUserContext: APIGatewayProxyHandler = async (event) => {
       });
     }
     
-    const entryId = await (userPersistentContextService as any).createContext(
+    const entryId = await userPersistentContextService.createContext(
       tenantId,
       userId,
       contextType,
@@ -418,7 +418,7 @@ export const handler = async (event: Parameters<APIGatewayProxyHandler>[0]): Pro
     return updateUserContext(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
   }
   if (method === 'POST') {
-    return (userPersistentContextService as any).createContext(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+    return addUserContext(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
   }
   if (method === 'GET') {
     return getUserContext(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;

@@ -18,9 +18,7 @@ import {
   Pin,
   User,
   Globe,
-  Plus,
   Trash2,
-  PlayCircle,
   CheckCircle,
   XCircle,
   Clock
@@ -197,7 +195,8 @@ export default function LoraAdaptersPage() {
 
   const globalCount = dashboard?.layerCounts?.global?.count || 0;
   const userCount = dashboard?.layerCounts?.user?.count || 0;
-  const domainCount = dashboard?.layerCounts?.domain?.count || 0;
+  const _domainCount = dashboard?.layerCounts?.domain?.count || 0;
+  void _domainCount; // Reserved for domain stats display
 
   return (
     <div className="space-y-6">

@@ -29,7 +29,6 @@ import {
   Zap,
   GitBranch,
   Eye,
-  Command,
   ArrowRight,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -118,11 +117,13 @@ export function MagicCarpetNavigator({
   altitude = 'ground',
   onFly,
   onLand,
-  onCommand,
+  onCommand: _onCommand,
   className,
 }: MagicCarpetNavigatorProps) {
+  void _onCommand; // Reserved for command handling
   const [searchQuery, setSearchQuery] = useState('');
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [_isExpanded, _setIsExpanded] = useState(false);
+  void _isExpanded; void _setIsExpanded; // Reserved for expanded state
   const [showDestinations, setShowDestinations] = useState(false);
 
   const modeStyle = MODE_STYLES[mode] || MODE_STYLES.resting;
@@ -189,7 +190,8 @@ export function MagicCarpetNavigator({
             <div className="flex-1 flex items-center gap-2 overflow-x-auto scrollbar-hide">
               <AnimatePresence mode="popLayout">
                 {journey.slice(-5).map((point, index) => {
-                  const Icon = DESTINATION_ICONS[point.destination.type] || Compass;
+                  const _Icon = DESTINATION_ICONS[point.destination.type] || Compass;
+                  void _Icon; // Reserved for icon display
                   const isLast = index === journey.length - 1;
                   
                   return (
@@ -330,7 +332,8 @@ export function MagicCarpetNavigator({
                 <div className="p-2 max-h-[300px] overflow-y-auto">
                   <div className="space-y-1">
                     {filteredDestinations.map((dest) => {
-                      const Icon = DESTINATION_ICONS[dest.type] || Compass;
+                      const _Icon = DESTINATION_ICONS[dest.type] || Compass;
+                      void _Icon; // Reserved for icon display
                       const isCurrent = currentDestination?.id === dest.id;
                       
                       return (

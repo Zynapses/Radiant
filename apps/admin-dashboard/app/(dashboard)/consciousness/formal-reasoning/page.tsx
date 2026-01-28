@@ -35,13 +35,6 @@ import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
 import { Textarea } from '@/components/ui/textarea';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
   Table,
   TableBody,
   TableCell,
@@ -50,7 +43,6 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import {
-  AlertCircle,
   CheckCircle,
   Clock,
   DollarSign,
@@ -62,8 +54,6 @@ import {
   Database,
   Shield,
   Cpu,
-  BarChart3,
-  Settings,
   Play,
   RefreshCw,
   TrendingUp,

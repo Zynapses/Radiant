@@ -430,7 +430,7 @@ actor AWSService {
         
         if process.terminationStatus != 0 {
             let errorData = errorPipe.fileHandleForReading.readDataToEndOfFile()
-            let errorMessage = String(data: errorData, encoding: .utf8) ?? "Unknown error"
+            let _ = String(data: errorData, encoding: .utf8) ?? "Unknown error"
             throw AWSError.invalidCredentials
         }
         

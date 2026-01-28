@@ -66,19 +66,15 @@ func (h *HistoryService) GetLastSequence(ctx context.Context, sessionID string) 
 		return 0, err
 	}
 
-	info, err := stream.Info(ctx)
+	// Get the last message for this specific subject
+	msg, err := stream.GetLastMsgForSubject(ctx, subject)
 	if err != nil {
+		// If no messages exist for this subject, return 0
+		if err.Error() == "nats: no message found" {
+			return 0, nil
+		}
 		return 0, err
 	}
 
-	// Check if there are any messages for this subject
-	for subj, seq := range info.State.LastSeq {
-		if subj == subject {
-			return seq, nil
-		}
-	}
-
-	// No messages found for this subject
-	_ = subject // Use subject to avoid unused variable warning
-	return 0, nil
+	return msg.Sequence, nil
 }

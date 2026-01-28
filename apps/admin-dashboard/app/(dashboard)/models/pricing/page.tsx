@@ -72,10 +72,11 @@ interface PriceHistoryEntry {
 
 export default function ModelPricingPage() {
   const queryClient = useQueryClient();
-  const [selectedModel, setSelectedModel] = useState<ModelPricing | null>(null);
+  const [_selectedModel, setSelectedModel] = useState<ModelPricing | null>(null);
+  void _selectedModel; // Reserved for model detail view
   const [bulkMarkup, setBulkMarkup] = useState({ external: 40, selfHosted: 75 });
 
-  const { data: config, isLoading: configLoading } = useQuery<PricingConfig>({
+  const { data: config, isLoading: _configLoading } = useQuery<PricingConfig>({
     queryKey: ['pricing-config'],
     queryFn: () => fetch('/api/admin/pricing/config').then((r) => r.json()),
   });

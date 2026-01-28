@@ -6,7 +6,7 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 import { notificationsApi } from '@/lib/api/endpoints';
-import type { Notification, NotificationPreferences } from '@/lib/api/types';
+import type { NotificationPreferences } from '@/lib/api/types';
 
 // Query keys
 export const notificationKeys = {

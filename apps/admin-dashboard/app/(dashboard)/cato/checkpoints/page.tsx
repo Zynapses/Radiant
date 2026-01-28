@@ -9,11 +9,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Slider } from '@/components/ui/slider';
-import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
-import { AlertCircle, CheckCircle, Clock, XCircle, RefreshCw, Eye, Shield, Settings, Save } from 'lucide-react';
+import { AlertCircle, CheckCircle, Clock, XCircle, RefreshCw, Eye, Settings, Save } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 
 interface CheckpointDecision {

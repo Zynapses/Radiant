@@ -14,7 +14,6 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { 
   Table, 
@@ -71,7 +70,7 @@ export function MigrationsClient() {
     },
   });
 
-  const { data: approvals } = useQuery<Approval[]>({
+  const { data: _approvals } = useQuery<Approval[]>({
     queryKey: ['migrations', 'approvals', selectedRequest?.id],
     queryFn: async () => {
       if (!selectedRequest) return [];

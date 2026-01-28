@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Select,
   SelectContent,
@@ -14,8 +13,6 @@ import {
 import {
   LineChart,
   Line,
-  BarChart,
-  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -25,14 +22,15 @@ import {
   Pie,
   Cell,
 } from 'recharts';
-import { BarChart3, TrendingUp, Cpu, DollarSign, Clock } from 'lucide-react';
+import { BarChart3, Cpu, DollarSign, Clock } from 'lucide-react';
 import { CBFViolationsHeatmap, type CBFViolation } from '@/components/analytics/cbf-violations-heatmap';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
 export function AnalyticsClient() {
   const [timeRange, setTimeRange] = useState('7d');
-  const [metricType, setMetricType] = useState('usage');
+  const [metricType, _setMetricType] = useState('usage');
+  void _setMetricType; // Reserved for metric type filter
 
   const { data: metrics } = useQuery({
     queryKey: ['analytics', timeRange, metricType],
@@ -205,7 +203,7 @@ export function AnalyticsClient() {
       <CBFViolationsHeatmap
         violations={cbfViolations}
         timeRange={timeRange === '24h' ? 'Last 24 hours' : timeRange === '7d' ? 'Last 7 days' : timeRange === '30d' ? 'Last 30 days' : 'Last 90 days'}
-        onRuleClick={(violation) => { /* Navigate to violation detail */ }}
+        onRuleClick={(_violation) => { /* Navigate to violation detail */ }}
       />
 
       {/* Model Performance Table */}

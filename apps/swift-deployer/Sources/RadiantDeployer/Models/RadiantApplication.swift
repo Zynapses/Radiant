@@ -169,7 +169,7 @@ enum ApplicationTier: String, Codable, Sendable, Comparable {
 
 // MARK: - Application Status
 
-struct ApplicationStatus: Codable, Sendable, Identifiable {
+struct ApplicationStatus: Codable, Sendable, Identifiable, Hashable, Equatable {
     let id: String
     let app: RadiantApplication
     var enabled: Bool

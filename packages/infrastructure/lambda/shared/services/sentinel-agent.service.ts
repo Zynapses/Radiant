@@ -354,6 +354,75 @@ class SentinelAgentService {
     }
   }
 
+  async getAllEvents(tenantId: string, options: { limit?: number } = {}): Promise<SentinelEvent[]> {
+    try {
+      const result = await executeStatement(
+        `SELECT * FROM sentinel_events WHERE tenant_id = :tenantId ORDER BY started_at DESC LIMIT :limit`,
+        [stringParam('tenantId', tenantId), longParam('limit', options.limit || 100)]
+      );
+
+      return (result.rows || []).map(row => this.parseEvent(row as Record<string, unknown>));
+    } catch (error) {
+      logger.error('Failed to get all events', { tenantId, error });
+      throw error;
+    }
+  }
+
+  async getStats(tenantId: string): Promise<{
+    totalAgents: number;
+    activeAgents: number;
+    totalEvents: number;
+    eventsToday: number;
+    triggersToday: number;
+    successRate: number;
+    byType: Record<string, number>;
+  }> {
+    try {
+      const [agentStats, eventStats, todayStats, typeStats] = await Promise.all([
+        executeStatement(
+          `SELECT COUNT(*) as total, SUM(CASE WHEN enabled = true THEN 1 ELSE 0 END) as active FROM sentinel_agents WHERE tenant_id = :tenantId`,
+          [stringParam('tenantId', tenantId)]
+        ),
+        executeStatement(
+          `SELECT COUNT(*) as total, SUM(CASE WHEN status = 'success' THEN 1 ELSE 0 END) as success FROM sentinel_events WHERE tenant_id = :tenantId`,
+          [stringParam('tenantId', tenantId)]
+        ),
+        executeStatement(
+          `SELECT COUNT(*) as today FROM sentinel_events WHERE tenant_id = :tenantId AND started_at >= CURRENT_DATE`,
+          [stringParam('tenantId', tenantId)]
+        ),
+        executeStatement(
+          `SELECT type, COUNT(*) as count FROM sentinel_agents WHERE tenant_id = :tenantId GROUP BY type`,
+          [stringParam('tenantId', tenantId)]
+        ),
+      ]);
+
+      const totalAgents = Number((agentStats.rows?.[0] as Record<string, unknown>)?.total) || 0;
+      const activeAgents = Number((agentStats.rows?.[0] as Record<string, unknown>)?.active) || 0;
+      const totalEvents = Number((eventStats.rows?.[0] as Record<string, unknown>)?.total) || 0;
+      const successEvents = Number((eventStats.rows?.[0] as Record<string, unknown>)?.success) || 0;
+      const eventsToday = Number((todayStats.rows?.[0] as Record<string, unknown>)?.today) || 0;
+
+      const byType: Record<string, number> = {};
+      for (const row of (typeStats.rows || []) as Record<string, unknown>[]) {
+        byType[String(row.type)] = Number(row.count) || 0;
+      }
+
+      return {
+        totalAgents,
+        activeAgents,
+        totalEvents,
+        eventsToday,
+        triggersToday: eventsToday,
+        successRate: totalEvents > 0 ? successEvents / totalEvents : 1,
+        byType,
+      };
+    } catch (error) {
+      logger.error('Failed to get stats', { tenantId, error });
+      throw error;
+    }
+  }
+
   // --------------------------------------------------------------------------
   // Parse Helpers
   // --------------------------------------------------------------------------

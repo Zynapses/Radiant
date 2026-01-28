@@ -94,17 +94,18 @@ export const ConnectionLine = ({
 
 export const NodeActionsDropdown = ({ 
   children, 
-  onEdit, 
-  onDelete, 
-  onDuplicate 
+  onEdit: _onEdit, 
+  onDelete: _onDelete, 
+  onDuplicate: _onDuplicate 
 }: { 
   children?: React.ReactNode;
   onEdit?: () => void;
   onDelete?: () => void;
   onDuplicate?: () => void;
-}) => (
-  <div className="relative">{children}</div>
-);
+}) => {
+  void _onEdit; void _onDelete; void _onDuplicate; // Reserved for action handlers
+  return <div className="relative">{children}</div>;
+};
 
 export interface ParallelExecutionConfig {
   enabled: boolean;
@@ -114,19 +115,22 @@ export interface ParallelExecutionConfig {
 }
 
 export const ParallelExecutionPanel = ({
-  config,
-  onChange,
+  config: _config,
+  onChange: _onChange,
 }: {
   config?: ParallelExecutionConfig;
   onChange?: (config: ParallelExecutionConfig) => void;
-}) => (
-  <div className="space-y-4">
-    <div className="text-sm font-medium">Parallel Execution</div>
-    <div className="text-xs text-muted-foreground">
-      Configure parallel execution settings
+}) => {
+  void _config; void _onChange; // Reserved for panel configuration
+  return (
+    <div className="space-y-4">
+      <div className="text-sm font-medium">Parallel Execution</div>
+      <div className="text-xs text-muted-foreground">
+        Configure parallel execution settings
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export interface WorkflowNode {
   id: string;

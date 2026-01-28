@@ -40,7 +40,6 @@ import {
   Download,
   RefreshCw,
   PieChart,
-  BarChart3,
   Loader2,
   Building2,
   Cpu,

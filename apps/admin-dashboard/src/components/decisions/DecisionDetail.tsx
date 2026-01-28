@@ -1,16 +1,13 @@
 'use client';
 
 import React, { useState } from 'react';
-import { formatDistanceToNow, parseISO, format } from 'date-fns';
+import { parseISO, format } from 'date-fns';
 import {
   CheckCircle,
   XCircle,
   Edit3,
   Clock,
   AlertTriangle,
-  User,
-  FileText,
-  Send,
   Loader2,
   Stethoscope,
   DollarSign,
@@ -265,8 +262,9 @@ const ResolutionForm: React.FC<ResolutionFormProps> = ({ onSubmit, requireGuidan
 export const DecisionDetail: React.FC<DecisionDetailProps> = ({
   decision,
   onResolve,
-  onClose,
+  onClose: _onClose,
 }) => {
+  void _onClose; // Reserved for close handler
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

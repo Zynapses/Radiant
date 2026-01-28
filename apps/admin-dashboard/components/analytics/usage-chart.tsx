@@ -16,7 +16,7 @@ interface UsageChartProps {
 }
 
 export function UsageChart({ data, metric, title }: UsageChartProps) {
-  const { maxValue, chartData } = useMemo(() => {
+  const { maxValue: _maxValue, chartData } = useMemo(() => {
     const values = data.map(d => d[metric]);
     const max = Math.max(...values, 1);
     

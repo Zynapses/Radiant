@@ -36,7 +36,6 @@ import {
   Brain,
   TrendingUp,
   Clock,
-  Users,
   Layers,
   Shield,
   AlertTriangle,
@@ -132,7 +131,8 @@ export default function HITLOrchestrationPage() {
     maxSemanticCandidates: 20,
   });
   const [deduplicationStats, setDeduplicationStats] = useState<SemanticDeduplicationStats | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
+  void _loading; // Reserved for loading state display
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {

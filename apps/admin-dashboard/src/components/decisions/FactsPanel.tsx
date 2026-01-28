@@ -3,13 +3,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import {
-  CheckCircle,
   XCircle,
   Edit2,
   Trash2,
   RefreshCw,
   Search,
-  Filter,
   AlertTriangle,
   Database,
   Clock,
@@ -297,7 +295,8 @@ const EditModal: React.FC<EditModalProps> = ({ fact, mode, onClose, onSubmit }) 
 // MAIN PANEL
 // ============================================================================
 
-export const FactsPanel: React.FC<FactsPanelProps> = ({ onEditFact }) => {
+export const FactsPanel: React.FC<FactsPanelProps> = ({ onEditFact: _onEditFact }) => {
+  void _onEditFact; // Reserved for fact editing
   const [facts, setFacts] = useState<ResolvedDecision[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');

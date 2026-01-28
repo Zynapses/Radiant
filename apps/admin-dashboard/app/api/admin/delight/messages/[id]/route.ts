@@ -41,7 +41,7 @@ export async function DELETE(
     const authHeader = request.headers.get('authorization');
     const tenantId = request.headers.get('x-tenant-id') || 'default';
     
-    const response = await fetch(`${API_URL}/api/admin/delight/messages/${params.id}`, {
+    await fetch(`${API_URL}/api/admin/delight/messages/${params.id}`, {
       method: 'DELETE',
       headers: {
         'Authorization': authHeader || '',

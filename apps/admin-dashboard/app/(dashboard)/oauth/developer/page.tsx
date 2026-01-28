@@ -22,8 +22,8 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { toast } from '@/components/ui/use-toast';
 import { 
-  Plus, Key, Globe, Shield, Code, Copy, Eye, EyeOff, 
-  RefreshCw, Trash2, ExternalLink, CheckCircle2, Clock, XCircle,
+  Plus, Key, Shield, Code, Copy, 
+  RefreshCw, Trash2, CheckCircle2, Clock, XCircle,
   AlertTriangle, BookOpen, Terminal
 } from 'lucide-react';
 
@@ -407,8 +407,8 @@ Authorization: Bearer ACCESS_TOKEN`}
 // App Card Component
 function AppCard({
   app,
-  showSecret,
-  onToggleSecret,
+  showSecret: _showSecret,
+  onToggleSecret: _onToggleSecret,
   onCopy,
   onRotateSecret,
   onDelete,

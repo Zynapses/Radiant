@@ -320,6 +320,36 @@ class TimeTravelService {
     }
   }
 
+  async replayCheckpoints(
+    tenantId: string,
+    timelineId: string,
+    fromCheckpointId: string,
+    toCheckpointId: string
+  ): Promise<ConversationState[]> {
+    try {
+      const checkpoints = await this.getTimelineCheckpoints(tenantId, timelineId);
+      
+      const fromIndex = checkpoints.findIndex(cp => cp.id === fromCheckpointId);
+      const toIndex = checkpoints.findIndex(cp => cp.id === toCheckpointId);
+      
+      if (fromIndex === -1 || toIndex === -1) {
+        throw new Error('Checkpoint not found');
+      }
+      
+      const startIndex = Math.min(fromIndex, toIndex);
+      const endIndex = Math.max(fromIndex, toIndex);
+      
+      const replayCheckpoints = checkpoints.slice(startIndex, endIndex + 1);
+      
+      logger.info('Replaying checkpoints', { tenantId, timelineId, count: replayCheckpoints.length });
+      
+      return replayCheckpoints.map(cp => cp.state);
+    } catch (error) {
+      logger.error('Failed to replay checkpoints', { tenantId, timelineId, error });
+      throw error;
+    }
+  }
+
   async forkTimeline(tenantId: string, sourceTimelineId: string, checkpointId: string, name: string, userId: string): Promise<Timeline> {
     try {
       const checkpoint = await this.getCheckpoint(tenantId, checkpointId);

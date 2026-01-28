@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import {
-  Brain, Network, Clock, Zap, Search, RefreshCw, Plus,
-  ChevronRight, Circle, ArrowRight, Database, Activity,
-  TrendingUp, Eye, GitBranch, Layers, Sparkles
+  Brain, Network, Zap, Search, RefreshCw, Plus,
+  ChevronRight, Circle, ArrowRight, Activity,
+  TrendingUp, GitBranch, Layers, Sparkles
 } from 'lucide-react';
 
 interface Entity {
@@ -84,7 +84,8 @@ export default function WorldModelPage() {
     loadData();
   }, []);
 
-  const [error, setError] = useState<string | null>(null);
+  const [_error, setError] = useState<string | null>(null);
+  void _error; // Reserved for error display
 
   async function loadData() {
     setLoading(true);
@@ -240,7 +241,7 @@ export default function WorldModelPage() {
                 {/* Simple graph visualization */}
                 <svg className="w-full h-full">
                   {/* Relations as lines */}
-                  {relations.slice(0, 15).map((rel, i) => {
+                  {relations.slice(0, 15).map((rel, _i) => {
                     const subjectIdx = entities.findIndex(e => e.entityId === rel.subjectId);
                     const objectIdx = entities.findIndex(e => e.entityId === rel.objectId);
                     if (subjectIdx === -1 || objectIdx === -1) return null;

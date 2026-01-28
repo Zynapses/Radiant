@@ -52,7 +52,6 @@ import {
   Route,
   Edit3,
   ListChecks,
-  Smile,
   Lock,
   UsersRound,
   AlertTriangle,
@@ -62,8 +61,6 @@ import {
   Thermometer,
   Network,
   Database,
-  Flame,
-  Snowflake,
 } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -299,7 +296,7 @@ export function Sidebar() {
       </div>
 
       <nav className="flex-1 space-y-1 p-2 overflow-y-auto">
-        {navigation.map((item, index) => {
+        {navigation.map((item, _index) => {
           if (item.type === 'separator') {
             if (collapsed) return null;
             return (

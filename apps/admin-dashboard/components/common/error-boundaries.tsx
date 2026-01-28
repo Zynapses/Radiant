@@ -139,7 +139,8 @@ function DefaultErrorFallback({ error, onRetry }: ErrorFallbackProps) {
   );
 }
 
-function FullPageErrorFallback({ error, onRetry, onReset }: ErrorFallbackProps) {
+function FullPageErrorFallback({ error, onRetry, onReset: _onReset }: ErrorFallbackProps) {
+  void _onReset; // Reserved for reset functionality
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="max-w-lg w-full border-destructive/50">

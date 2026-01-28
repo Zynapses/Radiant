@@ -19,7 +19,6 @@ import {
   Zap,
   CheckCircle2,
   XCircle,
-  Clock,
   Save
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -126,7 +125,7 @@ export function StorageClient() {
   const { toast } = useToast();
   const [configForm, setConfigForm] = useState<S3OffloadingConfig | null>(null);
 
-  const { data: usage, isLoading } = useQuery<StorageUsage[]>({
+  const { data: usage, isLoading: _isLoading } = useQuery<StorageUsage[]>({
     queryKey: ['storage', 'usage'],
     queryFn: async () => {
       const res = await apiClient.get<{ usage: StorageUsage[] }>('/storage/usage');
@@ -142,7 +141,7 @@ export function StorageClient() {
     },
   });
 
-  const { data: s3Dashboard, isLoading: s3Loading } = useQuery<S3DashboardData>({
+  const { data: s3Dashboard, isLoading: _s3Loading } = useQuery<S3DashboardData>({
     queryKey: ['storage', 's3-dashboard'],
     queryFn: async () => {
       const res = await apiClient.get<S3DashboardData>('/admin/s3-storage/dashboard');

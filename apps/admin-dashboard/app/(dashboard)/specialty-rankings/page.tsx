@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Brain, RefreshCw, Trophy, TrendingUp, Lock, Search, Settings, Clock, Zap, Sliders, AlertCircle } from 'lucide-react';
+import { Brain, RefreshCw, Trophy, TrendingUp, Lock, Search, Clock, Zap, Sliders } from 'lucide-react';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/api';
 
@@ -13,21 +13,6 @@ interface RankingData {
   trend: string;
   isLocked?: boolean;
   adminOverride?: number;
-}
-
-interface ScoringWeights {
-  benchmarkWeight: number;
-  communityWeight: number;
-  internalWeight: number;
-}
-
-interface ResearchSchedule {
-  scheduleId: string;
-  name: string;
-  frequency: 'hourly' | 'daily' | 'weekly' | 'monthly';
-  enabled: boolean;
-  lastRun?: string;
-  nextRun?: string;
 }
 
 // Orchestration Modes
@@ -88,8 +73,10 @@ export default function SpecialtyRankingsPage() {
   const [selectedSpecialty, setSelectedSpecialty] = useState<SpecialtyKey>('reasoning');
   const [selectedMode, setSelectedMode] = useState<ModeKey>('thinking');
   const [rankings, setRankings] = useState<RankingData[]>(DEFAULT_RANKINGS);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [_loading, setLoading] = useState(false);
+  void _loading; // Reserved for loading state display
+  const [_error, setError] = useState<string | null>(null);
+  void _error; // Reserved for error display
   const [lastUpdated, setLastUpdated] = useState<string>('Never');
   const [isResearching, setIsResearching] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');

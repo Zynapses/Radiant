@@ -33,8 +33,6 @@ import {
   Code2, 
   FileCode2, 
   ShieldAlert,
-  TrendingUp,
-  TrendingDown,
   Clock,
   RefreshCw,
   Eye,

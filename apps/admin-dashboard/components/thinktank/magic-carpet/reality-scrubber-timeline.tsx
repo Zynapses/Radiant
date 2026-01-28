@@ -11,7 +11,7 @@
  */
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   SkipBack,
   SkipForward,
@@ -26,7 +26,6 @@ import {
   RotateCcw,
   Camera,
   Database,
-  Code,
   MessageSquare,
   Layout,
   Clock,
@@ -35,7 +34,6 @@ import {
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Slider } from '@/components/ui/slider';
 import {
   Tooltip,
   TooltipContent,
@@ -47,7 +45,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { format, formatDistanceToNow } from 'date-fns';
+import { format } from 'date-fns';
 
 // Types
 interface RealitySnapshot {
@@ -271,7 +269,8 @@ export function RealityScrubberTimeline({
                   const Icon = config.icon;
                   const left = (index / Math.max(1, totalSnapshots - 1)) * 100;
                   const isCurrent = index === currentPosition;
-                  const isHovered = hoveredSnapshot?.id === snapshot.id;
+                  const _isHovered = hoveredSnapshot?.id === snapshot.id;
+                  void _isHovered; // Reserved for hover state display
 
                   return (
                     <Tooltip key={snapshot.id}>

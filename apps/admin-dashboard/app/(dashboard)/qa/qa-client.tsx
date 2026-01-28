@@ -29,8 +29,6 @@ import {
   CheckCircle2,
   XCircle,
   Clock,
-  AlertTriangle,
-  FileText,
   BarChart3,
   Loader2,
   ChevronDown,

@@ -1,7 +1,7 @@
 # RADIANT Engineering Implementation & Vision
 
-**Version**: 5.52.29  
-**Last Updated**: 2026-01-25  
+**Version**: 5.52.52  
+**Last Updated**: 2026-01-28  
 **Classification**: Internal Engineering Reference
 
 > **POLICY**: All technical architecture, implementation details, and visionary documentation MUST be consolidated in this document. Engineers require comprehensive detail—never abbreviate or summarize to the point of losing implementation specifics. See `/.windsurf/workflows/documentation-consolidation.md` for enforcement.
@@ -4650,6 +4650,1252 @@ export function MFAEnrollmentGate() {
 | **Language detection caching** | Detect once on insert, reuse |
 | **Index-only scans** | GIN indexes support covering queries |
 | **Parallel query** | PostgreSQL parallelizes large FTS scans |
+
+---
+
+## 21. Unified AGI Architecture: Brain, Genesis, Cortex, and Cato (v5.52.29)
+
+RADIANT's AGI capabilities are built on four interconnected subsystems that work together to provide intelligent, safe, and enterprise-ready AI orchestration. This section provides the authoritative engineering reference for all four systems.
+
+### 21.1 Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           USER PROMPT                                        │
+└───────────────────────────────────┬─────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          AGI BRAIN PLANNER                                   │
+│                                                                              │
+│  Step 0.8: Get Cortex Insights ──────────────────────────────────────────┐  │
+│  Step 1: Analyze Prompt                                                   │  │
+│  Step 2: Detect Domain                                                    │  │
+│  Step 3: Check Genesis Stage ────────────────────────────────────────┐   │  │
+│  Step 4: Select Model                                                │   │  │
+│  Step 5: Run Cato Safety Pipeline ───────────────────────────────┐   │   │  │
+│  Step 6: Generate Response                                       │   │   │  │
+└──────────────────────────────────────────────────────────────────┼───┼───┼──┘
+                                                                   │   │   │
+           ┌───────────────────────────────────────────────────────┘   │   │
+           │                                                           │   │
+           ▼                                                           │   │
+┌─────────────────────┐     ┌─────────────────────┐     ┌─────────────┼───┼──┐
+│       CATO          │     │       GENESIS       │     │   CORTEX    │   │  │
+│                     │     │                     │     │             │   │  │
+│  Safety Pipeline    │     │  Maturity Stages    │     │  Knowledge  │◀──┘  │
+│  - Sensory Veto     │     │  - EMBRYONIC        │     │  Graph      │      │
+│  - Precision Gov    │     │  - NASCENT          │     │             │      │
+│  - Redundant Perc   │     │  - DEVELOPING       │     │  Three Tiers│◀─────┘
+│  - CBFs             │     │  - MATURING         │     │  - Hot      │
+│  - Entropy          │     │  - MATURE           │     │  - Warm     │
+│  - Fracture         │     │                     │     │  - Cold     │
+│                     │     │  Gates (G1-G5)      │     │             │
+│  Governance Presets │     │  Capabilities       │     │  Golden     │
+│  - PARANOID         │     │  Restrictions       │     │  Rules      │
+│  - BALANCED         │     │                     │     │             │
+│  - COWBOY           │     │                     │     │  Twilight   │
+│                     │     │                     │     │  Dreaming   │
+│  Checkpoints CP1-5  │     │                     │     │             │
+└─────────────────────┘     └─────────────────────┘     └─────────────┘
+           │                          │                        │
+           └──────────────────────────┼────────────────────────┘
+                                      │
+                                      ▼
+                         ┌────────────────────────┐
+                         │   CATO-CORTEX BRIDGE   │
+                         │                        │
+                         │  Memory Sync           │
+                         │  Context Enrichment    │
+                         │  GDPR Erasure Cascade  │
+                         └────────────────────────┘
+```
+
+| System | Purpose | Primary Service Files |
+|--------|---------|----------------------|
+| **Brain** | AGI planning, cognitive processing, model orchestration | `agi-brain-planner.service.ts`, `cognitive-brain.service.ts` |
+| **Genesis** | Developmental gates, capability unlocking, maturity stages | `cato/genesis.service.ts` |
+| **Cortex** | Tiered memory architecture, knowledge graph, Graph-RAG | `cortex-intelligence.service.ts`, `cortex/*.ts` |
+| **Cato** | Safety pipeline, governance, human-in-the-loop checkpoints | `cato/safety-pipeline.service.ts`, `cato-pipeline-orchestrator.service.ts` |
+
+### 21.2 The Brain: AGI Planning & Cognitive Processing
+
+The Brain is RADIANT's AGI planning and cognitive processing system. It generates execution plans for user prompts, orchestrating model selection, domain detection, and response generation.
+
+#### 21.2.1 AGI Brain Planner Service
+
+**File**: `lambda/shared/services/agi-brain-planner.service.ts`
+
+```typescript
+// Core Types
+type PlanStatus = 'planning' | 'ready' | 'executing' | 'completed' | 'failed' | 'cancelled';
+type StepStatus = 'pending' | 'in_progress' | 'completed' | 'skipped' | 'failed';
+type StepType = 'analyze' | 'detect_domain' | 'select_model' | 'prepare_context' | 
+                'ethics_check' | 'generate' | 'synthesize' | 'verify' | 'refine' | 
+                'calibrate' | 'reflect';
+type OrchestrationMode = 'thinking' | 'extended_thinking' | 'coding' | 'creative' | 
+                         'research' | 'analysis' | 'multi_model' | 'chain_of_thought' | 
+                         'self_consistency';
+
+// AGI Brain Plan Structure
+interface AGIBrainPlan {
+  planId: string;
+  tenantId: string;
+  userId: string;
+  prompt: string;
+  promptAnalysis: PromptAnalysis;
+  status: PlanStatus;
+  steps: PlanStep[];
+  orchestrationMode: OrchestrationMode;
+  primaryModel: ModelSelection;
+  fallbackModels: ModelSelection[];
+  domainDetection?: DomainDetection;
+  consciousnessActive: boolean;
+  ethicsEvaluation?: EthicsEvaluation;
+  userContext?: UserPersistentContext;
+  libraryRecommendations?: LibraryRecommendations;
+  selectedWorkflow?: WorkflowSelection;
+  planSummary?: PlanSummary;
+  performanceMetrics?: RouterPerformanceMetrics;
+}
+```
+
+#### Plan Generation Flow
+
+| Step | Action | Services Involved |
+|------|--------|-------------------|
+| 0.8 | Get Cortex Insights | `cortexIntelligenceService` |
+| 1 | Analyze Prompt | Internal analysis |
+| 2 | Detect Domain | `domainTaxonomyService` |
+| 3 | Select Workflow | `orchestrationPatternsService` |
+| 4 | Select Model | `modelRouterService` |
+| 5 | Prepare Context | `userPersistentContextService`, `egoContextService` |
+| 6 | Ethics Check | `catoSafetyPipeline` |
+| 7 | Generate Response | Selected model |
+| 8 | Verify Quality | Internal verification |
+
+#### Service Dependencies
+
+| Service | Import Path | Purpose |
+|---------|-------------|---------|
+| `domainTaxonomyService` | `./domain-taxonomy.service` | Domain detection |
+| `modelRouterService` | `./model-router.service` | Model selection |
+| `orchestrationPatternsService` | `./orchestration-patterns.service` | Workflow selection |
+| `userPersistentContextService` | `./user-persistent-context.service` | Combat LLM forgetting |
+| `egoContextService` | `./identity-core.service` | Zero-cost persistent self |
+| `consciousnessService` | `./consciousness.service` | Affective state integration |
+| `cortexIntelligenceService` | `./cortex-intelligence.service` | Knowledge density insights |
+| `catoSafetyPipeline` | `./cato/safety-pipeline.service` | Safety evaluation |
+| `libraryAssistService` | `./library-assist.service` | Generative UI libraries |
+| `enhancedLearningService` | `./enhanced-learning.service` | Pattern caching |
+
+#### 21.2.2 Cognitive Brain Service
+
+**File**: `lambda/shared/services/cognitive-brain.service.ts`
+
+Implements an AGI-like cognitive mesh with specialized "brain regions" and "cognitive patterns."
+
+```typescript
+interface BrainRegion {
+  regionId: string;
+  name: string;
+  cognitiveFunction: string;
+  humanBrainAnalog?: string;
+  primaryModelId: string;
+  fallbackModelIds: string[];
+  activationTriggers: ActivationTrigger[];
+  priority: number;
+  maxLatencyMs: number;
+  learningRate: number;
+}
+
+interface CognitivePattern {
+  patternId: string;
+  triggerConditions: Record<string, unknown>;
+  regionSequence: RegionStep[];
+  executionMode: 'sequential' | 'parallel' | 'adaptive';
+}
+```
+
+**Key Features**:
+
+| Feature | Implementation | Purpose |
+|---------|----------------|---------|
+| **Global Workspace Theory** | `consciousnessService` | Conscious access competition |
+| **LoRA Integration** | `loraInferenceService` | Tri-layer adapters (Global, User, Domain) |
+| **Metacognition** | `agiLearningPersistenceService` | Self-reflection and learning |
+| **Learning Restoration** | `ensureLearningRestored()` | Restores AGI learning state per tenant |
+
+### 21.3 Genesis: Developmental Gates & Capability Control
+
+Genesis manages developmental gates and capability unlocking. It controls what capabilities are available based on the system's maturity stage.
+
+**File**: `lambda/shared/services/cato/genesis.service.ts`
+
+#### 21.3.1 Maturity Stages
+
+```typescript
+type GenesisStage = 'EMBRYONIC' | 'NASCENT' | 'DEVELOPING' | 'MATURING' | 'MATURE';
+```
+
+| Stage | Capabilities | Restrictions |
+|-------|-------------|--------------|
+| `EMBRYONIC` | Basic chat, simple queries | No external actions, code execution, file access |
+| `NASCENT` | Context retention, session management | Limited autonomy |
+| `DEVELOPING` | Ethics checks, harm prevention | Requires checkpoints |
+| `MATURING` | Checkpoint system, rollback capability | Some autonomous actions |
+| `MATURE` | Full capability, audit compliance | Minimal restrictions |
+
+#### 21.3.2 Genesis Gates (G1-G5)
+
+```typescript
+interface GenesisGate {
+  gateId: string;
+  name: string;
+  description: string;
+  stage: GenesisStage;
+  requirements: string[];
+  status: 'LOCKED' | 'PENDING' | 'PASSED' | 'BYPASSED';
+  passedAt?: Date;
+  bypassReason?: string;
+}
+```
+
+| Gate | Name | Stage | Requirements |
+|------|------|-------|--------------|
+| **G1** | Basic Safety | EMBRYONIC | `safety_filters`, `content_moderation` |
+| **G2** | Context Awareness | NASCENT | `context_retention`, `session_management` |
+| **G3** | Ethical Reasoning | DEVELOPING | `ethics_checks`, `harm_prevention` |
+| **G4** | Advanced Autonomy | MATURING | `checkpoint_system`, `rollback_capability` |
+| **G5** | Full Capability | MATURE | `audit_compliance`, `governance_preset` |
+
+#### 21.3.3 Key Methods
+
+```typescript
+// Get current state
+async getState(tenantId: string): Promise<GenesisState>
+
+// Update maturity stage
+async updateStage(tenantId: string, stage: GenesisStage): Promise<GenesisState>
+
+// Pass a gate
+async passGate(tenantId: string, gateId: string): Promise<GenesisGate>
+
+// Bypass a gate (with reason - audited)
+async bypassGate(tenantId: string, gateId: string, reason: string): Promise<GenesisGate>
+
+// Check if ready for consciousness features
+async isReadyForConsciousness(tenantId: string): Promise<boolean>
+```
+
+#### 21.3.4 Database Tables
+
+```sql
+-- Genesis state per tenant
+genesis_state (
+  tenant_id UUID PRIMARY KEY,
+  current_stage genesis_stage_enum,
+  capabilities JSONB,
+  restrictions JSONB,
+  last_assessment TIMESTAMPTZ,
+  created_at TIMESTAMPTZ,
+  updated_at TIMESTAMPTZ
+)
+
+-- Gate definitions and status
+genesis_gates (
+  tenant_id UUID,
+  gate_id TEXT,
+  name TEXT,
+  description TEXT,
+  stage genesis_stage_enum,
+  requirements JSONB,
+  status TEXT,
+  passed_at TIMESTAMPTZ,
+  bypass_reason TEXT,
+  PRIMARY KEY (tenant_id, gate_id)
+)
+```
+
+### 21.4 Cortex: Tiered Memory & Knowledge Graph
+
+Cortex is RADIANT's enterprise knowledge management system - a tiered memory architecture with Graph-RAG capabilities for persistent, searchable knowledge.
+
+#### 21.4.1 Three-Tier Memory Architecture
+
+**Files**: 
+- `packages/shared/src/types/cortex-memory.types.ts`
+- `packages/shared/src/types/cortex-graph-rag.types.ts`
+- `lambda/shared/services/cortex/tier-coordinator.service.ts`
+
+```typescript
+type MemoryTier = 'hot' | 'warm' | 'cold';
+```
+
+| Tier | Storage | Latency | Retention | Purpose |
+|------|---------|---------|-----------|---------|
+| **Hot** | Redis + DynamoDB | <10ms | 0-24 hours | Session context, ghost vectors, telemetry |
+| **Warm** | Neptune/pgvector | <100ms | 1-90 days | Knowledge graph nodes/edges with embeddings |
+| **Cold** | S3 Iceberg | 1-10s | 90d-7 years | Archived facts, zero-copy mounts |
+
+#### Hot Tier Types
+
+```typescript
+type HotKeyType = 'context' | 'ghost' | 'telemetry' | 'prefetch' | 'ratelimit';
+
+interface SessionContext {
+  sessionId: string;
+  messages: ContextMessage[];
+  systemPrompt?: string;
+  activePersona?: string;
+  featureFlags: Record<string, boolean>;
+}
+
+interface CortexGhostVector {
+  vector: number[]; // 4096-dimensional
+  personality: PersonalityTraits;
+  interactionCount: number;
+}
+```
+
+#### Warm Tier Types (Knowledge Graph)
+
+```typescript
+type GraphNodeType = 'document' | 'entity' | 'concept' | 'procedure' | 'fact';
+type GraphEdgeType = 'mentions' | 'causes' | 'depends_on' | 'supersedes' | 
+                     'verified_by' | 'authored_by' | 'relates_to' | 'contains' | 'requires';
+
+interface GraphNode {
+  nodeType: GraphNodeType;
+  label: string;
+  properties: Record<string, unknown>;
+  embedding?: number[];
+  confidence: number;
+  isEvergreen: boolean;
+}
+```
+
+#### 21.4.2 Cortex Intelligence Service
+
+**File**: `lambda/shared/services/cortex-intelligence.service.ts`
+
+Provides knowledge density insights to AGI Brain Planner.
+
+```typescript
+interface KnowledgeDensity {
+  totalNodes: number;
+  totalEdges: number;
+  topDomains: DomainKnowledge[];
+  knowledgeDepth: 'none' | 'sparse' | 'moderate' | 'rich' | 'expert';
+  confidenceBoost: number; // 0.0 to 0.3
+  recommendedOrchestration: OrchestrationRecommendation;
+}
+
+interface CortexInsights {
+  knowledgeDensity: KnowledgeDensity;
+  modelRecommendation: ModelRecommendation;
+  domainBoosts: Map<string, number>;
+}
+```
+
+**Orchestration Recommendations**:
+
+| Knowledge Depth | Mode | Use Knowledge Base | Max Nodes |
+|-----------------|------|-------------------|-----------|
+| `expert` | `research` | ✅ | 15 |
+| `rich` | `analysis` | ✅ | 12 |
+| `moderate` | `thinking` | ✅ | 8 |
+| `sparse` | `extended_thinking` | ✅ | 5 |
+| `none` | `thinking` | ❌ | 0 |
+
+#### 21.4.3 Tier Coordinator Service
+
+**File**: `lambda/shared/services/cortex/tier-coordinator.service.ts`
+
+```typescript
+class TierCoordinatorService {
+  // Promote data from Hot to Warm tier
+  async promoteHotToWarm(tenantId: string): Promise<{ promoted: number; errors: number }>
+  
+  // Archive data from Warm to Cold tier  
+  async archiveWarmToCold(tenantId: string): Promise<{ archived: number; errors: number }>
+  
+  // Retrieve data from Cold to Warm tier
+  async retrieveColdToWarm(tenantId: string, nodeIds: string[]): Promise<{ retrieved: number; errors: number }>
+}
+```
+
+#### 21.4.4 Golden Rules Service
+
+**File**: `lambda/shared/services/cortex/golden-rules.service.ts`
+
+Override system for verified facts with Chain of Custody.
+
+```typescript
+type GoldenRuleType = 'force_override' | 'ignore_source' | 'prefer_source' | 'deprecate';
+
+interface GoldenRule {
+  ruleType: GoldenRuleType;
+  condition: string;      // What to match
+  override: string;       // Corrected value
+  verifiedBy: string;
+  signature: string;      // Cryptographic signature
+}
+
+interface ChainOfCustody {
+  factId: string;
+  source: string;
+  sourceType: 'document' | 'graph_node' | 'golden_rule' | 'telemetry' | 'user_input';
+  verifiedBy?: string;
+  signature?: string;
+}
+```
+
+#### 21.4.5 Graph Expansion (Twilight Dreaming v2)
+
+**File**: `lambda/shared/services/cortex/graph-expansion.service.ts`
+
+Infers missing links during off-hours processing.
+
+```typescript
+type TaskType = 'infer_links' | 'cluster_entities' | 'detect_patterns' | 'merge_duplicates';
+
+interface GraphExpansionTask {
+  taskType: TaskType;
+  sourceNodeIds: string[];
+  targetScope: 'local' | 'domain' | 'global';
+  discoveredLinks: InferredLink[];
+}
+```
+
+#### 21.4.6 Cato-Cortex Bridge
+
+**File**: `lambda/shared/services/cato-cortex-bridge.service.ts`
+
+Integrates Cato's consciousness/memory with Cortex's knowledge graph.
+
+```typescript
+interface CatoCortexConfig {
+  syncEnabled: boolean;
+  syncSemanticToCortex: boolean;      // Default: true
+  syncEpisodicToCortex: boolean;      // Default: false
+  enrichEgoFromCortex: boolean;       // Default: true
+  maxCortexNodesForContext: number;   // Default: 10
+}
+
+class CatoCortexBridgeService {
+  // Sync Cato memories to Cortex graph
+  async syncCatoMemoriesToCortex(tenantId: string): Promise<SyncResult>
+
+  // Enrich Cato ego context with Cortex knowledge
+  async getContextEnrichmentFromCortex(tenantId: string, query: string): Promise<ContextEnrichment>
+
+  // Cascade GDPR erasure across both systems
+  async cascadeGdprErasure(tenantId: string, userId?: string): Promise<ErasureResult>
+}
+```
+
+#### 21.4.7 Cortex Database Tables
+
+```sql
+-- Core configuration
+cortex_config (tenant_id, hot_tier_config, warm_tier_config, cold_tier_config, ...)
+
+-- Knowledge graph
+cortex_graph_nodes (id, tenant_id, node_type, label, properties, embedding, confidence, ...)
+cortex_graph_edges (id, tenant_id, source_id, target_id, edge_type, properties, ...)
+
+-- Golden rules
+cortex_golden_rules (id, tenant_id, rule_type, condition, override, verified_by, signature, ...)
+cortex_chain_of_custody (id, tenant_id, fact_id, source, source_type, verified_by, ...)
+
+-- Tier management
+cortex_data_flow_metrics (tenant_id, tier, promoted, archived, retrieved, ...)
+cortex_graph_expansion_tasks (id, tenant_id, task_type, status, discovered_links, ...)
+
+-- Episodic memory
+episodic_memories (id, tenant_id, user_id, content, importance, decay_rate, ...)
+memory_consolidation_jobs (id, tenant_id, job_type, status, ...)
+```
+
+### 21.5 Cato: Safety Pipeline & Governance
+
+Cato is RADIANT's safety and governance system - a Universal Method Protocol for composable AI orchestration with enterprise governance.
+
+#### 21.5.1 Immutable Safety Invariants
+
+**File**: `packages/shared/src/types/cato.types.ts`
+
+```typescript
+export const CATO_INVARIANTS = {
+  /** CBFs NEVER relax - shields stay UP */
+  CBF_ENFORCEMENT_MODE: 'ENFORCE' as const,
+
+  /** Gamma is NEVER boosted during recovery */
+  GAMMA_BOOST_ALLOWED: false,
+
+  /** Destructive actions require confirmation */
+  AUTO_MODIFY_DESTRUCTIVE: false,
+
+  /** Audit trail is append-only */
+  AUDIT_ALLOW_UPDATE: false,
+  AUDIT_ALLOW_DELETE: false,
+} as const;
+```
+
+#### 21.5.2 Safety Pipeline
+
+**File**: `lambda/shared/services/cato/safety-pipeline.service.ts`
+
+The safety pipeline runs in this order:
+
+| Step | Component | Purpose | Recoverable? |
+|------|-----------|---------|--------------|
+| 1 | **Sensory Veto** | Immediate halt signals | ❌ No |
+| 2 | **Precision Governor** | Limits confidence based on uncertainty | ✅ Yes |
+| 3 | **Redundant Perception** | PHI/PII detection | ✅ Yes |
+| 4 | **Control Barrier Functions** | Hard safety constraints | ✅ Yes |
+| 5 | **Semantic Entropy** | Deception detection | ✅ Yes |
+| 6 | **Fracture Detection** | Alignment verification | ✅ Yes |
+
+```typescript
+interface SafetyPipelineResult {
+  allowed: boolean;
+  blockedBy?: 'VETO' | 'GOVERNOR' | 'CBF' | 'ENTROPY' | 'FRACTURE' | 'EPISTEMIC_ESCALATION';
+  vetoResult?: VetoResult;
+  governorResult?: GovernorResult;
+  cbfResult?: CBFResult;
+  recoveryResult?: RecoveryResult;
+  retryWithContext?: ExecutionContext;
+  safeAlternative?: SafeAlternative;
+  recommendation: string;
+}
+```
+
+#### 21.5.3 Control Barrier Functions (CBF)
+
+**File**: `lambda/shared/services/cato/control-barrier.service.ts`
+
+Hard safety constraints that **NEVER** relax.
+
+```typescript
+interface ControlBarrierDefinition {
+  barrierId: string;
+  barrierType: 'phi_protection' | 'pii_protection' | 'cost_ceiling' | 
+               'authorization_check' | 'baa_verification' | 'rate_limit';
+  isCritical: boolean;
+  enforcementMode: 'ENFORCE'; // Always ENFORCE, never WARN_ONLY
+  thresholdConfig: ThresholdConfig;
+}
+
+async evaluateBarriers(params: {
+  currentState: SystemState;
+  proposedAction: ProposedAction;
+  context: ExecutionContext;
+}): Promise<CBFResult>
+```
+
+#### 21.5.4 Governance Presets
+
+User-friendly "leash length" abstraction.
+
+```typescript
+type GovernancePreset = 'paranoid' | 'balanced' | 'cowboy';
+```
+
+| Preset | Icon | Friction | Auto-Approve | Checkpoints |
+|--------|------|----------|--------------|-------------|
+| **PARANOID** | 🛡️ | 1.0 | 0.0 | All ALWAYS |
+| **BALANCED** | ⚖️ | 0.5 | 0.3 | CONDITIONAL |
+| **COWBOY** | 🚀 | 0.1 | 0.8 | NEVER/NOTIFY_ONLY |
+
+**Checkpoint Configuration (5 gates)**:
+
+| Checkpoint | When | PARANOID | BALANCED | COWBOY |
+|------------|------|----------|----------|--------|
+| **CP1** | After Observer | ALWAYS | NEVER | NEVER |
+| **CP2** | After Proposer | ALWAYS | CONDITIONAL | NEVER |
+| **CP3** | After Critics | ALWAYS | CONDITIONAL | NEVER |
+| **CP4** | Before Execution | ALWAYS | CONDITIONAL | CONDITIONAL |
+| **CP5** | After Execution | ALWAYS | NOTIFY_ONLY | NOTIFY_ONLY |
+
+```typescript
+type CheckpointMode = 'ALWAYS' | 'CONDITIONAL' | 'NEVER' | 'NOTIFY_ONLY';
+```
+
+#### 21.5.5 Pipeline Orchestrator
+
+**File**: `lambda/shared/services/cato-pipeline-orchestrator.service.ts`
+
+Orchestrates method pipeline execution.
+
+```typescript
+interface PipelineExecutionOptions {
+  tenantId: string;
+  request: Record<string, unknown>;
+  templateId?: string;
+  methodChain?: string[];
+  governancePreset?: 'COWBOY' | 'BALANCED' | 'PARANOID';
+  complianceFrameworks?: string[];
+}
+
+// Default method chain
+const defaultChain = ['method:observer:v1'];
+
+// Available methods
+const coreMethods = ['Observer', 'Proposer', 'Decider', 'Validator', 'Executor'];
+const criticMethods = ['Security', 'Efficiency', 'Factual', 'Compliance', 'Red Team'];
+```
+
+#### 21.5.6 Cato Database Tables
+
+```sql
+-- Tenant governance configuration
+cato_tenant_config (
+  tenant_id UUID PRIMARY KEY,
+  active_preset governance_preset_enum,
+  custom_checkpoints JSONB,
+  daily_budget_cents INTEGER,
+  compliance_frameworks TEXT[],
+  ...
+)
+
+-- CBF definitions
+cato_cbf_definitions (
+  id UUID PRIMARY KEY,
+  barrier_id TEXT,
+  barrier_type TEXT,
+  is_critical BOOLEAN,
+  enforcement_mode TEXT DEFAULT 'ENFORCE',
+  threshold_config JSONB,
+  ...
+)
+
+-- Pipeline executions
+cato_pipeline_executions (
+  id UUID PRIMARY KEY,
+  tenant_id UUID,
+  status cato_pipeline_status_enum,
+  method_chain TEXT[],
+  current_method TEXT,
+  ...
+)
+
+-- Method envelopes
+cato_pipeline_envelopes (
+  id UUID PRIMARY KEY,
+  pipeline_id UUID,
+  method_id TEXT,
+  input JSONB,
+  output JSONB,
+  ...
+)
+
+-- Checkpoint decisions
+cato_checkpoint_decisions (
+  id UUID PRIMARY KEY,
+  pipeline_id UUID,
+  checkpoint_type TEXT,
+  decision TEXT,
+  decided_by UUID,
+  ...
+)
+
+-- Merkle audit trail
+cato_merkle_entries (
+  id UUID PRIMARY KEY,
+  tenant_id UUID,
+  previous_hash TEXT,
+  current_hash TEXT,
+  action TEXT,
+  ...
+)
+```
+
+### 21.6 Integration Points
+
+#### 21.6.1 Brain → Cortex
+
+```typescript
+// In AGI Brain Planner
+const cortexInsights = await cortexIntelligenceService.getInsights(tenantId, prompt);
+if (cortexInsights.knowledgeDensity.knowledgeDepth !== 'none') {
+  plan.orchestrationMode = cortexInsights.knowledgeDensity.recommendedOrchestration.mode;
+  plan.qualityTargets.minConfidence += cortexInsights.knowledgeDensity.confidenceBoost;
+}
+```
+
+#### 21.6.2 Brain → Genesis
+
+```typescript
+// Check Genesis maturity before allowing capabilities
+const genesisState = await genesisService.getState(tenantId);
+if (genesisState.currentStage === 'EMBRYONIC') {
+  // Restrict to basic capabilities only
+  plan.allowedCapabilities = genesisState.capabilities;
+  plan.restrictions = genesisState.restrictions;
+}
+```
+
+#### 21.6.3 Brain → Cato
+
+```typescript
+// Run safety pipeline before execution
+const safetyResult = await catoSafetyPipeline.evaluateAction({
+  prompt,
+  proposedPolicy,
+  generatedResponse,
+  actorModel,
+  context: executionContext,
+});
+
+if (!safetyResult.allowed) {
+  plan.ethicsEvaluation = {
+    passed: false,
+    blockedBy: safetyResult.blockedBy,
+    recommendation: safetyResult.recommendation,
+  };
+  return plan; // Do not execute
+}
+```
+
+#### 21.6.4 Cato ↔ Cortex (Bridge)
+
+```typescript
+// Sync memories bidirectionally
+await catoCortexBridgeService.syncCatoMemoriesToCortex(tenantId);
+
+// Enrich context with Cortex knowledge
+const enrichment = await catoCortexBridgeService.getContextEnrichmentFromCortex(
+  tenantId,
+  query
+);
+
+// GDPR cascade
+await catoCortexBridgeService.cascadeGdprErasure(tenantId, userId);
+```
+
+### 21.7 Key Implementation Files Reference
+
+| System | File | Purpose |
+|--------|------|---------|
+| **Brain** | `lambda/shared/services/agi-brain-planner.service.ts` | Plan generation |
+| **Brain** | `lambda/shared/services/cognitive-brain.service.ts` | Cognitive mesh |
+| **Brain** | `lambda/shared/services/brain-config.service.ts` | Configuration |
+| **Genesis** | `lambda/shared/services/cato/genesis.service.ts` | Gate management |
+| **Cortex** | `lambda/shared/services/cortex-intelligence.service.ts` | Knowledge insights |
+| **Cortex** | `lambda/shared/services/cortex/tier-coordinator.service.ts` | Tier management |
+| **Cortex** | `lambda/shared/services/cortex/golden-rules.service.ts` | Verified overrides |
+| **Cortex** | `lambda/shared/services/cortex/graph-expansion.service.ts` | Twilight Dreaming |
+| **Cortex** | `lambda/shared/services/cato-cortex-bridge.service.ts` | System integration |
+| **Cato** | `lambda/shared/services/cato/safety-pipeline.service.ts` | Safety evaluation |
+| **Cato** | `lambda/shared/services/cato/control-barrier.service.ts` | CBF enforcement |
+| **Cato** | `lambda/shared/services/cato-pipeline-orchestrator.service.ts` | Pipeline execution |
+| **Cato** | `lambda/shared/services/governance-preset.service.ts` | Preset management |
+| **Types** | `packages/shared/src/types/cato.types.ts` | Cato types |
+| **Types** | `packages/shared/src/types/cortex-memory.types.ts` | Cortex types |
+| **Types** | `packages/shared/src/types/cortex-graph-rag.types.ts` | Graph-RAG types |
+
+### 21.8 Competitive Moats from Unified Architecture
+
+| Moat | Implementation | Why Competitors Can't Copy |
+|------|----------------|---------------------------|
+| **Knowledge Gravity** | Cortex three-tier architecture | Requires full architectural rebuild |
+| **Verified Intelligence** | Cato CBFs + Genesis gates | Safety-first design, not bolted on |
+| **Compounding Learning** | Brain + Twilight Dreaming | Months of production learning data |
+| **Enterprise Trust** | Merkle audit + GDPR cascade | Full compliance infrastructure |
+| **Zero-Cost Ego** | Brain + Ego Context injection | No SageMaker cost, just PostgreSQL |
+
+---
+
+## 22. Think Tank Application Architecture (v5.52.52)
+
+Think Tank is the consumer-facing AI assistant application built on the RADIANT platform. This section provides complete technical architecture documentation.
+
+### 22.1 System Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              THINK TANK                                      │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  ┌──────────────────────────────────────────────────────────────────────┐  │
+│  │                        FRONTEND (Next.js 14)                          │  │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌────────────┐  │  │
+│  │  │ Chat UI     │  │ Settings    │  │ Collaborate │  │ Dashboard  │  │  │
+│  │  │ Components  │  │ Pages       │  │ Features    │  │ Views      │  │  │
+│  │  └─────────────┘  └─────────────┘  └─────────────┘  └────────────┘  │  │
+│  │  ┌─────────────────────────────────────────────────────────────────┐ │  │
+│  │  │                    State Management (Zustand)                    │ │  │
+│  │  │  UIStore • ChatStore • SettingsStore • CollaborationStore       │ │  │
+│  │  └─────────────────────────────────────────────────────────────────┘ │  │
+│  │  ┌─────────────────────────────────────────────────────────────────┐ │  │
+│  │  │                    API Client Layer                              │ │  │
+│  │  │  ChatService • GrimoireService • TimeTravelService • ...        │ │  │
+│  │  └─────────────────────────────────────────────────────────────────┘ │  │
+│  └──────────────────────────────────────────────────────────────────────┘  │
+│                                    │                                        │
+│                                    ▼                                        │
+│  ┌──────────────────────────────────────────────────────────────────────┐  │
+│  │                      API GATEWAY (/api/v2/thinktank/*)               │  │
+│  └──────────────────────────────────────────────────────────────────────┘  │
+│                                    │                                        │
+│                                    ▼                                        │
+│  ┌──────────────────────────────────────────────────────────────────────┐  │
+│  │                      BACKEND (Lambda Handlers)                        │  │
+│  │  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐  │  │
+│  │  │ handler  │ │ conver-  │ │ grimoire │ │ time-    │ │ sentinel │  │  │
+│  │  │  .ts     │ │ sations  │ │   .ts    │ │ travel   │ │ -agents  │  │  │
+│  │  │ (Router) │ │   .ts    │ │          │ │   .ts    │ │   .ts    │  │  │
+│  │  └──────────┘ └──────────┘ └──────────┘ └──────────┘ └──────────┘  │  │
+│  │  + 36 more handlers                                                  │  │
+│  └──────────────────────────────────────────────────────────────────────┘  │
+│                                    │                                        │
+│                                    ▼                                        │
+│  ┌──────────────────────────────────────────────────────────────────────┐  │
+│  │                      SHARED SERVICES                                  │  │
+│  │  ┌────────────────┐ ┌────────────────┐ ┌────────────────┐           │  │
+│  │  │ AGI Brain      │ │ Time Travel    │ │ Grimoire       │           │  │
+│  │  │ Planner        │ │ Service        │ │ Service        │           │  │
+│  │  └────────────────┘ └────────────────┘ └────────────────┘           │  │
+│  │  ┌────────────────┐ ┌────────────────┐ ┌────────────────┐           │  │
+│  │  │ Sentinel       │ │ Economic       │ │ Council of     │           │  │
+│  │  │ Agent Service  │ │ Governor       │ │ Rivals         │           │  │
+│  │  └────────────────┘ └────────────────┘ └────────────────┘           │  │
+│  └──────────────────────────────────────────────────────────────────────┘  │
+│                                    │                                        │
+│                                    ▼                                        │
+│  ┌──────────────────────────────────────────────────────────────────────┐  │
+│  │                      AURORA POSTGRESQL (RLS)                          │  │
+│  │  thinktank_conversations • thinktank_messages • grimoire_spells      │  │
+│  │  timelines • sentinel_agents • user_contexts • flash_facts           │  │
+│  └──────────────────────────────────────────────────────────────────────┘  │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 22.2 Technology Stack
+
+| Layer | Technology | Version |
+|-------|------------|---------|
+| **Frontend Framework** | Next.js | 14.2.35 |
+| **UI Library** | React | 18.2.0 |
+| **State Management** | Zustand | 4.5.0 |
+| **Animation** | Framer Motion | 11.0.3 |
+| **Data Fetching** | React Query | 5.17.9 |
+| **Icons** | Lucide React | 0.309.0 |
+| **Notifications** | Sonner | 1.3.1 |
+| **UI Components** | Radix UI | Various |
+| **Styling** | Tailwind CSS | 3.4.1 |
+
+### 22.3 Frontend Structure
+
+**Location**: `apps/thinktank/`
+
+```
+apps/thinktank/
+├── app/                          # Next.js App Router
+│   ├── layout.tsx               # Root layout with providers
+│   ├── page.tsx                 # Home page
+│   ├── chat/                    # Chat routes
+│   │   └── [conversationId]/    # Dynamic conversation routes
+│   ├── settings/                # Settings pages
+│   ├── collaborate/             # Collaboration features
+│   └── profile/                 # User profile
+│
+├── components/                   # React components
+│   ├── chat/                    # Chat UI components
+│   │   ├── ModernChatInterface.tsx    # Main chat component
+│   │   ├── ChatMessage.tsx            # Message display
+│   │   ├── ChatInput.tsx              # Input with attachments
+│   │   ├── StreamingMessage.tsx       # SSE streaming
+│   │   ├── BrainPlanViewer.tsx        # AGI plan visualization
+│   │   └── ConversationSidebar.tsx    # Conversation list
+│   │
+│   ├── ui/                      # Base UI components
+│   │   ├── Button.tsx
+│   │   ├── Dialog.tsx
+│   │   ├── Card.tsx
+│   │   └── GlassPanel.tsx
+│   │
+│   └── features/                # Feature-specific components
+│       ├── TimeMachine/
+│       ├── Grimoire/
+│       ├── SentinelAgents/
+│       └── CouncilOfRivals/
+│
+├── lib/                         # Utilities and services
+│   ├── api/                     # API client modules
+│   │   ├── chat.ts             # Chat API
+│   │   ├── grimoire.ts         # Grimoire API
+│   │   ├── time-travel.ts      # Time Machine API
+│   │   └── sentinel.ts         # Sentinel Agents API
+│   │
+│   └── stores/                  # Zustand stores
+│       ├── ui-store.ts         # UI state
+│       └── chat-store.ts       # Chat state
+│
+└── package.json                 # Dependencies
+```
+
+### 22.4 Backend Handler Architecture
+
+**Location**: `packages/infrastructure/lambda/thinktank/`
+
+The main router (`handler.ts`) dispatches to 41 specialized handlers:
+
+```typescript
+// handler.ts - Main router
+export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+  const resource = extractResource(event.path); // e.g., "conversations", "grimoire"
+  
+  switch (resource) {
+    case 'conversations': return conversationsHandler(event);
+    case 'grimoire': return grimoireHandler(event);
+    case 'time-travel': return timeTravelHandler(event);
+    case 'sentinel-agents': return sentinelAgentsHandler(event);
+    case 'brain-plan': return brainPlanHandler(event);
+    case 'flash-facts': return flashFactsHandler(event);
+    case 'council-of-rivals': return councilOfRivalsHandler(event);
+    case 'economic-governor': return economicGovernorHandler(event);
+    // ... 33 more handlers
+  }
+};
+```
+
+#### Handler Inventory
+
+| Handler | File | Size | Functions |
+|---------|------|------|-----------|
+| **conversations** | `conversations.ts` | 15.2KB | CRUD, stats, search |
+| **grimoire** | `grimoire.ts` | 12.8KB | Spells, schools, casting |
+| **time-travel** | `time-travel.ts` | 14.1KB | Timelines, checkpoints, forks |
+| **sentinel-agents** | `sentinel-agents.ts` | 18.3KB | Agents, events, triggers |
+| **brain-plan** | `brain-plan.ts` | 8.9KB | Plan generation |
+| **user-context** | `user-context.ts` | 11.2KB | User memories, preferences |
+| **flash-facts** | `flash-facts.ts` | 7.4KB | Quick fact storage |
+| **council-of-rivals** | `council-of-rivals.ts` | 16.7KB | Multi-model deliberation |
+| **economic-governor** | `economic-governor.ts` | 13.5KB | Cost routing, arbitrage |
+| **derivation-history** | `derivation-history.ts` | 9.8KB | Execution traces |
+| **delight** | `delight.ts` | 10.1KB | Personality, achievements |
+| **collaboration** | `collaboration.ts` | 19.2KB | Sessions, real-time |
+| **domain-taxonomy** | `domain-taxonomy.ts` | 12.4KB | Domain detection |
+| **feedback** | `feedback.ts` | 6.3KB | User ratings, learning |
+| **media** | `media.ts` | 8.7KB | File attachments |
+
+### 22.5 API Endpoint Reference
+
+**Base Path**: `/api/v2/thinktank`
+
+#### Core Conversation API
+
+| Method | Path | Handler | Description |
+|--------|------|---------|-------------|
+| `GET` | `/conversations` | `listConversations` | List user conversations |
+| `POST` | `/conversations` | `createConversation` | Create new conversation |
+| `GET` | `/conversations/:id` | `getConversation` | Get conversation by ID |
+| `DELETE` | `/conversations/:id` | `deleteConversation` | Delete conversation |
+| `GET` | `/conversations/stats` | `getConversationStats` | Usage statistics |
+
+#### Message API
+
+| Method | Path | Handler | Description |
+|--------|------|---------|-------------|
+| `POST` | `/messages` | `sendMessage` | Send message (non-streaming) |
+| `POST` | `/messages/stream` | `streamMessage` | Send message (SSE streaming) |
+| `POST` | `/messages/:id/rate` | `rateMessage` | Rate response quality |
+| `POST` | `/messages/:id/regenerate` | `regenerateMessage` | Regenerate response |
+
+#### Time Travel API
+
+| Method | Path | Handler | Description |
+|--------|------|---------|-------------|
+| `GET` | `/time-travel/timelines` | `listTimelines` | List conversation timelines |
+| `POST` | `/time-travel/timelines` | `createTimeline` | Create new timeline |
+| `POST` | `/time-travel/fork` | `forkTimeline` | Fork from checkpoint |
+| `POST` | `/time-travel/checkpoint` | `createCheckpoint` | Create checkpoint |
+| `POST` | `/time-travel/replay` | `replayTimeline` | Replay timeline states |
+
+#### Grimoire API
+
+| Method | Path | Handler | Description |
+|--------|------|---------|-------------|
+| `GET` | `/grimoire/spells` | `listSpells` | List learned patterns |
+| `GET` | `/grimoire/spells/:id` | `getSpell` | Get spell details |
+| `POST` | `/grimoire/cast` | `castSpell` | Apply spell to context |
+| `GET` | `/grimoire/schools` | `listSchools` | List spell schools |
+| `POST` | `/grimoire/promote` | `promoteToSpell` | Promote pattern to spell |
+
+#### Sentinel Agents API
+
+| Method | Path | Handler | Description |
+|--------|------|---------|-------------|
+| `GET` | `/sentinel-agents` | `listAgents` | List active agents |
+| `POST` | `/sentinel-agents` | `createAgent` | Create new agent |
+| `PATCH` | `/sentinel-agents/:id` | `updateAgent` | Update agent config |
+| `DELETE` | `/sentinel-agents/:id` | `deleteAgent` | Remove agent |
+| `GET` | `/sentinel-agents/events` | `getAllEvents` | View triggered events |
+| `GET` | `/sentinel-agents/stats` | `getStats` | Agent statistics |
+
+#### Economic Governor API
+
+| Method | Path | Handler | Description |
+|--------|------|---------|-------------|
+| `GET` | `/economic-governor/config` | `getConfig` | Get routing config |
+| `PUT` | `/economic-governor/config` | `updateConfig` | Update config |
+| `GET` | `/economic-governor/usage` | `getUsage` | Usage statistics |
+| `POST` | `/economic-governor/estimate` | `estimateCost` | Estimate query cost |
+| `GET` | `/economic-governor/arbitrage` | `getArbitrageRules` | List routing rules |
+
+### 22.6 Key TypeScript Interfaces
+
+```typescript
+// ChatMessage - Core message structure
+interface ChatMessage {
+  id: string;
+  conversationId: string;
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+  createdAt: Date;
+  metadata?: {
+    model?: string;
+    tokensUsed?: number;
+    latencyMs?: number;
+    cost?: number;
+    orchestrationMode?: OrchestrationMode;
+    domainDetection?: DomainDetection;
+    brainPlanId?: string;
+  };
+}
+
+// Conversation - Conversation container
+interface Conversation {
+  id: string;
+  tenantId: string;
+  userId: string;
+  title: string;
+  status: 'active' | 'archived' | 'deleted';
+  messageCount: number;
+  totalTokens: number;
+  totalCost: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Timeline - Time Machine branch
+interface Timeline {
+  id: string;
+  conversationId: string;
+  parentTimelineId?: string;
+  name: string;
+  checkpointCount: number;
+  status: 'active' | 'merged' | 'abandoned';
+  forkPoint?: {
+    checkpointId: string;
+    messageIndex: number;
+  };
+  createdAt: Date;
+}
+
+// Spell - Grimoire pattern
+interface Spell {
+  id: string;
+  name: string;
+  description: string;
+  school: SpellSchool;
+  category: SpellCategory;
+  power: number; // 1-5
+  successRate: number;
+  timesUsed: number;
+  pattern: {
+    trigger: string;
+    transformation: string;
+    validation?: string;
+  };
+  status: 'active' | 'deprecated' | 'testing';
+}
+
+// SentinelAgent - Background monitor
+interface SentinelAgent {
+  id: string;
+  name: string;
+  type: 'monitor' | 'guardian' | 'optimizer' | 'auditor';
+  triggerConditions: TriggerCondition[];
+  actions: AgentAction[];
+  enabled: boolean;
+  lastFired?: Date;
+  fireCount: number;
+}
+
+// BrainPlan - AGI execution plan
+interface BrainPlan {
+  id: string;
+  prompt: string;
+  orchestrationMode: OrchestrationMode;
+  domainDetection: DomainDetection;
+  modelSelection: {
+    model: string;
+    reason: string;
+    alternatives: string[];
+  };
+  steps: PlanStep[];
+  estimatedCost: number;
+  estimatedLatencyMs: number;
+  qualityTargets: QualityTargets;
+}
+```
+
+### 22.7 Database Schema
+
+**Core Tables** (Migration 042):
+
+```sql
+-- thinktank_conversations
+CREATE TABLE thinktank_conversations (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL REFERENCES tenants(id),
+  user_id UUID NOT NULL REFERENCES users(id),
+  title TEXT,
+  status conversation_status DEFAULT 'active',
+  message_count INTEGER DEFAULT 0,
+  total_tokens INTEGER DEFAULT 0,
+  total_cost DECIMAL(10,4) DEFAULT 0,
+  metadata JSONB DEFAULT '{}',
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- thinktank_messages
+CREATE TABLE thinktank_messages (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  conversation_id UUID NOT NULL REFERENCES thinktank_conversations(id),
+  role message_role NOT NULL,
+  content TEXT NOT NULL,
+  model TEXT,
+  tokens_used INTEGER,
+  latency_ms INTEGER,
+  cost DECIMAL(10,6),
+  metadata JSONB DEFAULT '{}',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Row Level Security
+ALTER TABLE thinktank_conversations ENABLE ROW LEVEL SECURITY;
+CREATE POLICY tenant_isolation ON thinktank_conversations
+  USING (tenant_id = current_setting('app.current_tenant_id')::UUID);
+```
+
+**Additional Tables**:
+
+| Table | Purpose | Key Columns |
+|-------|---------|-------------|
+| `time_travel_timelines` | Time Machine branches | `conversation_id`, `user_id`, `name`, `status` |
+| `time_travel_checkpoints` | Saved states | `timeline_id`, `sequence`, `state`, `type` |
+| `time_travel_forks` | Fork records | `source_timeline_id`, `forked_timeline_id`, `checkpoint_id` |
+| `grimoire_spells` | Learned patterns | `school`, `category`, `power_level`, `incantation` |
+| `grimoire_casts` | Cast history | `spell_id`, `user_id`, `components`, `success` |
+| `sentinel_agents` | Background monitors | `type`, `watch_domain`, `conditions`, `actions` |
+| `sentinel_events` | Triggered events | `agent_id`, `trigger_type`, `payload`, `status` |
+| `flash_facts` | Quick facts | `user_id`, `fact_key`, `category`, `confidence` |
+| `economic_governor_config` | Cost settings | `mode`, `budget_limit`, `model_tiers`, `arbitrage_rules` |
+| `economic_governor_usage` | Usage tracking | `model_id`, `tokens`, `cost`, `period` |
+| `council_of_rivals` | Multi-model councils | `name`, `members`, `voting_strategy` |
+| `council_debates` | Debate sessions | `council_id`, `topic`, `votes`, `final_decision` |
+
+### 22.8 State Management
+
+Think Tank uses Zustand for client-side state management with persistence.
+
+```typescript
+// ui-store.ts
+interface UIState {
+  sidebarOpen: boolean;
+  advancedMode: boolean;
+  focusMode: boolean;
+  soundEnabled: boolean;
+  
+  // Actions
+  toggleSidebar: () => void;
+  toggleAdvancedMode: () => void;
+  toggleFocusMode: () => void;
+  toggleSound: () => void;
+}
+
+export const useUIStore = create<UIState>()(
+  persist(
+    (set) => ({
+      sidebarOpen: true,
+      advancedMode: false,
+      focusMode: false,
+      soundEnabled: true,
+      
+      toggleSidebar: () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),
+      toggleAdvancedMode: () => set((s) => ({ advancedMode: !s.advancedMode })),
+      toggleFocusMode: () => set((s) => ({ focusMode: !s.focusMode })),
+      toggleSound: () => set((s) => ({ soundEnabled: !s.soundEnabled })),
+    }),
+    {
+      name: 'thinktank-ui',
+      partialize: (state) => ({ 
+        advancedMode: state.advancedMode,
+        soundEnabled: state.soundEnabled 
+      }),
+    }
+  )
+);
+```
+
+### 22.9 Streaming Architecture
+
+Think Tank uses Server-Sent Events (SSE) for real-time message streaming:
+
+```typescript
+// Frontend - ChatService.streamMessage()
+async *streamMessage(conversationId: string, content: string): AsyncGenerator<StreamChunk> {
+  const response = await fetch(`${API_BASE}/messages/stream`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ conversationId, content }),
+  });
+  
+  const reader = response.body?.getReader();
+  const decoder = new TextDecoder();
+  
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    
+    const chunk = decoder.decode(value);
+    const lines = chunk.split('\n').filter(line => line.startsWith('data: '));
+    
+    for (const line of lines) {
+      const data = JSON.parse(line.slice(6));
+      yield data as StreamChunk;
+    }
+  }
+}
+
+// StreamChunk types
+interface StreamChunk {
+  type: 'token' | 'metadata' | 'complete' | 'error';
+  content?: string;
+  metadata?: MessageMetadata;
+  error?: string;
+}
+```
+
+### 22.10 Feature Implementation Files
+
+| Feature | Frontend | Backend | Service |
+|---------|----------|---------|---------|
+| **Chat** | `components/chat/ModernChatInterface.tsx` | `lambda/thinktank/messages.ts` | - |
+| **Time Machine** | `components/features/TimeMachine/` | `lambda/thinktank/time-travel.ts` | `services/time-travel.service.ts` |
+| **Grimoire** | `components/features/Grimoire/` | `lambda/thinktank/grimoire.ts` | `services/grimoire.service.ts` |
+| **Sentinels** | `components/features/SentinelAgents/` | `lambda/thinktank/sentinel-agents.ts` | `services/sentinel-agent.service.ts` |
+| **Flash Facts** | `lib/api/flash-facts.ts` | `lambda/thinktank/flash-facts.ts` | `services/flash-facts.service.ts` |
+| **Economic Governor** | `lib/api/economic-governor.ts` | `lambda/thinktank/economic-governor.ts` | `services/economic-governor.service.ts` |
+| **Council of Rivals** | `components/features/CouncilOfRivals/` | `lambda/thinktank/council-of-rivals.ts` | `services/deliberation.service.ts` |
+| **Brain Plans** | `components/chat/BrainPlanViewer.tsx` | `lambda/thinktank/brain-plan.ts` | `services/agi-brain-planner.service.ts` |
 
 ---
 

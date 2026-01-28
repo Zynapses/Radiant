@@ -34,14 +34,6 @@ interface WebVitals {
   INP?: number;  // Interaction to Next Paint
 }
 
-interface APIMetrics {
-  endpoint: string;
-  method: string;
-  duration: number;
-  status: number;
-  size?: number;
-}
-
 // ============================================================================
 // PERFORMANCE COLLECTOR
 // ============================================================================

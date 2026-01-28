@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useMemo, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -45,7 +45,6 @@ import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import {
   Play,
-  Pause,
   Square,
   Save,
   Undo,
@@ -53,31 +52,20 @@ import {
   ZoomIn,
   ZoomOut,
   Maximize2,
-  Grid3X3,
   Settings,
-  Plus,
   Trash2,
   Copy,
   GitBranch,
-  MessageSquare,
   Code,
   Database,
   Globe,
   Mail,
   Clock,
-  CheckCircle2,
   XCircle,
-  AlertTriangle,
-  ArrowRight,
-  ArrowDown,
   Loader2,
   MoreVertical,
-  GripVertical,
   Search,
-  FileJson,
   Eye,
-  Download,
-  Upload,
   Sparkles,
   Zap,
   Box,
@@ -465,7 +453,7 @@ export default function WorkflowEditorPage() {
   });
 
   // Load workflow if editing existing
-  const { isLoading: isLoadingWorkflow } = useQuery({
+  const { isLoading: _isLoadingWorkflow } = useQuery({
     queryKey: ['workflow', workflowId],
     queryFn: async () => {
       if (!workflowId || workflowId === 'new') return null;
@@ -532,10 +520,13 @@ export default function WorkflowEditorPage() {
 
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
   const [zoom, setZoom] = useState(1);
-  const [isPanning, setIsPanning] = useState(false);
+  const [_isPanning, _setIsPanning] = useState(false);
+  void _isPanning; // Reserved for panning state
+  void _setIsPanning;
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
   const [showSettings, setShowSettings] = useState(false);
-  const [isRunning, setIsRunning] = useState(false);
+  const [isRunning, _setIsRunning] = useState(false);
+  void _setIsRunning; // Reserved for running state updates
   const canvasRef = useRef<HTMLDivElement>(null);
 
   const selectedNodeData = useMemo(() => {

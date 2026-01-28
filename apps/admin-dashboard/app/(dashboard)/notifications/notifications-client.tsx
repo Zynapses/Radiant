@@ -14,7 +14,7 @@ import {
   CheckCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { apiClient } from '@/lib/api';
@@ -34,7 +34,7 @@ export function NotificationsClient() {
   const [activeTab, setActiveTab] = useState('all');
   const queryClient = useQueryClient();
 
-  const { data: notifications, isLoading } = useQuery({
+  const { data: notifications, isLoading: _isLoading } = useQuery({
     queryKey: ['notifications'],
     queryFn: async (): Promise<Notification[]> => {
       return apiClient.get<Notification[]>('/admin/notifications');

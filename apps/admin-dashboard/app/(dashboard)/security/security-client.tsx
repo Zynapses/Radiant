@@ -2,12 +2,11 @@
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Select,
@@ -33,7 +32,6 @@ import {
 } from '@/components/ui/dialog';
 import {
   AlertTriangle,
-  Shield,
   ShieldAlert,
   ShieldCheck,
   Search,
@@ -46,16 +44,8 @@ import {
   Globe,
   Activity,
   Eye,
-  ChevronRight,
-  FileText,
-  Lock,
-  Unlock,
   AlertCircle,
-  TrendingUp,
-  TrendingDown,
-  ExternalLink,
   Copy,
-  MoreHorizontal,
 } from 'lucide-react';
 import { formatDistanceToNow, format } from 'date-fns';
 import { cn } from '@/lib/utils';

@@ -9,7 +9,7 @@ import { Progress } from '@/components/ui/progress';
 import { 
   Brain, Zap, Database, Target, GitBranch, 
   TrendingUp, AlertTriangle, CheckCircle, Clock,
-  RefreshCw, Play, Pause, Settings
+  RefreshCw, Play, Settings
 } from 'lucide-react';
 
 interface CacheMetrics {

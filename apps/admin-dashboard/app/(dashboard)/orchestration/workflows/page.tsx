@@ -16,22 +16,12 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import {
   Search,
   Plus,
   Play,
-  Pause,
   Settings2,
   Workflow,
   Clock,
-  CheckCircle,
-  XCircle,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 

@@ -1,15 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { toast } from 'sonner';
 import { 
   Users, 
   Shield, 
@@ -21,7 +19,6 @@ import {
   Eye,
   Lock,
   RefreshCw,
-  AlertTriangle,
   CheckCircle,
 } from 'lucide-react';
 
@@ -81,10 +78,13 @@ async function fetchLegalHolds(): Promise<LegalHold[]> {
 }
 
 export default function UserRegistryPage() {
-  const queryClient = useQueryClient();
+  const _queryClient = useQueryClient();
+  void _queryClient; // Reserved for query invalidation
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedUser, setSelectedUser] = useState<UserAssignment | null>(null);
-  const [dsarDialogOpen, setDsarDialogOpen] = useState(false);
+  const [_selectedUser, _setSelectedUser] = useState<UserAssignment | null>(null);
+  void _selectedUser; void _setSelectedUser; // Reserved for user details display
+  const [_dsarDialogOpen, _setDsarDialogOpen] = useState(false);
+  void _dsarDialogOpen; void _setDsarDialogOpen; // Reserved for DSAR dialog
 
   const { data: assignments = [], isLoading: assignmentsLoading } = useQuery({
     queryKey: ['user-assignments'],

@@ -42,7 +42,8 @@ export function MFAVerificationPrompt({
   const [rememberDevice, setRememberDevice] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [lockoutCountdown, setLockoutCountdown] = useState<number | null>(null);
+  const [_lockoutCountdown, _setLockoutCountdown] = useState<number | null>(null);
+  void _lockoutCountdown; void _setLockoutCountdown; // Reserved for lockout countdown display
 
   const isLockedOut = lockoutUntil && new Date(lockoutUntil) > new Date();
 

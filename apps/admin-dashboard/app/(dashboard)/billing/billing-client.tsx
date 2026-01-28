@@ -1,23 +1,18 @@
 'use client';
 
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { 
-  CreditCard, 
   DollarSign, 
-  Users, 
   TrendingUp,
   Package,
   Zap,
-  ArrowUpRight,
-  ArrowDownRight,
   RefreshCw
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import { 
   Table, 
   TableBody, 
@@ -67,7 +62,7 @@ export function BillingClient() {
   const [activeTab, setActiveTab] = useState('overview');
   const queryClient = useQueryClient();
 
-  const { data: tiers, isLoading: tiersLoading } = useQuery<SubscriptionTier[]>({
+  const { data: tiers, isLoading: _tiersLoading } = useQuery<SubscriptionTier[]>({
     queryKey: ['billing', 'tiers'],
     queryFn: async () => {
       const res = await apiClient.get<{ tiers: SubscriptionTier[] }>('/billing/tiers');

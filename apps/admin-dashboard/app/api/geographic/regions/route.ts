@@ -6,7 +6,8 @@ import { geographicApi } from '@/lib/api/endpoints';
 export const GET = withAuth(async (request: AuthenticatedRequest) => {
   try {
     const { searchParams } = new URL(request.url);
-    const period = searchParams.get('period') || '30d';
+    const _period = searchParams.get('period') || '30d';
+    void _period; // Reserved for period filtering
 
     const regions = await geographicApi.getRegions();
 

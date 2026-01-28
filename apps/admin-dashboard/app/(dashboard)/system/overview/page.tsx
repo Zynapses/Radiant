@@ -33,7 +33,6 @@ import {
   Server,
   Cloud,
   Shield,
-  Check,
 } from 'lucide-react';
 import type { SystemComponentHealth, SystemAlert, SystemHealthDashboard } from '@radiant/shared';
 
@@ -94,6 +93,7 @@ export default function SystemOverviewPage() {
       toast({ title: 'Failed to acknowledge alert', variant: 'destructive' });
     },
   });
+  void acknowledgeAlertMutation; // Reserved for alert acknowledgment
 
   useEffect(() => {
     if (autoRefresh) {

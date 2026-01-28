@@ -17,11 +17,8 @@ import {
   AlertTriangle, 
   Shield,
   Lock,
-  Key,
   RefreshCw,
   Save,
-  Clock,
-  FileText,
 } from 'lucide-react';
 
 interface EthicsFreeConfig {

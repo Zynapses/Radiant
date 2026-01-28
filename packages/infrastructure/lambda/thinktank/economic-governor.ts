@@ -395,7 +395,7 @@ export async function addRule(event: APIGatewayProxyEvent): Promise<APIGatewayPr
       return jsonResponse(400, { error: 'name, condition, and action are required' });
     }
 
-    const rule = await (economicGovernorService as any).addArbitrageRule(tenantId, {
+    const rule = await economicGovernorService.addArbitrageRule(tenantId, {
       name,
       condition,
       action,
@@ -422,7 +422,7 @@ export async function updateRule(event: APIGatewayProxyEvent): Promise<APIGatewa
     if (!ruleId) return jsonResponse(400, { error: 'Rule ID required' });
 
     const body = JSON.parse(event.body || '{}');
-    await (economicGovernorService as any).updateArbitrageRule(tenantId, ruleId, body);
+    await economicGovernorService.updateArbitrageRule(tenantId, ruleId, body);
 
     return jsonResponse(200, { success: true });
   } catch (error) {
@@ -442,7 +442,7 @@ export async function deleteRule(event: APIGatewayProxyEvent): Promise<APIGatewa
     if (!tenantId) return jsonResponse(401, { error: 'Unauthorized' });
     if (!ruleId) return jsonResponse(400, { error: 'Rule ID required' });
 
-    await (economicGovernorService as any).deleteArbitrageRule(tenantId, ruleId);
+    await economicGovernorService.deleteArbitrageRule(tenantId, ruleId);
 
     return jsonResponse(200, { success: true });
   } catch (error) {

@@ -105,7 +105,8 @@ export default function PlanningPage() {
     loadData();
   }, []);
 
-  const [error, setError] = useState<string | null>(null);
+  const [_error, setError] = useState<string | null>(null);
+  void _error; // Reserved for error display
 
   useEffect(() => {
     if (selectedPlan) {

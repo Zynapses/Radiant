@@ -471,6 +471,137 @@ class GrimoireService {
   }
 
   // --------------------------------------------------------------------------
+  // Query & Search
+  // --------------------------------------------------------------------------
+
+  async querySpells(
+    tenantId: string,
+    options: { search?: string; category?: SpellCategory; school?: SpellSchool; status?: SpellStatus; limit?: number; offset?: number } = {}
+  ): Promise<{ spells: Spell[]; total: number }> {
+    try {
+      let sql = `SELECT * FROM grimoire_spells WHERE tenant_id = :tenantId`;
+      let countSql = `SELECT COUNT(*) as total FROM grimoire_spells WHERE tenant_id = :tenantId`;
+      const params = [stringParam('tenantId', tenantId)];
+
+      if (options.search) {
+        sql += ` AND (name ILIKE :search OR description ILIKE :search OR incantation ILIKE :search)`;
+        countSql += ` AND (name ILIKE :search OR description ILIKE :search OR incantation ILIKE :search)`;
+        params.push(stringParam('search', `%${options.search}%`));
+      }
+      if (options.category) {
+        sql += ` AND category = :category`;
+        countSql += ` AND category = :category`;
+        params.push(stringParam('category', options.category));
+      }
+      if (options.school) {
+        sql += ` AND school = :school`;
+        countSql += ` AND school = :school`;
+        params.push(stringParam('school', options.school));
+      }
+      if (options.status) {
+        sql += ` AND status = :status`;
+        countSql += ` AND status = :status`;
+        params.push(stringParam('status', options.status));
+      }
+
+      sql += ` ORDER BY cast_count DESC, updated_at DESC`;
+      const limitParams = [...params];
+      if (options.limit) {
+        sql += ` LIMIT :limit`;
+        limitParams.push(longParam('limit', options.limit));
+      }
+      if (options.offset) {
+        sql += ` OFFSET :offset`;
+        limitParams.push(longParam('offset', options.offset));
+      }
+
+      const [result, countResult] = await Promise.all([
+        executeStatement(sql, limitParams),
+        executeStatement(countSql, params),
+      ]);
+
+      const spells = (result.rows || []).map(row => this.parseSpell(row as Record<string, unknown>));
+      const total = Number((countResult.rows?.[0] as Record<string, unknown>)?.total) || 0;
+
+      return { spells, total };
+    } catch (error) {
+      logger.error('Failed to query spells', { tenantId, error });
+      throw error;
+    }
+  }
+
+  async findSpellByPattern(tenantId: string, pattern: string): Promise<Spell | null> {
+    try {
+      const result = await executeStatement(
+        `SELECT * FROM grimoire_spells 
+         WHERE tenant_id = :tenantId 
+         AND (incantation ILIKE :pattern OR name ILIKE :pattern)
+         ORDER BY cast_count DESC
+         LIMIT 1`,
+        [stringParam('tenantId', tenantId), stringParam('pattern', `%${pattern}%`)]
+      );
+
+      if (result.rows && result.rows.length > 0) {
+        return this.parseSpell(result.rows[0] as Record<string, unknown>);
+      }
+      return null;
+    } catch (error) {
+      logger.error('Failed to find spell by pattern', { tenantId, pattern, error });
+      throw error;
+    }
+  }
+
+  async getGrimoire(tenantId: string, userId?: string): Promise<{
+    spells: Spell[];
+    schoolMastery: Record<SpellSchool, number>;
+    totalCasts: number;
+    favoriteSchool: SpellSchool;
+  }> {
+    try {
+      let sql = `SELECT * FROM grimoire_spells WHERE tenant_id = :tenantId`;
+      const params = [stringParam('tenantId', tenantId)];
+
+      if (userId) {
+        sql += ` AND created_by = :userId`;
+        params.push(stringParam('userId', userId));
+      }
+
+      sql += ` ORDER BY cast_count DESC`;
+      const result = await executeStatement(sql, params);
+      const spells = (result.rows || []).map(row => this.parseSpell(row as Record<string, unknown>));
+
+      const schoolMastery: Record<SpellSchool, number> = {
+        code: 0, data: 0, text: 0, analysis: 0,
+        design: 0, integration: 0, automation: 0, universal: 0,
+      };
+      let totalCasts = 0;
+
+      for (const spell of spells) {
+        schoolMastery[spell.school] += spell.castCount;
+        totalCasts += spell.castCount;
+      }
+
+      const favoriteSchool = (Object.entries(schoolMastery).sort((a, b) => b[1] - a[1])[0]?.[0] || 'universal') as SpellSchool;
+
+      return { spells, schoolMastery, totalCasts, favoriteSchool };
+    } catch (error) {
+      logger.error('Failed to get grimoire', { tenantId, userId, error });
+      throw error;
+    }
+  }
+
+  async promoteToSpell(
+    tenantId: string,
+    userId: string,
+    spellData: Omit<Spell, 'id' | 'tenantId' | 'successRate' | 'castCount' | 'createdAt' | 'updatedAt' | 'createdBy'>
+  ): Promise<Spell> {
+    return this.createSpell(tenantId, {
+      ...spellData,
+      createdBy: userId,
+    });
+  }
+
+  // --------------------------------------------------------------------------
   // Reflexion Learning
   // --------------------------------------------------------------------------
 

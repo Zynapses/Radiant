@@ -5,7 +5,8 @@ import { withAuth, apiError, type AuthenticatedRequest } from '@/lib/api/auth-wr
 export const GET = withAuth(async (request: AuthenticatedRequest) => {
   try {
     const { searchParams } = new URL(request.url);
-    const product = searchParams.get('product') || 'combined';
+    const _product = searchParams.get('product') || 'combined';
+    void _product; // Reserved for product filtering
 
     const scores = [
       {

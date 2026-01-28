@@ -44,11 +44,11 @@ export async function listAgents(event: APIGatewayProxyEvent): Promise<APIGatewa
 
     const params = event.queryStringParameters || {};
     const { agents, total } = await sentinelAgentService.listAgents(tenantId, {
-      type: params.type as any,
+      type: params.type as 'monitor' | 'guardian' | 'scout' | 'herald' | 'arbiter' | undefined,
       enabled: params.enabled === 'true' ? true : params.enabled === 'false' ? false : undefined,
       limit: parseInt(params.limit || '50', 10),
       offset: parseInt(params.offset || '0', 10),
-    } as any);
+    });
 
     // Add visualization data for watchtower UI
     const towers = agents.map(agent => ({
@@ -319,9 +319,8 @@ export async function getAllEvents(event: APIGatewayProxyEvent): Promise<APIGate
     if (!tenantId) return jsonResponse(401, { error: 'Unauthorized' });
 
     const params = event.queryStringParameters || {};
-    const events = await (sentinelAgentService as any).getAllEvents(tenantId, {
+    const events = await sentinelAgentService.getAllEvents(tenantId, {
       limit: parseInt(params.limit || '100', 10),
-      // // status: params.status, // Not in type // Removed: not in type
     });
 
     return jsonResponse(200, {
@@ -348,7 +347,7 @@ export async function getStats(event: APIGatewayProxyEvent): Promise<APIGatewayP
     const tenantId = getTenantId(event);
     if (!tenantId) return jsonResponse(401, { error: 'Unauthorized' });
 
-    const stats = await (sentinelAgentService as any).getStats(tenantId);
+    const stats = await sentinelAgentService.getStats(tenantId);
 
     return jsonResponse(200, {
       success: true,

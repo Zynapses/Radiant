@@ -23,16 +23,12 @@ import {
 import {
   AlertTriangle,
   TrendingUp,
-  TrendingDown,
-  Minus,
   RefreshCw,
   Flag,
   Eye,
   Shield,
   BarChart3,
   FileWarning,
-  Search,
-  Filter,
   Download,
 } from 'lucide-react';
 
@@ -46,17 +42,6 @@ interface ProviderRejectionSummary {
   rejectedToUser: number;
   fallbackSuccessRate: number;
   rejectionTypes: string[];
-  lastRejection: string;
-}
-
-interface ModelRejectionSummary {
-  modelId: string;
-  providerId: string;
-  totalRejections: number;
-  uniquePrompts: number;
-  rejectedToUser: number;
-  rejectionTypes: string[];
-  modesAffected: string[];
   lastRejection: string;
 }
 

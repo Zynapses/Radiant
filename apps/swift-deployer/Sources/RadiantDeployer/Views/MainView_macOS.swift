@@ -590,49 +590,56 @@ struct DetailContentView: View {
     @EnvironmentObject var appState: AppState
     
     var body: some View {
-        Group {
-            switch appState.selectedTab {
-            case .dashboard:
-                DashboardView()
-            case .apps:
-                AppsView()
-            case .deploy:
-                DeployView()
-            case .instances:
-                InstancesView()
-            case .snapshots:
-                SnapshotsView()
-            case .packages:
-                PackagesView()
-            case .history:
-                HistoryView()
-            case .providers:
-                ProvidersView()
-            case .models:
-                ModelsView()
-            case .selfHosted:
-                SelfHostedModelsView()
-            case .domains:
-                DomainSetupView()
-            case .email:
-                EmailSetupView()
-            case .multiRegion:
-                MultiRegionView()
-            case .abTesting:
-                ABTestingView()
-            case .security:
-                SecurityView()
-            case .compliance:
-                ComplianceView()
-            case .costs:
-                CostsView()
-            case .monitoring:
-                AWSMonitoringView()
-            case .settings:
-                SettingsView()
-            }
+        contentView
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+    
+    @ViewBuilder
+    private var contentView: some View {
+        switch appState.selectedTab {
+        case .dashboard:
+            DashboardView()
+        case .apps:
+            AppsView()
+        case .deploy:
+            DeployView()
+        case .instances:
+            InstancesView()
+        case .snapshots:
+            SnapshotsView()
+        case .packages:
+            PackagesView()
+        case .history:
+            HistoryView()
+        case .providers:
+            ProvidersView()
+        case .models:
+            ModelsView()
+        case .selfHosted:
+            SelfHostedModelsView()
+        case .domainUrls:
+            DomainSetupView()
+        case .email:
+            EmailSetupView()
+        case .curator:
+            CuratorConfigView()
+        case .multiRegion:
+            MultiRegionView()
+        case .abTesting:
+            ABTestingView()
+        case .cortex:
+            CortexMemoryView()
+        case .security:
+            SecurityView()
+        case .compliance:
+            ComplianceView()
+        case .costs:
+            CostsView()
+        case .monitoring:
+            AWSMonitoringView()
+        case .settings:
+            SettingsView()
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 

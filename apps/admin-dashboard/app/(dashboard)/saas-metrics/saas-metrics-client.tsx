@@ -32,7 +32,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
@@ -40,7 +39,6 @@ import {
   Line,
   BarChart,
   Bar,
-  AreaChart,
   Area,
   PieChart,
   Pie,
@@ -59,7 +57,6 @@ import {
   TrendingDown,
   Users,
   CreditCard,
-  Activity,
   Download,
   RefreshCw,
   Loader2,
@@ -76,8 +73,6 @@ import {
   Zap,
   Server,
   Cloud,
-  Clock,
-  CheckCircle,
   AlertTriangle,
 } from 'lucide-react';
 
@@ -847,7 +842,7 @@ export function SaaSMetricsClient() {
                       cy="50%"
                       outerRadius={100}
                       innerRadius={60}
-                      label={({ category, percentage }) => `${percentage.toFixed(0)}%`}
+                      label={({ percentage }) => `${percentage.toFixed(0)}%`}
                     >
                       {metrics.costByCategory.map((entry, index) => (
                         <Cell key={entry.category} fill={PIE_COLORS[index % PIE_COLORS.length]} />

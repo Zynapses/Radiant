@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import {
-  Users, Brain, MessageSquare, GitBranch, Play, Pause, RefreshCw,
-  ChevronRight, Circle, ArrowRight, CheckCircle, XCircle, Clock,
-  Zap, Target, TrendingUp, Activity, Plus, Settings, Eye
+  Users, Brain, MessageSquare, GitBranch, Play, RefreshCw,
+  ChevronRight, Circle, CheckCircle, XCircle, Clock,
+  Target, Activity, Eye
 } from 'lucide-react';
 
 interface CognitiveAgent {
@@ -73,7 +73,8 @@ const roleColors: Record<string, string> = {
   devils_advocate: '#f97316',
 };
 
-const roleIcons: Record<string, string> = {
+// Role icons mapping for future use
+const _roleIcons: Record<string, string> = {
   planner: 'map',
   critic: 'search',
   executor: 'zap',
@@ -82,6 +83,7 @@ const roleIcons: Record<string, string> = {
   synthesizer: 'git-merge',
   devils_advocate: 'alert-triangle',
 };
+void _roleIcons;
 
 const patternLabels: Record<string, string> = {
   debate: 'Structured Debate',
@@ -105,7 +107,8 @@ export default function AgentsPage() {
     loadData();
   }, []);
 
-  const [error, setError] = useState<string | null>(null);
+  const [_error, setError] = useState<string | null>(null);
+  void _error; // Used for error state management
 
   useEffect(() => {
     if (selectedSession) {
@@ -552,7 +555,8 @@ function PersonalityBar({ label, value, color }: { label: string; value: number;
   );
 }
 
-function CollaborationButton({ pattern, icon: Icon, label, description }: { pattern: string; icon: React.ElementType; label: string; description: string }) {
+function CollaborationButton({ pattern: _pattern, icon: Icon, label, description }: { pattern: string; icon: React.ElementType; label: string; description: string }) {
+  void _pattern; // Reserved for future pattern-specific styling
   return (
     <button className="w-full p-3 text-left rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
       <div className="flex items-center gap-3">

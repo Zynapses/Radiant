@@ -72,7 +72,7 @@ const statusConfig = {
 };
 
 export function ThinkTankHealthCard() {
-  const { data: status, isLoading, refetch } = useQuery<ThinkTankStatus>({
+  const { data: status, isLoading, refetch: _refetch } = useQuery<ThinkTankStatus>({
     queryKey: ['thinktank', 'status'],
     queryFn: () => fetch('/api/admin/thinktank/status').then(r => r.json()),
     refetchInterval: 30000,

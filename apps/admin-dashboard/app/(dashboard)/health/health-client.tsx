@@ -28,15 +28,12 @@ import {
   HardDrive,
   Clock,
   TrendingUp,
-  TrendingDown,
   BarChart3,
   Cpu,
   MemoryStick,
   Network,
-  History,
   AlertCircle,
   ChevronRight,
-  ExternalLink,
 } from 'lucide-react';
 import { formatDistanceToNow, format, subHours } from 'date-fns';
 import { SectionErrorBoundary } from '@/components/common/error-boundaries';

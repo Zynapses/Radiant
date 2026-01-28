@@ -6,26 +6,17 @@ import { motion } from 'framer-motion';
 import {
   Activity,
   AlertTriangle,
-  ArrowUpDown,
   CheckCircle,
   Clock,
-  Cloud,
-  Cpu,
-  Globe,
-  HardDrive,
-  Layers,
   MessageSquare,
   Network,
   Pause,
-  Play,
   RefreshCw,
   Server,
   Settings,
   Shield,
-  Trash2,
   Users,
   Wifi,
-  WifiOff,
   Zap,
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -38,21 +29,6 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
   Table,
   TableBody,
   TableCell,
@@ -61,12 +37,8 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import {
-  LineChart,
-  Line,
   AreaChart,
   Area,
-  BarChart,
-  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -155,16 +127,6 @@ async function updateConfig(config: Partial<GatewayConfig>): Promise<void> {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(config),
-  });
-  const data = await res.json();
-  if (!data.success) throw new Error(data.error);
-}
-
-async function setMaintenanceMode(enabled: boolean, message: string): Promise<void> {
-  const res = await fetch(`${API_BASE}/maintenance`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ enabled, message, allowed_ips: [] }),
   });
   const data = await res.json();
   if (!data.success) throw new Error(data.error);

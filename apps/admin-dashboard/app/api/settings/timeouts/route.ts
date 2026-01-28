@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { withAuth, withAdminAuth, apiError, type AuthenticatedRequest } from '@/lib/api/auth-wrapper';
 
 // GET /api/settings/timeouts - Get operation timeout settings
-export const GET = withAuth(async (request: AuthenticatedRequest) => {
+export const GET = withAuth(async (_request: AuthenticatedRequest) => {
   try {
     const timeouts = [
       { operationName: 'cdk_bootstrap', timeoutSeconds: 600, retryCount: 2, retryDelayMs: 5000, isActive: true },
@@ -32,7 +32,7 @@ export const PUT = withAdminAuth(async (request: AuthenticatedRequest) => {
 });
 
 // POST /api/settings/timeouts/sync - Sync with SSM (admin only)
-export const POST = withAdminAuth(async (request: AuthenticatedRequest) => {
+export const POST = withAdminAuth(async (_request: AuthenticatedRequest) => {
   try {
     return NextResponse.json({
       success: true,

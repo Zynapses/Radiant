@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { withAuth, apiError, type AuthenticatedRequest } from '@/lib/api/auth-wrapper';
 
 const LAMBDA_API_URL = process.env.LAMBDA_API_URL || 'https://api.radiant.example.com';

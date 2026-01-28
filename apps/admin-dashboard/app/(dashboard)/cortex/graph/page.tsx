@@ -21,7 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Network, Search, Filter, RefreshCw, ArrowRight, Database, GitBranch } from 'lucide-react';
+import { Network, Search, RefreshCw, ArrowRight, Database, GitBranch } from 'lucide-react';
 
 interface GraphNode {
   id: string;

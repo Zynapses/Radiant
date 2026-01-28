@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import {
-  Brain, GitBranch, Zap, Database, Bot, RefreshCw, Settings,
+  Zap, Database, Bot, RefreshCw, Settings,
   Play, Pause, CheckCircle, XCircle, Clock, AlertTriangle,
   ChevronRight, Network, Layers, Cpu, Eye, Shield, Activity
 } from 'lucide-react';
@@ -110,7 +110,8 @@ export default function CognitionPage() {
     loadData();
   }, []);
 
-  const [error, setError] = useState<string | null>(null);
+  const [_error, setError] = useState<string | null>(null);
+  void _error; // Reserved for error display
 
   async function loadData() {
     setLoading(true);
@@ -317,7 +318,7 @@ export default function CognitionPage() {
                   );
                 })}
                 <svg className="absolute inset-0 w-full h-full pointer-events-none">
-                  {causalEdges.map((edge, i) => {
+                  {causalEdges.map((edge, _i) => {
                     const sourceIdx = causalNodes.findIndex((n) => n.nodeId === edge.causeNodeId);
                     const targetIdx = causalNodes.findIndex((n) => n.nodeId === edge.effectNodeId);
                     if (sourceIdx === -1 || targetIdx === -1) return null;

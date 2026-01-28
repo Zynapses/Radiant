@@ -13,13 +13,10 @@ import {
   Layers,
   Search,
   Zap,
-  HardDrive,
   BarChart3,
   Settings,
   Play,
   Trash2,
-  TrendingUp,
-  TrendingDown,
   Info,
 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';

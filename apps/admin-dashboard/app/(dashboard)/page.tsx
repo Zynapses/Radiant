@@ -9,7 +9,6 @@ import {
   Activity, 
   DollarSign, 
   Cpu, 
-  Users,
   Zap,
   TrendingUp
 } from 'lucide-react';

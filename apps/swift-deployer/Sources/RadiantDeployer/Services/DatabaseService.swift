@@ -144,8 +144,8 @@ actor DatabaseService {
                 defer { close(sock) }
                 
                 // Set socket to non-blocking for timeout
-                var flags = fcntl(sock, F_GETFL, 0)
-                fcntl(sock, F_SETFL, flags | O_NONBLOCK)
+                let flags = fcntl(sock, F_GETFL, 0)
+                _ = fcntl(sock, F_SETFL, flags | O_NONBLOCK)
                 
                 let connectResult = connect(sock, addrInfo.pointee.ai_addr, addrInfo.pointee.ai_addrlen)
                 
@@ -227,7 +227,7 @@ actor DatabaseService {
         )
         
         var results: [MigrationResult] = []
-        let fileManager = FileManager.default
+        _ = FileManager.default // Reserved for future file operations
         
         for migration in migrations where migration.status == .pending {
             let startTime = Date()

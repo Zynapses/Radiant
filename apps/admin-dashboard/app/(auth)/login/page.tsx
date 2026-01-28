@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { useAuth } from '@/lib/auth/hooks';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Button } from '@/components/ui/button';
