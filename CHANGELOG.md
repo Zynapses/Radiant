@@ -5,6 +5,135 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.52.56] - 2026-01-29
+
+### Documentation
+
+#### Glossary Synchronization Policy
+
+**New Policy**: `/.windsurf/workflows/glossary-sync-policy.md`
+
+Mandatory policy ensuring the RADIANT Glossary stays synchronized with all other documentation:
+
+- **Trigger Documents**: 8 primary docs that require glossary sync when updated
+- **Update Checklist**: 9 categories of terms to check for
+- **Section Mapping**: Where each type of term should be added
+- **PDF Regeneration**: Command to regenerate formatted PDF after updates
+
+**Policy Integration**:
+- Added to `docs/DOCUMENTATION-MANIFEST.json` as primary document
+- Integrated with master policy `docs-update-all.md`
+- Added `glossarySyncPolicy` section to manifest with sync triggers and checklist
+
+**Documentation Manifest Updates** (`docs/DOCUMENTATION-MANIFEST.json` v1.1.0):
+- Added `docs/RADIANT-GLOSSARY.md` to `primaryDocs` with HIGH priority
+- Added glossary triggers: `new_term`, `new_subsystem`, `new_acronym`, `aws_service`, `documentation_sync`
+- Added `glossarySyncPolicy` section with 8 sync trigger documents
+- Added glossary to `versionedDocs` list
+
+**Master Policy Updates** (`docs-update-all.md`):
+- Added change types: `new_term`, `new_subsystem`, `new_acronym`, `aws_service`
+- Added "New Terms, Subsystems, or Acronyms" section with required docs
+- Added glossary to versioned docs list
+- Updated verification checklist
+- Updated quick reference card
+- Added anti-pattern: "Introducing new terms/acronyms without updating RADIANT-GLOSSARY.md"
+
+---
+
+## [5.52.55] - 2026-01-29
+
+### Documentation
+
+#### RADIANT Glossary & Cheat Sheet
+
+**New Document**: `docs/RADIANT-GLOSSARY.md`
+
+Comprehensive glossary and quick reference cheat sheet covering all RADIANT terminology:
+
+- **AI & Machine Learning Terms**: 23 definitions (LLM, LoRA, RAG, RLHF, embeddings, transformers, etc.)
+- **RADIANT Core Subsystems**: 30+ subsystems organized by category:
+  - AGI & Cognition (Brain, Cato, Cortex, Ego, Genesis, Ghost Vectors, SOFAI)
+  - Pipeline & Orchestration (Checkpoints, Compensation, Workflow Engine)
+  - Safety & Verification (CBF, ECD, Truth Engine™, Reflexion Loop)
+  - Memory & Storage (Flash Facts, Grimoire, Time Machine, UDS)
+  - Economic & Governance (HITL, Mission Control, RAWS)
+- **Think Tank Features**: 30 user-facing features (Magic Carpet, Living Parchment, Polymorphic UI, etc.)
+- **AWS Services Used**: 25+ services organized by category (Compute, Database, Networking, Security, AI/ML)
+- **Acronyms & Abbreviations**: 60+ acronyms including:
+  - General (API, CDK, MCP, A2A, SSE, JWT)
+  - RADIANT-specific (CBF, HITL, RAWS, SOFAI, UDS, ECD)
+  - Compliance (GDPR, HIPAA, SOC 2, CCPA, DSAR)
+  - AI Models (GPT, LLaMA, Mixtral, Qwen)
+- **Database & Storage Terms**: Hot/Warm/Cold tiers, pgvector, RDS Proxy
+- **Security & Compliance Terms**: RLS, RBAC, Merkle Chain, Break Glass
+- **API & Protocol Terms**: MCP, A2A, LiteLLM, Yjs CRDT
+- **UI/UX Terms**: GenUI, Apple Glass, Shadcn/ui
+- **Quick Reference Tables**: CDK Stacks (35), AI Providers (9), Governance Presets (3)
+
+---
+
+## [5.52.54] - 2026-01-28
+
+### Documentation
+
+#### Cato Orchestration Engineering Guide
+
+**New Document**: `docs/CATO-ORCHESTRATION-ENGINEERING-GUIDE.md`
+
+Comprehensive engineering documentation for the Cato orchestration system, verified against source code. Includes:
+
+- **Architecture Overview**: Pipeline execution flow, key design principles
+- **Core Components**: Orchestrator, executor, registries, checkpoint, compensation services
+- **Method Implementations**: Observer, Proposer, Validator, Executor, Decider with full input/output types
+- **Universal Envelope Protocol**: Complete `CatoMethodEnvelope` structure and persistence
+- **Node Connection & Data Flow**: Method chaining, type-safe routing, parallel execution patterns
+- **Stream Transfer Protocol**: Envelope as transfer unit, context accumulation, multi-model handling, distributed tracing
+- **Context Strategies**: FULL, MINIMAL, TAIL, RELEVANT, SUMMARY with implementation details
+- **Checkpoint System (HITL)**: CP1-CP5 types, modes, governance presets, pipeline resume
+- **Compensation (SAGA Pattern)**: Types, log structure, LIFO execution for rollback
+- **Database Schema**: 13 core tables with relationships and envelope schema
+- **API Reference**: Pipeline execution, resume, registry, checkpoint, compensation APIs
+
+All code references verified against:
+- `cato-pipeline-orchestrator.service.ts`
+- `cato-method-executor.service.ts`
+- `cato-methods/*.method.ts`
+- `cato-checkpoint.service.ts`
+- `cato-compensation.service.ts`
+- `cato-pipeline.types.ts`
+
+#### Documentation Updates - Cato Pipeline Orchestration
+
+Updated existing documentation to reflect the Cato orchestration system (code-verified):
+
+**ENGINEERING-IMPLEMENTATION-VISION.md** (v5.52.54):
+- Added **Section 21: Cato Pipeline Orchestration System** with comprehensive coverage:
+  - Architecture overview with ASCII diagram
+  - Core services table (Orchestrator, Executor, Registry services)
+  - Method implementations (Observer, Proposer, Validator, Executor, Decider) with full TypeScript interfaces
+  - Universal Envelope Protocol (`CatoMethodEnvelope`) with all fields documented
+  - Context strategies (FULL, MINIMAL, TAIL, RELEVANT, SUMMARY) with code examples
+  - Checkpoint system (CP1-CP5) with governance presets
+  - Compensation (SAGA pattern) with types and execution flow
+  - Database schema tables
+  - API reference
+  - Implementation file mapping
+- Updated Table of Contents
+
+**RADIANT-ADMIN-GUIDE.md** (v5.52.54):
+- Added **Section 10.6: Cato Pipeline Orchestration** covering:
+  - Pipeline methods table (Observer, Proposer, Validator, Executor, Decider)
+  - Checkpoint gates (CP1-CP5) for human-in-the-loop oversight
+  - Governance presets (COWBOY, BALANCED, PARANOID) with thresholds
+  - Configuration instructions for admins
+  - Pipeline execution API endpoints
+  - Compensation types for SAGA rollback
+  - Universal Envelope Protocol overview
+  - Reference to detailed engineering guide
+
+---
+
 ## [5.52.53] - 2026-01-28
 
 ### Fixed
