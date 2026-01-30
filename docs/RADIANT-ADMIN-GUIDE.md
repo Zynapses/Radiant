@@ -2,7 +2,7 @@
 
 > **Complete guide for managing the RADIANT AI Platform via the Admin Dashboard**
 > 
-> Version: 5.52.40 | Last Updated: January 2026
+> Version: 5.52.54 | Last Updated: January 2026
 >
 > **Compliance Frameworks:** HIPAA, SOC 2 Type II, GDPR, FDA 21 CFR Part 11
 
@@ -1804,6 +1804,83 @@ WHERE template_id = 'template-uuid' AND is_public = true;
 ```
 
 **Migration**: `V2026_01_10_003__orchestration_rls_security.sql`
+
+### 10.6 Cato Pipeline Orchestration
+
+**Location**: Admin Dashboard → Orchestration → Pipelines
+
+The Cato Pipeline Orchestration system provides modular, type-safe AI task execution with built-in governance, risk assessment, and rollback capabilities.
+
+#### Pipeline Methods
+
+| Method | ID | Purpose | Output Type |
+|--------|-----|---------|-------------|
+| **Observer** | `method:observer:v1` | Classify intent, extract context, detect domain | CLASSIFICATION |
+| **Proposer** | `method:proposer:v1` | Generate action proposals with cost/risk estimates | PROPOSAL |
+| **Validator** | `method:validator:v1` | Risk assessment and triage decisions | ASSESSMENT |
+| **Executor** | `method:executor:v1` | Execute approved actions via Lambda/MCP tools | EXECUTION_RESULT |
+| **Decider** | `method:decider:v1` | Synthesize critiques, make final decisions | JUDGMENT |
+
+#### Checkpoint Gates (Human-in-the-Loop)
+
+Five checkpoint gates control human oversight:
+
+| Checkpoint | Name | Trigger Point |
+|------------|------|---------------|
+| **CP1** | Context Gate | After Observer |
+| **CP2** | Plan Gate | After Proposer |
+| **CP3** | Review Gate | After Critics |
+| **CP4** | Execution Gate | Before Executor |
+| **CP5** | Post-Mortem Gate | After Executor |
+
+#### Governance Presets
+
+| Preset | Description | Auto-Execute Threshold | Veto Threshold |
+|--------|-------------|----------------------|----------------|
+| **COWBOY** | Maximum autonomy - minimal checkpoints | 0.7 | 0.95 |
+| **BALANCED** | Checkpoints at key decision points | 0.5 | 0.85 |
+| **PARANOID** | Maximum oversight - checkpoints at every stage | 0.2 | 0.6 |
+
+To configure governance preset:
+1. Navigate to **Orchestration → Pipelines → Settings**
+2. Select desired preset from dropdown
+3. Optionally customize individual checkpoint triggers
+4. Click **Save Configuration**
+
+#### Pipeline Execution API
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/admin/cato-pipeline/execute` | POST | Start new pipeline |
+| `/api/admin/cato-pipeline/:id` | GET | Get execution status |
+| `/api/admin/cato-pipeline/:id/resume` | POST | Resume from checkpoint |
+| `/api/admin/cato-pipeline/:id/envelopes` | GET | Get all method envelopes |
+| `/api/admin/cato-pipeline/checkpoints/pending` | GET | List pending checkpoints |
+| `/api/admin/cato-pipeline/checkpoints/:id/resolve` | POST | Resolve a checkpoint |
+
+#### Compensation (SAGA Rollback)
+
+When pipeline execution fails, the system automatically executes compensating transactions in reverse order (LIFO):
+
+| Compensation Type | Behavior |
+|-------------------|----------|
+| **DELETE** | Delete created resource |
+| **RESTORE** | Restore to previous state |
+| **NOTIFY** | Send notification only |
+| **MANUAL** | Flag for manual intervention |
+| **NONE** | No compensation needed |
+
+#### Universal Envelope Protocol
+
+All method outputs are wrapped in `CatoMethodEnvelope` containing:
+- **Identity**: envelopeId, pipelineId, tenantId, sequence
+- **Output**: outputType, data, hash, summary
+- **Confidence**: score (0-1), individual factors
+- **Risk Signals**: detected risks with severity
+- **Tracing**: traceId, spanId for distributed tracing
+- **Compliance**: frameworks, data classification, PII/PHI flags
+
+See `docs/CATO-ORCHESTRATION-ENGINEERING-GUIDE.md` for complete technical documentation.
 
 ---
 

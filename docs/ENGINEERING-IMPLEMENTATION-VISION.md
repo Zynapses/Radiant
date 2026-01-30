@@ -1,6 +1,6 @@
 # RADIANT Engineering Implementation & Vision
 
-**Version**: 5.52.52  
+**Version**: 5.52.54  
 **Last Updated**: 2026-01-28  
 **Classification**: Internal Engineering Reference
 
@@ -30,6 +30,7 @@
 18. [OAuth 2.0 Provider & Developer Portal](#18-oauth-20-provider--developer-portal-v55226)
 19. [Two-Factor Authentication (MFA)](#19-two-factor-authentication-mfa-v55228)
 20. [Internationalization & Multi-Language Search](#20-internationalization--multi-language-search-v55229)
+21. [Cato Pipeline Orchestration System](#21-cato-pipeline-orchestration-system-v55254)
 
 ---
 
@@ -5405,6 +5406,551 @@ await catoCortexBridgeService.cascadeGdprErasure(tenantId, userId);
 | **Compounding Learning** | Brain + Twilight Dreaming | Months of production learning data |
 | **Enterprise Trust** | Merkle audit + GDPR cascade | Full compliance infrastructure |
 | **Zero-Cost Ego** | Brain + Ego Context injection | No SageMaker cost, just PostgreSQL |
+
+---
+
+## 21. Cato Pipeline Orchestration System (v5.52.54)
+
+The Cato Pipeline Orchestration system implements a modular, type-safe method pipeline for AI task execution with built-in governance, risk assessment, and rollback capabilities.
+
+### 21.1 Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    CATO PIPELINE ORCHESTRATION                               │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  ┌──────────────────────────────────────────────────────────────────────┐   │
+│  │                     PIPELINE ORCHESTRATOR                             │   │
+│  │  - Method chaining          - Checkpoint integration                  │   │
+│  │  - Context management       - Error handling + compensation           │   │
+│  │  - Event emission           - Template-based execution                │   │
+│  └─────────────────────────────────┬────────────────────────────────────┘   │
+│                                    │                                         │
+│  ┌─────────────────────────────────▼────────────────────────────────────┐   │
+│  │                     METHOD EXECUTOR (Base)                            │   │
+│  │  - Prompt rendering         - Model invocation                        │   │
+│  │  - Context pruning          - Envelope creation                       │   │
+│  │  - Confidence calculation   - Risk signal detection                   │   │
+│  └─────────────────────────────────┬────────────────────────────────────┘   │
+│                                    │                                         │
+│  ┌─────────────────────────────────▼────────────────────────────────────┐   │
+│  │                     METHOD IMPLEMENTATIONS                            │   │
+│  │  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐   │   │
+│  │  │ Observer │ │ Proposer │ │ Validator│ │ Executor │ │ Decider  │   │   │
+│  │  │ CLASSIFY │ │ PROPOSAL │ │ASSESSMENT│ │EXEC_RSLT │ │ JUDGMENT │   │   │
+│  │  └──────────┘ └──────────┘ └──────────┘ └──────────┘ └──────────┘   │   │
+│  └──────────────────────────────────────────────────────────────────────┘   │
+│                                                                              │
+│  ┌────────────────┐  ┌────────────────┐  ┌────────────────────────────┐    │
+│  │ Method Registry│  │ Schema Registry│  │ Tool Registry              │    │
+│  │ (definitions)  │  │ (JSON schemas) │  │ (Lambda/MCP tools)         │    │
+│  └────────────────┘  └────────────────┘  └────────────────────────────┘    │
+│                                                                              │
+│  ┌────────────────────────────┐  ┌────────────────────────────────────┐    │
+│  │ Checkpoint Service (HITL)  │  │ Compensation Service (SAGA)        │    │
+│  │ CP1-CP5, governance presets│  │ Rollback on failure                │    │
+│  └────────────────────────────┘  └────────────────────────────────────┘    │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Key Design Principles:**
+- **Universal Envelope Protocol**: All method outputs wrapped in typed envelopes with metadata
+- **Type-Safe Routing**: Methods declare accepted/produced output types for compile-time safety
+- **Context Strategies**: Configurable context pruning (FULL, MINIMAL, TAIL, RELEVANT, SUMMARY)
+- **Governance Presets**: COWBOY, BALANCED, PARANOID control checkpoint triggers
+- **SAGA Compensation**: Automatic rollback via logged compensating transactions
+
+### 21.2 Core Services
+
+| Service | File | Purpose |
+|---------|------|---------|
+| **Pipeline Orchestrator** | `cato-pipeline-orchestrator.service.ts` | Coordinates method execution, handles checkpoints, triggers compensation |
+| **Method Executor** | `cato-method-executor.service.ts` | Abstract base class for all methods; handles prompt rendering, model invocation, envelope creation |
+| **Method Registry** | `cato-method-registry.service.ts` | CRUD for method definitions, prompt templates, method chains |
+| **Schema Registry** | `cato-schema-registry.service.ts` | JSON Schema definitions for method outputs |
+| **Tool Registry** | `cato-tool-registry.service.ts` | Tool definitions for Lambda/MCP invocation |
+| **Checkpoint Service** | `cato-checkpoint.service.ts` | Human-in-the-loop checkpoints (CP1-CP5) |
+| **Compensation Service** | `cato-compensation.service.ts` | SAGA pattern rollback execution |
+
+### 21.3 Method Implementations
+
+#### 21.3.1 Observer Method (`method:observer:v1`)
+
+**Purpose**: First method in most pipelines. Analyzes incoming requests to classify intent, extract context, detect domain, and flag ambiguities.
+
+**File**: `lambda/shared/services/cato-methods/observer.method.ts`
+
+```typescript
+interface ObserverInput {
+  userRequest: string;
+  additionalInstructions?: string;
+  sessionContext?: {
+    previousMessages?: string[];
+    userPreferences?: Record<string, unknown>;
+    domain?: string;
+  };
+}
+
+interface ObserverOutput {
+  category: string;                           // Primary intent classification
+  subcategory?: string;                       // Refined classification
+  confidence: number;                         // 0-1 confidence score
+  reasoning: string;                          // Explanation of classification
+  alternatives: Array<{ category: string; confidence: number }>;
+  domain: {
+    detected: string;                         // medical, legal, financial, etc.
+    confidence: number;
+    keywords: string[];
+  };
+  complexity: 'simple' | 'moderate' | 'complex' | 'expert';
+  requiredCapabilities: string[];             // Tools/features needed
+  ambiguities: Array<{
+    aspect: string;
+    description: string;
+    suggestedClarification: string;
+  }>;
+  extractedEntities: Array<{ type: string; value: string; relevance: number }>;
+  suggestedNextMethods: string[];             // e.g., ['method:proposer:v1']
+}
+```
+
+**Risk Signals Detected**:
+- `ambiguous_intent` - Multiple ambiguities detected
+- `low_classification_confidence` - Confidence < 60%
+- `expert_complexity` - Request requires expert handling
+- `sensitive_domain` - Medical, legal, financial, security domains
+
+#### 21.3.2 Proposer Method (`method:proposer:v1`)
+
+**Purpose**: Generates action proposals based on observations. Creates structured plans with reversibility information, cost estimates, and alternative approaches.
+
+**File**: `lambda/shared/services/cato-methods/proposer.method.ts`
+
+```typescript
+interface ProposerInput {
+  observation: ObserverOutput;
+  userRequest: string;
+  availableTools?: string[];
+  constraints?: {
+    maxCostCents?: number;
+    maxDurationMs?: number;
+    mustBeReversible?: boolean;
+    allowedRiskLevels?: CatoRiskLevel[];
+  };
+}
+
+interface ProposerOutput {
+  proposalId: string;
+  title: string;
+  actions: ProposedAction[];                  // Ordered list of actions
+  rationale: string;
+  estimatedImpact: {
+    costCents: number;
+    durationMs: number;
+    riskLevel: CatoRiskLevel;
+  };
+  alternatives: Array<{
+    title: string;
+    rationale: string;
+    tradeoffs: string;
+    estimatedImpact: { costCents: number; durationMs: number; riskLevel: CatoRiskLevel };
+  }>;
+  prerequisites: string[];
+  assumptions: string[];
+  warnings: string[];
+}
+
+interface ProposedAction {
+  actionId: string;
+  type: string;
+  description: string;
+  toolId?: string;                            // Reference to tool registry
+  inputs: Record<string, unknown>;
+  reversible: boolean;
+  compensationType: CatoCompensationType;     // DELETE, RESTORE, NOTIFY, MANUAL, NONE
+  compensationStrategy?: string;
+  estimatedCostCents: number;
+  estimatedDurationMs: number;
+  riskLevel: CatoRiskLevel;
+  dependencies: string[];                     // actionIds this depends on
+}
+```
+
+**Risk Signals Detected**:
+- `irreversible_actions` - Actions that cannot be undone
+- `high_cost` - Estimated cost > $1.00
+- `high_risk_actions` - HIGH or CRITICAL risk level
+- `many_assumptions` - > 3 assumptions in proposal
+- `proposal_warnings` - Explicit warnings in output
+
+#### 21.3.3 Validator Method (`method:validator:v1`)
+
+**Purpose**: Performs comprehensive risk assessment and triage decisions. Implements veto logic for CRITICAL risks.
+
+**File**: `lambda/shared/services/cato-methods/validator.method.ts`
+
+```typescript
+interface ValidatorInput {
+  proposal: ProposerOutput;
+  critiques?: Array<{ criticType: string; verdict: string; score: number; issues: Array<Record<string, unknown>> }>;
+  governancePreset: 'COWBOY' | 'BALANCED' | 'PARANOID';
+}
+
+interface ValidatorOutput {
+  overallRisk: CatoRiskLevel;                 // CRITICAL, HIGH, MEDIUM, LOW, NONE
+  overallRiskScore: number;                   // 0-1 weighted score
+  triageDecision: CatoTriageDecision;         // AUTO_EXECUTE, CHECKPOINT_REQUIRED, BLOCKED
+  triageReason: string;
+  vetoApplied: boolean;                       // True if execution should be blocked
+  vetoFactor?: string;                        // Which risk factor triggered veto
+  vetoReason?: string;
+  riskFactors: CatoRiskFactor[];              // Individual risk assessments
+  autoExecuteThreshold: number;               // From governance preset
+  vetoThreshold: number;                      // From governance preset
+  unmitigatedRisks: string[];                 // Risks with no mitigations
+  mitigationSuggestions: Array<{ riskFactorId: string; suggestion: string; estimatedReduction: number }>;
+}
+```
+
+**Triage Decision Logic**:
+```typescript
+// From governance preset thresholds
+const preset = CATO_GOVERNANCE_PRESETS[governancePreset];
+
+if (vetoApplied || overallRiskScore >= preset.riskThresholds.veto) {
+  triageDecision = CatoTriageDecision.BLOCKED;
+} else if (overallRiskScore >= preset.riskThresholds.autoExecute) {
+  triageDecision = CatoTriageDecision.CHECKPOINT_REQUIRED;
+} else {
+  triageDecision = CatoTriageDecision.AUTO_EXECUTE;
+}
+```
+
+#### 21.3.4 Executor Method (`method:executor:v1`)
+
+**Purpose**: Executes approved proposals by invoking tools (Lambda or MCP). Manages compensation log for SAGA rollback pattern.
+
+**File**: `lambda/shared/services/cato-methods/executor.method.ts`
+
+```typescript
+interface ExecutorInput {
+  proposal: ProposerOutput;
+  dryRun?: boolean;                           // Simulate without executing
+}
+
+interface ExecutorOutput {
+  executionId: string;
+  status: 'SUCCESS' | 'PARTIAL_SUCCESS' | 'FAILED' | 'ROLLED_BACK';
+  actionsExecuted: ActionResult[];
+  artifacts: Array<{ artifactId: string; type: string; uri: string; metadata?: Record<string, unknown> }>;
+  totalDurationMs: number;
+  totalCostCents: number;
+  compensationLog: Array<{ stepNumber: number; actionId: string; compensationType: CatoCompensationType; status: string }>;
+}
+```
+
+**Tool Invocation**:
+- **Lambda Tools**: Direct AWS Lambda invocation via `@aws-sdk/client-lambda`
+- **MCP Tools**: HTTP POST to MCP Gateway (`/tools/call`)
+
+**Compensation Logging**: Before each action, logs compensation strategy to `cato_compensation_log`. On failure, triggers LIFO rollback.
+
+#### 21.3.5 Decider Method (`method:decider:v1`)
+
+**Purpose**: Synthesizes critiques from multiple critics and makes a final decision. Used in War Room deliberation pipelines.
+
+**File**: `lambda/shared/services/cato-methods/decider.method.ts`
+
+```typescript
+interface DeciderInput {
+  proposal: ProposerOutput;
+  critiques: Array<{ criticType: string; verdict: string; score: number; issues: Array<Record<string, unknown>>; recommendations: string[] }>;
+}
+
+interface DeciderOutput {
+  decision: 'PROCEED' | 'PROCEED_WITH_MODIFICATIONS' | 'BLOCK' | 'ESCALATE';
+  confidence: number;
+  reasoning: string;
+  synthesizedIssues: Array<{ issueId: string; severity: CatoRiskLevel; description: string; source: string; resolution: string }>;
+  requiredModifications: string[];
+  acceptedRisks: string[];
+  dissent: Array<{ criticType: string; objection: string; weight: number }>;
+  consensusLevel: 'UNANIMOUS' | 'MAJORITY' | 'SPLIT' | 'DEADLOCK';
+  nextSteps: string[];
+}
+```
+
+### 21.4 Universal Envelope Protocol
+
+Every method output is wrapped in a `CatoMethodEnvelope` for consistent handling:
+
+```typescript
+interface CatoMethodEnvelope<T = unknown> {
+  // Identity
+  envelopeId: string;                         // Unique ID (UUID)
+  pipelineId: string;                         // Parent pipeline
+  tenantId: string;                           // Tenant isolation
+  sequence: number;                           // Order in pipeline (0-indexed)
+  envelopeVersion: string;                    // Protocol version ("5.0")
+
+  // Source
+  source: {
+    methodId: string;                         // e.g., "method:observer:v1"
+    methodType: CatoMethodType;               // OBSERVER, PROPOSER, etc.
+    methodName: string;                       // Human-readable name
+  };
+
+  // Optional routing
+  destination?: {
+    methodId: string;
+    routingReason: string;
+  };
+
+  // Output
+  output: {
+    outputType: CatoOutputType;               // CLASSIFICATION, PROPOSAL, ASSESSMENT, etc.
+    schemaRef: string;                        // JSON Schema reference
+    data: T;                                  // The actual typed output
+    hash: string;                             // SHA-256 of data
+    summary: string;                          // Human-readable summary
+  };
+
+  // Confidence
+  confidence: {
+    score: number;                            // 0-1 overall confidence
+    factors: CatoConfidenceFactor[];          // Individual factors
+  };
+
+  // Context
+  contextStrategy: CatoContextStrategy;       // FULL, MINIMAL, TAIL, RELEVANT, SUMMARY
+  context: CatoAccumulatedContext;            // Pruned history
+
+  // Risk
+  riskSignals: CatoRiskSignal[];              // Detected risks
+
+  // Tracing
+  tracing: {
+    traceId: string;                          // End-to-end trace ID
+    spanId: string;                           // This method's span
+    parentSpanId?: string;                    // Parent span (if chained)
+  };
+
+  // Compliance
+  compliance: {
+    frameworks: string[];                     // HIPAA, SOC2, etc.
+    dataClassification: 'PUBLIC' | 'INTERNAL' | 'CONFIDENTIAL' | 'RESTRICTED';
+    containsPii: boolean;
+    containsPhi: boolean;
+  };
+
+  // Model usage
+  models: CatoModelUsage[];                   // Models used, tokens, cost
+
+  // Metrics
+  durationMs: number;
+  costCents: number;
+  tokensUsed: number;
+  timestamp: Date;
+}
+```
+
+### 21.5 Context Strategies
+
+Methods declare their context strategy for memory management:
+
+| Strategy | Behavior | Use Case |
+|----------|----------|----------|
+| **FULL** | Pass all previous envelopes | Small pipelines, need full history |
+| **MINIMAL** | Pass no previous envelopes | Stateless methods |
+| **TAIL** | Pass last N envelopes (configurable `tailCount`) | Long pipelines, recent context |
+| **RELEVANT** | Filter by `acceptsOutputTypes` | Type-specific methods |
+| **SUMMARY** | LLM summarizes middle envelopes | Large context, token savings |
+
+**Implementation** (`cato-method-executor.service.ts`):
+```typescript
+protected async applyContextStrategy(
+  envelopes: CatoMethodEnvelope[],
+  strategy: CatoContextStrategy
+): Promise<CatoAccumulatedContext> {
+  switch (strategy) {
+    case CatoContextStrategy.FULL:
+      return { history: envelopes, ... };
+    case CatoContextStrategy.MINIMAL:
+      return { history: [], ... };
+    case CatoContextStrategy.TAIL:
+      const tailCount = this.methodDefinition?.contextStrategy.tailCount || 5;
+      return { history: envelopes.slice(-tailCount), ... };
+    case CatoContextStrategy.RELEVANT:
+      const acceptedTypes = this.methodDefinition?.acceptsOutputTypes || [];
+      return { history: envelopes.filter(e => acceptedTypes.includes(e.output.outputType)), ... };
+    case CatoContextStrategy.SUMMARY:
+      return { history: await this.summarizeEnvelopes(envelopes), ... };
+  }
+}
+```
+
+### 21.6 Checkpoint System (HITL)
+
+Five checkpoint gates with configurable modes per governance preset:
+
+| Checkpoint | Name | Trigger Point | Purpose |
+|------------|------|---------------|---------|
+| **CP1** | Context Gate | After Observer | Clarify ambiguous intent |
+| **CP2** | Plan Gate | After Proposer | Review proposed actions |
+| **CP3** | Review Gate | After Critics | Address raised concerns |
+| **CP4** | Execution Gate | Before Executor | Final approval before action |
+| **CP5** | Post-Mortem Gate | After Executor | Review results |
+
+**Governance Presets**:
+
+```typescript
+const CATO_GOVERNANCE_PRESETS = {
+  COWBOY: {
+    description: 'Maximum autonomy - minimal checkpoints',
+    checkpoints: {
+      CP1: { mode: DISABLED, triggerOn: [] },
+      CP2: { mode: CONDITIONAL, triggerOn: ['destructive_action'] },
+      CP3: { mode: DISABLED, triggerOn: [] },
+      CP4: { mode: CONDITIONAL, triggerOn: ['critical_risk'] },
+      CP5: { mode: DISABLED, triggerOn: [] },
+    },
+    riskThresholds: { autoExecute: 0.7, veto: 0.95 },
+  },
+  BALANCED: {
+    description: 'Balanced autonomy - checkpoints at key decision points',
+    checkpoints: {
+      CP1: { mode: CONDITIONAL, triggerOn: ['ambiguous_intent', 'missing_context'] },
+      CP2: { mode: CONDITIONAL, triggerOn: ['high_cost', 'irreversible_actions'] },
+      CP3: { mode: CONDITIONAL, triggerOn: ['objections_raised', 'consensus_not_reached'] },
+      CP4: { mode: CONDITIONAL, triggerOn: ['risk_above_threshold', 'cost_above_threshold'] },
+      CP5: { mode: DISABLED, triggerOn: [] },
+    },
+    riskThresholds: { autoExecute: 0.5, veto: 0.85 },
+  },
+  PARANOID: {
+    description: 'Maximum oversight - checkpoints at every stage',
+    checkpoints: {
+      CP1: { mode: MANUAL, triggerOn: ['always'] },
+      CP2: { mode: MANUAL, triggerOn: ['always'] },
+      CP3: { mode: MANUAL, triggerOn: ['always'] },
+      CP4: { mode: MANUAL, triggerOn: ['always'] },
+      CP5: { mode: CONDITIONAL, triggerOn: ['execution_completed'] },
+    },
+    riskThresholds: { autoExecute: 0.2, veto: 0.6 },
+  },
+};
+```
+
+### 21.7 Compensation (SAGA Pattern)
+
+**File**: `cato-compensation.service.ts`
+
+When pipeline execution fails, compensations execute in **reverse order** (LIFO):
+
+```typescript
+// Compensation entry logged BEFORE each action
+interface CatoCompensationEntry {
+  id: string;
+  pipelineId: string;
+  tenantId: string;
+  stepNumber: number;                         // Determines LIFO order
+  stepName?: string;
+  compensationType: CatoCompensationType;     // DELETE, RESTORE, NOTIFY, MANUAL, NONE
+  compensationTool?: string;                  // Tool to invoke for compensation
+  compensationInputs?: Record<string, unknown>;
+  affectedResources: CatoAffectedResource[];
+  status: 'PENDING' | 'EXECUTING' | 'COMPLETED' | 'FAILED' | 'SKIPPED';
+  originalAction: Record<string, unknown>;
+  originalResult?: Record<string, unknown>;
+}
+
+// Compensation types
+enum CatoCompensationType {
+  DELETE = 'DELETE',                          // Delete created resource
+  RESTORE = 'RESTORE',                        // Restore to previous state
+  NOTIFY = 'NOTIFY',                          // Send notification only
+  MANUAL = 'MANUAL',                          // Flag for manual intervention
+  NONE = 'NONE',                              // No compensation needed
+}
+```
+
+**Execution Flow**:
+```typescript
+async executeCompensations(pipelineId: string, tenantId: string): Promise<{ executed: number; failed: number }> {
+  // Get pending compensations in REVERSE order (LIFO for SAGA)
+  const compensations = await this.pool.query(
+    `SELECT * FROM cato_compensation_log
+     WHERE pipeline_id = $1 AND tenant_id = $2 AND status = 'PENDING'
+     ORDER BY step_number DESC`,
+    [pipelineId, tenantId]
+  );
+  
+  for (const entry of compensations.rows) {
+    await this.executeCompensation(entry);
+  }
+}
+```
+
+### 21.8 Database Schema
+
+**Core Tables**:
+
+| Table | Purpose |
+|-------|---------|
+| `cato_pipeline_executions` | Pipeline execution records |
+| `cato_pipeline_envelopes` | All method output envelopes |
+| `cato_pipeline_templates` | Reusable pipeline configurations |
+| `cato_pipeline_checkpoints` | Checkpoint state for resume |
+| `cato_method_definitions` | Method registry |
+| `cato_schema_definitions` | JSON Schema registry |
+| `cato_tool_definitions` | Tool registry |
+| `cato_method_invocations` | Individual method invocation records |
+| `cato_audit_prompt_records` | Full prompt/response audit trail |
+| `cato_checkpoint_configurations` | Per-tenant checkpoint config |
+| `cato_checkpoint_decisions` | Checkpoint decision records |
+| `cato_risk_assessments` | Risk assessment records |
+| `cato_compensation_log` | Compensation entries for SAGA |
+
+### 21.9 API Reference
+
+**Pipeline Execution**:
+```
+POST /api/admin/cato-pipeline/execute        # Start new pipeline
+GET  /api/admin/cato-pipeline/:id            # Get execution status
+POST /api/admin/cato-pipeline/:id/resume     # Resume from checkpoint
+GET  /api/admin/cato-pipeline/:id/envelopes  # Get all envelopes
+```
+
+**Method Registry**:
+```
+GET  /api/admin/cato-pipeline/methods        # List methods
+GET  /api/admin/cato-pipeline/methods/:id    # Get method definition
+POST /api/admin/cato-pipeline/methods        # Create method
+```
+
+**Checkpoint Management**:
+```
+GET  /api/admin/cato-pipeline/checkpoints/pending  # Pending checkpoints
+POST /api/admin/cato-pipeline/checkpoints/:id/resolve  # Resolve checkpoint
+```
+
+### 21.10 Implementation Files
+
+| Component | File |
+|-----------|------|
+| Pipeline Orchestrator | `lambda/shared/services/cato-pipeline-orchestrator.service.ts` |
+| Method Executor Base | `lambda/shared/services/cato-method-executor.service.ts` |
+| Observer Method | `lambda/shared/services/cato-methods/observer.method.ts` |
+| Proposer Method | `lambda/shared/services/cato-methods/proposer.method.ts` |
+| Validator Method | `lambda/shared/services/cato-methods/validator.method.ts` |
+| Executor Method | `lambda/shared/services/cato-methods/executor.method.ts` |
+| Decider Method | `lambda/shared/services/cato-methods/decider.method.ts` |
+| Checkpoint Service | `lambda/shared/services/cato-checkpoint.service.ts` |
+| Compensation Service | `lambda/shared/services/cato-compensation.service.ts` |
+| Method Registry | `lambda/shared/services/cato-method-registry.service.ts` |
+| TypeScript Types | `packages/shared/src/types/cato-pipeline.types.ts` |
 
 ---
 

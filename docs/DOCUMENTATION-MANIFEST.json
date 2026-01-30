@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "version": "1.0.0",
-  "lastUpdated": "2026-01-25",
+  "version": "1.1.0",
+  "lastUpdated": "2026-01-29",
   "description": "Master manifest of ALL documentation files in RADIANT. AI agents MUST update relevant docs when making code changes.",
   
   "primaryDocs": {
@@ -54,6 +54,12 @@
         "priority": "HIGH",
         "triggers": ["architecture", "cdk", "lambda", "api", "database"],
         "description": "Complete system architecture reference"
+      },
+      {
+        "path": "docs/RADIANT-GLOSSARY.md",
+        "priority": "HIGH",
+        "triggers": ["new_term", "new_subsystem", "new_acronym", "aws_service", "documentation_sync"],
+        "description": "Master glossary and cheat sheet - MUST be updated when new terms, subsystems, or acronyms are introduced"
       }
     ]
   },
@@ -221,6 +227,11 @@
       "consciousness": ["CHANGELOG.md", "docs/CONSCIOUSNESS-SERVICE.md", "docs/THINKTANK-ADMIN-GUIDE.md"],
       "cato": ["CHANGELOG.md", "docs/CATO-COMPLETE-DOCUMENTATION.md", "docs/RADIANT-ADMIN-GUIDE.md"],
       "cortex": ["CHANGELOG.md", "docs/CORTEX-MEMORY-ADMIN-GUIDE.md"],
+      "new_term": ["CHANGELOG.md", "docs/RADIANT-GLOSSARY.md"],
+      "new_subsystem": ["CHANGELOG.md", "docs/RADIANT-GLOSSARY.md", "docs/RADIANT-PLATFORM-ARCHITECTURE.md"],
+      "new_acronym": ["CHANGELOG.md", "docs/RADIANT-GLOSSARY.md"],
+      "aws_service": ["CHANGELOG.md", "docs/RADIANT-GLOSSARY.md", "docs/RADIANT-PLATFORM-ARCHITECTURE.md"],
+      "documentation_sync": ["CHANGELOG.md", "docs/RADIANT-GLOSSARY.md"],
       "curator": ["CHANGELOG.md", "docs/CURATOR-USER-GUIDE.md", "docs/RADIANT-MOATS.md"],
       "deployer": ["CHANGELOG.md", "docs/SWIFT-DEPLOYER-USER-GUIDE.md"],
       "swift_app": ["CHANGELOG.md", "docs/SWIFT-DEPLOYER-USER-GUIDE.md"],
@@ -256,7 +267,31 @@
       "docs/RADIANT-PLATFORM-ARCHITECTURE.md",
       "docs/SWIFT-DEPLOYER-USER-GUIDE.md",
       "docs/UDS-ADMIN-GUIDE.md",
+      "docs/SERVICE-LAYER-GUIDE.md",
+      "docs/RADIANT-GLOSSARY.md"
+    ]
+  },
+
+  "glossarySyncPolicy": {
+    "description": "MANDATORY: Glossary must be updated when ANY of these documents are updated",
+    "syncTriggers": [
+      "docs/RADIANT-ADMIN-GUIDE.md",
+      "docs/THINKTANK-ADMIN-GUIDE.md",
+      "docs/THINKTANK-USER-GUIDE.md",
+      "docs/ENGINEERING-IMPLEMENTATION-VISION.md",
+      "docs/RADIANT-PLATFORM-ARCHITECTURE.md",
+      "docs/RADIANT-MOATS.md",
+      "docs/THINKTANK-MOATS.md",
       "docs/SERVICE-LAYER-GUIDE.md"
+    ],
+    "updateChecklist": [
+      "Check for new AI/ML terms",
+      "Check for new subsystems or services",
+      "Check for new AWS services used",
+      "Check for new acronyms or abbreviations",
+      "Check for new Think Tank features",
+      "Check for new UI/UX terms",
+      "Update version number in glossary"
     ]
   }
 }

@@ -53,6 +53,10 @@ Before making ANY code change, identify what type of change it is:
 | `api_keys` | API key, interface type, scopes, key validation |
 | `gateway` | Go gateway, NATS, WebSocket, SSE, protocol |
 | `service_layer` | MCP worker, A2A worker, Cedar policy |
+| `new_term` | New AI term, technology concept, definition |
+| `new_subsystem` | New service, component, feature system |
+| `new_acronym` | New abbreviation introduced |
+| `aws_service` | New AWS service added to infrastructure |
 
 ---
 
@@ -148,6 +152,13 @@ Use the trigger matrix to find ALL required documentation:
 ✅ docs/RADIANT-PLATFORM-ARCHITECTURE.md
 ✅ docs/RADIANT-ADMIN-GUIDE.md (if admin-configurable)
 ✅ docs/ENGINEERING-IMPLEMENTATION-VISION.md (if architectural)
+```
+
+### New Terms, Subsystems, or Acronyms
+```
+✅ CHANGELOG.md
+✅ docs/RADIANT-GLOSSARY.md (MANDATORY)
+✅ docs/RADIANT-PLATFORM-ARCHITECTURE.md (if new subsystem)
 ```
 
 ---
@@ -247,6 +258,7 @@ When updating these documents, also update the version number in the header:
 - `docs/RADIANT-PLATFORM-ARCHITECTURE.md`
 - `docs/SWIFT-DEPLOYER-USER-GUIDE.md`
 - `docs/SERVICE-LAYER-GUIDE.md`
+- `docs/RADIANT-GLOSSARY.md`
 
 ---
 
@@ -265,6 +277,7 @@ Before marking task complete, verify:
 □ Platform architecture updated (if architectural change)
 □ Swift Deployer guide updated (if deployer changes)
 □ Service Layer guide updated (if MCP, A2A, API, gateway changes)
+□ **Glossary updated (if new terms, subsystems, acronyms, or AWS services)**
 □ Version numbers updated in all touched docs
 ```
 
@@ -319,6 +332,9 @@ Use this manifest to programmatically determine which docs need updating.
 │  ✅ SERVICE-LAYER-GUIDE.md                                              │
 │  ✅ RADIANT-PLATFORM-ARCHITECTURE.md                                    │
 │                                                                          │
+│  FOR NEW TERMS/SUBSYSTEMS/ACRONYMS:                                      │
+│  ✅ RADIANT-GLOSSARY.md (MANDATORY)                                     │
+│                                                                          │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -334,6 +350,7 @@ Use this manifest to programmatically determine which docs need updating.
 ❌ Skipping user guide for user-facing changes
 ❌ Skipping admin guide for admin-facing changes
 ❌ Forgetting STRATEGIC-VISION-MARKETING.md when updating admin guides
+❌ **Introducing new terms/acronyms without updating RADIANT-GLOSSARY.md**
 
 ---
 
