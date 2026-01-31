@@ -7,7 +7,7 @@
  * Uses database persistence for state that must survive Lambda invocations.
  */
 
-import { executeStatement } from '../../database/aurora-client';
+import { executeStatement } from '../../db/client';
 import { logger } from '../../logging/enhanced-logger';
 
 export type GenesisStage = 'EMBRYONIC' | 'NASCENT' | 'DEVELOPING' | 'MATURING' | 'MATURE';

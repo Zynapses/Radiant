@@ -88,6 +88,7 @@ export class RadiantError extends Error {
   public readonly translationKey: string;
   public readonly timestamp: string;
   public readonly requestId?: string;
+  public override cause?: Error;
 
   constructor(options: RadiantErrorOptions) {
     const metadata = getErrorMetadata(options.code);

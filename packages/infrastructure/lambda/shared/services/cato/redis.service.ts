@@ -153,14 +153,14 @@ class CatoStateService {
     const now = Date.now();
 
     // Clean up persona overrides
-    for (const [key, entry] of this.personaOverrides) {
+    for (const [key, entry] of Array.from(this.personaOverrides)) {
       if (entry.expiresAt < now) {
         this.personaOverrides.delete(key);
       }
     }
 
     // Clean up recovery states
-    for (const [key, entry] of this.recoveryStates) {
+    for (const [key, entry] of Array.from(this.recoveryStates)) {
       if (entry.expiresAt < now) {
         this.recoveryStates.delete(key);
       }
@@ -168,7 +168,7 @@ class CatoStateService {
 
     // Clean up old rejection history
     const cutoff = now - TTL_MS.REJECTION_HISTORY;
-    for (const [key, entries] of this.rejectionHistory) {
+    for (const [key, entries] of Array.from(this.rejectionHistory)) {
       const filtered = entries.filter((e) => e.timestamp > cutoff);
       if (filtered.length === 0) {
         this.rejectionHistory.delete(key);

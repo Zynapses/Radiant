@@ -2,7 +2,7 @@
 
 > **Complete guide for managing the RADIANT AI Platform via the Admin Dashboard**
 > 
-> Version: 5.52.54 | Last Updated: January 2026
+> Version: 5.52.57 | Last Updated: January 2026
 >
 > **Compliance Frameworks:** HIPAA, SOC 2 Type II, GDPR, FDA 21 CFR Part 11
 
@@ -70,6 +70,7 @@
 73. [Cortex Graph-RAG Knowledge Engine](#section-73-cortex-graph-rag-knowledge-engine)
 75. [Complete Admin API Architecture](#section-75-complete-admin-api-architecture-v5526)
 76. [Security Policy Registry](#section-76-security-policy-registry)
+77. [Model Registry & Version Discovery](#section-77-model-registry--version-discovery)
 
 ---
 
@@ -22472,10 +22473,121 @@ User Input → Security Check → [Block/Warn/Allow] → AI Processing
 
 ---
 
+## Section 77: Model Registry & Version Discovery
+
+### 77.1 Overview
+
+The Model Registry provides comprehensive management of self-hosted AI model versions, including automated discovery from HuggingFace, thermal state management, and safe deletion with usage tracking.
+
+**Key Capabilities:**
+- **Automated Discovery**: Poll HuggingFace for new versions of watched model families
+- **Version Management**: Track all model versions with metadata and storage info
+- **Thermal States**: Hot/Warm/Cold/Off states for cost and latency optimization
+- **Safe Deletion**: Queue-based deletion that waits for active sessions to end
+
+### 77.2 Admin Dashboard
+
+Navigate to **Platform → Model Registry** to access:
+
+| Tab | Purpose |
+|-----|---------|
+| **Overview** | Dashboard with version counts, thermal distribution, storage stats |
+| **Versions** | List all versions with filtering, thermal controls, deletion |
+| **Watchlist** | Manage which model families to monitor on HuggingFace |
+| **Deletion Queue** | View and manage models queued for deletion |
+| **Discovery Jobs** | History of HuggingFace discovery runs |
+
+### 77.3 Thermal State Management
+
+| State | Description | Use Case |
+|-------|-------------|----------|
+| **Hot** | Fully loaded in memory, instant response | High-traffic production models |
+| **Warm** | Loaded on demand, quick cold start | Medium-traffic models |
+| **Cold** | Stored in S3, requires download | Infrequently used versions |
+| **Off** | Disabled, not available for inference | Deprecated versions |
+
+**Bulk Operations**: Select multiple versions and set thermal state in bulk.
+
+### 77.4 HuggingFace Discovery
+
+The system automatically discovers new model versions by polling HuggingFace:
+
+**Watchlist Configuration per Family:**
+- **HuggingFace Org**: Organization to search (e.g., `meta-llama`)
+- **Auto Download**: Automatically download new versions
+- **Auto Deploy**: Automatically deploy new versions
+- **Min Likes**: Minimum likes threshold to filter noise
+- **Notifications**: Email alerts for new versions
+
+**Run Discovery**: Click "Run Discovery" to trigger immediate discovery.
+
+### 77.5 Deletion Queue
+
+Models are not deleted immediately - they enter a queue:
+
+1. **Pending**: Ready to delete when no active sessions
+2. **Blocked**: Has active sessions, waiting for them to end
+3. **Processing**: Currently deleting S3 data
+4. **Completed**: Successfully deleted
+5. **Cancelled**: Admin cancelled the deletion
+
+**Safe Deletion Features:**
+- Tracks active usage sessions per model version
+- Automatically transitions from blocked → pending when sessions end
+- Preserves S3 data until explicitly processed
+- Supports priority ordering for controlled deletion
+
+### 77.6 Admin API Endpoints
+
+**Base Path**: `/api/admin/model-registry`
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/dashboard` | GET | Overview statistics |
+| `/versions` | GET | List versions with filtering |
+| `/versions` | POST | Create new version |
+| `/versions/:id` | GET | Get version details |
+| `/versions/:id` | PATCH | Update version |
+| `/versions/:id/thermal` | POST | Set thermal state |
+| `/versions/thermal/bulk` | POST | Bulk thermal update |
+| `/versions/:id/storage` | GET | S3 storage info |
+| `/discovery/run` | POST | Trigger discovery |
+| `/discovery/jobs` | GET | List discovery jobs |
+| `/watchlist` | GET | Get watchlist |
+| `/watchlist` | POST | Add to watchlist |
+| `/watchlist/:family` | PATCH | Update watchlist item |
+| `/watchlist/:family` | DELETE | Remove from watchlist |
+| `/deletion-queue` | GET | List queued items |
+| `/deletion-queue` | POST | Queue for deletion |
+| `/deletion-queue/:id/cancel` | POST | Cancel deletion |
+| `/deletion-queue/process` | POST | Process next deletion |
+
+### 77.7 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `model_versions` | All model versions with metadata |
+| `model_family_watchlist` | HuggingFace discovery configuration |
+| `model_discovery_jobs` | Discovery job history |
+| `model_deletion_queue` | Soft delete queue |
+| `model_usage_sessions` | Active session tracking |
+
+### 77.8 Scheduler Integration
+
+The scheduled model sync (hourly by default) includes:
+
+1. **Registry Sync**: Sync models from code registry to database
+2. **HuggingFace Discovery**: Run discovery if `syncFromHuggingFace` is enabled
+3. **Deletion Processing**: Process up to 5 pending deletions per run
+4. **Blocked Refresh**: Check if blocked deletions can proceed
+
+---
+
 ## Version History
 
 | Version | Date | Changes |
 |---------|------|---------|
+| **5.52.57** | 2026-01-29 | Model Registry Enhancement System; HuggingFace discovery service; Model version manager with thermal states; Deletion queue with usage tracking; Admin dashboard; Scheduler integration |
 | **5.52.31** | 2026-01-26 | Security Policy Registry (OWASP LLM Top 10 2025); Dynamic admin-configurable security policies; 12 policy categories; 6 detection methods; 20+ pre-seeded system policies; Violation logging and analytics; Admin dashboard with test feature |
 | **5.52.26** | 2026-01-25 | OAuth 2.0 Provider & Developer Portal (PROMPT-41A); RFC 6749 compliant authorization server; Authorization Code (PKCE), Client Credentials, Refresh Token grants; 14 default scopes; Admin dashboard for app management; OIDC discovery endpoints |
 | **5.52.22** | 2026-01-25 | PostgreSQL Scaling Admin Dashboard; Full visibility into queues, connections, replicas, partitions, slow queries, indexes, materialized views, and maintenance; 17 new admin API endpoints |

@@ -416,7 +416,7 @@ class UDSTierCoordinatorService implements IUDSTierService {
    */
   private async transitionResource(
     tenantId: string,
-    resourceType: 'conversation' | 'message' | 'upload',
+    resourceType: 'conversation' | 'message' | 'upload' | 'envelope',
     resourceId: string,
     fromTier: UDSTier,
     toTier: UDSTier,
@@ -426,7 +426,9 @@ class UDSTierCoordinatorService implements IUDSTierService {
       ? 'uds_conversations'
       : resourceType === 'message'
         ? 'uds_messages'
-        : 'uds_uploads';
+        : resourceType === 'envelope'
+          ? 'uds_envelopes'
+          : 'uds_uploads';
 
     // Get current size for metrics
     const sizeResult = await executeStatement(
@@ -598,11 +600,15 @@ class UDSTierCoordinatorService implements IUDSTierService {
     // Update tier counts
     await this.updateTierCounts(tenantId);
 
-    // Promote hot to warm
+    // Promote hot to warm (conversations, messages)
     await this.promoteHotToWarm(tenantId);
 
-    // Archive warm to cold
+    // Archive warm to cold (conversations, uploads)
     await this.archiveWarmToCold(tenantId);
+
+    // Envelope tier management
+    await this.promoteEnvelopesHotToWarm(tenantId);
+    await this.archiveEnvelopesWarmToCold(tenantId);
 
     // Clean up deleted items
     await this.cleanupDeleted(tenantId);
@@ -715,7 +721,7 @@ class UDSTierCoordinatorService implements IUDSTierService {
   private async getResourceType(
     tenantId: string,
     resourceId: string
-  ): Promise<'conversation' | 'message' | 'upload' | null> {
+  ): Promise<'conversation' | 'message' | 'upload' | 'envelope' | null> {
     // Check conversations
     const convResult = await executeStatement(
       `SELECT id FROM uds_conversations WHERE id = $1 AND tenant_id = $2`,
@@ -737,7 +743,153 @@ class UDSTierCoordinatorService implements IUDSTierService {
     );
     if (uploadResult.rows?.length) return 'upload';
 
+    // Check envelopes
+    const envResult = await executeStatement(
+      `SELECT id FROM uds_envelopes WHERE id = $1 AND tenant_id = $2`,
+      [stringParam('id', resourceId), stringParam('tenantId', tenantId)]
+    );
+    if (envResult.rows?.length) return 'envelope';
+
     return null;
+  }
+
+  // ===========================================================================
+  // Envelope Tier Management
+  // ===========================================================================
+
+  /**
+   * Promote envelopes from Hot to Warm tier
+   */
+  async promoteEnvelopesHotToWarm(tenantId: string): Promise<PromotionResult> {
+    logger.info('Starting Envelope Hot → Warm promotion', { tenantId });
+
+    const config = await this.getConfig(tenantId);
+    if (!config.enableAutoPromotion) {
+      return { promoted: 0, errors: 0, details: ['Auto-promotion disabled'] };
+    }
+
+    let promoted = 0;
+    let errors = 0;
+
+    // Get envelopes ready for promotion using DB function
+    const envelopes = await executeStatement(
+      `SELECT * FROM uds_envelopes_get_hot_to_warm($1, $2, $3)`,
+      [
+        stringParam('tenantId', tenantId),
+        stringParam('hours', String(config.hotToWarmHours)),
+        stringParam('limit', String(BATCH_SIZE)),
+      ]
+    );
+
+    for (const row of envelopes.rows || []) {
+      try {
+        await this.transitionResource(tenantId, 'envelope', row.envelope_id as string, 'hot', 'warm', 'ttl_expiry');
+        promoted++;
+      } catch (error) {
+        errors++;
+        logger.error('Failed to promote envelope', { envelopeId: row.envelope_id, error });
+      }
+    }
+
+    // Record metrics
+    await this.recordEnvelopeDataFlow(tenantId, 'hot_to_warm', promoted);
+
+    logger.info('Envelope Hot → Warm promotion complete', { tenantId, promoted, errors });
+
+    return { promoted, errors };
+  }
+
+  /**
+   * Archive envelopes from Warm to Cold tier
+   */
+  async archiveEnvelopesWarmToCold(tenantId: string): Promise<PromotionResult> {
+    logger.info('Starting Envelope Warm → Cold archival', { tenantId });
+
+    const config = await this.getConfig(tenantId);
+    if (!config.enableAutoArchival) {
+      return { promoted: 0, errors: 0, details: ['Auto-archival disabled'] };
+    }
+
+    let archived = 0;
+    let errors = 0;
+
+    // Get envelopes ready for archival using DB function
+    const envelopes = await executeStatement(
+      `SELECT * FROM uds_envelopes_get_warm_to_cold($1, $2, $3)`,
+      [
+        stringParam('tenantId', tenantId),
+        stringParam('days', String(config.warmToColdDays)),
+        stringParam('limit', String(BATCH_SIZE)),
+      ]
+    );
+
+    for (const row of envelopes.rows || []) {
+      try {
+        // Use DB function for transition (handles payload clearing)
+        await executeStatement(
+          `SELECT uds_envelopes_transition_tier($1, 'warm', 'cold', $2)`,
+          [
+            stringParam('envelopeId', row.envelope_id as string),
+            stringParam('s3Key', `envelopes/${tenantId}/${new Date().getFullYear()}/${row.envelope_id}.json`),
+          ]
+        );
+        archived++;
+      } catch (error) {
+        errors++;
+        logger.error('Failed to archive envelope', { envelopeId: row.envelope_id, error });
+      }
+    }
+
+    // Record metrics
+    await this.recordEnvelopeDataFlow(tenantId, 'warm_to_cold', archived);
+
+    logger.info('Envelope Warm → Cold archival complete', { tenantId, archived, errors });
+
+    return { promoted: archived, errors };
+  }
+
+  /**
+   * Get envelope tier counts
+   */
+  async getEnvelopeTierCounts(tenantId: string): Promise<{ tier: string; count: number }[]> {
+    const result = await executeStatement(
+      `SELECT * FROM uds_envelopes_tier_counts($1)`,
+      [stringParam('tenantId', tenantId)]
+    );
+    return (result.rows || []).map(row => ({
+      tier: row.tier as string,
+      count: parseInt(row.count as string) || 0,
+    }));
+  }
+
+  /**
+   * Record envelope data flow metrics
+   */
+  private async recordEnvelopeDataFlow(
+    tenantId: string,
+    flowType: 'hot_to_warm' | 'warm_to_cold' | 'cold_to_warm',
+    count: number
+  ): Promise<void> {
+    const periodStart = new Date();
+    periodStart.setMinutes(0, 0, 0);
+
+    const column = flowType === 'hot_to_warm'
+      ? 'envelope_hot_to_warm_count'
+      : flowType === 'warm_to_cold'
+        ? 'envelope_warm_to_cold_count'
+        : 'envelope_cold_to_warm_count';
+
+    await executeStatement(
+      `INSERT INTO uds_data_flow_metrics (tenant_id, period, period_start, ${column})
+       VALUES ($1, 'hour', $2, $3)
+       ON CONFLICT (tenant_id, period, period_start)
+       DO UPDATE SET ${column} = uds_data_flow_metrics.${column} + $3`,
+      [
+        stringParam('tenantId', tenantId),
+        stringParam('periodStart', periodStart.toISOString()),
+        stringParam('count', String(count)),
+      ]
+    );
   }
 
   private mapMetricsRow(row: Record<string, unknown>): UDSDataFlowMetrics {

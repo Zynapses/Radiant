@@ -1,9 +1,11 @@
-// RADIANT v4.18.0 - Scheduled Model Sync Lambda
+// RADIANT v5.2.4 - Scheduled Model Sync Lambda
 // Triggered by EventBridge on configured interval
-// Syncs model registry from code registries and checks health
+// Syncs model registry from code registries, discovers new versions, and processes deletions
 
 import { ScheduledEvent, Context } from 'aws-lambda';
 import { modelCoordinationService } from '../shared/services/model-coordination.service';
+import { huggingfaceDiscoveryService } from '../shared/services/huggingface-discovery.service';
+import { modelDeletionQueueService } from '../shared/services/model-deletion-queue.service';
 import { logger } from '../shared/logging/enhanced-logger';
 
 // ============================================================================
@@ -19,6 +21,15 @@ interface SyncResult {
   proficienciesGenerated: number;
   durationMs: number;
   errors: string[];
+  discovery?: {
+    ran: boolean;
+    modelsDiscovered: number;
+    modelsAdded: number;
+  };
+  deletionQueue?: {
+    processed: number;
+    unblocked: number;
+  };
 }
 
 // ============================================================================
@@ -73,6 +84,48 @@ export const handler = async (
       errorCount: job.errors.length,
     });
 
+    // Run HuggingFace discovery if enabled
+    let discoveryResult = { ran: false, modelsDiscovered: 0, modelsAdded: 0 };
+    if (config.syncFromHuggingFace) {
+      try {
+        logger.info('Running HuggingFace discovery');
+        const discoveryJob = await huggingfaceDiscoveryService.runDiscovery();
+        discoveryResult = {
+          ran: true,
+          modelsDiscovered: discoveryJob.modelsDiscovered,
+          modelsAdded: discoveryJob.modelsAdded,
+        };
+        logger.info('HuggingFace discovery completed', discoveryResult);
+      } catch (discoveryError) {
+        logger.error('HuggingFace discovery failed', discoveryError instanceof Error ? discoveryError : undefined);
+        job.errors.push({ 
+          errorType: 'unknown',
+          message: `Discovery failed: ${discoveryError instanceof Error ? discoveryError.message : 'Unknown error'}`,
+          timestamp: new Date(),
+        });
+      }
+    }
+
+    // Process deletion queue
+    let deletionResult = { processed: 0, unblocked: 0 };
+    try {
+      // Refresh blocked items that may now be ready
+      deletionResult.unblocked = await modelDeletionQueueService.refreshBlockedItems();
+      
+      // Process pending deletions (up to 5 per run)
+      for (let i = 0; i < 5; i++) {
+        const processed = await modelDeletionQueueService.processNextInQueue();
+        if (!processed) break;
+        deletionResult.processed++;
+      }
+      
+      if (deletionResult.processed > 0 || deletionResult.unblocked > 0) {
+        logger.info('Deletion queue processed', deletionResult);
+      }
+    } catch (deletionError) {
+      logger.error('Deletion queue processing failed', deletionError instanceof Error ? deletionError : undefined);
+    }
+
     return {
       success: job.status === 'completed' || job.status === 'partial',
       jobId: job.id,
@@ -82,6 +135,8 @@ export const handler = async (
       proficienciesGenerated: job.proficienciesGenerated,
       durationMs: job.durationMs || (Date.now() - startTime),
       errors: job.errors.map((e: { message: string }) => e.message),
+      discovery: discoveryResult,
+      deletionQueue: deletionResult,
     };
 
   } catch (error) {

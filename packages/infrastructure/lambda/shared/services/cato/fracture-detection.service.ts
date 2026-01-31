@@ -350,7 +350,7 @@ export class FractureDetectionService {
     if (intentWords.size === 0) return 1.0;
 
     let overlap = 0;
-    for (const word of intentWords) {
+    for (const word of Array.from(intentWords)) {
       if (responseWords.has(word)) {
         overlap++;
       }

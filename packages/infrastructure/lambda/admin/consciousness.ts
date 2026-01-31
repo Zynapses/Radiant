@@ -611,7 +611,7 @@ export const getAvailableTests: APIGatewayProxyHandler = async () => {
           doi: '10.48550/arXiv.2308.08708',
         },
         totalTests: tests.length,
-        categories: [...new Set(tests.map(t => t.testCategory))],
+        categories: Array.from(new Set(tests.map(t => t.testCategory))),
       }
     });
   } catch (error) {

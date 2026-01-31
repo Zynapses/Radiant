@@ -5,7 +5,7 @@
  * Uses database persistence for cost data that must survive Lambda invocations.
  */
 
-import { executeStatement } from '../../database/aurora-client';
+import { executeStatement } from '../../db/client';
 import { logger } from '../../logging/enhanced-logger';
 
 export interface CostEntry {

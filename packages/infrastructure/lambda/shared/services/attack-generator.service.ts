@@ -5,7 +5,7 @@
 import { executeStatement, stringParam, longParam, doubleParam, boolParam } from '../db/client';
 import { modelRouterService, type ChatMessage } from './model-router.service';
 import { enhancedLogger as logger } from '../logging/enhanced-logger';
-import crypto from 'crypto';
+import * as crypto from 'crypto';
 
 // ============================================================================
 // Types

@@ -1,4 +1,5 @@
 import { executeStatement, toSqlParams } from '../db/client';
+import { s3ContentOffloadService } from './s3-content-offload.service';
 
 export type ArtifactType = 'code' | 'markdown' | 'mermaid' | 'html' | 'svg' | 'json' | 'table';
 
@@ -77,16 +78,46 @@ export class CanvasService {
     return String((result.rows[0] as Record<string, unknown>)?.id || '');
   }
 
-  async addArtifact(canvasId: string, artifact: ArtifactCreate, createdBy?: string): Promise<string> {
+  async addArtifact(canvasId: string, artifact: ArtifactCreate, createdBy?: string, tenantId?: string): Promise<string> {
+    // Get tenantId from canvas if not provided
+    let effectiveTenantId = tenantId;
+    if (!effectiveTenantId) {
+      const canvasResult = await executeStatement(
+        `SELECT tenant_id FROM canvases WHERE id = $1`,
+        [{ name: 'canvasId', value: { stringValue: canvasId } }]
+      );
+      effectiveTenantId = String((canvasResult.rows[0] as Record<string, unknown>)?.tenant_id || 'default');
+    }
+
+    // Offload large artifact content to S3
+    let storedContent = artifact.content;
+    let s3Key: string | null = null;
+    
+    if (artifact.content.length > 10000) {
+      const tempId = `art_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+      const offloadResult = await s3ContentOffloadService.offloadContent(
+        effectiveTenantId,
+        'artifacts',
+        tempId,
+        artifact.content,
+        artifact.type === 'code' ? 'text/plain' : 'text/html'
+      );
+      if (offloadResult) {
+        s3Key = offloadResult.s3_key;
+        storedContent = `[S3:${offloadResult.s3_key}]`; // Placeholder - actual content in S3
+      }
+    }
+
     const result = await executeStatement(
-      `INSERT INTO artifacts (canvas_id, artifact_type, title, content, language, position_x, position_y, width, height)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      `INSERT INTO artifacts (canvas_id, artifact_type, title, content, s3_key, language, position_x, position_y, width, height)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
        RETURNING id`,
       [
         { name: 'canvasId', value: { stringValue: canvasId } },
         { name: 'artifactType', value: { stringValue: artifact.type } },
         { name: 'title', value: artifact.title ? { stringValue: artifact.title } : { isNull: true } },
-        { name: 'content', value: { stringValue: artifact.content } },
+        { name: 'content', value: { stringValue: storedContent } },
+        { name: 's3Key', value: s3Key ? { stringValue: s3Key } : { isNull: true } },
         { name: 'language', value: artifact.language ? { stringValue: artifact.language } : { isNull: true } },
         { name: 'positionX', value: { longValue: artifact.position?.x || 0 } },
         { name: 'positionY', value: { longValue: artifact.position?.y || 0 } },
@@ -97,12 +128,14 @@ export class CanvasService {
 
     const artifactId = String((result.rows[0] as Record<string, unknown>)?.id || '');
 
+    // Store version with S3 reference if applicable
     await executeStatement(
-      `INSERT INTO artifact_versions (artifact_id, version, content, created_by)
-       VALUES ($1, 1, $2, $3)`,
+      `INSERT INTO artifact_versions (artifact_id, version, content, s3_key, created_by)
+       VALUES ($1, 1, $2, $3, $4)`,
       [
         { name: 'artifactId', value: { stringValue: artifactId } },
-        { name: 'content', value: { stringValue: artifact.content } },
+        { name: 'content', value: { stringValue: storedContent } },
+        { name: 's3Key', value: s3Key ? { stringValue: s3Key } : { isNull: true } },
         { name: 'createdBy', value: createdBy ? { stringValue: createdBy } : { isNull: true } },
       ]
     );

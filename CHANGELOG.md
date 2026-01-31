@@ -5,6 +5,210 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.53.0] - 2026-01-31
+
+### Added
+
+#### Universal Envelope Protocol v2.0 (UEP v2.0)
+
+Major protocol enhancement for multi-modal, streaming, asynchronous AI communication across RADIANT subsystems.
+
+**Core Enhancements**:
+- **Multi-modal payloads**: Native support for text, images, audio, video, documents (PDF, DOCX), and binary data
+- **Chunked streaming**: Progressive delivery with sequence tracking (`stream.start`, `stream.chunk`, `stream.end`)
+- **Resumable transfers**: tus.io-inspired resume tokens and byte offsets for interrupted transfers
+- **Source/Destination Cards**: Rich metadata about AI model, version, mode, and capabilities (A2A-inspired)
+- **Cross-subsystem routing**: Unified routing across Cato, Brain, Cortex, Genesis, Curator, Think Tank, UDS
+
+**Industry Standards Incorporated**:
+- Google A2A Protocol: Agent Cards, capability discovery
+- CloudEvents (CNCF): `source`, `id`, `type`, `specversion` attributes
+- Anthropic MCP: Tools/Resources/Prompts primitives
+- OpenTelemetry OTLP: Trace/Span/Resource model with baggage
+- tus.io: Resumable uploads with `Upload-Offset`
+- MIME Multipart (RFC 2046): Multi-part message format
+- AsyncAPI: WebSocket binding schema definitions
+
+**New Envelope Types**:
+- `stream.*`: `start`, `chunk`, `end`, `error`, `cancel`
+- `artifact.*`: `created`, `reference`
+- `control.*`: `ack`, `nack`, `heartbeat`, `capability`
+- `event.*`: `checkpoint`, `progress`, `error`
+
+**TypeScript Types** (`packages/shared/src/types/uep-v2.types.ts`):
+- `UEPEnvelope<T>`: Full envelope interface with generics
+- `UEPSourceCard`, `UEPDestinationCard`: Source/destination metadata
+- `UEPPayload`, `UEPContentReference`: Multi-modal payload support
+- `UEPStreamingInfo`, `UEPStreamProgress`: Chunked streaming
+- Specialized types: `UEPStreamStartEnvelope`, `UEPStreamChunkEnvelope`, `UEPStreamEndEnvelope`
+
+**Database Schema** (`docs/specs/UEP-V2-SPECIFICATION.md`):
+- `uep_envelopes_v2`: Extended envelope storage with streaming support
+- `uep_streams`: Stream lifecycle management with resume tokens
+- `uep_artifacts`: Artifact registry for external content references
+- Row Level Security policies for multi-tenant isolation
+
+**Transport Bindings**:
+- HTTP: CloudEvents-compatible headers
+- WebSocket: AsyncAPI-compatible schema
+- Server-Sent Events (SSE): For streaming chunks
+- PostgreSQL: Internal durable storage
+
+**Backward Compatibility**:
+- UEP v1.0 `CatoMethodEnvelope` objects are valid v2.0 envelopes
+- Migration helper provided for automatic conversion
+
+**Documentation**: `docs/specs/UEP-V2-SPECIFICATION.md` - Complete specification with examples
+
+**Implementation Services** (`packages/infrastructure/lambda/shared/services/uep/`):
+- `envelope-builder.service.ts` - Fluent builder pattern for envelope construction
+- `stream-manager.service.ts` - Chunked streaming lifecycle with resumable transfers
+- `migration.service.ts` - v1.0 to v2.0 bidirectional migration
+- `security.service.ts` - E2E encryption, signing, MLS design
+- `index.ts` - Barrel exports
+
+**Security Layer**:
+- **Encryption**: AES-256-GCM and ChaCha20-Poly1305 via AWS KMS envelope encryption
+- **Signing**: ECDSA_SHA_256/384, RSASSA_PSS for envelope integrity
+- **Key Management**: Per-tenant isolation, automatic rotation, versioning
+- **MLS Design**: RFC 9420 placeholder for future multi-agent encryption
+
+**Database Migration** (`V5.3.0__uep_v2_streaming.sql`):
+- 8 new tables: `uep_envelopes_v2`, `uep_streams`, `uep_artifacts`, `uep_encryption_keys`, `uep_signature_verifications`, `uep_routing_rules`, `uep_dead_letters`, `uep_metrics`
+- 8 new enums for envelope types, source types, delivery modes, etc.
+- PostgreSQL functions: `uep_get_stream_progress`, `uep_generate_resume_token`, `uep_validate_resume_token`, `uep_record_metric`
+- Full RLS policies for multi-tenant isolation
+
+**Regulatory Compliance** (`services/uep/compliance.service.ts`):
+- **PHI Detection**: SSN, MRN, DOB, diagnosis codes, medication patterns
+- **PII Detection**: Driver's license, passport, bank account patterns
+- **Framework Support**: HIPAA, GDPR, SOC2, FDA, CCPA, PCI-DSS
+- **Auto-Classification**: Determines `PUBLIC`/`INTERNAL`/`CONFIDENTIAL`/`RESTRICTED`
+- **Retention Calculation**: Auto-calculates based on framework requirements
+- **Audit Logging**: Full compliance audit with findings and recommendations
+
+**Compliance Audit Report** (`docs/specs/UEP-V2-REGULATORY-COMPLIANCE-AUDIT.md`):
+- ✅ HIPAA: PHI protection, encryption, audit trails, 6-year retention
+- ✅ GDPR: Data subject rights, consent tracking, cross-border controls
+- ✅ SOC2: Trust service criteria, change management, monitoring
+- ✅ FDA 21 CFR Part 11: Electronic records, digital signatures
+- ✅ CCPA: Consumer privacy rights
+- ✅ PCI-DSS: Payment card data security
+
+**UDS-Integrated Storage** (`services/uep/uds-storage-adapter.service.ts`):
+- **Reuses UDS Infrastructure**: No duplicate tier management, monitoring, or admin UI
+- **Kinesis Queuing**: High-throughput async writes via existing `radiant-uds-events` stream
+- **SQS Fallback**: FIFO queue with deduplication for guaranteed delivery
+- **Hot Tier**: Redis/ElastiCache with pipeline/trace indexes (shared with UDS)
+- **Warm Tier**: PostgreSQL `uds_envelopes` table (shared tier coordinator)
+- **Cold/Glacier**: S3 archival via existing UDS tier transitions
+- **Scale Target**: 1M+ concurrent users using proven UDS infrastructure
+- **Single Pane**: All tier health, metrics, and controls in existing UDS admin dashboard
+
+**Platform-Wide Integration** (`services/uep/integration.service.ts`):
+- **Model Router**: All AI model responses wrapped in UEP v2.0 envelopes
+- **Cato Pipeline**: v1 → v2 envelope migration, new methods use UEP natively
+- **AGI Orchestrator**: Multi-model orchestration results in UEP format
+- **Brain Router**: Domain-aware routing responses wrapped
+- **Response Synthesis**: Ensemble/merge results in UEP envelopes
+- **Distributed Tracing**: Linked spans across service boundaries
+- **Storage API**: Unified `storeEnvelope()`, `queryEnvelopes()` methods
+
+**Database Migration** (`V2026_01_31_001__uds_envelopes.sql`):
+- `uds_envelopes` table with RLS and tier management
+- Tier transition functions (`hot_to_warm`, `warm_to_cold`)
+- PHI retention compliance functions
+- Audit trigger for envelope operations
+- Envelope metrics columns in `uds_data_flow_metrics`
+
+**Documentation** (`docs/UEP-V2-SPECIFICATION.md`):
+- Complete protocol specification with examples
+- Integration guides for all services
+- Storage architecture and tier management
+- Compliance framework requirements
+- Added to DOCUMENTATION-MANIFEST.json for auto-evaluation
+
+**S3 Content Offloading** - Database Scaling Fix:
+Migrated large content storage from PostgreSQL to S3 to prevent database bloat:
+
+- **internet_content**: Web scraping content (up to 50KB/URL) → S3
+- **reward_training_data**: AI response pairs for RLHF → S3 for responses >10KB
+- **artifacts/artifact_versions**: Code/markdown/HTML content → S3
+- **consciousness_dreams**: Dream content → S3
+- **consciousness_monologue_data**: Monologue training data → S3
+- **distillation_training_data**: Teacher responses → S3
+- **semantic_memories**: Semantic memory content → S3
+- **user_memory**: User memory content → S3
+- **liquid_ghost_events**: Event payloads → S3
+- **council_debates**: Debate topics/context → S3
+
+Services updated:
+- `internet-learning.service.ts` - Uses `s3ContentOffloadService`
+- `reward-model.service.ts` - Offloads large responses
+- `canvas-service.ts` - Offloads artifact content
+
+Migration: `V2026_01_31_002__s3_offloading_columns.sql`
+
+---
+
+## [5.52.57] - 2026-01-29
+
+### Added
+
+#### Model Registry Enhancement System
+
+Comprehensive model version discovery, management, and lifecycle system for self-hosted AI models.
+
+**HuggingFace Discovery Service** (`huggingface-discovery.service.ts`):
+- Automated polling of HuggingFace API for new model versions
+- Family watchlist management with configurable settings per model family
+- Discovery job tracking with status, timing, and results
+- Rate limiting and API token management
+- Automatic version extraction from model metadata
+
+**Model Version Manager Service** (`model-version-manager.service.ts`):
+- S3 storage management for model weights and artifacts
+- Thermal state management (hot/warm/cold/off) with transitions
+- Bulk thermal state updates for fleet management
+- Storage info tracking with file counts and sizes
+- Dashboard with comprehensive statistics
+
+**Model Deletion Queue Service** (`model-deletion-queue.service.ts`):
+- Soft delete with usage tracking - models wait until no active sessions
+- Queue priority management for controlled deletion order
+- Automatic status transitions (pending → blocked → processing → completed)
+- S3 cleanup on completion with byte tracking
+- Usage session management for accurate deletion timing
+
+**Database Migration** (`039_model_version_discovery.sql`):
+- `model_versions` - Version tracking with thermal state, storage, and deployment info
+- `model_family_watchlist` - HuggingFace discovery configuration per family
+- `model_discovery_jobs` - Discovery job history and results
+- `model_deletion_queue` - Soft delete queue with blocking logic
+- `model_usage_sessions` - Active session tracking for safe deletion
+- Views, functions, and triggers for automated management
+
+**Admin API** (`lambda/admin/model-registry.ts`):
+- `GET/POST /versions` - List and create model versions
+- `POST /versions/:id/thermal` - Set thermal state
+- `POST /discovery/run` - Trigger manual discovery
+- `GET/POST/PATCH/DELETE /watchlist` - Manage discovery watchlist
+- `GET/POST /deletion-queue` - Queue management and processing
+
+**Admin Dashboard** (`app/(dashboard)/model-registry/`):
+- Overview tab with version counts, thermal distribution, storage stats
+- Versions tab with filtering, thermal controls, and deletion actions
+- Watchlist tab with enable/disable toggles per family
+- Deletion Queue tab showing status, sessions, and cancel option
+- Discovery Jobs tab with job history and results
+
+**Scheduler Integration** (`lambda/scheduled/model-sync.ts`):
+- HuggingFace discovery runs during scheduled sync when enabled
+- Deletion queue processing (up to 5 per run)
+- Blocked item refresh to unblock ready deletions
+
+---
+
 ## [5.52.56] - 2026-01-29
 
 ### Documentation

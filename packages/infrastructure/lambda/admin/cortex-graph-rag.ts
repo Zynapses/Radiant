@@ -710,8 +710,8 @@ async function ingestContent(event: APIGatewayProxyEvent): Promise<APIGatewayPro
 
   await transaction(async (client) => {
     // Process content based on source type
-    const content = body.content || '';
-    const sourceId = body.source.id || `ingest_${Date.now()}`;
+    const content = body.source.content || '';
+    const sourceId = body.source.documentId || body.source.conversationId || `ingest_${Date.now()}`;
 
     // Create chunks from content (split by paragraphs)
     const paragraphs = content.split(/\n\n+/).filter((p: string) => p.trim().length > 50);
@@ -743,7 +743,7 @@ async function ingestContent(event: APIGatewayProxyEvent): Promise<APIGatewayPro
       }
     }
 
-    for (const [, entity] of foundEntities) {
+    for (const [, entity] of Array.from(foundEntities)) {
       // Check if entity already exists
       const existing = await client.query(`
         SELECT id FROM cortex_entities 

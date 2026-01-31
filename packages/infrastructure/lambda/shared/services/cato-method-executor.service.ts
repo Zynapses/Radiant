@@ -25,6 +25,7 @@ import {
 import { CatoMethodRegistryService } from './cato-method-registry.service';
 import { CatoSchemaRegistryService } from './cato-schema-registry.service';
 import { ModelRouterService, modelRouterService, ModelRequest, ModelResponse } from './model-router.service.js';
+import { uepIntegrationService } from './uep/index.js';
 
 export interface MethodExecutionContext {
   pipelineId: string;
@@ -401,6 +402,11 @@ export abstract class CatoBaseMethodExecutor<TInput = unknown, TOutput = unknown
   }
 
   protected async persistEnvelope(envelope: CatoMethodEnvelope<TOutput>): Promise<void> {
+    // Store in UEP v2.0 UDS tiered storage (async, fire-and-forget for scale)
+    this.storeToUEP(envelope).catch(err => {
+      // Non-fatal - primary storage is still the PostgreSQL table below
+    });
+
     await this.pool.query(
       `INSERT INTO cato_pipeline_envelopes (
         envelope_id, pipeline_id, tenant_id, sequence, envelope_version,
@@ -667,6 +673,72 @@ Provide a JSON response with format: { "summary": "...", "keyPoints": ["...", ".
       // Fallback: just take first and last if summarization fails
       return [envelopes[0], envelopes[envelopes.length - 1]];
     }
+  }
+
+  /**
+   * Store envelope to UEP v2.0 UDS tiered storage
+   * This enables scalable envelope storage with Hot → Warm → Cold tiers
+   */
+  protected async storeToUEP(envelope: CatoMethodEnvelope<TOutput>): Promise<void> {
+    const uepEnvelope = uepIntegrationService.createCatoEnvelope(
+      envelope.tenantId,
+      envelope.source.methodId,
+      envelope.output.data as Record<string, unknown>,
+      {
+        pipelineId: envelope.pipelineId,
+        traceId: envelope.tracing.traceId,
+        sequence: envelope.sequence,
+        methodVersion: envelope.envelopeVersion,
+        complianceFrameworks: envelope.compliance.frameworks,
+      }
+    );
+
+    // Complete the envelope with output and risk signals
+    const completedEnvelope = uepIntegrationService.completeCatoEnvelope(
+      uepEnvelope,
+      envelope.output.data as Record<string, unknown>,
+      {
+        status: 'completed',
+        durationMs: envelope.durationMs,
+        riskSignals: envelope.riskSignals.length > 0 ? {
+          overallRisk: this.calculateOverallRisk(envelope.riskSignals),
+          scores: {
+            safety: this.getRiskScore(envelope.riskSignals, 'safety'),
+            compliance: this.getRiskScore(envelope.riskSignals, 'compliance'),
+            quality: envelope.confidence.score,
+            cost: 1.0,
+          },
+          flags: envelope.riskSignals.map(r => r.signalType),
+        } : undefined,
+      }
+    );
+
+    // Store to UDS tiered storage (fire-and-forget)
+    await uepIntegrationService.storeEnvelope(completedEnvelope);
+  }
+
+  private calculateOverallRisk(signals: CatoRiskSignal[]): 'low' | 'medium' | 'high' | 'critical' {
+    const maxSeverity = Math.max(...signals.map(s => {
+      switch (s.severity) {
+        case 'CRITICAL': return 4;
+        case 'HIGH': return 3;
+        case 'MEDIUM': return 2;
+        default: return 1;
+      }
+    }), 1);
+    
+    switch (maxSeverity) {
+      case 4: return 'critical';
+      case 3: return 'high';
+      case 2: return 'medium';
+      default: return 'low';
+    }
+  }
+
+  private getRiskScore(signals: CatoRiskSignal[], category: string): number {
+    const relevant = signals.filter(s => s.signalType.toLowerCase().includes(category));
+    if (relevant.length === 0) return 1.0;
+    return 1.0 - (relevant.length * 0.2); // Reduce score by 0.2 per signal
   }
 }
 

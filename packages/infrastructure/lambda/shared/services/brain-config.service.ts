@@ -367,7 +367,7 @@ class BrainConfigService {
       }
 
       const categories: ParameterCategory[] = [];
-      for (const [categoryId, parameters] of categoryMap) {
+      for (const [categoryId, parameters] of Array.from(categoryMap)) {
         const categoryInfo = PARAMETER_CATEGORIES[categoryId as keyof typeof PARAMETER_CATEGORIES];
         categories.push({
           id: categoryId,
