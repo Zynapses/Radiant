@@ -395,11 +395,11 @@ export const getOverview: APIGatewayProxyHandler = async () => {
     const logs = await modelProficiencyService.getDiscoveryLog(10);
     
     // Get unique models
-    const modelIds = [...new Set(rankings.map(r => r.modelId))];
+    const modelIds = Array.from(new Set(rankings.map(r => r.modelId)));
     
     // Get domain coverage
-    const domains = [...new Set(rankings.filter(r => r.domain !== '__mode__').map(r => r.domain))];
-    const modes = [...new Set(rankings.filter(r => r.mode).map(r => r.mode!))];
+    const domains = Array.from(new Set(rankings.filter(r => r.domain !== '__mode__').map(r => r.domain)));
+    const modes = Array.from(new Set(rankings.filter(r => r.mode).map(r => r.mode!)));
     
     // Calculate averages
     const avgDomainScore = rankings

@@ -8,6 +8,7 @@ import type { RewardContext, RewardScore, RewardTrainingData } from '@radiant/sh
 import { REWARD_MODEL_CONFIG, REWARD_DIMENSION_WEIGHTS } from '@radiant/shared/constants';
 import { getDbPool } from './database';
 import { callLiteLLM } from './litellm.service';
+import { s3ContentOffloadService } from './s3-content-offload.service';
 
 export class RewardModelService {
   
@@ -68,16 +69,48 @@ export class RewardModelService {
     losingModelId?: string
   ): Promise<void> {
     const pool = await getDbPool();
+    const recordId = crypto.randomUUID();
+    
+    // Offload large responses to S3 instead of storing in database
+    // This prevents database bloat from storing full AI responses
+    let winningS3Key: string | null = null;
+    let losingS3Key: string | null = null;
+    let storedWinning = winningResponse;
+    let storedLosing = losingResponse;
+    
+    // Offload winning response if large
+    if (winningResponse.length > 10000) {
+      const result = await s3ContentOffloadService.offloadContent(
+        tenantId, 'reward_training_data', `${recordId}_winning`, winningResponse, 'text/plain'
+      );
+      if (result) {
+        winningS3Key = result.s3_key;
+        storedWinning = `[S3:${result.s3_key}]`; // Placeholder in DB
+      }
+    }
+    
+    // Offload losing response if large
+    if (losingResponse.length > 10000) {
+      const result = await s3ContentOffloadService.offloadContent(
+        tenantId, 'reward_training_data', `${recordId}_losing`, losingResponse, 'text/plain'
+      );
+      if (result) {
+        losingS3Key = result.s3_key;
+        storedLosing = `[S3:${result.s3_key}]`; // Placeholder in DB
+      }
+    }
     
     await pool.query(`
       INSERT INTO reward_training_data (
         id, tenant_id, user_id, prompt, context,
-        winning_response, winning_model_id, losing_response, losing_model_id,
+        winning_response, winning_model_id, winning_s3_key,
+        losing_response, losing_model_id, losing_s3_key,
         signal_type, signal_strength, domain_ids, created_at
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, NOW())
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, NOW())
     `, [
-      crypto.randomUUID(), tenantId, userId, prompt, JSON.stringify(context),
-      winningResponse, winningModelId, losingResponse, losingModelId,
+      recordId, tenantId, userId, prompt, JSON.stringify(context),
+      storedWinning, winningModelId, winningS3Key,
+      storedLosing, losingModelId, losingS3Key,
       signalType, signalStrength, domainIds,
     ]);
   }

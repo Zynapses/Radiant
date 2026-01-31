@@ -492,6 +492,8 @@ export interface DeciderOutput {
 
 **File**: `@/packages/shared/src/types/cato-pipeline.types.ts` (Lines 385-419)
 
+> **UEP v2.0 Available**: For multi-modal streaming, chunked delivery, and cross-subsystem communication, see the enhanced **[UEP v2.0 Specification](./specs/UEP-V2-SPECIFICATION.md)**. UEP v1.0 envelopes remain fully compatible with v2.0.
+
 The envelope is the **universal data container** that flows between methods. It carries the method output along with metadata for tracing, compliance, risk, and cost tracking.
 
 ### 4.1 CatoMethodEnvelope Structure

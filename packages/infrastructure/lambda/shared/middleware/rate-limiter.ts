@@ -131,7 +131,7 @@ const MAX_MEMORY_STORE_SIZE = 10000;
 
 function cleanupMemoryStore(): void {
   const now = Date.now();
-  for (const [key, value] of memoryStore.entries()) {
+  for (const [key, value] of Array.from(memoryStore.entries())) {
     if (value.resetAt < now) {
       memoryStore.delete(key);
     }

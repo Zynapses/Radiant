@@ -310,6 +310,12 @@ async function routeRequest(
     }
   }
 
+  // Model Registry v5.52.57 - Model Version Discovery & Lifecycle
+  if (pathParts[1] === 'model-registry') {
+    const { handler: modelRegistryHandler } = await import('./model-registry.js');
+    return modelRegistryHandler(event);
+  }
+
   // Model coordination
   if (pathParts[1] === 'model-coordination') {
     const mod = await import('./model-coordination.js');

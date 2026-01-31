@@ -487,7 +487,7 @@ ${prompt}<|im_end|>
   private restoreSpecialContent(text: string, replacements: Map<string, string>): string {
     let result = text;
     
-    for (const [placeholder, original] of replacements) {
+    for (const [placeholder, original] of Array.from(replacements)) {
       result = result.replace(placeholder, original);
     }
     

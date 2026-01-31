@@ -24,3 +24,8 @@ export { NeuralOrchestrationService, neuralOrchestrationService } from '../neura
 
 // Thermal Management
 export { ThermalStateService, thermalStateService, type ThermalState } from '../thermal-state';
+
+// Model Version Discovery & Lifecycle
+export { huggingfaceDiscoveryService } from '../huggingface-discovery.service';
+export { modelVersionManagerService } from '../model-version-manager.service';
+export { modelDeletionQueueService } from '../model-deletion-queue.service';

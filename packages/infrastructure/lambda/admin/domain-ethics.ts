@@ -147,7 +147,7 @@ export const getConfig: APIGatewayProxyHandler = async (event) => {
     const config = await domainEthicsService.getTenantConfig(tenantId);
     
     // Get available domains
-    const domains = [...new Set(DOMAIN_ETHICS_REGISTRY.map(f => f.domain))];
+    const domains = Array.from(new Set(DOMAIN_ETHICS_REGISTRY.map(f => f.domain)));
     
     return success({
       config,

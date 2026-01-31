@@ -1020,7 +1020,7 @@ class IITPhiCalculationService {
     const typesCount = byType.size;
     const perType = Math.floor(maxNodes / typesCount);
     
-    for (const [, typeNodes] of byType) {
+    for (const [, typeNodes] of Array.from(byType)) {
       // Sort by activation (most active first) and take top perType
       typeNodes.sort((a, b) => {
         const aAvg = a.activationHistory.reduce((sum, v) => sum + v, 0) / a.activationHistory.length;

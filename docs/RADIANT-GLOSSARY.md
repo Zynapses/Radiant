@@ -2,7 +2,7 @@
 
 > **Quick Reference for AI Terms, Subsystems, AWS Services, and Acronyms**
 > 
-> **Version**: 1.0.0 | **Last Updated**: January 29, 2026
+> **Version**: 1.1.0 | **Last Updated**: January 29, 2026
 
 ---
 
@@ -68,6 +68,15 @@
 | **Graph-RAG** | Knowledge graph + retrieval augmented generation | `cortex-graph-rag.service.ts` |
 | **SOFAI Router** | System 1/System 2 dynamic routing (60%+ cost reduction) | `sofai-router.service.ts` |
 | **Twilight Dreaming** | Offline learning during low-traffic periods (2-6 AM) | `dream-scheduler.service.ts` |
+
+### Model Management
+
+| Subsystem | Description | Key Files |
+|-----------|-------------|-----------|
+| **Model Registry** | Version tracking and lifecycle management for self-hosted models | `model-version-manager.service.ts` |
+| **HuggingFace Discovery** | Automated polling for new model versions from HuggingFace | `huggingface-discovery.service.ts` |
+| **Deletion Queue** | Safe model deletion with usage session tracking | `model-deletion-queue.service.ts` |
+| **Thermal Manager** | Hot/Warm/Cold/Off state management for cost optimization | `thermal-state.ts` |
 
 ### Pipeline & Orchestration
 
@@ -436,6 +445,7 @@
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.1.0 | Jan 29, 2026 | Added Model Management subsystems (Model Registry, HuggingFace Discovery, Deletion Queue, Thermal Manager) |
 | 1.0.0 | Jan 29, 2026 | Initial comprehensive glossary |
 
 ---

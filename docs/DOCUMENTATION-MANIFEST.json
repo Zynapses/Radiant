@@ -103,6 +103,16 @@
         "description": "API reference documentation"
       },
       {
+        "path": "docs/UEP-V2-SPECIFICATION.md",
+        "triggers": ["uep", "envelope", "tracing", "pipeline", "model_response", "compliance", "cato_method"],
+        "description": "Universal Envelope Protocol v2.0 - wraps all AI interactions for tracing, compliance, and storage"
+      },
+      {
+        "path": "docs/specs/UEP-V2-REGULATORY-COMPLIANCE-AUDIT.md",
+        "triggers": ["uep", "compliance", "hipaa", "gdpr", "soc2", "regulatory"],
+        "description": "UEP v2.0 regulatory compliance audit report"
+      },
+      {
         "path": "docs/SERVICE-LAYER-GUIDE.md",
         "triggers": ["mcp", "a2a", "api_keys", "gateway", "service_layer", "cedar_policy", "interface_type"],
         "description": "Service layer documentation - MCP, A2A, API interfaces, gateway, Cedar policies"
@@ -225,7 +235,12 @@
       "models": ["CHANGELOG.md", "docs/RADIANT-ADMIN-GUIDE.md", "docs/ENGINEERING-IMPLEMENTATION-VISION.md"],
       "dependency": ["CHANGELOG.md", "docs/OPEN-SOURCE-LIBRARIES.md"],
       "consciousness": ["CHANGELOG.md", "docs/CONSCIOUSNESS-SERVICE.md", "docs/THINKTANK-ADMIN-GUIDE.md"],
-      "cato": ["CHANGELOG.md", "docs/CATO-COMPLETE-DOCUMENTATION.md", "docs/RADIANT-ADMIN-GUIDE.md"],
+      "cato": ["CHANGELOG.md", "docs/CATO-COMPLETE-DOCUMENTATION.md", "docs/RADIANT-ADMIN-GUIDE.md", "docs/UEP-V2-SPECIFICATION.md"],
+      "uep": ["CHANGELOG.md", "docs/UEP-V2-SPECIFICATION.md", "docs/ENGINEERING-IMPLEMENTATION-VISION.md", "docs/RADIANT-PLATFORM-ARCHITECTURE.md"],
+      "envelope": ["CHANGELOG.md", "docs/UEP-V2-SPECIFICATION.md"],
+      "tracing": ["CHANGELOG.md", "docs/UEP-V2-SPECIFICATION.md", "docs/ENGINEERING-IMPLEMENTATION-VISION.md"],
+      "model_response": ["CHANGELOG.md", "docs/UEP-V2-SPECIFICATION.md"],
+      "cato_method": ["CHANGELOG.md", "docs/UEP-V2-SPECIFICATION.md", "docs/CATO-COMPLETE-DOCUMENTATION.md"],
       "cortex": ["CHANGELOG.md", "docs/CORTEX-MEMORY-ADMIN-GUIDE.md"],
       "new_term": ["CHANGELOG.md", "docs/RADIANT-GLOSSARY.md"],
       "new_subsystem": ["CHANGELOG.md", "docs/RADIANT-GLOSSARY.md", "docs/RADIANT-PLATFORM-ARCHITECTURE.md"],
@@ -268,7 +283,8 @@
       "docs/SWIFT-DEPLOYER-USER-GUIDE.md",
       "docs/UDS-ADMIN-GUIDE.md",
       "docs/SERVICE-LAYER-GUIDE.md",
-      "docs/RADIANT-GLOSSARY.md"
+      "docs/RADIANT-GLOSSARY.md",
+      "docs/UEP-V2-SPECIFICATION.md"
     ]
   },
 

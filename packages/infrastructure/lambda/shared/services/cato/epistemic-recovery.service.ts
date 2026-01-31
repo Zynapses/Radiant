@@ -286,7 +286,7 @@ INSTRUCTIONS:
         sessionId,
         attempt,
         strategy,
-        [...new Set(rejectionHistory.map((r) => r.rejectedBy))],
+        Array.from(new Set(rejectionHistory.map((r) => r.rejectedBy))),
         JSON.stringify(rejectionHistory),
         params.forcedPersona,
         params.uncertaintyThresholdReduction,

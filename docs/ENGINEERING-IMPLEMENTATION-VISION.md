@@ -1,7 +1,7 @@
 # RADIANT Engineering Implementation & Vision
 
-**Version**: 5.52.54  
-**Last Updated**: 2026-01-28  
+**Version**: 5.53.0  
+**Last Updated**: 2026-01-31  
 **Classification**: Internal Engineering Reference
 
 > **POLICY**: All technical architecture, implementation details, and visionary documentation MUST be consolidated in this document. Engineers require comprehensive detail—never abbreviate or summarize to the point of losing implementation specifics. See `/.windsurf/workflows/documentation-consolidation.md` for enforcement.
@@ -31,6 +31,8 @@
 19. [Two-Factor Authentication (MFA)](#19-two-factor-authentication-mfa-v55228)
 20. [Internationalization & Multi-Language Search](#20-internationalization--multi-language-search-v55229)
 21. [Cato Pipeline Orchestration System](#21-cato-pipeline-orchestration-system-v55254)
+22. [Model Registry & Version Discovery System](#22-model-registry--version-discovery-system-v55257)
+23. [Universal Envelope Protocol v2.0](#23-universal-envelope-protocol-v20-v5530)
 
 ---
 
@@ -6463,3 +6465,530 @@ When implementing new features, add documentation to the appropriate section:
 12. **Admin API handlers** → Section 16
 
 See `/.windsurf/workflows/documentation-consolidation.md` for the enforcement policy.
+
+---
+
+## 22. Model Registry & Version Discovery System (v5.52.57)
+
+### 22.1 Overview
+
+The Model Registry system provides comprehensive management of self-hosted AI model versions, including automated discovery from HuggingFace, thermal state management for cost optimization, and safe deletion with usage session tracking.
+
+**Core Capabilities:**
+- **Automated Discovery**: Poll HuggingFace API for new versions of watched model families
+- **Version Management**: Track all model versions with metadata, storage info, and deployment status
+- **Thermal States**: Hot/Warm/Cold/Off states for cost and latency optimization
+- **Safe Deletion**: Queue-based deletion that waits for active sessions to complete
+
+### 22.2 Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    MODEL REGISTRY ARCHITECTURE                               │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐    │
+│  │   HuggingFace    │     │  Model Version   │     │  Deletion Queue  │    │
+│  │   Discovery      │────▶│    Manager       │────▶│    Service       │    │
+│  │   Service        │     │                  │     │                  │    │
+│  └────────┬─────────┘     └────────┬─────────┘     └────────┬─────────┘    │
+│           │                        │                        │              │
+│           │  Polls HF API          │  Manages S3            │  Tracks      │
+│           │  for new versions      │  and thermal           │  sessions    │
+│           │                        │  states                │              │
+│           ▼                        ▼                        ▼              │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                     PostgreSQL Tables                                │   │
+│  │  model_versions | model_family_watchlist | model_discovery_jobs     │   │
+│  │  model_deletion_queue | model_usage_sessions                        │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                         S3 Storage                                   │   │
+│  │  radiant-models-{env}/                                               │   │
+│  │  ├── llama/3.2-70b/weights/                                         │   │
+│  │  ├── qwen/2.5-72b/weights/                                          │   │
+│  │  └── deepseek/v3/weights/                                           │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 22.3 HuggingFace Discovery Service
+
+**File**: `lambda/shared/services/huggingface-discovery.service.ts`
+
+```typescript
+interface HuggingFaceDiscoveryService {
+  // Core discovery
+  runDiscovery(userId?: string, families?: string[]): Promise<ModelDiscoveryJob>;
+  getRecentDiscoveryJobs(limit?: number): Promise<ModelDiscoveryJob[]>;
+  
+  // Watchlist management
+  getWatchlist(): Promise<ModelFamilyWatchlist[]>;
+  addWatchlistFamily(family: WatchlistInput): Promise<ModelFamilyWatchlist>;
+  updateWatchlistItem(family: string, updates: Partial<WatchlistInput>): Promise<void>;
+  removeWatchlistFamily(family: string): Promise<void>;
+  
+  // HuggingFace API
+  searchModels(query: string, filters?: HFSearchFilters): Promise<HFModelInfo[]>;
+  getModelInfo(modelId: string): Promise<HFModelInfo>;
+}
+```
+
+**Key Features:**
+- **Rate Limiting**: Respects HuggingFace API limits with configurable delays
+- **API Token Management**: Retrieves token from AWS Secrets Manager
+- **Version Extraction**: Parses version from model names, tags, and metadata
+- **Family Filtering**: Only discovers models from watched families
+
+### 22.4 Model Version Manager Service
+
+**File**: `lambda/shared/services/model-version-manager.service.ts`
+
+```typescript
+interface ModelVersionManagerService {
+  // CRUD operations
+  listVersions(filters?: VersionFilters): Promise<{ versions: ModelVersion[]; total: number }>;
+  getVersion(id: string): Promise<ModelVersion | null>;
+  createVersion(input: CreateVersionInput): Promise<ModelVersion>;
+  updateVersion(id: string, updates: Partial<ModelVersion>): Promise<ModelVersion>;
+  
+  // Thermal state management
+  setThermalState(id: string, state: ThermalState): Promise<void>;
+  bulkSetThermalState(ids: string[], state: ThermalState): Promise<number>;
+  
+  // S3 storage
+  getStorageInfo(id: string): Promise<StorageInfo>;
+  deleteS3Data(id: string): Promise<{ deletedBytes: number }>;
+  
+  // Dashboard
+  getDashboard(): Promise<VersionDashboard>;
+}
+```
+
+**Thermal States:**
+
+| State | Description | SageMaker Status | Cold Start |
+|-------|-------------|------------------|------------|
+| `hot` | Fully loaded, instant response | Running | 0ms |
+| `warm` | Loaded on demand | Scaling | 5-30s |
+| `cold` | In S3, requires download | Stopped | 2-10min |
+| `off` | Disabled, not available | Deleted | N/A |
+
+### 22.5 Model Deletion Queue Service
+
+**File**: `lambda/shared/services/model-deletion-queue.service.ts`
+
+```typescript
+interface ModelDeletionQueueService {
+  // Queue management
+  listQueueItems(filters?: QueueFilters): Promise<DeletionQueueItem[]>;
+  queueForDeletion(input: QueueInput): Promise<DeletionQueueItem>;
+  cancelDeletion(id: string): Promise<void>;
+  updatePriority(id: string, priority: number): Promise<void>;
+  
+  // Processing
+  processNextInQueue(): Promise<boolean>;
+  refreshBlockedItems(): Promise<number>;
+  
+  // Usage tracking
+  getActiveSessions(modelVersionId: string): Promise<UsageSession[]>;
+  
+  // Dashboard
+  getQueueDashboard(): Promise<QueueDashboard>;
+}
+```
+
+**Deletion States:**
+
+```
+pending ─────▶ processing ─────▶ completed
+    │              │
+    │              └───▶ failed (retry)
+    │
+    └─▶ blocked (active sessions) ─▶ pending (when sessions end)
+    │
+    └─▶ cancelled (admin action)
+```
+
+### 22.6 Database Schema
+
+**Migration**: `039_model_version_discovery.sql`
+
+```sql
+-- Model versions with thermal state tracking
+CREATE TABLE model_versions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  model_id TEXT NOT NULL,
+  family model_family NOT NULL,
+  version TEXT NOT NULL,
+  display_name TEXT,
+  huggingface_id TEXT,
+  thermal_state thermal_state DEFAULT 'off',
+  download_status download_status DEFAULT 'pending',
+  deployment_status deployment_status DEFAULT 'not_deployed',
+  is_active BOOLEAN DEFAULT true,
+  s3_bucket TEXT,
+  s3_prefix TEXT,
+  storage_size_bytes BIGINT DEFAULT 0,
+  total_requests BIGINT DEFAULT 0,
+  metadata JSONB DEFAULT '{}',
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(model_id, version)
+);
+
+-- HuggingFace discovery watchlist
+CREATE TABLE model_family_watchlist (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  family model_family NOT NULL UNIQUE,
+  is_enabled BOOLEAN DEFAULT true,
+  auto_download BOOLEAN DEFAULT false,
+  auto_deploy BOOLEAN DEFAULT false,
+  huggingface_org TEXT,
+  min_likes INTEGER DEFAULT 100,
+  check_interval_hours INTEGER DEFAULT 24,
+  last_checked_at TIMESTAMPTZ,
+  versions_found INTEGER DEFAULT 0,
+  metadata JSONB DEFAULT '{}'
+);
+
+-- Soft deletion queue
+CREATE TABLE model_deletion_queue (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  model_version_id UUID NOT NULL REFERENCES model_versions(id),
+  status deletion_status DEFAULT 'pending',
+  priority INTEGER DEFAULT 0,
+  reason TEXT,
+  queued_by UUID,
+  queued_at TIMESTAMPTZ DEFAULT NOW(),
+  processing_started_at TIMESTAMPTZ,
+  completed_at TIMESTAMPTZ,
+  error_message TEXT,
+  s3_bytes_deleted BIGINT DEFAULT 0
+);
+
+-- Active usage session tracking
+CREATE TABLE model_usage_sessions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  model_version_id UUID NOT NULL REFERENCES model_versions(id),
+  session_id TEXT NOT NULL,
+  user_id UUID,
+  tenant_id UUID,
+  started_at TIMESTAMPTZ DEFAULT NOW(),
+  last_activity_at TIMESTAMPTZ DEFAULT NOW(),
+  ended_at TIMESTAMPTZ,
+  request_count INTEGER DEFAULT 0
+);
+```
+
+### 22.7 Admin API Endpoints
+
+**File**: `lambda/admin/model-registry.ts`
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/dashboard` | GET | Overview statistics |
+| `/versions` | GET | List versions with filtering |
+| `/versions` | POST | Create new version |
+| `/versions/:id` | GET | Get version details |
+| `/versions/:id` | PATCH | Update version |
+| `/versions/:id/thermal` | POST | Set thermal state |
+| `/versions/thermal/bulk` | POST | Bulk thermal update |
+| `/versions/:id/storage` | GET | S3 storage info |
+| `/discovery/run` | POST | Trigger discovery |
+| `/discovery/jobs` | GET | List discovery jobs |
+| `/watchlist` | GET | Get watchlist |
+| `/watchlist` | POST | Add to watchlist |
+| `/watchlist/:family` | PATCH | Update watchlist item |
+| `/watchlist/:family` | DELETE | Remove from watchlist |
+| `/deletion-queue` | GET | List queued items |
+| `/deletion-queue` | POST | Queue for deletion |
+| `/deletion-queue/:id/cancel` | POST | Cancel deletion |
+| `/deletion-queue/process` | POST | Process next deletion |
+
+### 22.8 Scheduler Integration
+
+**File**: `lambda/scheduled/model-sync.ts`
+
+The model-sync scheduler now includes:
+
+1. **Registry Sync**: Sync models from code registry to database
+2. **HuggingFace Discovery**: Run discovery if `syncFromHuggingFace` is enabled in config
+3. **Deletion Processing**: Process up to 5 pending deletions per run
+4. **Blocked Refresh**: Check if blocked deletions can proceed (sessions ended)
+
+```typescript
+// Scheduled sync now returns extended result
+interface SyncResult {
+  success: boolean;
+  jobId?: string;
+  modelsScanned: number;
+  modelsAdded: number;
+  modelsUpdated: number;
+  durationMs: number;
+  errors: string[];
+  discovery?: {
+    ran: boolean;
+    modelsDiscovered: number;
+    modelsAdded: number;
+  };
+  deletionQueue?: {
+    processed: number;
+    unblocked: number;
+  };
+}
+```
+
+### 22.9 Admin Dashboard
+
+**File**: `apps/admin-dashboard/app/(dashboard)/model-registry/`
+
+| Tab | Features |
+|-----|----------|
+| **Overview** | Version counts, thermal distribution, storage stats, deletion queue summary |
+| **Versions** | List with family/thermal filters, thermal state controls, delete action |
+| **Watchlist** | Enable/disable per family, auto-download toggle, HF org config |
+| **Deletion Queue** | Status, active sessions, cancel action, reason display |
+| **Discovery Jobs** | Job history with type, status, models discovered/added |
+
+---
+
+## 23. Universal Envelope Protocol v2.0 (v5.53.0)
+
+### 23.1 Overview
+
+UEP v2.0 is RADIANT's next-generation protocol for **multi-modal, asynchronous, streaming communication** between AI methods, agents, and subsystems. It extends UEP v1.0 (the `CatoMethodEnvelope`) with comprehensive support for:
+
+- **Multi-modal payloads**: Text, images, audio, video, documents (PDF, DOCX), and binary data
+- **Chunked streaming**: Progressive delivery with sequence tracking
+- **Resumable transfers**: tus.io-inspired resume tokens for interrupted transfers
+- **Rich source/destination metadata**: A2A Agent Card-inspired capability discovery
+- **Cross-subsystem routing**: Unified communication across all RADIANT services
+
+**Full Specification**: `docs/specs/UEP-V2-SPECIFICATION.md`
+
+### 23.2 Industry Standards Incorporated
+
+| Standard | What We Took | How We Improved |
+|----------|--------------|-----------------|
+| **Google A2A Protocol** | Agent Cards, JSON-RPC 2.0 base | Added streaming, multi-modal, chunking |
+| **CloudEvents (CNCF)** | `source`, `id`, `type`, `specversion` | Added AI-specific risk, confidence, compliance |
+| **Anthropic MCP** | Tools/Resources/Prompts primitives | Unified into single envelope model |
+| **OpenTelemetry OTLP** | Trace/Span/Resource model | Enhanced with baggage support |
+| **tus.io** | Resumable uploads with `Upload-Offset` | Generalized to any payload type |
+| **MIME Multipart** | Multi-part message format | Modernized with JSON manifest |
+| **AsyncAPI** | Channel/message schema definitions | Used for WebSocket binding |
+
+### 23.3 Envelope Types
+
+```typescript
+type UEPEnvelopeType = 
+  // Pipeline (v1.0 compatible)
+  | 'method.output' | 'method.input'
+  
+  // Streaming (NEW)
+  | 'stream.start' | 'stream.chunk' | 'stream.end' 
+  | 'stream.error' | 'stream.cancel'
+  
+  // Artifacts (NEW)
+  | 'artifact.created' | 'artifact.reference'
+  
+  // Control (NEW)
+  | 'control.ack' | 'control.nack' | 'control.heartbeat' | 'control.capability'
+  
+  // Events (NEW)
+  | 'event.checkpoint' | 'event.progress' | 'event.error';
+```
+
+### 23.4 Source Card (A2A-inspired)
+
+Every envelope identifies its producer with rich metadata:
+
+```typescript
+interface UEPSourceCard {
+  sourceId: string;              // 'method:observer:v2', 'model:claude-3.5'
+  sourceType: UEPSourceType;     // 'method' | 'tool' | 'model' | 'agent' | 'service'
+  name: string;                  // Human-readable name
+  version: string;               // Semantic version
+  
+  registryRef?: {
+    registry: 'cato-method' | 'cato-tool' | 'model' | 'agent' | 'service';
+    lookupKey: string;           // Key to look up in registry
+  };
+  
+  aiModel?: {
+    provider: string;            // 'anthropic', 'openai', 'self-hosted'
+    modelId: string;             // 'claude-3.5-sonnet'
+    temperature?: number;
+    mode?: string;               // 'thinking', 'creative', 'coding'
+  };
+  
+  capabilities?: string[];       // ['text-generation', 'code-execution']
+  executionContext?: {
+    pipelineId?: string;
+    tenantId: string;
+    userId?: string;
+  };
+}
+```
+
+### 23.5 Multi-Modal Payload System
+
+```typescript
+interface UEPPayload<T = unknown> {
+  contentType: string;           // MIME type: 'application/json', 'video/mp4'
+  contentEncoding?: string;      // 'base64', 'gzip', 'br'
+  delivery: 'inline' | 'reference' | 'chunked';
+  
+  // Inline (small payloads < 1MB)
+  data?: T;
+  
+  // Reference (large payloads - video, audio, documents)
+  reference?: {
+    uri: string;                 // s3://bucket/key, https://...
+    protocol: 'https' | 's3' | 'radiant' | 'ipfs';
+    accessMethod: 'presigned_url' | 'bearer_token' | 'public';
+    supportsRangeRequests: boolean;
+  };
+  
+  // Multi-part (mixed content)
+  parts?: UEPPayloadPart[];
+  
+  // Integrity
+  hash?: { algorithm: 'sha256' | 'blake3'; value: string };
+  sizeBytes?: number;
+}
+```
+
+### 23.6 Chunked Streaming Protocol
+
+Stream lifecycle for progressive delivery:
+
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│ stream.start│────▶│stream.chunk │────▶│stream.chunk │────▶│ stream.end  │
+│   (1/N)     │     │   (2/N)     │     │   (N-1/N)   │     │   (N/N)     │
+└─────────────┘     └─────────────┘     └─────────────┘     └─────────────┘
+```
+
+```typescript
+interface UEPStreamingInfo {
+  streamId: string;              // Groups all chunks together
+  sequence: {
+    current: number;             // 1-indexed chunk number
+    total?: number;              // Total if known
+    isFirst: boolean;
+    isLast: boolean;
+  };
+  progress?: {
+    bytesTransferred: number;
+    bytesTotal?: number;
+    percentComplete?: number;
+  };
+  resumable: boolean;
+  resumeToken?: string;          // Token to resume from this point
+  uploadOffset?: number;         // Byte offset for resumption
+}
+```
+
+### 23.7 Cross-Subsystem Routing
+
+| Subsystem | Routing Prefix | Purpose |
+|-----------|---------------|---------|
+| Cato Pipeline | `cato://` | Method orchestration |
+| Brain Router | `brain://` | Model selection & inference |
+| Cortex Memory | `cortex://` | Vector store & retrieval |
+| Genesis Safety | `genesis://` | Ethics & safety checks |
+| Curator | `curator://` | Content curation |
+| Think Tank | `thinktank://` | User sessions |
+| UDS | `uds://` | User data service |
+| Blackboard | `blackboard://` | Multi-agent coordination |
+
+### 23.8 TypeScript Types
+
+**File**: `packages/shared/src/types/uep-v2.types.ts`
+
+Key exports:
+- `UEPEnvelope<T>` - Full envelope interface with generics
+- `UEPSourceCard`, `UEPDestinationCard` - Source/destination metadata
+- `UEPPayload`, `UEPContentReference` - Multi-modal payload support
+- `UEPStreamingInfo`, `UEPStreamProgress` - Chunked streaming
+- Specialized: `UEPStreamStartEnvelope`, `UEPStreamChunkEnvelope`, `UEPStreamEndEnvelope`
+
+### 23.9 Database Schema
+
+New tables for UEP v2.0:
+
+| Table | Purpose |
+|-------|---------|
+| `uep_envelopes_v2` | Extended envelope storage with streaming support |
+| `uep_streams` | Stream lifecycle management with resume tokens |
+| `uep_artifacts` | Artifact registry for external content references |
+
+All tables include RLS policies for multi-tenant isolation.
+
+### 23.10 Backward Compatibility
+
+UEP v1.0 `CatoMethodEnvelope` objects are **fully compatible** with v2.0:
+
+```typescript
+function migrateV1ToV2<T>(v1: CatoMethodEnvelope<T>): UEPEnvelope<T> {
+  return {
+    envelopeId: v1.envelopeId,
+    specversion: '2.0',
+    type: 'method.output',
+    source: {
+      sourceId: v1.source.methodId,
+      sourceType: 'method',
+      name: v1.source.methodName,
+      version: '1.0.0',
+    },
+    payload: {
+      contentType: 'application/json',
+      delivery: 'inline',
+      data: v1.output.data,
+    },
+    tracing: v1.tracing,
+    // ... rest of mapping
+  };
+}
+```
+
+### 23.11 Regulatory Compliance
+
+UEP v2.0 includes comprehensive regulatory compliance via `UEPComplianceService`:
+
+**Supported Frameworks**:
+- **HIPAA**: PHI detection, 6-year retention, encryption enforcement
+- **GDPR**: PII detection, data subject rights, cross-border controls
+- **SOC2**: Audit logging, change management, monitoring
+- **FDA 21 CFR Part 11**: Electronic signatures, record retention
+- **CCPA**: Consumer privacy rights
+- **PCI-DSS**: Payment card data security
+
+**PHI/PII Detection Patterns**:
+```typescript
+// Automatically detects:
+- SSN: /\b\d{3}[-.]?\d{2}[-.]?\d{4}\b/
+- MRN: /\b(MRN|Medical Record)[:\s#]*\d{6,12}\b/
+- Email, Phone, DOB, Credit Cards
+- ICD-10 diagnosis codes, medications
+```
+
+**Compliance Enforcement**:
+```typescript
+const { envelope, riskSignals } = complianceService.enforceCompliance(
+  envelope,
+  ['HIPAA', 'SOC2'],
+  tenantId
+);
+// Automatically:
+// - Detects PHI/PII
+// - Sets dataClassification
+// - Calculates retentionDays
+// - Adds risk signals
+```
+
+**Audit Report**: `docs/specs/UEP-V2-REGULATORY-COMPLIANCE-AUDIT.md`

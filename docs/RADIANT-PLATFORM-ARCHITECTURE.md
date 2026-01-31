@@ -1,6 +1,6 @@
 # RADIANT Platform Documentation
 ## Complete System Architecture Reference
-### Version 5.52.40 | January 2026
+### Version 5.52.57 | January 2026
 
 ---
 
@@ -72,6 +72,11 @@ Enterprise-grade scaling for parallel AI model execution supporting 100+ concurr
 | `*.detected_language` | Auto-detected content language | 071 |
 | `*.search_vector_simple` | Fallback tsvector for FTS | 071 |
 | `*.search_vector_english` | Language-specific tsvector | 071 |
+| `model_versions` | Self-hosted model version tracking | 039 |
+| `model_family_watchlist` | HuggingFace discovery configuration | 039 |
+| `model_discovery_jobs` | Discovery job history | 039 |
+| `model_deletion_queue` | Soft delete queue with usage tracking | 039 |
+| `model_usage_sessions` | Active session tracking for safe deletion | 039 |
 
 ### Multi-Language Search (Migration 071)
 
@@ -480,6 +485,76 @@ RADIANT's AGI capabilities are built on four interconnected subsystems that work
 | 6 | Fracture Detection | Alignment verification |
 
 **Detailed Documentation**: See [ENGINEERING-IMPLEMENTATION-VISION.md Section 21](./ENGINEERING-IMPLEMENTATION-VISION.md#21-unified-agi-architecture-brain-genesis-cortex-and-cato-v55229) for full engineering reference.
+
+---
+
+## 1.6.2 Universal Envelope Protocol (UEP) v2.0
+
+UEP v2.0 provides standardized wrapping for all AI interactions across RADIANT, enabling unified tracing, compliance, and storage.
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           AI REQUEST/RESPONSE                                │
+└───────────────────────────────────┬─────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                       UEP INTEGRATION SERVICE                                │
+│  Adapters: Model Router | Cato Pipeline | AGI | Brain | Response Synthesis  │
+└──────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                       UDS TIERED STORAGE                                     │
+│  Hot (Redis) → Warm (PostgreSQL) → Cold (S3) → Glacier (S3 Glacier)         │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Envelope Structure
+
+| Field | Type | Purpose |
+|-------|------|---------|
+| `envelopeId` | UUID | Unique envelope identifier |
+| `specversion` | '2.0' | Protocol version |
+| `type` | string | Event type (e.g., `ai.model.response`) |
+| `source` | object | Origin (system, component, tenant) |
+| `payload` | object | Input/output data with tokens |
+| `tracing` | object | Distributed trace context |
+| `compliance` | object | PHI/PII flags, retention, frameworks |
+| `riskSignals` | object | Safety scores and flags |
+
+### Integration Points
+
+| Service | Type | Description |
+|---------|------|-------------|
+| **Model Router** | `ai.model.response` | All model completions |
+| **Cato Pipeline** | `cato.method.*` | Pipeline method envelopes |
+| **AGI Orchestrator** | `agi.orchestration.*` | Multi-model orchestration |
+| **Brain Router** | `brain.router.response` | Domain-aware routing |
+| **Response Synthesis** | `synthesis.*` | Ensemble/merge results |
+
+### Storage Tiers
+
+| Tier | Storage | Retention | Latency |
+|------|---------|-----------|---------|
+| **Hot** | Redis/ElastiCache | 0-24h | <10ms |
+| **Warm** | PostgreSQL (`uds_envelopes`) | 1-90 days | <100ms |
+| **Cold** | S3 Standard-IA | 90d-7 years | 1-10s |
+| **Glacier** | S3 Glacier | 7+ years | 1-12h |
+
+### Key Files
+
+| File | Purpose |
+|------|---------|
+| `services/uep/integration.service.ts` | Platform-wide adapters |
+| `services/uep/uds-storage-adapter.service.ts` | UDS tiered storage |
+| `services/uep/compliance.service.ts` | PHI/PII detection |
+| `services/uep/security.service.ts` | Encryption/signing |
+| `migrations/V2026_01_31_001__uds_envelopes.sql` | Database schema |
+
+**Documentation**: See [UEP-V2-SPECIFICATION.md](./UEP-V2-SPECIFICATION.md) for complete specification.
 
 ---
 
@@ -1792,6 +1867,9 @@ apps/thinktank/lib/api/
 | **HITL** | Human-in-the-Loop |
 | **Sovereign Mesh** | v5.0 architecture where every node can think |
 | **Thermal State** | Model instance status (OFF/COLD/WARM/HOT) |
+| **Model Registry** | Version discovery and lifecycle management system |
+| **HuggingFace Discovery** | Automated polling for new model versions |
+| **Deletion Queue** | Safe model deletion with usage session tracking |
 
 ---
 

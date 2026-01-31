@@ -7,7 +7,7 @@
  * Uses database persistence for state that must survive Lambda invocations.
  */
 
-import { executeStatement } from '../../database/aurora-client';
+import { executeStatement } from '../../db/client';
 import { logger } from '../../logging/enhanced-logger';
 
 // ============================================================================
@@ -535,7 +535,7 @@ class InfrastructureTierService {
     }
     
     // Check expiration
-    if (new Date(tokenRecord.expires_at) < new Date()) {
+    if (new Date(String(tokenRecord.expires_at)) < new Date()) {
       errors.push('Token has expired');
       return { valid: false, errors };
     }

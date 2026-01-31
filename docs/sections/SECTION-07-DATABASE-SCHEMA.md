@@ -1,4 +1,4 @@
-# SECTION 7: EXTERNAL PROVIDERS & DATABASE SCHEMA (v2.3.0 - CANONICAL)
+# SECTION 7: EXTERNAL PROVIDERS & DATABASE SCHEMA (v2.4.0 - CANONICAL)
 # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 > **Dependencies:** Sections 0-6
@@ -98,6 +98,11 @@ Ignore any migration snippets in other sections - use ONLY the migrations define
 | `prompt_patterns` | Common prompt patterns for typeahead matching |
 | `user_prompt_history` | User prompt history with embeddings for suggestions |
 | `suggestion_log` | Typeahead suggestion usage tracking |
+| `model_versions` | Self-hosted model version tracking with thermal state (v5.52.57) |
+| `model_family_watchlist` | HuggingFace discovery configuration per model family (v5.52.57) |
+| `model_discovery_jobs` | Discovery job history and results (v5.52.57) |
+| `model_deletion_queue` | Soft delete queue with usage session tracking (v5.52.57) |
+| `model_usage_sessions` | Active session tracking for safe deletion (v5.52.57) |
 | `result_ideas` | Ideas shown with AI responses |
 | `proactive_suggestions` | Push notification suggestions |
 | `trending_prompts` | Popular prompts by domain |

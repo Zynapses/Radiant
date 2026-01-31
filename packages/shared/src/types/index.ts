@@ -62,6 +62,7 @@ export * from './auth-v51.types';
 export * from './cortex-graph-rag.types';
 export * from './oauth-provider.types';
 export * from './mfa.types';
+export * from './model-version-discovery.types';
 
 // Living Parchment 2029 Vision types (selective export to avoid SynthesisSession conflict)
 export type {
@@ -160,3 +161,6 @@ export type {
   MemoryPalaceNavigationResponse,
   CreateOracleViewRequest,
 } from './living-parchment.types';
+
+// UEP v2.0 - Universal Envelope Protocol
+export * from './uep-v2.types';
