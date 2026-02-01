@@ -32,6 +32,7 @@
     "@aws-sdk/client-sqs": "^3.470.0",
     "@aws-sdk/client-ssm": "^3.470.0",
     "@aws-sdk/client-textract": "^3.470.0",
+    "@aws-sdk/client-transcribe": "^3.470.0",
     "@aws-sdk/client-xray": "^3.975.0",
     "@aws-sdk/lib-dynamodb": "^3.470.0",
     "@aws-sdk/s3-request-presigner": "^3.470.0",

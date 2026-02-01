@@ -9,6 +9,202 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+#### Gemini Consultation Enhancements - Workflow & Orchestration System
+
+Implemented recommendations from Gemini AI consultation for RADIANT's workflow and orchestration capabilities. All enhancements follow mitigated approaches that balance innovation with practical concerns.
+
+**Multimedia Sidecar Service** (`lambda/shared/services/workflow/multimedia-sidecar.service.ts`):
+- **Cognitive Sidecars**: Pre-computed representations for cross-modal AI (transcriptions, frame samples, embeddings, descriptions)
+- **Auto-Bridging**: Automatic conversion between modalities for condition evaluation (e.g., text condition on video uses sidecar.transcription)
+- **Zero-Copy Pattern**: UEP envelopes contain S3 URIs + sidecars, never raw media bytes
+- **Stream Synthesis**: "Director" pattern for synthesizing multiple multimedia streams with visual anchoring
+
+**Sandboxed Expression Engine** (`lambda/shared/services/workflow/sandboxed-expression.service.ts`):
+- **Security**: Replaces unsafe `new Function()` with AST-based parser and evaluator
+- **Allowlisted Operations**: Only permitted operators, functions, and identifiers
+- **Safe Helpers**: `contains()`, `hasField()`, `matches()`, `length()`, `isEmpty()`, `isArray()`, etc.
+- **Blocked Properties**: Prevents prototype pollution (`__proto__`, `constructor`, `eval`, etc.)
+- **Validation API**: Pre-check expressions without executing them
+
+**Vector Semantic Router** (`lambda/shared/services/workflow/vector-semantic-router.service.ts`):
+- **Semantic Routing**: Vector similarity for model/workflow selection (NOT for condition evaluation)
+- **Refusal Detection**: Fast safety check via pre-computed refusal vectors
+- **Workflow Matching**: Semantic similarity to find best workflow for query
+- **Domain Detection**: Keyword + embedding-based domain classification
+- **Historical Learning**: Record and learn from past routing decisions
+
+**Enhanced Uncertainty Service** (`lambda/shared/services/workflow/enhanced-uncertainty.service.ts`):
+- **Surprise Metric**: Integrated into Semantic Entropy (not a separate system)
+- **Cross-Entropy Surprise**: Measures how different samples are from dominant cluster
+- **Reflexion Trigger**: Automatic System 2 escalation when surprise exceeds threshold
+- **Quick Check API**: Fast 3-sample uncertainty estimation for routing decisions
+- **Confidence Intervals**: Bootstrap approximation for uncertainty bounds
+
+**Cost Negotiation Service** (`lambda/shared/services/workflow/cost-negotiation.service.ts`):
+- **Budget Allocation**: Workflow-level budget tracking with step-by-step spending
+- **Model Bidding**: Generate cost/quality/latency bids from all qualifying models
+- **Negotiation API**: Balance quality targets, latency constraints, and budget limits
+- **Quality-Cost Curves**: Learn and predict quality outcomes from historical data
+- **Tradeoff Analysis**: Recommendations based on value (quality/cost ratio)
+
+**CRDT Workflow Service** (`lambda/shared/services/workflow/crdt-workflow.service.ts`):
+- **Conflict-Free Editing**: Y.js-inspired CRDTs for real-time collaborative workflows
+- **Vector Clocks**: Causal ordering with client-specific versioning
+- **Presence Awareness**: Track collaborator cursors, selections, and colors
+- **Last-Writer-Wins**: Deterministic conflict resolution with client ID tiebreaker
+- **Operation Log**: Persistent operation history for sync and merge
+- **Offline Merge**: Reconcile states after network partitions
+
+**Mitigations Applied**:
+- Vector semantics for ROUTING only (not conditions) - avoids latency in hot path
+- Surprise as enhancement to Semantic Entropy (not parallel system) - reuses infrastructure
+- Cost negotiation centralized (not agent micro-ledger) - avoids distributed complexity
+- CRDT foundation only (full Y.js is Phase 2) - provides data structures without full sync
+
+#### Gemini Service Integrations (v5.53.1)
+
+**Security: Sandboxed Expression Engine Integration** (`lambda/shared/services/workflow/uep-node.service.ts`):
+- **Replaced `new Function()`**: UEP node service now uses `sandboxedExpressionService.evaluate()` for expression evaluation
+- **Safe by Default**: All workflow conditions are now evaluated through the secure AST-based parser
+- **Error Handling**: Graceful fallback with logging when expression evaluation fails
+
+**Vector Semantic Router Integration** (`lambda/shared/services/sofai-router.service.ts`):
+- **Refusal Detection**: SOFAI router now checks prompts against refusal vectors for safety-critical routing
+- **Semantic Domain Detection**: Uses `vectorSemanticRouterService.detectDomainFromQuery()` for improved domain classification
+- **Safety-Critical Escalation**: High refusal risk (>0.8) forces System 2 routing automatically
+- **Risk Factor Weighting**: Combined risk formula now includes domain (50%), ECD (30%), semantic refusal (20%)
+
+**Enhanced Uncertainty Integration** (`lambda/shared/services/orchestration-methods.service.ts`):
+- **New Method**: `enhanced-uncertainty-service` added to orchestration methods dispatcher
+- **Combined Metrics**: Returns entropy, surprise, combined uncertainty, reflexion triggers
+- **Fallback**: Gracefully falls back to standard semantic entropy on errors
+- **Available Services**: Added to `getAvailableServices()` list
+
+**Cost Negotiation Integration** (`lambda/shared/services/governor/economic-governor.ts`):
+- **`negotiateModelSelection()`**: Budget-aware model selection using centralized cost negotiation
+- **`initializeWorkflowBudget()`**: Create budget allocations for workflows
+- **`getWorkflowBudgetStatus()`**: Query remaining budget for workflow execution
+- **Capability Detection**: Automatically detects required capabilities (code, math, creative) from task
+- **Tradeoff Analysis**: Returns negotiation result with allocated budget and reasoning
+
+**AWS Multimedia Service Integrations** (`lambda/shared/services/workflow/multimedia-sidecar.service.ts`):
+- **AWS Transcribe**: Real transcription for S3-hosted audio/video with async job polling
+- **OpenAI Whisper Fallback**: Automatic fallback for external URLs or Transcribe failures
+- **AWS Lambda Frame Extraction**: Invokes `radiant-frame-extractor` Lambda for video frames
+- **S3 Presigned URLs**: Generated for all extracted frames with 1-hour expiration
+- **AWS Textract**: Full document extraction for S3-hosted PDFs/documents
+- **Structure Extraction**: Headings, tables, and page counts from Textract blocks
+
+**UDS Multimedia Upload Processing** (`lambda/shared/services/uds/upload.service.ts`):
+- **Auto-Detection**: Multimedia uploads (video/audio/image) automatically route to sidecar processing
+- **Cognitive Sidecars**: Generates transcriptions, frame samples, embeddings, and descriptions
+- **Search Indexing**: Extracted text from transcriptions/descriptions indexed for full-text search
+- **Embedding Storage**: Vector embeddings stored for semantic similarity search
+
+**CRDT Collaborative Workflow Editing** (`lambda/shared/services/workflow-engine.ts`):
+- **`initializeCollaborativeSession()`**: Initialize CRDT state from existing workflow definition
+- **`applyCollaborativeEdit()`**: Apply conflict-free edits (insert/delete/move nodes/edges)
+- **`getCollaborativeState()`**: Get current workflow state for rendering
+- **`mergeRemoteOperations()`**: Merge operations from other collaborators
+- **`saveCollaborativeChanges()`**: Persist CRDT state back to database
+- **`updateCollaboratorPresence()`**: Track cursor positions and selections
+- **`getSessionCollaborators()`**: Get list of active collaborators with presence info
+
+#### UI Components for Gemini Workflow Enhancements
+
+Created comprehensive React/Next.js UI components for the Gemini workflow enhancements using glass UI design system (`apps/admin-dashboard/components/workflow-editor/`):
+
+**CollaborationPresenceBar** (`collaboration-presence.tsx`):
+- **CollaboratorAvatar**: Animated avatar with presence indicator and color
+- **CollaboratorStack**: Overlapping avatar group with overflow count
+- **LiveCursor**: Real-time cursor position with user label
+- **SelectionHighlight**: Node selection border with collaborator attribution
+- **PresenceSidebar**: Full collaborator list with online/away status
+
+**MultimediaSidecarPanel** (`multimedia-sidecar-panel.tsx`):
+- **TranscriptionViewer**: Timestamped transcript with segment selection
+- **FrameSamplesGallery**: Video frame thumbnails with preview
+- **DescriptionViewer**: Multi-level description (short/medium/detailed)
+- **EmbeddingViewer**: Vector heatmap visualization (64-dim preview)
+- **BridgeStatus**: Cross-modal bridge readiness indicator
+
+**CostNegotiationPanel** (`cost-negotiation-panel.tsx`):
+- **BudgetGauge**: Animated progress bar with warning thresholds
+- **ModelBidCard**: Model cost/quality/latency comparison card
+- **TradeoffChart**: 2D quality vs cost scatter plot with ideal zone
+- **StepBreakdown**: Per-step spending breakdown
+- **NegotiationResultDisplay**: Tradeoff analysis with recommendations
+
+**UncertaintyMetricsPanel** (`uncertainty-metrics-panel.tsx`):
+- **EntropyGauge**: Animated metric bar with tooltip descriptions
+- **ClusterDistribution**: Stacked bar chart of semantic clusters
+- **ReflexionAlert**: System 2 trigger notification
+- **SampleViewer**: Collapsible sample comparison with surprise scores
+- **ConfidenceInterval**: Visual 95% CI display
+
+**NeuralFeedbackPanel** (`neural-feedback-panel.tsx`):
+- **StarRating**: Interactive 5-star rating component
+- **QuickFeedback**: Thumbs up/down buttons for fast feedback
+- **FeedbackForm**: Detailed feedback with quality slider and comments
+- **ModelPerformanceCard**: Model metrics with learning trend
+- **LearningProgress**: SVG learning curve chart
+- **InsightCard**: Pattern/improvement/warning/suggestion cards
+
+All components use:
+- Framer Motion for animations
+- Glass UI design system (GlassCard, backdrop blur)
+- Tailwind CSS with consistent design tokens
+- Lucide icons
+- shadcn/ui primitives (Badge, Button, Slider, etc.)
+
+#### Documentation: Workflows & Orchestration Methods (User Guide)
+
+Added comprehensive user-facing documentation for workflows and orchestration methods to `THINKTANK-USER-GUIDE.md`:
+
+- **What Are Workflows**: Explanation of step chaining, parallel AI execution, quality checks
+- **System Workflows**: 70+ pre-built workflows by category (Research, Code, Writing, Analysis, Decision, Creative)
+- **Multi-AI Selection**: How parallel model execution works with stream evaluation modes (any, all, majority, best, weighted)
+- **Orchestration Methods**: User-friendly explanation of 25+ methods (Semantic Entropy, Self-Consistency, Panel of Judges, Debate, etc.)
+- **Saving Custom Workflows**: How users save workflow templates with privacy levels (Private, Team, Public)
+- **Configurable Parameters**: Quality weight, cost threshold, confidence threshold, sample count, max escalations
+- **Conditional Logic**: Expression and AI-interpreted conditions, model-agnostic evaluation
+- **Viewing Execution**: How to see step-by-step workflow execution in Brain Plan panel
+- **New Glossary Terms**: Workflow, Orchestration Method, Stream Evaluation, Model-Agnostic Condition, Workflow Template
+
+Also created `docs/exports/GEMINI-WORKFLOW-CONSULTATION.md` - comprehensive document for Gemini AI consultation on workflow architecture, competitive analysis, and 2030 roadmap.
+
+#### Cato Compensation Service - Full SAGA Implementation
+
+Complete implementation of SAGA pattern compensation for Cato pipeline rollbacks.
+
+**CatoCompensationService** (`lambda/shared/services/cato-compensation.service.ts`):
+- `executeDeleteCompensation()` - Actual resource deletion via tools or generic DB operations
+- `executeRestoreCompensation()` - State restoration from `previousState` snapshots
+- `executeNotifyCompensation()` - SNS notifications with audit trail persistence
+- `invokeCompensationTool()` - Lambda/MCP tool invocation for custom compensations
+- `deleteResourceByType()` - Generic soft/hard delete for known resource types
+- `restoreResourceByType()` - Generic state restoration from previousState
+
+**Supported Resource Types**:
+- `cato_pipeline_execution`, `cato_method_invocation`, `cato_envelope`
+- `conversation`, `message`, `upload` (UDS)
+- `knowledge_node`, `knowledge_edge` (Cortex)
+
+**SNS Notifications**:
+- Topic ARN via `COMPENSATION_SNS_TOPIC_ARN` environment variable
+- Message attributes for filtering (tenantId, pipelineId, compensationType)
+- Audit trail stored in `cato_compensation_notifications` table
+
+**Executor Method Integration** (`lambda/shared/services/cato-methods/executor.method.ts`):
+- Now uses `CatoCompensationService` instead of stub implementation
+- Proper affected resource tracking from action inputs
+- Logging via compensation service with full metadata
+
+**Database Migration** (`V2026_01_31_001__cato_compensation_notifications.sql`):
+- `cato_compensation_notifications` table for audit trail
+- RLS policies for tenant isolation
+- Indexes for efficient querying
+
 #### Universal Envelope Protocol v2.0 (UEP v2.0)
 
 Major protocol enhancement for multi-modal, streaming, asynchronous AI communication across RADIANT subsystems.
@@ -148,6 +344,207 @@ Services updated:
 - `canvas-service.ts` - Offloads artifact content
 
 Migration: `V2026_01_31_002__s3_offloading_columns.sql`
+
+#### Workflow UEP Integration v2.0
+
+Complete UEP v2.0 integration into workflow orchestration with model-agnostic condition evaluation.
+
+**UEP Node Service** (`lambda/shared/services/workflow/uep-node.service.ts`):
+- Central integration point for workflow UEP operations
+- Envelope creation for node inputs/outputs with parent-child linking
+- Model-agnostic condition evaluation (evaluates content, not model identity)
+- AI-interpreted conditions for natural language quality checks
+- Stream-based evaluation for parallel model outputs
+- Envelope transformation based on condition results
+- Full distributed tracing with trace/span propagation
+
+**Condition Evaluation System**:
+- **Expression Conditions**: JavaScript-like expressions evaluated against output content
+  - Helper functions: `hasField()`, `getField()`, `length()`, `contains()`
+  - Example: `output.confidence > 0.8 && !contains("error")`
+- **AI-Interpreted Conditions**: Natural language condition evaluation
+  - Uses fast model by default (`groq/llama-3.1-8b-instant`)
+  - Configurable confidence threshold
+  - Evaluates content quality, NOT model identity
+- **Composite Conditions**: AND, OR, NOT, XOR operators for complex logic
+
+**Stream Evaluation Modes**:
+- `all` - All streams must pass (consensus)
+- `any` - Any stream passing is sufficient
+- `majority` - >50% of streams must pass
+- `quorum` - Configurable threshold (0.0-1.0)
+- `best` - Select highest-confidence stream
+- `unanimous` - 100% agreement required
+- `weighted` - Weight by confidence scores
+
+**Key Design Principle**: CONDITIONS ARE MODEL-AGNOSTIC
+- Conditions evaluate OUTPUT CONTENT, not model identity
+- Users can swap AI models without breaking workflow logic
+- Model info captured for tracing/debugging only, never used in condition logic
+
+**Workflow Engine Integration** (`workflow-engine.ts`):
+- `startExecutionWithUEP()` - Start workflow with UEP envelope wrapping
+- `executeTaskWithUEP()` - Execute task node with envelope creation
+- `completeTaskWithUEP()` - Complete task with output envelope
+- `getUEPContext()` - Get execution context for continuing workflows
+
+**Database Migration** (`V2026_01_31_003__workflow_uep_integration.sql`):
+- `workflow_condition_evaluations` - Audit trail for condition evaluations
+- `workflow_node_conditions` - Stored condition definitions
+- `workflow_uep_envelopes` - Links workflow nodes to UEP storage
+- `workflow_stream_outputs` - Parallel model outputs for stream evaluation
+- Added UEP columns to `workflow_executions` and `task_executions`
+- Views: `v_condition_evaluation_stats`, `v_workflow_uep_trace`
+
+**Documentation**: `docs/WORKFLOW-UEP-ARCHITECTURE.md`
+- Complete architecture documentation with diagrams
+- Condition evaluator guide with examples
+- Stream evaluation mode selection guide
+- Integration examples and best practices
+- Troubleshooting guide
+
+#### Orchestration Methods UEP Integration
+
+All 70+ orchestration methods now support UEP envelope wrapping via `executeMethodWithUEP()`.
+
+**New Method** (`orchestration-methods.service.ts`):
+- `executeMethodWithUEP(serviceMethod, input, params, uepContext)` - Execute with full envelope wrapping
+- Returns `{ output, envelope: { envelopeId, traceId, spanId, stored } }`
+- Backward compatible - `executeMethod()` still works for legacy code
+
+**UEP Integration Service** (`uep/integration.service.ts`):
+- Added `createOrchestrationEnvelope()` for orchestration method outputs
+- Envelope type: `orchestration.method.{serviceName}`
+- Stores to UDS tiered storage with compliance tagging
+
+**Subsystem UEP Boundaries** (documented in `WORKFLOW-UEP-ARCHITECTURE.md`):
+
+| Subsystem | UEP Status | Notes |
+|-----------|------------|-------|
+| Cato Methods | ✅ UEP-aware | All 10+ methods via `CatoBaseMethodExecutor.storeToUEP()` |
+| Workflow Engine | ✅ UEP-aware | All nodes via `uep-node.service.ts` |
+| Orchestration Methods | ✅ UEP-aware | 70+ methods via `executeMethodWithUEP()` |
+| Model Router | ✅ UEP-aware | Via `wrapModelResponse()` |
+| Cortex | ⚪ Not needed | Memory retrieval - doesn't generate AI outputs |
+| UDS | ⚪ Not needed | Storage layer - stores envelopes, doesn't produce them |
+
+**Design Principle**: UEP wrapping at point of AI generation, not memory/storage.
+
+#### AI-Powered Curator with UEP Integration
+
+Intelligent knowledge curation with full UEP v2.0 tracing for document extraction, question generation, and answer verification.
+
+**AI Curator Service** (`lambda/shared/services/curator/ai-curator.service.ts`):
+- `extractKnowledge()` - AI-powered document extraction for facts, procedures, entities, concepts, relationships
+- `generateExamQuestions()` - AI question generation for Entrance Exam system (fact_check, logic_check, ambiguity types)
+- `verifyAnswer()` - AI answer verification with Golden Rule recommendation
+
+**UEP Integration**:
+- All AI operations wrapped in UEP envelopes for full traceability
+- Envelope types: `curator.extraction`, `curator.question_generation`, `curator.answer_verification`
+- Compliance framework tagging for audit requirements
+- Storage in UDS tiered storage
+
+**Models Used**:
+- Extraction: `anthropic/claude-3-5-sonnet-20241022` (high precision)
+- Question Generation: `anthropic/claude-3-5-sonnet-20241022` (quality questions)
+- Verification: `groq/llama-3.1-70b-versatile` (fast verification)
+
+**Question Types**:
+- `fact_check` - True/false verification of extracted facts
+- `logic_check` - Tests understanding of relationships/implications
+- `ambiguity` - Two plausible interpretations, user chooses correct one
+
+**Difficulty Levels**: easy, medium, hard with configurable guidelines
+
+**Database Tables** (`V2026_01_30_001__uep_self_healing.sql`):
+- `curator_ai_extractions` - Track document extraction results
+- `curator_ai_questions` - Store generated exam questions
+- `curator_ai_verifications` - Track answer verification results
+
+#### UEP Self-Healing System
+
+Enterprise-grade durability system ensuring UEP data persistence across system restarts and isolated failures.
+
+**Self-Healing Service** (`lambda/shared/services/uep/self-healing.service.ts`):
+- `runHealing(tenantId, mode, config)` - Full self-healing process (startup, adhoc, scheduled)
+- `startupRecovery(tenantId)` - Automatic recovery on Lambda cold start
+- `registerPendingEnvelope()` - Track in-memory buffers for durability
+- `markEnvelopePersisted()` - Confirm successful writes
+- `getBufferStatus()` - Monitor pending envelopes
+
+**Issue Types Detected & Repaired**:
+- `partial_write_s3` - Partially written S3 objects
+- `partial_write_db` - Incomplete database records
+- `orphaned_envelope` - Envelopes without index records
+- `corrupted_checksum` - Checksum mismatches
+- `stale_transaction` - Uncommitted transactions
+- `memory_buffer_leak` - Pending envelopes in memory
+- `missing_s3_object` - Index without storage
+
+**Recovery Actions**:
+- Automatic repair of partial writes from DB cache
+- Rebuild orphaned envelope indexes
+- Quarantine corrupted envelopes (configurable)
+- Rollback stale transactions
+- Flush memory buffers with retry
+
+**Configuration Options**:
+```typescript
+interface HealingConfig {
+  maxRecoveryAttempts: number;        // Default: 3
+  staleTransactionThresholdMinutes: number;  // Default: 30
+  quarantineCorruptedData: boolean;   // Default: true
+  autoRepairPartialWrites: boolean;   // Default: true
+  flushMemoryBuffersOnStartup: boolean;  // Default: true
+  verifyChecksumsOnRecovery: boolean;    // Default: true
+}
+```
+
+**UEP Recovery Lambda** (`lambda/system/uep-recovery.ts`):
+- Scheduled healing via EventBridge (e.g., every 15 minutes)
+- Startup recovery on Lambda initialization
+- Ad-hoc healing via admin API
+
+**Admin API Endpoints** (Base: `/api/admin/uep-recovery`):
+- `GET /status` - Buffer and healing status
+- `POST /heal` - Trigger ad-hoc healing
+- `GET /reports` - Recent healing reports
+- `GET /quarantine` - View quarantined envelopes
+- `POST /quarantine/:id/resolve` - Resolve quarantine (recovered/discarded/manual_fix)
+
+**Database Tables** (`V2026_01_30_001__uep_self_healing.sql`):
+- `uep_write_transactions` - Track pending envelope writes
+- `uep_envelope_storage` - Primary envelope storage with write status
+- `uep_envelope_index` - Quick lookup index
+- `uep_quarantine` - Corrupted envelope quarantine
+- `uep_healing_reports` - Self-healing run reports
+- `persistence_wal` - Write-ahead log for atomic persistence
+- `persistence_records` - Atomic record storage with checksums
+
+**Healing Report Structure**:
+```typescript
+interface HealingReport {
+  runId: string;
+  mode: 'startup' | 'adhoc' | 'scheduled';
+  summary: {
+    totalIssuesFound: number;
+    totalIssuesResolved: number;
+    partialWritesRecovered: number;
+    orphanedEnvelopesFixed: number;
+    corruptedEnvelopesQuarantined: number;
+    staleTransactionsRolledBack: number;
+    memoryBuffersFlushed: number;
+  };
+  issues: HealingIssue[];
+  durationMs: number;
+}
+```
+
+**Integration with Persistence Guard**:
+- Leverages existing `persistence-guard.service.ts` for atomic transactions
+- WAL-based crash recovery for incomplete transactions
+- Checksum validation on all reads
 
 ---
 

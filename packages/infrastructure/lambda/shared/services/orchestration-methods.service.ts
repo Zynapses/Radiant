@@ -4,12 +4,22 @@
  * 
  * Each method follows its scientific reference implementation pattern
  * and is compatible with our multi-model orchestration system.
+ * 
+ * UEP v2.0 INTEGRATION:
+ * All method outputs are wrapped in UEP envelopes for tracing, compliance,
+ * and storage in UDS tiered storage. Use executeMethodWithUEP() for full
+ * envelope wrapping, or executeMethod() for raw output (legacy).
  */
 
 import { modelRouterService } from './model-router.service';
 import { modelMetadataService, ModelMetadata } from './model-metadata.service';
 import { enhancedLogger as logger } from '../logging/enhanced-logger';
 import { catoNeuralDecisionService } from './cato/neural-decision.service';
+import { uepIntegrationService } from './uep/index.js';
+import { v4 as uuidv4 } from 'uuid';
+
+// Gemini v5.53.0 Enhancement: Enhanced Uncertainty with Surprise scoring
+import { enhancedUncertaintyService } from './workflow/enhanced-uncertainty.service';
 
 // ============================================================================
 // Types
@@ -37,6 +47,30 @@ interface MethodOutput {
   selectedModel?: string;
   tokens?: number;
   [key: string]: unknown;
+}
+
+/**
+ * UEP-wrapped method output
+ */
+interface UEPMethodResult {
+  output: MethodOutput;
+  envelope: {
+    envelopeId: string;
+    traceId: string;
+    spanId: string;
+    stored: boolean;
+  };
+}
+
+/**
+ * Context for UEP envelope creation
+ */
+interface UEPExecutionContext {
+  tenantId: string;
+  userId?: string;
+  traceId?: string;
+  parentSpanId?: string;
+  complianceFrameworks?: string[];
 }
 
 // ============================================================================
@@ -1839,6 +1873,10 @@ class OrchestrationMethodsService {
           // Embedding KDE-based continuous entropy
           return await this.kernelEntropy.computeKDE(input, params);
 
+        case 'enhanced-uncertainty-service':
+          // v5.53.0 Gemini Enhancement: Semantic Entropy + Surprise scoring
+          return await this.executeEnhancedUncertainty(input, params);
+
         case 'pareto-routing-service':
           return await this.paretoRouting.selectModel(input, params);
 
@@ -1907,10 +1945,116 @@ class OrchestrationMethodsService {
     };
   }
 
+  /**
+   * Execute Enhanced Uncertainty analysis (v5.53.0 Gemini Enhancement)
+   * Combines Semantic Entropy with Surprise scoring for better uncertainty quantification
+   */
+  private async executeEnhancedUncertainty(input: MethodInput, params: Record<string, unknown>): Promise<MethodOutput> {
+    const sampleCount = (params.sample_count as number) || 10;
+    const surpriseThreshold = (params.surprise_threshold as number) || 0.7;
+    const reflexionThreshold = (params.reflexion_threshold as number) || 0.6;
+
+    try {
+      const result = await enhancedUncertaintyService.computeEnhancedEntropy(
+        input.prompt,
+        {
+          sampleCount,
+          surpriseThreshold,
+          reflexionThreshold,
+        }
+      );
+
+      // Calculate combined uncertainty (average of entropy and surprise)
+      const combinedUncertainty = (result.uncertainty.semanticEntropy + result.uncertainty.surpriseScore) / 2;
+
+      return {
+        response: result.response,
+        uncertainty: result.uncertainty.semanticEntropy,
+        confidence: 1 - result.uncertainty.semanticEntropy,
+        surpriseScore: result.uncertainty.surpriseScore,
+        combinedUncertainty,
+        clusterCount: result.uncertainty.clusterCount,
+        sampleAgreement: result.uncertainty.sampleAgreement,
+        triggerReflexion: result.uncertainty.triggerReflexion,
+        reflexionReason: result.uncertainty.reflexionReason,
+        confidenceInterval: result.uncertainty.confidenceInterval,
+        sampleCount: result.samples.length,
+        processingTimeMs: result.processingTimeMs,
+        tokensUsed: result.tokensUsed,
+        reasoning: `Enhanced Uncertainty (v5.53.0): entropy=${result.uncertainty.semanticEntropy.toFixed(3)}, surprise=${result.uncertainty.surpriseScore.toFixed(3)}, combined=${combinedUncertainty.toFixed(3)}. ${result.uncertainty.triggerReflexion ? 'REFLEXION TRIGGERED: ' + result.uncertainty.reflexionReason : 'No reflexion needed.'}`,
+      };
+    } catch (error) {
+      logger.error('Enhanced uncertainty execution failed', { error });
+      // Fallback to standard semantic entropy
+      return await this.semanticEntropy.computeEntropy(input, params);
+    }
+  }
+
+  /**
+   * Execute a method with UEP envelope wrapping
+   * All outputs are wrapped in UEP v2.0 envelopes for tracing and storage
+   */
+  async executeMethodWithUEP(
+    serviceMethod: string,
+    input: MethodInput,
+    params: Record<string, unknown>,
+    uepContext: UEPExecutionContext
+  ): Promise<UEPMethodResult> {
+    const startTime = Date.now();
+    const traceId = uepContext.traceId || uuidv4();
+    const spanId = uuidv4().replace(/-/g, '').substring(0, 16);
+    
+    // Execute the method
+    const output = await this.executeMethod(serviceMethod, input, params);
+    
+    const durationMs = Date.now() - startTime;
+    
+    // Create UEP envelope for the output
+    const envelope = uepIntegrationService.createOrchestrationEnvelope(
+      uepContext.tenantId,
+      serviceMethod,
+      output,
+      {
+        traceId,
+        spanId,
+        parentSpanId: uepContext.parentSpanId,
+        durationMs,
+        prompt: input.prompt,
+        complianceFrameworks: uepContext.complianceFrameworks || [],
+        confidence: output.confidence,
+        uncertainty: output.uncertainty,
+      }
+    );
+    
+    // Store envelope asynchronously (fire-and-forget for performance)
+    let stored = false;
+    try {
+      await uepIntegrationService.storeEnvelope(envelope);
+      stored = true;
+    } catch (error) {
+      logger.warn('Failed to store UEP envelope', { 
+        serviceMethod, 
+        envelopeId: envelope.envelopeId,
+        error: error instanceof Error ? error.message : 'unknown' 
+      });
+    }
+    
+    return {
+      output,
+      envelope: {
+        envelopeId: envelope.envelopeId,
+        traceId,
+        spanId,
+        stored,
+      },
+    };
+  }
+
   getAvailableServices(): string[] {
     return [
       // Core uncertainty/entropy implementations
       'semantic-entropy-service',
+      'enhanced-uncertainty-service', // v5.53.0: Entropy + Surprise (Gemini)
       'se-probes-service',         // Logprob-based fast entropy (ICML 2024)
       'kernel-entropy-service',    // Embedding KDE entropy (NeurIPS 2024)
       'self-consistency-service',

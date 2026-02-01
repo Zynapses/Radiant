@@ -1,9 +1,72 @@
 /**
  * Workflow Editor Components Barrel Export
- * Re-exports UI components and workflow-specific utilities
+ * RADIANT v5.53.0
+ * 
+ * Re-exports UI components and workflow-specific utilities including:
+ * - CRDT collaboration presence
+ * - Multimedia sidecar panels
+ * - Cost negotiation UI
+ * - Uncertainty metrics display
+ * - Neural feedback loops
  */
 
 import React, { useState, useCallback } from 'react';
+
+// =============================================================================
+// Gemini Enhancements (v5.53.0)
+// =============================================================================
+
+// CRDT Collaboration Presence
+export {
+  CollaboratorAvatar,
+  CollaboratorStack,
+  LiveCursor,
+  SelectionHighlight,
+  PresenceSidebar,
+  CollaborationPresenceBar,
+  type Collaborator,
+  type CollaborationPresenceProps,
+} from './collaboration-presence';
+
+// Multimedia Sidecar Panel
+export {
+  MultimediaSidecarPanel,
+  type CognitiveSidecar,
+  type MultimediaStream,
+  type MediaType,
+  type SidecarStatus,
+} from './multimedia-sidecar-panel';
+
+// Cost Negotiation Panel
+export {
+  CostNegotiationPanel,
+  type ModelBid,
+  type BudgetAllocation,
+  type NegotiationResult,
+  type CostNegotiationPanelProps,
+} from './cost-negotiation-panel';
+
+// Uncertainty Metrics Panel
+export {
+  UncertaintyMetricsPanel,
+  type UncertaintyMetrics,
+  type EnhancedEntropyResult,
+  type SampleData,
+  type UncertaintyMetricsPanelProps,
+} from './uncertainty-metrics-panel';
+
+// Neural Feedback Panel
+export {
+  NeuralFeedbackPanel,
+  type FeedbackSubmission,
+  type ModelPerformance,
+  type LearningInsight,
+  type NeuralFeedbackPanelProps,
+} from './neural-feedback-panel';
+
+// =============================================================================
+// Original Exports
+// =============================================================================
 
 // Re-export UI components used by workflow editor
 export { Card, CardContent } from '@/components/ui/card';

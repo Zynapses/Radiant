@@ -89,7 +89,7 @@ interface OpenAICompatibleResponse {
 // Model Registry - All supported models with routing info
 // ============================================================================
 
-const MODEL_REGISTRY: Record<string, ModelConfig> = {
+export const MODEL_REGISTRY: Record<string, ModelConfig> = {
   // =========== BEDROCK PRIMARY (Claude, Llama, Titan) ===========
   'anthropic/claude-3-5-sonnet-20241022': {
     modelId: 'anthropic/claude-3-5-sonnet-20241022',
@@ -948,6 +948,59 @@ export class ModelRouterService {
     });
 
     return candidates[0] || null;
+  }
+
+  /**
+   * Get available models for a tenant, optionally filtered by provider
+   */
+  async getAvailableModels(
+    tenantId: string,
+    options?: { provider?: ModelProvider }
+  ): Promise<Array<{ id: string; modelId: string; provider: ModelProvider; isActive: boolean }>> {
+    try {
+      // Query database for tenant's available models
+      const result = await executeStatement(
+        `SELECT id, model_id, provider, is_active 
+         FROM model_configurations 
+         WHERE tenant_id = $1 AND is_active = true
+         ${options?.provider ? 'AND provider = $2' : ''}
+         ORDER BY model_id`,
+        options?.provider 
+          ? [{ name: 'tenantId', value: { stringValue: tenantId } }, { name: 'provider', value: { stringValue: options.provider } }]
+          : [{ name: 'tenantId', value: { stringValue: tenantId } }]
+      );
+
+      if (!result.rows || result.rows.length === 0) {
+        // Fall back to registry models if no tenant-specific config
+        const registryModels = Object.entries(MODEL_REGISTRY)
+          .filter(([_, config]) => config.isAvailable && (!options?.provider || config.provider === options.provider))
+          .map(([modelId, config]) => ({
+            id: modelId,
+            modelId,
+            provider: config.provider,
+            isActive: true,
+          }));
+        return registryModels;
+      }
+
+      return result.rows.map((row: Record<string, unknown>) => ({
+        id: row.id as string,
+        modelId: row.model_id as string,
+        provider: row.provider as ModelProvider,
+        isActive: row.is_active as boolean,
+      }));
+    } catch (error) {
+      logger.error('Failed to get available models', { tenantId, error });
+      // Fall back to registry on error
+      return Object.entries(MODEL_REGISTRY)
+        .filter(([_, config]) => config.isAvailable && (!options?.provider || config.provider === options.provider))
+        .map(([modelId, config]) => ({
+          id: modelId,
+          modelId,
+          provider: config.provider,
+          isActive: true,
+        }));
+    }
   }
 }
 

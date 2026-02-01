@@ -8,11 +8,13 @@
 import { Pool } from 'pg';
 import { v4 as uuidv4 } from 'uuid';
 import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
-import { CatoOutputType, CatoRiskLevel, CatoCompensationType, CatoAccumulatedContext, CatoRiskSignal, CatoCompensationEntry } from '@radiant/shared';
+import { CatoOutputType, CatoRiskLevel, CatoCompensationType, CatoAccumulatedContext, CatoRiskSignal, CatoCompensationEntry, CatoAffectedResource } from '@radiant/shared';
 import { CatoBaseMethodExecutor, MethodExecutionContext, ModelInvocationResult } from '../cato-method-executor.service';
 import { CatoMethodRegistryService } from '../cato-method-registry.service';
 import { CatoSchemaRegistryService } from '../cato-schema-registry.service';
 import { CatoToolRegistryService } from '../cato-tool-registry.service';
+import { CatoCompensationService } from '../cato-compensation.service';
+import { enhancedLogger as logger } from '../../logging/enhanced-logger';
 
 const lambdaClient = new LambdaClient({});
 
@@ -43,10 +45,12 @@ export interface ExecutorOutput {
 
 export class CatoExecutorMethod extends CatoBaseMethodExecutor<ExecutorInput, ExecutorOutput> {
   private toolRegistry: CatoToolRegistryService;
+  private compensationService: CatoCompensationService;
 
   constructor(pool: Pool, methodRegistry: CatoMethodRegistryService, schemaRegistry: CatoSchemaRegistryService, toolRegistry: CatoToolRegistryService) {
     super(pool, methodRegistry, schemaRegistry);
     this.toolRegistry = toolRegistry;
+    this.compensationService = new CatoCompensationService(pool, toolRegistry);
   }
 
   getMethodId(): string { return 'method:executor:v1'; }
@@ -199,25 +203,81 @@ export class CatoExecutorMethod extends CatoBaseMethodExecutor<ExecutorInput, Ex
     }
   }
 
-  private async logCompensation(pipelineId: string, tenantId: string, stepNumber: number, action: ExecutorInput['proposal']['actions'][0]): Promise<void> {
-    await this.pool.query(
-      `INSERT INTO cato_compensation_log (pipeline_id, tenant_id, step_number, step_name, compensation_type, compensation_tool, compensation_inputs, affected_resources, status, original_action)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'PENDING', $9)`,
-      [pipelineId, tenantId, stepNumber, action.description, action.compensationType, action.toolId, JSON.stringify(action.inputs), '[]', JSON.stringify(action)]
+  private async logCompensation(
+    pipelineId: string,
+    tenantId: string,
+    stepNumber: number,
+    action: ExecutorInput['proposal']['actions'][0],
+    executionResult?: Record<string, unknown>
+  ): Promise<string> {
+    // Build affected resources from action inputs and results
+    const affectedResources: CatoAffectedResource[] = [];
+    
+    // Extract resources from action inputs
+    if (action.inputs) {
+      const resourceId = action.inputs.resourceId as string || action.inputs.id as string;
+      const resourceType = action.inputs.resourceType as string || action.type;
+      if (resourceId && resourceType) {
+        affectedResources.push({
+          resourceType,
+          resourceId,
+          action: action.type === 'create' ? 'CREATE' : action.type === 'update' ? 'UPDATE' : action.type === 'delete' ? 'DELETE' : 'UPDATE',
+          previousState: executionResult?.previousState as Record<string, unknown> | undefined,
+        });
+      }
+    }
+
+    // Use the compensation service to log properly
+    return this.compensationService.logCompensation(
+      pipelineId,
+      tenantId,
+      stepNumber,
+      action.description,
+      action.compensationType,
+      action.toolId,
+      action.inputs,
+      affectedResources,
+      action as unknown as Record<string, unknown>,
+      executionResult
     );
   }
 
-  private async executeCompensations(pipelineId: string, tenantId: string, actionsExecuted: ActionResult[], compensationLog: Array<{ stepNumber: number; actionId: string; compensationType: CatoCompensationType; status: string }>): Promise<boolean> {
-    const successfulActions = actionsExecuted.filter(a => a.status === 'SUCCESS').reverse();
-    for (const action of successfulActions) {
-      const comp = compensationLog.find(c => c.actionId === action.actionId);
-      if (comp && comp.compensationType !== CatoCompensationType.NONE) {
-        // Execute compensation logic here
-        action.compensationExecuted = true;
-        comp.status = 'COMPENSATED';
+  private async executeCompensations(
+    pipelineId: string,
+    tenantId: string,
+    actionsExecuted: ActionResult[],
+    compensationLog: Array<{ stepNumber: number; actionId: string; compensationType: CatoCompensationType; status: string }>
+  ): Promise<boolean> {
+    try {
+      // Use the compensation service to execute all pending compensations
+      const result = await this.compensationService.executeCompensations(pipelineId, tenantId);
+      
+      logger.info('Compensation execution completed', {
+        pipelineId,
+        tenantId,
+        executed: result.executed,
+        failed: result.failed,
+      });
+
+      // Update local tracking
+      const successfulActions = actionsExecuted.filter(a => a.status === 'SUCCESS').reverse();
+      for (const action of successfulActions) {
+        const comp = compensationLog.find(c => c.actionId === action.actionId);
+        if (comp && comp.compensationType !== CatoCompensationType.NONE) {
+          action.compensationExecuted = true;
+          comp.status = result.failed > 0 ? 'PARTIALLY_COMPENSATED' : 'COMPENSATED';
+        }
       }
+
+      return result.executed > 0;
+    } catch (error) {
+      logger.error('Failed to execute compensations', {
+        pipelineId,
+        tenantId,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      return false;
     }
-    return successfulActions.some(a => a.compensationExecuted);
   }
 
   protected async detectRiskSignals(output: ExecutorOutput, context: MethodExecutionContext): Promise<CatoRiskSignal[]> {

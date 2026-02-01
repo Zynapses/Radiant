@@ -108,6 +108,11 @@
         "description": "Universal Envelope Protocol v2.0 - wraps all AI interactions for tracing, compliance, and storage"
       },
       {
+        "path": "docs/WORKFLOW-UEP-ARCHITECTURE.md",
+        "triggers": ["workflow", "uep", "condition", "stream_evaluation", "orchestration", "parallel_execution"],
+        "description": "Workflow UEP Integration - model-agnostic condition evaluation, stream processing, envelope transformation"
+      },
+      {
         "path": "docs/specs/UEP-V2-REGULATORY-COMPLIANCE-AUDIT.md",
         "triggers": ["uep", "compliance", "hipaa", "gdpr", "soc2", "regulatory"],
         "description": "UEP v2.0 regulatory compliance audit report"

@@ -6,6 +6,7 @@
  * - Trust score (1 - entropy)
  * - Domain risk
  * - Compute cost considerations
+ * - Vector semantic analysis (v5.53.0 - Gemini enhancement)
  */
 
 import { executeStatement } from '../db/client';
@@ -18,6 +19,9 @@ import {
   type PredictiveUncertaintyOutput,
 } from '@radiant/shared';
 import { estimateTokens } from '@radiant/shared';
+
+// Vector Semantic Router for enhanced routing decisions (Gemini v5.53.0)
+import { vectorSemanticRouterService } from './workflow/vector-semantic-router.service';
 
 // =============================================================================
 // SOFAI Router Service
@@ -38,6 +42,7 @@ class SofaiRouterService {
     domain?: string;
     uncertainty?: PredictiveUncertaintyOutput;
     forceLevel?: SystemLevel;
+    useSemanticRouting?: boolean; // v5.53.0: Enable vector semantic routing
   }): Promise<SofaiRoutingDecision> {
     const startTime = Date.now();
 
@@ -58,35 +63,79 @@ class SofaiRouterService {
       brainConfigService.getNumber('SOFAI_SYSTEM2_THRESHOLD', 0.5),
       brainConfigService.getBoolean('SOFAI_ENABLE_SYSTEM1_5', true),
     ]);
+    // Semantic routing enabled by default (v5.53.0 Gemini enhancement)
+    const enableSemanticRouting = true;
+
+    // v5.53.0: Vector Semantic Routing (Gemini enhancement)
+    // Check for refusal patterns and get semantic domain detection
+    let semanticRefusalRisk = 0;
+    let semanticDomain: string | null = null;
+    
+    if ((params.useSemanticRouting ?? enableSemanticRouting)) {
+      try {
+        // Use the main semantic routing API which handles refusal checks
+        const semanticRouting = await vectorSemanticRouterService.getSemanticRouting(
+          params.prompt,
+          { checkRefusals: true, matchWorkflows: false, matchModels: false }
+        );
+        
+        // Check for safety flags (refusal detection)
+        if (semanticRouting.safetyFlags.length > 0) {
+          // Convert safety flags to risk score (more flags = higher risk)
+          semanticRefusalRisk = Math.min(0.9, 0.3 * semanticRouting.safetyFlags.length);
+          logger.info('Semantic safety flags detected', {
+            flags: semanticRouting.safetyFlags,
+            riskScore: semanticRefusalRisk,
+          });
+        }
+        
+        // Semantic domain detection (faster keyword-based method)
+        semanticDomain = vectorSemanticRouterService.detectDomainFromQuery(params.prompt);
+        if (semanticDomain === 'general') {
+          semanticDomain = null; // Only use if specific domain detected
+        }
+      } catch (error) {
+        // Semantic routing is optional enhancement - continue without it
+        logger.debug('Semantic routing unavailable, using fallback', {
+          error: error instanceof Error ? error.message : 'unknown',
+        });
+      }
+    }
 
     // Calculate trust and risk
     const trust = params.uncertainty 
       ? 1 - params.uncertainty.predictedEntropy 
       : await this.estimateTrustFromPrompt(params.prompt);
     
-    const domain = params.domain || this.detectDomain(params.prompt);
+    // Use semantic domain if available, otherwise fallback to keyword detection
+    const domain = semanticDomain || params.domain || this.detectDomain(params.prompt);
     const domainRisk = await this.getDomainRisk(domain);
     const computeCost = this.calculateComputeCost(params.prompt);
     
     // ECD Risk: Estimate hallucination risk based on query characteristics
     const ecdRisk = ecdVerificationService.estimateECDRisk(params.prompt);
     
-    // Enhanced formula: Combine domain risk and ECD risk (60/40 weighting)
-    const combinedRisk = domainRisk * 0.6 + ecdRisk * 0.4;
+    // Enhanced formula: Combine domain risk, ECD risk, and semantic refusal risk
+    // Weighting: domain (50%), ECD (30%), semantic refusal (20%)
+    const combinedRisk = domainRisk * 0.5 + ecdRisk * 0.3 + semanticRefusalRisk * 0.2;
 
     // SOFAI Formula: Route to System 2 if (1-trust) * combinedRisk > threshold
     const routingScore = (1 - trust) * combinedRisk;
-    const shouldUseSystem2 = routingScore > system2Threshold;
+    
+    // Force System 2 for high refusal risk (safety critical)
+    const shouldUseSystem2 = routingScore > system2Threshold || semanticRefusalRisk > 0.8;
 
     let level: SystemLevel;
     let reasoning: string;
 
     if (shouldUseSystem2) {
       level = 'system2';
-      reasoning = `High routing score (${routingScore.toFixed(2)}) exceeds threshold (${system2Threshold}). Domain: ${domain}, Risk: ${combinedRisk.toFixed(2)}, ECD: ${ecdRisk.toFixed(2)}`;
-    } else if (enableSystem1_5 && (routingScore > system2Threshold * 0.5 || ecdRisk > 0.5)) {
+      reasoning = semanticRefusalRisk > 0.8 
+        ? `High semantic refusal risk (${semanticRefusalRisk.toFixed(2)}). Safety-critical routing to System 2.`
+        : `High routing score (${routingScore.toFixed(2)}) exceeds threshold (${system2Threshold}). Domain: ${domain}, Risk: ${combinedRisk.toFixed(2)}, ECD: ${ecdRisk.toFixed(2)}`;
+    } else if (enableSystem1_5 && (routingScore > system2Threshold * 0.5 || ecdRisk > 0.5 || semanticRefusalRisk > 0.4)) {
       level = 'system1.5';
-      reasoning = `Moderate routing score (${routingScore.toFixed(2)}) or ECD risk (${ecdRisk.toFixed(2)}). Using intermediate reasoning. Domain: ${domain}`;
+      reasoning = `Moderate routing score (${routingScore.toFixed(2)}) or risk factors. Using intermediate reasoning. Domain: ${domain}, Semantic: ${semanticDomain || 'N/A'}`;
     } else {
       level = 'system1';
       reasoning = `Low routing score (${routingScore.toFixed(2)}). Fast response appropriate. Domain: ${domain}, ECD: ${ecdRisk.toFixed(2)}`;

@@ -945,6 +945,101 @@ export class DomainTaxonomyService {
     }
     return {};
   }
+
+  // ============================================================================
+  // User Selection Methods
+  // ============================================================================
+
+  async getUserSelection(
+    userId: string,
+    tenantId: string,
+    sessionId?: string
+  ): Promise<{ fieldId: string; domainId: string; subspecialtyId?: string; isDefault: boolean } | null> {
+    const result = await executeStatement(
+      `SELECT field_id, domain_id, subspecialty_id, is_default
+       FROM domain_taxonomy_user_selections
+       WHERE user_id = $1 AND tenant_id = $2 
+         AND (session_id = $3 OR ($3 IS NULL AND is_default = true))
+       ORDER BY is_default DESC, updated_at DESC
+       LIMIT 1`,
+      [
+        { name: 'userId', value: { stringValue: userId } },
+        { name: 'tenantId', value: { stringValue: tenantId } },
+        { name: 'sessionId', value: sessionId ? { stringValue: sessionId } : { isNull: true } },
+      ]
+    );
+
+    if (!result.rows || result.rows.length === 0) {
+      return null;
+    }
+
+    const row = result.rows[0] as Record<string, unknown>;
+    return {
+      fieldId: String(row.field_id),
+      domainId: String(row.domain_id),
+      subspecialtyId: row.subspecialty_id ? String(row.subspecialty_id) : undefined,
+      isDefault: Boolean(row.is_default),
+    };
+  }
+
+  async saveUserSelection(params: {
+    userId: string;
+    tenantId: string;
+    sessionId?: string;
+    fieldId: string;
+    domainId: string;
+    subspecialtyId?: string;
+    isDefault?: boolean;
+  }): Promise<void> {
+    await executeStatement(
+      `INSERT INTO domain_taxonomy_user_selections 
+         (user_id, tenant_id, session_id, field_id, domain_id, subspecialty_id, is_default, created_at, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW())
+       ON CONFLICT (user_id, tenant_id, COALESCE(session_id, '')) 
+       DO UPDATE SET 
+         field_id = EXCLUDED.field_id,
+         domain_id = EXCLUDED.domain_id,
+         subspecialty_id = EXCLUDED.subspecialty_id,
+         is_default = EXCLUDED.is_default,
+         updated_at = NOW()`,
+      [
+        { name: 'userId', value: { stringValue: params.userId } },
+        { name: 'tenantId', value: { stringValue: params.tenantId } },
+        { name: 'sessionId', value: params.sessionId ? { stringValue: params.sessionId } : { isNull: true } },
+        { name: 'fieldId', value: { stringValue: params.fieldId } },
+        { name: 'domainId', value: { stringValue: params.domainId } },
+        { name: 'subspecialtyId', value: params.subspecialtyId ? { stringValue: params.subspecialtyId } : { isNull: true } },
+        { name: 'isDefault', value: { booleanValue: params.isDefault ?? false } },
+      ]
+    );
+  }
+
+  // ============================================================================
+  // Feedback Methods
+  // ============================================================================
+
+  async submitFeedback(params: {
+    userId: string;
+    tenantId: string;
+    prompt: string;
+    detectedDomainId: string;
+    correctDomainId: string;
+    wasCorrect: boolean;
+  }): Promise<void> {
+    await executeStatement(
+      `INSERT INTO domain_taxonomy_feedback 
+         (user_id, tenant_id, prompt, detected_domain_id, correct_domain_id, was_correct, created_at)
+       VALUES ($1, $2, $3, $4, $5, $6, NOW())`,
+      [
+        { name: 'userId', value: { stringValue: params.userId } },
+        { name: 'tenantId', value: { stringValue: params.tenantId } },
+        { name: 'prompt', value: { stringValue: params.prompt } },
+        { name: 'detectedDomainId', value: { stringValue: params.detectedDomainId } },
+        { name: 'correctDomainId', value: { stringValue: params.correctDomainId } },
+        { name: 'wasCorrect', value: { booleanValue: params.wasCorrect } },
+      ]
+    );
+  }
 }
 
 export const domainTaxonomyService = new DomainTaxonomyService();

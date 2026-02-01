@@ -1,7 +1,7 @@
 # CATO Orchestration Engineering Guide
 
-> **Version**: 5.52.53  
-> **Last Updated**: 2026-01-28  
+> **Version**: 5.53.0  
+> **Last Updated**: 2026-01-31  
 > **Purpose**: Complete technical reference for AI analysis of the Cato orchestration system
 
 ---
@@ -1099,10 +1099,12 @@ export interface CatoAffectedResource {
 
 ### 9.3 Execution Flow
 
-**File**: `@/packages/infrastructure/lambda/shared/services/cato-compensation.service.ts` (Lines 56-105)
+**File**: `@/packages/infrastructure/lambda/shared/services/cato-compensation.service.ts`
+
+Compensations execute in **LIFO order** (reverse of execution) and support multiple execution strategies:
 
 ```typescript
-async executeCompensations(pipelineId: string, tenantId: string) {
+async executeCompensations(pipelineId: string, tenantId: string): Promise<{ executed: number; failed: number }> {
   // Get pending compensations in REVERSE order (LIFO for SAGA)
   const result = await this.pool.query(
     `SELECT * FROM cato_compensation_log
@@ -1111,23 +1113,126 @@ async executeCompensations(pipelineId: string, tenantId: string) {
     [pipelineId, tenantId]
   );
 
+  let executed = 0, failed = 0;
   for (const row of result.rows) {
     const entry = this.mapRowToEntry(row);
-    
-    switch (entry.compensationType) {
-      case CatoCompensationType.DELETE:
-        await this.executeDeleteCompensation(entry);
-        break;
-      case CatoCompensationType.RESTORE:
-        await this.executeRestoreCompensation(entry);
-        break;
-      case CatoCompensationType.NOTIFY:
-        await this.executeNotifyCompensation(entry);
-        break;
-      case CatoCompensationType.MANUAL:
-        await this.flagForManualCompensation(entry);
-        break;
+    try {
+      await this.executeCompensation(entry);
+      executed++;
+    } catch (error) {
+      failed++;
+      await this.markCompensationFailed(entry.id, error.message);
     }
+  }
+  return { executed, failed };
+}
+```
+
+### 9.4 Compensation Strategies
+
+#### DELETE Compensation
+Deletes resources created by a failed action. Supports both custom tools and generic database operations:
+
+```typescript
+private async executeDeleteCompensation(entry: CatoCompensationEntry): Promise<void> {
+  for (const resource of entry.affectedResources) {
+    if (resource.action === 'CREATE') {
+      if (entry.compensationTool) {
+        // Use custom compensation tool via Lambda/MCP
+        await this.invokeCompensationTool(entry.compensationTool, {
+          operation: 'DELETE',
+          resourceType: resource.resourceType,
+          resourceId: resource.resourceId,
+        });
+      } else {
+        // Generic database deletion (soft delete if supported)
+        await this.deleteResourceByType(entry.tenantId, resource);
+      }
+    }
+  }
+}
+```
+
+**Supported Resource Types** (generic deletion):
+- `cato_pipeline_execution`, `cato_method_invocation`, `cato_envelope`
+- `conversation`, `message`, `upload` (UDS)
+- `knowledge_node`, `knowledge_edge` (Cortex)
+
+#### RESTORE Compensation
+Restores resources to their previous state using `previousState` snapshots:
+
+```typescript
+private async executeRestoreCompensation(entry: CatoCompensationEntry): Promise<void> {
+  for (const resource of entry.affectedResources) {
+    if (resource.previousState && (resource.action === 'UPDATE' || resource.action === 'DELETE')) {
+      if (entry.compensationTool) {
+        await this.invokeCompensationTool(entry.compensationTool, {
+          operation: 'RESTORE',
+          resourceType: resource.resourceType,
+          resourceId: resource.resourceId,
+          previousState: resource.previousState,
+        });
+      } else {
+        await this.restoreResourceByType(entry.tenantId, resource);
+      }
+    }
+  }
+}
+```
+
+#### NOTIFY Compensation
+Sends SNS notifications with full audit trail:
+
+```typescript
+private async executeNotifyCompensation(entry: CatoCompensationEntry): Promise<void> {
+  // Send SNS notification if configured
+  if (COMPENSATION_SNS_TOPIC_ARN) {
+    await snsClient.send(new PublishCommand({
+      TopicArn: COMPENSATION_SNS_TOPIC_ARN,
+      Subject: `[CATO] Compensation Required - Pipeline ${entry.pipelineId}`,
+      Message: JSON.stringify(notification),
+      MessageAttributes: {
+        tenantId: { DataType: 'String', StringValue: entry.tenantId },
+        pipelineId: { DataType: 'String', StringValue: entry.pipelineId },
+        compensationType: { DataType: 'String', StringValue: entry.compensationType },
+      },
+    }));
+  }
+  
+  // Store notification in database for audit trail
+  await this.pool.query(
+    `INSERT INTO cato_compensation_notifications (...) VALUES (...)`
+  );
+}
+```
+
+**Environment Variables**:
+- `COMPENSATION_SNS_TOPIC_ARN` - SNS topic for compensation notifications
+- `MCP_GATEWAY_URL` - MCP gateway for tool invocations (default: `http://localhost:3001`)
+
+### 9.5 Tool Invocation
+
+Custom compensation tools are invoked via Lambda or MCP:
+
+```typescript
+private async invokeCompensationTool(toolId: string, inputs: Record<string, unknown>): Promise<Record<string, unknown>> {
+  const tool = await this.toolRegistry.getTool(toolId);
+  
+  if (this.toolRegistry.isLambdaTool(tool)) {
+    // Lambda invocation
+    const command = new InvokeCommand({
+      FunctionName: this.toolRegistry.getLambdaFunctionName(tool),
+      InvocationType: 'RequestResponse',
+      Payload: Buffer.from(JSON.stringify({ toolId, inputs, isCompensation: true })),
+    });
+    return await lambdaClient.send(command);
+  } else {
+    // MCP tool invocation
+    const response = await fetch(`${MCP_GATEWAY_URL}/tools/call`, {
+      method: 'POST',
+      body: JSON.stringify({ server: tool.mcpServer, tool: toolId, arguments: inputs }),
+    });
+    return await response.json();
   }
 }
 ```

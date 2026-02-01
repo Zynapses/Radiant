@@ -1523,7 +1523,161 @@ Simply drag files directly into the chat window to attach them.
 
 ---
 
-## 24. Glossary
+## 24. Workflows & Orchestration Methods
+
+Think Tank uses a powerful workflow system to intelligently process your requests. Understanding how workflows work helps you get better results and customize your AI experience.
+
+### What Are Workflows?
+
+Workflows are predefined patterns for how Think Tank approaches different types of questions. Instead of just sending your prompt to a single AI model, workflows can:
+
+- **Chain multiple steps** together (analyze → propose → verify → refine)
+- **Run multiple AI models in parallel** and combine their outputs
+- **Apply quality checks** and verification at each step
+- **Route to specialist models** based on your domain
+
+```
+Your Question
+     │
+     ▼
+┌──────────────┐
+│   Observer   │ ← Understand what you're asking
+└──────┬───────┘
+       ▼
+┌──────────────┐
+│   Proposer   │ ← Generate possible approaches
+└──────┬───────┘
+       ▼
+┌──────────────┐
+│    Critics   │ ← Evaluate and improve (may use multiple AIs)
+└──────┬───────┘
+       ▼
+┌──────────────┐
+│   Validator  │ ← Verify quality and accuracy
+└──────┬───────┘
+       ▼
+   Final Response
+```
+
+### System Workflows
+
+Think Tank includes **70+ pre-built workflows** for common tasks:
+
+| Category | Example Workflows |
+|----------|-------------------|
+| **Research** | Deep Research, Literature Review, Fact Check |
+| **Code** | Code Review, Bug Analysis, Refactor Proposal |
+| **Writing** | Content Polish, Translation, Summarization |
+| **Analysis** | Sentiment Analysis, Trend Analysis, Competitive Intel |
+| **Decision** | Pros-Cons Analysis, Risk Assessment, Recommendation |
+| **Creative** | Brainstorm, Story Expansion, Concept Generation |
+
+The Brain Plan panel shows which workflow Think Tank selected for your question.
+
+### Multi-AI Selection
+
+Think Tank can use **multiple AI models simultaneously** for a single response:
+
+**How It Works:**
+1. Your question runs through several AI models in parallel
+2. Each model provides its perspective
+3. Results are evaluated and combined
+4. The best answer is synthesized
+
+**Stream Evaluation Modes:**
+- **Any** - First good answer wins (fastest)
+- **All** - All models must agree (most thorough)
+- **Majority** - >50% agreement required
+- **Best** - Highest confidence answer selected
+- **Weighted** - Answers weighted by confidence scores
+
+You can see multi-AI execution in the Brain Plan when it shows "Parallel" or "Council" modes.
+
+### Orchestration Methods
+
+Behind workflows are **25+ orchestration methods** based on peer-reviewed AI research:
+
+| Method | What It Does | When It's Used |
+|--------|--------------|----------------|
+| **Semantic Entropy** | Measures uncertainty across multiple samples | High-stakes questions |
+| **Self-Consistency** | Generates multiple reasoning paths, takes majority vote | Math/logic problems |
+| **Panel of Judges** | Multiple AI models evaluate quality independently | Quality assurance |
+| **Debate** | AIs argue different positions, synthesize best arguments | Complex decisions |
+| **Hallucination Detection** | Checks if claims are consistent and attributable | Factual questions |
+| **Mixture of Agents** | Layered synthesis from diverse models | Comprehensive answers |
+| **Process Reward** | Verifies each reasoning step individually | Step-by-step problems |
+| **Frugal Cascade** | Starts with cheap models, escalates only if needed | Cost optimization |
+
+### Saving Your Own Workflows
+
+You can save customized workflows for reuse:
+
+1. **During a conversation**, click **"Save as Template"** in the Brain Plan panel
+2. **Name your workflow** (e.g., "My Code Review Process")
+3. **Adjust parameters** like:
+   - Which AI models to use
+   - Quality thresholds
+   - Number of verification steps
+   - Cost limits
+4. **Save** - Available in your Workflow Templates
+
+**Sharing Workflows:**
+- **Private** - Only you can use
+- **Team** - Shared with your organization
+- **Public** - Available to all users (requires admin approval)
+
+### Workflow Parameters You Can Customize
+
+| Parameter | What It Controls | Default |
+|-----------|------------------|---------|
+| **Quality Weight** | Balance between quality and speed | 0.7 |
+| **Cost Threshold** | Maximum cost per query | Varies |
+| **Confidence Threshold** | Minimum confidence to accept | 0.85 |
+| **Sample Count** | How many samples for voting methods | 5 |
+| **Max Escalations** | How many times to try stronger models | 2 |
+| **Auto-Approve Threshold** | Skip human review if confidence exceeds | 0.95 |
+
+Access these in **Settings → Workflow Preferences**.
+
+### Conditional Logic
+
+Workflows use **conditions** to decide what happens next:
+
+**Expression Conditions** (automatic):
+- `confidence > 0.8` - Proceed if AI is confident
+- `contains("error")` - Branch if error detected
+- `length > 100` - Check response completeness
+
+**AI-Interpreted Conditions** (smart):
+- "Is this response helpful and on-topic?"
+- "Does this contain any safety concerns?"
+- "Is this code syntactically correct?"
+
+These conditions are **model-agnostic** - they evaluate the quality of the answer, not which AI model produced it. This means you can swap AI models without breaking your workflows.
+
+### Viewing Workflow Execution
+
+To see how Think Tank processed your question:
+
+1. **Brain Plan Panel** - Shows orchestration mode, domain, and confidence
+2. **Expand Details** - Click to see step-by-step execution
+3. **Cost Breakdown** - Shows tokens and cost per step
+4. **Model Usage** - Which AI models were used
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│  ✅ Step 1: Observer           Claude 3.5 Sonnet     0.02¢   150ms │
+│  ✅ Step 2: Proposer           GPT-4o               0.05¢   320ms │
+│  ✅ Step 3: Critic (parallel)  3 models             0.08¢   280ms │
+│  ✅ Step 4: Validator          Claude 3.5 Sonnet    0.03¢   180ms │
+│  ─────────────────────────────────────────────────────────────────  │
+│  Total: 0.18¢  |  930ms  |  Confidence: 94%                        │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 25. Glossary
 
 | Term | Definition |
 |------|------------|
@@ -1555,6 +1709,11 @@ Simply drag files directly into the chat window to attach them.
 | **Timeline** | A branch in Time Machine representing a conversation path |
 | **War Room** | Strategic Decision Theater for high-stakes collaborative decisions |
 | **War Room Mode** | Thorough multi-agent execution |
+| **Workflow** | A predefined pattern of steps for processing AI requests |
+| **Orchestration Method** | A specific algorithm or technique used within workflows |
+| **Stream Evaluation** | How multiple parallel AI outputs are combined |
+| **Model-Agnostic Condition** | A condition that evaluates output quality, not model identity |
+| **Workflow Template** | A saved, reusable workflow configuration |
 
 ---
 
@@ -1568,6 +1727,7 @@ Simply drag files directly into the chat window to attach them.
 | 5.44.0 | Jan 22, 2026 | Added Living Parchment section (War Room, Council, Debate Arena) |
 | 5.52.0 | Jan 23, 2026 | Simulator now uses real API data with graceful fallbacks |
 | 5.52.52 | Jan 28, 2026 | Major update: Added Time Machine, Grimoire, Flash Facts, Sentinel Agents, Economic Governor, Council of Rivals, Voice Input & File Attachments sections |
+| 5.52.58 | Jan 31, 2026 | Added Workflows & Orchestration Methods section (multi-AI selection, stream evaluation, workflow templates, configurable parameters) |
 
 ---
 

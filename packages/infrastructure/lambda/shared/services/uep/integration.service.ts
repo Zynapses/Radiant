@@ -600,6 +600,72 @@ class UEPIntegrationService {
   }
 
   // ===========================================================================
+  // Orchestration Methods Integration
+  // ===========================================================================
+
+  /**
+   * Create envelope for orchestration method output (70+ methods)
+   * Used by OrchestrationMethodsService.executeMethodWithUEP()
+   */
+  createOrchestrationEnvelope(
+    tenantId: string,
+    serviceMethod: string,
+    output: Record<string, unknown>,
+    options: {
+      traceId: string;
+      spanId: string;
+      parentSpanId?: string;
+      durationMs: number;
+      prompt?: string;
+      complianceFrameworks?: string[];
+      confidence?: number;
+      uncertainty?: number;
+    }
+  ): UEPEnvelope {
+    // Extract service name from serviceMethod (e.g., "semantic-entropy-service.computeEntropy")
+    const [serviceName] = serviceMethod.split('.');
+
+    return {
+      envelopeId: uuidv4(),
+      specversion: '2.0',
+      type: `orchestration.method.${serviceName}`,
+      source: {
+        system: 'RADIANT',
+        component: 'orchestration-methods',
+        version: RADIANT_VERSION,
+        tenantId,
+      },
+      payload: {
+        input: {
+          type: 'text',
+          content: options.prompt || '',
+        },
+        output: {
+          type: 'structured',
+          content: output,
+          finishReason: output.error ? 'error' : 'completed',
+        },
+        metadata: {
+          serviceMethod,
+          confidence: options.confidence,
+          uncertainty: options.uncertainty,
+          response: output.response,
+          reasoning: output.reasoning,
+          selectedModel: output.selectedModel,
+        },
+      },
+      tracing: {
+        traceId: options.traceId,
+        spanId: options.spanId,
+        parentSpanId: options.parentSpanId,
+        timestamp: new Date().toISOString(),
+        durationMs: options.durationMs,
+      },
+      compliance: this.buildCompliance(options.complianceFrameworks),
+    };
+  }
+
+  // ===========================================================================
   // Storage Integration
   // ===========================================================================
 

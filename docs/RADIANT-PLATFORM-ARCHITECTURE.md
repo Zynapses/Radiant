@@ -556,6 +556,54 @@ UEP v2.0 provides standardized wrapping for all AI interactions across RADIANT, 
 
 **Documentation**: See [UEP-V2-SPECIFICATION.md](./UEP-V2-SPECIFICATION.md) for complete specification.
 
+### 1.6.3 Workflow UEP Integration
+
+UEP v2.0 is fully integrated into the workflow orchestration system with model-agnostic condition evaluation.
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         WORKFLOW EXECUTION                               │
+│  ┌──────────┐    UEP     ┌───────────┐    UEP     ┌──────────┐         │
+│  │  Node A  │───────────▶│ Condition │───────────▶│  Node B  │         │
+│  │ AI Call  │  Envelope  │ Evaluator │  Envelope  │ AI Call  │         │
+│  └──────────┘            └───────────┘            └──────────┘         │
+│       │                       │                        │               │
+│       └───────────────────────┴────────────────────────┘               │
+│                               │                                        │
+│                        UDS Tiered Storage                              │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+**Key Design Principle**: **CONDITIONS ARE MODEL-AGNOSTIC**
+- Conditions evaluate OUTPUT CONTENT, not model identity
+- Users can swap AI models without breaking workflow logic
+- Model info captured for tracing/debugging only
+
+**Condition Types**:
+| Type | Description | Cost |
+|------|-------------|------|
+| `expression` | JavaScript-like expressions | Free |
+| `ai_interpreted` | Natural language quality checks | ~$0.001/eval |
+| `composite` | AND/OR/NOT combinations | Sum of parts |
+
+**Stream Evaluation Modes** (for parallel model outputs):
+| Mode | Description |
+|------|-------------|
+| `all` | All streams must pass |
+| `any` | Any stream sufficient |
+| `majority` | >50% must pass |
+| `best` | Highest confidence |
+| `quorum` | Configurable threshold |
+
+**Key Files**:
+| File | Purpose |
+|------|---------|
+| `services/workflow/uep-node.service.ts` | Central UEP integration |
+| `workflow-engine.ts` | UEP-aware execution methods |
+| `migrations/V2026_01_31_003__workflow_uep_integration.sql` | Database schema |
+
+**Documentation**: See [WORKFLOW-UEP-ARCHITECTURE.md](./WORKFLOW-UEP-ARCHITECTURE.md) for complete guide.
+
 ---
 
 ## 1.7 Pricing System (v4_12_pricing_system.ts)

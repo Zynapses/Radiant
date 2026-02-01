@@ -12,6 +12,11 @@
  * - Circuit breaker integration
  * - Domain-aware routing
  * 
+ * NEW in v5.53.0 (Gemini Enhancement):
+ * - Cost negotiation for budget-aware model selection
+ * - Quality-cost tradeoff optimization
+ * - Budget allocation tracking per workflow
+ * 
  * Complexity Scale:
  * 1-4: Simple (formatting, summarization, basic Q&A) → gpt-4o-mini
  * 5-8: Medium (analysis, multi-step reasoning) → original model
@@ -25,6 +30,9 @@
  */
 
 import { Logger } from '../../logger';
+
+// v5.53.0 Gemini Enhancement: Cost Negotiation Service
+import { costNegotiationService } from '../workflow/cost-negotiation.service';
 
 export type GovernorMode = 'performance' | 'balanced' | 'cost_saver' | 'off';
 
@@ -445,6 +453,127 @@ Return ONLY a single integer from 1-10. No explanation.`
     return Promise.all(
       tasks.map(({ task, agent }) => this.optimizeModelSelection(task, agent, mode))
     );
+  }
+
+  // ============================================================================
+  // v5.53.0 Cost Negotiation (Gemini Enhancement)
+  // ============================================================================
+
+  /**
+   * Budget-aware model selection using cost negotiation.
+   * 
+   * This implements Gemini's recommendation for centralized cost negotiation
+   * (rather than agent micro-ledger approach) to balance quality and cost.
+   * 
+   * @param task - The task to execute
+   * @param workflowId - Workflow ID for budget tracking
+   * @param stepId - Step ID within the workflow
+   * @param budgetCents - Available budget in cents
+   * @param qualityTarget - Target quality score (0-1, default 0.8)
+   */
+  async negotiateModelSelection(
+    task: SwarmTask,
+    workflowId: string,
+    stepId: string,
+    budgetCents: number,
+    qualityTarget: number = 0.8
+  ): Promise<GovernorDecision & { negotiationResult?: { selectedModel: string; allocatedBudget: number; reasoning: string } }> {
+    try {
+      // 1. Get complexity score for the task
+      const complexityScore = await this.scoreComplexity(task.prompt);
+      const normalizedComplexity = complexityScore / 10;
+
+      // 2. Determine required capabilities based on task
+      const requiredCapabilities: string[] = [];
+      const queryLower = task.prompt.toLowerCase();
+      
+      if (queryLower.includes('code') || queryLower.includes('program')) {
+        requiredCapabilities.push('code_generation');
+      }
+      if (queryLower.includes('math') || queryLower.includes('calculate')) {
+        requiredCapabilities.push('mathematical_reasoning');
+      }
+      if (queryLower.includes('creative') || queryLower.includes('story')) {
+        requiredCapabilities.push('creative_writing');
+      }
+      if (requiredCapabilities.length === 0) {
+        requiredCapabilities.push('general_reasoning');
+      }
+
+      // 3. Use cost negotiation service to select optimal model
+      const negotiationResult = await costNegotiationService.negotiate({
+        workflowId,
+        stepId,
+        taskDescription: task.prompt,
+        requiredCapabilities,
+        qualityTarget,
+        preferCheaper: this.config.mode === 'cost_saver',
+      });
+
+      // 4. Map negotiation result to governor decision
+      const selectedModel = negotiationResult.selectedModel?.modelId || this.config.cheapModel;
+      const avgInputTokens = 500;
+      const avgOutputTokens = 1000;
+      const estimatedOriginalCost = this.estimateCost(this.config.premiumModel, avgInputTokens, avgOutputTokens);
+      const estimatedActualCost = negotiationResult.selectedModel?.estimatedCostCents 
+        ? negotiationResult.selectedModel.estimatedCostCents / 100 
+        : this.estimateCost(selectedModel, avgInputTokens, avgOutputTokens);
+
+      return {
+        originalModel: this.config.premiumModel,
+        selectedModel,
+        complexityScore,
+        mode: this.config.mode,
+        reason: negotiationResult.reasoning,
+        estimatedOriginalCost,
+        estimatedActualCost,
+        savingsAmount: Math.max(0, estimatedOriginalCost - estimatedActualCost),
+        routeType: normalizedComplexity > this.config.warRoomThreshold ? 'war_room' : 'sniper',
+        retrievalConfidence: 1.0,
+        ghostHit: false,
+        circuitBreakerOpen: false,
+        negotiationResult: {
+          selectedModel,
+          allocatedBudget: negotiationResult.allocatedBudgetCents,
+          reasoning: negotiationResult.reasoning,
+        },
+      };
+    } catch (error) {
+      this.logger.warn('Cost negotiation failed, falling back to standard selection', { error });
+      
+      // Fallback to standard model selection
+      const result = await this.optimizeModelSelection(
+        task,
+        { id: 'fallback', name: 'Fallback', role: 'assistant', model: this.config.cheapModel }
+      );
+      return result;
+    }
+  }
+
+  /**
+   * Initialize or get budget allocation for a workflow.
+   */
+  initializeWorkflowBudget(
+    workflowId: string,
+    totalBudgetCents: number
+  ): { allocationId: string; budgetCents: number } {
+    const allocation = costNegotiationService.createBudgetAllocation(workflowId, totalBudgetCents);
+    return {
+      allocationId: allocation.allocationId,
+      budgetCents: allocation.remainingBudgetCents,
+    };
+  }
+
+  /**
+   * Get remaining budget for a workflow.
+   */
+  getWorkflowBudgetStatus(workflowId: string): {
+    remainingCents: number;
+  } {
+    const remaining = costNegotiationService.getRemainingBudget(workflowId);
+    return {
+      remainingCents: remaining,
+    };
   }
 
   // ============================================================================

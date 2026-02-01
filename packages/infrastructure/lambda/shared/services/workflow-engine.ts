@@ -1,4 +1,9 @@
 import { executeStatement } from '../db/client';
+import { v4 as uuidv4 } from 'uuid';
+import * as crypto from 'crypto';
+import { uepNodeService, type NodeExecutionContext, type WorkflowUEPEnvelope } from './workflow/index.js';
+// v5.53.1 Gemini Enhancement: CRDT Workflow Service for collaborative editing
+import { crdtWorkflowService, type CRDTOperation, type CRDTWorkflowState } from './workflow/crdt-workflow.service';
 
 type WorkflowStatus = 'pending' | 'running' | 'paused' | 'completed' | 'failed' | 'cancelled';
 type TaskStatus = 'pending' | 'running' | 'completed' | 'failed' | 'skipped' | 'retrying';
@@ -31,6 +36,16 @@ interface TaskDefinition {
   dependsOn?: string[];
   conditionExpression?: string;
   timeoutSeconds?: number;
+}
+
+/**
+ * UEP-aware execution options for workflows
+ */
+interface UEPExecutionOptions {
+  enableUEP?: boolean;
+  complianceFrameworks?: string[];
+  traceId?: string;
+  parentSpanId?: string;
 }
 
 export class WorkflowEngine {
@@ -297,6 +312,401 @@ export class WorkflowEngine {
        WHERE workflow_execution_id = $1 AND status IN ('pending', 'running')`,
       [{ name: 'executionId', value: { stringValue: executionId } }]
     );
+  }
+
+  // ==========================================================================
+  // UEP-Aware Execution Methods
+  // ==========================================================================
+
+  /**
+   * Start workflow execution with UEP envelope wrapping
+   * All node inputs/outputs are wrapped in UEP v2.0 envelopes
+   */
+  async startExecutionWithUEP(
+    workflowId: string,
+    workflowCode: string,
+    tenantId: string,
+    userId: string,
+    inputParameters: Record<string, unknown>,
+    options: UEPExecutionOptions = {}
+  ): Promise<{ executionId: string; traceId: string; workflowSpanId: string }> {
+    // Generate tracing IDs
+    const traceId = options.traceId || uuidv4();
+    const workflowSpanId = crypto.randomBytes(8).toString('hex');
+    
+    // Start execution
+    const executionId = await this.startExecution(
+      workflowId,
+      tenantId,
+      userId,
+      inputParameters
+    );
+    
+    // Update with UEP tracing info
+    await executeStatement(
+      `UPDATE workflow_executions 
+       SET trace_id = $2, workflow_span_id = $3, compliance_frameworks = $4
+       WHERE id = $1`,
+      [
+        { name: 'executionId', value: { stringValue: executionId } },
+        { name: 'traceId', value: { stringValue: traceId } },
+        { name: 'workflowSpanId', value: { stringValue: workflowSpanId } },
+        { name: 'frameworks', value: { stringValue: `{${(options.complianceFrameworks || []).join(',')}}` } },
+      ]
+    );
+    
+    // Create root UEP envelope for workflow
+    const rootContext: NodeExecutionContext = {
+      workflowId,
+      workflowCode,
+      executionId,
+      tenantId,
+      userId,
+      traceId,
+      workflowSpanId,
+      stepOrder: 0,
+      inputEnvelopes: [],
+      parameters: inputParameters,
+      complianceFrameworks: options.complianceFrameworks || [],
+    };
+    
+    const rootEnvelope = uepNodeService.createInputEnvelope(
+      'workflow_start',
+      'Workflow Start',
+      'start',
+      inputParameters,
+      rootContext
+    );
+    
+    // Store root envelope
+    await uepNodeService.storeEnvelope(rootEnvelope);
+    
+    // Update execution with root envelope
+    await executeStatement(
+      `UPDATE workflow_executions SET root_envelope_id = $2 WHERE id = $1`,
+      [
+        { name: 'executionId', value: { stringValue: executionId } },
+        { name: 'envelopeId', value: { stringValue: rootEnvelope.envelopeId } },
+      ]
+    );
+    
+    return { executionId, traceId, workflowSpanId };
+  }
+
+  /**
+   * Execute a task node with UEP envelope wrapping
+   */
+  async executeTaskWithUEP(
+    executionId: string,
+    taskId: string,
+    taskName: string,
+    taskType: TaskType,
+    input: unknown,
+    context: NodeExecutionContext,
+    sourceEnvelope?: WorkflowUEPEnvelope
+  ): Promise<{ taskExecutionId: string; inputEnvelope: WorkflowUEPEnvelope }> {
+    // Create input envelope
+    const nodeType = this.mapTaskTypeToNodeType(taskType);
+    const inputEnvelope = uepNodeService.createInputEnvelope(
+      taskId,
+      taskName,
+      nodeType,
+      input,
+      context,
+      sourceEnvelope
+    );
+    
+    // Start task execution
+    const taskExecutionId = await this.startTaskExecution(
+      executionId,
+      taskId,
+      input as Record<string, unknown>
+    );
+    
+    // Update with envelope info
+    await executeStatement(
+      `UPDATE task_executions 
+       SET input_envelope_id = $2, span_id = $3
+       WHERE id = $1`,
+      [
+        { name: 'taskExecutionId', value: { stringValue: taskExecutionId } },
+        { name: 'envelopeId', value: { stringValue: inputEnvelope.envelopeId } },
+        { name: 'spanId', value: { stringValue: inputEnvelope.tracing.spanId } },
+      ]
+    );
+    
+    return { taskExecutionId, inputEnvelope };
+  }
+
+  /**
+   * Complete a task node with UEP output envelope
+   */
+  async completeTaskWithUEP(
+    taskExecutionId: string,
+    inputEnvelope: WorkflowUEPEnvelope,
+    output: unknown,
+    options: {
+      status: TaskStatus;
+      usage: { inputTokens: number; outputTokens: number; costCents: number; latencyMs: number };
+      modelInfo?: { modelId: string; mode?: string };
+      error?: { message: string; code?: string };
+    }
+  ): Promise<WorkflowUEPEnvelope> {
+    // Complete the output envelope
+    const outputEnvelope = uepNodeService.completeOutputEnvelope(
+      inputEnvelope,
+      output,
+      {
+        modelInfo: options.modelInfo,
+        usage: {
+          inputTokens: options.usage.inputTokens,
+          outputTokens: options.usage.outputTokens,
+          totalTokens: options.usage.inputTokens + options.usage.outputTokens,
+          costCents: options.usage.costCents,
+          latencyMs: options.usage.latencyMs,
+        },
+      }
+    );
+    
+    // Store output envelope
+    await uepNodeService.storeEnvelope(outputEnvelope);
+    
+    // Complete task execution
+    await this.completeTaskExecution(
+      taskExecutionId,
+      options.status,
+      output as Record<string, unknown>,
+      options.error,
+      options.usage.costCents / 100
+    );
+    
+    // Update with output envelope
+    await executeStatement(
+      `UPDATE task_executions SET output_envelope_id = $2 WHERE id = $1`,
+      [
+        { name: 'taskExecutionId', value: { stringValue: taskExecutionId } },
+        { name: 'envelopeId', value: { stringValue: outputEnvelope.envelopeId } },
+      ]
+    );
+    
+    return outputEnvelope;
+  }
+
+  /**
+   * Get UEP context for continuing workflow execution
+   */
+  async getUEPContext(executionId: string): Promise<NodeExecutionContext | null> {
+    const result = await executeStatement(
+      `SELECT we.*, wd.workflow_id as workflow_code
+       FROM workflow_executions we
+       JOIN workflow_definitions wd ON we.workflow_id = wd.id
+       WHERE we.id = $1`,
+      [{ name: 'executionId', value: { stringValue: executionId } }]
+    );
+    
+    if (result.rows.length === 0) return null;
+    
+    const execution = result.rows[0] as Record<string, unknown>;
+    
+    return {
+      workflowId: String(execution.workflow_id),
+      workflowCode: String(execution.workflow_code || ''),
+      executionId,
+      tenantId: String(execution.tenant_id),
+      userId: String(execution.user_id || ''),
+      traceId: String(execution.trace_id || ''),
+      workflowSpanId: String(execution.workflow_span_id || ''),
+      stepOrder: 0,
+      inputEnvelopes: [],
+      parameters: typeof execution.resolved_parameters === 'string'
+        ? JSON.parse(execution.resolved_parameters)
+        : (execution.resolved_parameters as Record<string, unknown>) || {},
+      complianceFrameworks: (execution.compliance_frameworks as string[]) || [],
+    };
+  }
+
+  private mapTaskTypeToNodeType(taskType: TaskType): 'ai_inference' | 'condition' | 'transform' | 'aggregate' | 'parallel_split' | 'parallel_join' | 'human_review' | 'external_api' | 'start' | 'end' {
+    const mapping: Record<TaskType, 'ai_inference' | 'condition' | 'transform' | 'aggregate' | 'parallel_split' | 'parallel_join' | 'human_review' | 'external_api' | 'start' | 'end'> = {
+      'model_inference': 'ai_inference',
+      'transformation': 'transform',
+      'condition': 'condition',
+      'parallel': 'parallel_split',
+      'aggregation': 'aggregate',
+      'external_api': 'external_api',
+      'human_review': 'human_review',
+    };
+    return mapping[taskType] || 'transform';
+  }
+
+  // ==========================================================================
+  // CRDT Collaborative Editing (v5.53.1 Gemini Enhancement)
+  // ==========================================================================
+
+  /**
+   * Initialize collaborative editing session for a workflow
+   * Creates a CRDT state that can be shared across multiple editors
+   */
+  async initializeCollaborativeSession(
+    workflowId: string,
+    tenantId: string,
+    userId: string
+  ): Promise<{ sessionId: string; state: ReturnType<typeof crdtWorkflowService.getWorkflowState> }> {
+    // Get existing workflow definition
+    const workflow = await this.getWorkflow(workflowId);
+    if (!workflow) {
+      throw new Error(`Workflow ${workflowId} not found`);
+    }
+
+    // Initialize CRDT state from current workflow
+    const workflowData = workflow as Record<string, unknown>;
+    const dagDefinition = typeof workflowData.dag_definition === 'string'
+      ? JSON.parse(workflowData.dag_definition)
+      : workflowData.dag_definition || {};
+
+    // Get or create CRDT state
+    const crdtState = crdtWorkflowService.getOrCreateWorkflow(workflowId);
+
+    // Populate from existing workflow if state is empty
+    if (crdtState.nodes.size === 0 && dagDefinition.nodes) {
+      for (const node of dagDefinition.nodes) {
+        crdtWorkflowService.addNode(workflowId, userId, {
+          type: node.type || 'method',
+          label: node.name || node.label || '',
+          position: node.position || { x: 0, y: 0 },
+          config: node.config || {},
+          createdBy: userId,
+        });
+      }
+    }
+
+    // Join the session as a collaborator
+    crdtWorkflowService.updatePresence(workflowId, userId, {
+      userId,
+      userName: userId,
+      cursor: undefined,
+      selectedNodeIds: [],
+    });
+
+    const state = crdtWorkflowService.getWorkflowState(workflowId);
+    return { sessionId: workflowId, state };
+  }
+
+  /**
+   * Apply a collaborative edit operation to the workflow
+   * Uses CRDT to ensure conflict-free merging
+   */
+  applyCollaborativeEdit(
+    workflowId: string,
+    userId: string,
+    operationType: 'insert_node' | 'delete_node' | 'update_node' | 'move_node' | 'insert_edge' | 'delete_edge',
+    targetId: string,
+    payload: unknown
+  ): CRDTOperation {
+    return crdtWorkflowService.applyLocalOperation(workflowId, userId, operationType, targetId, payload);
+  }
+
+  /**
+   * Get current collaborative state for a workflow
+   */
+  getCollaborativeState(workflowId: string): ReturnType<typeof crdtWorkflowService.getWorkflowState> {
+    return crdtWorkflowService.getWorkflowState(workflowId);
+  }
+
+  /**
+   * Get operations since a specific version (for sync)
+   */
+  getOperationsSince(workflowId: string, sinceVersion: number): CRDTOperation[] {
+    return crdtWorkflowService.getOperationsSince(workflowId, sinceVersion);
+  }
+
+  /**
+   * Merge remote operations from another collaborator
+   */
+  mergeRemoteOperations(
+    workflowId: string,
+    operations: CRDTOperation[]
+  ): { merged: number; conflicts: number } {
+    return crdtWorkflowService.mergeState(workflowId, operations);
+  }
+
+  /**
+   * Save collaborative changes to the database
+   * Converts CRDT state back to workflow definition
+   */
+  async saveCollaborativeChanges(
+    workflowId: string,
+    _tenantId: string,
+    _userId: string
+  ): Promise<void> {
+    const state = crdtWorkflowService.getWorkflowState(workflowId);
+    if (!state) {
+      throw new Error(`No collaborative state for workflow ${workflowId}`);
+    }
+
+    // Convert CRDT state back to DAG definition
+    const dagDefinition = {
+      nodes: state.nodes.map(node => ({
+        id: node.nodeId,
+        type: node.type,
+        label: node.label,
+        config: node.config,
+        position: node.position,
+      })),
+      edges: state.edges.map(edge => ({
+        id: edge.edgeId,
+        source: edge.sourceNodeId,
+        target: edge.targetNodeId,
+        condition: edge.condition,
+      })),
+    };
+
+    // Update workflow definition
+    await executeStatement(
+      `UPDATE workflow_definitions 
+       SET dag_definition = $2, updated_at = NOW()
+       WHERE workflow_id = $1`,
+      [
+        { name: 'workflowId', value: { stringValue: workflowId } },
+        { name: 'dagDefinition', value: { stringValue: JSON.stringify(dagDefinition) } },
+      ]
+    );
+  }
+
+  /**
+   * Update collaborator presence (cursor position, selection)
+   */
+  updateCollaboratorPresence(
+    workflowId: string,
+    userId: string,
+    presence: { cursor?: { x: number; y: number }; selectedNodeIds?: string[] }
+  ): void {
+    crdtWorkflowService.updatePresence(workflowId, userId, presence);
+  }
+
+  /**
+   * Cleanup stale collaborator presence
+   */
+  cleanupCollaboratorPresence(workflowId: string): string[] {
+    return crdtWorkflowService.cleanupPresence(workflowId);
+  }
+
+  /**
+   * Get all collaborators currently in a session
+   */
+  getSessionCollaborators(workflowId: string): ReturnType<typeof crdtWorkflowService.getCollaborators> {
+    return crdtWorkflowService.getCollaborators(workflowId);
+  }
+
+  /**
+   * Generate a consistent color for a collaborator based on their ID
+   */
+  private generateCollaboratorColor(userId: string): string {
+    const colors = [
+      '#ef4444', '#f97316', '#eab308', '#22c55e', 
+      '#14b8a6', '#3b82f6', '#8b5cf6', '#ec4899'
+    ];
+    const hash = userId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    return colors[hash % colors.length];
   }
 }
 

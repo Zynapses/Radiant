@@ -86,7 +86,20 @@ Multi-user same-conversation collaboration with:
 
 **Implementation**:
 - Service: `lambda/shared/services/enhanced-collaboration.service.ts`
+- CRDT Workflow Service: `lambda/shared/services/workflow/crdt-workflow.service.ts`
 - Admin UI: `apps/thinktank-admin/app/(dashboard)/collaborate/enhanced/page.tsx`
+
+**v5.53.0 Enhancement - CRDT Workflow Editing**:
+
+| Feature | Description |
+|---------|-------------|
+| Vector Clocks | Causal ordering with client-specific versioning |
+| Conflict-Free Merge | Last-Writer-Wins with deterministic tiebreakers |
+| Presence Awareness | Collaborator cursors, selections, and colors |
+| Operation Log | Persistent history for sync and offline merge |
+| Node/Edge Operations | Insert, delete, move, update with CRDT semantics |
+
+This foundation enables **multiplayer workflow editing** where multiple users can simultaneously edit the same workflow without conflicts.
 
 ---
 

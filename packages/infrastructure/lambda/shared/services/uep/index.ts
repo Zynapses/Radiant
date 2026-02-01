@@ -26,6 +26,11 @@ export {
   UEPIntegrationService,
 } from './integration.service';
 
+export {
+  uepSelfHealingService,
+  UEPSelfHealingService,
+} from './self-healing.service';
+
 // Re-export types for convenience
 export type {
   StreamCreateOptions,
@@ -67,3 +72,11 @@ export type {
   MLSGroupConfig,
   MLSGroupMember,
 } from './security.service';
+
+export type {
+  HealingReport,
+  HealingIssue,
+  HealingIssueType,
+  HealingConfig,
+  MemoryBuffer,
+} from './self-healing.service';

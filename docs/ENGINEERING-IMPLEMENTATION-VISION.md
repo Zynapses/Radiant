@@ -33,6 +33,7 @@
 21. [Cato Pipeline Orchestration System](#21-cato-pipeline-orchestration-system-v55254)
 22. [Model Registry & Version Discovery System](#22-model-registry--version-discovery-system-v55257)
 23. [Universal Envelope Protocol v2.0](#23-universal-envelope-protocol-v20-v5530)
+24. [Gemini Workflow Enhancements](#24-gemini-workflow-enhancements-v5530)
 
 ---
 
@@ -6992,3 +6993,198 @@ const { envelope, riskSignals } = complianceService.enforceCompliance(
 ```
 
 **Audit Report**: `docs/specs/UEP-V2-REGULATORY-COMPLIANCE-AUDIT.md`
+
+---
+
+## 24. Gemini Workflow Enhancements (v5.53.0)
+
+### 24.1 Overview
+
+Following Gemini AI consultation on RADIANT's workflow architecture, we implemented six strategic enhancements with mitigated approaches that balance innovation with practical concerns.
+
+**Services Directory**: `lambda/shared/services/workflow/`
+
+### 24.2 Multimedia Sidecar Service
+
+**File**: `multimedia-sidecar.service.ts`
+
+Implements the "Sidecar & Bridge" pattern for multimedia orchestration:
+
+| Component | Purpose |
+|-----------|---------|
+| Cognitive Sidecars | Pre-computed representations (transcriptions, embeddings, descriptions) |
+| Auto-Bridging | Automatic cross-modal condition evaluation |
+| Zero-Copy | S3 URIs + sidecars in envelopes, never raw media bytes |
+
+**Key Types**:
+```typescript
+interface CognitiveSidecar {
+  transcription?: { text: string; language: string; confidence: number };
+  frameSamples?: Array<{ timestampMs: number; signedUrl: string }>;
+  embedding?: { model: string; vector: number[]; dimensions: number };
+  description?: { short: string; medium: string; detailed: string };
+  documentContent?: { extractedText: string; pageCount: number };
+}
+
+interface MultimediaStream {
+  streamId: string;
+  mediaType: 'text' | 'image' | 'audio' | 'video' | 'document';
+  sourceUri: string;  // S3 URI
+  sidecar: CognitiveSidecar;
+}
+```
+
+**Usage**:
+```typescript
+// Generate sidecar during upload
+const sidecar = await multimediaSidecarService.generateSidecar(
+  's3://bucket/video.mp4', 'video',
+  { generateTranscription: true, generateDescription: true }
+);
+
+// Auto-bridge for cross-modal conditions
+const bridge = multimediaSidecarService.autoBridge(stream, 'text');
+// bridge.content = sidecar.transcription.text
+```
+
+### 24.3 Sandboxed Expression Engine
+
+**File**: `sandboxed-expression.service.ts`
+
+Replaces unsafe `new Function()` with AST-based evaluation:
+
+| Security Feature | Implementation |
+|------------------|----------------|
+| AST Parsing | Tokenizer → Parser → Evaluator |
+| Allowlisted Operators | `+`, `-`, `*`, `/`, `>`, `<`, `&&`, `||`, etc. |
+| Safe Helpers | `contains()`, `hasField()`, `matches()`, `length()` |
+| Blocked Properties | `__proto__`, `constructor`, `eval`, `Function` |
+
+**Usage**:
+```typescript
+const result = sandboxedExpressionService.evaluate(
+  'confidence > 0.8 && contains("approved")',
+  { output: response, confidence: 0.95 }
+);
+// result.success = true, result.value = true
+```
+
+### 24.4 Vector Semantic Router
+
+**File**: `vector-semantic-router.service.ts`
+
+Vector similarity for ROUTING decisions (not condition evaluation):
+
+| Feature | Purpose |
+|---------|---------|
+| Refusal Detection | Fast safety check via pre-computed refusal vectors |
+| Workflow Matching | Semantic similarity to find best workflow |
+| Domain Detection | Keyword + embedding-based classification |
+| Historical Learning | Learn from past routing decisions |
+
+**Mitigation**: Vector similarity is expensive. Used for routing only, not hot-path conditions.
+
+### 24.5 Enhanced Uncertainty Service
+
+**File**: `enhanced-uncertainty.service.ts`
+
+Integrates "surprise" into existing Semantic Entropy (not a parallel system):
+
+```typescript
+interface UncertaintyMetrics {
+  semanticEntropy: number;        // 0-1: cluster diversity
+  surpriseScore: number;          // 0-1: deviation from dominant cluster
+  triggerReflexion: boolean;      // Should escalate to System 2?
+  reflexionReason?: string;       // Why reflexion triggered
+}
+```
+
+**Surprise Calculation**: Cross-entropy between individual samples and dominant cluster using Jaccard similarity.
+
+### 24.6 Cost Negotiation Service
+
+**File**: `cost-negotiation.service.ts`
+
+Budget-aware model selection without distributed agent micro-ledgers:
+
+| Feature | Implementation |
+|---------|----------------|
+| Budget Allocation | Workflow-level tracking with step spending |
+| Model Bidding | Cost/quality/latency bids from qualifying models |
+| Negotiation | Balance quality targets, latency, and budget |
+| Quality Curves | Learn and predict quality from historical data |
+
+**Usage**:
+```typescript
+// Create workflow budget
+costNegotiationService.createBudgetAllocation('workflow-123', 500); // 500¢
+
+// Negotiate model for step
+const result = await costNegotiationService.negotiate({
+  workflowId: 'workflow-123',
+  stepId: 'step-1',
+  taskDescription: 'Analyze medical document',
+  requiredCapabilities: ['medical', 'analytical'],
+  qualityTarget: 0.85,
+});
+// result.selectedModel = { modelId: 'claude-3-opus', estimatedCostCents: 45 }
+```
+
+### 24.7 CRDT Workflow Service
+
+**File**: `crdt-workflow.service.ts`
+
+Foundation for real-time collaborative workflow editing:
+
+| CRDT Feature | Implementation |
+|--------------|----------------|
+| Vector Clocks | Causal ordering per client |
+| Operations | insert_node, delete_node, move_node, insert_edge, delete_edge |
+| Conflict Resolution | Last-Writer-Wins with client ID tiebreaker |
+| Presence | Collaborator cursors, selections, colors |
+| Offline Merge | Reconcile after network partitions |
+
+**Usage**:
+```typescript
+// Add a node
+const op = crdtWorkflowService.addNode('workflow-123', 'client-abc', {
+  type: 'method',
+  label: 'Semantic Entropy',
+  position: { x: 100, y: 200 },
+  config: { sampleCount: 5 },
+});
+
+// Apply remote operation
+const { applied, conflicts } = crdtWorkflowService.applyRemoteOperation(
+  'workflow-123', remoteOp
+);
+
+// Get collaborators
+const collaborators = crdtWorkflowService.getCollaborators('workflow-123');
+```
+
+### 24.8 Mitigations Applied
+
+| Gemini Recommendation | Our Mitigation |
+|-----------------------|----------------|
+| Vector semantics everywhere | ROUTING only (not conditions) - avoids latency |
+| Active Inference / Free Energy | Surprise as Semantic Entropy component - reuses infrastructure |
+| Agent micro-ledgers | Centralized budget allocation - avoids distributed complexity |
+| Full Y.js integration | CRDT foundation only - Phase 2 for full sync |
+| Expression DSL | AST-based JS subset - familiar syntax, safe execution |
+
+### 24.9 Exports
+
+All services exported from `lambda/shared/services/workflow/index.ts`:
+
+```typescript
+export {
+  multimediaSidecarService,
+  sandboxedExpressionService,
+  vectorSemanticRouterService,
+  enhancedUncertaintyService,
+  costNegotiationService,
+  crdtWorkflowService,
+  // ... types
+} from './workflow';
+```

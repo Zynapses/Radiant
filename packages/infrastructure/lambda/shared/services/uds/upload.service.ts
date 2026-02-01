@@ -27,6 +27,8 @@ import { executeStatement, stringParam, boolParam } from '../../db/client';
 import { enhancedLogger as logger } from '../../logging/enhanced-logger';
 import { udsEncryptionService } from './encryption.service';
 import { udsAuditService } from './audit.service';
+// v5.53.1 Gemini Enhancement: Multimedia Sidecar Service for cognitive processing
+import { multimediaSidecarService } from '../workflow/multimedia-sidecar.service';
 import type {
   UDSUpload,
   UDSUploadCreate,
@@ -680,6 +682,13 @@ class UDSUploadService implements IUDSUploadService {
     const upload = await this.getInternal(tenantId, uploadId);
     if (!upload) return;
 
+    // v5.53.1 Gemini Enhancement: Handle multimedia files with sidecar service
+    const multimediaTypes: UDSContentType[] = ['video', 'audio', 'image'];
+    if (multimediaTypes.includes(upload.contentType as UDSContentType)) {
+      await this.triggerMultimediaProcessing(tenantId, uploadId, upload);
+      return;
+    }
+
     // Check if text extraction is applicable
     const extractableTypes: UDSContentType[] = ['text', 'markdown', 'code', 'pdf', 'document', 'spreadsheet'];
     if (!extractableTypes.includes(upload.contentType as UDSContentType)) {
@@ -714,7 +723,7 @@ class UDSUploadService implements IUDSUploadService {
           Payload: JSON.stringify({
             tenantId,
             uploadId,
-            s3Key: upload.s3Key,
+            s3Key: upload.storageKey,
             contentType: upload.contentType,
             originalFilename: upload.originalFilename,
             callbackType: 'uds_text_extraction',
@@ -740,7 +749,7 @@ class UDSUploadService implements IUDSUploadService {
           const s3Client = new S3Client({ region: process.env.AWS_REGION || 'us-east-1' });
           const response = await s3Client.send(new GetObjectCommand({
             Bucket: process.env.UDS_UPLOADS_BUCKET || 'radiant-uds-uploads',
-            Key: upload.s3Key,
+            Key: upload.storageKey,
           }));
           
           const text = await response.Body?.transformToString() || '';
@@ -933,6 +942,126 @@ class UDSUploadService implements IUDSUploadService {
         model: modelId,
       });
       return null;
+    }
+  }
+
+  // ===========================================================================
+  // Multimedia Processing (v5.53.1 Gemini Enhancement)
+  // ===========================================================================
+
+  /**
+   * Trigger multimedia processing using the sidecar service
+   * Generates transcriptions, frame samples, embeddings, and descriptions
+   */
+  private async triggerMultimediaProcessing(
+    tenantId: string,
+    uploadId: string,
+    upload: UDSUpload
+  ): Promise<void> {
+    logger.info('Triggering multimedia processing', { 
+      tenantId, 
+      uploadId, 
+      contentType: upload.contentType 
+    });
+
+    // Update status to processing
+    await executeStatement(
+      `UPDATE uds_uploads 
+       SET status = 'processing', updated_at = CURRENT_TIMESTAMP 
+       WHERE id = $1 AND tenant_id = $2`,
+      [stringParam('id', uploadId), stringParam('tenantId', tenantId)]
+    );
+
+    try {
+      // Build S3 URI for the upload
+      const bucket = upload.storageBucket || process.env.UDS_UPLOADS_BUCKET || 'radiant-uds-uploads';
+      const key = upload.storageKey;
+      const s3Uri = `s3://${bucket}/${key}`;
+
+      // Map content type to media type
+      const mediaTypeMap: Record<string, 'video' | 'audio' | 'image'> = {
+        'video': 'video',
+        'audio': 'audio',
+        'image': 'image',
+      };
+      const mediaType = mediaTypeMap[upload.contentType as string] || 'image';
+
+      // Generate cognitive sidecar using multimedia sidecar service
+      const sidecar = await multimediaSidecarService.generateSidecar(s3Uri, mediaType, {
+        generateTranscription: mediaType === 'video' || mediaType === 'audio',
+        generateFrameSamples: mediaType === 'video',
+        frameSampleCount: mediaType === 'video' ? 5 : 0,
+        generateEmbedding: true,
+        generateDescription: true,
+        embeddingModel: 'text-embedding-3-small',
+      });
+
+      // Extract transcription text for search indexing
+      const transcriptionText = sidecar.transcription?.text || '';
+      const descriptionText = sidecar.description?.detailed || '';
+      const combinedText = [transcriptionText, descriptionText].filter(Boolean).join('\n\n');
+
+      // Store sidecar data and extracted text
+      await executeStatement(
+        `UPDATE uds_uploads 
+         SET status = 'ready',
+             extracted_text = $3,
+             cognitive_sidecar = $4,
+             text_extraction_status = 'completed',
+             updated_at = CURRENT_TIMESTAMP
+         WHERE id = $1 AND tenant_id = $2`,
+        [
+          stringParam('id', uploadId),
+          stringParam('tenantId', tenantId),
+          stringParam('text', combinedText.substring(0, 100000)), // Limit for DB
+          stringParam('sidecar', JSON.stringify(sidecar)),
+        ]
+      );
+
+      // Store embedding if generated
+      if (sidecar.embedding?.vector && sidecar.embedding.vector.length > 0) {
+        await executeStatement(
+          `UPDATE uds_uploads 
+           SET embedding = $3::vector,
+               embedding_model = $4,
+               embedded_at = CURRENT_TIMESTAMP
+           WHERE id = $1 AND tenant_id = $2`,
+          [
+            stringParam('id', uploadId),
+            stringParam('tenantId', tenantId),
+            stringParam('embedding', `[${sidecar.embedding.vector.join(',')}]`),
+            stringParam('model', sidecar.embedding.model || 'text-embedding-3-small'),
+          ]
+        );
+      }
+
+      logger.info('Multimedia processing completed', { 
+        tenantId, 
+        uploadId,
+        hasTranscription: !!sidecar.transcription,
+        hasFrames: (sidecar.frameSamples?.length || 0) > 0,
+        hasEmbedding: !!sidecar.embedding,
+        hasDescription: !!sidecar.description,
+        errors: sidecar.errors?.length || 0,
+      });
+
+    } catch (error) {
+      logger.error('Multimedia processing failed', { tenantId, uploadId, error });
+      
+      // Mark as ready but with failed extraction
+      await executeStatement(
+        `UPDATE uds_uploads 
+         SET status = 'ready',
+             text_extraction_status = 'failed',
+             text_extraction_error = $3,
+             updated_at = CURRENT_TIMESTAMP
+         WHERE id = $1 AND tenant_id = $2`,
+        [
+          stringParam('id', uploadId),
+          stringParam('tenantId', tenantId),
+          stringParam('error', error instanceof Error ? error.message : 'Multimedia processing failed'),
+        ]
+      );
     }
   }
 

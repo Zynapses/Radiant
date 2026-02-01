@@ -154,28 +154,37 @@ describe('UDSEncryptionService', () => {
 
       const { udsEncryptionService } = await import('../uds/encryption.service');
       
-      const encryptedField = {
-        encrypted: Buffer.from('encrypted-data'),
-        iv: Buffer.alloc(12, 0),
-      };
+      // Create encrypted buffer with auth tag appended (16 bytes)
+      const ciphertext = Buffer.from('encrypted-data');
+      const authTag = Buffer.alloc(16, 1);
+      const encryptedWithTag = Buffer.concat([ciphertext, authTag]);
+      const iv = Buffer.alloc(12, 0);
       
-      const result = await udsEncryptionService.decrypt('tenant-1', encryptedField);
+      // decrypt(tenantId, encrypted, iv, userId?)
+      const result = await udsEncryptionService.decrypt('tenant-1', encryptedWithTag, iv);
       
       expect(result).toBeDefined();
     });
 
     it('should throw error for invalid key', async () => {
-      mockExecuteStatement.mockResolvedValueOnce({ rows: [] });
+      // Reset modules to get fresh mocks
+      vi.resetModules();
+      
+      // Mock database to return empty rows for this test
+      vi.doMock('../../db/client', () => ({
+        executeStatement: vi.fn().mockResolvedValue({ rows: [] }),
+      }));
 
       const { udsEncryptionService } = await import('../uds/encryption.service');
       
-      const encryptedField = {
-        encrypted: Buffer.from('encrypted-data'),
-        iv: Buffer.alloc(12, 0),
-      };
+      // Create encrypted buffer with auth tag appended (16 bytes)
+      const ciphertext = Buffer.from('encrypted-data');
+      const authTag = Buffer.alloc(16, 1);
+      const encryptedWithTag = Buffer.concat([ciphertext, authTag]);
+      const iv = Buffer.alloc(12, 0);
       
       await expect(
-        udsEncryptionService.decrypt('nonexistent-tenant', encryptedField)
+        udsEncryptionService.decrypt('nonexistent-tenant', encryptedWithTag, iv)
       ).rejects.toThrow();
     });
   });
