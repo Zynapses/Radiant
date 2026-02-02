@@ -26,6 +26,10 @@ export default defineConfig({
       '**/e2e/**',
       // Admin dashboard has its own vitest config with path aliases
       'apps/admin-dashboard/**',
+      // Think Tank has its own vitest config with path aliases
+      'apps/thinktank/**',
+      // Infrastructure package uses Jest, not Vitest
+      'packages/infrastructure/**',
     ],
     // Coverage configuration
     coverage: {

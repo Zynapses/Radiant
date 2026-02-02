@@ -5,6 +5,1293 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [6.4.2] - 2026-02-02
+
+### Fixed
+
+#### Technical Debt Cleanup
+
+##### Egress Proxy - Environment Variable Validation
+- **Startup Validation**: Added `validateProviderEnvVars()` to fail fast with clear error messages when API keys are missing
+- **Provider Registration**: Only registers providers with complete configuration; skips misconfigured providers with warnings
+- **New Exports**: `REQUIRED_ENV_VARS`, `validateProviderEnvVars()`, `getConfiguredProviders()`
+- **Files**: `services/egress-proxy/src/providers.ts`, `services/egress-proxy/src/index.ts`
+
+##### Type Safety - Lambda Context
+- **Typed Context Helper**: Created `MINIMAL_CONTEXT` and `NOOP_CALLBACK` to replace 47 instances of `{} as any` in admin handler routing
+- **New File**: `packages/infrastructure/lambda/shared/lambda-context.ts`
+- **Files Updated**: `packages/infrastructure/lambda/admin/handler.ts`
+
+##### UI - Artificial Delays Removed
+- **chat-view.tsx**: Removed `setTimeout(500 + Math.random() * 500)` artificial delay, ready for real API integration
+- **terminal-view.tsx**: Removed `setTimeout(300 + Math.random() * 200)` artificial delay, ready for Sniper service integration
+- **Files**: `apps/thinktank-admin/components/polymorphic/views/chat-view.tsx`, `apps/thinktank-admin/components/polymorphic/views/terminal-view.tsx`
+
+---
+
+## [6.4.1] - 2026-02-01
+
+### Fixed
+
+#### System Cartridge Registry Security Fix
+- **Auth Context**: Fixed hardcoded `isSuperAdmin = true` to properly use `useAuth()` hook - now correctly checks `user?.role === 'super_admin'`
+- **Audit Dialog**: Implemented missing audit dialog for viewing cartridge-specific audit history (was only logging to console)
+
+#### LIVS Improvements
+- **Logic Chain Analysis**: Replaced hardcoded `logicChainComplete: true` with actual analysis that:
+  - Detects presence of reasoning indicators (because, therefore, since, etc.)
+  - Identifies logical gap indicators (obviously, clearly, everyone knows)
+  - Checks for broken logic during interrogation (circular reasoning, failed dependency probes)
+- **Cost Savings Calculation**: Implemented cost savings metric based on prevented bad outputs:
+  - Confirmed lies: $15 estimated savings each
+  - Likely lies: $5 estimated savings each
+  - Suspicious: $1 estimated savings each
+
+---
+
+## [6.4.0] - 2026-02-01
+
+### Added
+
+#### The Crucible - Competitive Multi-LLM Deliberation System v1.0.0
+
+Novel orchestration primitive for competitive multi-LLM deliberation. **Tier 1 Moat** - No competitor has systematic competitive LLM deliberation with provenance tracking.
+
+**Core Concept**:
+- When multiple LLMs are assigned to a method, they enter "The Crucible" to competitively refine their answers
+- LLMs can ask each other questions (up to 5 total by default) to improve their own output
+- Non-consensus based: each LLM competes for the best individual output
+- Non-LLM models participate in output but not deliberation
+
+**Integrity Pre-Prompting**:
+- LLMs informed upfront about evaluation criteria: accuracy, truthfulness, reasoning quality, completeness, citation quality
+- Clear competitive framing - no penalty for asking questions
+- Instructions to track provenance and detect circular citations
+- Knowledge of other participants' models and modes before questioning
+
+**Deliberation Features**:
+- Iterative questioning: ask one question, learn, ask better follow-up
+- Question types: clarification, challenge, evidence_request, methodology_probe, edge_case, consistency_check, provenance_trace
+- Question quality scoring: low, medium, high, exceptional
+- Answer evaluation with circular citation detection
+
+**Provenance Tracking**:
+- Automatic detection of circular reasoning/citations
+- Per-participant circular citation counting
+- Configurable penalty applied to final scores (default 10%)
+- Database trigger for real-time detection
+
+**Learning & Audit**:
+- Full session storage for learning and compliance
+- Learning insights extraction: model strengths, weaknesses, question patterns, deliberation dynamics
+- Model performance tracking: win rates, average scores, question quality
+- Complete audit log with event types
+
+**Cost Modes**:
+- `economy`: 3 questions max, minimal deliberation
+- `balanced`: 5 questions max (default)
+- `thorough`: 8 questions max, comprehensive deliberation
+
+**New Types** (`packages/shared/src/types/crucible.types.ts`):
+- `CrucibleConfig`: Per-tenant configuration with all settings
+- `CrucibleSession`: Deliberation session with status tracking
+- `CrucibleParticipant`: Participant with model info and stats
+- `CrucibleQuestion`, `CrucibleAnswer`: Q&A with quality scoring
+- `CrucibleCitation`: Citation tracking with circular detection
+- `CrucibleFinalReport`: Final output with scoring
+- `CruciblePrePrompt`: Generated pre-prompt for participants
+- `CrucibleLearningInsight`: Extracted insights from sessions
+- `generateCruciblePrePrompt()`: Pre-prompt generator function
+
+**New Services** (`lambda/shared/services/crucible/`):
+- `CrucibleService`: Configuration, session management, scoring, learning
+- `CrucibleOrchestratorService`: Full session lifecycle orchestration
+
+**Admin API** (Base: `/api/admin/crucible`):
+- `GET /dashboard` - Full dashboard data
+- `GET/PUT /config` - Configuration CRUD
+- `GET /sessions`, `GET /sessions/:id` - Session listing and details
+- `GET /sessions/:id/questions` - Session question log
+- `GET /performance` - Model performance stats
+- `GET /insights` - Learning insights
+- `GET /audit` - Audit log
+- `GET /stats` - Statistics
+
+**Admin UI** (`apps/admin-dashboard/app/(dashboard)/platform/crucible/page.tsx`):
+- Dashboard with summary cards: total sessions, today's sessions, avg questions, avg duration, circular citations
+- Overview tab: top performing models, recent sessions, learning insights
+- Sessions tab: session table with status, participants, questions
+- Performance tab: model leaderboard with win rates and scores
+- Configuration tab: toggles, sliders, cost mode limits
+- Session detail modal: participants, full deliberation log
+
+**Database** (`migrations/V2026_02_01_014__crucible_deliberation.sql`):
+- `crucible_config`: Per-tenant configuration
+- `crucible_sessions`: Deliberation sessions
+- `crucible_participants`: Session participants with stats
+- `crucible_questions`: Questions with quality scoring
+- `crucible_answers`: Answers with circular detection
+- `crucible_citations`: Citation tracking
+- `crucible_final_reports`: Final outputs with scores
+- `crucible_learning_insights`: Extracted insights
+- `crucible_model_performance`: Aggregated model stats
+- `crucible_audit_log`: Full audit trail
+- `detect_circular_citations()`: PostgreSQL function for detection
+- RLS policies for tenant isolation
+
+**Hierarchical Configuration** (`migrations/V2026_02_01_015__crucible_user_preferences.sql`):
+- System-level defaults (Radiant Admin): `crucible_system_config` table
+- Tenant-level overrides (Think Tank Admin): `crucible_tenant_config` table
+- User-level preferences (per method/workflow): `crucible_user_preferences` table
+- `get_crucible_resolved_config()`: PostgreSQL function for hierarchy resolution
+- Configuration hierarchy: **User > Tenant > System**
+- Users can set max questions per method if tenant and system allow
+
+**New Types for Hierarchical Config**:
+- `CrucibleSystemConfig`: System-wide defaults
+- `CrucibleTenantConfig`: Tenant-level overrides
+- `CrucibleUserPreference`: User preferences per scope (global, method, workflow, method_in_workflow)
+- `CrucibleResolvedConfig`: Resolved config after applying hierarchy
+- `CruciblePreferenceScope`: Scope enum for user preferences
+
+**New Service** (`CrucibleConfigService`):
+- System config management (Radiant Admin)
+- Tenant config overrides (Think Tank Admin)
+- User preference CRUD (Think Tank App)
+- `getResolvedConfig()`: Applies full hierarchy resolution
+- `getEffectiveMaxQuestions()`: For deliberation execution
+
+**Think Tank Admin API** (`/api/thinktank-admin/crucible`):
+- `GET/PUT /config`: Tenant-level configuration
+- `DELETE /config/:field`: Reset field to system default
+- `GET /users`: User preference summary
+- `GET /stats`: Tenant Crucible statistics
+
+**Think Tank User API** (`/api/thinktank/crucible`):
+- `GET /config`: Get resolved config for user
+- `GET/POST /preferences`: User preferences CRUD
+- `PUT /method/:methodId/questions`: Set max questions for method
+- `GET /sessions/active`: Active Crucible sessions
+- `GET /sessions/:id/stream`: Live deliberation events
+
+**Think Tank Admin UI** (`apps/thinktank-admin/app/(dashboard)/crucible/page.tsx`):
+- Override system defaults for tenant
+- Control user override permissions
+- Show deliberation to users toggle
+- Auto-enable for multi-LLM toggle
+
+**Think Tank App Component** (`apps/thinktank/components/crucible/CrucibleDeliberationPanel.tsx`):
+- Live deliberation view during workflow execution
+- User preference controls per method
+- Real-time Q&A event streaming
+- Circular citation warnings
+
+**Radiant Admin System Config Tab**:
+- System-wide defaults management
+- Tenant/user override permissions
+- Configuration hierarchy visualization
+
+**Documentation**:
+- Admin Guide: Section 91 in `RADIANT-ADMIN-GUIDE.md`
+- Moats: New entry in `RADIANT-MOATS.md`
+
+---
+
+## [6.3.0] - 2026-02-01
+
+### Added
+
+#### LLM Integrity Verification System (LIVS) v1.0.0
+
+Two-tier defense against AI "lying" behaviors that mirror human organizational failures. **Tier 1 Moat** - No competitor has systematic LLM lie detection.
+
+**Tier 1: Individual LLM Interrogation**:
+- Multi-round "peeling the onion" interrogation protocol
+- Question patterns: Dependency Probe, Forensic Validator, Edge Case Probe, Confidence Calibration, Contradiction Test
+- Lie detection signals: confidence mismatch, contradictions, hedging increase, specificity decrease, assertion without evidence, deflection count, scope narrowing
+- Interrogation depth levels: None (0), Spot Check (1), Moderate (2), Thorough (3), Forensic (4)
+- Verdicts: trusted, suspicious, likely_lie, confirmed_lie
+- Different interrogator model than original (prevents self-validation)
+
+**Tier 2: Orchestration Integrity**:
+- Pre-action interrogation before methods act on upstream outputs
+- Pipeline consistency checking across multi-model orchestrations
+- Failure pattern detection: Watermelon Pipeline, Echo Chamber, Confidence Inflation, Circular Reasoning, Scope Drift
+- Evidence chain validation and goal alignment scoring
+
+**Cato/Cortex Integration**:
+- Model integrity weights factor into selection (30% weight)
+- Per-model lie rates by domain and question type
+- Orchestration pattern reliability scoring
+- Twilight Dreaming learns from interrogation results
+- Automatic model substitution recommendations
+
+**Configuration (Soft Rules)**:
+- System → Tenant → User hierarchy
+- On by default, can be disabled for speed/cost
+- Custom soft rules for specific domains/models/query types
+- Cost modes: economy, balanced, thorough
+- 4 system default rules: Medical Domain, Legal Domain, Financial Domain, Code Generation
+
+**New Types** (`packages/shared/src/types/livs.types.ts`):
+- `LIVSConfiguration`: Master configuration with hierarchy
+- `LIVSSoftRule`, `LIVSSoftRuleConditions`, `LIVSSoftRuleActions`: Soft rule system
+- `InterrogationResult`, `InterrogationExchange`: Interrogation protocol
+- `LieDetectionSignals`, `LieDetectionSignal`: Signal detection
+- `ModelIntegrityProfile`, `ModelIntegrityWeights`: Model weights
+- `OrchestrationIntegrityResult`, `OrchestrationFailurePattern`: Orchestration integrity
+- `LIVSDashboard`: Admin dashboard data
+- `IntegrityScoreModelCandidate`: Cato integration
+
+**New Services** (`lambda/shared/services/livs/`):
+- `LIVSConfigService`: Configuration management with hierarchy
+- `LIVSInterrogatorService`: Multi-round interrogation protocol
+- `LIVSSoftRulesService`: Soft rule matching and application
+- `LIVSWeightsService`: Model integrity weight tracking
+- `LIVSOrchestrationService`: Pipeline integrity verification
+- `LIVSCatoIntegrationService`: Cato model selection integration
+
+**Admin API** (Base: `/api/admin/livs`):
+- `GET/PUT /config` - Configuration CRUD
+- `GET/POST /rules`, `PUT/DELETE /rules/:id` - Soft rules CRUD
+- `GET /dashboard` - Dashboard metrics
+- `GET /models`, `GET /models/:id` - Model integrity profiles
+- `GET /models/top-lying`, `GET /models/most-reliable` - Model rankings
+- `GET /interrogations`, `POST /interrogations` - Interrogation history
+- `GET /audits` - Pipeline audit history
+- `GET /patterns` - Orchestration failure patterns
+
+**Admin UI** (`apps/admin-dashboard/app/(dashboard)/platform/livs/page.tsx`):
+- Configuration toggles (Tier 1/2, cost mode, depth)
+- Soft rules management with JSON editor
+- Model integrity analytics (lying/reliable rankings)
+- Interrogation history with verdict display
+- Dashboard metrics (24h/7d/30d)
+
+**Database** (`migrations/V2026_02_01_013__livs_integrity_system.sql`):
+- `livs_config`: Per-tenant configuration
+- `livs_soft_rules`: Configurable integrity rules
+- `livs_interrogations`: Interrogation records (partitioned)
+- `livs_model_weights`: Per-model lie statistics
+- `livs_orchestration_weights`: Pattern reliability
+- `livs_pipeline_audits`: Pipeline audit records (partitioned)
+- `livs_global_model_weights`: Cross-tenant aggregation
+
+**Documentation**:
+- Proposal: `docs/proposals/LLM-INTEGRITY-VERIFICATION-PROPOSAL.md`
+- Admin Guide: Section 90 in `RADIANT-ADMIN-GUIDE.md`
+- Glossary: 16 new terms in `RADIANT-GLOSSARY.md`
+- Moats: New entry in `RADIANT-MOATS.md`
+
+---
+
+## [6.2.0] - 2026-02-01
+
+### Added
+
+#### Genesis Vault - Keyhole Pattern (v1.0.0)
+
+Secrets management for cartridges using the Keyhole Pattern - cartridges declare required secrets but never contain actual credentials.
+
+**Architecture**:
+- Cartridges include `vault.req` manifest declaring required secrets
+- Service Layer fetches secrets from Genesis Vault at runtime
+- Secrets encrypted with AWS KMS, never passed to AI models
+- Full audit trail for compliance (HIPAA, SOC2, GDPR)
+- Secret rotation with version history
+
+**New Types** (`packages/shared/src/types/cartridge-vault.types.ts`):
+- `VaultSecretCategory`: 'api_key' | 'database' | 'oauth' | 'encryption' | 'webhook' | 'custom'
+- `VaultSecretRequirement`: Secret requirement in vault.req
+- `CartridgeVaultManifest`: Vault requirements manifest
+- `VaultSecret`: Stored secret with encryption metadata
+- `VaultAccessLog`: Audit log entry
+- `VaultRequirementCheck`: Result of checking requirements
+- `VaultSecretsContext`: Runtime secrets context (Keyhole)
+- `VaultDashboard`: Admin dashboard data
+
+**New Service** (`lambda/shared/services/cartridge-vault.service.ts`):
+- `createSecret()`, `getSecretValue()`, `updateSecret()`, `rotateSecret()`, `deleteSecret()`
+- `checkRequirements()`: Verify cartridge vault requirements
+- `storeRequirements()`: Store vault.req from cartridge
+- `createSecretsContext()`: Create runtime Keyhole context
+- `getDashboard()`: Admin dashboard data
+
+**Admin API** (Base: `/api/admin/vault`):
+- `GET /dashboard` - Vault dashboard
+- `GET/POST /secrets` - List/create secrets
+- `GET/PUT/DELETE /secrets/:key` - Secret CRUD
+- `POST /secrets/:key/rotate` - Rotate secret
+- `POST /check-requirements` - Check cartridge requirements
+
+**Admin UI** (`apps/admin-dashboard/app/(dashboard)/platform/vault/page.tsx`):
+- Secrets management with category icons
+- Secret rotation with history
+- Access log audit trail
+- Missing secrets alert for cartridges
+
+**Database** (`migrations/V2026_02_01_010__cartridge_vault.sql`):
+- `vault_secrets`: Encrypted secrets storage
+- `vault_access_log`: Partitioned audit log
+- `cartridge_vault_requirements`: Per-cartridge requirements
+- `vault_secret_history`: Rotation history
+
+#### RNIR - Radiant Neural Intermediate Representation (v1.0.0)
+
+Model-agnostic cognitive source code that can be compiled into different formats.
+
+**Architecture**:
+- RNIR stores training examples as JSONL (user/assistant pairs)
+- Compiles to: LoRA weights, system prompts, few-shot examples, RAG chunks
+- Enables same cartridge to work across different models
+- Generated from Curator golden rules or manual input
+
+**New Types** (`packages/shared/src/types/cartridge-rnir.types.ts`):
+- `RNIRExample`: Single training example
+- `RNIRDocument`: Collection of examples for a domain
+- `RNIRCompilationTarget`: 'lora' | 'system_prompt' | 'few_shot' | 'rag_chunks' | 'all'
+- `RNIRModelFamily`: 'llama' | 'qwen' | 'mistral' | 'claude' | 'gpt' | 'gemini' | 'universal'
+- `RNIRCompilationJob`: Compilation job with progress
+- `RNIRCompiledArtifact`: Compiled output artifact
+- `RNIRDashboard`: Admin dashboard data
+
+**New Service** (`lambda/shared/services/cartridge-rnir.service.ts`):
+- `generateFromCurator()`: Generate RNIR from Curator knowledge
+- `startCompilation()`: Start compilation job
+- `processCompilation()`: Process job (worker)
+- `compileToSystemPrompt()`, `compileToFewShot()`, `queueLoRATraining()`
+- `getDashboard()`, `getDocumentPreviews()`
+
+**Admin API** (Base: `/api/admin/rnir`):
+- `GET /dashboard` - RNIR dashboard
+- `POST /generate` - Generate from Curator
+- `GET /documents/:cartridgeId` - Document previews
+- `POST /compile` - Start compilation
+- `GET /jobs`, `GET /jobs/:id` - Job management
+
+**Admin UI** (`apps/admin-dashboard/app/(dashboard)/platform/rnir/page.tsx`):
+- Compilation job management
+- Target format selection (LoRA, System Prompt, etc.)
+- Model family selection
+- Progress tracking
+- Domain distribution visualization
+
+**Database** (`migrations/V2026_02_01_011__cartridge_rnir.sql`):
+- `rnir_documents`: RNIR document metadata
+- `rnir_examples`: Individual examples with embeddings
+- `rnir_compilation_jobs`: Compilation jobs
+- `rnir_compiled_artifacts`: Compiled outputs
+
+#### Cartridge Operations - Time Machine Integration (v1.0.0)
+
+Long-running cartridge operations with checkpointing and resume capability.
+
+**Architecture**:
+- Operations broken into checkpointable steps
+- State saved to Time Machine at each checkpoint
+- Resume from any checkpoint after failure or Lambda timeout
+- Rollback to previous checkpoint if needed
+- Real-time progress events
+
+**New Types** (`packages/shared/src/types/cartridge-operations.types.ts`):
+- `CartridgeOperationType`: 'import' | 'export' | 'compile_rnir' | 'federation_sync' | etc.
+- `CartridgeOperationStatus`: 'pending' | 'in_progress' | 'paused' | 'checkpointing' | etc.
+- `CartridgeOperationStep`: Step definition with checkpoint/rollback flags
+- `CartridgeOperationCheckpoint`: Saved state for resume
+- `CartridgeOperation`: Full operation record
+- `CartridgeOperationsDashboard`: Admin dashboard data
+- `IMPORT_OPERATION_STEPS`, `EXPORT_OPERATION_STEPS`: Pre-defined step templates
+
+**New Service** (`lambda/shared/services/cartridge-operations.service.ts`):
+- `startOperation()`: Start new operation
+- `updateProgress()`, `completeStep()`, `failStep()`
+- `createCheckpoint()`: Save checkpoint to Time Machine
+- `resumeOperation()`: Resume from checkpoint
+- `rollbackOperation()`: Rollback to checkpoint
+- `pauseOperation()`, `cancelOperation()`
+- `getDashboard()`, `getEvents()`
+
+**Admin API** (Base: `/api/admin/cartridge-operations`):
+- `GET /dashboard` - Operations dashboard
+- `GET/POST /` - List/start operations
+- `GET /:id`, `GET /:id/events` - Operation details
+- `POST /:id/pause`, `POST /:id/resume`, `POST /:id/cancel`, `POST /:id/rollback`
+
+**Admin UI** (`apps/admin-dashboard/app/(dashboard)/platform/cartridge-operations/page.tsx`):
+- Real-time operation progress
+- Step-by-step progress visualization
+- Pause/Resume/Cancel controls
+- Checkpoint status display
+- Expandable operation details
+- Average completion time by type
+
+**Database** (`migrations/V2026_02_01_012__cartridge_operations.sql`):
+- `cartridge_operations`: Operation records
+- `cartridge_operation_steps`: Step status
+- `cartridge_operation_checkpoints`: Checkpoint data
+- `cartridge_operation_events`: Real-time events
+
+#### v4.21.0 Spec Alignment Enhancements
+
+Type system enhancements aligned with RADIANT Unified Architecture v4.21.0 spec:
+
+**Vault Enhancements** (`cartridge-vault.types.ts`):
+- `VaultMerkleEntry`: Tamper-evident audit trail (from Cato Merkle system)
+- `VaultChainOfCustody`: Cryptographic provenance (from Curator)
+- `VaultCBFDefinition`: Control Barrier Functions that NEVER relax
+- `VaultGovernancePreset`: PARANOID/BALANCED/COWBOY presets
+- `VAULT_GOVERNANCE_PRESETS`: Pre-configured governance configs
+
+**RNIR Enhancements** (`cartridge-rnir.types.ts`):
+- `RNIRKnowledgeDensity`: Cortex integration for knowledge-aware compilation
+- `RNIRCortexAwareCompilation`: Use existing Cortex knowledge in compilation
+- `TwilightDreamingTask`: Off-hours background compilation (2am UTC)
+- `TwilightTaskResult`: Improvement metrics from nightly runs
+- `ScheduleTwilightRNIRRequest`: Schedule compilation for Twilight Dreaming
+- `RNIRDomainSignature`: Axiom-aligned domain signatures with model variants
+
+**Operations Enhancements** (`cartridge-operations.types.ts`):
+- `CatoCheckpointLevel`: CP1-CP5 levels aligned with Cato HITL
+- `CATO_CHECKPOINT_LEVELS`: Pre-configured checkpoint configs with timeouts
+- `SagaCompensationAction`: SAGA pattern rollback actions
+- `SagaCompensationLog`: Compensation execution log
+- `SagaTransactionState`: Forward/compensating phase tracking
+- `OperationTracingContext`: Universal Envelope Protocol tracing (traceId/spanId)
+- `CartridgeOperationWithSaga`: Extended operation with full SAGA/tracing support
+
+---
+
+## [6.1.0] - 2026-02-01
+
+### Added
+
+#### Curator Cartridge Management Interface (v1.0.0)
+
+Users can now manage cartridges directly from the Curator app.
+
+**New UI** (`apps/curator/app/(dashboard)/cartridges/page.tsx`):
+- Dashboard with cartridge statistics (total, active, signed, thermal states)
+- Three-tab view: My Cartridges, Organization, System
+- Cartridge cards showing scope, thermal state, signature status, and components
+- **Create Cartridge** dialog:
+  - Name and description
+  - Scope selection (Personal or Organization)
+  - Component selection (Curator Knowledge, Ghost Vectors)
+- **Import .RADz** dialog:
+  - Drag-and-drop file upload
+  - Optional signature validation toggle
+  - Verification status display
+- **Export** functionality with presigned download URLs
+- Search and filtering capabilities
+- Thermal state indicators (Hot/Warm/Cold)
+- Signature status badges (Signed/Unsigned)
+
+**Navigation Update** (`apps/curator/app/(dashboard)/layout.tsx`):
+- Added Cartridges to sidebar navigation
+
+**Documentation** (`docs/CURATOR-USER-GUIDE.md`):
+- New Section 11: Managing Cartridges
+- Covers: what cartridges are, creating, exporting, importing, thermal states, PKI signatures, federation
+
+#### System Cartridge Registry - Domain Experts as System Cartridges (v1.0.0)
+
+Domain experts are now managed as system cartridges with full audit trail and compliance tracking.
+
+**Architecture**:
+- Domain experts registered as `scope='system'` cartridges with `category='domain_expert'`
+- System-wide registry accessible via Radiant Admin or Curator
+- Tenant admins can toggle visibility (enabled by default, can hide from users)
+- Full audit trail for HIPAA, SOC2, GDPR compliance
+- Thermal state management (cold/warming/warm/hot) for inference optimization
+
+**New Types** (`packages/shared/src/types/cartridge.types.ts`):
+- `CartridgeCategory`: 'general' | 'domain_expert'
+- `CartridgeThermalState`: 'cold' | 'warming' | 'warm' | 'hot'
+- `SystemCartridgeAuditAction`: 'created' | 'updated' | 'deleted' | 'enabled' | 'disabled' | 'thermal_state_changed' | 'version_upgraded'
+- `SystemCartridgeAuditEntry`: Audit log entry with IP, user agent, compliance flags
+- `TenantCartridgeVisibility`: Per-tenant visibility toggle
+- `SystemCartridgeEntry`: Extended Cartridge with registry fields
+- `RegisterSystemCartridgeRequest`, `UpdateTenantVisibilityRequest`
+- `SystemCartridgeDashboard`, `ListSystemCartridgesRequest/Response`
+
+**New Service** (`lambda/shared/services/system-cartridge-registry.service.ts`):
+- `getDashboard()` - Summary with thermal stats, audit actions, hidden tenants
+- `registerSystemCartridge()` - Register via RADz import or Curator (super admin only)
+- `updateSystemCartridge()` - Update with audit logging
+- `deleteSystemCartridge()` - Soft-delete with audit logging
+- `upgradeSystemCartridge()` - Version upgrade from new RADz file
+- `updateTenantVisibility()` - Toggle cartridge visibility for tenant
+- `getTenantVisibility()` - Get visibility status for all system cartridges
+- `getVisibleCartridgesForTenant()` - Get visible cartridges for inference stack
+- `updateThermalState()` - Change thermal state with history tracking
+- `recordInference()` - Record inference and auto-warm based on usage
+
+**New Admin API** (`lambda/admin/system-cartridges.ts`):
+- `GET /api/admin/system-cartridges/dashboard` - Dashboard summary
+- `GET /api/admin/system-cartridges` - List system cartridges
+- `GET /api/admin/system-cartridges/:id` - Get single cartridge
+- `POST /api/admin/system-cartridges` - Register cartridge (super admin)
+- `PUT /api/admin/system-cartridges/:id` - Update cartridge (super admin)
+- `DELETE /api/admin/system-cartridges/:id` - Delete cartridge (super admin)
+- `POST /api/admin/system-cartridges/:id/upgrade` - Upgrade version
+- `GET /api/admin/system-cartridges/:id/audit` - Cartridge audit log
+- `GET /api/admin/system-cartridges/audit` - Recent audit log
+- `GET /api/admin/system-cartridges/tenant/visibility` - Tenant visibility
+- `PUT /api/admin/system-cartridges/tenant/visibility` - Update visibility
+
+**New Database Migration** (`migrations/V2026_02_01_008__system_cartridge_registry.sql`):
+- Enums: `cartridge_category`, `cartridge_thermal_state`, `system_cartridge_audit_action`
+- Extended `cartridges` table with category, domain_id, thermal_state, registry fields
+- `system_cartridge_audit_log` - Partitioned audit log (monthly)
+- `tenant_cartridge_visibility` - Per-tenant visibility toggles with RLS
+- `system_cartridge_thermal_history` - Thermal state change history
+- `system_cartridge_inference_metrics` - Hourly inference metrics per cartridge/tenant
+- Functions: `log_system_cartridge_audit()`, `update_cartridge_thermal_state()`, `is_system_cartridge_visible()`, `get_visible_system_cartridges()`, `auto_cool_idle_system_cartridges()`
+- Views: `v_system_cartridge_audit_summary`, `v_tenant_cartridge_visibility_summary`
+
+**New Admin UI** (`apps/admin-dashboard/app/(dashboard)/system-cartridges/page.tsx`):
+- Dashboard with thermal distribution, audit actions, hidden tenant count
+- Cartridges tab with category/thermal filters, registration, deletion
+- Tenant Visibility tab with toggle switches
+- Audit Log tab with compliance framework badges
+- Register Cartridge dialog for Curator-based registration
+
+**Cartridge Service Integration** (`lambda/shared/services/cartridge.service.ts`):
+- `getCartridgeStack()` now respects tenant visibility settings
+- System cartridges hidden by tenant admin are excluded from the stack
+- Default is visible (when no tenant_cartridge_visibility entry exists)
+
+**Compliance**:
+- All admin operations logged with IP address, user agent, compliance flags
+- Audit log partitioned by month for efficient querying and retention
+- RLS on tenant visibility for tenant isolation
+- Auto-tagging with HIPAA, SOC2, GDPR compliance flags
+
+#### Cartridge Cluster Compatibility (v1.0.0)
+
+Cartridges now include cluster compatibility information for safe cross-cluster imports.
+
+**Compatibility Profile**:
+- `sourceClusterId`, `sourceClusterName`, `sourceClusterVersion` - Source cluster identification
+- `minPlatformVersion`, `maxPlatformVersion` - Version requirements
+- `compatibleApps` - Which apps can use this cartridge (radiant_admin, thinktank_admin, thinktank, curator, service_layer)
+- `requiredFeatures` - Features needed (ghost_vectors, lora_adapters, etc.)
+- `environment` - production/staging/development
+- `intendedTenantIds` - Optional tenant restrictions
+
+**Compatibility Checks on Import**:
+- Version: Target cluster meets minimum version requirement
+- Apps: Target app is in compatible apps list
+- Features: All required features available in target cluster
+- Environment: Cannot import staging/dev cartridges into production
+- Tenant: If restricted, target tenant must be in intended list
+
+**New Verification Statuses**:
+- `incompatible_version` - Platform version not compatible
+- `incompatible_apps` - Target apps not supported
+- `incompatible_features` - Required features not available
+- `incompatible_environment` - Environment mismatch
+
+**Implementation**:
+- Types: `ClusterCompatibility`, `CompatibilityCheckResult`, `RadiantApp`
+- Service: `cartridgePKIService.checkCompatibility()`
+- Database: `compatible_apps`, `required_features`, `min_platform_version` columns
+
+#### Cartridge PKI - Cryptographic Signing & Verification (v1.0.0)
+
+Cartridges are now cryptographically signed on export and verified on import per Security Architecture v8.0.
+
+**Architecture**:
+- Radiant Root CA → Tenant Intermediate CA → Cartridge Signing Keys
+- Dual signatures: author_check (tenant) + platform_check (Radiant counter-signature)
+- SHA-256 hash + Ed25519/ECDSA asymmetric encryption
+- Federated trust for multi-cluster deployments
+- `signature.sig` file included in .RADz container
+- `meta.json` sidecar for web publishing
+
+**New Types** (`packages/shared/src/types/cartridge-pki.types.ts`):
+- `RootCACertificate`: Radiant Root CA, generated at Genesis, stored offline/HSM
+- `TenantCACertificate`: Signed by Root CA, stored in Genesis Vault
+- `CartridgeSigningKey`: Active signing keys for author/platform
+- `CartridgeSignature`: Individual signature with key fingerprint, algorithm
+- `CartridgeSignatureBlock`: Complete signature block stored as `signature.sig`
+- `CartridgeMetadata`: Lightweight `meta.json` for web publishing
+- `CartridgeSignatureVerificationStatus`: 'valid' | 'invalid_author' | 'invalid_platform' | 'expired' | 'revoked' | 'untrusted' | 'missing_signature' | 'hash_mismatch' | 'corrupted'
+- `CartridgeVerificationResult`: Detailed verification with individual checks
+- `TrustedRootCA`: Federated trust for cross-cluster verification
+- `PKIDashboard`, `PKIAuditEntry`: Admin dashboard types
+
+**New Service** (`lambda/shared/services/cartridge-pki.service.ts`):
+- `signCartridge()` - Sign with dual signatures (Signing Ceremony)
+- `verifyCartridge()` - Full verification with certificate chain validation
+- `generateTenantCA()` - Create tenant intermediate CA
+- `getDashboard()` - PKI dashboard with certificate status
+- Verification result caching (24-hour TTL)
+- Audit logging for all PKI operations
+
+**New Database Migration** (`migrations/V2026_02_01_009__cartridge_pki.sql`):
+- Enums: `certificate_type`, `certificate_status`, `key_algorithm`, `signature_type`, `pki_audit_action`
+- `root_ca_certificates`: Radiant Root CA records
+- `tenant_ca_certificates`: Tenant Intermediate CAs with root signature
+- `cartridge_signing_keys`: Active signing keys per tenant/purpose
+- `cartridge_signatures`: Complete signature records per cartridge
+- `trusted_root_cas`: Federated trust for external clusters
+- `pki_audit_log`: Partitioned audit log for all PKI operations
+- `signature_verification_cache`: Cached verification results
+- Extended `cartridges` table with `is_signed`, `signed_at`, `signature_id`
+- Views: `v_pki_dashboard`, `v_tenant_signing_status`
+- Functions: `log_pki_operation()`, `get_active_signing_key()`, `is_cartridge_signature_valid()`
+
+**Cartridge Service Integration** (`lambda/shared/services/cartridge.service.ts`):
+- `exportCartridge()` now performs Signing Ceremony and stores `signature.sig` and `meta.json`
+- `importCartridge()` verifies signature when `validateSignature: true`, rejects invalid
+- `verifyCartridgeSignature()` fetches and validates `signature.sig`
+
+**Security Flow**:
+1. **Export**: Hash content → Sign with tenant key → Counter-sign with platform key → Store `signature.sig`
+2. **Import**: Fetch `signature.sig` → Verify hash → Validate author signature → Validate platform signature → Accept or reject
+
+**Federation**:
+- Multiple Radiant clusters can trust each other's Root CAs
+- `trusted_root_cas` table stores external cluster public keys
+- Trust levels: 'full' (all tenants) or 'limited' (specific tenants only)
+
+**New Admin API** (`lambda/admin/cartridge-pki.ts`):
+- `GET /api/admin/pki/dashboard` - PKI dashboard with all stats
+- `GET /api/admin/pki/root-ca` - Get active Root CA details
+- `POST /api/admin/pki/root-ca/initialize` - Initialize Root CA (Genesis)
+- `GET /api/admin/pki/root-ca/export` - Export Root CA for federation
+- `GET /api/admin/pki/tenant-cas` - List all Tenant CAs
+- `POST /api/admin/pki/tenant-cas` - Generate new Tenant CA
+- `GET /api/admin/pki/tenant-cas/:tenantId` - Get Tenant CA
+- `POST /api/admin/pki/tenant-cas/:tenantId/revoke` - Revoke Tenant CA
+- `GET /api/admin/pki/signing-keys` - List signing keys
+- `POST /api/admin/pki/signing-keys/:keyId/rotate` - Rotate signing key
+- `GET /api/admin/pki/trusted-roots` - List federated trusted roots
+- `POST /api/admin/pki/trusted-roots` - Add trusted root
+- `GET /api/admin/pki/trusted-roots/:id` - Get trusted root
+- `PUT /api/admin/pki/trusted-roots/:id` - Update trusted root
+- `DELETE /api/admin/pki/trusted-roots/:id` - Remove trusted root
+- `GET /api/admin/pki/signatures` - List cartridge signatures
+- `POST /api/admin/pki/signatures/:id/verify` - Re-verify signature
+- `GET /api/admin/pki/audit` - PKI audit log
+
+**New Admin UI** (`apps/admin-dashboard/app/(dashboard)/platform/pki/page.tsx`):
+- Overview tab with Root CA status and summary cards
+- Tenant CAs tab with generation and revocation
+- Signing Keys tab with rotation capability
+- Federation tab with trusted root management
+- Audit Log tab with PKI operation history
+- Export Root CA dialog for federation setup
+- Add Trusted Root dialog with paste-from-export
+
+**Competitive Moat** (Moat #31 - Score 27/30):
+- Tamper-proof AI knowledge transfer
+- Federated AI marketplaces across independent clusters
+- Supply chain security for regulated industries
+- M&A intelligence transfer with cryptographic verification
+
+## [6.0.0] - 2026-02-01
+
+### Added
+
+#### Cartridge System - Three-Tier Scope Hierarchy (v2.0.0)
+
+Enhanced cartridge system with system-wide, tenant, and user scope levels with proper isolation.
+
+**Scope Hierarchy**:
+- **System Scope**: Platform-wide cartridges managed by Radiant Admin only. Visible to all tenants but cannot be modified or disabled.
+- **Tenant Scope**: Organization-wide cartridges managed by Tenant Admins. Cannot be disabled by users.
+- **User Scope**: Personal cartridges that users can toggle on/off.
+
+**Service Layer API** (`lambda/gateway/cartridge-api.ts`):
+- `GET /api/v1/tenant/cartridges` - List tenant's cartridges with system cartridges (read-only)
+- `GET /api/v1/tenant/cartridges/:id` - Get cartridge (tenant or system read-only)
+- `POST /api/v1/tenant/cartridges` - Create tenant cartridge (scope enforced)
+- `PATCH /api/v1/tenant/cartridges/:id` - Update tenant cartridge
+- `DELETE /api/v1/tenant/cartridges/:id` - Archive tenant cartridge
+- `GET /api/v1/tenant/cartridges/stack` - Get cartridge stack (system → tenant → user)
+- `POST /api/v1/tenant/cartridges/:id/activate` - Activate cartridge
+- `POST /api/v1/tenant/cartridges/:id/deactivate` - Deactivate cartridge
+- `POST /api/v1/tenant/cartridges/export` - Export tenant cartridges
+- `POST /api/v1/tenant/cartridges/import` - Import .RADz file
+
+**Admin Apps**:
+- **Radiant Admin**: Full control over all cartridges including system cartridges
+- **Think Tank Admin**: Manage all tenant cartridges across the platform
+- **Think Tank Tenant Admin**: Isolated to own tenant's cartridges via service layer
+
+**Tenant Isolation**:
+- Think Tank Tenant Admin sits BEHIND the service layer
+- All requests authenticated via JWT with tenant_id claim
+- Cannot see other tenants' cartridges
+- System cartridges visible as read-only
+
+**Types Updated** (`packages/shared/src/types/cartridge.types.ts`):
+- `CartridgeScope` now includes 'system' | 'tenant' | 'user'
+- `CartridgeStack` includes `systemStack`, `tenantStack`, `userStack`
+- `UpdateCartridgeRequest` includes `status` for activation
+
+#### AXIOM Scorers - Full Implementation (v2.3.0)
+
+Complete implementation of the 8 AXIOM Scorers (lightweight MLPs for scoring/ranking) with inference service, pipeline wiring, and database schema.
+
+**The 8 Scorers** (`packages/shared/src/types/axiom-clarion.types.ts`):
+
+| # | Scorer | Input | Output | Purpose |
+|---|--------|-------|--------|---------|
+| 1 | **Domain Scorer** | 1536 | 800 | Classifies queries into 800+ domain taxonomy |
+| 2 | **CLARION Scorer** | 1536 | 1 | Scores question relevance for adaptive questioning |
+| 3 | **Pattern Scorer** | 3072 | 1 | Ranks prompt patterns for retrieval |
+| 4 | **Model Scorer** | 1536 | 106 | Scores individual models for task suitability |
+| 5 | **Topology Scorer** | 512 | 9 | Evaluates orchestration strategies (single/multi/chain) |
+| 6 | **Combination Scorer** | 640 | 1 | Scores multi-model combinations for ensemble tasks |
+| 7 | **Variant Scorer** | 1536 | 1 | Scores prompt variants for model-specific optimization |
+| 8 | **User Scorer** | 128 | 64 | Personalizes scores via Ghost Vector integration |
+
+**New Inference Service** (`lambda/shared/services/axiom-neural-cortex.service.ts`):
+- `classifyDomain()` - Domain Scorer inference with pgvector fallback
+- `scoreClarionQuestions()` - CLARION Scorer for question ranking
+- `scorePatterns()` - Pattern Scorer with cosine similarity fallback
+- `scoreModels()` - Model Scorer for task-model matching
+- `scoreTopologies()` - Topology Scorer for 9 orchestration modes
+- `scoreCombinations()` - Combination Scorer for multi-model ensembles
+- `scoreVariants()` - Variant Scorer for model-specific prompts
+- `applyUserPersonalization()` - User Scorer via Ghost Vector
+- Thermal state management (cold/warm/hot)
+- Heuristic fallbacks when scorers are cold
+
+**AXIOM Pipeline Integration** (`lambda/shared/services/axiom.service.ts`):
+- `selectModel()` now uses Model Scorer + Topology Scorer
+- `buildTaskFeatures()` encodes session state for scoring
+- `mergeModelScores()` combines CLARION predictions with scorer outputs (60/40 weighting)
+
+**CLARION Integration** (`lambda/shared/services/clarion.service.ts`):
+- `getNeuralScore()` uses CLARION Scorer
+- `buildSessionContextFeatures()` encodes session for scorer input
+- `buildQuestionFeatures()` encodes question characteristics
+- Graceful fallback to heuristics on scorer failure
+
+**Database Migration** (`migrations/V2026_02_01_001__axiom_neural_cortex.sql`):
+- `axiom_network_status` - Thermal state, metrics, SageMaker endpoints
+- `axiom_network_inference_log` - Training data collection
+- `axiom_network_training_batches` - CATO training tracking
+- `domain_taxonomy_embeddings` - Domain centroids for fallback
+- `update_axiom_network_metrics()` function for auto-metrics
+- `auto_cool_axiom_networks()` function for thermal management
+
+**Documentation Updates**:
+- `THINKTANK-ADMIN-GUIDE.md` Section 56: AXIOM Scorers
+- `RADIANT-PLATFORM-ARCHITECTURE.md` Section 1.11: AXIOM Scorers architecture
+- `ENGINEERING-IMPLEMENTATION-VISION.md` v6.1.0:
+  - Section 25: Updated CORTEX Neural Networks → AXIOM Scorers (8 scorers, ~3.3M params)
+  - Section 26: AXIOM Prompt Optimization Pipeline - comprehensive 800-line documentation
+  - Section 27: CLARION Adaptive Questioning System - question scoring, branching, confidence
+  - Section 28: UEP Real-Time Event Streaming - SSE implementation, event types, client hooks
+- `STRATEGIC-VISION-MARKETING.md` v6.1.0:
+  - New AXIOM section with competitive positioning
+  - CLARION adaptive questioning demo script
+  - Updated document history
+
+#### AXIOM + CLARION UEP Event Wiring (v2.1.0)
+
+Complete SSE streaming integration using UEP (Universal Envelope Protocol) for real-time CLARION session updates.
+
+**New Service** (`lambda/shared/services/axiom-events.service.ts`):
+- `AxiomEventsService` - Event emitter with UEP envelope wrapping
+- Event types: `session_started`, `domain_detected`, `domain_refined`, `question_selected`, `answer_received`, `model_scores_update`, `confidence_update`, `clarification_complete`, `compilation_started`, `compilation_complete`, `session_error`, `heartbeat`
+- `createAxiomEventStream()` - SSE stream helper for client connections
+- Heartbeat support for connection keep-alive
+- Event history with replay for late subscribers
+
+**SSE Streaming Endpoint** (`lambda/axiom-clarion/handler.ts`):
+- `GET /api/v2/axiom/stream?sessionId=xxx` - SSE endpoint for real-time updates
+- Returns `text/event-stream` content type
+- Sends session state and event history on connection
+- UEP envelope format with tracing support
+
+**Service Integration** (`lambda/shared/services/clarion.service.ts`):
+- `startSession()` emits `session_started` and `domain_detected` events
+- `submitAnswer()` emits `answer_received`, `confidence_update`, `model_scores_update`, `question_selected`/`clarification_complete` events
+- All events include UEP envelope with traceId for distributed tracing
+
+**Client Hook** (`apps/thinktank/lib/hooks/useAxiomSession.ts`):
+- Added `connectToStream()` for SSE connection management
+- Auto-connects when session starts
+- Handles all event types with proper state updates
+- Tracks `previousScore` for score animation
+
+**Types Updated** (`apps/thinktank/lib/axiom/types.ts`):
+- `AxiomEventType` aligned with server-side events
+- Added `connected`, `question_selected`, `answer_received`, `heartbeat` types
+
+#### AXIOM + CLARION Integrated Subsystem (v2.0.0)
+
+Complete implementation of the AXIOM (Adaptive eXpert Intelligence Optimization Module) and CLARION (Context-aware Learning Adaptive Reasoning Interrogation ONtology) systems for adaptive prompt optimization.
+
+**AXIOM Features**:
+- **Domain Signature Management**: Template-based prompts with slot definitions for 800+ domains
+- **Pattern Storage & Retrieval**: Vector-indexed prompt patterns with neural ranking
+- **Prompt Compilation Pipeline**: Slot filling, pattern merging, model-specific variants
+- **Model Routing**: Neural network-based optimal model selection
+- **Model Variant Generation**: Provider-specific prompt optimization
+
+**CLARION Features**:
+- **Adaptive Questioning**: Intelligent question selection based on information gain
+- **Question Tree Architecture**: Branching logic with model signals per answer
+- **Multi-type Questions**: Choice, multi-select, text, scale, boolean
+- **Localization Support**: Multi-language question text and options
+- **Effectiveness Learning**: Track question performance for continuous improvement
+- **Compiler Feedback Loop**: Handle missing slots with targeted clarification
+
+**Types** (`packages/shared/src/types/axiom-clarion.types.ts`):
+- `ClarionSession`, `ClarionQuestion`, `ClarionAnswer`: Session management
+- `AxiomDomainSignature`, `AxiomPromptPattern`: Domain templates and patterns
+- `AxiomCompiledPrompt`, `AxiomModelSelection`: Compilation results
+- `AXIOM_CORTEX_CONFIG`: Neural network configuration for 6 AXIOM networks
+
+**Services**:
+- `clarion.service.ts`: Adaptive questioning with session management
+- `axiom.service.ts`: Prompt compilation with domain signatures and patterns
+
+**Lambda Handler** (`lambda/axiom-clarion/handler.ts`):
+- `POST /api/v2/axiom/session` - Start AXIOM session
+- `GET /api/v2/axiom/session/:id` - Get session status
+- `GET /api/v2/axiom/session/:id/forge-state` - Full UI state
+- `POST /api/v2/axiom/session/:id/answer` - Submit answer
+- `POST /api/v2/axiom/session/:id/skip` - Skip question
+- `POST /api/v2/axiom/session/:id/compile` - Compile optimized prompt
+- `GET/POST /api/v2/axiom/questions` - Question management
+- `GET/POST /api/v2/axiom/signatures` - Domain signature management
+- `GET/POST /api/v2/axiom/patterns` - Pattern management
+
+**Think Tank UI Components** (`apps/thinktank/components/axiom/`):
+- `AxiomForge`: Main container with 4-step workflow visualization
+- `WorkflowProgress`: Animated progress steps (Classify → Clarify → Compile → Route)
+- `ClarificationCard`: Multi-type question rendering with full accessibility support
+- `ModelScoreBars`: Real-time model prediction visualization
+- `CompiledPromptPreview`: Final prompt display with editing capability
+- `DomainDisplay`: Domain detection display with confidence and breadcrumb path
+- `ConfidenceMeter`: Animated optimization progress indicator
+- `FeedbackCapture`: User feedback collection for AXIOM sessions
+- `ClarionPreferencesPanel`: User settings UI for CLARION preferences
+- `ErrorStates`: Network error, timeout, and validation error components
+- `DelightSystem`: Progress messages, chemistry moments, domain-aware framing
+- `useAxiomSession`: React hook for session state management with SSE support
+- `useClarionPreferences`: Hook for managing user CLARION preferences
+
+**Accessibility & Mobile Features**:
+- Full keyboard navigation with arrow keys and role attributes
+- Screen reader support with aria-live regions
+- Auto-focus management on question transitions
+- Swipe-to-skip gesture support for mobile
+- Touch-optimized interaction targets
+
+**Delight System Features**:
+- Progress acknowledgment messages after questions
+- Model chemistry moments (score shift toasts)
+- Domain-aware question framing per domain type
+- Optional sound effects for interactions
+
+**Library Exports** (`apps/thinktank/lib/axiom/`):
+- `types.ts`: Comprehensive TypeScript interfaces for AXIOM/CLARION
+- `api.ts`: API client with SSE connection support
+- `useClarionPreferences.ts`: User preferences hook with persistence
+
+**Database Migration** (`migrations/V2026_02_01_006__axiom_clarion_system.sql`):
+- `clarion_questions`: Question repository with localization
+- `clarion_sessions`: Active questioning sessions
+- `clarion_question_effectiveness`: Question performance tracking
+- `axiom_domain_signatures`: Domain-specific prompt templates
+- `axiom_prompt_patterns`: Reusable prompt patterns with embeddings
+- `axiom_compilations`: Compilation history for learning
+- `axiom_model_variant_rules`: Model-specific formatting rules
+- `axiom_training_signals`: CATO training data collection
+- `axiom_pattern_evolution`: Pattern evolution history
+- `axiom_key_chains`: Cross-session identity resolution
+- `axiom_config`: Per-tenant configuration
+
+**AGI Brain Planner Integration**:
+- Added `axiomOptimization` field to `AGIBrainPlan`
+- Added `enableAxiom` and `axiomSessionId` to `GeneratePlanRequest`
+- AXIOM can provide pre-compiled prompts to bypass standard routing
+
+#### AXIOM Admin Apps & Curator Integration (v2.0.0)
+
+Complete admin management capabilities for AXIOM/CLARION subsystem.
+
+**Radiant Admin Dashboard** (`apps/admin-dashboard/app/(dashboard)/axiom/page.tsx`):
+- **Overview Tab**: Session metrics, pattern origins, question stats, tenant usage
+- **Patterns Tab**: Pending approval queue, pattern injection, approve/reject workflow
+- **Questions Tab**: CLARION question management interface
+- **A/B Tests Tab**: Prompt variant experiment management
+- **Configuration Tab**: Global AXIOM parameters (thresholds, weights, toggles)
+
+**Admin API** (`lambda/admin/axiom-admin.ts`):
+- `GET /api/admin/axiom/dashboard` - Full dashboard data
+- `GET /api/admin/axiom/metrics` - Aggregated metrics with time range
+- `GET /api/admin/axiom/metrics/tenants` - Per-tenant metrics
+- `GET/POST /api/admin/axiom/patterns` - Pattern management
+- `GET /api/admin/axiom/patterns/pending` - CATO-evolved patterns for review
+- `POST /api/admin/axiom/patterns/:id/approve|reject` - Approval workflow
+- `GET/PUT /api/admin/axiom/config` - Global configuration
+- `GET/POST/DELETE /api/admin/axiom/ab-tests` - A/B test management
+- `GET/PUT /api/admin/axiom/tenants/:id/config` - Tenant-specific config
+- `GET /api/admin/axiom/tenants/:id/stats` - Tenant statistics
+- `POST /api/admin/axiom/tenants/:id/export` - Compliance data export
+- `DELETE /api/admin/axiom/tenants/:id/delete-learning` - Delete tenant learning data
+- `GET/PUT /api/admin/axiom/signatures` - Domain signature management
+- `GET/POST/PUT/DELETE /api/admin/axiom/questions` - Question CRUD
+
+**Curator Integration Service** (`lambda/shared/services/axiom-curator.service.ts`):
+- `submitFeedback()` - Curator feedback on patterns, domains, taxonomy
+- `processFeedback()` - Approve/reject/implement feedback
+- `promotePattern()` - Mark patterns as curator-validated (high weight)
+- `getPatternBoost()` - Get curator weight boost for pattern ranking
+- `flagDomain()` - Flag domains needing attention
+- `resolveFlag()` - Resolve domain flags
+- `detectProblematicDomains()` - Auto-detect domains with issues
+- `recordQualitySignal()` - Quality signals feed into fitness functions
+
+**User Feedback & Caching** (`apps/thinktank/lib/hooks/useAxiomSession.ts`):
+- `submitFeedback()` - General feedback submission
+- `rateSession()` - Rate session quality (1-5)
+- `ratePrompt()` - Thumbs up/down on compiled prompt
+- `submitCorrection()` - Submit prompt corrections
+- `cacheQuestionTree()` - Cache questions for offline use
+- `getCachedQuestions()` - Retrieve cached questions
+- `cleanQuestionCache()` - Clear expired cache entries
+
+**Database Migration** (`migrations/V2026_02_01_007__axiom_admin_features.sql`):
+- `axiom_ab_tests` - A/B test configurations
+- `axiom_ab_test_assignments` - User variant assignments
+- `axiom_curator_feedback` - Curator feedback records
+- `axiom_curator_patterns` - Curator-promoted patterns
+- `axiom_domain_flags` - Domain attention flags
+- `axiom_user_feedback` - End-user feedback signals
+- `axiom_question_cache` - Question tree cache for offline support
+
+#### Neural Operations Center (v6.0.0)
+
+Complete dashboard for CORTEX neural network monitoring and control, implementing Phase 1 of the RADIANT Neural Architecture v6.0.0 specification.
+
+**Neural Operations Dashboard** (`apps/admin-dashboard/app/(dashboard)/neural-operations/page.tsx`):
+- **System Status Overview**: Real-time health monitoring with healthy/degraded/critical status
+- **CORTEX Network Cards**: Status for all 6 base MLPs (Pattern, Routing, Topology, CLARION, Combination, User)
+- **World Map Visualization**: Regional status with thermal state indicators
+- **Shadow Validation Progress**: Active model validation sessions with abort capability
+- **Thermal State Controls**: Override thermal state per region with reason and duration
+- **Recent Deployments**: Deployment history with promoted/rejected/rolled_back status
+- **Alert Management**: Severity-based alerts with acknowledgment workflow
+
+**Neural Operations Types** (`packages/shared/src/types/neural-operations.types.ts`):
+- `CortexNetworkStatus`: Network ID, version, parameters, RPS, latency, error rate
+- `ShadowValidation`: Validation status, progress, metrics (error rate, latency delta, divergence)
+- `RegionStatus`: Regional health, thermal state, active cartridge
+- `NetworkDeployment`: Deployment history with shadow validation reference
+- `NeuralAlert`: Severity-based alerts with acknowledgment tracking
+- `CORTEX_NETWORK_CONFIG`: Configuration for 6 base networks (~2.5M params total)
+- `THERMAL_STATE_CONFIG`: Cold/Warming/Warm/Hot state definitions
+
+**Neural Operations Service** (`lambda/shared/services/neural-operations.service.ts`):
+- `getDashboard()`: Complete dashboard data aggregation
+- `getNetworkStatuses()`: Status for all CORTEX networks
+- `getActiveShadowValidations()`: Running shadow validations
+- `getRegionStatuses()`: Regional thermal state and health
+- `overrideThermalState()`: Manual thermal state override
+- `abortShadowValidation()`: Cancel running shadow validation
+- `acknowledgeAlert()`: Alert acknowledgment workflow
+
+**Neural Operations API** (`lambda/admin/neural-operations.ts`):
+- `GET /api/admin/neural-operations/dashboard` - Full dashboard data
+- `GET /api/admin/neural-operations/networks` - Network statuses
+- `GET /api/admin/neural-operations/shadows` - Active shadow validations
+- `POST /api/admin/neural-operations/shadows/:id/abort` - Abort validation
+- `GET /api/admin/neural-operations/regions` - Regional status
+- `POST /api/admin/neural-operations/regions/:id/thermal-override` - Override thermal state
+- `GET /api/admin/neural-operations/alerts` - Active alerts
+- `POST /api/admin/neural-operations/alerts/:id/acknowledge` - Acknowledge alert
+
+**Database Migration** (`migrations/V2026_02_01_001__neural_operations_center.sql`):
+- `cortex_network_status`: Current status of CORTEX networks
+- `cortex_network_metrics`: Time-series metrics for networks
+- `cortex_shadow_validations`: Shadow validation sessions
+- `cortex_network_deployments`: Deployment history
+- `neural_region_status`: Regional status and thermal state
+- `neural_thermal_overrides`: Manual thermal state overrides
+- `neural_alerts`: Alert management
+
+#### Cartridge System (.RADz) (v6.0.0)
+
+Portable AI brains for export/import of neural intelligence packages. Implements the cartridge stack resolution system where tenant cartridges cannot be disabled and user cartridges can be toggled.
+
+**Cartridge Types** (`packages/shared/src/types/cartridge.types.ts`):
+- `CartridgeManifest`: Complete manifest schema for .RADz files
+- `Cartridge`: Database entity for cartridge records
+- `CartridgeStack`: Tenant + user stack with resolution order
+- `CartridgeContents`: CORTEX networks, domain experts, LoRA adapters, Curator knowledge
+- `CuratorGoldenRules`, `CuratorOntology`, `CuratorSafetyMatrix`: Embedded knowledge types
+
+**Cartridge Service** (`lambda/shared/services/cartridge.service.ts`):
+- `createCartridge()`: Create new cartridge record
+- `exportCartridge()`: Export to .RADz file with presigned download URL
+- `importCartridge()`: Import from .RADz file with validation
+- `getCartridgeStack()`: Get resolved tenant + user stack
+- `toggleUserCartridge()`: Enable/disable user cartridges (tenant: always active)
+- `validateCartridgeFile()`: Validate manifest and checksums
+
+**Cartridge API** (`lambda/admin/cartridges.ts`):
+- `GET /api/admin/cartridges` - List cartridges with filtering
+- `GET /api/admin/cartridges/:id` - Get single cartridge
+- `POST /api/admin/cartridges` - Create cartridge
+- `PATCH /api/admin/cartridges/:id` - Update cartridge
+- `DELETE /api/admin/cartridges/:id` - Archive cartridge
+- `POST /api/admin/cartridges/export` - Export to .RADz
+- `POST /api/admin/cartridges/import` - Import from .RADz
+- `GET /api/admin/cartridges/stack` - Get cartridge stack
+- `POST /api/admin/cartridges/:id/toggle` - Toggle user cartridge
+- `POST /api/admin/cartridges/:id/validate` - Validate cartridge file
+
+**Cartridge Manager UI** (`apps/admin-dashboard/app/(dashboard)/cartridges/page.tsx`):
+- **Stack Visualization**: Tenant stack (always active) → User stack (toggleable)
+- **Export Dialog**: Select scope, domains, and components to include
+- **Import Dialog**: Upload .RADz, choose merge strategy, activate immediately
+- **Cartridge List**: Filter by scope/status, toggle user cartridges, archive
+
+**Database Migration** (`migrations/V2026_02_01_002__cartridge_system.sql`):
+- `cartridges`: Main cartridge records with scope, status, contents summary
+- `cartridge_stack_positions`: Ordering within tenant/user stacks
+- `cartridge_imports`: Import job tracking with validation results
+- `cartridge_exports`: Export job tracking with download URLs
+- `cartridge_activation_log`: Audit log for enable/disable events
+- `cartridge_content_cache`: Extracted content cache for fast loading
+- `get_effective_cartridge_stack()`: Function for stack resolution
+
+**Key Business Rules**:
+- Tenant cartridges: CANNOT be disabled, always active
+- User cartridges: CAN be toggled on/off
+- Stack resolution: Tenant first (base), then user (overrides)
+- `allowUserOverride` flag controls whether user cartridges can modify tenant settings
+
+#### Domain Expert Cortex (v6.0.0)
+
+7 specialized neural networks per domain (~4M parameters each, ~28M total per domain) for deep domain expertise in healthcare, legal, finance, and other verticals.
+
+**Domain Expert Types** (`packages/shared/src/types/domain-expert.types.ts`):
+- `DomainExpertNetworkType`: 7 network types (entity_classifier, contraindication_net, protocol_matcher, severity_assessor, personalization_net, citation_network, orchestration_selector)
+- `DomainExpertConfig`: Domain configuration with safety thresholds and citation requirements
+- `DomainExpertNetwork`: Deployed network with ONNX storage, metrics, and training info
+- `DomainExpertSuite`: Complete suite of 7 networks per domain with completeness tracking
+- `DomainExpertTrainingJob`: Training job with epochs, metrics, and progress
+
+**7 Specialized Networks per Domain**:
+
+| Network | Parameters | Purpose |
+|---------|-----------|---------|
+| Entity Classifier | ~4M | Classifies domain-specific entities |
+| Contraindication Net | ~4M | Flags dangerous/incompatible combinations |
+| Protocol Matcher | ~4M | Matches to standard protocols |
+| Severity Assessor | ~4M | Assesses severity/urgency levels |
+| Personalization Net | ~4M | Personalizes based on user history |
+| Citation Network | ~4M | Finds relevant citations/references |
+| Orchestration Selector | ~4M | Selects optimal orchestration mode |
+
+**Domain Expert Service** (`lambda/shared/services/domain-expert.service.ts`):
+- `getDashboard()`: Dashboard with all domain expert suites
+- `listDomainExperts()`: List suites with filtering
+- `createDomainConfig()`: Create new domain configuration
+- `deployNetwork()`: Deploy ONNX network for a domain
+- `runInference()`: Run inference on deployed network
+- `startTraining()`: Start training job for a network
+
+**Domain Expert API** (`lambda/admin/domain-experts.ts`):
+- `GET /api/admin/domain-experts/dashboard` - Full dashboard
+- `GET /api/admin/domain-experts` - List domain expert suites
+- `GET /api/admin/domain-experts/domains/:domainId` - Get domain config
+- `POST /api/admin/domain-experts/domains` - Create domain
+- `PATCH /api/admin/domain-experts/domains/:domainId` - Update domain
+- `POST /api/admin/domain-experts/domains/:domainId/networks/:networkType/deploy` - Deploy network
+- `POST /api/admin/domain-experts/inference` - Run inference
+- `POST /api/admin/domain-experts/training` - Start training job
+
+**Domain Expert UI** (`apps/admin-dashboard/app/(dashboard)/domain-experts/page.tsx`):
+- **Summary Stats**: Total domains, active networks, training jobs, total parameters
+- **Domain Cards**: Visual grid with 7-network status bars and completeness
+- **Training Jobs**: Active training with epoch progress
+- **Configuration Dialog**: Safety threshold slider, citation requirements, training domain flag
+
+**Database Migration** (`migrations/V2026_02_01_003__domain_expert_cortex.sql`):
+- `domain_expert_configs`: Domain configuration with safety settings
+- `domain_expert_networks`: Deployed networks with ONNX storage
+- `domain_expert_training_jobs`: Training job tracking
+- `domain_expert_inference_metrics`: Time-series inference metrics
+
+**Predefined Domains**:
+- Healthcare: 50K entities, 95% safety, citations required
+- Legal: 30K entities, 90% safety, citations required
+- Finance: 25K entities, 85% safety, citations required
+- Fitness: 5K entities, 70% safety (training domain)
+- Education: 10K entities, 60% safety
+- Technology: 15K entities, 50% safety
+
+#### CATO Twilight Dreaming (v6.0.0)
+
+30% Invention Minimum Enforcement with PromptBreeder 9-operator evolutionary prompt optimization. "Twilight Dreaming" occurs when CATO is not actively responding, evolving prompts and generating inventions.
+
+**CATO Twilight Types** (`packages/shared/src/types/cato-twilight.types.ts`):
+- `PromptBreederOperator`: 9 evolutionary operators
+- `PromptGenome`: Individual prompt with fitness, novelty, safety scores
+- `PromptPopulation`: Population of prompts for evolution
+- `TwilightDreamingSession`: Dreaming session with operator usage tracking
+- `InventionCandidate`: Novel patterns discovered through dreaming
+- `InventionEnforcementConfig`: 30% target configuration
+
+**9 PromptBreeder Operators**:
+
+| Operator | Description |
+|----------|-------------|
+| Zero-Order Hypermutation | Random mutations without gradient guidance |
+| First-Order Hypermutation | Gradient-guided mutations |
+| Estimation of Distribution | Learn from elite prompts |
+| Lineage-Based Mutation | Ancestry-informed changes |
+| Crossover | Combine two parent prompts |
+| Lamarckian Mutation | Persist successful adaptations |
+| Context Shuffling | Reorder context elements |
+| Working Memory Expansion | Expand relevant context |
+| ELM (Extreme Learning) | Radical exploratory mutations |
+
+**PromptBreeder Service** (`lambda/shared/services/cato/prompt-breeder.service.ts`):
+- `selectOperator()`: Weighted operator selection
+- `applyMutation()`: Apply selected operator to genome
+- `evolvePopulation()`: Evolve population by one generation
+- `evaluateGenome()`: Calculate fitness from test results
+
+**Twilight Dreaming Service** (`lambda/shared/services/cato/twilight-dreaming.service.ts`):
+- `getDashboard()`: Full dashboard with metrics
+- `startDreamingSession()`: Start background evolution
+- `checkInventionRate()`: Check 30% enforcement status
+- `recordResponse()`: Track novelty for rate calculation
+- `approveInvention()`: Approve discovered patterns
+- `updateEnforcementConfig()`: Configure enforcement
+
+**CATO Twilight API** (`lambda/admin/cato-twilight.ts`):
+- `GET /api/admin/cato-twilight/dashboard` - Full dashboard
+- `POST /api/admin/cato-twilight/sessions` - Start dreaming session
+- `GET /api/admin/cato-twilight/invention-rate` - Check rate
+- `GET /api/admin/cato-twilight/config` - Get config
+- `PATCH /api/admin/cato-twilight/config` - Update config
+- `POST /api/admin/cato-twilight/inventions/:id/approve` - Approve invention
+- `POST /api/admin/cato-twilight/record-response` - Record response
+
+**Twilight Dreaming UI** (`apps/admin-dashboard/app/(dashboard)/cato-twilight/page.tsx`):
+- **Invention Rate Gauge**: Visual progress to 30% target with deficit indicator
+- **9 Operator Grid**: Display of all PromptBreeder operators
+- **Active Session Card**: Real-time dreaming session progress
+- **Invention List**: Recent inventions with approval status
+- **Session History**: Past dreaming sessions with fitness improvement
+- **Config Dialog**: Target rate slider, enforcement toggle, dreaming toggle
+
+**Database Migration** (`migrations/V2026_02_01_004__cato_twilight_dreaming.sql`):
+- `prompt_populations`: Populations for evolution
+- `prompt_genomes`: Individual prompts with fitness
+- `twilight_dreaming_sessions`: Session tracking
+- `invention_candidates`: Discovered inventions
+- `invention_enforcement_config`: 30% target config
+- `invention_response_log`: Response novelty tracking
+- `invention_metrics_cache`: Cached metrics
+
+**30% Enforcement Modes**:
+- **Passive**: < 5% below target, normal operation
+- **Active**: 5-10% below target, prefer inventive responses
+- **Aggressive**: > 10% below target, force invention
+
+#### Safety Matrix Manager (v6.0.0)
+
+Entity-Action Contraindication Grid for Domain Expert Cortex. Defines which entities CANNOT be combined with which actions in safety-critical domains.
+
+**Safety Matrix Types** (`packages/shared/src/types/safety-matrix.types.ts`):
+- `SafetyEntity`: Domain entities (medications, conditions, legal entities, etc.)
+- `SafetyAction`: Domain actions (prescribe, recommend, combine with, etc.)
+- `Contraindication`: Entity-action pair with severity, reason, conditions
+- `SafetyMatrixGrid`: Full grid visualization
+- `ContraindicationCheckRequest/Result`: Real-time checking
+
+**Contraindication Severities**:
+
+| Severity | Color | Description |
+|----------|-------|-------------|
+| **Absolute** | Red | Never combine - critical risk |
+| **Relative** | Orange | Usually avoid - significant risk |
+| **Caution** | Yellow | Consider risks - moderate concern |
+| **Monitor** | Green | Proceed with care - low concern |
+
+**Entity Categories**: medication, condition, procedure, patient_group, legal_entity, document_type, financial_instrument, regulatory_status, custom
+
+**Action Categories**: prescribe, recommend, combine_with, administer_to, advise, execute, transfer, disclose, custom
+
+**Safety Matrix Service** (`lambda/shared/services/safety-matrix.service.ts`):
+- `getDashboard()`: Full dashboard with stats and recent items
+- `listEntities()` / `createEntity()`: Entity management
+- `listActions()` / `createAction()`: Action management
+- `listContraindications()` / `createContraindication()`: Grid entries
+- `checkContraindication()`: Real-time safety check
+- `getMatrixGrid()`: Get full grid for visualization
+- `reviewContraindication()`: Approve/reject pending items
+
+**Safety Matrix API** (`lambda/admin/safety-matrix.ts`):
+- `GET /api/admin/safety-matrix/dashboard` - Full dashboard
+- `GET /api/admin/safety-matrix/entities` - List entities
+- `POST /api/admin/safety-matrix/entities` - Create entity
+- `GET /api/admin/safety-matrix/actions` - List actions
+- `POST /api/admin/safety-matrix/actions` - Create action
+- `GET /api/admin/safety-matrix/contraindications` - List contraindications
+- `POST /api/admin/safety-matrix/contraindications` - Create contraindication
+- `POST /api/admin/safety-matrix/check` - Check for contraindications
+- `GET /api/admin/safety-matrix/grid` - Get matrix grid
+
+**Safety Matrix UI** (`apps/admin-dashboard/app/(dashboard)/safety-matrix/page.tsx`):
+- **Summary Stats**: Total entities, actions, contraindications, pending review
+- **Severity Breakdown**: Visual breakdown by severity level
+- **Matrix Grid View**: Interactive entity×action grid with colored cells
+- **Pending Review Tab**: Items awaiting approval
+- **Create Dialog**: Add new contraindications with severity and reason
+
+**Database Migration** (`migrations/V2026_02_01_005__safety_matrix.sql`):
+- `safety_entities`: Domain entities with external IDs and verification
+- `safety_actions`: Domain actions with verb forms
+- `contraindications`: Entity-action pairs with severity and conditions
+- `contraindication_overrides`: Audit log for override events
+- `check_contraindication()`: Function for real-time checking
+
+#### Think Tank Integration (v6.0.0)
+
+Domain selection dropdown and cartridge indicator for the Think Tank chat interface, connecting users to Domain Expert Cortex and Cartridge System.
+
+**New Components**:
+- `DomainSelector` (`apps/thinktank/components/chat/DomainSelector.tsx`): Domain selection dropdown with search
+- `CartridgeIndicator` (`apps/thinktank/components/chat/CartridgeIndicator.tsx`): Active cartridges display
+
+**DomainSelector Features**:
+- Auto-detect mode (default) or manual domain selection
+- Search domains via Domain Taxonomy API
+- Popular domains: Healthcare, Legal, Finance, Technology, Education, Science
+- Saves user selection to Domain Taxonomy API
+- Domain icons for visual recognition
+- Compact mode for header integration
+
+**CartridgeIndicator Features**:
+- Shows active cartridges with scope badges (System, Organization, Personal)
+- Expandable panel with cartridge details
+- Version and priority indicators
+- Active/inactive status visualization
+
+**Integration Points**:
+- `ModernChatInterface` now accepts `selectedDomain` and `onDomainSelect` props
+- Domain and cartridge selectors appear in Advanced Mode only
+- Compact mode fits in the chat header alongside model selector
+
+---
+
 ## [5.53.0] - 2026-01-31
 
 ### Added

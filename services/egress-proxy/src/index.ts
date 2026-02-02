@@ -13,7 +13,7 @@
 
 import Fastify from 'fastify';
 import { HTTP2Pool } from './pool';
-import { providerConfigs } from './providers';
+import { providerConfigs, validateProviderEnvVars, getConfiguredProviders } from './providers';
 
 const app = Fastify({
   logger: {
@@ -21,12 +21,29 @@ const app = Fastify({
   },
 });
 
+// Validate environment variables at startup
+const envValidation = validateProviderEnvVars();
+if (!envValidation.valid) {
+  app.log.warn('Missing environment variables for some providers:');
+  for (const error of envValidation.errors) {
+    app.log.warn(`  - ${error}`);
+  }
+  app.log.warn('These providers will not be available until configured.');
+}
+
+const configuredProviders = getConfiguredProviders();
+app.log.info(`Configured providers: ${configuredProviders.join(', ') || 'none'}`);
+
 const pool = new HTTP2Pool();
 
-// Initialize provider pools
+// Initialize only properly configured provider pools
 for (const [name, config] of Object.entries(providerConfigs)) {
-  pool.registerProvider(name, config);
-  app.log.info(`Registered provider: ${name} -> ${config.baseUrl}`);
+  if (configuredProviders.includes(name)) {
+    pool.registerProvider(name, config);
+    app.log.info(`Registered provider: ${name} -> ${config.baseUrl}`);
+  } else {
+    app.log.warn(`Skipping provider ${name}: missing required environment variables`);
+  }
 }
 
 // Periodic cleanup of unhealthy connections
@@ -120,7 +137,7 @@ app.get('/metrics', async () => ({
 const PORT = parseInt(process.env.PORT || '9000');
 const HOST = process.env.HOST || '0.0.0.0';
 
-app.listen({ port: PORT, host: HOST }, (err, address) => {
+app.listen({ port: PORT, host: HOST }, (err: Error | null, address: string) => {
   if (err) {
     app.log.error(err);
     process.exit(1);

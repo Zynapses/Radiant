@@ -48,6 +48,8 @@ Before making ANY code change, identify what type of change it is:
 | `architecture` | service, pattern, design, system |
 | `competitive_advantage` | moat, unique feature, differentiator |
 | `deployer` | Swift app, deployment, domain URL, tier, installation |
+| `curator` | knowledge graph, verification, documents, overrides, chain of custody |
+| `cartridge` | cartridge, .radz, export, import, PKI, signing, federation |
 | `mcp` | Model Context Protocol, MCP server, tools, resources |
 | `a2a` | Agent-to-Agent, A2A protocol, agent registry |
 | `api_keys` | API key, interface type, scopes, key validation |
@@ -143,6 +145,23 @@ Use the trigger matrix to find ALL required documentation:
 ✅ CHANGELOG.md
 ✅ docs/SWIFT-DEPLOYER-USER-GUIDE.md
 ✅ docs/RADIANT-ADMIN-GUIDE.md (if affects deployment options)
+```
+
+### Curator / Knowledge Changes
+```
+✅ CHANGELOG.md
+✅ docs/CURATOR-USER-GUIDE.md
+✅ docs/CURATOR-ENGINEERING-GUIDE.md (if technical)
+✅ docs/RADIANT-ADMIN-GUIDE.md (if admin-configurable)
+```
+
+### Cartridge Changes
+```
+✅ CHANGELOG.md
+✅ docs/CURATOR-USER-GUIDE.md (Section 11: Managing Cartridges)
+✅ docs/RADIANT-ADMIN-GUIDE.md (Section 89: Cartridge PKI)
+✅ docs/RADIANT-MOATS.md (if portable intelligence advantage)
+✅ docs/ENGINEERING-IMPLEMENTATION-VISION.md (Section 25: Neural Architecture)
 ```
 
 ### Service Layer Changes (MCP, A2A, API)
@@ -253,6 +272,8 @@ When updating these documents, also update the version number in the header:
 - `docs/THINKTANK-ADMIN-GUIDE.md`
 - `docs/THINKTANK-ADMIN-GUIDE-V2.md`
 - `docs/THINKTANK-USER-GUIDE.md`
+- `docs/CURATOR-USER-GUIDE.md`
+- `docs/CURATOR-ENGINEERING-GUIDE.md`
 - `docs/STRATEGIC-VISION-MARKETING.md`
 - `docs/ENGINEERING-IMPLEMENTATION-VISION.md`
 - `docs/RADIANT-PLATFORM-ARCHITECTURE.md`
@@ -277,6 +298,7 @@ Before marking task complete, verify:
 □ Platform architecture updated (if architectural change)
 □ Swift Deployer guide updated (if deployer changes)
 □ Service Layer guide updated (if MCP, A2A, API, gateway changes)
+□ Curator guide updated (if knowledge, verification, or cartridge changes)
 □ **Glossary updated (if new terms, subsystems, acronyms, or AWS services)**
 □ Version numbers updated in all touched docs
 ```

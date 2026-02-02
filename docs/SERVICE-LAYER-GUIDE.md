@@ -102,6 +102,25 @@ Authorization: Bearer rad_sk_xxxxxxxxxxxx
 | `/knowledge/search` | POST | Search knowledge base |
 | `/files/upload` | POST | Upload file |
 
+### Tenant API (Service Layer)
+
+The Tenant API provides tenant-isolated access for applications that sit behind the service layer (e.g., Think Tank Tenant Admin). All requests are authenticated via JWT with `tenant_id` claim.
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/tenant/cartridges` | GET | List tenant's cartridges (includes system read-only) |
+| `/tenant/cartridges` | POST | Create tenant cartridge |
+| `/tenant/cartridges/{id}` | GET | Get cartridge (tenant or system read-only) |
+| `/tenant/cartridges/{id}` | PATCH | Update tenant cartridge |
+| `/tenant/cartridges/{id}` | DELETE | Archive tenant cartridge |
+| `/tenant/cartridges/stack` | GET | Get cartridge stack (system → tenant → user) |
+| `/tenant/cartridges/{id}/activate` | POST | Activate cartridge |
+| `/tenant/cartridges/{id}/deactivate` | POST | Deactivate cartridge |
+| `/tenant/cartridges/export` | POST | Export tenant cartridges to .RADz |
+| `/tenant/cartridges/import` | POST | Import .RADz file |
+
+**Tenant Isolation**: Tenants can only see their own cartridges plus system cartridges (read-only). They cannot see other tenants' cartridges or modify system cartridges.
+
 ### Scopes
 
 | Scope | Description |

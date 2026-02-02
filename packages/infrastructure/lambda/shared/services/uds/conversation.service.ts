@@ -710,8 +710,9 @@ class UDSConversationService implements IUDSConversationService {
 
     try {
       // Use AI to generate a concise, descriptive title
-      const response = await modelRouterService.routeRequest({
+      const response = await modelRouterService.invoke({
         tenantId,
+        modelId: 'claude-3-haiku-20240307', // Fast model for title generation
         messages: [
           {
             role: 'system',
@@ -724,7 +725,6 @@ class UDSConversationService implements IUDSConversationService {
         ],
         maxTokens: 30,
         temperature: 0.3,
-        preferFast: true, // Use fastest available model for title generation
       });
 
       title = response.content?.trim() || '';

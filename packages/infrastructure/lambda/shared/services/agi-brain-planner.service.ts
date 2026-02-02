@@ -24,6 +24,8 @@ import type {
   TenantSettings 
 } from './cato/types';
 import { cortexIntelligenceService, type CortexInsights, type KnowledgeDensity } from './cortex-intelligence.service';
+import { axiomService } from './axiom.service';
+import { clarionService } from './clarion.service';
 import { v4 as uuidv4 } from 'uuid';
 
 // Gemini 3 model for plan summarization
@@ -246,6 +248,24 @@ export interface AGIBrainPlan {
     recommendation?: string;
     auditEntryId?: string;
   };
+  // AXIOM/CLARION - Adaptive prompt optimization
+  axiomOptimization?: {
+    enabled: boolean;
+    sessionId?: string;
+    status: 'skipped' | 'active' | 'ready' | 'compiled';
+    domainConfidence: number;
+    questionsAnswered: number;
+    compiledPrompt?: {
+      systemPrompt: string;
+      userPrompt: string;
+    };
+    selectedModel?: {
+      modelId: string;
+      modelName: string;
+      matchScore: number;
+    };
+    processingTimeMs: number;
+  };
   // Cortex Intelligence - enterprise knowledge informs decisions
   cortexInsights?: {
     enabled: boolean;
@@ -288,6 +308,8 @@ export interface GeneratePlanRequest {
   enableUserContext?: boolean;  // Enable user persistent context injection (default: true)
   enableEgoContext?: boolean;   // Enable ego context injection (default: true)
   enableLibraryAssist?: boolean; // Enable library recommendations for generative UI (default: true)
+  enableAxiom?: boolean;        // Enable AXIOM/CLARION prompt optimization (default: false - requires UI interaction)
+  axiomSessionId?: string;      // Existing AXIOM session ID to use compiled prompt from
   domainOverride?: {
     fieldId?: string;
     domainId?: string;

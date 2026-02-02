@@ -671,13 +671,13 @@ class EnhancedLearningService {
   }
 
   private signalToErrorCategory(signalType: string): ErrorCategory {
-    const mapping: Record<string, ErrorCategory> = {
-      'thumbs_down': 'incorrect_answer',
-      'abandon_conversation': 'unhelpful_response',
-      'regenerate_request': 'poor_formatting',
+    const mapping: Record<string, string> = {
+      'thumbs_down': 'factual_error',
+      'abandon_conversation': 'context_loss',
+      'regenerate_request': 'hallucination',
       'report_issue': 'factual_error',
     };
-    return mapping[signalType] || 'other';
+    return (mapping[signalType] || 'other') as ErrorCategory;
   }
   
   // ==========================================================================

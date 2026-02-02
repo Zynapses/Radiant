@@ -677,10 +677,11 @@ class MagicCarpetService {
   private async getPredictedDestinations(carpet: MagicCarpet): Promise<CarpetDestination[]> {
     try {
       // Import Pre-Cognition service for real predictions
-      const { preCognitionService } = await import('../reality-engine/pre-cognition.service');
+      const { preCognitionService } = await import('../reality-engine/pre-cognition.service.js');
       
       // Get conversation history from the reality engine session
       const conversationHistory = carpet.journey.map(point => ({
+        id: crypto.randomUUID(),
         role: 'user' as const,
         content: point.destination?.name || 'navigation',
         timestamp: point.arrivedAt,
@@ -719,10 +720,9 @@ class MagicCarpetService {
           predictedDestinations.push({
             ...matchingDest,
             wasPreCognized: true,
-            preCognitionConfidence: prediction.confidence,
             suggestedPrompt: prediction.prompt,
             estimatedArrivalMs: 0, // Instant because pre-cognized
-          });
+          } as CarpetDestination);
         }
       }
 

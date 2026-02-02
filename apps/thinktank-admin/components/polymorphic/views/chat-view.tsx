@@ -66,20 +66,24 @@ export function ChatView({
     setInput('');
     setIsLoading(true);
 
-    await new Promise(resolve => setTimeout(resolve, 500 + Math.random() * 500));
+    // TODO: Replace with actual API call to Economic Governor
+    // This demo response simulates the expected behavior
+    try {
+      // In production, this would be: const response = await economicGovernor.route(userMessage.content, mode);
+      const assistantMessage: ChatMessage = {
+        id: crypto.randomUUID(),
+        role: 'assistant',
+        content: `Processing your request in ${mode === 'sniper' ? 'Sniper' : 'War Room'} mode...\n\nThis is a demonstration of the Polymorphic UI chat interface. In production, this would route through the Economic Governor for intelligent model selection.`,
+        timestamp: new Date(),
+        mode,
+        persona: mode === 'sniper' ? 'Sniper' : 'Sage',
+        costCents: mode === 'sniper' ? 1 : 50,
+      };
 
-    const assistantMessage: ChatMessage = {
-      id: crypto.randomUUID(),
-      role: 'assistant',
-      content: `Processing your request in ${mode === 'sniper' ? 'Sniper' : 'War Room'} mode...\n\nThis is a demonstration of the Polymorphic UI chat interface. In production, this would route through the Economic Governor for intelligent model selection.`,
-      timestamp: new Date(),
-      mode,
-      persona: mode === 'sniper' ? 'Sniper' : 'Sage',
-      costCents: mode === 'sniper' ? 1 : 50,
-    };
-
-    setMessages(prev => [...prev, assistantMessage]);
-    setIsLoading(false);
+      setMessages(prev => [...prev, assistantMessage]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {

@@ -63,6 +63,17 @@ export * from './cortex-graph-rag.types';
 export * from './oauth-provider.types';
 export * from './mfa.types';
 export * from './model-version-discovery.types';
+export * from './neural-operations.types';
+export * from './cartridge.types';
+export * from './cartridge-pki.types';
+export * from './cartridge-vault.types';
+export * from './cartridge-rnir.types';
+export * from './cartridge-operations.types';
+export * from './domain-expert.types';
+export * from './cato-twilight.types';
+export * from './safety-matrix.types';
+export * from './axiom-clarion.types';
+export * from './livs.types';
 
 // Living Parchment 2029 Vision types (selective export to avoid SynthesisSession conflict)
 export type {
@@ -164,3 +175,6 @@ export type {
 
 // UEP v2.0 - Universal Envelope Protocol
 export * from './uep-v2.types';
+
+// The Crucible - Competitive Multi-LLM Deliberation
+export * from './crucible.types';

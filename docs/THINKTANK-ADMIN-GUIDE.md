@@ -2,8 +2,8 @@
 
 > **Configuration and administration of Think Tank AI features**
 > 
-> Version: 3.11.0 | Platform: RADIANT 5.52.52
-> Last Updated: January 28, 2026
+> Version: 3.12.0 | Platform: RADIANT 6.0.0
+> Last Updated: February 1, 2026
 
 ---
 
@@ -148,6 +148,9 @@ This guide covers administrative features specific to **Think Tank**, the consum
 49. [Sentinel Agents Administration](#49-sentinel-agents-administration)
 50. [Economic Governor Administration](#50-economic-governor-administration)
 51. [Flash Facts Administration](#51-flash-facts-administration)
+52. [Domain Taxonomy Selector](#52-domain-taxonomy-selector)
+53. [Cartridge Indicator Administration](#54-cartridge-indicator-administration)
+55. [AXIOM Forge Administration](#55-axiom-forge-administration)
 
 ---
 
@@ -10198,6 +10201,496 @@ lambda/thinktank/flash-facts.ts
 lambda/shared/services/flash-facts.service.ts
 migrations/XXX_flash_facts.sql
 ```
+
+---
+
+## 52. Neural Architecture v6.0.0 Administration
+
+**Location**: Admin Dashboard → Think Tank → Neural Operations
+
+### 52.1 Overview
+
+Neural Architecture v6.0.0 introduces **RADIANT Cartridges** — portable AI brain packages that encapsulate all learned intelligence for export, import, and transfer between deployments.
+
+### 52.2 CORTEX Network Status
+
+Monitor the 6 small MLPs (~2.5M params total) that power Think Tank's intelligent routing:
+
+| Network | Purpose | Admin Actions |
+|---------|---------|---------------|
+| **Pattern** | Rank prompt patterns from vector database | View accuracy, rollback |
+| **Routing** | Select optimal AI model for task | Adjust weights, force model |
+| **Topology** | Choose orchestration method | Override topology |
+| **CLARION** | Rank clarification questions | Configure question priority |
+| **Combination** | Score multi-model combinations | Enable/disable combinations |
+| **User** | Personalize based on Ghost Vector | Reset user vectors |
+
+### 52.3 Cartridge Management
+
+| Action | Description |
+|--------|-------------|
+| **Export Cartridge** | Create .RADz file with all tenant intelligence |
+| **Import Cartridge** | Load external cartridge (merge or replace) |
+| **View Installed** | See current cartridge versions |
+| **Update Cartridge** | Hot-swap to new version (zero downtime) |
+| **Rollback** | Revert to previous cartridge version |
+
+### 52.4 Thermal State Controls
+
+| State | Trigger | Admin Override |
+|-------|---------|----------------|
+| **COLD** | No cartridge installed | Force to WARM for testing |
+| **WARMING** | Cartridge installing | Monitor progress |
+| **WARM** | Normal operation | Reduce to save costs |
+| **HOT** | High demand auto-detected | Force for events |
+
+### 52.5 Dreaming Status
+
+Monitor CATO Twilight Dreaming cycle:
+
+| Metric | Target | Alert If |
+|--------|--------|----------|
+| Invention Ratio | ≥30% | <30% (policy violation) |
+| Evolution Ratio | ≤70% | N/A (complementary) |
+| Canary Pass Rate | 100% | Any failure |
+| Training Duration | <4h | >6h |
+
+### 52.6 Admin Actions
+
+- **Force Dreaming Cycle**: Trigger immediate training
+- **Rollback Version**: Revert to previous CORTEX version
+- **View Training Logs**: Inspect learning signals
+- **Export Metrics**: Download training analytics
+
+### 52.7 API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/admin/thinktank/neural/status` | GET | All network statuses |
+| `/api/admin/thinktank/neural/cortex/:network` | GET/PUT | Network details |
+| `/api/admin/thinktank/cartridge/export` | POST | Export cartridge |
+| `/api/admin/thinktank/cartridge/import` | POST | Import cartridge |
+| `/api/admin/thinktank/thermal/override` | POST | Override thermal state |
+| `/api/admin/thinktank/dreaming/force` | POST | Trigger dreaming |
+| `/api/admin/thinktank/dreaming/rollback` | POST | Rollback to version |
+
+### 52.8 Implementation Files
+
+```
+lambda/admin/neural-operations.ts
+lambda/admin/cartridge.ts
+lambda/admin/thermal.ts
+lambda/shared/services/cortex-network.service.ts
+lambda/shared/services/cartridge.service.ts
+apps/admin-dashboard/app/(dashboard)/neural-operations/page.tsx
+apps/admin-dashboard/app/(dashboard)/cartridge-manager/page.tsx
+```
+
+---
+
+## 53. Domain Selector Administration
+
+**Location**: Admin Dashboard → Think Tank → Domain Taxonomy
+
+### 53.1 Overview
+
+The Domain Selector allows users to manually specify their expertise domain from 800+ options across 8 major fields.
+
+### 53.2 Taxonomy Structure
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  8 Fields → 100+ Domains each → 5-20 Subspecialties each       │
+│                                                                 │
+│  Healthcare ─┬─ Cardiology ─── Interventional Cardiology        │
+│              ├─ Oncology ───── Pediatric Oncology               │
+│              └─ Neurology ──── Stroke Medicine                  │
+│                                                                 │
+│  Technology ─┬─ Software Dev ─ Cloud Native                     │
+│              ├─ Data Science ─ MLOps                            │
+│              └─ Security ───── Penetration Testing              │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 53.3 Admin Configuration
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| **Enable Domain Selection** | Allow manual override | `true` |
+| **Show Auto-Detection** | Display detected domain | `true` |
+| **Allow User Defaults** | Let users set default domain | `true` |
+| **Custom Domains** | Enable tenant-specific domains | `false` |
+
+### 53.4 API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/admin/thinktank/domain-taxonomy` | GET | Full taxonomy |
+| `/api/admin/thinktank/domain-taxonomy/fields` | GET | List fields |
+| `/api/admin/thinktank/domain-taxonomy/domains` | GET | List domains |
+| `/api/admin/thinktank/domain-taxonomy/custom` | POST | Add custom domain |
+
+---
+
+## 54. Cartridge Indicator Administration
+
+**Location**: Admin Dashboard → Think Tank → Cartridge Status
+
+### 54.1 Overview
+
+The Cartridge Indicator shows users which AI intelligence packages are active and their status.
+
+### 54.2 Admin Configuration
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| **Show Indicator** | Display cartridge status | `true` |
+| **Show Version** | Display version numbers | `true` |
+| **Show Capabilities** | List enhanced features | `true` |
+| **Allow Details** | Let users expand for details | `true` |
+
+### 54.3 Indicator Customization
+
+Customize the cartridge indicator appearance:
+
+| Element | Options |
+|---------|---------|
+| **Position** | Header, Footer, Sidebar |
+| **Style** | Minimal, Standard, Detailed |
+| **Colors** | Default, Custom brand colors |
+| **Labels** | Default, Custom terminology |
+
+---
+
+## 55. AXIOM Forge Administration
+
+**Location**: Admin Dashboard → Think Tank → AXIOM Forge
+
+### 55.1 Overview
+
+AXIOM (Adaptive eXpert Instruction Optimization Model) is an intelligent prompt optimization system that automatically enhances user prompts through:
+
+- **Domain Classification**: Automatic detection of query domain and expertise level
+- **Clarifying Questions**: CLARION adaptive questioning for context gathering
+- **Pattern Matching**: Retrieval of proven prompt patterns from the pattern database
+- **Model Routing**: Intelligent selection of optimal AI models based on task requirements
+
+### 55.2 Admin Configuration
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| **Enable AXIOM** | Master toggle for AXIOM features | `true` |
+| **Max Questions** | Maximum clarifying questions per session | `5` |
+| **Confidence Threshold** | Minimum confidence to skip questions | `0.85` |
+| **Enable Caching** | Cache question trees for performance | `true` |
+| **Cache TTL** | Cache time-to-live in minutes | `60` |
+| **Enable A/B Testing** | Run optimization experiments | `false` |
+
+### 55.3 CLARION Question Types
+
+| Type | Description | Use Case |
+|------|-------------|----------|
+| **choice** | Single selection from options | Domain selection |
+| **multi_select** | Multiple selections allowed | Feature preferences |
+| **text** | Free-form text input | Specific requirements |
+| **scale** | Numeric scale (1-10) | Priority/importance |
+| **boolean** | Yes/No selection | Binary decisions |
+
+### 55.4 Pattern Management
+
+Patterns can be approved, rejected, or promoted:
+
+| Action | Effect |
+|--------|--------|
+| **Approve** | Pattern becomes available for matching |
+| **Reject** | Pattern is excluded from matching |
+| **Promote** | Pattern gets higher priority in matching |
+
+### 55.5 A/B Testing
+
+Configure experiments to optimize AXIOM behavior:
+
+```typescript
+{
+  name: "Question Order Test",
+  variants: {
+    control: { questionOrder: "priority" },
+    treatment: { questionOrder: "adaptive" }
+  },
+  metrics: ["completion_rate", "user_satisfaction"]
+}
+```
+
+### 55.6 API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/admin/axiom/config` | GET/PUT | Global configuration |
+| `/api/admin/axiom/patterns` | GET | List patterns |
+| `/api/admin/axiom/patterns/:id/approve` | POST | Approve pattern |
+| `/api/admin/axiom/patterns/:id/reject` | POST | Reject pattern |
+| `/api/admin/axiom/questions` | GET/POST | Manage questions |
+| `/api/admin/axiom/ab-tests` | GET/POST | A/B test management |
+| `/api/admin/axiom/metrics` | GET | Dashboard metrics |
+
+### 55.7 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `axiom_sessions` | Active optimization sessions |
+| `axiom_patterns` | Prompt pattern database |
+| `axiom_questions` | CLARION question definitions |
+| `axiom_ab_tests` | A/B test configurations |
+| `axiom_feedback` | User feedback signals |
+
+### 55.8 Implementation Files
+
+| File | Purpose |
+|------|---------|
+| `lambda/shared/services/axiom.service.ts` | Core AXIOM service |
+| `lambda/shared/services/clarion.service.ts` | CLARION questioning |
+| `lambda/admin/axiom-admin.ts` | Admin API handler |
+| `apps/admin-dashboard/app/(dashboard)/axiom/page.tsx` | Admin UI |
+| `apps/thinktank/components/axiom/` | User-facing components |
+
+---
+
+## 56. AXIOM Scorers
+
+**Location**: Admin Dashboard → Think Tank → AXIOM Scorers
+
+The AXIOM Scorers are 8 lightweight MLPs (multi-layer perceptrons) that power AXIOM's prompt optimization. Unlike large language models, these are small scoring functions (~50K-1M parameters each) that rank and score inputs.
+
+### 56.1 The 8 Scorers
+
+| # | Scorer | Input Dim | Output | Purpose |
+|---|--------|-----------|--------|---------|
+| 1 | **Domain Scorer** | 1536 | 800 classes | Classifies queries into 800+ domain taxonomy |
+| 2 | **CLARION Scorer** | 1536 | Score (0-1) | Scores question relevance for adaptive questioning |
+| 3 | **Pattern Scorer** | 3072 | Score (0-1) | Ranks prompt patterns for retrieval |
+| 4 | **Model Scorer** | 1536 | 106 scores | Scores individual AI models for task suitability |
+| 5 | **Topology Scorer** | 512 | 9 modes | Evaluates orchestration strategies |
+| 6 | **Combination Scorer** | 640 | Score (0-1) | Scores multi-model combinations for ensemble tasks |
+| 7 | **Variant Scorer** | 1536 | Score (0-1) | Scores prompt variants for model-specific optimization |
+| 8 | **User Scorer** | 128 | 64 factors | Personalizes scores via Ghost Vector integration |
+
+### 56.2 Scorer Flow
+
+```
+User Query
+    │
+    ▼
+┌─────────────────┐
+│ Domain Scorer   │ → Classify into 800+ domains
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐     ┌─────────────────┐
+│ CLARION Scorer  │ ←── │  User Scorer    │ (personalize question order)
+└────────┬────────┘     └─────────────────┘
+         │ (ask questions)
+         ▼
+┌─────────────────┐
+│ Pattern Scorer  │ → Retrieve best patterns
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ Topology Scorer │ → Choose orchestration mode
+└────────┬────────┘
+         │
+    ┌────┴────┐
+    │         │
+    ▼         ▼
+Single    Multi-model
+Model     ┌─────────────────┐
+    │     │Combination Scorer│ → Pick best model combo
+    │     └────────┬────────┘
+    │              │
+    └──────┬───────┘
+           ▼
+┌─────────────────┐
+│  Model Scorer   │ → Score models
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ Variant Scorer  │ → Optimize prompt for model
+└────────┬────────┘
+         │
+         ▼
+    Execute Request
+```
+
+### 56.3 Thermal State Management
+
+Scorers have thermal states that control inference behavior:
+
+| State | Behavior | Use Case |
+|-------|----------|----------|
+| **Cold** | Uses heuristic fallbacks | Low traffic, cost saving |
+| **Warm** | SageMaker endpoint ready | Normal operations |
+| **Hot** | Multiple endpoint replicas | High traffic |
+
+**Auto-Scaling Rules:**
+- Scorers auto-warm after 10+ requests
+- Scorers auto-cool after 30 minutes idle
+- Hot state triggered at 10+ requests/minute
+
+### 56.4 Admin Configuration
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| **Enable Scorers** | Use scorers vs heuristics | `true` |
+| **Auto Thermal Management** | Automatic warm/cool transitions | `true` |
+| **Cool Down Minutes** | Minutes of idle before cooling | `30` |
+| **Hot Threshold RPM** | Requests/minute to trigger hot | `10` |
+| **Fallback Mode** | Behavior when scorers unavailable | `heuristic` |
+
+### 56.5 Orchestration Modes
+
+The Topology Scorer evaluates these 9 orchestration modes:
+
+| Mode | Description |
+|------|-------------|
+| `thinking` | Standard single-model reasoning |
+| `extended_thinking` | Deep multi-step reasoning |
+| `coding` | Code generation tasks |
+| `creative` | Creative writing |
+| `research` | Research synthesis |
+| `analysis` | Quantitative analysis |
+| `multi_model` | Multiple models for consensus |
+| `chain_of_thought` | Explicit reasoning chain |
+| `self_consistency` | Multiple samples for consistency |
+
+### 56.6 API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/admin/axiom-scorers/status` | GET | All scorer statuses |
+| `/api/admin/axiom-scorers/:id` | GET | Single scorer details |
+| `/api/admin/axiom-scorers/:id/warm` | POST | Warm up a scorer |
+| `/api/admin/axiom-scorers/:id/cool` | POST | Cool down a scorer |
+| `/api/admin/axiom-scorers/metrics` | GET | Inference metrics |
+| `/api/admin/axiom-scorers/training` | GET | Training batch status |
+
+### 56.7 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `axiom_network_status` | Scorer thermal state and metrics |
+| `axiom_network_inference_log` | Inference log for training data |
+| `axiom_network_training_batches` | CATO training batch tracking |
+| `domain_taxonomy_embeddings` | Domain centroids for fallback |
+
+### 56.8 Implementation Files
+
+| File | Purpose |
+|------|---------|
+| `lambda/shared/services/axiom-neural-cortex.service.ts` | Core inference client |
+| `lambda/shared/services/axiom.service.ts` | AXIOM pipeline (uses Model/Topology scorers) |
+| `lambda/shared/services/clarion.service.ts` | CLARION (uses CLARION Scorer) |
+| `packages/shared/src/types/axiom-clarion.types.ts` | Scorer type definitions |
+| `migrations/V2026_02_01_001__axiom_neural_cortex.sql` | Database schema |
+
+### 56.9 Training Integration
+
+Scorers are trained by CATO during nightly "dreaming" cycles:
+
+1. **Data Collection**: Inferences logged with `axiom_network_inference_log`
+2. **Feedback**: User feedback updates `feedback_score` column
+3. **Training**: CATO batches samples nightly
+4. **Deployment**: New model versions deployed to SageMaker
+5. **Validation**: Shadow testing before promotion
+
+**Training Metrics:**
+- Accuracy before/after
+- Validation loss
+- Inference latency change
+
+---
+
+## Section 57: The Crucible - Tenant Configuration (v6.4.0)
+
+### Overview
+
+The Crucible is RADIANT's competitive multi-LLM deliberation system. When multiple LLMs are assigned to a method, they enter The Crucible to question each other and refine their answers. Think Tank Admins can customize Crucible behavior for their tenant.
+
+### 57.1 Configuration Hierarchy
+
+| Level | Who Controls | Scope |
+|-------|--------------|-------|
+| **System** | Radiant Admin | Platform-wide defaults |
+| **Tenant** | Think Tank Admin | Overrides for your tenant |
+| **User** | End Users | Per-method preferences |
+
+**Resolution**: User > Tenant > System. Higher levels take precedence.
+
+### 57.2 Tenant Configuration
+
+**Location**: Think Tank Admin → Crucible
+
+| Setting | Description | System Default |
+|---------|-------------|----------------|
+| **Max Questions Override** | Maximum questions per deliberation | 5 |
+| **Cost Mode Override** | economy/balanced/thorough | balanced |
+| **Cost Mode Limits** | Questions per mode | 3/5/8 |
+| **Circular Penalty** | Score penalty for circular reasoning | 15% |
+| **Allow User Override** | Let users customize per method | true |
+| **Show Deliberation** | Users can see live Q&A | true |
+| **Auto-Enable** | Trigger when multiple LLMs assigned | true |
+
+### 57.3 User Override Controls
+
+When "Allow User Override" is enabled, end users can:
+
+- Set max questions for specific methods
+- Set max questions within specific workflows
+- View live deliberation during execution
+- See circular citation warnings
+
+Users access this through the `CrucibleDeliberationPanel` component during workflow execution.
+
+### 57.4 Deliberation Visibility
+
+When "Show Deliberation to Users" is enabled:
+
+- Users see real-time Q&A between models
+- Circular citation warnings are displayed
+- Question types and quality scores are visible
+- Users can adjust preferences mid-workflow
+
+When disabled:
+- Crucible runs silently in the background
+- Users only see final outputs
+- Config panel shows "Deliberation visibility is disabled"
+
+### 57.5 API Endpoints
+
+**Base**: `/api/thinktank-admin/crucible`
+
+| Method | Endpoint | Purpose |
+|--------|----------|---------|
+| GET | `/config` | Get tenant config with system defaults |
+| PUT | `/config` | Update tenant overrides |
+| DELETE | `/config/:field` | Reset field to system default |
+| GET | `/users` | Users with custom preferences |
+| GET | `/users/:userId/preferences` | User's preferences |
+| GET | `/stats` | Tenant Crucible statistics |
+
+### 57.6 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `crucible_tenant_config` | Tenant-level overrides |
+| `crucible_user_preferences` | User preferences per scope |
+
+### 57.7 Best Practices
+
+1. **Start with system defaults** - Only override when necessary
+2. **Enable user overrides** - Let users tune for their workflow
+3. **Monitor circular citations** - High rates may indicate model issues
+4. **Review learning insights** - Crucible extracts patterns from sessions
 
 ---
 

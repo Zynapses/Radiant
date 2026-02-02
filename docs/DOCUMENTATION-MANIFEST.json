@@ -139,8 +139,8 @@
       },
       {
         "path": "docs/CURATOR-USER-GUIDE.md",
-        "triggers": ["curator", "knowledge_graph", "verification", "golden_rules", "chain_of_custody"],
-        "description": "Curator user guide - teaching AI, verification, overrides"
+        "triggers": ["curator", "knowledge_graph", "verification", "golden_rules", "chain_of_custody", "cartridge", "radz", "import_cartridge", "export_cartridge"],
+        "description": "Curator user guide - teaching AI, verification, overrides, cartridge management"
       },
       {
         "path": "docs/SWIFT-DEPLOYER-USER-GUIDE.md",

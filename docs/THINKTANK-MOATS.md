@@ -456,6 +456,9 @@ Achievement notifications, progress tracking, and engagement features:
 | 18 | Council of Experts | Feature | **No competitor offers multi-persona consultation** |
 | 19 | Debate Arena | Feature | **No competitor offers adversarial exploration UI** |
 | 20 | Living Parchment UI | UX | **No competitor offers sensory decision interfaces** |
+| 21 | Domain Selector | Feature | **800+ domains with auto-detection** |
+| 22 | Cartridge Indicator | Feature | **Visible AI intelligence status** |
+| 23 | Three-Tier Personalization | Technical | **70% user weight for returning users** |
 | — | Persistent Memory | Memory | Contextual gravity compounds |
 | — | Twilight Dreaming | Memory | Appreciating asset |
 | — | Economic Governor | UX | Cost transparency |

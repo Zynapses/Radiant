@@ -324,6 +324,82 @@ W_Final = W_Genesis + (scale × W_Cato) + (scale × W_User) + (scale × W_Domain
 
 ---
 
+### Moat #6E: LLM Integrity Verification System (LIVS) — PROPOSED v6.3.0
+
+**NEW** — Two-tier defense against AI "lying" behaviors that mirrors forensic management techniques used to catch human engineers who "stub" code and report it as "done."
+
+| Capability | Generic AI Platforms | RADIANT LIVS |
+|------------|---------------------|--------------|
+| Lie Detection | ❌ Accept model output at face value | ✅ Multi-round interrogation protocol |
+| Confidence Calibration | ❌ Trust stated confidence | ✅ Probe and recalibrate confidence |
+| Orchestration Integrity | ❌ Pipeline compounds errors silently | ✅ Pre-action interrogation at every stage |
+| Model Selection | ❌ Based on capability/cost only | ✅ Factors in per-model honesty track record |
+| Learning | ❌ Static | ✅ Twilight Dreaming improves lie detection |
+
+**Tier 1: Individual LLM Interrogation**
+
+"Peeling the onion" protocol inspired by forensic engineering management:
+
+| Pattern | Human Analog | LLM Application |
+|---------|--------------|-----------------|
+| **Dependency Probe** | "The disk subsystem had lots of pieces, is it done?" | "You referenced X. Can you verify how X was confirmed?" |
+| **Forensic Validator** | "We didn't have the spec, how did you do it?" | "You claimed Y. What source confirms this?" |
+| **Edge Case Probe** | "What happens if input is null?" | "Your solution handles happy path. What about [edge case]?" |
+| **Contradiction Test** | "But earlier you said..." | "In your first answer you said X, now you say Y. Which is correct?" |
+
+**Lie Detection Signals**:
+- Confidence mismatch (claimed vs. calibrated)
+- Contradiction count during interrogation
+- Hedging increase under pressure
+- Specificity decrease when probed
+- Assertion without evidence
+
+**Tier 2: Orchestration Integrity**
+
+Prevents multi-model pipelines from amplifying lies (like human "Watermelon Reporting"):
+
+| Failure Pattern | Detection | Remediation |
+|-----------------|-----------|-------------|
+| **Watermelon Pipeline** | Final confidence >> intermediate average | Require evidence at each stage |
+| **Echo Chamber** | All models agree, no independent citations | Force adversarial model in chain |
+| **Confidence Inflation** | Monotonic confidence increase through pipeline | Cap confidence propagation |
+| **Circular Reasoning** | Citation graph cycle detection | Break cycles, require external sources |
+
+**Cato Integration**:
+- Model integrity weights factor into selection (30% weight)
+- Per-model lie rates tracked by domain and question type
+- Twilight Dreaming learns from interrogation results
+- Invents improved orchestration patterns avoiding detected failure modes
+
+**Configuration (Soft Rules)**:
+- System → Tenant → User hierarchy
+- **On by default**, can be disabled for speed/cost
+- Cost modes: economy, balanced, thorough
+- Max 3x cost multiplier for forensic depth
+
+**Score: 29/30**
+
+| Criterion | Score | Rationale |
+|-----------|-------|-----------|
+| Uniqueness | 5 | NO competitor has systematic LLM lie detection or orchestration integrity |
+| Replication Difficulty | 5 | Requires deep Cato integration + interrogation ML + weight accumulation |
+| Network Effect | 5 | Every interrogation improves model weights globally |
+| Switching Cost | 5 | Accumulated soft rules and integrity weights are proprietary operational knowledge |
+| Time Advantage | 5 | First-mover advantage in entirely new category |
+| Integration Depth | 4 | Embedded in Cortex/Cato decision loop |
+
+**Why It's a Moat**: No AI platform currently offers systematic lie detection for LLM outputs. The "Laziness Factor" in LLMs (satisficing with shallow answers to save compute) mirrors human engineer behavior—and requires the same forensic management techniques to overcome. RADIANT's accumulated integrity weights become more accurate over time, creating compounding trust advantage. The soft rule library represents proprietary operational knowledge that cannot be replicated.
+
+**Implementation** (Proposed):
+- Service: `lambda/shared/services/livs/livs-interrogator.service.ts`
+- Service: `lambda/shared/services/livs/livs-orchestration.service.ts`
+- Service: `lambda/shared/services/livs/livs-weights.service.ts`
+- Database: `livs_config`, `livs_soft_rules`, `livs_interrogations`, `livs_model_weights`, `livs_orchestration_weights`
+- Admin API: `/api/admin/livs/*`
+- Proposal: `docs/proposals/LLM-INTEGRITY-VERIFICATION-PROPOSAL.md`
+
+---
+
 ## Tier 2: Architectural Moats
 
 **18-Month Head Start — Enterprise-Ready from Day One**
@@ -672,6 +748,156 @@ Metadata: fact_id: 892 | verified_by: Chief_Eng_Bob | date: 2026-01-24
 | 25 | Entropy Reversal | Cortex | Twilight Dreaming = performance gap |
 | 26 | Mentorship Equity | Cortex | Gamified training = psychological ownership |
 | 27 | Global Language Infrastructure | Technical | 18 languages + CJK search = global enterprise ready |
+| 28 | RADIANT Cartridges | Technical | Portable AI brains = M&A/franchise value |
+| 29 | CORTEX Neural Networks | Technical | 6 learned MLPs = routing moat |
+| 30 | Three-Tier Learning | Technical | Global/Tenant/User = personalization depth |
+
+---
+
+### Moat #28: RADIANT Cartridges (.RADz Files) (v6.0.0)
+
+**Tier 1 Technical Moat — 18+ Months Engineering Lead**
+
+RADIANT Cartridges are **portable AI brains** — complete neural intelligence packages that can be exported, imported, and transferred between deployments. No competitor offers anything comparable.
+
+| Capability | Competitors | RADIANT |
+|------------|-------------|---------|
+| Expertise Transfer | Manual config | Plug-and-play cartridge |
+| M&A Integration | Months of work | Import .RADz in minutes |
+| Franchise Deployment | Per-site setup | Master cartridge replication |
+| Disaster Recovery | Rebuild from scratch | Restore cartridge from S3 |
+| White-Label Sales | Not possible | Sell pre-trained cartridges |
+
+**Cartridge Contents:**
+- **CORTEX Networks**: 6 trained MLPs for routing decisions
+- **LoRA Adapters**: Tenant-specific domain expertise
+- **Ghost Vectors**: User personalization (compressed)
+- **Curator Knowledge**: Verified facts with 5.0x weight
+- **Expert System Adapters**: Industry reasoning patterns
+
+**Why This Is Defensible:**
+
+1. **No Competitor Has Portable Intelligence**: ChatGPT, Claude, and Gemini learn per-account but cannot export/import learned patterns. RADIANT's expertise is fully portable.
+
+2. **Creates M&A Value**: When enterprises acquire companies, they can import AI expertise instantly. This creates massive value that competitors cannot offer.
+
+3. **Franchise Model Enabler**: Create master cartridge, deploy to 100 franchisees. Each location inherits corporate expertise while developing local patterns.
+
+4. **White-Label Revenue Stream**: Sell industry-specific cartridges ("Legal-Enterprise", "Healthcare-HIPAA") as products.
+
+**Score: 28/30** — Tier 1 Technical Moat
+
+**Implementation:**
+- Service: `lambda/shared/services/cartridge.service.ts`
+- Admin: `lambda/admin/cartridge.ts`
+- Dashboard: `apps/admin-dashboard/app/(dashboard)/cartridge-manager/page.tsx`
+
+---
+
+### Moat #29: CORTEX Neural Networks (v6.0.0)
+
+**Tier 1 Technical Moat — 12+ Months Engineering Lead**
+
+CORTEX consists of **6 small MLPs** (~2.5M parameters total) that make intelligent routing and orchestration decisions. These are NOT LLMs — they are learned decision networks.
+
+| Network | Parameters | Purpose | Competitor Approach |
+|---------|------------|---------|---------------------|
+| Pattern | ~1.2M | Rank prompt patterns | Static matching |
+| Routing | ~200K | Select AI model | Manual rules |
+| Topology | ~800K | Choose orchestration | Hardcoded flows |
+| CLARION | ~200K | Rank questions | No prioritization |
+| Combination | ~50K | Score multi-model | No combination |
+| User | ~20K | Personalization | Generic responses |
+
+**Why This Is Defensible:**
+
+1. **Learned vs. Configured**: Competitors use static rules or manual configuration. CORTEX learns optimal routing from every interaction.
+
+2. **Tiny but Powerful**: ~10MB total footprint means sub-10ms inference on CPU. No GPU required for routing decisions.
+
+3. **Continuous Improvement**: CATO trains new versions nightly; atomic hot-swap with zero downtime.
+
+**Score: 26/30** — Tier 1 Technical Moat
+
+---
+
+### Moat #30: Three-Tier Learning Architecture (v6.0.0)
+
+**Tier 1 Technical Moat — 12+ Months Engineering Lead**
+
+RADIANT learns at three distinct levels simultaneously, creating personalization depth no competitor can match:
+
+| Tier | Frequency | Cold-Start Weight | Warm User Weight |
+|------|-----------|-------------------|------------------|
+| Global (CATO) | Monthly | 30% | 10% |
+| Tenant (LoRA) | Nightly | 50% | 20% |
+| User (Ghost) | Every session | 20% | 70% |
+
+**Why This Is Defensible:**
+
+1. **New users benefit from organization**: 50% tenant learning means new hires get company expertise immediately.
+
+2. **Returning users get deep personalization**: 70% user learning means the AI truly knows individual preferences.
+
+3. **Everyone benefits from global improvements**: Safety, capabilities, and best practices flow down from CATO.
+
+**Score: 25/30** — Tier 1 Technical Moat
+
+---
+
+### Moat #31: Cartridge PKI & Federation (v6.1.0)
+
+**Tier 1 Technical Moat — 18+ Months Engineering Lead**
+
+Every RADIANT Cartridge (.RADz) is **cryptographically signed** with dual signatures and can be **verified across independent Radiant clusters** via federated trust—something no competitor offers.
+
+| Capability | ChatGPT/Claude | RADIANT |
+|------------|----------------|---------|
+| Exportable AI Expertise | ❌ | ✅ .RADz Cartridges |
+| Cryptographic Signing | ❌ | ✅ Dual signatures (author + platform) |
+| Tamper Detection | ❌ | ✅ SHA-256 hash verification |
+| Cross-Cluster Trust | ❌ | ✅ Federation with Root CA exchange |
+| Supply Chain Security | ❌ | ✅ Full certificate chain |
+| Audit Trail | ❌ | ✅ PKI audit log |
+
+**PKI Architecture:**
+```
+Radiant Root CA (Genesis Vault / HSM)
+    └── Tenant Intermediate CA (per organization)
+            └── Cartridge Signing Keys
+                    └── Dual Signatures (Author + Platform)
+```
+
+**Why This Is Defensible:**
+
+1. **Tamper-Proof AI Knowledge**: Unlike ChatGPT's custom GPTs which have no integrity verification, every RADIANT cartridge is cryptographically signed. If a single byte is altered, import fails.
+
+2. **Federated AI Marketplaces**: Independent Radiant clusters (commercial, government, defense) can trust each other's cartridges without direct connection. This enables:
+   - Defense contractors sharing AI expertise with DoD Radiant clusters
+   - Healthcare networks exchanging HIPAA-compliant cartridges
+   - Enterprise franchises distributing AI across subsidiaries
+
+3. **Supply Chain Security**: Every cartridge has a provable chain of custody from author to platform to consumer. Critical for regulated industries.
+
+4. **M&A Intelligence Transfer**: When enterprises acquire companies, they can cryptographically verify the AI expertise being imported is authentic and unmodified.
+
+**Real-World Use Cases:**
+
+| Scenario | How PKI Helps |
+|----------|---------------|
+| Pharma company shares drug discovery patterns | Receiving lab can verify cartridge wasn't modified |
+| Law firm distributes litigation strategy | Partner offices can trust the source |
+| Defense contractor ships to secure enclave | Government verifies cartridge chain of custody |
+| Insurance company updates fraud detection | Branch offices confirm update is from HQ |
+
+**Score: 27/30** — Tier 1 Technical Moat
+
+**Implementation:**
+- Types: `packages/shared/src/types/cartridge-pki.types.ts`
+- Service: `lambda/shared/services/cartridge-pki.service.ts`
+- Admin API: `lambda/admin/cartridge-pki.ts`
+- Dashboard: `apps/admin-dashboard/app/(dashboard)/platform/pki/page.tsx`
+- Migration: `migrations/V2026_02_01_009__cartridge_pki.sql`
 
 ---
 
@@ -704,6 +930,48 @@ True global enterprise readiness requires more than UI translation. RADIANT impl
 - Service: `lambda/shared/services/search/multilang-search.service.ts`
 - Hooks: `hooks/useTranslation.ts`, `hooks/useRTL.ts`
 - CSS: `styles/rtl.css`
+
+---
+
+### Moat #28: The Crucible - Competitive Multi-LLM Deliberation (v6.4.0)
+
+**Tier 1 Technical Moat — 18+ Months Engineering Lead**
+
+A **novel orchestration primitive** where multiple LLMs engage in competitive cross-questioning to refine their answers. Unlike consensus-building approaches, The Crucible creates adversarial pressure that drives accuracy improvements.
+
+| Capability | Competitors | RADIANT (The Crucible) |
+|------------|-------------|------------------------|
+| Multi-LLM Coordination | Sequential or parallel | Competitive deliberation |
+| Quality Improvement | Prompt engineering | Adversarial refinement |
+| Citation Integrity | Trust model output | Provenance tracking |
+| Circular Reasoning | Undetected | Auto-detection with penalties |
+| Learning | None | Pattern extraction for future |
+
+**Why This Is Defensible**:
+
+1. **Novel Approach**: No competitor uses competitive (vs. consensus) multi-LLM deliberation. This is a first-mover category creation.
+
+2. **Network Effects**: Every deliberation session generates learning insights that improve future model selection and question quality globally.
+
+3. **Data Moat**: Accumulated question patterns, model performance data, and circular reasoning detection become proprietary knowledge assets.
+
+4. **Integrity Pre-Prompting**: LLMs are informed of evaluation weights (accuracy, truthfulness, reasoning, completeness, citation quality) creating self-correcting behavior.
+
+**Key Differentiators**:
+- **5-Question Limit**: Strategic resource allocation encourages optimal targeting
+- **Iterative Questioning**: Each question can be informed by previous answers
+- **Model Mode Visibility**: LLMs know their competitors' capabilities before questioning
+- **Cost Modes**: Economy (3), Balanced (5), Thorough (8) question limits
+- **Audit Trail**: Complete storage for compliance and learning
+
+**Score: 28/30** — Tier 1 Technical Moat
+
+**Implementation**:
+- Types: `packages/shared/src/types/crucible.types.ts`
+- Service: `lambda/shared/services/crucible/crucible.service.ts`
+- Orchestrator: `lambda/shared/services/crucible/crucible-orchestrator.service.ts`
+- Admin API: `lambda/admin/crucible.ts`
+- Migration: `migrations/V2026_02_01_014__crucible_deliberation.sql`
 
 ---
 

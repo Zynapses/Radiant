@@ -16,8 +16,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Send, Sparkles, Zap, Settings, Menu, MoreVertical, 
   Brain, Mic, Paperclip, Code, ChevronDown,
-  Star, Copy, ThumbsUp, ThumbsDown, RotateCcw
+  Star, Copy, ThumbsUp, ThumbsDown, RotateCcw,
 } from 'lucide-react';
+import { DomainSelector, Domain } from './DomainSelector';
+import { CartridgeIndicator } from './CartridgeIndicator';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -50,6 +52,8 @@ interface ModernChatInterfaceProps {
   isTyping?: boolean;
   selectedModel?: string;
   onModelSelect?: () => void;
+  selectedDomain?: Domain | null;
+  onDomainSelect?: (domain: Domain | null) => void;
   className?: string;
 }
 
@@ -61,6 +65,8 @@ export function ModernChatInterface({
   isTyping = false,
   selectedModel,
   onModelSelect,
+  selectedDomain,
+  onDomainSelect,
   className,
 }: ModernChatInterfaceProps) {
   const { t } = useTranslation();
@@ -150,9 +156,22 @@ export function ModernChatInterface({
               )}
             </Badge>
           </motion.div>
+
+          {/* Domain Selector - v6.0.0 */}
+          {advancedMode && onDomainSelect && (
+            <DomainSelector
+              selectedDomain={selectedDomain}
+              onSelectDomain={onDomainSelect}
+              compact
+            />
+          )}
         </div>
 
         <div className="flex items-center gap-1.5">
+          {/* Cartridge Indicator - v6.0.0 */}
+          {advancedMode && (
+            <CartridgeIndicator compact />
+          )}
           <Link href="/settings">
             <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white hover:bg-white/[0.06] h-8 w-8">
               <Settings className="h-4 w-4" />

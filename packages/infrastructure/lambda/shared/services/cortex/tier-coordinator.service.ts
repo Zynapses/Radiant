@@ -80,7 +80,7 @@ class TierCoordinatorService {
 
     try {
       // Query hot tier entries older than threshold
-      const thresholdHours = config.hot.retentionHours || 24;
+      const thresholdHours = (config.hot as unknown as { retentionHours?: number }).retentionHours || 24;
       const hotEntriesResult = await executeStatement(
         `SELECT id, node_type, label, content, embedding, metadata, created_at
          FROM cortex_hot_tier_cache 

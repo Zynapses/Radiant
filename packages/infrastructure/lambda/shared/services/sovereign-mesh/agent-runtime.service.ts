@@ -753,7 +753,7 @@ Respond with factual, concise observations.`,
   ): Promise<{ allowed: boolean; reason?: string }> {
     try {
       // Import and use the Genesis Cato safety pipeline
-      const { CatoSafetyPipeline } = await import('../cato/safety-pipeline.service');
+      const { CatoSafetyPipeline } = await import('../cato/safety-pipeline.service.js');
       const safetyPipeline = new CatoSafetyPipeline();
 
       // Build execution context for safety evaluation
@@ -778,16 +778,17 @@ Respond with factual, concise observations.`,
         const safetyResult = await safetyPipeline.evaluateAction({
           prompt: execution.goal || '',
           proposedPolicy: {
+            id: crypto.randomUUID(),
+            priority: 1,
             action: {
               type: 'agent_action',
-              description: actionStr,
               riskLevel: 'medium',
-            },
+            } as unknown as import('@radiant/shared').ProposedAction,
             requestedGamma: 1.0,
           },
           generatedResponse: actionStr,
           actorModel: execution.agentId,
-          context: executionContext,
+          context: executionContext as unknown as import('@radiant/shared').ExecutionContext,
         });
 
         if (!safetyResult.allowed) {

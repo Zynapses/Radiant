@@ -62,3 +62,8 @@ coverage/
 tmp/
 temp/
 *.tmp
+
+# Large zip archives
+radiant-source-bundle.zip
+radiant-source-code.zip
+radiant-source-docs.zip

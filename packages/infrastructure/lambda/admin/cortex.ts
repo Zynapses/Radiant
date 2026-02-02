@@ -444,7 +444,7 @@ async function rescanMount(tenantId: string, mountId: string): Promise<APIGatewa
       
       logger.info('Mount scan Lambda invoked', { tenantId, mountId, lambda: scanLambda });
     } catch (error) {
-      logger.error('Failed to invoke scan Lambda, marking as failed', { tenantId, mountId, error });
+      logger.error('Failed to invoke scan Lambda, marking as failed', error instanceof Error ? error : undefined, { tenantId, mountId });
       await executeStatement(
         `UPDATE cortex_zero_copy_mounts SET status = 'scan_failed' WHERE tenant_id = $1 AND id = $2`,
         [stringParam('tenantId', tenantId), stringParam('mountId', mountId)]
@@ -501,7 +501,7 @@ async function createErasureRequest(tenantId: string, userId: string, body: any)
     await tierCoordinatorService.processGdprErasure(requestId);
     logger.info('GDPR erasure processing started', { tenantId, requestId });
   } catch (error) {
-    logger.error('Failed to start GDPR erasure processing', { requestId, error });
+    logger.error('Failed to start GDPR erasure processing', error instanceof Error ? error : undefined, { requestId });
     // Update request status to indicate processing failed to start
     await executeStatement(
       `UPDATE cortex_gdpr_erasure_requests SET status = 'processing_failed', error_message = $2 WHERE id = $1`,

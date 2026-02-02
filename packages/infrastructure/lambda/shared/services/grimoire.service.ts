@@ -329,7 +329,7 @@ class GrimoireService {
       switch (spell.school) {
         case 'code': {
           // Code transformation spells - integrate with code generation
-          const { brainRouter } = await import('./brain-router.service');
+          const { brainRouter } = await import('./brain-router.service.js');
           const result = await brainRouter.route({
             tenantId: spell.tenantId,
             userId: spell.createdBy,
@@ -346,7 +346,7 @@ class GrimoireService {
 
         case 'data': {
           // Data analysis spells - integrate with analytics
-          const { brainRouter } = await import('./brain-router.service');
+          const { brainRouter } = await import('./brain-router.service.js');
           const result = await brainRouter.route({
             tenantId: spell.tenantId,
             userId: spell.createdBy,
@@ -363,7 +363,7 @@ class GrimoireService {
 
         case 'text': {
           // Text transformation spells
-          const { brainRouter } = await import('./brain-router.service');
+          const { brainRouter } = await import('./brain-router.service.js');
           const result = await brainRouter.route({
             tenantId: spell.tenantId,
             userId: spell.createdBy,
@@ -417,7 +417,7 @@ class GrimoireService {
 
         default: {
           // Universal spells - general AI processing
-          const { brainRouter } = await import('./brain-router.service');
+          const { brainRouter } = await import('./brain-router.service.js');
           const result = await brainRouter.route({
             tenantId: spell.tenantId,
             userId: spell.createdBy,

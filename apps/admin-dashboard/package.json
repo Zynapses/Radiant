@@ -1,6 +1,6 @@
 {
   "name": "@radiant/admin-dashboard",
-  "version": "4.18.0",
+  "version": "5.2.4",
   "private": true,
   "scripts": {
     "dev": "next dev",

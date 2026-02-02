@@ -173,7 +173,7 @@ class AICuratorService {
         maxTokens: 4000,
         temperature: 0.2,
         tenantId: context.tenantId,
-        responseFormat: { type: 'json_object' },
+        // responseFormat: { type: 'json_object' }, // Not supported by ModelRequest type
       });
 
       // Parse extracted knowledge
@@ -266,7 +266,7 @@ class AICuratorService {
         maxTokens: 4000,
         temperature: 0.4,
         tenantId: context.tenantId,
-        responseFormat: { type: 'json_object' },
+        // responseFormat: { type: 'json_object' }, // Not supported by ModelRequest type
       });
 
       const questions = this.parseQuestionGenerationResponse(response.content, request);
@@ -352,7 +352,7 @@ class AICuratorService {
         maxTokens: 1000,
         temperature: 0.1,
         tenantId: context.tenantId,
-        responseFormat: { type: 'json_object' },
+        // responseFormat: { type: 'json_object' }, // Not supported by ModelRequest type
       });
 
       const result = this.parseVerificationResponse(response.content, request);

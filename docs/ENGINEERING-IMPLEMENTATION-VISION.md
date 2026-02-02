@@ -1,7 +1,7 @@
 # RADIANT Engineering Implementation & Vision
 
-**Version**: 5.53.0  
-**Last Updated**: 2026-01-31  
+**Version**: 6.1.0  
+**Last Updated**: 2026-02-01  
 **Classification**: Internal Engineering Reference
 
 > **POLICY**: All technical architecture, implementation details, and visionary documentation MUST be consolidated in this document. Engineers require comprehensive detail—never abbreviate or summarize to the point of losing implementation specifics. See `/.windsurf/workflows/documentation-consolidation.md` for enforcement.
@@ -34,6 +34,10 @@
 22. [Model Registry & Version Discovery System](#22-model-registry--version-discovery-system-v55257)
 23. [Universal Envelope Protocol v2.0](#23-universal-envelope-protocol-v20-v5530)
 24. [Gemini Workflow Enhancements](#24-gemini-workflow-enhancements-v5530)
+25. [Neural Architecture v6.0.0](#25-neural-architecture-v600)
+26. [AXIOM Prompt Optimization Pipeline](#26-axiom-prompt-optimization-pipeline-v610)
+27. [CLARION Adaptive Questioning System](#27-clarion-adaptive-questioning-system-v610)
+28. [UEP Real-Time Event Streaming](#28-uep-real-time-event-streaming-v610)
 
 ---
 
@@ -7188,3 +7192,1089 @@ export {
   // ... types
 } from './workflow';
 ```
+
+---
+
+## 25. Neural Architecture v6.0.0
+
+### 25.1 Overview
+
+Neural Architecture v6.0.0 introduces **RADIANT Cartridges** — portable AI intelligence packages that encapsulate all learned patterns, adapters, and expertise for transfer between deployments.
+
+### 25.2 AXIOM Scorers (Evolved from CORTEX)
+
+> **Note**: The original CORTEX architecture (6 networks) has been superseded by **AXIOM Scorers** (8 scorers) as of v6.1.0. See [Section 26](#26-axiom-prompt-optimization-pipeline-v610) for comprehensive documentation.
+
+Eight lightweight MLPs (~3.3M parameters total, ~13MB on disk) for intelligent routing and orchestration:
+
+| Scorer | Input | Output | Params | Purpose |
+|--------|-------|--------|--------|---------|
+| **Domain** | 1536 | 800 | ~1M | Classify into 800+ domain taxonomy |
+| **CLARION** | 1536 | 1 | ~400K | Score question relevance |
+| **Pattern** | 3072 | 1 | ~500K | Rank prompt patterns |
+| **Model** | 1536 | 106 | ~200K | Score AI models for task |
+| **Topology** | 512 | 9 | ~800K | Evaluate orchestration modes |
+| **Combination** | 640 | 1 | ~150K | Score multi-model combos |
+| **Variant** | 1536 | 1 | ~200K | Score prompt formatting |
+| **User** | 128 | 64 | ~50K | Personalization via Ghost |
+
+**CRITICAL**: These are NOT LLMs. They make routing/scoring decisions, not generate text.
+
+### 25.3 Training/Inference Separation
+
+```
+TRAINING (Nightly)                    INFERENCE (24/7)
+┌──────────────────┐                 ┌──────────────────┐
+│  PyTorch 2.x     │                 │  ONNX Runtime    │
+│  ml.g5.xlarge    │  ──S3 CRR──>    │  inf2.xlarge     │
+│  Single instance │                 │  Auto-scale 1-100│
+│  ~$50-100/month  │                 │  ~$5-10K/month   │
+└──────────────────┘                 └──────────────────┘
+```
+
+Communication is **S3-only**. No direct network calls between training and inference.
+
+### 25.4 Ghost Vector System v3.2
+
+Two-stage compression for user personalization:
+
+```typescript
+// Compressor: 4096 → 64 dimensions
+Input(4096) → Linear(32) → GELU → Linear(64)
+// Parameters: 133,216
+
+// Expander: 64 → 4096 dimensions (backwards compatibility)
+Input(64) → Linear(256) → GELU → Linear(4096)
+// Parameters: 262,400
+
+// Total: 395,616 parameters (62% smaller than 1M proposal)
+```
+
+### 25.5 Three-Tier Learning Architecture
+
+```typescript
+interface LearningWeights {
+  coldStartUser: {
+    global: 0.30,   // CATO Monthly
+    tenant: 0.50,   // LoRA Nightly
+    user: 0.20      // Ghost Vectors
+  },
+  warmUser: {
+    global: 0.10,
+    tenant: 0.20,
+    user: 0.70      // Personalization dominates
+  }
+}
+```
+
+### 25.6 CATO Twilight Dreaming
+
+Nightly autonomous learning at 2am UTC:
+
+| Phase | Duration | Activities |
+|-------|----------|------------|
+| COLLECT | 30 min | Gather signals, apply sample weights |
+| EVOLVE | 2 hours | Multi-teacher distillation (70%) |
+| INVENT | 1 hour | PromptBreeder evolution (30% ENFORCED) |
+| DEPLOY | 30 min | ONNX export, S3 upload, canary, rollout |
+
+**30% Invention Minimum**: Non-negotiable. Prevents pure distillation.
+
+### 25.7 Cartridge Structure
+
+```
+cartridge.RADz (encrypted ZIP)
+├── manifest.json
+├── axiom/                           # AXIOM Scorers (v6.1.0+)
+│   ├── domain_scorer.onnx
+│   ├── clarion_scorer.onnx
+│   ├── pattern_scorer.onnx
+│   ├── model_scorer.onnx
+│   ├── topology_scorer.onnx
+│   ├── combination_scorer.onnx
+│   ├── variant_scorer.onnx
+│   └── user_scorer.onnx
+├── lora/
+│   └── *.safetensors
+├── esa/
+│   └── *.json
+├── curator/
+│   ├── golden_rules.json
+│   ├── ontology.json
+│   └── safety_matrix.json
+└── ghost/
+    └── compression_model.onnx
+```
+
+### 25.8 Implementation Files
+
+| Component | File |
+|-----------|------|
+| Cartridge Service | `lambda/shared/services/cartridge.service.ts` |
+| CORTEX Service | `lambda/shared/services/cortex-network.service.ts` |
+| Ghost Vector Service | `lambda/shared/services/ghost-vector.service.ts` |
+| Thermal Manager | `lambda/shared/services/thermal-manager.service.ts` |
+| Dreaming Pipeline | `lambda/consciousness/twilight-dreaming.ts` |
+| Neural Ops Admin | `lambda/admin/neural-operations.ts` |
+| Cartridge Admin | `lambda/admin/cartridge.ts` |
+| PKI Service | `lambda/shared/services/cartridge-pki.service.ts` |
+| PKI Admin | `lambda/admin/cartridge-pki.ts` |
+
+### 25.9 Cartridge PKI - Cryptographic Signing & Federation (v6.1.0)
+
+Every RADIANT Cartridge is cryptographically signed with dual signatures and can be verified across independent Radiant clusters via federated trust.
+
+**Certificate Hierarchy**:
+```
+Radiant Root CA (Genesis Vault / HSM)
+    │
+    └── Tenant Intermediate CA (per organization)
+            │
+            └── Cartridge Signing Keys (author + platform)
+                    │
+                    └── Dual Signatures on each .RADz
+```
+
+**Signature Flow**:
+1. **Export (Signing Ceremony)**:
+   - Compute SHA-256 hash of cartridge contents
+   - Sign with tenant's author key → `author_check`
+   - Counter-sign with platform key → `platform_check`
+   - Store `signature.sig` in .RADz container
+   - Generate `meta.json` sidecar for web publishing
+
+2. **Import (Verification)**:
+   - Fetch `signature.sig` from cartridge
+   - Recompute SHA-256 hash
+   - Verify author signature against tenant CA
+   - Verify platform signature against Root CA
+   - Check certificate chain validity
+   - Accept or reject based on verification result
+
+**Federation Architecture**:
+```
+Radiant Cluster A              Radiant Cluster B
+┌─────────────────┐            ┌─────────────────┐
+│ Root CA A       │            │ Root CA B       │
+│ fp: aaa...      │            │ fp: bbb...      │
+└────────┬────────┘            └────────┬────────┘
+         │                              │
+         ▼                              ▼
+┌─────────────────┐            ┌─────────────────┐
+│ trusted_roots:  │◄──────────►│ trusted_roots:  │
+│ - Root CA B     │  Exchange  │ - Root CA A     │
+└─────────────────┘            └─────────────────┘
+```
+
+**Key Algorithms**:
+| Algorithm | Use Case | KMS Support |
+|-----------|----------|-------------|
+| Ed25519 | Primary signing (fast, compact) | Fallback to ECDSA |
+| ECDSA P-256 | Platform signatures | Native KMS |
+| RSA-PSS 4096 | Legacy compatibility | Native KMS |
+
+**Database Tables**:
+- `root_ca_certificates` - Radiant Root CA records
+- `tenant_ca_certificates` - Tenant Intermediate CAs
+- `cartridge_signing_keys` - Active signing keys
+- `cartridge_signatures` - Complete signature records
+- `trusted_root_cas` - Federated trust relationships
+- `pki_audit_log` - Partitioned audit log
+- `signature_verification_cache` - 24-hour TTL cache
+
+**Admin API** (Base: `/api/admin/pki`):
+- Root CA: initialize, export for federation
+- Tenant CAs: generate, list, revoke
+- Signing Keys: list, rotate
+- Federation: add/remove/toggle trusted roots
+- Audit: complete PKI operation history
+
+### 25.10 Cluster Compatibility (v6.1.0)
+
+Cartridges include compatibility metadata to ensure safe cross-cluster imports.
+
+**Compatibility Profile**:
+```typescript
+interface ClusterCompatibility {
+  sourceClusterId: string;           // "us-east-1-prod"
+  sourceClusterName: string;         // "Radiant Commercial US-East"
+  sourceClusterVersion: string;      // "6.1.0"
+  minPlatformVersion: string;        // Minimum required version
+  maxPlatformVersion?: string;       // Optional max version
+  compatibleApps: RadiantApp[];      // Which apps can use this
+  requiredFeatures?: string[];       // Features needed
+  environment: 'production' | 'staging' | 'development';
+  intendedTenantIds?: string[];      // Optional tenant restrictions
+}
+
+type RadiantApp = 
+  | 'radiant_admin' 
+  | 'thinktank_admin' 
+  | 'thinktank' 
+  | 'curator' 
+  | 'service_layer';
+```
+
+**Validation Flow**:
+1. Extract compatibility from signature block
+2. Check version compatibility (min/max)
+3. Check app compatibility
+4. Check feature availability
+5. Check environment (no dev→prod)
+6. Check tenant restrictions
+7. Return detailed result with incompatibilities
+
+**Use Case**: Each Radiant cluster typically serves one system with multiple apps. Compatibility ensures cartridges are only imported into compatible clusters.
+
+---
+
+## 26. AXIOM Prompt Optimization Pipeline (v6.1.0)
+
+### 26.1 Overview
+
+AXIOM (Adaptive eXpert Intelligence Orchestration Matrix) is RADIANT's intelligent prompt optimization pipeline. It transforms raw user queries into highly optimized, model-specific prompts through a sophisticated multi-stage process involving domain detection, adaptive questioning, pattern retrieval, and neural scoring.
+
+**Core Philosophy**: Don't just send the user's query to an AI—understand *what they actually need*, gather missing context, select the optimal model, and craft a prompt specifically optimized for that model's strengths.
+
+### 26.2 Pipeline Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        AXIOM OPTIMIZATION PIPELINE                           │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  User Query                                                                  │
+│      │                                                                       │
+│      ▼                                                                       │
+│  ┌──────────────┐     ┌──────────────┐     ┌──────────────┐                │
+│  │   DOMAIN     │────▶│   CLARION    │────▶│   PATTERN    │                │
+│  │   SCORER     │     │   SCORER     │     │   SCORER     │                │
+│  │ (800 domains)│     │ (questions)  │     │ (templates)  │                │
+│  └──────────────┘     └──────────────┘     └──────────────┘                │
+│         │                    │                    │                         │
+│         └────────────────────┴────────────────────┘                         │
+│                              │                                               │
+│                              ▼                                               │
+│  ┌──────────────┐     ┌──────────────┐     ┌──────────────┐                │
+│  │  TOPOLOGY    │────▶│   MODEL      │────▶│  COMBINATION │                │
+│  │   SCORER     │     │   SCORER     │     │   SCORER     │                │
+│  │ (9 modes)    │     │ (106 models) │     │ (ensembles)  │                │
+│  └──────────────┘     └──────────────┘     └──────────────┘                │
+│         │                    │                    │                         │
+│         └────────────────────┴────────────────────┘                         │
+│                              │                                               │
+│                              ▼                                               │
+│  ┌──────────────┐     ┌──────────────┐     ┌──────────────┐                │
+│  │   VARIANT    │────▶│    USER      │────▶│   COMPILE    │                │
+│  │   SCORER     │     │   SCORER     │     │   & EXECUTE  │                │
+│  │ (prompt fmt) │     │ (Ghost Vec)  │     │              │                │
+│  └──────────────┘     └──────────────┘     └──────────────┘                │
+│                                                    │                         │
+│                                                    ▼                         │
+│                                              Optimized Response              │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 26.3 The 8 AXIOM Scorers
+
+AXIOM uses 8 lightweight MLPs (~50K-1M parameters each) for intelligent scoring. These are NOT large language models—they're small neural networks that make fast routing/ranking decisions.
+
+| # | Scorer | Input Dim | Output Dim | Parameters | Purpose |
+|---|--------|-----------|------------|------------|---------|
+| 1 | **Domain Scorer** | 1536 | 800 | ~1M | Classifies query into 800+ domain taxonomy |
+| 2 | **CLARION Scorer** | 1536 | 1 | ~400K | Scores question relevance for adaptive questioning |
+| 3 | **Pattern Scorer** | 3072 | 1 | ~500K | Ranks prompt patterns from template library |
+| 4 | **Model Scorer** | 1536 | 106 | ~200K | Scores AI models for task suitability |
+| 5 | **Topology Scorer** | 512 | 9 | ~800K | Evaluates orchestration strategies |
+| 6 | **Combination Scorer** | 640 | 1 | ~150K | Scores multi-model combinations for ensemble |
+| 7 | **Variant Scorer** | 1536 | 1 | ~200K | Scores prompt formatting variants per model |
+| 8 | **User Scorer** | 128 | 64 | ~50K | Personalizes via Ghost Vector integration |
+
+**Total**: ~3.3M parameters (~13MB on disk)
+
+#### Scorer Architecture (Common Pattern)
+
+All scorers follow this architecture:
+
+```python
+Input(input_dim)
+    → Linear(hidden_1) → LayerNorm → GELU → Dropout(0.1)
+    → Linear(hidden_2) → LayerNorm → GELU → Dropout(0.1)
+    → [Linear(hidden_3) → LayerNorm → GELU → Dropout(0.1)]  # optional
+    → Linear(output_dim)
+    → [Softmax | Sigmoid | Raw]  # activation depends on scorer
+```
+
+### 26.4 Scorer Details
+
+#### 26.4.1 Domain Scorer
+
+**Purpose**: Classify user queries into a hierarchical 800+ domain taxonomy.
+
+**Input**: 1536-dim query embedding (text-embedding-3-large)
+
+**Output**: 800 softmax probabilities (top-k domains selected)
+
+**Domain Hierarchy** (3 levels):
+```
+Field (18)
+└── Domain (~150)
+    └── Subspecialty (~800)
+
+Example:
+├── Medicine (Field)
+│   ├── Cardiology (Domain)
+│   │   ├── Interventional Cardiology (Subspecialty)
+│   │   ├── Electrophysiology (Subspecialty)
+│   │   └── Heart Failure (Subspecialty)
+│   └── Oncology (Domain)
+│       ├── Medical Oncology
+│       ├── Radiation Oncology
+│       └── Surgical Oncology
+```
+
+**Fallback**: pgvector cosine similarity against `domain_taxonomy_embeddings` centroids.
+
+**Implementation**: `axiom-neural-cortex.service.ts` → `classifyDomain()`
+
+#### 26.4.2 CLARION Scorer
+
+**Purpose**: Score questions by expected information gain for the current session context.
+
+**Input**: 
+- Session context encoding (1408-dim): domain, answered questions, confidence trajectory
+- Question features (128-dim): information gain, priority, skip rate, dependencies
+
+**Output**: Relevance score (0-1) via sigmoid
+
+**Scoring Formula** (fallback heuristic):
+```typescript
+score = (informationGain * 0.4) + (priority * 0.35) + (skipRateInverse * 0.25)
+```
+
+**Integration**: Used by CLARION to rank which question to ask next.
+
+**Implementation**: `axiom-neural-cortex.service.ts` → `scoreClarionQuestions()`
+
+#### 26.4.3 Pattern Scorer
+
+**Purpose**: Rank prompt patterns from the template library for the current query.
+
+**Input**: Concatenated embeddings (3072-dim)
+- Query embedding (1536-dim)
+- Pattern embedding (1536-dim)
+
+**Output**: Relevance score (0-1) via sigmoid
+
+**Fallback**: Cosine similarity between query and pattern embeddings.
+
+**Pattern Library**: 500+ optimized prompt templates categorized by:
+- Domain (medical, legal, technical, creative)
+- Task type (analysis, generation, classification, extraction)
+- Output format (structured, narrative, list, table)
+
+**Implementation**: `axiom-neural-cortex.service.ts` → `scorePatterns()`
+
+#### 26.4.4 Model Scorer
+
+**Purpose**: Score all 106 AI models for task suitability.
+
+**Input**: Task features (1536-dim encoding of query + context + requirements)
+
+**Output**: 106 scores (one per model)
+
+**Model Capability Matrix**:
+```typescript
+interface ModelCapabilities {
+  reasoning: number;      // 0-1: logical reasoning ability
+  creativity: number;     // 0-1: creative generation
+  coding: number;         // 0-1: code generation
+  factualAccuracy: number; // 0-1: factual correctness
+  instructionFollowing: number; // 0-1: follows complex instructions
+  multimodal: number;     // 0-1: handles images/audio
+  speed: number;          // 0-1: inference speed
+}
+```
+
+**Fallback**: Weighted sum of task requirements × model capabilities from `ai_models` table.
+
+**Implementation**: `axiom-neural-cortex.service.ts` → `scoreModels()`
+
+#### 26.4.5 Topology Scorer
+
+**Purpose**: Select the optimal orchestration strategy from 9 modes.
+
+**Input**: Task features (512-dim encoding of complexity, domain, requirements)
+
+**Output**: 9 mode scores (one per orchestration mode)
+
+**9 Orchestration Modes**:
+
+| Mode | Description | When Used |
+|------|-------------|-----------|
+| `thinking` | Standard single-model reasoning | Simple queries |
+| `extended_thinking` | Deep multi-step reasoning | Complex analysis |
+| `coding` | Code generation with execution | Programming tasks |
+| `creative` | Creative writing with iteration | Content creation |
+| `research` | Multi-source research synthesis | Research queries |
+| `analysis` | Quantitative/data analysis | Data-heavy tasks |
+| `multi_model` | Multiple models for consensus | High-stakes decisions |
+| `chain_of_thought` | Explicit reasoning chain | Logical problems |
+| `self_consistency` | Multiple samples for consistency | Uncertain domains |
+
+**Implementation**: `axiom-neural-cortex.service.ts` → `scoreTopologies()`
+
+#### 26.4.6 Combination Scorer
+
+**Purpose**: Score multi-model combinations for ensemble tasks.
+
+**Input**: 
+- Task features (256-dim)
+- Model pair features (384-dim: 192-dim × 2 models)
+
+**Output**: Combination quality score (0-1) + synergy score
+
+**Synergy Calculation**: Models from different providers tend to have higher synergy (diverse perspectives).
+
+**Implementation**: `axiom-neural-cortex.service.ts` → `scoreCombinations()`
+
+#### 26.4.7 Variant Scorer
+
+**Purpose**: Score prompt formatting variants optimized for specific models.
+
+**Input**: Prompt embedding (1536-dim) + target model ID
+
+**Output**: Variant quality score (0-1) per variant
+
+**Variant Types**:
+- **XML format**: Preferred by Claude models
+- **Markdown format**: Preferred by GPT models
+- **Structured JSON**: Preferred by Gemini models
+- **Plain text**: Universal fallback
+
+**Implementation**: `axiom-neural-cortex.service.ts` → `scoreVariants()`
+
+#### 26.4.8 User Scorer
+
+**Purpose**: Personalize all scores based on the user's Ghost Vector.
+
+**Input**: Ghost Vector (128-dim compressed from 4096-dim full vector)
+
+**Output**: 64 personalization adjustment factors
+
+**Application**: Multiplied against base scores to bias toward user preferences.
+
+**Implementation**: `axiom-neural-cortex.service.ts` → `applyUserPersonalization()`
+
+### 26.5 Thermal State Management
+
+Scorers have thermal states that control inference behavior:
+
+| State | Behavior | Cost | Latency |
+|-------|----------|------|---------|
+| **Cold** | Heuristic fallbacks only | $0 | <5ms |
+| **Warm** | SageMaker endpoint ready | ~$0.001/inference | ~20ms |
+| **Hot** | Multiple endpoint replicas | ~$0.0005/inference | ~10ms |
+
+**Auto-Scaling Rules**:
+```typescript
+// Auto-warm after sustained usage
+if (requestsInLastHour > 10 && thermalState === 'cold') {
+  await warmUpScorer(scorerId);
+}
+
+// Auto-cool after idle period
+if (minutesSinceLastRequest > 30 && thermalState !== 'cold') {
+  await coolDownScorer(scorerId);
+}
+
+// Scale to hot under load
+if (requestsPerMinute > 10 && thermalState === 'warm') {
+  await scaleToHot(scorerId);
+}
+```
+
+**Zero-Cost Development**: In development, all scorers run cold (heuristic fallbacks), enabling full pipeline testing without GPU costs.
+
+### 26.6 AXIOM Session Lifecycle
+
+```typescript
+interface AxiomSession {
+  sessionId: string;
+  tenantId: string;
+  userId: string;
+  status: 'initializing' | 'questioning' | 'compiling' | 'executing' | 'complete' | 'error';
+  
+  // Domain detection
+  detectedDomain: {
+    field: string;
+    domain: string;
+    subspecialty: string;
+    confidence: number;
+  };
+  
+  // CLARION state
+  clarionSession: ClarionSession;
+  
+  // Model selection
+  selectedModel: {
+    modelId: string;
+    score: number;
+    reason: string;
+  };
+  
+  // Orchestration
+  topology: {
+    mode: OrchestrationMode;
+    confidence: number;
+  };
+  
+  // Compilation
+  compiledPrompt: {
+    systemPrompt: string;
+    userPrompt: string;
+    parameters: ModelParameters;
+  };
+  
+  // Timing
+  createdAt: string;
+  updatedAt: string;
+  completedAt?: string;
+}
+```
+
+### 26.7 Training Integration (CATO)
+
+Scorers are trained by CATO during nightly "dreaming" cycles:
+
+**Data Collection**:
+1. Every inference logged to `axiom_network_inference_log`
+2. User feedback updates `feedback_score` column
+3. A/B test results provide ground truth labels
+
+**Training Pipeline**:
+```
+4 AM Local Time
+┌──────────────┐    ┌──────────────┐    ┌──────────────┐
+│   COLLECT    │───▶│    TRAIN     │───▶│   DEPLOY     │
+│   Signals    │    │   PyTorch    │    │   ONNX       │
+│   from logs  │    │   on g5.xl   │    │   to inf2    │
+└──────────────┘    └──────────────┘    └──────────────┘
+```
+
+**Training Safeguards**:
+- Minimum 1000 samples before training
+- Validation accuracy must exceed current model
+- Canary deployment with automatic rollback
+- A/B testing against production weights
+
+### 26.8 Implementation Files
+
+| Component | File Path |
+|-----------|-----------|
+| AXIOM Service | `lambda/shared/services/axiom.service.ts` |
+| Scorer Inference | `lambda/shared/services/axiom-neural-cortex.service.ts` |
+| AXIOM Events | `lambda/shared/services/axiom-events.service.ts` |
+| AXIOM Handler | `lambda/axiom-clarion/handler.ts` |
+| Type Definitions | `packages/shared/src/types/axiom-clarion.types.ts` |
+
+### 26.9 Database Tables
+
+```sql
+-- AXIOM Session Tables
+axiom_sessions              -- Active optimization sessions
+axiom_session_history       -- Completed sessions for analytics
+
+-- Scorer Infrastructure
+axiom_network_status        -- Scorer thermal state and metrics
+axiom_network_inference_log -- Inference log for training
+axiom_network_training_batches -- CATO training tracking
+
+-- Domain Taxonomy
+domain_taxonomy             -- 800+ domain hierarchy
+domain_taxonomy_embeddings  -- Centroid embeddings for fallback
+
+-- Pattern Library
+axiom_prompt_patterns       -- 500+ optimized prompt templates
+axiom_pattern_embeddings    -- Pattern embeddings for retrieval
+```
+
+### 26.10 API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/v2/axiom/session` | POST | Start new AXIOM session |
+| `/api/v2/axiom/session/:id` | GET | Get session state |
+| `/api/v2/axiom/session/:id/answer` | POST | Submit CLARION answer |
+| `/api/v2/axiom/session/:id/skip` | POST | Skip CLARION question |
+| `/api/v2/axiom/session/:id/compile` | POST | Compile optimized prompt |
+| `/api/v2/axiom/session/:id/execute` | POST | Execute with selected model |
+| `/api/v2/axiom/stream` | GET | SSE stream for real-time updates |
+
+**Admin Endpoints**:
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/admin/axiom-scorers/status` | GET | All scorer statuses |
+| `/api/admin/axiom-scorers/:id` | GET | Single scorer details |
+| `/api/admin/axiom-scorers/:id/warm` | POST | Warm up a scorer |
+| `/api/admin/axiom-scorers/:id/cool` | POST | Cool down a scorer |
+| `/api/admin/axiom-scorers/metrics` | GET | Inference metrics |
+
+---
+
+## 27. CLARION Adaptive Questioning System (v6.1.0)
+
+### 27.1 Overview
+
+CLARION (Contextual Learning and Adaptive Response Intelligence Optimization Network) is AXIOM's adaptive questioning system. Instead of immediately processing a query, CLARION asks strategically-selected clarifying questions to gather context that dramatically improves response quality.
+
+**Core Insight**: A 30-second Q&A session can provide context that would take an AI 10 paragraphs to infer incorrectly.
+
+### 27.2 Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        CLARION QUESTIONING SYSTEM                            │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  User Query: "Help me write a report"                                        │
+│      │                                                                       │
+│      ▼                                                                       │
+│  ┌────────────────────────────────────────────────────────────────────────┐ │
+│  │                     QUESTION SELECTION ENGINE                           │ │
+│  ├────────────────────────────────────────────────────────────────────────┤ │
+│  │                                                                         │ │
+│  │  ┌─────────────┐   ┌─────────────┐   ┌─────────────┐   ┌────────────┐ │ │
+│  │  │ Information │   │  CLARION    │   │   User      │   │  Branching │ │ │
+│  │  │    Gain     │ + │   Scorer    │ + │   Scorer    │ + │   Logic    │ │ │
+│  │  │  (entropy)  │   │  (neural)   │   │  (Ghost)    │   │  (rules)   │ │ │
+│  │  └─────────────┘   └─────────────┘   └─────────────┘   └────────────┘ │ │
+│  │         │                │                 │                 │         │ │
+│  │         └────────────────┴─────────────────┴─────────────────┘         │ │
+│  │                                  │                                      │ │
+│  │                                  ▼                                      │ │
+│  │                    Combined Score per Question                          │ │
+│  │                                  │                                      │ │
+│  │                                  ▼                                      │ │
+│  │                      Select Top Question                                │ │
+│  └────────────────────────────────────────────────────────────────────────┘ │
+│                                     │                                        │
+│                                     ▼                                        │
+│  ┌────────────────────────────────────────────────────────────────────────┐ │
+│  │  Q1: "What type of report is this?"                                     │ │
+│  │      [ ] Technical   [ ] Business   [ ] Academic   [ ] Creative         │ │
+│  └────────────────────────────────────────────────────────────────────────┘ │
+│                                     │                                        │
+│                                     ▼ (user answers)                         │
+│                                                                              │
+│  ┌────────────────────────────────────────────────────────────────────────┐ │
+│  │  Answer: "Technical"                                                    │ │
+│  │  → Branch: Skip marketing questions                                     │ │
+│  │  → Signal: +0.3 to Claude Opus (technical writing)                      │ │
+│  │  → Context: Add "technical_report" to session                           │ │
+│  └────────────────────────────────────────────────────────────────────────┘ │
+│                                     │                                        │
+│                                     ▼                                        │
+│  ┌────────────────────────────────────────────────────────────────────────┐ │
+│  │  Confidence: 0.45 → 0.62 (+0.17)                                        │ │
+│  │  Questions remaining: 3                                                  │ │
+│  │  Ready to compile: No (confidence < 0.75)                               │ │
+│  └────────────────────────────────────────────────────────────────────────┘ │
+│                                     │                                        │
+│                                     ▼                                        │
+│                           (continue questioning)                             │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 27.3 Question Types
+
+| Type | Input Format | Use Case |
+|------|--------------|----------|
+| **single_choice** | Radio buttons | Mutually exclusive options |
+| **multiple_choice** | Checkboxes | Multiple selections allowed |
+| **scale** | Slider 1-10 | Degree/intensity |
+| **text** | Text input | Open-ended context |
+| **boolean** | Yes/No buttons | Binary decisions |
+| **confirmation** | Confirm/Edit | Verify inferred context |
+
+### 27.4 Question Scoring Algorithm
+
+```typescript
+function scoreQuestion(question: ClarionQuestion, session: ClarionSession): number {
+  // 1. Base information gain (entropy reduction)
+  const informationGain = question.informationGain; // Pre-computed per question
+  
+  // 2. Neural score from CLARION Scorer
+  const neuralScore = await axiomNeuralCortexService.scoreClarionQuestions(
+    buildSessionContext(session),
+    [{ questionId: question.id, features: buildQuestionFeatures(question) }]
+  );
+  
+  // 3. User personalization from Ghost Vector
+  const userScore = await axiomNeuralCortexService.applyUserPersonalization(
+    [neuralScore.scores[0].score],
+    session.ghostVector
+  );
+  
+  // 4. Apply weights
+  const weights = QUESTION_SCORE_WEIGHTS;
+  return (
+    informationGain * weights.informationGain +      // 0.35
+    neuralScore.scores[0].score * weights.neural +   // 0.30
+    userScore.scores[0] * weights.personalization +  // 0.20
+    priorityBonus(question) * weights.priority       // 0.15
+  );
+}
+```
+
+### 27.5 Branching Logic
+
+Questions can trigger branches based on answers:
+
+```typescript
+interface QuestionBranch {
+  condition: string;           // Answer value that triggers branch
+  skipQuestions: string[];     // Question IDs to skip
+  addQuestions: string[];      // Question IDs to add to queue
+  modelSignals: ModelSignal[]; // Adjust model scores
+  contextUpdates: Record<string, unknown>; // Add to working context
+}
+
+// Example: Technical report branch
+{
+  condition: 'technical',
+  skipQuestions: ['marketing_tone', 'creative_style', 'audience_emotion'],
+  addQuestions: ['technical_depth', 'code_examples', 'diagram_needs'],
+  modelSignals: [
+    { modelId: 'claude-3-opus', adjustment: 0.3, reason: 'Technical writing strength' },
+    { modelId: 'gpt-4', adjustment: 0.2, reason: 'Structured output' }
+  ],
+  contextUpdates: {
+    reportType: 'technical',
+    formalityLevel: 'high',
+    includeCodeBlocks: true
+  }
+}
+```
+
+### 27.6 Confidence Tracking
+
+CLARION tracks confidence that enough context has been gathered:
+
+```typescript
+interface ConfidenceState {
+  currentConfidence: number;           // 0-1: current readiness
+  confidenceThreshold: number;         // Target (default 0.75)
+  confidenceTrajectory: number[];      // History for visualization
+  maxQuestions: number;                // Hard limit (default 8)
+  askedQuestions: number;              // Questions asked so far
+}
+
+// Confidence update per answer
+function updateConfidence(session: ClarionSession, question: ClarionQuestion): void {
+  const baseGain = question.informationGain;
+  const answerQuality = assessAnswerQuality(session.lastAnswer);
+  const confidenceGain = baseGain * answerQuality * 0.5;
+  
+  session.currentConfidence = Math.min(1.0, session.currentConfidence + confidenceGain);
+  session.confidenceTrajectory.push(session.currentConfidence);
+}
+```
+
+**Ready to Compile** when:
+- `currentConfidence >= confidenceThreshold` (default 0.75), OR
+- `askedQuestions >= maxQuestions` (default 8), OR
+- User explicitly requests compilation
+
+### 27.7 Working Context
+
+CLARION accumulates a working context that feeds into prompt compilation:
+
+```typescript
+interface ClarionWorkingContext {
+  // Accumulated from answers
+  reportType?: string;
+  audience?: string;
+  formalityLevel?: 'casual' | 'professional' | 'academic';
+  lengthPreference?: 'brief' | 'detailed' | 'comprehensive';
+  outputFormat?: 'prose' | 'bullets' | 'structured';
+  
+  // Inferred from branching
+  skipTopics: string[];
+  emphasizeTopics: string[];
+  
+  // Model signals
+  modelAdjustments: Map<string, number>;
+  
+  // Confidence tracking
+  confidenceTrajectory: number[];
+  
+  // Raw answers for reference
+  rawAnswers: Record<string, unknown>;
+}
+```
+
+### 27.8 Session State Machine
+
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│  CREATED    │────▶│ QUESTIONING │────▶│   READY     │
+│             │     │             │     │  TO_COMPILE │
+└─────────────┘     └─────────────┘     └─────────────┘
+      │                   │                    │
+      │                   ▼                    ▼
+      │            ┌─────────────┐     ┌─────────────┐
+      │            │  SKIPPED    │     │  COMPILED   │
+      │            │  (by user)  │     │             │
+      │            └─────────────┘     └─────────────┘
+      │                                       │
+      └───────────────────────────────────────┼───▶ ┌─────────────┐
+                                              │     │   ERROR     │
+                                              │     └─────────────┘
+                                              ▼
+                                       ┌─────────────┐
+                                       │  COMPLETE   │
+                                       └─────────────┘
+```
+
+### 27.9 Implementation Files
+
+| Component | File Path |
+|-----------|-----------|
+| CLARION Service | `lambda/shared/services/clarion.service.ts` |
+| Question Bank | `lambda/shared/data/clarion-questions.ts` |
+| Branching Logic | `lambda/shared/services/clarion-branching.service.ts` |
+| Type Definitions | `packages/shared/src/types/axiom-clarion.types.ts` |
+
+### 27.10 Database Tables
+
+```sql
+-- Question Management
+clarion_questions           -- Question definitions
+clarion_question_branches   -- Branching rules
+clarion_question_analytics  -- Usage and effectiveness metrics
+
+-- Session Tracking
+clarion_sessions            -- Active sessions
+clarion_session_answers     -- Answer history
+clarion_session_context     -- Working context snapshots
+```
+
+### 27.11 Configuration
+
+| Setting | Type | Default | Description |
+|---------|------|---------|-------------|
+| `confidenceThreshold` | number | 0.75 | Target confidence to stop questioning |
+| `maxQuestions` | number | 8 | Maximum questions before forced compile |
+| `minQuestions` | number | 2 | Minimum questions to ask |
+| `questionTimeout` | number | 60000 | Milliseconds before auto-skip |
+| `enableBranching` | boolean | true | Enable branching logic |
+| `enableNeuralScoring` | boolean | true | Use CLARION Scorer (vs heuristic) |
+
+---
+
+## 28. UEP Real-Time Event Streaming (v6.1.0)
+
+### 28.1 Overview
+
+The Universal Envelope Protocol (UEP) provides real-time event streaming for AXIOM/CLARION sessions via Server-Sent Events (SSE). Clients receive live updates as the optimization pipeline progresses.
+
+### 28.2 UEP Envelope Structure
+
+```typescript
+interface UEPEnvelope<T = unknown> {
+  // Header
+  envelopeId: string;        // UUID for this envelope
+  version: '2.0';            // UEP version
+  timestamp: string;         // ISO 8601 timestamp
+  
+  // Routing
+  source: string;            // 'axiom' | 'clarion' | 'pipeline'
+  destination: string;       // 'client' | 'service' | 'broadcast'
+  
+  // Payload
+  eventType: AxiomEventType;
+  payload: T;
+  
+  // Metadata
+  correlationId: string;     // Links related events
+  sessionId?: string;        // AXIOM session ID
+  tenantId: string;
+  userId: string;
+  
+  // Tracing
+  traceId?: string;          // Distributed tracing
+  spanId?: string;
+}
+```
+
+### 28.3 AXIOM Event Types
+
+| Event Type | Payload | When Emitted |
+|------------|---------|--------------|
+| `connected` | `{ sessionId }` | SSE connection established |
+| `session_started` | `{ session }` | AXIOM session created |
+| `domain_detected` | `{ field, domain, subspecialty, confidence }` | Initial domain classification |
+| `domain_refined` | `{ field, domain, subspecialty, confidence }` | Domain updated after answers |
+| `question_selected` | `{ question, questionNumber, totalExpected }` | Next CLARION question |
+| `answer_received` | `{ questionId, value }` | User answered a question |
+| `model_scores_update` | `{ scores: ModelScore[] }` | Model rankings updated |
+| `confidence_update` | `{ confidence, trajectory }` | Confidence level changed |
+| `clarification_complete` | `{ finalConfidence }` | CLARION questioning done |
+| `compilation_started` | `{ }` | Prompt compilation begun |
+| `compilation_complete` | `{ compiledPrompt }` | Optimized prompt ready |
+| `session_error` | `{ error, code }` | Error occurred |
+| `heartbeat` | `{ timestamp }` | Keep-alive (every 30s) |
+
+### 28.4 SSE Stream Implementation
+
+**Endpoint**: `GET /api/v2/axiom/stream?sessionId=:id`
+
+**Response Headers**:
+```http
+Content-Type: text/event-stream
+Cache-Control: no-cache
+Connection: keep-alive
+X-Accel-Buffering: no
+```
+
+**Event Format**:
+```
+id: <envelopeId>
+event: <eventType>
+data: <JSON payload>
+
+```
+
+**Example Stream**:
+```
+id: evt_abc123
+event: session_started
+data: {"sessionId":"sess_xyz","status":"questioning"}
+
+id: evt_abc124
+event: domain_detected
+data: {"field":"Technology","domain":"Software Engineering","subspecialty":"API Design","confidence":0.87}
+
+id: evt_abc125
+event: question_selected
+data: {"question":{"id":"q_123","text":"What programming language?","type":"single_choice","options":["Python","JavaScript","Go","Rust"]},"questionNumber":1,"totalExpected":5}
+
+id: evt_abc126
+event: heartbeat
+data: {"timestamp":"2026-02-01T13:45:30.000Z"}
+```
+
+### 28.5 Client Integration
+
+**React Hook** (`useAxiomSession.ts`):
+
+```typescript
+function useAxiomSession(initialQuery: string) {
+  const [session, setSession] = useState<AxiomSession | null>(null);
+  const [currentQuestion, setCurrentQuestion] = useState<ClarionQuestion | null>(null);
+  const eventSourceRef = useRef<EventSource | null>(null);
+
+  useEffect(() => {
+    if (!session?.sessionId) return;
+
+    // Connect to SSE stream
+    const eventSource = new EventSource(
+      `/api/v2/axiom/stream?sessionId=${session.sessionId}`
+    );
+    eventSourceRef.current = eventSource;
+
+    // Handle events
+    eventSource.addEventListener('question_selected', (e) => {
+      const data = JSON.parse(e.data);
+      setCurrentQuestion(data.question);
+    });
+
+    eventSource.addEventListener('confidence_update', (e) => {
+      const data = JSON.parse(e.data);
+      setSession(prev => prev ? {
+        ...prev,
+        currentConfidence: data.confidence,
+        confidenceTrajectory: data.trajectory
+      } : null);
+    });
+
+    eventSource.addEventListener('compilation_complete', (e) => {
+      const data = JSON.parse(e.data);
+      setSession(prev => prev ? {
+        ...prev,
+        status: 'compiled',
+        compiledPrompt: data.compiledPrompt
+      } : null);
+    });
+
+    return () => eventSource.close();
+  }, [session?.sessionId]);
+
+  // ... rest of hook
+}
+```
+
+### 28.6 Event History
+
+Events are stored in memory for late-joining clients:
+
+```typescript
+class AxiomEventsService {
+  private eventHistory: Map<string, UEPEnvelope[]> = new Map();
+  private maxHistoryPerSession = 100;
+
+  // Store event
+  emitEvent(sessionId: string, event: UEPEnvelope): void {
+    const history = this.eventHistory.get(sessionId) || [];
+    history.push(event);
+    if (history.length > this.maxHistoryPerSession) {
+      history.shift(); // Remove oldest
+    }
+    this.eventHistory.set(sessionId, history);
+    this.notifySubscribers(sessionId, event);
+  }
+
+  // Get history for late-joining client
+  getEventHistory(sessionId: string, since?: string): UEPEnvelope[] {
+    const history = this.eventHistory.get(sessionId) || [];
+    if (since) {
+      const sinceIndex = history.findIndex(e => e.envelopeId === since);
+      return sinceIndex >= 0 ? history.slice(sinceIndex + 1) : history;
+    }
+    return history;
+  }
+}
+```
+
+### 28.7 Implementation Files
+
+| Component | File Path |
+|-----------|-----------|
+| Events Service | `lambda/shared/services/axiom-events.service.ts` |
+| SSE Handler | `lambda/axiom-clarion/handler.ts` → `/stream` endpoint |
+| React Hook | `apps/thinktank/lib/hooks/useAxiomSession.ts` |
+| Event Types | `apps/thinktank/lib/axiom/types.ts` |
+
+---
+
+## Document History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 6.1.0 | 2026-02-01 | AXIOM Prompt Optimization Pipeline (8 Scorers), CLARION Adaptive Questioning System, UEP Real-Time Event Streaming for AXIOM/CLARION sessions |
+| 6.0.0 | 2026-01-31 | Neural Architecture v6.0.0: CORTEX Networks, Ghost Vector v3.2, Three-Tier Learning, CATO Twilight Dreaming, Cartridge System |
+| 5.53.0 | 2026-01-31 | Universal Envelope Protocol v2.0, Gemini Workflow Enhancements |
+| 5.52.57 | 2026-01-29 | Model Registry & Version Discovery System |
+| 5.52.54 | 2026-01-28 | Cato Pipeline Orchestration System |
+| 5.52.29 | 2026-01-25 | Internationalization & Multi-Language Search |
+| 5.52.28 | 2026-01-25 | Two-Factor Authentication (MFA) |
+| 5.52.26 | 2026-01-25 | OAuth 2.0 Provider & Developer Portal |
+| 5.52.6 | 2026-01-24 | Complete Admin API Architecture |
+| 5.52.5 | 2026-01-24 | Services Layer & Interface-Based Access Control |
+| 5.52.4 | 2026-01-24 | Semantic Blackboard Architecture |
+| 5.52.2 | 2026-01-23 | Apple Glass UI Design System |
+| 5.46.0 | 2026-01-23 | Cortex Memory System v4.20.0 |

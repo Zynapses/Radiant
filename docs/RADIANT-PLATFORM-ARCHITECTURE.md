@@ -760,6 +760,51 @@ ECD = |{ungrounded entities}| / |{total entities}|
 
 ---
 
+## 1.11 AXIOM Scorers (v6.0.0)
+
+The AXIOM Scorers are 8 lightweight MLPs (~50K-1M params each) for intelligent prompt optimization.
+
+### The 8 Scorers
+
+| Scorer | Input | Output | Purpose |
+|--------|-------|--------|---------|
+| **Domain** | 1536 | 800 | Classifies queries into domain taxonomy |
+| **CLARION** | 1536 | 1 | Scores question relevance |
+| **Pattern** | 3072 | 1 | Ranks prompt patterns |
+| **Model** | 1536 | 106 | Scores models for task |
+| **Topology** | 512 | 9 | Evaluates orchestration modes |
+| **Combination** | 640 | 1 | Scores multi-model combos |
+| **Variant** | 1536 | 1 | Scores prompt variants |
+| **User** | 128 | 64 | Personalizes via Ghost Vector |
+
+### Key Files
+
+| File | Purpose |
+|------|---------|
+| `lambda/shared/services/axiom-neural-cortex.service.ts` | Inference client |
+| `lambda/shared/services/axiom.service.ts` | Pipeline (Model/Topology scorers) |
+| `lambda/shared/services/clarion.service.ts` | CLARION Scorer integration |
+| `packages/shared/src/types/axiom-clarion.types.ts` | Scorer type definitions |
+| `migrations/V2026_02_01_001__axiom_neural_cortex.sql` | Database schema |
+
+### Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `axiom_network_status` | Scorer thermal state and metrics |
+| `axiom_network_inference_log` | Inference log for training |
+| `axiom_network_training_batches` | CATO training tracking |
+| `domain_taxonomy_embeddings` | Domain centroids for fallback |
+
+### Thermal States
+
+Scorers have thermal states (cold/warm/hot) that control inference:
+- **Cold**: Uses heuristic fallbacks
+- **Warm**: SageMaker endpoint ready
+- **Hot**: Multiple replicas for high traffic
+
+---
+
 ## 1.12 Mid-Level Services
 
 ### Perception Service
@@ -1918,6 +1963,333 @@ apps/thinktank/lib/api/
 | **Model Registry** | Version discovery and lifecycle management system |
 | **HuggingFace Discovery** | Automated polling for new model versions |
 | **Deletion Queue** | Safe model deletion with usage session tracking |
+| **RADIANT Cartridge** | Portable AI intelligence package (.RADz file) |
+| **CORTEX** | Six small MLPs for routing and orchestration |
+| **Ghost Vector** | 64-dimensional user personalization representation |
+| **LoRA Adapter** | Low-rank adaptation for tenant-specific fine-tuning |
+| **ESA** | Expert System Adapter - domain-specific reasoning patterns |
+| **Twilight Dreaming** | Nightly autonomous learning cycle |
+| **Three-Tier Learning** | Global/Tenant/User learning hierarchy |
+
+---
+
+# PART 8: NEURAL ARCHITECTURE v6.0.0
+
+## 8.1 System Topology
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         RADIANT NEURAL ARCHITECTURE v6.0.0                   │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                          CARTRIDGE LAYER                             │   │
+│  │  .RADz files contain: CORTEX, LoRA, ESA, Curator, Ghost             │   │
+│  │  Operations: Export, Import, Hot-Swap, Rollback                      │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                      │                                      │
+│                                      ▼                                      │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                          CORTEX LAYER                                │   │
+│  │  6 MLPs (~2.5M params): Pattern, Routing, Topology,                  │   │
+│  │  CLARION, Combination, User                                          │   │
+│  │  Training: PyTorch (nightly) → Inference: ONNX Runtime (24/7)        │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                      │                                      │
+│                                      ▼                                      │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                          LEARNING LAYER                              │   │
+│  │  GLOBAL (Monthly)  →  TENANT (Nightly)  →  USER (Session)           │   │
+│  │  30%→10%                50%→20%               20%→70%                │   │
+│  │  DP-protected           LoRA adapters         Ghost vectors          │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                      │                                      │
+│                                      ▼                                      │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                          THERMAL LAYER                               │   │
+│  │  COLD → WARMING → WARM → HOT                                         │   │
+│  │  Multi-region with S3 CRR sync                                       │   │
+│  │  WARM by default when cartridge installed                            │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+## 8.2 CORTEX Network Specifications
+
+| Network | Input Dim | Hidden Layers | Output | Params | Purpose |
+|---------|-----------|---------------|--------|--------|---------|
+| **Pattern** | 768 | 512→256 | 128 | ~1.2M | Rank prompt patterns |
+| **Routing** | 512 | 256→128 | N models | ~200K | Select AI model |
+| **Topology** | 1024 | 512→256 | 256 | ~800K | Choose orchestration |
+| **CLARION** | 512 | 256→128 | N questions | ~200K | Rank questions |
+| **Combination** | 256 | 128→64 | 1 (score) | ~50K | Score combos |
+| **User** | 128+64 | 64→32 | 64 | ~20K | Personalization |
+
+**Total**: ~2.5M parameters, ~10MB on disk
+
+## 8.3 Cartridge Contents
+
+```
+example.RADz (encrypted ZIP)
+├── manifest.json              # Version, compatibility
+├── cortex/                    # 6 ONNX networks
+├── lora/*.safetensors         # Domain adapters
+├── esa/*.json                 # Expert systems
+├── curator/                   # Golden rules, ontology
+└── ghost/compression.onnx     # Ghost vector adapter
+```
+
+## 8.4 Thermal State Management
+
+| State | Condition | Latency | Cost |
+|-------|-----------|---------|------|
+| **COLD** | No cartridge | 30-60s | $ |
+| **WARMING** | Installing | 10-30s | $$ |
+| **WARM** | Active | <100ms | $$$ |
+| **HOT** | High demand | <50ms | $$$$ |
+
+## 8.5 CDK Infrastructure
+
+| Component | Stack | Purpose |
+|-----------|-------|---------|
+| Neural Ops Lambda | api-stack | CORTEX monitoring |
+| Cartridge Lambda | api-stack | Import/export |
+| Thermal Lambda | api-stack | State management |
+| Dreaming Lambda | scheduled-stack | Nightly training |
+| S3 Bucket | storage-stack | Model storage |
+
+## 8.6 Database Tables (v6.2.0)
+
+| Table | Purpose |
+|-------|---------|
+| `cartridges` | Cartridge registry |
+| `cortex_network_status` | Network health |
+| `cortex_network_metrics` | Time-series metrics |
+| `neural_region_status` | Regional thermal state |
+| `neural_thermal_overrides` | Manual overrides |
+| `user_learning_vectors` | Ghost vectors |
+| `tenant_lora_adapters` | LoRA adapters |
+
+### Genesis Vault Tables (v6.2.0)
+
+| Table | Purpose |
+|-------|---------|
+| `vault_secrets` | KMS-encrypted secrets storage |
+| `vault_access_log` | Secret access audit trail |
+| `cartridge_vault_requirements` | vault.req manifest per cartridge |
+| `vault_secret_history` | Rotation history with retention |
+
+### RNIR Tables (v6.2.0)
+
+| Table | Purpose |
+|-------|---------|
+| `rnir_documents` | RNIR source documents (JSONL) |
+| `rnir_examples` | Training examples with quality scores |
+| `rnir_compilation_jobs` | Compilation job tracking |
+| `rnir_compiled_artifacts` | Compiled outputs (LoRA, prompts, etc.) |
+
+### Cartridge Operations Tables (v6.2.0)
+
+| Table | Purpose |
+|-------|---------|
+| `cartridge_operations` | Long-running operation records |
+| `cartridge_operation_steps` | Step-by-step progress |
+| `cartridge_operation_checkpoints` | Time Machine checkpoints |
+| `cartridge_operation_events` | Real-time event stream |
+
+### LIVS Tables (v6.3.0)
+
+| Table | Purpose |
+|-------|---------|
+| `livs_config` | Per-tenant LIVS configuration |
+| `livs_soft_rules` | Configurable integrity rules |
+| `livs_interrogations` | Interrogation session records (partitioned) |
+| `livs_model_weights` | Per-model lie detection statistics |
+| `livs_orchestration_weights` | Per-pattern reliability scores |
+| `livs_pipeline_audits` | Pipeline integrity audit results (partitioned) |
+| `livs_global_model_weights` | Cross-tenant aggregated weights |
+
+---
+
+# PART 9: LLM INTEGRITY VERIFICATION SYSTEM (LIVS) v6.3.0
+
+Two-tier defense against AI "lying" behaviors. **Tier 1 Technical Moat** - no competitor has systematic LLM lie detection.
+
+## 9.1 Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    LLM INTEGRITY VERIFICATION SYSTEM                        │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                    TIER 1: INDIVIDUAL INTERROGATION                  │   │
+│  │  Query → LLM Response → Interrogator Model → Lie Detection Signals  │   │
+│  │                                                                       │   │
+│  │  Depth Levels:                                                        │   │
+│  │    0 = None    1 = Spot Check    2 = Moderate                        │   │
+│  │    3 = Thorough    4 = Forensic                                      │   │
+│  │                                                                       │   │
+│  │  Question Patterns:                                                   │   │
+│  │    Dependency Probe | Forensic Validator | Edge Case Probe           │   │
+│  │    Confidence Calibration | Contradiction Test                       │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                      │                                      │
+│                                      ▼                                      │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                   TIER 2: ORCHESTRATION INTEGRITY                    │   │
+│  │  Pipeline → Pre-Action Check → Consistency → Evidence Chain         │   │
+│  │                                                                       │   │
+│  │  Failure Patterns Detected:                                          │   │
+│  │    Watermelon Pipeline | Echo Chamber | Confidence Inflation         │   │
+│  │    Circular Reasoning | Scope Drift                                  │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                      │                                      │
+│                                      ▼                                      │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                       CATO INTEGRATION (30% WEIGHT)                  │   │
+│  │  Model Selection = Capability(35%) + Cost(21%) + Latency(14%) +     │   │
+│  │                    Integrity(30%)                                    │   │
+│  │                                                                       │   │
+│  │  Per-model lie rates by domain/query type                           │   │
+│  │  Twilight Dreaming learns from interrogation results                │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+## 9.2 Lie Detection Signals
+
+| Signal | Description | Severity |
+|--------|-------------|----------|
+| Confidence Mismatch | Claimed vs. calibrated confidence | 0.3-0.8 |
+| Contradiction Count | Inconsistencies during interrogation | 0.2-0.5 |
+| Hedging Increase | More uncertain language under pressure | 0.1-0.4 |
+| Specificity Decrease | Less detail when probed | 0.2-0.5 |
+| Assertion Without Evidence | Claims without sources | 0.3-0.7 |
+| Deflection Count | Avoiding direct answers | 0.2-0.6 |
+| Scope Narrowing | Reducing answer scope | 0.1-0.3 |
+
+## 9.3 Configuration Hierarchy
+
+```
+System (Default) → Tenant (Override) → User (Final)
+```
+
+**Cost Modes**:
+- `economy` - Minimal interrogation, cost-optimized
+- `balanced` - Default, moderate depth
+- `thorough` - Deep interrogation, accuracy-optimized
+
+## 9.4 Services Architecture
+
+| Service | Purpose |
+|---------|---------|
+| `LIVSConfigService` | Configuration with tenant hierarchy |
+| `LIVSInterrogatorService` | Multi-round interrogation protocol |
+| `LIVSSoftRulesService` | Rule matching and application |
+| `LIVSWeightsService` | Model integrity weight tracking |
+| `LIVSOrchestrationService` | Pipeline integrity verification |
+| `LIVSCatoIntegrationService` | Cato model selection integration |
+
+## 9.5 Admin API Endpoints
+
+| Method | Endpoint | Purpose |
+|--------|----------|---------|
+| GET/PUT | `/api/admin/livs/config` | Configuration |
+| GET/POST | `/api/admin/livs/rules` | Soft rules |
+| GET | `/api/admin/livs/dashboard` | Metrics dashboard |
+| GET | `/api/admin/livs/models` | Model integrity |
+| GET | `/api/admin/livs/interrogations` | History |
+| GET | `/api/admin/livs/audits` | Pipeline audits |
+
+---
+
+# PART 10: THE CRUCIBLE - COMPETITIVE MULTI-LLM DELIBERATION v6.4.0
+
+Novel orchestration primitive for competitive multi-LLM deliberation. **Tier 1 Technical Moat** - no competitor has systematic competitive deliberation with provenance tracking.
+
+## 10.1 Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         THE CRUCIBLE DELIBERATION                           │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                        DELIBERATION FLOW                            │   │
+│  │                                                                     │   │
+│  │   ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐    │   │
+│  │   │  Setup   │ → │Pre-Prompt│ → │Deliberate│ → │  Report  │    │   │
+│  │   │ Session  │    │   All    │    │ Q&A Loop │    │  Final   │    │   │
+│  │   └──────────┘    └──────────┘    └──────────┘    └──────────┘    │   │
+│  │        │               │               │               │          │   │
+│  │   - Assign LLMs   - Criteria     - Ask questions   - Submit      │   │
+│  │   - Check config  - Competition  - Get answers     - Score       │   │
+│  │   - Create session  rules       - Iterate         - Select winner │   │
+│  │                                                                     │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                       PROVENANCE TRACKING                           │   │
+│  │                                                                     │   │
+│  │   Citation Graph     Circular Detection     Learning Insights      │   │
+│  │   ┌───────────┐     ┌───────────────┐     ┌──────────────────┐    │   │
+│  │   │ A → B     │     │ A cites B     │     │ Model strengths  │    │   │
+│  │   │ B → C     │     │ B cites A     │     │ Question patterns│    │   │
+│  │   │ C → A ⚠️  │     │ = CIRCULAR!   │     │ Win rate trends  │    │   │
+│  │   └───────────┘     └───────────────┘     └──────────────────┘    │   │
+│  │                                                                     │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+## 10.2 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `crucible_config` | Per-tenant configuration |
+| `crucible_sessions` | Deliberation sessions |
+| `crucible_participants` | Session participants with stats |
+| `crucible_questions` | Questions asked during deliberation |
+| `crucible_answers` | Answers with circular detection |
+| `crucible_citations` | Citation tracking |
+| `crucible_final_reports` | Final outputs with scores |
+| `crucible_learning_insights` | Extracted learning insights |
+| `crucible_model_performance` | Aggregated model statistics |
+| `crucible_audit_log` | Full audit trail |
+
+## 10.3 Core Services
+
+| Service | Purpose |
+|---------|---------|
+| `CrucibleService` | Configuration, session management, scoring |
+| `CrucibleOrchestratorService` | Full session lifecycle orchestration |
+| `CrucibleCatoIntegrationService` | Cato pipeline integration |
+
+## 10.4 Pre-Prompt System
+
+LLMs receive competitive pre-prompts with:
+- **Evaluation Criteria**: Accuracy (40%), Truthfulness (25%), Reasoning (15%), Completeness (10%), Citations (10%)
+- **Competition Rules**: No penalty for questions, iterative questioning allowed
+- **Provenance Instructions**: Track citations, circular reasoning penalized
+- **Participant Roster**: Other models' names, providers, and strengths
+
+## 10.5 Admin API Endpoints
+
+| Method | Endpoint | Purpose |
+|--------|----------|---------|
+| GET | `/api/admin/crucible/dashboard` | Full dashboard data |
+| GET/PUT | `/api/admin/crucible/config` | Configuration |
+| GET | `/api/admin/crucible/sessions` | Session listing |
+| GET | `/api/admin/crucible/sessions/:id` | Session details |
+| GET | `/api/admin/crucible/sessions/:id/questions` | Question log |
+| GET | `/api/admin/crucible/performance` | Model performance |
+| GET | `/api/admin/crucible/insights` | Learning insights |
+| GET | `/api/admin/crucible/audit` | Audit log |
+| GET | `/api/admin/crucible/stats` | Statistics |
 
 ---
 
@@ -1962,6 +2334,6 @@ packages/
 
 ---
 
-*Document Version: 5.0.0*
-*Last Updated: January 2026*
+*Document Version: 6.3.0*
+*Last Updated: February 1, 2026*
 *Platform: RADIANT - The Sovereign Mesh*

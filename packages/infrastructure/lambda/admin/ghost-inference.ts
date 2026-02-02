@@ -351,7 +351,7 @@ export const validateConfig: APIGatewayProxyHandler = async (event) => {
 // Main Router
 // ============================================================================
 
-export const handler: APIGatewayProxyHandler = async (event, context) => {
+export const handler = async (event: APIGatewayProxyEvent, context: any) => {
   const method = event.httpMethod;
   const path = event.path.replace(/^\/api\/admin\/ghost-inference\/?/, '');
   

@@ -5,7 +5,7 @@
  * Provides CRUD operations for ghost inference configuration and deployment management.
  */
 
-import { executeStatement, stringParam, numberParam, boolParam } from '../db/client';
+import { executeStatement, stringParam, longParam, boolParam, doubleParam } from '../db/client';
 import { enhancedLogger as logger } from '../logging/enhanced-logger';
 import { SageMakerClient, DescribeEndpointCommand, UpdateEndpointCommand } from '@aws-sdk/client-sagemaker';
 import { v4 as uuidv4 } from 'uuid';
@@ -249,7 +249,7 @@ class GhostInferenceConfigService {
 
       // Build dynamic update query
       const setClauses: string[] = [];
-      const params: Array<{ name: string; value: { stringValue?: string; longValue?: number; booleanValue?: boolean; doubleValue?: number } }> = [
+      const params: unknown[] = [
         stringParam('tenantId', tenantId),
       ];
       let paramIndex = 2;
@@ -287,7 +287,7 @@ class GhostInferenceConfigService {
           if (typeof value === 'boolean') {
             params.push(boolParam(key, value));
           } else if (typeof value === 'number') {
-            params.push(numberParam(key, value));
+            params.push(longParam(key, value));
           } else {
             params.push(stringParam(key, value as string));
           }
@@ -356,7 +356,7 @@ class GhostInferenceConfigService {
          WHERE tenant_id = $1 
          ORDER BY started_at DESC 
          LIMIT $2`,
-        [stringParam('tenantId', tenantId), numberParam('limit', limit)]
+        [stringParam('tenantId', tenantId), longParam('limit', limit)]
       );
 
       return result.rows.map((row) => this.transformDeployment(row as Record<string, unknown>));
@@ -424,7 +424,7 @@ class GhostInferenceConfigService {
   ): Promise<void> {
     try {
       const setClauses = ['status = $2'];
-      const params: Array<{ name: string; value: { stringValue?: string; longValue?: number } }> = [
+      const params: unknown[] = [
         stringParam('deploymentId', deploymentId),
         stringParam('status', status),
       ];
@@ -454,7 +454,7 @@ class GhostInferenceConfigService {
       }
       if (details?.startupDurationSeconds !== undefined) {
         setClauses.push(`startup_duration_seconds = $${paramIndex++}`);
-        params.push(numberParam('startupDurationSeconds', details.startupDurationSeconds));
+        params.push(longParam('startupDurationSeconds', details.startupDurationSeconds));
       }
 
       await executeStatement(
@@ -532,21 +532,21 @@ class GhostInferenceConfigService {
           stringParam('deploymentId', deploymentId),
           stringParam('windowStart', metrics.windowStart.toISOString()),
           stringParam('windowEnd', metrics.windowEnd.toISOString()),
-          numberParam('totalRequests', metrics.totalRequests),
-          numberParam('successfulRequests', metrics.successfulRequests),
-          numberParam('failedRequests', metrics.failedRequests),
-          numberParam('avgLatencyMs', metrics.avgLatencyMs || 0),
-          numberParam('p50LatencyMs', metrics.p50LatencyMs || 0),
-          numberParam('p95LatencyMs', metrics.p95LatencyMs || 0),
-          numberParam('p99LatencyMs', metrics.p99LatencyMs || 0),
-          numberParam('maxLatencyMs', metrics.maxLatencyMs || 0),
-          numberParam('tokensProcessed', metrics.tokensProcessed || 0),
-          numberParam('hiddenStatesExtracted', metrics.hiddenStatesExtracted || 0),
-          numberParam('avgGpuUtilization', metrics.avgGpuUtilization || 0),
-          numberParam('avgGpuMemoryUtilization', metrics.avgGpuMemoryUtilization || 0),
-          numberParam('avgCpuUtilization', metrics.avgCpuUtilization || 0),
-          numberParam('activeInstances', metrics.activeInstances || 0),
-          numberParam('costUsd', metrics.costUsd || 0),
+          longParam('totalRequests', metrics.totalRequests),
+          longParam('successfulRequests', metrics.successfulRequests),
+          longParam('failedRequests', metrics.failedRequests),
+          longParam('avgLatencyMs', metrics.avgLatencyMs || 0),
+          longParam('p50LatencyMs', metrics.p50LatencyMs || 0),
+          longParam('p95LatencyMs', metrics.p95LatencyMs || 0),
+          longParam('p99LatencyMs', metrics.p99LatencyMs || 0),
+          longParam('maxLatencyMs', metrics.maxLatencyMs || 0),
+          longParam('tokensProcessed', metrics.tokensProcessed || 0),
+          longParam('hiddenStatesExtracted', metrics.hiddenStatesExtracted || 0),
+          longParam('avgGpuUtilization', metrics.avgGpuUtilization || 0),
+          longParam('avgGpuMemoryUtilization', metrics.avgGpuMemoryUtilization || 0),
+          longParam('avgCpuUtilization', metrics.avgCpuUtilization || 0),
+          longParam('activeInstances', metrics.activeInstances || 0),
+          longParam('costUsd', metrics.costUsd || 0),
         ]
       );
     } catch (error) {

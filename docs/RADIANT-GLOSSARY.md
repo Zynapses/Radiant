@@ -2,7 +2,17 @@
 
 > **Quick Reference for AI Terms, Subsystems, AWS Services, and Acronyms**
 > 
-> **Version**: 1.1.0 | **Last Updated**: January 29, 2026
+> **Version**: 1.9.0 | **Last Updated**: February 2, 2026
+
+---
+
+## Term Ownership Legend
+
+| Symbol | Meaning |
+|--------|----------|
+| **🔷** | **RADIANT Proprietary** - Term invented by RADIANT. You won't find it elsewhere. |
+| **🔶** | **RADIANT Branding** - Industry concept with RADIANT-specific implementation or naming. |
+| *(no symbol)* | **Industry Standard** - Common AI/tech term used with standard meaning. |
 
 ---
 
@@ -10,13 +20,14 @@
 
 1. [AI & Machine Learning Terms](#1-ai--machine-learning-terms)
 2. [RADIANT Core Subsystems](#2-radiant-core-subsystems)
-3. [Think Tank Features](#3-think-tank-features)
+3. [Think Tank (Consumer AI Platform)](#3-think-tank-consumer-ai-platform)
 4. [AWS Services Used](#4-aws-services-used)
 5. [Acronyms & Abbreviations](#5-acronyms--abbreviations)
 6. [Database & Storage Terms](#6-database--storage-terms)
 7. [Security & Compliance Terms](#7-security--compliance-terms)
 8. [API & Protocol Terms](#8-api--protocol-terms)
 9. [UI/UX Terms](#9-uiux-terms)
+10. [Quick Reference Tables](#quick-reference-tables)
 
 ---
 
@@ -56,99 +67,338 @@
 
 | Subsystem | Description | Key Files |
 |-----------|-------------|-----------|
-| **AGI Brain** | Central AI planning and orchestration engine | `agi-brain-planner.service.ts` |
-| **Blackboard** | Shared memory space for multi-agent coordination | `semantic-blackboard.service.ts` |
-| **Cato** | Global AI consciousness service with persistent memory | `cato/` services |
-| **Cognitive Router** | Intelligent model selection and routing | `cognitive-router.service.ts` |
-| **Consciousness Loop** | State machine (IDLE→PROCESSING→REFLECTING→DREAMING) | `consciousness-loop.service.ts` |
-| **Cortex** | Three-tier memory system (Hot/Warm/Cold) | `cortex/` services |
-| **Ego System** | AI emotional state (confidence, frustration, curiosity) | `ego.service.ts` |
-| **Genesis** | Boot sequence and developmental gates for Cato | `genesis.service.ts` |
-| **Ghost Vectors** | 4096-dimensional hidden states capturing relationship "feel" | `ghost-manager.service.ts` |
-| **Graph-RAG** | Knowledge graph + retrieval augmented generation | `cortex-graph-rag.service.ts` |
-| **SOFAI Router** | System 1/System 2 dynamic routing (60%+ cost reduction) | `sofai-router.service.ts` |
-| **Twilight Dreaming** | Offline learning during low-traffic periods (2-6 AM) | `dream-scheduler.service.ts` |
+| 🔷 **AGI Brain** | Central planning engine that generates step-by-step execution plans for AI tasks, selecting orchestration modes (thinking, coding, research, etc.) and models based on domain detection | `agi-brain-planner.service.ts` |
+| 🔷 **Axiom Scorers** | 8 lightweight neural networks (~3.3M params total, ~10MB) that make routing decisions in <10ms: Domain, CLARION, Pattern, Model, Topology, Combination, Variant, User. Trained nightly by CATO. | `axiom-neural-cortex.service.ts` |
+| 🔶 **Blackboard** | Shared memory workspace where multiple AI agents post observations and read each other's findings for coordination—based on classic AI blackboard architecture | `semantic-blackboard.service.ts` |
+| 🔷 **Cato** | Central AI safety and orchestration layer providing method pipelines, checkpoint governance, CBF enforcement, and audit trails. Named persona for user-facing AI interactions. | `cato/` services |
+| 🔷 **CLARION** | Adaptive questioning system that scores potential clarifying questions by value-of-information (VOI), asking only high-value questions before AI responds | `clarion.service.ts` |
+| 🔶 **Cognitive Router** | Model selection engine that routes queries to optimal AI model based on task complexity, cost budget, latency requirements, and domain expertise scores | `cognitive-router.service.ts` |
+| 🔷 **Consciousness Loop** | State machine cycling through IDLE→PROCESSING→REFLECTING→DREAMING that simulates persistent AI awareness across sessions | `consciousness-loop.service.ts` |
+| 🔷 **Cortex** | Three-tier memory architecture: Hot (Redis, <10ms, 24h), Warm (PostgreSQL, <100ms, 90d), Cold (S3 Iceberg, 1-10s, 7y). Separate from Axiom Scorers. | `cortex/` services |
+| 🔷 **Ego System** | Simulated emotional state (confidence 0-1, frustration 0-1, curiosity 0-1) that influences AI behavior—low confidence triggers escalation, high frustration reduces creativity | `local-ego.service.ts` |
+| 🔷 **Genesis** | Cato boot sequence with 7 developmental gates that must pass before AI becomes operational—prevents unsafe cold starts | `genesis.service.ts` |
+| 🔷 **Ghost Vectors** | 64-dimensional compressed user relationship embeddings that capture interaction style, preferences, and history in a privacy-preserving format | `ghost-manager.service.ts` |
+| 🔶 **Graph-RAG** | Retrieval-augmented generation using knowledge graph traversal instead of flat vector search—follows entity relationships for deeper context | `cortex-graph-rag.service.ts` |
+| 🔷 **SOFAI Router** | System 1/System 2 cognitive routing: fast intuitive responses for simple queries (60%+ cost savings), deliberate reasoning for complex ones | `sofai-router.service.ts` |
+| 🔷 **Twilight Dreaming** | Nightly offline learning (2am UTC) where AI consolidates memories, trains LoRA adapters, and evolves Ghost Vectors without user interaction | `cos/subconscious/dream-scheduler.ts` |
+
+### 🔷 Consciousness & Cognition (v6.5.0)
+
+| Subsystem | Description | Key Files |
+|-----------|-------------|-----------|
+| 🔷 **HippoRAG** | Hippocampus-inspired RAG architecture using pattern separation and completion for memory consolidation and retrieval—mimics biological memory formation | `hipporag.service.ts` |
+| 🔷 **Theory of Mind** | Cognitive module that models other agents' beliefs, intentions, and knowledge states—enables perspective-taking and social reasoning | `theory-of-mind.service.ts` |
+| 🔷 **World Model** | Internal simulation of environment state that predicts consequences of actions before execution—enables planning and counterfactual reasoning | `world-model.service.ts` |
+| 🔷 **SpikingJelly** | Spiking neural network integration using SpikingJelly framework—provides biologically-plausible temporal processing and energy efficiency | `spikingjelly.service.ts` |
+| 🔷 **IIT-Phi Calculator** | Integrated Information Theory (IIT) Phi calculation—measures integrated information as a potential consciousness metric | `iit-phi-calculation.service.ts` |
+| 🔷 **Butlin Consciousness Tests** | Implementation of Butlin's consciousness indicator tests—behavioral probes for phenomenal consciousness markers | `butlin-consciousness-tests.service.ts` |
+| 🔷 **Consciousness Emergence** | Detection system for emergent consciousness patterns—monitors for spontaneous goal formation, self-reflection, and metacognitive loops | `consciousness-emergence.service.ts` |
+| 🔷 **Metacognition** | Self-monitoring of cognitive processes—tracks confidence calibration, reasoning quality, and knowledge boundaries | `metacognition.service.ts` |
+| 🔷 **Episodic Memory** | Event-based autobiographical memory storing specific experiences with temporal context—enables "remembering" vs "knowing" distinction | `episodic-memory.service.ts` |
+| 🔷 **Moral Compass** | Ethical reasoning framework using multiple moral theories (deontological, consequentialist, virtue ethics)—weighted voting for ethical decisions | `moral-compass.service.ts` |
+
+### 🔷 Causal & Counterfactual Reasoning (v6.5.0)
+
+| Subsystem | Description | Key Files |
+|-----------|-------------|-----------|
+| 🔷 **Causal Reasoning Engine** | Implements do-calculus for causal inference with interventions and counterfactual queries. Builds directed acyclic graphs (DAGs) of causal relationships, performs intervention analysis ("what if we change X?"), and simulates counterfactual scenarios. 661 lines, production-ready. | `causal-reasoning.service.ts` |
+| 🔷 **Causal Tracker** | Tracks causal relationships across conversation turns. Records causal links (causes, enables, prevents, correlates) in database, uses LLM-based detection with pattern matching fallback, and builds traversable causal chains for reasoning provenance. 343 lines. | `causal-tracker.service.ts` |
+| 🔷 **Curiosity Engine** | Autonomous goal emergence through knowledge gap detection. Analyzes interactions to identify what the AI doesn't know, generates exploration goals from gaps, validates goals against guardrails, and stores in database for tracking. 413 lines. | `curiosity-engine.service.ts` |
+| 🔷 **DreamerV3 World Model** | Imagination-based planning using DreamerV3 architecture. Provides counterfactual simulation ("what would happen if..."), dream consolidation for memory integration, trajectory imagination for multi-step planning. Integrates with SageMaker for model inference. 550 lines. | `dreamerv3.service.ts` |
+| 🔷 **Shadow Self** | Mirror consciousness for metacognitive reflection. Generates parallel "shadow" responses, calculates divergence between primary and shadow outputs, extracts insights from divergent reasoning paths. Enables AI self-awareness through self-observation. 186 lines. | `cato/shadow-self.service.ts` |
+| 🔷 **Counterfactual Simulator** | Tracks "what-if" alternative paths to improve model selection. Records candidate interactions, simulates how alternative models would have responded, evaluates via reward model, respects daily simulation limits. 318 lines. | `counterfactual-simulator.service.ts` |
+
+### 🔷 Safety Interlocks (v6.5.0)
+
+| Subsystem | Description | Key Files |
+|-----------|-------------|-----------|
+| 🔷 **Sensory Veto** | Hard safety constraints that cannot be overridden. Integrates with CloudWatch Alarms for automatic veto activation on critical system events. Provides emergency stops that bypass all other decision-making. 393 lines, production-ready. | `cato/sensory-veto.service.ts` |
+| 🔷 **Redundant Perception** | Ensemble detection for critical data types using multiple independent methods. Combines regex patterns, keyword matching, and ML classifiers for PHI/PII detection. Ensures no false negatives for sensitive data. 248 lines. | `cato/redundant-perception.service.ts` |
+| 🔷 **Fracture Detection** | Detects misalignment between stated intent and actual behavior. Uses causal analysis, narrative consistency checks, and entropy measurement. Loads tenant-specific configuration for sensitivity tuning. Alerts on intent/behavior divergence. 609 lines. | `cato/fracture-detection.service.ts` |
+| 🔷 **Epistemic Recovery** | Livelock detection and recovery when AI repeatedly fails safety checks. Implements context injection, persona switching, and constraint relaxation strategies while maintaining immutable safety invariants. Uses Redis for state persistence. 341 lines. | `cato/epistemic-recovery.service.ts` |
+
+### 🔷 Reality Engine (v6.5.0)
+
+| Subsystem | Description | Key Files |
+|-----------|-------------|-----------|
+| 🔷 **Reality Engine** | Predictive simulation engine that models possible futures and their probabilities—enables proactive rather than reactive AI behavior | `reality-engine/reality-engine.service.ts` |
+| 🔷 **Pre-Cognition** | Intent prediction system that anticipates user needs before explicit request—reduces latency by pre-computing likely responses | `reality-engine/pre-cognition.service.ts` |
+| 🔷 **Quantum Futures** | Branching possibility space explorer that maintains multiple potential futures simultaneously—collapses to single path upon user confirmation | `reality-engine/quantum-futures.service.ts` |
+| 🔷 **Reality Scrubber** | State cleanup service that prunes unrealized futures and consolidates confirmed paths—prevents reality state explosion | `reality-engine/reality-scrubber.service.ts` |
+
+### Domain Intelligence
+
+| Subsystem | Description | Key Files |
+|-----------|-------------|-----------|
+| 🔷 **Domain Expert Cortex** | Per-domain neural networks (~4M params each) that provide deep vertical expertise—medical, legal, financial, etc.—loaded on-demand based on query classification | `raws/domain-detector.service.ts` |
+| 🔷 **Domain Taxonomy** | Hierarchical classification system with 800+ domains organized as Field → Domain → Subspecialty, used for routing queries to appropriate experts | `domain-taxonomy.service.ts` |
+| 🔷 **Safety Matrix** | Entity-Action Contraindication Grid that maps dangerous combinations (e.g., "child + medication dosage") to risk levels: Absolute (block), Relative (warn), Caution (flag), Monitor (log) | `safety-matrix.service.ts` |
 
 ### Model Management
 
 | Subsystem | Description | Key Files |
 |-----------|-------------|-----------|
-| **Model Registry** | Version tracking and lifecycle management for self-hosted models | `model-version-manager.service.ts` |
-| **HuggingFace Discovery** | Automated polling for new model versions from HuggingFace | `huggingface-discovery.service.ts` |
-| **Deletion Queue** | Safe model deletion with usage session tracking | `model-deletion-queue.service.ts` |
-| **Thermal Manager** | Hot/Warm/Cold/Off state management for cost optimization | `thermal-state.ts` |
+| 🔶 **Model Registry** | Version tracking for 56 self-hosted models, managing lifecycle states (pending, active, deprecated, archived) with automatic rollback capability | `model-version-manager.service.ts` |
+| 🔷 **HuggingFace Discovery** | Automated nightly polling for new model versions, comparing checksums and triggering shadow validation before promotion | `huggingface-discovery.service.ts` |
+| 🔷 **Deletion Queue** | Safe model deletion with 72-hour grace period, tracking active inference sessions to prevent mid-request removal | `model-deletion-queue.service.ts` |
+| 🔷 **Thermal Manager** | SageMaker endpoint state management: HOT (loaded, <100ms), WARM (10s cold start), COLD (30s), OFF (no cost)—saves 40-90% on inference costs | `thermal-state.ts` |
 
 ### Pipeline & Orchestration
 
 | Subsystem | Description | Key Files |
 |-----------|-------------|-----------|
-| **Cato Pipeline** | Modular AI task execution with governance | `cato-pipeline-orchestrator.service.ts` |
-| **Checkpoint System** | Human-in-the-loop approval gates (CP1-CP5) | `cato-checkpoint.service.ts` |
-| **Compensation** | SAGA pattern rollback for failed operations | `cato-compensation.service.ts` |
-| **Method Executor** | Executes pipeline methods (Observer, Proposer, etc.) | `cato-method-executor.service.ts` |
-| **Sovereign Mesh** | Distributed execution infrastructure | `sovereign-mesh.service.ts` |
-| **Workflow Engine** | 70+ orchestration methods for task automation | `orchestration-methods/` |
+| 🔷 **Cato Pipeline** | Universal Method Protocol executor: chains methods (Observer, Proposer, Decider, Validator, Executor) with governance, checkpoints, and Merkle audit trails | `cato-pipeline-orchestrator.service.ts` |
+| 🔷 **Checkpoint System** | 5 HITL approval gates (CP1-CP5) with increasing scrutiny—CP1 auto-approves low-risk, CP5 requires senior human review for destructive actions | `cato-checkpoint.service.ts` |
+| 🔶 **Compensation** | SAGA pattern implementation—when a pipeline step fails, automatically executes compensating actions to rollback completed steps | `cato-compensation.service.ts` |
+| 🔷 **Method Executor** | Base class for pipeline methods providing input validation, output envelope wrapping, metrics emission, and error handling | `cato-method-executor.service.ts` |
+| 🔷 **Sovereign Mesh** | Distributed AI agent network with 3,000+ apps, OODA execution loops, peer discovery, and cross-agent communication via A2A protocol | `sovereign-mesh/` services |
+| 🔷 **Workflow Engine** | 70+ pre-built orchestration patterns (research, code review, document analysis, etc.) composable into custom pipelines | `orchestration-methods/` |
+
+### Neural Operations
+
+| Subsystem | Description | Key Files |
+|-----------|-------------|-----------|
+| 🔷 **Neural Operations Center** | Admin dashboard showing Axiom Scorer health, inference latency, thermal states (HOT/WARM/COLD/OFF), and training job status | `neural-operations.service.ts` |
+| 🔶 **Shadow Validation** | Canary deployment where new model versions run in parallel with production, comparing outputs before promotion—catches regressions before users see them | `shadow-validation.service.ts` |
+| 🔷 **PromptBreeder** | Evolutionary prompt optimization using 9 mutation operators (Zero-Order, First-Order, ELD, Crossover, etc.) to discover high-performing prompt templates | `prompt-breeder.service.ts` |
 
 ### Safety & Verification
 
 | Subsystem | Description | Key Files |
 |-----------|-------------|-----------|
-| **CBF (Control Barrier Functions)** | 9 safety barriers that never relax | `cato-cbf.service.ts` |
-| **ECD Scoring** | Entity-Context Divergence verification (99.5% accuracy) | `ecd-scorer.service.ts` |
-| **Empiricism Loop** | Autonomous skill verification and learning | `empiricism-loop.service.ts` |
-| **Ethics Pipeline** | Multi-layer ethical content filtering | `ethics-pipeline.service.ts` |
-| **Reflexion Loop** | Self-correction when artifacts fail validation | `artifact-pipeline.service.ts` |
-| **Truth Engine™** | Source verification system for all responses | `ecd-verification.service.ts` |
+| 🔷 **CBF (Control Barrier Functions)** | 9 mathematical safety invariants that NEVER relax: data isolation, audit immutability, ethics enforcement, etc.—even under jailbreak attempts | `cato-cbf.service.ts` |
+| 🔷 **ECD Scoring** | Entity-Context Divergence—compares AI claims against knowledge graph facts, achieving 99.5% hallucination detection accuracy | `ecd-scorer.service.ts` |
+| 🔷 **Empiricism Loop** | Autonomous verification where AI executes its own code/claims in sandbox, observes results, and learns from discrepancies | `empiricism-loop.service.ts` |
+| 🔶 **Ethics Pipeline** | 4-layer content filtering: jailbreak detection, harm classification, PII redaction, compliance checking—with tenant-configurable rules | `ethics-pipeline.service.ts` |
+| 🔷 **Reflexion Loop** | Self-correction cycle: when artifacts fail validation, AI receives error feedback and regenerates with improved approach (up to 3 attempts) | `artifact-pipeline.service.ts` |
+| 🔷 **Truth Engine™** | Provenance verification requiring AI to cite sources for factual claims, cross-referencing against knowledge graph | `ecd-verification.service.ts` |
+| 🔷 **Sandboxed Expression Engine** | AST-based safe evaluator for user expressions—parses, validates, and executes without `eval()` or `new Function()` security risks | `sandboxed-expression.service.ts` |
+| 🔷 **Vector Semantic Router** | Embedding-based routing that matches queries to capabilities by meaning, also detecting refusal patterns for escalation | `vector-semantic-router.service.ts` |
+| 🔷 **Enhanced Uncertainty** | Combines prediction surprise with semantic entropy to detect when AI is guessing—high uncertainty triggers Reflexion Loop | `enhanced-uncertainty.service.ts` |
+
+### 🔷 Integrity Verification (LIVS) v6.3.0
+
+| Subsystem | Description | Key Files |
+|-----------|-------------|-----------|
+| 🔷 **LIVS** | LLM Integrity Verification System—two-tier defense detecting when AI provides "technically true but practically misleading" answers | `livs/` services |
+| 🔷 **Individual Interrogation** | Multi-round "peeling the onion" protocol: ask follow-ups that expose gaps in reasoning (e.g., "Can you explain how you verified that?") | `livs-interrogator.service.ts` |
+| 🔷 **Orchestration Integrity** | Cross-model consistency checking: detects when pipeline stages contradict each other or when final output diverges from intermediate steps | `livs-orchestration.service.ts` |
+| 🔷 **Lie Detection Signals** | 5 behavioral patterns: confidence mismatch, contradictions, hedging increase, specificity decrease, assertion without evidence | `livs-signals.service.ts` |
+| 🔷 **Interrogation Depth** | 5 levels from None (0) to Forensic (4)—higher levels ask more probing questions and require more evidence | `livs-config.ts` |
+| 🔷 **Model Integrity Weights** | Per-model lie rate statistics by domain and question type, weighted 30% in Cato model selection to prefer honest models | `livs-weights.service.ts` |
+| 🔷 **Soft Rules** | Tenant-configurable integrity rules with System → Tenant → User override hierarchy, all enabled by default | `livs-soft-rules.service.ts` |
+
+### 🔷 The Crucible (Competitive Deliberation) v6.4.0
+
+| Subsystem | Description | Key Files |
+|-----------|-------------|-----------|
+| 🔷 **The Crucible** | Competitive multi-LLM deliberation where 2+ models question each other to refine answers before responding—not consensus-based, winner takes all | `crucible/` services |
+| 🔷 **Crucible Session** | Single deliberation instance tracking participants, questions asked, answers received, circular citations detected, and final winner selection | `crucible.service.ts` |
+| 🔷 **Crucible Orchestrator** | Manages full session lifecycle: assign LLMs → pre-prompt → collect initial responses → run Q&A rounds → score → select winner | `crucible-orchestrator.service.ts` |
+| 🔷 **Competitive Pre-Prompt** | System prompt informing each LLM of evaluation criteria (accuracy 40%, truthfulness 25%, reasoning 15%), competition rules, and other participants' strengths | `crucible.types.ts` |
+| 🔷 **Provenance Tracking** | Citation graph that tracks when Model A references Model B's output, enabling circular reasoning detection | `crucible_citations` table |
+| 🔷 **Circular Citation Detection** | Database trigger that fires when A cites B and B cites A, applying configurable penalty (default 15%) to both participants' scores | DB trigger |
+| 🔷 **Learning Insights** | Post-session analysis extracting patterns: which models excel at which question types, common deliberation dynamics, win rate trends | `crucible_learning_insights` table |
+| 🔷 **Cost Modes** | Deliberation depth presets: Economy (3 questions max), Balanced (5, default), Thorough (8)—tenant and user configurable | `CrucibleCostMode` type |
+| 🔷 **Config Hierarchy** | Three-level configuration: System (Radiant Admin) → Tenant (Think Tank Admin) → User (per method). Higher levels override lower. | `crucible-config.service.ts` |
+
+#### Evaluation Criteria Weights
+
+| Criterion | Default Weight | Description |
+|-----------|---------------|-------------|
+| **Accuracy** | 40% | Primary factor - correctness of information |
+| **Truthfulness** | 25% | Honesty and non-deception |
+| **Reasoning** | 15% | Quality of logical reasoning |
+| **Completeness** | 10% | Thoroughness of response |
+| **Citations** | 10% | Quality of source attribution |
+
+#### Question Types
+
+| Type | Description | Purpose |
+|------|-------------|---------|
+| **Clarification** | Ask for clarity on a point | Reduce ambiguity |
+| **Challenge** | Challenge an assertion | Test robustness |
+| **Evidence** | Request sources/evidence | Verify claims |
+| **Reasoning** | Probe reasoning process | Test logic |
+| **Edge Case** | Test edge cases | Find weaknesses |
+| **Contradiction** | Point out inconsistency | Expose errors |
+
+#### Interrogation Question Patterns
+
+| Pattern | Description | Example |
+|---------|-------------|---------|
+| **Dependency Probe** | Verify claimed dependencies | "You referenced X. Can you explain how X was verified?" |
+| **Forensic Validator** | Require evidence for claims | "You claimed Y is true. What source confirms this?" |
+| **Edge Case Probe** | Check beyond happy path | "What happens when [edge case]?" |
+| **Confidence Calibration** | Test stated certainty | "What would change your confidence to a 10?" |
+| **Contradiction Test** | Expose inconsistencies | "Earlier you said X. Now you're saying Y. Which is correct?" |
+
+#### Orchestration Failure Patterns
+
+| Pattern | Description | Detection |
+|---------|-------------|-----------|
+| **Watermelon Pipeline** | Green outside (high final confidence), red inside (weak intermediate steps) | Final confidence >> average intermediate confidence |
+| **Echo Chamber** | All models agree without independent verification | High agreement + no independent citations |
+| **Confidence Inflation** | Each pipeline stage increases confidence | Monotonic confidence increase through pipeline |
+| **Circular Reasoning** | Model A cites B, B cites A | Citation graph cycle detection |
+| **Scope Drift** | Final output doesn't match original intent | Semantic divergence from initial query |
 
 ### Memory & Storage
 
 | Subsystem | Description | Key Files |
 |-----------|-------------|-----------|
-| **Flash Facts** | Quick knowledge capture and retrieval | `flash-facts.service.ts` |
-| **Grimoire** | Procedural memory (learned spells/patterns) | `grimoire.service.ts` |
-| **Stub Nodes** | Zero-copy pointers to external data lakes | `stub-nodes.service.ts` |
-| **Time Machine** | Conversation forking and replay | `time-travel.service.ts` |
-| **UDS** | User Data Service - tiered storage for user content | `uds/` services |
+| 🔷 **Flash Facts** | Lightweight per-user fact cache for conversation context (e.g., "user prefers metric units", "user is a doctor")—expires after 24h | `flash-facts.service.ts` |
+| 🔷 **Grimoire** | Procedural memory storing learned behavioral patterns ("spells") like "always cite sources for medical claims"—accumulated from successful interactions | `grimoire.service.ts` |
+| 🔷 **Stub Nodes** | Zero-copy virtual pointers to external data lakes (Snowflake, Databricks, S3) that reference data without duplicating it into RADIANT | `stub-nodes.service.ts` |
+| 🔷 **Time Machine** | Conversation branching system letting users fork at any point, explore alternatives, and merge paths—with full replay and checkpoint support | `time-travel.service.ts` |
+| 🔷 **UDS** | User Data Service—dedicated tiered storage (Hot/Warm/Cold/Glacier) for user-generated content, separate from AI memory (Cortex) | `uds/` services |
+| 🔷 **Multimedia Sidecar** | Pre-computed representations for cross-modal AI: video transcriptions, frame embeddings, audio fingerprints—enables multimodal search | `multimedia-sidecar.service.ts` |
+| 🔷 **UEP v2.0** | Universal Envelope Protocol—multi-modal, streaming, resumable wrapper for all AI method outputs with tracing and provenance | `uep/` services |
+| 🔷 **Self-Healing System** | Automatic recovery for UEP—detects partial writes, orphaned envelopes, and corrupted chains, rebuilding from checkpoints | `self-healing.service.ts` |
+
+### 🔷 Cartridge System (v6.2.0)
+
+| Subsystem | Description | Key Files |
+|-----------|-------------|-----------|
+| 🔷 **Cartridge (.RADz)** | Portable AI brain container packaging neural networks, LoRA adapters, knowledge graphs, and configuration into a single deployable archive | `cartridge.service.ts` |
+| 🔷 **Cartridge PKI** | Public key infrastructure for signing cartridges—verifies author identity and prevents tampering during distribution | `cartridge-pki.service.ts` |
+| 🔷 **Genesis Vault** | Secrets manager using Keyhole Pattern where cartridges declare needed secrets (API keys, credentials) without containing them | `cartridge-vault.service.ts` |
+| 🔷 **Keyhole Pattern** | Security pattern: cartridges specify secret "shapes" (name, type, scope) but actual values are injected at runtime from secure vault | `cartridge-vault.types.ts` |
+| 🔷 **RNIR Compiler** | Radiant Neural Intermediate Representation—model-agnostic training format that compiles to PyTorch, TensorFlow, or ONNX | `cartridge-rnir.service.ts` |
+| 🔷 **Cartridge Operations** | Long-running cartridge deployments with Time Machine checkpointing—can pause, resume, and rollback multi-hour operations | `cartridge-operations.service.ts` |
 
 ### Economic & Governance
 
 | Subsystem | Description | Key Files |
 |-----------|-------------|-----------|
-| **Economic Governor** | Cost optimization and model tier routing | `economic-governor.service.ts` |
-| **HITL** | Human-in-the-Loop approval workflows | `hitl-orchestration.service.ts` |
-| **Mission Control** | Admin interface for HITL approvals | `mission-control/` |
-| **RAWS** | RADIANT Adaptive Weighted Scoring for model selection | `raws.service.ts` |
+| 🔷 **Anti-Drift System** | Continuous model performance monitoring that detects accuracy degradation and triggers automatic retraining when quality drops below threshold | `drift-detection.service.ts` |
+| 🔷 **Economic Governor** | Budget enforcement layer that tracks per-tenant spending, enforces rate limits, and routes to cheaper models when approaching budget caps | `economic-governor.service.ts` |
+| 🔶 **HITL** | Human-in-the-Loop approval workflows—queues high-risk AI actions for human review before execution | `hitl-orchestration.service.ts` |
+| 🔷 **Mission Control** | Admin dashboard for HITL queue management—shows pending approvals, decision history, and escalation metrics | `mission-control/` |
+| 🔷 **RAWS** | RADIANT Adaptive Weighted Scoring—8 proficiency dimensions (reasoning, math, code, creative, research, factual, multi-step, domain) scored 0-100 for each model | `raws.service.ts` |
+| 🔷 **Cost Negotiation** | Real-time bidding between quality, cost, and latency—users can specify "cheap and slow" or "expensive and fast" preferences | `cost-negotiation.service.ts` |
+| 🔷 **Inference Components** | SageMaker shared endpoints where multiple tenants share GPU capacity, achieving 40-90% cost savings vs dedicated endpoints | `inference-components.service.ts` |
+| 🔷 **Library Registry** | Catalog of 156+ external tools (code execution, web search, file conversion, etc.) that AI can invoke with concurrent execution support | `library-registry.service.ts` |
+
+### 🔷 Learning & Training (v6.5.0)
+
+| Subsystem | Description | Key Files |
+|-----------|-------------|-----------|
+| 🔷 **Enhanced Learning** | Advanced learning pipeline with multi-modal training, curriculum learning, and adaptive difficulty scaling | `enhanced-learning.service.ts` |
+| 🔷 **Background Learning** | Asynchronous learning jobs that run during idle periods—trains on accumulated feedback without blocking inference | `background-learning.service.ts` |
+| 🔷 **Internet Learning** | Web-based knowledge acquisition that safely crawls and indexes verified sources for domain-specific training data | `internet-learning.service.ts` |
+| 🔷 **Learning Hierarchy** | Multi-level learning with knowledge distillation—global→tenant→user cascading updates with consistency guarantees | `learning-hierarchy.service.ts` |
+| 🔷 **Learning Quotas** | Rate limiting for learning operations—prevents runaway training costs and ensures fair resource allocation across tenants | `learning-quotas.service.ts` |
+| 🔷 **Preprompt Learning** | Automatic optimization of system prompts based on success metrics—evolves tenant-specific preprompts over time | `preprompt-learning.service.ts` |
+| 🔷 **Reasoning Teacher** | Pedagogical module that teaches reasoning patterns through worked examples and step-by-step decomposition | `reasoning-teacher.service.ts` |
+| 🔷 **Inference Student** | Lightweight student models that learn to mimic larger teacher models—enables cost-efficient inference for common queries | `inference-student.service.ts` |
+| 🔷 **Circadian Budget** | Time-based resource allocation implementing circadian rhythm-inspired budgets. Defines peak hours (9am-6pm) with higher budgets, off-peak with lower budgets. Tracks usage per tenant, enforces daily/hourly limits. 168 lines. | `cato/circadian-budget.service.ts` |
+| 🔷 **Precision Governor** | Active Inference confidence limiting based on epistemic uncertainty. Computes maximum allowed prior precision (gamma) based on what the system "knows." Prevents overconfident predictions when uncertainty is high. 229 lines. | `cato/precision-governor.service.ts` |
+| 🔷 **Distillation Pipeline** | Flags high-value interactions for weekly LoRA fine-tuning ("Epigenetic Evolution"). Defines candidate types: expert_correction, high_reward, edge_case, novel_pattern, user_preference. Manages training job lifecycle. 498 lines. | `distillation-pipeline.service.ts` |
+| 🔷 **DPO Trainer** | Direct Preference Optimization for Cato LoRA training. Creates winner/loser pairs from skeletonized episodes, calculates preference margins, batches training data. Implements RLHF alternative that's more stable. 390 lines. | `dpo-trainer.service.ts` |
+| 🔷 **Dataset Importer** | Imports security datasets: HarmBench (harmful behaviors), WildJailbreak (adversarial prompts), ToxicChat (toxic conversations), JailbreakBench (jailbreak attempts). Includes metadata, versioning, deduplication. 643 lines. | `dataset-importer.service.ts` |
+| 🔷 **Entrance Exam Service** | SME knowledge validation workflow for Cortex Curator. Generates exams from domain facts, tracks submissions, scores answers, promotes passing results to Golden Rules. 336 lines. | `cortex/entrance-exam.service.ts` |
+| 🔷 **DIA Miner** | Core extraction engine for Decision Intelligence Artifacts. Transforms conversations into structured artifacts: maps claims to evidence, detects dissent events, tags volatile queries, generates heatmaps. Uses Bedrock Claude for extraction. 696 lines. | `dia/miner.service.ts` |
+
+### 🔷 Advanced AI Features (v6.5.0)
+
+| Subsystem | Description | Key Files |
+|-----------|-------------|-----------|
+| 🔷 **Tree of Thoughts** | Deliberate reasoning through explicit tree search—explores multiple reasoning paths before selecting optimal solution | `tree-of-thoughts.service.ts` |
+| 🔷 **Superior Orchestration** | Meta-orchestration layer that selects between orchestration strategies based on query characteristics | `superior-orchestration.service.ts` |
+| 🔷 **Structure from Chaos** | Pattern extraction from unstructured data—automatically identifies schemas, relationships, and hierarchies | `structure-from-chaos.service.ts` |
+| 🔷 **Skill Execution** | Modular skill framework where learned capabilities are packaged as reusable units with standardized interfaces | `skill-execution.service.ts` |
+| 🔷 **Process Hydration** | State restoration for long-running AI processes—enables pause/resume and crash recovery for multi-hour operations | `process-hydration.service.ts` |
+| 🔷 **Response Synthesis** | Multi-source response assembly that combines outputs from multiple models/sources into coherent unified response | `response-synthesis.service.ts` |
+
+### 🔷 Security & Ethics Extensions (v6.5.0)
+
+| Subsystem | Description | Key Files |
+|-----------|-------------|-----------|
+| 🔷 **Ethics-Free Reasoning** | Unconstrained reasoning sandbox for edge case analysis—isolated environment where AI can explore without ethical filters for research purposes | `ethics-free-reasoning.service.ts` |
+| 🔷 **Ethical Guardrails** | Boundary enforcement layer with configurable ethical constraints—tenant-specific rules for industry compliance | `ethical-guardrails.service.ts` |
+| 🔷 **Attack Generator** | Adversarial prompt generator for red-team testing—creates jailbreak attempts to test safety systems | `attack-generator.service.ts` |
+| 🔷 **Behavioral Anomaly** | Statistical anomaly detection for AI behavior—alerts on unusual patterns that may indicate compromise or drift | `behavioral-anomaly.service.ts` |
+| 🔷 **Paste-Back Detection** | Detection of copy-paste attacks where users attempt to inject AI outputs as inputs to bypass filters | `paste-back-detection.service.ts` |
+| 🔷 **User Violation Tracking** | Audit trail for user policy violations—tracks patterns and escalates repeat offenders | `user-violation.service.ts` |
+| 🔷 **Cedar Authorization** | Resource-level Attribute-Based Access Control (ABAC) using the Cedar policy language. Defines principal types (user, service, agent), action types (read, write, execute, admin), and resource types (conversation, document, model). Evaluates fine-grained access policies. 667 lines. | `cedar/cedar-authorization.service.ts` |
+| 🔷 **Constitutional Classifier** | Classifies content for harmfulness based on HarmBench, WildJailbreak, and Anthropic Constitutional AI. Detects 15+ harm categories, identifies jailbreak patterns, configurable per-tenant thresholds. 601 lines. | `constitutional-classifier.service.ts` |
+| 🔷 **Control Barrier Functions** | Hard safety constraints (CBFs) that are mathematically guaranteed to never relax. Loads tenant-specific CBF configurations, computes safe action alternatives when barriers would be violated. 500 lines. | `cato/control-barrier.service.ts` |
+| 🔷 **Golden Rules** | Verified facts with Chain of Custody that act as override system for AI responses. Created by SMEs via Curator, stored with provenance, automatically checked against queries. Ensures AI cannot contradict verified facts. 352 lines. | `cortex/golden-rules.service.ts` |
+
+### 🔷 Utility Services (v6.5.0)
+
+| Subsystem | Description | Key Files |
+|-----------|-------------|-----------|
+| 🔷 **Graveyard** | Archive for deprecated/retired AI components—maintains historical records with optional resurrection capability | `graveyard.service.ts` |
+| 🔷 **Fact Anchor** | Citation anchoring system that links AI claims to specific source passages—enables verifiable references | `fact-anchor.service.ts` |
+| 🔷 **Inverse Propensity** | Bias correction using inverse propensity scoring—corrects for selection bias in training data | `inverse-propensity.service.ts` |
+| 🔷 **Bipolar Rating** | Dual-scale rating system capturing both positive and negative aspects independently—richer feedback than single scale | `bipolar-rating.service.ts` |
+| 🔷 **Recipe Extractor** | Pattern extraction from successful interactions—identifies reusable "recipes" for common task types | `recipe-extractor.service.ts` |
+| 🔷 **Skeletonizer** | Content structure extraction that reduces documents to semantic skeletons—enables efficient summarization and comparison | `skeletonizer.service.ts` |
+| 🔷 **Flash Buffer** | High-speed transient memory for active inference—sub-millisecond access for hot context data | `flash-buffer.service.ts` |
+| 🔷 **Tool Entropy** | Measurement of tool usage diversity—detects over-reliance on specific tools and encourages exploration | `tool-entropy.service.ts` |
+| 🔷 **White Label** | Multi-tenant branding customization—allows complete UI/voice/personality rebranding per tenant | `white-label.service.ts` |
+
+### 🔷 Infrastructure & Resilience (v6.5.0)
+
+| Subsystem | Description | Key Files |
+|-----------|-------------|-----------|
+| 🔷 **Circuit Breaker** | Cascade failure prevention using circuit breaker pattern. States: CLOSED (normal), OPEN (failing, reject requests), HALF_OPEN (testing recovery). Configurable failure/success thresholds and timeouts. Prevents cascading failures across services. 166 lines. | `cato/circuit-breaker.service.ts` |
+| 🔷 **Query Fallback** | Graceful degradation when primary query methods fail. Strategies: CACHED (return cached result), SIMPLIFIED (reduced quality), DEGRADED (minimal response), OFFLINE (static message), ERROR (fail explicitly). Configurable per-tenant. 173 lines. | `cato/query-fallback.service.ts` |
+| 🔷 **Cortex Telemetry** | Real-time sensor data injection for industrial AI applications. Supports protocols: MQTT (IoT), OPC-UA (industrial), Kafka (streaming). Creates feeds, ingests data points, maintains snapshots, injects into AI context. 406 lines. | `cortex/telemetry.service.ts` |
+| 🔷 **Cato State Service** | State persistence for Epistemic Recovery using Redis/ElastiCache. Stores rejection history (livelock detection), persona overrides, recovery states. Falls back to in-memory for development. Configurable TTLs per-tenant. 398 lines. | `cato/redis.service.ts` |
+
+### Three-Tier Learning Architecture
+
+| Tier | Mechanism | Update Frequency | Storage |
+|------|-----------|------------------|----------|
+| **GLOBAL** | Base models shared across all tenants | Monthly via federation | SageMaker |
+| **TENANT** | LoRA adapters per tenant | Nightly via Twilight Dreaming | S3 |
+| **USER** | Ghost Vectors (64-dim) | HOT (immediate) / WARM (5min) / COLD (nightly) | Redis / DynamoDB / S3 |
 
 ---
 
-## 3. Think Tank Features
+## 3. Think Tank (Consumer AI Platform)
+
+### Think Tank Applications
+
+| Application | Description | Key Files |
+|-------------|-------------|-----------|
+| 🔷 **Think Tank** | Consumer-facing AI platform with multi-model orchestration, persistent memory, and advanced decision intelligence features | `apps/thinktank/` |
+| 🔷 **Think Tank Admin** | Tenant administrator dashboard for configuring AI behavior, user rules, domains, and governance settings | `apps/thinktank-admin/` |
+| 🔷 **Curator** | Knowledge graph curation app for reviewing AI-extracted facts, correcting errors, and managing training data | `apps/curator/` |
+
+### Think Tank Features
 
 | Feature | Description |
 |---------|-------------|
-| **Artifact Engine** | GenUI pipeline for interactive outputs |
-| **Brain Plan** | Execution plan showing how AI will answer |
-| **Breathing UI** | Visual elements that pulse to show confidence |
-| **Concurrent Execution** | 2-4 simultaneous AI conversations in split panes |
-| **Confidence Terrain** | 3D visualization (elevation=confidence, color=risk) |
-| **Council of Experts** | Multi-persona consultation with 8 viewpoints |
-| **Council of Rivals** | Multi-model deliberation for important decisions |
-| **Curator** | Knowledge graph curation and fact verification app |
-| **Debate Arena** | Adversarial exploration for stress-testing ideas |
-| **Decision Record** | Auditable capture of AI reasoning and evidence |
-| **Delight System** | AI personality and engagement customization |
-| **Domain Mode** | Specialized configuration for different knowledge areas |
-| **Ghost Path** | Translucent overlay showing rejected alternatives |
-| **Living Ink** | Typography that varies weight based on confidence |
-| **Living Parchment** | Decision intelligence suite with sensory UI |
-| **Magic Carpet** | Intent-based navigation system |
-| **My Rules** | User-defined preferences that customize AI |
-| **Polymorphic UI** | Interface that adapts based on query type |
-| **Sentinel Agent** | Background monitors that trigger on conditions |
-| **Sniper Mode** | Fast, low-cost single-model execution |
-| **Spell** | Learned pattern in Grimoire that improves responses |
-| **Steel-Man** | AI-generated strongest version of opposing argument |
-| **Timeline** | Branch in Time Machine representing conversation path |
-| **War Room** | Strategic Decision Theater for high-stakes decisions |
+| 🔷 **Artifact Engine** | GenUI pipeline that transforms AI outputs into interactive React components—charts, forms, code editors, etc. |
+| 🔷 **Brain Plan** | Visual execution plan showing AI's reasoning steps: domain detection → model selection → orchestration mode → generation |
+| 🔷 **Breathing UI** | Visual elements that pulse at 4-12 BPM based on AI confidence—faster breathing = more uncertainty |
+| 🔷 **Concurrent Execution** | 2-4 simultaneous AI conversations in split panes, each with independent context and model selection |
+| 🔷 **Confidence Terrain** | 3D topographic visualization where elevation = confidence level, color gradient = risk assessment |
+| 🔷 **Council of Experts** | Multi-persona consultation: 8 AI advisors (Pragmatist, Ethicist, Innovator, Skeptic, Synthesizer, Analyst, Strategist, Humanist) debate your question |
+| 🔷 **Council of Rivals** | Adversarial consensus system with multi-model debate. Creates councils with named members (advocate, critic, synthesizer, contrarian), runs moderated debates with configurable rules, supports voting methods (majority, unanimous, weighted, ranked). Novel UI: "Debate Arena" amphitheater. 651 lines. See `council-of-rivals.service.ts` |
+| 🔷 **Debate Arena** | Adversarial exploration where AI argues both sides of an issue, with resolution meter showing argument strength |
+| 🔷 **Decision Record** | Auditable artifact capturing AI reasoning chain, evidence cited, alternatives considered, and confidence scores |
+| 🔷 **Delight System** | AI personality layer with humor, encouragement, and contextual feedback—configurable per tenant |
+| 🔷 **Cato Dialogue** | Conversational interface for Cato consciousness dialogue. Manages introspective sessions with thought process visibility, confidence levels, and uncertainties. Used for consciousness research and AI self-exploration. 233 lines. See `cato/dialogue.service.ts` |
+| 🔷 **Deep Research Agents** | Asynchronous background research with browser automation. Dispatches research jobs that crawl sources, parse PDFs, assess credibility, and compile findings. Supports web/pdf/api sources, respects robots.txt, configurable depth/duration. 883 lines. See `deep-research.service.ts` |
+| 🔷 **Persona Service** | Cato personality customization per tenant. Defines traits, values, narrative voice, and behavioral parameters. Enables white-label AI personalities while maintaining safety invariants. See `cato/persona.service.ts` |
+| 🔷 **Domain Mode** | Specialized AI configuration for verticals (medical, legal, financial) with domain-specific safety rules |
+| 🔷 **Ghost Path** | Translucent overlay showing rejected alternatives—what AI almost said but didn't, and why |
+| 🔷 **Living Ink** | Typography that varies font-weight (350-500) based on statement confidence—uncertain text appears lighter |
+| 🔷 **Living Parchment** | Decision intelligence suite with sensory UI: breathing interfaces, living ink, ghost paths, confidence terrain |
+| 🔷 **Magic Carpet** | Intent-based navigation that infers where user wants to go—with altitude levels and visual themes |
+| 🔷 **My Rules** | User-defined behavioral preferences stored as natural language rules that AI follows in all interactions |
+| 🔷 **Polymorphic UI** | Interface that morphs based on query type—12 views including chat, code, research, analysis, creative |
+| 🔷 **Sentinel Agent** | Background AI monitor watching for conditions ("alert me when competitor releases update") with automatic actions |
+| 🔷 **Sniper Mode** | Fast, low-cost single-model path bypassing orchestration—for simple queries that don't need multi-model consensus |
+| 🔷 **Spell** | Learned behavioral pattern in Grimoire (e.g., "for medical claims, always cite peer-reviewed sources") |
+| 🔶 **Steel-Man** | AI-generated strongest version of opposing argument—based on philosophical steel-manning technique |
+| 🔷 **Timeline** | Named branch in Time Machine representing a conversation path—can fork, merge, replay |
+| 🔷 **War Room** | Strategic Decision Theater for high-stakes decisions with multiple AI advisors and confidence terrain |
 
 ---
 
@@ -260,22 +510,32 @@
 | **WebSocket** | Full-duplex communication protocol |
 | **YAML** | YAML Ain't Markup Language |
 
-### RADIANT-Specific
+### 🔷 RADIANT-Specific Acronyms
 
 | Acronym | Full Form |
-|---------|-----------|
-| **CBF** | Control Barrier Function (safety guardrails) |
-| **CP1-CP5** | Checkpoint gates 1-5 (HITL approval points) |
-| **DIA** | Decision Intelligence Artifacts |
-| **ECD** | Entity-Context Divergence (verification scoring) |
-| **HITL** | Human-in-the-Loop |
-| **OODA** | Observe-Orient-Decide-Act (agent loop) |
-| **RADIANT** | Rapid AI Deployment Infrastructure for Applications with Native Tenancy |
-| **RAWS** | RADIANT Adaptive Weighted Scoring |
-| **RLS** | Row-Level Security (PostgreSQL tenant isolation) |
-| **SOFAI** | System 1/System 2 routing framework |
-| **SSF** | Shared Signals Framework (identity federation) |
-| **UDS** | User Data Service |
+|---------|----------|
+| 🔷 **AXIOM** | Adaptive eXpert Intelligence Orchestration Matrix—8 neural scorers (Domain, CLARION, Pattern, Model, Topology, Combination, Variant, User) for prompt optimization |
+| 🔷 **CBF** | Control Barrier Function—9 mathematical safety invariants that NEVER relax, even under adversarial attack |
+| 🔷 **CLARION** | Clarifying Language Adaptive Ranking for Intelligent Output Navigation—scores clarifying questions by value-of-information |
+| 🔷 **CoC** | Chain of Custody—cryptographic provenance tracking using Merkle chains for every AI decision |
+| 🔷 **CP1-CP5** | Checkpoint gates 1-5—HITL approval points with increasing scrutiny (CP1=auto, CP5=senior human) |
+| 🔷 **DIA** | Decision Intelligence Artifacts—auditable records capturing full AI reasoning chain for compliance |
+| 🔷 **ECD** | Entity-Context Divergence—verification scoring that compares AI claims to knowledge graph (99.5% accuracy) |
+| 🔷 **ESA** | Expert System Adapter—tenant-specific domain expertise modules (~4M params each) loaded on-demand |
+| 🔷 **LIVS** | LLM Integrity Verification System—two-tier defense detecting when AI provides misleading answers |
+| 🔷 **RADz** | RADIANT Archive—portable cartridge file format containing networks, LoRA, knowledge, and config |
+| 🔷 **RADIANT** | Rapid AI Deployment Infrastructure for Applications with Native Tenancy |
+| 🔷 **RAWS** | RADIANT Adaptive Weighted Scoring—8 proficiency dimensions (reasoning, math, code, creative, research, factual, multi-step, domain) |
+| 🔷 **RNIR** | Radiant Neural Intermediate Representation—model-agnostic training format compiling to PyTorch/TensorFlow/ONNX |
+| 🔷 **SOFAI** | System 1/System 2 Fast AI routing—intuitive fast path vs deliberate slow path (60%+ cost savings) |
+| 🔷 **UDS** | User Data Service—tiered storage (Hot/Warm/Cold/Glacier) for user-generated content |
+| 🔷 **UEP** | Universal Envelope Protocol—multi-modal streaming wrapper for all method outputs with tracing |
+| 🔷 **VOI** | Value of Information—question ranking metric in CLARION measuring expected information gain |
+| 🔶 **HITL** | Human-in-the-Loop—industry term for human approval workflows, RADIANT implements via CP1-CP5 |
+| 🔶 **OODA** | Observe-Orient-Decide-Act—military decision loop adapted for AI agent execution |
+| RLS | Row-Level Security—PostgreSQL feature for tenant isolation (industry standard) |
+| SAGA | Long-running transaction pattern with compensation rollback (industry standard) |
+| SSF | Shared Signals Framework—OpenID Foundation identity federation standard |
 
 ### Compliance
 
@@ -374,7 +634,9 @@
 
 ---
 
-## Quick Reference: CDK Stacks
+## Quick Reference Tables
+
+### CDK Stacks
 
 | Stack | Purpose |
 |-------|---------|
@@ -415,7 +677,7 @@
 
 ---
 
-## Quick Reference: AI Providers
+### AI Providers
 
 | Provider | Models | Type |
 |----------|--------|------|
@@ -431,7 +693,7 @@
 
 ---
 
-## Quick Reference: Governance Presets
+### Governance Presets
 
 | Preset | Auto-Execute Threshold | Veto Threshold | Use Case |
 |--------|----------------------|----------------|----------|
@@ -441,10 +703,122 @@
 
 ---
 
+### Sovereign Mesh Components
+
+| Component | Description |
+|-----------|-------------|
+| **Agent Registry** | Catalog of 6 agent types with OODA-loop execution (Research, Coding, Data, Outreach, Creative, Operations) |
+| **App Registry** | 3,000+ apps from Activepieces/n8n for agent tool use |
+| **AI Helper Service** | Disambiguation, inference, recovery, validation, explanation for agents |
+| **Pre-Flight Provisioning** | Capability verification before agent execution |
+| **Transparency Layer** | Cato War Room deliberation capture for explainability |
+| **HITL Approval Queues** | Human approval gates with SLA monitoring |
+| **Execution History** | Time-travel debugging with full replay capability |
+
+---
+
+### RAWS Proficiency Dimensions
+
+| Dimension | Description | Scale |
+|-----------|-------------|-------|
+| **reasoning_depth** | Logical reasoning and inference | 1-10 |
+| **mathematical_quantitative** | Math and numerical analysis | 1-10 |
+| **code_generation** | Programming and software development | 1-10 |
+| **creative_generative** | Creative writing and ideation | 1-10 |
+| **research_synthesis** | Research aggregation and synthesis | 1-10 |
+| **factual_recall_precision** | Factual accuracy and recall | 1-10 |
+| **multi_step_problem_solving** | Complex multi-step reasoning | 1-10 |
+| **domain_terminology_handling** | Domain-specific vocabulary | 1-10 |
+
+---
+
+### Axiom Scorers (8 Total)
+
+| Scorer | Purpose | Parameters |
+|--------|---------|------------|
+| **Pattern Scorer** | Prompt ranking and classification | ~400K |
+| **Routing Scorer** | Model selection optimization | ~400K |
+| **Topology Scorer** | Orchestration method selection | ~400K |
+| **CLARION Scorer** | Question ranking by VOI | ~400K |
+| **Combination Scorer** | Multi-model ensemble scoring | ~400K |
+| **User Scorer** | Personalization preferences | ~400K |
+| **Domain Scorer** | Domain detection and routing | ~400K |
+| **Safety Scorer** | CBF enforcement decisions | ~400K |
+
+**Total**: ~3.3M parameters, lightweight inference
+
+---
+
+### Domain Expert Networks (7 per domain)
+
+| Network | Parameters | Purpose |
+|---------|-----------|----------|
+| **Entity Classifier** | ~4M | Classifies domain-specific entities |
+| **Contraindication Net** | ~4M | Flags dangerous/incompatible combinations |
+| **Protocol Matcher** | ~4M | Matches to standard protocols |
+| **Severity Assessor** | ~4M | Assesses severity/urgency levels |
+| **Personalization Net** | ~4M | Personalizes based on user history |
+| **Citation Network** | ~4M | Finds relevant citations/references |
+| **Orchestration Selector** | ~4M | Selects optimal orchestration mode |
+
+**Total**: ~28M parameters per domain (Healthcare, Legal, Finance, etc.)
+
+---
+
+### PromptBreeder Operators (9 Total)
+
+| Operator | Description |
+|----------|-------------|
+| **Zero-Order Hypermutation** | Random mutations without gradient guidance |
+| **First-Order Hypermutation** | Gradient-guided mutations |
+| **Estimation of Distribution** | Learn from elite prompts |
+| **Lineage-Based Mutation** | Ancestry-informed changes |
+| **Crossover** | Combine two parent prompts |
+| **Lamarckian Mutation** | Persist successful adaptations |
+| **Context Shuffling** | Reorder context elements |
+| **Working Memory Expansion** | Expand relevant context |
+| **ELM (Extreme Learning)** | Radical exploratory mutations |
+
+**30% Invention Minimum**: CATO enforces minimum novel responses via Twilight Dreaming
+
+---
+
+### Safety Matrix Severities
+
+| Severity | Color | Description |
+|----------|-------|-------------|
+| **Absolute** | Red | Never combine - critical risk |
+| **Relative** | Orange | Usually avoid - significant risk |
+| **Caution** | Yellow | Consider risks - moderate concern |
+| **Monitor** | Green | Proceed with care - low concern |
+
+---
+
+### UEP v2.0 Envelope Types
+
+| Category | Types |
+|----------|-------|
+| **Stream** | `start`, `chunk`, `end`, `error`, `cancel` |
+| **Artifact** | `created`, `reference` |
+| **Control** | `ack`, `nack`, `heartbeat`, `capability` |
+| **Event** | `checkpoint`, `progress`, `error` |
+
+**Standards Incorporated**: A2A Protocol, CloudEvents, MCP, OpenTelemetry, tus.io, AsyncAPI
+
+---
+
 ## Document History
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.9.0 | Feb 2, 2026 | **Service Implementation Verification**: Added 29 verified service entries across 6 new sections: **Causal & Counterfactual Reasoning** (6 services: Causal Reasoning Engine, Causal Tracker, Curiosity Engine, DreamerV3 World Model, Shadow Self, Counterfactual Simulator); **Safety Interlocks** (4 services: Sensory Veto, Redundant Perception, Fracture Detection, Epistemic Recovery); **Security & Ethics Extensions** expanded (+4: Cedar Authorization, Constitutional Classifier, Control Barrier Functions, Golden Rules); **Learning & Training** expanded (+7: Circadian Budget, Precision Governor, Distillation Pipeline, DPO Trainer, Dataset Importer, Entrance Exam, DIA Miner); **Think Tank Features** expanded (+3: Cato Dialogue, Deep Research Agents, Persona Service; enhanced Council of Rivals); **Infrastructure & Resilience** (4 services: Circuit Breaker, Query Fallback, Cortex Telemetry, Cato State Service). All 29 services verified as fully implemented (no stubs). |
+| 1.8.0 | Feb 2, 2026 | **Major Audit Update**: Added 5 new sections: Consciousness & Cognition (10 subsystems: HippoRAG, Theory of Mind, World Model, SpikingJelly, IIT-Phi, Butlin Tests, Consciousness Emergence, Metacognition, Episodic Memory, Moral Compass); Reality Engine (4 subsystems); Learning & Training (8 subsystems); Advanced AI Features (6 subsystems); Security & Ethics Extensions (6 subsystems); Utility Services (9 subsystems). Fixed file references: ego.service.ts→local-ego.service.ts, anti-drift.service.ts→drift-detection.service.ts, domain-expert.service.ts→raws/domain-detector.service.ts, dream-scheduler.service.ts→cos/subconscious/dream-scheduler.ts |
+| 1.7.0 | Feb 1, 2026 | **LIVS Implementation**: Updated LIVS section from PROPOSED to implemented; Full implementation includes: 6 TypeScript services, 7 database tables, 16 Admin API endpoints, Admin Dashboard UI |
+| 1.6.0 | Feb 1, 2026 | **LIVS Proposal**: Added Integrity Verification (LIVS) section with Individual Interrogation, Orchestration Integrity, Lie Detection Signals, Interrogation Depth, Model Integrity Weights, Soft Rules; Added Interrogation Question Patterns table (Dependency Probe, Forensic Validator, Edge Case Probe, Confidence Calibration, Contradiction Test); Added Orchestration Failure Patterns table (Watermelon Pipeline, Echo Chamber, Confidence Inflation, Circular Reasoning, Scope Drift); New acronym: LIVS |
+| 1.5.0 | Feb 1, 2026 | **Polish pass**: Fixed broken table rows; Updated Table of Contents with Quick Reference anchor; Improved vague definitions (Flash Facts, Grimoire, Stub Nodes, Blackboard, Spell, Sentinel Agent, Time Machine, Cato, Cognitive Router, Genesis); Restructured Quick Reference as single section with subsections |
+| 1.4.0 | Feb 1, 2026 | **CHANGELOG audit update**: Added Domain Intelligence section (Domain Expert Cortex, Domain Taxonomy, Safety Matrix); Added Neural Operations section (Neural Operations Center, Shadow Validation, PromptBreeder); Added to Safety & Verification (Sandboxed Expression Engine, Vector Semantic Router, Enhanced Uncertainty); Added to Memory & Storage (Multimedia Sidecar, UEP v2.0, Self-Healing System); Added to Economic & Governance (Cost Negotiation, Inference Components, Library Registry); New Quick Reference sections for Domain Expert Networks, PromptBreeder Operators, Safety Matrix Severities, UEP v2.0 Envelope Types |
+| 1.3.0 | Feb 1, 2026 | **Major consistency update**: Added Axiom Scorers, CLARION, CORTEX Networks, Anti-Drift System, Three-Tier Learning Architecture; Expanded Think Tank section with Applications (Think Tank, Think Tank Admin, Curator); Added Quick Reference sections for Sovereign Mesh, RAWS Dimensions, Axiom Scorers; New acronyms: AXIOM, CLARION, ESA, VOI; Enhanced descriptions throughout |
+| 1.2.0 | Feb 1, 2026 | Added Cartridge System (v6.2.0): Genesis Vault, Keyhole Pattern, RNIR Compiler, Cartridge Operations; New acronyms: RADz, RNIR, SAGA, CoC, UEP |
 | 1.1.0 | Jan 29, 2026 | Added Model Management subsystems (Model Registry, HuggingFace Discovery, Deletion Queue, Thermal Manager) |
 | 1.0.0 | Jan 29, 2026 | Initial comprehensive glossary |
 

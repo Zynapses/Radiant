@@ -1,6 +1,6 @@
 # RADIANT Curator User Guide
 
-> Version 2.2.0 | January 2026
+> Version 3.0.0 | February 2026
 > 
 > **For**: Knowledge Managers, Subject Matter Experts, Knowledge Contributors
 
@@ -16,8 +16,9 @@
 8. [Organizing with Domains](#8-organizing-with-domains)
 9. [Correcting the AI (Overrides)](#9-correcting-the-ai-overrides)
 10. [Understanding Chain of Custody](#10-understanding-chain-of-custody)
-11. [Tips & Best Practices](#11-tips--best-practices)
-12. [Troubleshooting](#12-troubleshooting)
+11. [Managing Cartridges](#11-managing-cartridges)
+12. [Tips & Best Practices](#12-tips--best-practices)
+13. [Troubleshooting](#13-troubleshooting)
 
 ---
 
@@ -747,7 +748,192 @@ Need to prove something for an audit? Click **"Export as PDF"** to download a si
 
 ---
 
-## 11. Tips & Best Practices
+## 11. Managing Cartridges
+
+### What Are Cartridges?
+
+**Cartridges** are portable AI knowledge packages (.RADz files) that bundle everything your AI has learned:
+
+| Component | Description |
+|-----------|-------------|
+| **Curator Knowledge** | Verified facts from your Knowledge Graph |
+| **Ghost Vectors** | Learned patterns and preferences |
+| **LoRA Adapters** | Fine-tuned model behaviors |
+| **Domain Experts** | Specialized reasoning capabilities |
+| **Overrides** | Your corrections and rules |
+
+Think of cartridges like a brain backup—everything the AI knows, packaged for transfer.
+
+### Why Use Cartridges?
+
+| Use Case | How Cartridges Help |
+|----------|---------------------|
+| **Backup & Recovery** | Export your knowledge before major changes |
+| **Share Expertise** | Send your AI configuration to a colleague |
+| **New Deployments** | Clone your setup to a new environment |
+| **M&A Integration** | Transfer AI expertise during acquisitions |
+| **Disaster Recovery** | Restore from cartridge if something goes wrong |
+
+### The Cartridges Dashboard
+
+Navigate to **Cartridges** in the sidebar to see:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  📦 CARTRIDGES                                                    │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│   Total          Active         Signed          Hot              │
+│     12             10             8              3               │
+│                                                                  │
+│  [My Cartridges] [Organization] [System]                        │
+│                                                                  │
+│  ┌────────────────────────────────────────────────────┐         │
+│  │ 📦 Engineering Knowledge Pack          v2.1.0      │         │
+│  │    Contains: Knowledge, Ghost, LoRA               │         │
+│  │    Thermal: 🔥 HOT    Signed: ✅                  │         │
+│  │    [View] [Export]                                │         │
+│  └────────────────────────────────────────────────────┘         │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Cartridge Scopes
+
+| Scope | Who Can See | Who Can Create |
+|-------|-------------|----------------|
+| **Personal** | Only you | You |
+| **Organization** | Everyone in your org | Tenant Admins |
+| **System** | All tenants | Radiant Admins |
+
+### Creating a Cartridge
+
+1. Click **"Create Cartridge"**
+2. Enter a **name** and **description**
+3. Choose **scope** (Personal or Organization)
+4. Select what to include:
+   - ✅ Curator Knowledge Graph (your verified facts)
+   - ✅ Ghost Vector Compression (learned patterns)
+   - ✅ Domain selections
+5. Click **"Create"**
+
+The cartridge will be built with all your selected components.
+
+### Exporting a Cartridge
+
+1. Find the cartridge you want to export
+2. Click **"Export"**
+3. Download the **.RADz file**
+
+The exported cartridge includes:
+- All selected knowledge and configurations
+- **Cryptographic signature** (dual-signed by you and the platform)
+- **Metadata** (version, timestamp, checksums)
+
+### Importing a Cartridge
+
+1. Click **"Import .RADz"**
+2. Drag-and-drop your .RADz file (or click to browse)
+3. Choose whether to **validate signature**:
+   - ✅ **Recommended**: Ensures the cartridge hasn't been tampered with
+   - Verifies both author and platform signatures
+4. Click **"Import"**
+
+If signature validation fails, you'll see:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  ⚠️ SIGNATURE VERIFICATION FAILED                                │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│   This cartridge could not be verified:                         │
+│                                                                  │
+│   ❌ Author signature: INVALID                                   │
+│   ✅ Platform signature: Valid                                   │
+│   ❌ Hash mismatch: Content may have been modified              │
+│                                                                  │
+│   [Cancel Import]  [Import Anyway (Not Recommended)]            │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Cartridge Thermal States
+
+Cartridges have thermal states indicating their usage:
+
+| State | Icon | Meaning |
+|-------|------|---------|
+| **Hot** | 🔥 | Actively being used, high inference volume |
+| **Warm** | 🌡️ | Ready for use, moderate activity |
+| **Cold** | ❄️ | Not recently used, may take longer to load |
+
+The system automatically manages thermal states based on usage patterns.
+
+### Cartridge Signatures (PKI)
+
+Every cartridge exported from Curator is **cryptographically signed**:
+
+| Signature | Who Signs | What It Proves |
+|-----------|-----------|----------------|
+| **Author** | You (via your tenant CA) | You created this cartridge |
+| **Platform** | RADIANT (via Root CA) | RADIANT verified and counter-signed |
+
+This dual-signature ensures:
+- **Authenticity**: The cartridge is from who it claims to be from
+- **Integrity**: The content hasn't been modified
+- **Non-repudiation**: The author can't deny creating it
+
+### Federation: Cross-Cluster Trust
+
+If your organization has multiple RADIANT clusters (e.g., commercial + government), cartridges from trusted clusters can be imported:
+
+1. Admin adds the other cluster's Root CA to trusted roots
+2. Cartridges from that cluster are now verifiable
+3. Import as normal—signatures will validate against trusted CAs
+
+This enables secure AI knowledge transfer across independent RADIANT deployments.
+
+### Cluster Compatibility
+
+Each cartridge includes compatibility information to ensure safe imports:
+
+| Field | Purpose |
+|-------|---------|
+| **Source Cluster** | Where the cartridge was created |
+| **Minimum Version** | Lowest RADIANT version that can use it |
+| **Compatible Apps** | Which apps can use it (Curator, Think Tank, etc.) |
+| **Required Features** | Features needed (Ghost Vectors, LoRA, etc.) |
+| **Environment** | production/staging/development |
+
+**What Gets Checked on Import**:
+1. **Version**: Your cluster must meet the minimum version
+2. **Apps**: The app you're importing into must be supported
+3. **Features**: All required features must be available
+4. **Environment**: Cannot import staging/dev cartridges into production
+
+If compatibility fails, you'll see a detailed message explaining what's missing:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  ⚠️ COMPATIBILITY CHECK FAILED                                   │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│   Source: Radiant Commercial US-East v6.2.0                     │
+│   Target: Radiant Government v6.0.0                             │
+│                                                                  │
+│   ❌ Version: Requires 6.2.0, cluster is 6.0.0                   │
+│   ✅ Apps: curator, thinktank supported                         │
+│   ❌ Features: Missing 'axiom_scorers'                           │
+│   ✅ Environment: production → production                        │
+│                                                                  │
+│   [Cancel Import]                                               │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 12. Tips & Best Practices
 
 ### For Better Document Ingestion
 
@@ -790,7 +976,7 @@ Need to prove something for an audit? Click **"Export as PDF"** to download a si
 
 ---
 
-## 12. Troubleshooting
+## 13. Troubleshooting
 
 ### Common Issues
 

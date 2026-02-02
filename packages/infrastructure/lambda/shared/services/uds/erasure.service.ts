@@ -38,7 +38,6 @@ async function getRedisClient(): Promise<Redis | null> {
     try {
       redisClient = new Redis(process.env.REDIS_ENDPOINT, {
         maxRetriesPerRequest: 3,
-        retryDelayOnFailover: 100,
         enableReadyCheck: true,
         lazyConnect: true,
       });
@@ -725,7 +724,7 @@ class UDSErasureService implements IUDSErasureService {
       }));
 
       logger.info('Backup erasure job queued', { requestId, tenantId: request.tenantId });
-      await this.updateTierStatus(requestId, 'backup', 'in_progress');
+      await this.updateTierStatus(requestId, 'backup', 'in_progress' as import('@radiant/shared').UDSErasureStatus);
 
       // Record in database for tracking
       await executeStatement(

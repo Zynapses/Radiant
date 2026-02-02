@@ -6,6 +6,11 @@
     "lib": ["ES2022"],
     "outDir": "./dist",
     "rootDir": ".",
+    "baseUrl": ".",
+    "paths": {
+      "@radiant/shared": ["../../shared/dist"],
+      "@radiant/shared/*": ["../../shared/dist/*"]
+    },
     "strict": false,
     "strictNullChecks": false,
     "noImplicitAny": false,

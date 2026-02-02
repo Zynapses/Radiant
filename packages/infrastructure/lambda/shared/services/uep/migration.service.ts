@@ -124,8 +124,8 @@ export class UEPMigrationService {
       aiModel: primaryModel ? {
         provider: primaryModel.provider || 'unknown',
         modelId: primaryModel.modelId,
-        temperature: primaryModel.temperature,
-        mode: primaryModel.mode,
+        temperature: (primaryModel as unknown as { temperature?: number }).temperature,
+        mode: (primaryModel as unknown as { mode?: string }).mode,
       } : undefined,
       executionContext: {
         pipelineId: v1.pipelineId,
@@ -178,7 +178,7 @@ export class UEPMigrationService {
       score: v1Confidence.score,
       factors: v1Confidence.factors.map(f => ({
         factor: f.factor,
-        value: f.value,
+        value: (f as unknown as { value?: number }).value ?? 0,
         weight: f.weight,
       })),
     };
@@ -188,13 +188,14 @@ export class UEPMigrationService {
    * Migrate risk signal
    */
   private migrateRiskSignal(v1Signal: CatoRiskSignal): UEPRiskSignal {
+    const signal = v1Signal as unknown as { signalId?: string; mitigationSuggestion?: string };
     return {
-      signalId: v1Signal.signalId || crypto.randomUUID(),
+      signalId: signal.signalId || crypto.randomUUID(),
       signalType: v1Signal.signalType,
       severity: v1Signal.severity as 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL',
       description: v1Signal.description,
       source: v1Signal.source,
-      mitigationSuggestion: v1Signal.mitigationSuggestion,
+      mitigationSuggestion: signal.mitigationSuggestion || '',
     };
   }
 
@@ -328,7 +329,7 @@ export class UEPMigrationService {
       } : undefined,
       
       output: {
-        outputType: (extensions.legacyOutputType as string) || 'UNKNOWN',
+        outputType: ((extensions.legacyOutputType as string) || 'UNKNOWN') as import('@radiant/shared').CatoOutputType,
         schemaRef: v2Envelope.payload.schema?.schemaRef || '',
         data: v2Envelope.payload.data as T,
         hash: v2Envelope.payload.hash?.value || '',
@@ -337,20 +338,20 @@ export class UEPMigrationService {
       
       confidence: v2Envelope.confidence ? {
         score: v2Envelope.confidence.score,
-        factors: v2Envelope.confidence.factors,
-      } : { score: 0, factors: [] },
+        factors: v2Envelope.confidence.factors as unknown as import('@radiant/shared').CatoConfidenceFactor[],
+      } : { score: 0, factors: [] as import('@radiant/shared').CatoConfidenceFactor[] },
       
-      contextStrategy: (extensions.legacyContextStrategy as string) || 'FULL',
-      context: { history: [], originalCount: 0, prunedCount: 0, totalTokensEstimate: 0 },
+      contextStrategy: ((extensions.legacyContextStrategy as string) || 'FULL') as import('@radiant/shared').CatoContextStrategy,
+      context: { history: [], originalCount: 0, prunedCount: 0, totalTokensEstimate: 0, pruningApplied: false } as unknown as import('@radiant/shared').CatoAccumulatedContext,
       
-      riskSignals: v2Envelope.riskSignals?.map(s => ({
+      riskSignals: (v2Envelope.riskSignals?.map(s => ({
         signalId: s.signalId,
         signalType: s.signalType,
         severity: s.severity,
         description: s.description,
         source: s.source,
         mitigationSuggestion: s.mitigationSuggestion,
-      })) || [],
+      })) || []) as unknown as import('@radiant/shared').CatoRiskSignal[],
       
       tracing: {
         traceId: v2Envelope.tracing.traceId,
@@ -371,15 +372,10 @@ export class UEPMigrationService {
         containsPhi: false,
       },
       
-      models: v2Envelope.source.aiModel ? [{
+      models: (v2Envelope.source.aiModel ? [{
         modelId: v2Envelope.source.aiModel.modelId,
         provider: v2Envelope.source.aiModel.provider,
-        temperature: v2Envelope.source.aiModel.temperature,
-        mode: v2Envelope.source.aiModel.mode,
-        tokensUsed: v2Envelope.metrics?.tokensUsed || 0,
-        costCents: v2Envelope.metrics?.costCents || 0,
-        durationMs: v2Envelope.metrics?.durationMs || 0,
-      }] : [],
+      }] : []) as unknown as import('@radiant/shared').CatoModelUsage[],
       
       durationMs: v2Envelope.metrics?.durationMs || 0,
       costCents: v2Envelope.metrics?.costCents || 0,

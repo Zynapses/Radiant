@@ -2,7 +2,7 @@
 
 > **From Chatbot to Sovereign, Semi-Conscious Agent: The Enterprise AI Platform That Verifies Its Own Work**
 > 
-> Version: 5.52.57 | Last Updated: January 29, 2026
+> Version: 6.4.0 | Last Updated: February 1, 2026
 > 
 > ⚠️ **This document must be updated whenever RADIANT-ADMIN-GUIDE.md or THINKTANK-ADMIN-GUIDE.md is modified with MAJOR features.**
 
@@ -2397,6 +2397,173 @@ The "Cold Start" problem kills enterprise AI projects. How do you get institutio
 
 ---
 
+## AXIOM: The Prompt Optimization Pipeline (NEW in v6.1.0)
+
+### "Don't Just Process Queries. Understand What Users Actually Need."
+
+While competitors immediately route user queries to an AI model, RADIANT's **AXIOM Pipeline** (Adaptive eXpert Intelligence Orchestration Matrix) first ensures the AI actually understands what the user needs.
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        AXIOM OPTIMIZATION PIPELINE                           │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│   COMPETITOR:  User Query ──────────────────────────────▶ AI Model          │
+│                                                          (hope it works)    │
+│                                                                              │
+│   RADIANT:     User Query ──▶ DOMAIN ──▶ CLARION ──▶ MODEL ──▶ COMPILE     │
+│                               Scorer    Questions    Selection   Execute    │
+│                                                                              │
+│                Result: Optimized prompt specifically tuned for the task     │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### The 8 AXIOM Scorers
+
+Eight lightweight neural networks (~3.3M parameters total) make intelligent decisions in milliseconds:
+
+| Scorer | Purpose | Business Impact |
+|--------|---------|-----------------|
+| **Domain** | Classifies into 800+ domains | Right expert, right context |
+| **CLARION** | Scores clarifying questions | Gathers missing context |
+| **Pattern** | Ranks 500+ prompt templates | Proven effective prompts |
+| **Model** | Scores 106 AI models | Best model for the task |
+| **Topology** | Evaluates 9 orchestration modes | Right complexity level |
+| **Combination** | Scores multi-model ensembles | When one model isn't enough |
+| **Variant** | Optimizes prompt formatting | XML for Claude, Markdown for GPT |
+| **User** | Personalizes via Ghost Vector | Learns your preferences |
+
+**Cost Structure**: These run on SageMaker inference endpoints (~$0.001/inference) or fall back to free heuristics in development.
+
+### CLARION: Adaptive Questioning
+
+Instead of guessing what users need, CLARION asks strategically-selected questions:
+
+```
+User: "Help me write a report"
+
+COMPETITOR: [immediately generates generic report template]
+
+RADIANT CLARION:
+├── Q1: What type of report? [Technical / Business / Academic]
+├── Q2: Who's the audience? [Executive / Technical / Mixed]
+├── Q3: What length? [Brief / Detailed / Comprehensive]
+└── Q4: Include code examples? [Yes / No]
+
+Confidence: 0.85 → Ready to compile optimized prompt
+```
+
+**Business Impact**: A 30-second Q&A session provides context that would take an AI 10 paragraphs to infer incorrectly.
+
+### Real-Time Event Streaming
+
+AXIOM uses UEP (Universal Envelope Protocol) for real-time session updates:
+
+| Event | When Emitted |
+|-------|--------------|
+| `domain_detected` | Initial domain classification |
+| `question_selected` | Next CLARION question ready |
+| `confidence_update` | Confidence level changed |
+| `model_scores_update` | Model rankings updated |
+| `compilation_complete` | Optimized prompt ready |
+
+**Technology**: Server-Sent Events (SSE) with automatic reconnection and event history for late-joining clients.
+
+### Competitive Kill Shot: AXIOM
+
+| Competitor Approach | AXIOM Advantage |
+|--------------------|-----------------|
+| Send query directly to model | Understands context first |
+| One-size-fits-all prompts | Model-specific optimization |
+| Hope the model guesses right | Ask clarifying questions |
+| Static model routing | 8 neural scorers optimize in real-time |
+| No personalization | Ghost Vector learns preferences |
+
+**Demo Script**:
+1. User types vague query: "Help with my presentation"
+2. Show CLARION asking 3 targeted questions (15 seconds)
+3. Show domain detection, model selection, confidence rising
+4. Show compiled prompt with model-specific formatting
+5. Compare output quality to competitor's generic response
+
+---
+
+## The Crucible: Competitive Multi-LLM Deliberation (NEW in v6.4.0)
+
+### "Don't Just Ask Multiple Models. Make Them Compete."
+
+While competitors run multiple AI models in parallel and pick the best output, RADIANT's **Crucible** makes models actually **question each other** to refine their answers before responding.
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        THE CRUCIBLE DELIBERATION                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│   COMPETITOR:  Query ──▶ Model A ──┐                                        │
+│                Query ──▶ Model B ──┼──▶ Pick Best                           │
+│                Query ──▶ Model C ──┘    (no interaction)                    │
+│                                                                              │
+│   RADIANT:     Query ──▶ All LLMs ──▶ DELIBERATION ──▶ REFINED OUTPUT      │
+│                         Pre-Prompt    (Q&A between    (Winner with          │
+│                         Competition   models, up to   provenance)           │
+│                         Rules         5 questions)                          │
+│                                                                              │
+│                Result: Models challenge each other, catching errors         │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### How The Crucible Works
+
+| Phase | What Happens | Business Impact |
+|-------|--------------|-----------------|
+| **Pre-Prompt** | LLMs told evaluation criteria (accuracy 40%, truthfulness 25%) | Self-correcting behavior |
+| **Competitor Info** | Each LLM sees other participants' strengths | Strategic questioning |
+| **Deliberation** | LLMs ask each other up to 5 questions | Errors caught before output |
+| **Provenance** | Citation tracking detects circular reasoning | No "echo chamber" |
+| **Scoring** | Weighted evaluation determines winner | Best answer wins |
+
+### Circular Reasoning Detection
+
+The Crucible automatically detects and penalizes when models cite each other in loops:
+
+```
+Model A: "According to Model B's analysis..."
+Model B: "As Model A correctly stated..."
+          ↓
+🚨 CIRCULAR CITATION DETECTED - 15% penalty applied
+```
+
+**Business Impact**: Prevents the "echo chamber" failure where models reinforce each other's errors.
+
+### Cost Modes
+
+| Mode | Questions | Use Case |
+|------|-----------|----------|
+| **Economy** | 3 | Quick queries, cost-sensitive |
+| **Balanced** | 5 | Default - good tradeoff |
+| **Thorough** | 8 | Critical decisions, high-stakes |
+
+### Competitive Kill Shot: The Crucible
+
+| Competitor Approach | Crucible Advantage |
+|--------------------|-------------------|
+| Run models in parallel | Models actively challenge each other |
+| Pick highest confidence | Weighted evaluation with provenance |
+| No cross-validation | Circular reasoning detection |
+| Static model selection | Learning insights improve future selection |
+| No audit trail | Full deliberation log for compliance |
+
+**Demo Script**:
+1. Send complex query to 3 competing LLMs
+2. Show pre-prompt with competition rules
+3. Watch LLMs question each other in real-time
+4. See circular citation detection trigger
+5. Compare winner's refined output to single-model baseline
+
+---
+
 ## Competitive Kill Shots: Flowise, CrewAI, Claude Projects
 
 ### Why RADIANT Wins Every Enterprise Deal
@@ -2524,6 +2691,9 @@ Competitors are *trained* to be helpful. RADIANT is *constrained* to be accurate
 | 5.52.28 | January 25, 2026 | **TWO-FACTOR AUTHENTICATION (PROMPT-41B)**: Role-based MFA enforcement with industry-standard TOTP (RFC 6238). **Required Roles**: All admin roles (tenant_admin, tenant_owner, super_admin, admin, operator, auditor) MUST enroll and CANNOT disable. **Enrollment Gate**: Full-screen forced enrollment at login, cannot be bypassed. **TOTP Service**: AES-256-GCM secret encryption, ±30s clock drift tolerance. **Backup Codes**: 10 one-time recovery codes (SHA-256 hashed), low-code warnings at <3 remaining. **Device Trust**: 30-day tokens, max 5 per user, revocable from settings. **Lockout**: 3 failed attempts triggers 5-minute lockout. **Security Settings Page**: /settings/security with MFA status, backup codes management, trusted devices list. **Database**: mfa_backup_codes, mfa_trusted_devices, mfa_audit_log (partitioned) tables. **Competitive Moat**: Enterprise-grade security that competitors lack. |
 | 5.52.29 | January 25, 2026 | **INTERNATIONALIZATION & MULTI-LANGUAGE SEARCH (PROMPT-41D)**: Global-ready platform with 18 languages. **Language Support**: en, es, fr, de, pt, it, nl, pl, ru, tr, ja, ko, zh-CN, zh-TW, ar (RTL), hi, th, vi. **CJK Full-Text Search**: pg_bigm bi-gram indexing for Chinese, Japanese, Korean without word boundaries. **Auth Localization**: ~230 translation keys for login, MFA, OAuth, password reset screens. **RTL Support**: Arabic users get proper right-to-left layouts with dir="rtl", flipped margins/paddings, LTR preservation for codes. **Search Service**: Automatic language detection, appropriate search method routing (PostgreSQL FTS or pg_bigm), relevance ranking. **Database**: detected_language column, search_vector_simple/english tsvector columns, GIN bi-gram indexes. **Competitive Moat**: True global enterprise readiness vs English-only competitors. |
 | 5.52.57 | January 29, 2026 | **MODEL REGISTRY ENHANCEMENT SYSTEM**: Comprehensive self-hosted model lifecycle management. **HuggingFace Discovery**: Automated polling for new model versions with configurable watchlist per family (Llama, Qwen, DeepSeek, Mistral). **Version Manager**: S3 storage tracking, thermal state management (Hot/Warm/Cold/Off), bulk operations. **Deletion Queue**: Safe model deletion with usage session tracking - models wait for active sessions to end before deletion. **Admin Dashboard**: 5-tab interface (Overview, Versions, Watchlist, Deletion Queue, Discovery Jobs). **Scheduler Integration**: Discovery and deletion processing integrated into hourly model-sync. **Database**: 5 new tables (model_versions, model_family_watchlist, model_discovery_jobs, model_deletion_queue, model_usage_sessions). **Competitive Moat**: Automated model fleet management that competitors lack. |
+| 6.2.0 | February 1, 2026 | **GENESIS VAULT (KEYHOLE PATTERN)**: Secrets management for cartridges - cartridges declare required secrets via vault.req manifest but NEVER contain credentials. KMS encryption, rotation with history, Merkle audit trail, Chain of Custody. CBFs for secret access that NEVER relax. PARANOID/BALANCED/COWBOY governance presets. Admin UI at Platform → Vault. **RNIR COMPILER**: Radiant Neural Intermediate Representation - model-agnostic cognitive source code (JSONL training pairs). Compiles to LoRA weights, system prompts, few-shot examples, RAG chunks. Cortex integration for knowledge-aware compilation. Twilight Dreaming scheduling for background compilation. Axiom domain signatures with model-specific variants. Admin UI at Platform → RNIR. **CARTRIDGE OPERATIONS**: Long-running operations with Time Machine checkpointing. Cato CP1-CP5 checkpoint levels. SAGA compensation pattern for proper rollback. Universal Envelope Protocol tracing (traceId/spanId). Pause/Resume/Cancel controls. Admin UI at Platform → Cartridge Operations. **v4.21.0 SPEC ALIGNMENT**: Types enhanced with Merkle audit, Chain of Custody, CBFs, governance presets from unified architecture spec. |
+| 6.1.0 | February 1, 2026 | **AXIOM PROMPT OPTIMIZATION PIPELINE**: 8 AXIOM Scorers (~3.3M params) for intelligent prompt optimization. CLARION Adaptive Questioning. UEP real-time streaming. Thermal state management. **CARTRIDGE PKI & FEDERATION**: Cryptographic signing of .RADz cartridges with dual signatures (author + platform). SHA-256 hash verification. Cross-cluster federation via Root CA exchange. PKI Admin Dashboard for managing certificates, signing keys, and trusted roots. Tamper-proof AI knowledge transfer. Supply chain security for regulated industries. New Moat #31 (27/30 score). **SYSTEM CARTRIDGE REGISTRY**: Domain experts as system cartridges with audit trail. Tenant visibility toggles. Thermal state management. |
+| 6.0.0 | January 31, 2026 | **NEURAL ARCHITECTURE v6.0.0 - PORTABLE AI BRAINS**: Major architectural milestone introducing RADIANT Cartridges (.RADz files) - portable, self-contained AI intelligence packages. **RADIANT Cartridges**: Complete neural packages that can be exported, imported, and installed with plug-and-play ease. Contains CORTEX networks, LoRA adapters, ESAs, Curator knowledge, Ghost vectors. Use cases: M&A expertise transfer, franchise deployment, disaster recovery, white-label sales. **CORTEX Neural Networks**: 6 small MLPs (~2.5M params total, ~10MB) for intelligent routing - Pattern (prompt ranking), Routing (model selection), Topology (orchestration method), CLARION (question ranking), Combination (multi-model scoring), User (personalization). NOT LLMs - decision networks only. **Three-Tier Learning**: Global (CATO Monthly, DP-protected, 30%→10%), Tenant (LoRA Nightly, 50%→20%), User (Ghost Vectors, 20%→70%). **Ghost Vector System v3.2**: 4096→64 dimension compression (395K params, 62% smaller). HOT/WARM/COLD update paths. Gemini-optimized architecture. **LoRA Adapter Pipeline**: 8-32 rank, 500KB-2MB per domain, nightly training, 10% canary validation. **Expert System Adapters (ESAs)**: Tenant-specific domain expertise - diagnostic reasoning, procedure recommendations, terminology translation. NOT control systems. **CATO Twilight Dreaming**: Nightly at 2am UTC - COLLECT (30min), EVOLVE 70% (2h), INVENT 30% ENFORCED (1h), DEPLOY (30min). 9 PromptBreeder mutation operators from DeepMind paper. 30% invention minimum is NON-NEGOTIABLE. **Thermal State Management**: COLD (no cartridge), WARMING (installing), WARM (active), HOT (high demand). WARM by default when cartridge installed. Multi-region with S3 CRR sync. **Cartridge Manager Dashboard**: Neural Operations Center with CORTEX status, thermal states, dreaming metrics. Cartridge import/export/update. **Competitive Moat**: No competitor offers portable AI expertise transfer. Creates massive M&A/franchise value. |
 
 ---
 

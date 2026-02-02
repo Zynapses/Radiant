@@ -7,6 +7,7 @@ import { Logger } from '../shared/logger';
 import { successResponse, errorResponse } from '../shared/response';
 import { UnauthorizedError, NotFoundError, ValidationError, ForbiddenError } from '../shared/errors';
 import { extractAuthContext, requireAdmin } from '../shared/auth';
+import { MINIMAL_CONTEXT, NOOP_CALLBACK } from '../shared/lambda-context';
 import {
   listTenants,
   getTenantById,
@@ -140,11 +141,11 @@ async function routeRequest(
     }
     if (pathParts[2] === 'regulatory-standards') {
       const mod = await import('./regulatory-standards.js');
-      return mod.handler(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+      return mod.handler(event, MINIMAL_CONTEXT, NOOP_CALLBACK) as Promise<APIGatewayProxyResult>;
     }
     if (pathParts[2] === 'self-audit') {
       const mod = await import('./self-audit.js');
-      return (mod.getDashboard(event, {} as any, () => {}) || successResponse({ message: 'Not found' })) as APIGatewayProxyResult;
+      return (mod.getDashboard(event, MINIMAL_CONTEXT, NOOP_CALLBACK) || successResponse({ message: 'Not found' })) as APIGatewayProxyResult;
     }
   }
 
@@ -152,10 +153,10 @@ async function routeRequest(
   if (pathParts[1] === 'security') {
     if (pathParts[2] === 'schedules') {
       const mod = await import('./security-schedules.js');
-      return mod.handler(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+      return mod.handler(event, MINIMAL_CONTEXT, NOOP_CALLBACK) as Promise<APIGatewayProxyResult>;
     }
     const mod = await import('./security.js');
-    return mod.handler(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+    return mod.handler(event, MINIMAL_CONTEXT, NOOP_CALLBACK) as Promise<APIGatewayProxyResult>;
   }
 
   // System configuration and health
@@ -247,7 +248,7 @@ async function routeRequest(
   // Enhanced learning
   if (pathParts[1] === 'enhanced-learning') {
     const mod = await import('./enhanced-learning.js');
-    return (mod.getConfig(event, {} as any, () => {}) || successResponse({ message: 'Not found' })) as APIGatewayProxyResult;
+    return (mod.getConfig(event, MINIMAL_CONTEXT, NOOP_CALLBACK) || successResponse({ message: 'Not found' })) as APIGatewayProxyResult;
   }
 
   // Logs (AWS logs)
@@ -260,53 +261,53 @@ async function routeRequest(
   if (pathParts[1] === 'consciousness') {
     if (pathParts[2] === 'engine') {
       const mod = await import('./consciousness-engine.js');
-      return (mod.getDashboard(event, {} as any, () => {}) || successResponse({ message: 'Not found' })) as APIGatewayProxyResult;
+      return (mod.getDashboard(event, MINIMAL_CONTEXT, NOOP_CALLBACK) || successResponse({ message: 'Not found' })) as APIGatewayProxyResult;
     }
     if (pathParts[2] === 'evolution') {
       const mod = await import('./consciousness-evolution.js');
-      return (mod.getPredictionMetrics(event, {} as any, () => {}) || successResponse({ message: 'Not found' })) as APIGatewayProxyResult;
+      return (mod.getPredictionMetrics(event, MINIMAL_CONTEXT, NOOP_CALLBACK) || successResponse({ message: 'Not found' })) as APIGatewayProxyResult;
     }
     const mod = await import('./consciousness.js');
-    return (mod.getConsciousnessMetrics(event, {} as any, () => {}) || successResponse({ message: 'Not found' })) as APIGatewayProxyResult;
+    return (mod.getConsciousnessMetrics(event, MINIMAL_CONTEXT, NOOP_CALLBACK) || successResponse({ message: 'Not found' })) as APIGatewayProxyResult;
   }
 
   // Ego system
   if (pathParts[1] === 'ego') {
     const mod = await import('./ego.js');
-    return (mod.getEgoDashboard(event, {} as any, () => {}) || successResponse({ message: 'Not found' })) as APIGatewayProxyResult;
+    return (mod.getEgoDashboard(event, MINIMAL_CONTEXT, NOOP_CALLBACK) || successResponse({ message: 'Not found' })) as APIGatewayProxyResult;
   }
 
   // Formal reasoning
   if (pathParts[1] === 'formal-reasoning') {
     const mod = await import('./formal-reasoning.js');
-    return mod.handler(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+    return mod.handler(event, MINIMAL_CONTEXT, NOOP_CALLBACK) as Promise<APIGatewayProxyResult>;
   }
 
   // Domain ethics
   if (pathParts[1] === 'domain-ethics') {
     const mod = await import('./domain-ethics.js');
-    return (mod.listFrameworks(event, {} as any, () => {}) || successResponse({ message: 'Not found' })) as APIGatewayProxyResult;
+    return (mod.listFrameworks(event, MINIMAL_CONTEXT, NOOP_CALLBACK) || successResponse({ message: 'Not found' })) as APIGatewayProxyResult;
   }
 
   // Ethics-free reasoning
   if (pathParts[1] === 'ethics-free-reasoning') {
     const mod = await import('./ethics-free-reasoning.js');
-    return mod.handler(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+    return mod.handler(event, MINIMAL_CONTEXT, NOOP_CALLBACK) as Promise<APIGatewayProxyResult>;
   }
 
   // Cato services
   if (pathParts[1] === 'cato') {
     if (pathParts[2] === 'genesis') {
       const mod = await import('./cato-genesis.js');
-      return mod.handler(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+      return mod.handler(event, MINIMAL_CONTEXT, NOOP_CALLBACK) as Promise<APIGatewayProxyResult>;
     }
     if (pathParts[2] === 'dialogue') {
       const mod = await import('./cato-dialogue.js');
-      return (mod.dialogue(event, {} as any, () => {}) || successResponse({ message: 'Not found' })) as APIGatewayProxyResult;
+      return (mod.dialogue(event, MINIMAL_CONTEXT, NOOP_CALLBACK) || successResponse({ message: 'Not found' })) as APIGatewayProxyResult;
     }
     if (pathParts[2] === 'global') {
       const mod = await import('./cato-global.js');
-      return mod.handler(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+      return mod.handler(event, MINIMAL_CONTEXT, NOOP_CALLBACK) as Promise<APIGatewayProxyResult>;
     }
   }
 
@@ -319,31 +320,31 @@ async function routeRequest(
   // Model coordination
   if (pathParts[1] === 'model-coordination') {
     const mod = await import('./model-coordination.js');
-    return (mod.getSyncConfig(event, {} as any, () => {}) || successResponse({ message: 'Not found' })) as APIGatewayProxyResult;
+    return (mod.getSyncConfig(event, MINIMAL_CONTEXT, NOOP_CALLBACK) || successResponse({ message: 'Not found' })) as APIGatewayProxyResult;
   }
 
   // Model proficiency
   if (pathParts[1] === 'model-proficiency') {
     const mod = await import('./model-proficiency.js');
-    return (mod.getAllRankings(event, {} as any, () => {}) || successResponse({ message: 'Not found' })) as APIGatewayProxyResult;
+    return (mod.getAllRankings(event, MINIMAL_CONTEXT, NOOP_CALLBACK) || successResponse({ message: 'Not found' })) as APIGatewayProxyResult;
   }
 
   // Infrastructure tier
   if (pathParts[1] === 'infrastructure-tier') {
     const mod = await import('./infrastructure-tier.js');
-    return mod.handler(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+    return mod.handler(event, MINIMAL_CONTEXT, NOOP_CALLBACK) as Promise<APIGatewayProxyResult>;
   }
 
   // Library registry
   if (pathParts[1] === 'library-registry') {
     const mod = await import('./library-registry.js');
-    return mod.handler(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+    return mod.handler(event, MINIMAL_CONTEXT, NOOP_CALLBACK) as Promise<APIGatewayProxyResult>;
   }
 
   // Inference components
   if (pathParts[1] === 'inference-components') {
     const mod = await import('./inference-components.js');
-    return (mod.getConfig(event, {} as any, () => {}) || successResponse({ message: 'Not found' })) as APIGatewayProxyResult;
+    return (mod.getConfig(event, MINIMAL_CONTEXT, NOOP_CALLBACK) || successResponse({ message: 'Not found' })) as APIGatewayProxyResult;
   }
 
   // User Registry - assignments, consent, DSAR, break glass, legal hold
@@ -380,51 +381,51 @@ async function routeRequest(
     // Registry entries
     if (!subRoute || subRoute === 'registry') {
       if (method === 'GET' && !resourceId) {
-        return mod.listRegistry(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+        return mod.listRegistry(event, MINIMAL_CONTEXT, NOOP_CALLBACK) as Promise<APIGatewayProxyResult>;
       }
       if (method === 'GET' && resourceId) {
         event.pathParameters = { ...event.pathParameters, id: resourceId };
-        return mod.getRegistryEntry(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+        return mod.getRegistryEntry(event, MINIMAL_CONTEXT, NOOP_CALLBACK) as Promise<APIGatewayProxyResult>;
       }
     }
     
     // Tenant translation overrides
     if (subRoute === 'overrides') {
       if (method === 'GET') {
-        return mod.listOverrides(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+        return mod.listOverrides(event, MINIMAL_CONTEXT, NOOP_CALLBACK) as Promise<APIGatewayProxyResult>;
       }
       if (method === 'POST') {
-        return mod.upsertOverride(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+        return mod.upsertOverride(event, MINIMAL_CONTEXT, NOOP_CALLBACK) as Promise<APIGatewayProxyResult>;
       }
       if (method === 'DELETE' && resourceId) {
         event.pathParameters = { ...event.pathParameters, id: resourceId };
-        return mod.deleteOverride(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+        return mod.deleteOverride(event, MINIMAL_CONTEXT, NOOP_CALLBACK) as Promise<APIGatewayProxyResult>;
       }
       if (method === 'PATCH' && resourceId && action === 'protection') {
         event.pathParameters = { ...event.pathParameters, id: resourceId };
-        return mod.toggleProtection(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+        return mod.toggleProtection(event, MINIMAL_CONTEXT, NOOP_CALLBACK) as Promise<APIGatewayProxyResult>;
       }
     }
     
     // Translation bundles
     if (subRoute === 'bundle') {
       event.pathParameters = { ...event.pathParameters, languageCode: resourceId || 'en' };
-      return mod.getBundle(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+      return mod.getBundle(event, MINIMAL_CONTEXT, NOOP_CALLBACK) as Promise<APIGatewayProxyResult>;
     }
     
     // Tenant localization config
     if (subRoute === 'config') {
       if (method === 'GET') {
-        return mod.getConfig(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+        return mod.getConfig(event, MINIMAL_CONTEXT, NOOP_CALLBACK) as Promise<APIGatewayProxyResult>;
       }
       if (method === 'PUT') {
-        return mod.updateConfig(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+        return mod.updateConfig(event, MINIMAL_CONTEXT, NOOP_CALLBACK) as Promise<APIGatewayProxyResult>;
       }
     }
     
     // Statistics
     if (subRoute === 'stats') {
-      return mod.getStats(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+      return mod.getStats(event, MINIMAL_CONTEXT, NOOP_CALLBACK) as Promise<APIGatewayProxyResult>;
     }
   }
 
@@ -466,83 +467,83 @@ async function routeRequest(
     
     // Dashboard overview
     if (!subRoute || subRoute === 'dashboard') {
-      return mod.getDashboard(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+      return mod.getDashboard(event, MINIMAL_CONTEXT, NOOP_CALLBACK) as Promise<APIGatewayProxyResult>;
     }
     
     // Connection pool metrics
     if (subRoute === 'connections') {
-      return mod.getConnectionMetrics(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+      return mod.getConnectionMetrics(event, MINIMAL_CONTEXT, NOOP_CALLBACK) as Promise<APIGatewayProxyResult>;
     }
     
     // Queue status
     if (subRoute === 'queues') {
       if (method === 'GET') {
-        return mod.getQueueStatus(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+        return mod.getQueueStatus(event, MINIMAL_CONTEXT, NOOP_CALLBACK) as Promise<APIGatewayProxyResult>;
       }
       if (method === 'POST' && action === 'retry-failed') {
-        return mod.retryFailedBatchWrites(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+        return mod.retryFailedBatchWrites(event, MINIMAL_CONTEXT, NOOP_CALLBACK) as Promise<APIGatewayProxyResult>;
       }
       if (method === 'DELETE' && action === 'clear-completed') {
-        return mod.clearCompletedBatchWrites(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+        return mod.clearCompletedBatchWrites(event, MINIMAL_CONTEXT, NOOP_CALLBACK) as Promise<APIGatewayProxyResult>;
       }
     }
     
     // Replica health
     if (subRoute === 'replicas') {
-      return mod.getReplicaHealth(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+      return mod.getReplicaHealth(event, MINIMAL_CONTEXT, NOOP_CALLBACK) as Promise<APIGatewayProxyResult>;
     }
     
     // Partition statistics
     if (subRoute === 'partitions') {
       if (method === 'GET') {
-        return mod.getPartitionStats(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+        return mod.getPartitionStats(event, MINIMAL_CONTEXT, NOOP_CALLBACK) as Promise<APIGatewayProxyResult>;
       }
       if (method === 'POST' && action === 'ensure-future') {
-        return mod.ensureFuturePartitions(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+        return mod.ensureFuturePartitions(event, MINIMAL_CONTEXT, NOOP_CALLBACK) as Promise<APIGatewayProxyResult>;
       }
     }
     
     // Slow query analysis
     if (subRoute === 'slow-queries') {
-      return mod.getSlowQueries(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+      return mod.getSlowQueries(event, MINIMAL_CONTEXT, NOOP_CALLBACK) as Promise<APIGatewayProxyResult>;
     }
     
     // Index health
     if (subRoute === 'indexes') {
       if (action === 'suggestions') {
-        return mod.getIndexSuggestions(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+        return mod.getIndexSuggestions(event, MINIMAL_CONTEXT, NOOP_CALLBACK) as Promise<APIGatewayProxyResult>;
       }
-      return mod.getIndexHealth(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+      return mod.getIndexHealth(event, MINIMAL_CONTEXT, NOOP_CALLBACK) as Promise<APIGatewayProxyResult>;
     }
     
     // Materialized views
     if (subRoute === 'materialized-views') {
       if (method === 'GET') {
-        return mod.getMaterializedViewStatus(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+        return mod.getMaterializedViewStatus(event, MINIMAL_CONTEXT, NOOP_CALLBACK) as Promise<APIGatewayProxyResult>;
       }
       if (method === 'POST' && action === 'refresh') {
-        return mod.triggerMaterializedViewRefresh(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+        return mod.triggerMaterializedViewRefresh(event, MINIMAL_CONTEXT, NOOP_CALLBACK) as Promise<APIGatewayProxyResult>;
       }
     }
     
     // Table statistics
     if (subRoute === 'tables') {
-      return mod.getTableStatistics(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+      return mod.getTableStatistics(event, MINIMAL_CONTEXT, NOOP_CALLBACK) as Promise<APIGatewayProxyResult>;
     }
     
     // Maintenance
     if (subRoute === 'maintenance') {
       if (method === 'POST' && action === 'run') {
-        return mod.runMaintenance(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+        return mod.runMaintenance(event, MINIMAL_CONTEXT, NOOP_CALLBACK) as Promise<APIGatewayProxyResult>;
       }
       if (method === 'GET' && action === 'history') {
-        return mod.getMaintenanceHistory(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+        return mod.getMaintenanceHistory(event, MINIMAL_CONTEXT, NOOP_CALLBACK) as Promise<APIGatewayProxyResult>;
       }
     }
     
     // Rate limits
     if (subRoute === 'rate-limits') {
-      return mod.getRateLimitStatus(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+      return mod.getRateLimitStatus(event, MINIMAL_CONTEXT, NOOP_CALLBACK) as Promise<APIGatewayProxyResult>;
     }
   }
 

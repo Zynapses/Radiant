@@ -183,11 +183,10 @@ export class UEPSecurityService {
     const iv = crypto.randomBytes(12);
     
     const cipher = crypto.createCipheriv(
-      algorithm === 'aes-256-gcm' ? 'aes-256-gcm' : 'chacha20-poly1305',
+      'aes-256-gcm',
       dataKey,
-      iv,
-      { authTagLength: 16 }
-    );
+      iv
+    ) as crypto.CipherGCM;
     
     const ciphertext = Buffer.concat([
       cipher.update(Buffer.from(plaintext, 'utf8')),
@@ -221,11 +220,10 @@ export class UEPSecurityService {
     const dataKey = await this.decryptDataKey(encryptionKey);
     
     const decipher = crypto.createDecipheriv(
-      algorithm === 'aes-256-gcm' ? 'aes-256-gcm' : 'chacha20-poly1305',
+      'aes-256-gcm',
       dataKey,
-      Buffer.from(iv, 'base64'),
-      { authTagLength: 16 }
-    );
+      Buffer.from(iv, 'base64')
+    ) as crypto.DecipherGCM;
     decipher.setAuthTag(Buffer.from(authTag, 'base64'));
     
     const plaintext = Buffer.concat([

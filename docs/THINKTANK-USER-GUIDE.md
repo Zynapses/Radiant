@@ -1,7 +1,7 @@
 # Think Tank User Guide
 
-> **Version**: 5.52.52  
-> **Last Updated**: January 28, 2026  
+> **Version**: 6.0.0  
+> **Last Updated**: February 1, 2026  
 > **Audience**: End Users of Think Tank
 
 ---
@@ -17,8 +17,9 @@
 7. [Delight System - AI Personality](#7-delight-system---ai-personality)
 8. [Collaboration Features](#8-collaboration-features)
 9. [Advanced Features](#9-advanced-features)
-10. [How Think Tank's Memory Works](#10-how-think-tanks-memory-works)
-11. [Understanding AI Decisions](#11-understanding-ai-decisions)
+10. [AXIOM Forge - Prompt Optimization](#10-axiom-forge---prompt-optimization)
+11. [How Think Tank's Memory Works](#11-how-think-tanks-memory-works)
+12. [Understanding AI Decisions](#12-understanding-ai-decisions)
 12. [Decision Records](#12-decision-records)
 13. [Living Parchment](#13-living-parchment)
 14. [Safety & Governance](#14-safety--governance)
@@ -397,6 +398,34 @@ If Think Tank picks the wrong domain:
 2. Select the correct domain
 3. Your choice is remembered for similar questions
 
+### Domain Selector (Advanced Mode) - v6.0.0
+
+In **Advanced Mode**, you can manually select your domain expertise for optimized responses:
+
+1. Enable **Advanced Mode** in the chat header
+2. Click the **Domain** selector (shows "Auto" by default)
+3. Search for or select your domain:
+   - **Healthcare** - Medical, clinical, pharmaceutical
+   - **Legal** - Law, contracts, regulations
+   - **Finance** - Investment, banking, markets
+   - **Technology** - Software, hardware, AI/ML
+   - **Education** - Teaching, curriculum, learning
+   - **Science** - Research, experiments, discovery
+4. Your selection is saved and used for future sessions
+
+### Cartridge Indicator (Advanced Mode) - v6.0.0
+
+In **Advanced Mode**, you can see which **Knowledge Cartridges** are active:
+
+1. Look for the cartridge icon in the header (shows count like "2 Cartridges")
+2. Click to expand and see:
+   - **System cartridges** - Platform-wide knowledge (e.g., RADIANT Core)
+   - **Organization cartridges** - Tenant-specific knowledge
+   - **Personal cartridges** - Your custom knowledge bundles
+3. Each cartridge shows version and priority level
+
+Cartridges provide specialized domain knowledge that enhances AI responses in specific areas.
+
 ---
 
 ## 7. Delight System - AI Personality
@@ -662,7 +691,153 @@ Click the **X** button in the tool header to close the morphed view and return t
 
 ---
 
-## 10. How Think Tank's Memory Works
+## 10. AXIOM Forge - Prompt Optimization
+
+**AXIOM Forge** is an intelligent prompt optimization system that transforms your questions into highly effective prompts that get better AI responses.
+
+### Why Use AXIOM Forge?
+
+| Without AXIOM | With AXIOM |
+|---------------|------------|
+| Generic responses | Domain-optimized responses |
+| AI guesses your intent | AI knows exactly what you need |
+| One-size-fits-all prompts | Tailored to the best model for your task |
+| Lower quality results | Consistently better outcomes |
+
+### How It Works
+
+When you enable AXIOM Forge, it guides you through a quick 4-step workflow:
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│  AXIOM FORGE WORKFLOW                                                │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  1️⃣ CLASSIFY      2️⃣ CLARIFY      3️⃣ COMPILE      4️⃣ ROUTE         │
+│  ┌─────────┐     ┌─────────┐     ┌─────────┐     ┌─────────┐       │
+│  │  🎯     │ ──▶ │  ❓     │ ──▶ │  ⚡     │ ──▶ │  🤖     │       │
+│  │ Domain  │     │Questions│     │ Build   │     │ Select  │       │
+│  │ Detect  │     │ 1-5 max │     │ Prompt  │     │ Model   │       │
+│  └─────────┘     └─────────┘     └─────────┘     └─────────┘       │
+│                                                                      │
+│  Detects your    Asks only the   Compiles an     Picks the best    │
+│  expertise area  questions that  optimized       AI model for      │
+│  automatically   really matter   prompt          your task         │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### The CLARION Questions
+
+AXIOM uses **CLARION** (Context-aware Learning Adaptive Reasoning Interrogation ONtology) to ask you smart clarifying questions:
+
+- **Maximum 5 questions** - We respect your time
+- **Skip anytime** - Press Skip if a question does not apply
+- **Smart ordering** - Questions adapt based on your answers
+- **Model signals** - Your answers help select the best AI model
+
+#### Question Types
+
+| Type | Example |
+|------|---------|
+| **Choice** | "What type of task is this?" (select one) |
+| **Multi-select** | "Which aspects matter most?" (select several) |
+| **Text** | "Describe your specific requirements" |
+| **Scale** | "How complex is this? (1-5)" |
+| **Yes/No** | "Does this need code examples?" |
+
+### Model Score Bars
+
+As you answer questions, you will see **Model Score Bars** showing which AI models are best suited for your task:
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│  MODEL PREDICTIONS                                                   │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  👑 Claude Sonnet 4      ████████████████████████░░░░  87%          │
+│     anthropic            Strong in analysis, reasoning               │
+│                                                                      │
+│     GPT-4 Turbo          ████████████████████░░░░░░░░  72%          │
+│     openai               Good general purpose                        │
+│                                                                      │
+│     Gemini 2.0           ███████████████░░░░░░░░░░░░░  58%          │
+│     google               Multimodal capability                       │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+The leading model (👑) is updated in real-time as you provide more context.
+
+### Compiled Prompt Preview
+
+After answering questions, AXIOM compiles your optimized prompt:
+
+- **System Prompt** - Instructions tailored to your domain and task
+- **User Prompt** - Your question enhanced with context
+- **Edit option** - Make final tweaks before sending
+- **Token count** - See how long your prompt is
+
+### When to Use AXIOM Forge
+
+| Good For | Not Needed For |
+|----------|----------------|
+| Complex analysis tasks | Quick factual lookups |
+| Domain-specific work (legal, medical, code) | Simple questions |
+| When you want the best results | Casual conversations |
+| Important deliverables | Follow-up questions |
+
+### Enabling AXIOM Forge
+
+1. Start typing your message
+2. Click the **⚡ Optimize** button (or press `Ctrl+Shift+O`)
+3. Answer the clarifying questions
+4. Review and send your optimized prompt
+
+> 💡 **Tip**: You can skip AXIOM optimization anytime by clicking "Skip optimization" - your message will be sent normally.
+
+### CLARION Settings
+
+Customize your AXIOM experience in **Settings → CLARION Preferences**:
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| **Clarification Mode** | When to ask questions (Auto/Always/Never) | Auto |
+| **Max Questions** | Maximum questions per session (3-7) | 5 |
+| **Show Model Scores** | Display real-time model predictions | On |
+| **Show Confidence Meter** | Display optimization progress | On |
+| **Animations** | Enable smooth transitions | On |
+| **Remember Answers** | Store answers for similar questions | On |
+| **Learn Preferences** | Adapt questions based on patterns | On |
+
+### Accessibility Features
+
+AXIOM Forge is fully accessible:
+
+- **Keyboard Navigation**: Use arrow keys to navigate options, Enter to select
+- **Screen Reader Support**: All questions and score updates are announced
+- **Focus Management**: Auto-focus on new questions
+- **High Contrast**: Visible selection states and progress indicators
+
+### Mobile Features
+
+On mobile devices:
+
+- **Swipe to Skip**: Swipe right on a question card to skip it
+- **Touch-Optimized**: Large tap targets for all interactive elements
+- **Responsive Layout**: Full-screen experience on smaller screens
+
+### Feedback
+
+After using AXIOM Forge, you can provide feedback:
+
+- **Quick Feedback**: Thumbs up/down for domain accuracy, questions, prompts, and model selection
+- **Detailed Feedback**: Rate your overall experience (1-5 stars) and leave comments
+- **Continuous Improvement**: Your feedback helps AXIOM learn and improve
+
+---
+
+## 11. How Think Tank's Memory Works
 
 Think Tank uses two interconnected systems to remember things and access knowledge.
 
@@ -1714,6 +1889,119 @@ To see how Think Tank processed your question:
 | **Stream Evaluation** | How multiple parallel AI outputs are combined |
 | **Model-Agnostic Condition** | A condition that evaluates output quality, not model identity |
 | **Workflow Template** | A saved, reusable workflow configuration |
+| **Cartridge** | Portable AI brain package (.RADz file) containing trained neural networks |
+| **CORTEX** | Six small neural networks that make routing and orchestration decisions |
+| **Ghost Vector** | 64-dimensional representation of your preferences and interaction style |
+| **LoRA Adapter** | Lightweight domain-specific training that customizes AI responses |
+| **Thermal State** | System readiness level (COLD, WARMING, WARM, HOT) |
+| **Twilight Dreaming** | Nightly autonomous learning cycle that improves the AI |
+
+---
+
+## 26. RADIANT Cartridges - Portable AI Brains
+
+### What Are Cartridges?
+
+Think Tank is powered by **RADIANT Cartridges** — portable AI intelligence packages that contain everything the system has learned. Think of them like game cartridges: the hardware (RADIANT) provides the platform, the cartridge provides the intelligence.
+
+**Why This Matters to You:**
+- Your organization's AI gets smarter over time
+- Expertise can be transferred between deployments
+- The AI remembers your team's terminology, preferences, and domain knowledge
+
+### How Cartridges Work
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          YOUR CARTRIDGE CONTAINS                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  🧠 CORTEX Networks     - Routing decisions, pattern recognition            │
+│  📚 LoRA Adapters       - Your organization's domain expertise              │
+│  👤 Ghost Vectors       - Personal preferences for each user                │
+│  ✅ Curator Knowledge   - Verified facts and golden rules                   │
+│  🏭 Expert Systems      - Industry-specific reasoning patterns              │
+│                                                                             │
+│  Result: AI that "gets" your business from day one                         │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### The Three Learning Tiers
+
+Think Tank learns at three levels simultaneously:
+
+| Tier | What It Learns | Update Frequency | Weight |
+|------|----------------|------------------|--------|
+| **You (Ghost Vectors)** | Your preferences, communication style, expertise | Every session | 70% for returning users |
+| **Your Organization (LoRA)** | Company terminology, processes, domain knowledge | Nightly | 50% for new users |
+| **Everyone (Global)** | Best practices, safety improvements, new capabilities | Monthly | 10-30% |
+
+**New users** benefit heavily from organizational learning (50%), while **returning users** get highly personalized responses (70% from your personal Ghost Vector).
+
+---
+
+## 27. Domain Selector
+
+### Selecting Your Expertise Domain
+
+The **Domain Selector** allows you to manually specify your area of expertise, which helps Think Tank tailor its responses more precisely.
+
+**To access the Domain Selector:**
+1. Click the **globe icon** (🌐) in the chat header
+2. Browse or search for your domain
+3. Select from 800+ domains across 8 major fields
+
+### Domain Hierarchy
+
+```
+Field (8 total)
+├── Domain (100+ per field)
+│   └── Subspecialty (5-20 per domain)
+```
+
+**Example:**
+- **Field**: Healthcare
+- **Domain**: Cardiology
+- **Subspecialty**: Interventional Cardiology
+
+### Auto-Detection vs. Manual Override
+
+| Mode | Description | Best For |
+|------|-------------|----------|
+| **Auto Detect** | AI analyzes your prompt and detects domain | General use, varied topics |
+| **Manual Selection** | You specify the domain explicitly | Specialized work, consistent domain |
+
+**Pro Tip**: Set a default domain in Settings if you primarily work in one field. You can always override per-conversation.
+
+---
+
+## 28. Cartridge Indicator
+
+### Understanding the Cartridge Status
+
+The **Cartridge Indicator** shows which AI intelligence packages are currently active and their status.
+
+**Accessing the Indicator:**
+- Click the **shield icon** in the chat header
+- View active cartridges, versions, and capabilities
+
+### Indicator States
+
+| Icon | State | Meaning |
+|------|-------|---------|
+| 🟢 | Active | Cartridge loaded, full intelligence available |
+| 🟡 | Warming | Cartridge loading, temporary reduced capability |
+| 🔴 | Inactive | No cartridge for this domain |
+| 🔵 | Updating | Hot-swap in progress, zero downtime |
+
+### Cartridge Details
+
+Expanding the indicator shows:
+- **Cartridge Name**: e.g., "Legal-Enterprise v2.1"
+- **Installed Date**: When this version was deployed
+- **Scope**: Global, Tenant, or User level
+- **Capabilities**: List of enhanced features
 
 ---
 
@@ -1721,13 +2009,13 @@ To see how Think Tank processed your question:
 
 | Version | Date | Changes |
 |---------|------|---------|
-| 5.35.0 | Jan 2026 | Initial comprehensive user guide |
-| 5.35.0 | Jan 2026 | Added visual diagrams and flowcharts |
-| 5.43.0 | Jan 22, 2026 | Added Decision Records section (DIA Engine) |
-| 5.44.0 | Jan 22, 2026 | Added Living Parchment section (War Room, Council, Debate Arena) |
-| 5.52.0 | Jan 23, 2026 | Simulator now uses real API data with graceful fallbacks |
-| 5.52.52 | Jan 28, 2026 | Major update: Added Time Machine, Grimoire, Flash Facts, Sentinel Agents, Economic Governor, Council of Rivals, Voice Input & File Attachments sections |
+| 6.0.0 | Jan 31, 2026 | **Neural Architecture v6.0.0**: Added RADIANT Cartridges section, Domain Selector guide, Cartridge Indicator documentation, Three Learning Tiers explanation, expanded Glossary with neural architecture terms |
 | 5.52.58 | Jan 31, 2026 | Added Workflows & Orchestration Methods section (multi-AI selection, stream evaluation, workflow templates, configurable parameters) |
+| 5.52.52 | Jan 28, 2026 | Major update: Added Time Machine, Grimoire, Flash Facts, Sentinel Agents, Economic Governor, Council of Rivals, Voice Input & File Attachments sections |
+| 5.52.0 | Jan 23, 2026 | Simulator now uses real API data with graceful fallbacks |
+| 5.44.0 | Jan 22, 2026 | Added Living Parchment section (War Room, Council, Debate Arena) |
+| 5.43.0 | Jan 22, 2026 | Added Decision Records section (DIA Engine) |
+| 5.35.0 | Jan 2026 | Initial comprehensive user guide |
 
 ---
 

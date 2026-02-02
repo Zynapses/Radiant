@@ -83,8 +83,8 @@ export function TerminalView({
     const startTime = Date.now();
     
     try {
-      await new Promise(resolve => setTimeout(resolve, 300 + Math.random() * 200));
-      
+      // TODO: Replace with actual API call to Sniper service
+      // In production: const response = await sniperService.execute(command, projectId);
       const executionMs = Date.now() - startTime;
       
       const outputEntry: TerminalEntry = {
