@@ -34,6 +34,7 @@ Before making ANY code change, identify what type of change it is:
 | `cdk` | stack, CDK, infrastructure, AWS resource |
 | `thinktank_feature` | Think Tank, chat, UI, morphing, liquid |
 | `thinktank_admin` | admin config, user rules, delight, domains |
+| `tenant_admin` | tenant settings, team config, tenant reports, org admin |
 | `platform_feature` | tenant, billing, models, providers |
 | `user_facing` | UI component, user interaction, visible to user |
 | `ui_component` | component, button, panel, view, design |
@@ -108,6 +109,7 @@ Use the trigger matrix to find ALL required documentation:
 ✅ docs/THINKTANK-USER-GUIDE.md
 ✅ docs/THINKTANK-ADMIN-GUIDE.md
 ✅ docs/THINKTANK-ADMIN-GUIDE-V2.md
+✅ docs/THINKTANK-TENANT-ADMIN-GUIDE.md (if tenant-admin features)
 ✅ docs/STRATEGIC-VISION-MARKETING.md (if major)
 ```
 
@@ -132,6 +134,7 @@ Use the trigger matrix to find ALL required documentation:
 ✅ docs/THINKTANK-MOATS.md (Think Tank advantages)
 ✅ docs/RADIANT-MOATS.md (Platform advantages)
 ✅ docs/STRATEGIC-VISION-MARKETING.md
+✅ docs/PITCH-DECK-POINTS.md (investor talking points)
 ```
 
 ### New Dependencies
@@ -160,8 +163,17 @@ Use the trigger matrix to find ALL required documentation:
 ✅ CHANGELOG.md
 ✅ docs/CURATOR-USER-GUIDE.md (Section 11: Managing Cartridges)
 ✅ docs/RADIANT-ADMIN-GUIDE.md (Section 89: Cartridge PKI)
+✅ docs/THINKTANK-TENANT-ADMIN-GUIDE.md (Section 4: Cartridge Manager)
 ✅ docs/RADIANT-MOATS.md (if portable intelligence advantage)
 ✅ docs/ENGINEERING-IMPLEMENTATION-VISION.md (Section 25: Neural Architecture)
+```
+
+### Tenant Admin Features (Company/Team Settings)
+```
+✅ CHANGELOG.md
+✅ docs/THINKTANK-TENANT-ADMIN-GUIDE.md
+✅ docs/THINKTANK-ADMIN-GUIDE.md (if affects platform config)
+✅ docs/ENGINEERING-IMPLEMENTATION-VISION.md (if architectural)
 ```
 
 ### Service Layer Changes (MCP, A2A, API)
@@ -271,6 +283,7 @@ When updating these documents, also update the version number in the header:
 - `docs/RADIANT-ADMIN-GUIDE.md`
 - `docs/THINKTANK-ADMIN-GUIDE.md`
 - `docs/THINKTANK-ADMIN-GUIDE-V2.md`
+- `docs/THINKTANK-TENANT-ADMIN-GUIDE.md`
 - `docs/THINKTANK-USER-GUIDE.md`
 - `docs/CURATOR-USER-GUIDE.md`
 - `docs/CURATOR-ENGINEERING-GUIDE.md`
@@ -335,6 +348,7 @@ Use this manifest to programmatically determine which docs need updating.
 │  ✅ THINKTANK-USER-GUIDE.md (user-facing)                               │
 │  ✅ THINKTANK-ADMIN-GUIDE.md (admin-facing)                             │
 │  ✅ THINKTANK-ADMIN-GUIDE-V2.md (admin-facing)                          │
+│  ✅ THINKTANK-TENANT-ADMIN-GUIDE.md (tenant/team admin)                 │
 │                                                                          │
 │  FOR PLATFORM CHANGES:                                                   │
 │  ✅ RADIANT-ADMIN-GUIDE.md                                              │

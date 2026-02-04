@@ -1,7 +1,7 @@
 # Think Tank User Guide
 
-> **Version**: 6.0.0  
-> **Last Updated**: February 1, 2026  
+> **Version**: 6.6.0  
+> **Last Updated**: February 3, 2026  
 > **Audience**: End Users of Think Tank
 
 ---
@@ -1895,6 +1895,13 @@ To see how Think Tank processed your question:
 | **LoRA Adapter** | Lightweight domain-specific training that customizes AI responses |
 | **Thermal State** | System readiness level (COLD, WARMING, WARM, HOT) |
 | **Twilight Dreaming** | Nightly autonomous learning cycle that improves the AI |
+| **Autonomous Organism** | Self-evolving AI infrastructure that adapts and grows capabilities |
+| **Liquid Compute** | Data sovereignty system ensuring processing in compliant jurisdictions |
+| **Ghost Simulation** | Digital twin that learns preferences without storing actual prompts |
+| **Economic Cortex** | Autonomous budget management with hierarchical cost controls |
+| **Genesis Auto-Tool** | System that automatically creates new capabilities on demand |
+| **Neural Affinity Routing** | AI model selection based on semantic similarity and proficiency |
+| **Tensor-Link** | High-efficiency vector-based communication protocol for AI systems |
 
 ---
 
@@ -2005,10 +2012,176 @@ Expanding the indicator shows:
 
 ---
 
+## 29. Autonomous Intelligence Features
+
+### Overview
+
+Think Tank v6.6.0 introduces the **Autonomous Organism Architecture** — a collection of intelligent systems that work behind the scenes to protect your privacy, personalize your experience, and manage costs efficiently.
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    AUTONOMOUS ORGANISM BENEFITS                              │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  🌍 LIQUID COMPUTE       - Your data stays in your jurisdiction            │
+│  👻 GHOST SIMULATION     - AI learns your style without storing prompts    │
+│  💰 ECONOMIC CORTEX      - Smart budgeting keeps costs predictable         │
+│  🔧 GENESIS AUTO-TOOL    - New capabilities appear automatically           │
+│  🧠 NEURAL ROUTING       - Best AI model selected for each question        │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Liquid Compute - Data Sovereignty
+
+Liquid Compute ensures your data is processed in compliance with regional regulations:
+
+| Feature | What It Means for You |
+|---------|----------------------|
+| **Automatic Jurisdiction Detection** | Your location determines where data is processed |
+| **GDPR Compliance** | EU users' data stays in EU data centers |
+| **HIPAA Routing** | Healthcare data uses compliant processing paths |
+| **No Configuration Needed** | Works automatically based on your organization's settings |
+
+**How It Works:**
+1. Think Tank detects your regulatory requirements
+2. Compute location is selected automatically (EU, US, APAC, or on-premise)
+3. Your data never leaves the approved jurisdiction
+4. You see a small indicator showing where processing occurs
+
+**Privacy Indicator:**
+```
+┌─────────────────────────────────────────┐
+│  🇪🇺 Processing in EU (Frankfurt)       │
+│  ✓ GDPR Compliant  ✓ Data Resident     │
+└─────────────────────────────────────────┘
+```
+
+### Ghost Simulation - Personalized Safety
+
+Ghost Simulation creates a **digital twin** of your interaction patterns to provide personalized responses without storing your actual prompts:
+
+| Benefit | Description |
+|---------|-------------|
+| **Pattern Learning** | AI understands your communication style |
+| **No Prompt Storage** | Your actual questions are not retained |
+| **Personalized Safety** | Guardrails adapt to your expertise level |
+| **Preference Memory** | Remembers if you prefer concise or detailed answers |
+
+**Your Ghost Vector:**
+- 4096-dimensional mathematical representation of your preferences
+- Updates with each interaction (decays naturally over time)
+- Never contains actual content — only patterns
+- You can reset it anytime in Settings → Privacy → Reset Ghost Vector
+
+**What Ghost Simulation Learns:**
+- Your preferred response length
+- Technical depth you're comfortable with
+- Domains where you have expertise
+- Times when you're typically active
+- Communication style preferences
+
+**Privacy Note:** Ghost Vectors are tenant-isolated and encrypted. Administrators cannot see individual user patterns.
+
+### Economic Cortex - Smart Budget Management
+
+Economic Cortex automatically manages AI costs while ensuring quality:
+
+| Feature | User Benefit |
+|---------|-------------|
+| **Hierarchical Budgets** | Personal and team budgets work together |
+| **Smart Model Selection** | Cheaper models used when sufficient |
+| **Budget Alerts** | Get notified before hitting limits |
+| **Cost Transparency** | See exactly what each query costs |
+
+**Understanding Your Budget Display:**
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  💰 Budget Status                                                           │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  Daily Budget:    ████████████░░░░  $4.20 / $5.00 (84%)                    │
+│  Weekly Budget:   ██████░░░░░░░░░░  $12.50 / $35.00 (36%)                  │
+│  Quality Mode:    Standard (auto-upgrades for complex queries)             │
+│                                                                             │
+│  Last Query: $0.003 (GPT-4o-mini) — Saved $0.047 vs premium                │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Budget Tiers:**
+| Tier | Models Used | When Applied |
+|------|-------------|-------------|
+| **Economy** | GPT-3.5, Claude Instant | Simple questions, high volume |
+| **Standard** | GPT-4o-mini, Claude Haiku | Default for most queries |
+| **Premium** | GPT-4o, Claude Sonnet | Complex analysis, code review |
+| **Flagship** | GPT-4-turbo, Claude Opus | Critical decisions, expert domains |
+
+**Cost Optimization Tips:**
+1. Set a default budget tier in Settings → Economic Preferences
+2. Use "Quick Mode" (⚡) for simple questions
+3. Enable "Smart Downgrade" to auto-select cheaper models when appropriate
+4. Review your weekly cost report (emailed Mondays)
+
+### Genesis Auto-Tool - Automatic Capability Expansion
+
+When you need a capability that doesn't exist, Genesis can create it:
+
+**How It Works:**
+1. You ask Think Tank to do something it can't do
+2. Genesis analyzes the request and builds a new tool
+3. The tool is validated in a sandbox
+4. Within minutes, the capability is available
+
+**Example:**
+```
+You: "Can you analyze this CSV and create a pivot table?"
+
+Think Tank: "I don't have a pivot table tool, but Genesis is building one..."
+
+[2 minutes later]
+
+Think Tank: "Done! Here's your pivot table. This capability is now 
+            available for future requests."
+```
+
+**Note:** Genesis-created tools are reviewed by administrators before becoming permanent.
+
+### Neural Affinity Routing
+
+Think Tank automatically selects the best AI model for each question:
+
+| Consideration | How It's Used |
+|--------------|---------------|
+| **Domain Match** | Coding → Claude, Creative → GPT-4 |
+| **Your History** | Models that worked well for you before |
+| **Cost Efficiency** | Cheapest model that meets quality threshold |
+| **Current Load** | Avoids overloaded models |
+
+**You can influence routing:**
+- Set model preferences in Settings → AI Models
+- Use the model selector (🤖) to force a specific model
+- Add a rule: "Always use Claude for Python questions"
+
+### Viewing Organism Status
+
+To see how these systems are working for you:
+
+1. **Click the organism icon** (🧬) in the header
+2. **View the status panel** showing:
+   - Current compute location
+   - Ghost vector confidence score
+   - Budget remaining
+   - Active tools count
+   - Model routing statistics
+
+---
+
 ## Document History
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 6.6.0 | Feb 3, 2026 | **Autonomous Organism Architecture (Project Metamorphosis)**: Added Section 29 covering Liquid Compute (data sovereignty), Ghost Simulation (personalized safety), Economic Cortex (budget management), Genesis Auto-Tool (capability expansion), and Neural Affinity Routing (model selection) |
 | 6.0.0 | Jan 31, 2026 | **Neural Architecture v6.0.0**: Added RADIANT Cartridges section, Domain Selector guide, Cartridge Indicator documentation, Three Learning Tiers explanation, expanded Glossary with neural architecture terms |
 | 5.52.58 | Jan 31, 2026 | Added Workflows & Orchestration Methods section (multi-AI selection, stream evaluation, workflow templates, configurable parameters) |
 | 5.52.52 | Jan 28, 2026 | Major update: Added Time Machine, Grimoire, Flash Facts, Sentinel Agents, Economic Governor, Council of Rivals, Voice Input & File Attachments sections |

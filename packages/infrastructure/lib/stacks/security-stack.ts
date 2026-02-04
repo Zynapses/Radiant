@@ -20,6 +20,7 @@ export class SecurityStack extends cdk.Stack {
   public readonly webAcl?: wafv2.CfnWebACL;
   public readonly encryptionKey: kms.Key;
   public readonly secretsKey: kms.Key;
+  public readonly cartridgeSigningKey: kms.Key;
   
   constructor(scope: Construct, id: string, props: SecurityStackProps) {
     super(scope, id, props);
@@ -45,10 +46,42 @@ export class SecurityStack extends cdk.Stack {
       removalPolicy: isProd ? cdk.RemovalPolicy.RETAIN : cdk.RemovalPolicy.DESTROY,
     });
 
+    // ==========================================================================
+    // ASYMMETRIC SIGNING KEY (CARTRIDGE PKI)
+    // ==========================================================================
+    
+    // Platform-level asymmetric signing key for Cartridge PKI
+    // This key serves as the "Root CA" for the RADIANT platform:
+    // - Signs Tenant CA certificates
+    // - Used for platform-wide cartridge verification
+    // - ECDSA P-256 for industry-standard digital signatures
+    this.cartridgeSigningKey = new kms.Key(this, 'CartridgeSigningKey', {
+      alias: `${appId}-${environment}-cartridge-signing`,
+      description: `RADIANT platform signing key for .RADz cartridge verification - ${appId} ${environment}`,
+      keySpec: kms.KeySpec.ECC_NIST_P256,
+      keyUsage: kms.KeyUsage.SIGN_VERIFY,
+      enableKeyRotation: false, // Asymmetric keys do NOT support automatic rotation
+      pendingWindow: cdk.Duration.days(isProd ? 30 : 7),
+      removalPolicy: isProd ? cdk.RemovalPolicy.RETAIN : cdk.RemovalPolicy.DESTROY,
+    });
+
+    // Tag for compliance and cost tracking
+    cdk.Tags.of(this.cartridgeSigningKey).add('Purpose', 'CartridgePKI');
+    cdk.Tags.of(this.cartridgeSigningKey).add('KeyType', 'Asymmetric');
+    cdk.Tags.of(this.cartridgeSigningKey).add('Compliance', 'SOC2');
+
     // Grant Lambda service access to KMS keys
     const lambdaServicePrincipal = new iam.ServicePrincipal('lambda.amazonaws.com');
     this.encryptionKey.grantEncryptDecrypt(lambdaServicePrincipal);
     this.secretsKey.grantDecrypt(lambdaServicePrincipal);
+    
+    // Grant Lambda access to cartridge signing key
+    this.cartridgeSigningKey.grant(lambdaServicePrincipal,
+      'kms:Sign',
+      'kms:Verify',
+      'kms:GetPublicKey',
+      'kms:DescribeKey',
+    );
 
     // API Security Group
     this.apiSecurityGroup = new ec2.SecurityGroup(this, 'ApiSecurityGroup', {
@@ -174,6 +207,18 @@ export class SecurityStack extends cdk.Stack {
       value: this.secretsKey.keyArn,
       description: 'Secrets encryption key ARN',
       exportName: `${appId}-${environment}-secrets-key-arn`,
+    });
+
+    new cdk.CfnOutput(this, 'CartridgeSigningKeyId', {
+      value: this.cartridgeSigningKey.keyId,
+      description: 'Cartridge PKI signing key ID',
+      exportName: `${appId}-${environment}-cartridge-signing-key-id`,
+    });
+
+    new cdk.CfnOutput(this, 'CartridgeSigningKeyArn', {
+      value: this.cartridgeSigningKey.keyArn,
+      description: 'Cartridge PKI signing key ARN',
+      exportName: `${appId}-${environment}-cartridge-signing-key-arn`,
     });
   }
 }

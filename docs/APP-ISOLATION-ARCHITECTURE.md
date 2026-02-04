@@ -53,7 +53,7 @@ RADIANT consists of **four completely isolated applications**. Think Tank MUST N
 
 ## Four Applications
 
-### 1. Radiant Admin (`apps/radiant-admin/`)
+### 1. Radiant Admin (`apps/admin-dashboard/`)
 
 **Purpose**: Platform-level administration for RADIANT infrastructure.
 

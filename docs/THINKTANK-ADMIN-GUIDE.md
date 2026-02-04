@@ -151,19 +151,76 @@ This guide covers administrative features specific to **Think Tank**, the consum
 52. [Domain Taxonomy Selector](#52-domain-taxonomy-selector)
 53. [Cartridge Indicator Administration](#54-cartridge-indicator-administration)
 55. [AXIOM Forge Administration](#55-axiom-forge-administration)
+56. [AXIOM Scorers](#56-axiom-scorers)
+57. [The Crucible - Tenant Configuration](#section-57-the-crucible---tenant-configuration-v640)
+58. [Mid-Level Services (MLS)](#section-58-mid-level-services-mls-v500)
 
 ---
 
 ## 1. Think Tank Admin Features
 
-**Location**: Admin Dashboard → Think Tank
+**Location**: Think Tank Admin App → Dashboard
 
-Think Tank admin features are accessible from the Think Tank section of the Admin Dashboard.
+Think Tank admin features are accessible from the dedicated Think Tank Admin application.
 
-### Available Sections
+### 1.1 Dashboard Overview (v2.0.0)
+
+The Think Tank Admin dashboard provides platform-level visibility:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  Think Tank Dashboard                    Welcome back, Admin     │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌────────────┐  ┌────────────┐  ┌────────────┐  ┌────────────┐│
+│  │Active Users│  │Conversations│  │ User Rules │  │API Requests││
+│  │    1,234   │  │   45,678   │  │   8,901    │  │   2.3M     ││
+│  │  +12.5%    │  │   +8.2%    │  │   +15.3%   │  │   +22.1%   ││
+│  └────────────┘  └────────────┘  └────────────┘  └────────────┘│
+│                                                                  │
+│  ┌─────────────────────────────────┐  ┌────────────────────────┐│
+│  │     System Health               │  │   Platform Stats       ││
+│  │  ✓ API Gateway      45ms       │  │   Active Tenants: 85   ││
+│  │  ✓ Brain Service   120ms       │  │   Models Active: 42    ││
+│  │  ✓ AXIOM Routing    35ms       │  │                        ││
+│  │  ✓ Cato Safety      25ms       │  │   [View Analytics]     ││
+│  │  ✓ Cortex Memory    80ms       │  │                        ││
+│  └─────────────────────────────────┘  └────────────────────────┘│
+│                                                                  │
+│  ┌─────────────────────────────────────────┐  ┌────────────────┐│
+│  │         Usage Trends (7 days)           │  │Domain Dist.    ││
+│  │    ▄▄▄▄▄                                │  │  Tech: 35%     ││
+│  │  ▄▄█████▄▄    Requests                  │  │  Biz:  25%     ││
+│  │▄▄█████████▄▄  Tokens                    │  │  Sci:  20%     ││
+│  │M  T  W  T  F  S  S                      │  │  Other:20%     ││
+│  └─────────────────────────────────────────┘  └────────────────┘│
+│                                                                  │
+│  ┌─────────────────────────────────────────┐  ┌────────────────┐│
+│  │         Recent Activity                 │  │ Quick Actions  ││
+│  │  • Tenant "Acme" activated cartridge   │  │ • Delight      ││
+│  │  • New user rules created (15)         │  │ • Domain Modes ││
+│  │  • Model routing updated               │  │ • Ego System   ││
+│  └─────────────────────────────────────────┘  └────────────────┘│
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 1.2 Dashboard Widgets
+
+| Widget | Description | Data Source |
+|--------|-------------|-------------|
+| **Metric Cards** | Active users, conversations, rules, requests | `/api/thinktank-admin/dashboard/stats` |
+| **System Health** | Service status, latency, uptime | `/api/thinktank-admin/dashboard/health` |
+| **Platform Stats** | Tenant counts, model activation | `/api/thinktank-admin/dashboard/stats` |
+| **Usage Trends** | 7-day request/token chart | `/api/thinktank-admin/dashboard/trends` |
+| **Domain Distribution** | Query topic pie chart | `/api/thinktank-admin/dashboard/domains` |
+| **Activity Feed** | Recent platform events | `/api/thinktank-admin/dashboard/activity` |
+| **Quick Actions** | Links to common admin tasks | Static |
+
+### 1.3 Available Sections
 
 | Section | Purpose |
 |---------|---------|
+| **Dashboard** | Platform overview and metrics |
 | **My Rules** | User memory rules configuration |
 | **Delight** | Personality and feedback system |
 | **Brain Plans** | AGI planning visibility |
@@ -10691,6 +10748,163 @@ When disabled:
 2. **Enable user overrides** - Let users tune for their workflow
 3. **Monitor circular citations** - High rates may indicate model issues
 4. **Review learning insights** - Crucible extracts patterns from sessions
+
+---
+
+## Section 58: Mid-Level Services (MLS) (v5.0.0)
+
+### Overview
+
+Mid-Level Services (MLS) provide domain-specific AI capabilities that combine multiple specialized models into unified endpoints. Think Tank users can access these services through AI-assisted workflows when their tenant tier supports them.
+
+### 58.1 Available Services by Tier
+
+| Service | Domain | Min Tier | Description |
+|---------|--------|----------|-------------|
+| **Perception** | Computer Vision | 3 (GROWTH) | Object detection, segmentation, classification |
+| **Scientific** | Computational Biology | 4 (SCALE) | Protein analysis, structure prediction |
+| **Medical** | Healthcare Imaging | 4 (SCALE) | HIPAA-compliant medical image analysis |
+| **Geospatial** | Satellite Imagery | 4 (SCALE) | Land classification, change detection |
+| **Reconstruction** | 3D Generation | 4 (SCALE) | NeRF and 3D Gaussian Splatting |
+
+### 58.2 Tenant Configuration
+
+**Location**: Think Tank Admin → MLS Services
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| **Enable MLS** | Master toggle for MLS services | `true` (tier-dependent) |
+| **Auto-Warm** | Automatically warm models on first request | `true` |
+| **Show Service Status** | Display service availability to users | `true` |
+| **Allow Manual Warm** | Users can trigger model warm-up | `false` |
+| **Cost Alerts** | Notify when MLS usage exceeds threshold | `true` |
+| **Cost Alert Threshold** | Monthly spend threshold for alerts | `$100` |
+
+### 58.3 Service Endpoints for Think Tank
+
+MLS services are exposed to Think Tank through the orchestration layer:
+
+| Endpoint | Input | Output | Use Case |
+|----------|-------|--------|----------|
+| `/perception/analyze` | Image | JSON | Full vision pipeline in conversations |
+| `/scientific/protein/fold` | FASTA sequence | PDB structure | Research workflows |
+| `/medical/segment` | DICOM/image | Annotated mask | Healthcare assistants |
+| `/geospatial/classify` | GeoTIFF | Land cover map | Environmental analysis |
+| `/reconstruction/nerf` | Video/images | 3D model | Creative workflows |
+
+### 58.4 Thermal State Visibility
+
+Users can see the current state of MLS models:
+
+| State | User Experience |
+|-------|-----------------|
+| **OFF** | Service unavailable, shows upgrade prompt |
+| **COLD** | "Starting up..." with estimated wait time (2-5 min) |
+| **WARM** | Ready for immediate use |
+| **HOT** | Ready with fast response times |
+
+When a user requests an MLS service and the model is COLD:
+1. Request returns HTTP 202 Accepted
+2. User sees warm-up progress indicator
+3. Request auto-retries when model is WARM
+4. User notified when ready
+
+### 58.5 Usage & Billing
+
+MLS usage is tracked per tenant and billed based on the service:
+
+| Service | Pricing | Billing Unit |
+|---------|---------|--------------|
+| Perception | $0.02 | Per image |
+| Perception (video) | $0.50 | Per minute |
+| Scientific | $0.50 | Per request |
+| Medical | $0.15 | Per image |
+| Medical (audio) | $0.08 | Per minute |
+| Geospatial | $0.05 | Per image |
+| Reconstruction | $5.00 | Per 3D model |
+
+**Admin Dashboard**: Think Tank Admin → Billing → MLS Usage
+
+### 58.6 Graceful Degradation
+
+When optional models are unavailable, services automatically reduce capabilities:
+
+| Level | User Impact | Admin Action |
+|-------|-------------|--------------|
+| **FULL** | All features available | None needed |
+| **REDUCED** | HD features disabled, standard quality | Optional: warm HD models |
+| **MINIMAL** | Basic functionality only | Consider warming required models |
+
+Users see capability indicators in the UI when services are degraded.
+
+### 58.7 Integration with Think Tank Workflows
+
+MLS services integrate with Think Tank's workflow orchestration:
+
+```
+User Request: "Analyze this protein structure"
+    │
+    ▼
+┌─────────────────┐
+│ AXIOM Domain    │ → Detects: scientific/biology
+│ Scorer          │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ MLS Router      │ → Routes to Scientific Service
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ Scientific/     │ → ESM-2 embedding + AlphaFold2 structure
+│ protein/fold    │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ Think Tank      │ → Presents 3D structure + explanation
+│ Response        │
+└─────────────────┘
+```
+
+### 58.8 Admin API Endpoints
+
+**Base**: `/api/thinktank-admin/mls`
+
+| Method | Endpoint | Purpose |
+|--------|----------|---------|
+| GET | `/services` | List available services for tenant tier |
+| GET | `/services/:id/status` | Service thermal state and health |
+| GET | `/usage` | Tenant MLS usage statistics |
+| GET | `/usage/breakdown` | Per-service usage breakdown |
+| PUT | `/config` | Update tenant MLS configuration |
+| POST | `/services/:id/warm` | Request model warm-up (if allowed) |
+
+### 58.9 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `mls_tenant_config` | Tenant-level MLS settings |
+| `mls_usage_records` | Per-request usage tracking |
+| `mls_service_access` | Service availability by tier |
+
+### 58.10 Best Practices
+
+1. **Monitor usage** - Set cost alerts to avoid unexpected bills
+2. **Pre-warm for demos** - Warm models before important presentations
+3. **Educate users** - Explain cold-start delays for first-time users
+4. **Review degradation** - Check service health dashboard regularly
+5. **Tier upgrades** - Consider upgrading tier for consistent access to specialized services
+
+### 58.11 Troubleshooting
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| Service unavailable | Tier too low | Upgrade tenant tier |
+| Long wait times | Model cold | Enable auto-warm or pre-warm |
+| High costs | Heavy usage | Set cost alerts, review usage patterns |
+| Degraded quality | Optional models offline | Wait for auto-warm or manually warm |
 
 ---
 

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "version": "1.1.0",
-  "lastUpdated": "2026-01-29",
+  "version": "1.2.0",
+  "lastUpdated": "2026-02-03",
   "description": "Master manifest of ALL documentation files in RADIANT. AI agents MUST update relevant docs when making code changes.",
   
   "primaryDocs": {
@@ -30,6 +30,12 @@
         "priority": "HIGH",
         "triggers": ["thinktank_admin", "user_rules", "delight", "brain_plans", "domains", "ego"],
         "description": "Think Tank admin guide v2 - consolidated version"
+      },
+      {
+        "path": "docs/THINKTANK-TENANT-ADMIN-GUIDE.md",
+        "priority": "HIGH",
+        "triggers": ["tenant_admin", "tenant_settings", "tenant_reports", "team_settings", "org_admin", "cartridge"],
+        "description": "Tenant Admin app guide - company/team level settings, reports, users, cartridges"
       },
       {
         "path": "docs/THINKTANK-USER-GUIDE.md",
@@ -76,6 +82,16 @@
         "path": "docs/RADIANT-MOATS.md",
         "triggers": ["platform_advantage", "unique_feature"],
         "description": "Platform competitive differentiators"
+      },
+      {
+        "path": "docs/PITCH-DECK-POINTS.md",
+        "triggers": ["competitive_advantage", "unique_feature", "platform_advantage", "investor", "moat"],
+        "description": "Investor pitch deck talking points - short, punchy lines for presentations"
+      },
+      {
+        "path": "docs/RADIANT-CAPABILITIES-OVERVIEW.md",
+        "triggers": ["investor", "pitch", "leapfrog", "genesis_forge", "liquid_compute", "tensor_link", "ghost_simulation", "economic_cortex", "omega_point"],
+        "description": "Comprehensive capabilities overview for investors - Five Leapfrog Technologies, moat analysis, market positioning"
       },
       {
         "path": "docs/sections/SECTION-07-DATABASE-SCHEMA.md",
@@ -224,7 +240,9 @@
       "user_facing": ["CHANGELOG.md", "docs/THINKTANK-USER-GUIDE.md"],
       "ui_component": ["CHANGELOG.md", "docs/THINKTANK-USER-GUIDE.md", "docs/UI-UX-PATTERNS.md"],
       "orchestration": ["CHANGELOG.md", "docs/ORCHESTRATION-METHODS.md", "docs/ENGINEERING-IMPLEMENTATION-VISION.md"],
-      "competitive_advantage": ["CHANGELOG.md", "docs/THINKTANK-MOATS.md", "docs/RADIANT-MOATS.md", "docs/STRATEGIC-VISION-MARKETING.md"],
+      "competitive_advantage": ["CHANGELOG.md", "docs/THINKTANK-MOATS.md", "docs/RADIANT-MOATS.md", "docs/STRATEGIC-VISION-MARKETING.md", "docs/RADIANT-CAPABILITIES-OVERVIEW.md"],
+      "investor": ["CHANGELOG.md", "docs/RADIANT-CAPABILITIES-OVERVIEW.md", "docs/PITCH-DECK-POINTS.md"],
+      "leapfrog": ["CHANGELOG.md", "docs/RADIANT-CAPABILITIES-OVERVIEW.md", "docs/RADIANT-OMEGA-POINT.md"],
       "architecture": ["CHANGELOG.md", "docs/ENGINEERING-IMPLEMENTATION-VISION.md", "docs/RADIANT-PLATFORM-ARCHITECTURE.md"],
       "security": ["CHANGELOG.md", "docs/RADIANT-ADMIN-GUIDE.md", "docs/COMPLIANCE.md", "docs/security/authentication-architecture.md"],
       "auth": ["CHANGELOG.md", "docs/authentication/overview.md", "docs/RADIANT-ADMIN-GUIDE.md"],

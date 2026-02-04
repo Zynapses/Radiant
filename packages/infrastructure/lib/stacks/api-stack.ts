@@ -8,6 +8,7 @@ import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as rds from 'aws-cdk-lib/aws-rds';
 import * as s3 from 'aws-cdk-lib/aws-s3';
+import * as kms from 'aws-cdk-lib/aws-kms';
 import { Construct } from 'constructs';
 import type { TierConfig, Environment } from '@radiant/shared';
 import { RADIANT_VERSION } from '@radiant/shared';
@@ -31,6 +32,8 @@ export interface ApiStackProps extends cdk.StackProps {
   // Genesis Cato Safety Architecture
   catoRedisEndpoint?: string;
   catoRedisPort?: number;
+  // Cartridge PKI
+  cartridgeSigningKey?: kms.IKey;
 }
 
 export class ApiStack extends cdk.Stack {
@@ -74,6 +77,11 @@ export class ApiStack extends cdk.Stack {
       ...(props.catoRedisEndpoint ? {
         CATO_REDIS_ENDPOINT: props.catoRedisEndpoint,
         CATO_REDIS_PORT: String(props.catoRedisPort || 6379),
+      } : {}),
+      // Cartridge PKI
+      ...(props.cartridgeSigningKey ? {
+        RADIANT_PLATFORM_SIGNING_KEY_ID: props.cartridgeSigningKey.keyId,
+        RADIANT_PLATFORM_SIGNING_KEY_ARN: props.cartridgeSigningKey.keyArn,
       } : {}),
     };
 

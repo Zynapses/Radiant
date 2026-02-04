@@ -5,6 +5,309 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [6.6.0] - 2026-02-03
+
+### Added
+
+#### PROMPT-43: Autonomous Organism Architecture (Project Metamorphosis)
+
+Complete implementation of the **RADIANT Autonomous Organism Architecture** - a breakthrough evolution transforming the platform into a self-evolving, self-optimizing AI system.
+
+**Core Services** (`lambda/shared/services/organism/`):
+
+| Service | Purpose |
+|---------|---------|
+| `mcp-server-manager.service.ts` | MCP server registry with Neural Affinity Routing |
+| `neural-schema-registry.service.ts` | Tool schemas with neural embeddings for intelligent discovery |
+| `genesis-auto-tool.service.ts` | On-demand tool generation via API scraping and code synthesis |
+| `liquid-compute.service.ts` | Dynamic compute location selection (Browser/Local/Edge/Cloud) |
+| `ghost-simulation.service.ts` | User digital twin for outcome prediction |
+| `tensor-link.service.ts` | Vector-based transport protocol with quantization |
+| `economic-cortex.service.ts` | Autonomous budget management and cost optimization |
+
+**Neural Affinity Routing**:
+- Semantic similarity scoring using embeddings
+- Domain proficiency tracking per MCP server
+- Error rate and latency-aware routing
+- Constraint-based filtering (capabilities, cost, latency)
+
+**Genesis Auto-Tool Pipeline**:
+- API discovery via OpenAPI, GraphQL, HTML scraping
+- AI-powered MCP server code generation
+- Zod schema generation for type safety
+- Sandbox validation before deployment
+- Hot-loading into active sessions
+
+**Liquid Compute Topology**:
+- Browser (WASM), Local, Edge, Cloud location selection
+- Privacy-aware routing rules
+- Cost optimization with latency constraints
+- Sensitivity-based location restrictions
+
+**Ghost Simulation Layer**:
+- 4096-dimension user digital twin vectors
+- Component vectors: preference, behavior, emotional, knowledge
+- User reaction prediction
+- Outcome prediction with confidence levels
+- Automatic calibration from feedback
+
+**Tensor-Link Protocol**:
+- Float16/Float32 tensor serialization
+- LZ4/Zstd compression
+- Quantization (8-bit and 16-bit)
+- Streaming support for large tensors
+
+**Enhanced Economic Cortex**:
+- Multi-scope budgets (tenant/user/session/task)
+- Alert thresholds with automatic tier switching
+- Cost negotiation with alternative suggestions
+- Spending analytics and projections
+
+**Database Migration** (`V2026_02_03_001__autonomous_organism_architecture.sql`):
+- 18 new tables with RLS policies
+- 13 new enums for type safety
+- Comprehensive indexing for query performance
+
+**Shared Types** (`packages/shared/src/types/autonomous-organism.types.ts`):
+- ~500 lines of comprehensive TypeScript types
+- Full MCP protocol types
+- Neural routing interfaces
+- Ghost simulation types
+
+**Admin API** (`lambda/admin/organism.ts`):
+- 35 endpoints for organism management
+- `/mcp-servers/*` - MCP server CRUD, discovery, routing
+- `/tools/*` - Tool schema management, semantic search
+- `/genesis/*` - Tool generation requests and results
+- `/compute/*` - Topology configuration, location selection
+- `/ghost/*` - Simulation, vectors, calibration
+- `/economic/*` - Budget config, analytics, negotiation
+
+**Admin Dashboard** (`apps/admin-dashboard/app/(dashboard)/platform/organism/page.tsx`):
+- 6-tab interface: Overview, MCP Servers, Tools, Genesis, Compute, Ghost
+- Server health monitoring with latency badges
+- Tool schema browser with semantic search
+- Genesis tool generation form
+- Compute topology visualization
+- Ghost simulation runner
+
+**Integration Service** (`organism-integration.service.ts`):
+- `routeRequest()` - Full routing through all organism services
+- `executeWithOrganism()` - Tool execution with metrics tracking
+- `enhanceBrainRouterContext()` - Context enrichment for BrainRouter
+
+**Implementation Summary**:
+- 8 core services (~5,880 lines)
+- 35 Admin API endpoints
+- 6-tab Admin Dashboard (~600 lines)
+- 18 database tables with RLS
+- ~500 lines shared types
+
+---
+
+## [6.5.0] - 2026-02-03
+
+### Added
+
+#### PROMPT-42: Cartridge PKI KMS Integration
+
+Replaced placeholder strings with **real AWS KMS asymmetric signing** for the `.RADz` cartridge PKI system.
+
+**Security Stack** (`lib/stacks/security-stack.ts`):
+| Resource | Type | Purpose |
+|----------|------|---------|
+| `cartridgeSigningKey` | KMS ECC_NIST_P256 | Platform root CA for cartridge signing |
+
+**CartridgePKIService** (`lambda/shared/services/cartridge-pki.service.ts`):
+| Method | Before | After |
+|--------|--------|-------|
+| `generateTenantCA()` | Placeholder strings | Real KMS `CreateKeyCommand` + `SignCommand` |
+| `createSigningKey()` | Placeholder strings | Real KMS `CreateKeyCommand` + `GetPublicKeyCommand` |
+
+**API Stack** (`lib/stacks/api-stack.ts`):
+- Added `cartridgeSigningKey` prop
+- Added `RADIANT_PLATFORM_SIGNING_KEY_ID` and `RADIANT_PLATFORM_SIGNING_KEY_ARN` environment variables
+
+**Database Migration** (`migrations/139_cartridge_pki_kms.sql`):
+- Added `key_id`, `key_arn` columns to `tenant_ca_certificates`
+- Added `key_arn`, `ca_signature` columns to `cartridge_signing_keys`
+- Added `ecdsa_p256` to key algorithm enum
+- Created `pki_audit_log` table with RLS
+
+**Admin API** (`lambda/admin/pki.ts`):
+- Base URL: `/api/admin/pki`
+- 10 endpoints: dashboard, tenant-cas (CRUD + revoke), signing-keys (CRUD + revoke), verify, audit
+
+**Key Hierarchy**:
+```
+Platform Root CA (KMS ECC_NIST_P256)
+├── Signs Tenant CA certificates
+└── Key ID: RADIANT_PLATFORM_SIGNING_KEY_ID
+
+Tenant CA Keys (KMS ECC_NIST_P256)
+├── Created dynamically per tenant
+├── Signed by Platform Root CA
+└── Signs cartridge artifacts
+
+Signing Keys (KMS ECC_NIST_P256)
+├── Purpose-specific (author, publisher, validator)
+└── Signed by Tenant CA
+```
+
+**Audit Items Addressed**:
+| Item | Status |
+|------|--------|
+| CartridgePKI KMS actual keys | ✅ Implemented |
+| MLSService (RFC 9420) | ✅ Implemented |
+
+---
+
+#### MLS (Message Layer Security) RFC 9420 Implementation
+
+Implemented **RFC 9420-inspired group encryption** for secure agent-to-agent communication.
+
+**MLS Service** (`lambda/shared/services/mls/mls.service.ts`):
+| Feature | Implementation |
+|---------|----------------|
+| Key Packages | X25519 ECDH + Ed25519 signatures |
+| Group Management | Create, add/remove members, epoch tracking |
+| Forward Secrecy | HKDF-based key ratcheting per epoch |
+| Post-Compromise Security | Key updates increment epoch |
+| Message Encryption | AES-256-GCM with authenticated encryption |
+
+**Admin API** (`lambda/admin/mls.ts`):
+```
+GET    /api/admin/mls/dashboard           Dashboard stats
+POST   /api/admin/mls/key-packages        Create key package
+GET    /api/admin/mls/key-packages/:id    Get key package
+GET    /api/admin/mls/groups              List groups
+POST   /api/admin/mls/groups              Create group
+GET    /api/admin/mls/groups/:id          Get group details
+POST   /api/admin/mls/groups/:id/members  Add member
+DELETE /api/admin/mls/groups/:id/members/:mid  Remove member
+POST   /api/admin/mls/groups/:id/update-key    Update member key
+GET    /api/admin/mls/groups/:id/messages Get messages
+POST   /api/admin/mls/groups/:id/messages Send message
+GET    /api/admin/mls/audit               Audit log
+```
+
+**Database Migration** (`migrations/140_mls_message_layer_security.sql`):
+| Table | Purpose |
+|-------|---------|
+| `mls_key_packages` | Member credentials and public keys |
+| `mls_groups` | Group state with epoch and secrets |
+| `mls_group_members` | Membership with ratchet tree positions |
+| `mls_commits` | State change proposals (add/remove/update) |
+| `mls_messages` | Encrypted messages |
+| `mls_epoch_secrets` | Per-epoch secrets for forward secrecy |
+| `mls_audit_log` | Operation audit trail |
+
+**Security Properties**:
+- **Forward Secrecy**: Compromising current keys doesn't reveal past messages
+- **Post-Compromise Security**: Key updates heal from compromise
+- **Group Key Agreement**: Efficient key distribution using ratchet tree
+- **Authenticated Encryption**: AES-256-GCM with Ed25519 signatures
+
+---
+
+## [6.4.3] - 2026-02-03
+
+### Added
+
+#### Dashboard Widgets for Think Tank Admin Apps
+
+Implemented full dashboard pages with widgets for both Think Tank Admin and Think Tank Tenant Admin apps, matching RADIANT Admin quality.
+
+**Think Tank Admin Dashboard** (`apps/thinktank-admin/app/(dashboard)/page.tsx`):
+| Widget | Description |
+|--------|-------------|
+| Metric Cards | Active users, conversations, user rules, API requests |
+| System Health | Service status with latency and uptime |
+| Platform Stats | Active tenants, models active with progress bars |
+| Usage Trends | 7-day area chart for requests/tokens |
+| Domain Distribution | Pie chart of query topics |
+| Activity Feed | Recent platform events |
+| Quick Actions | Links to Delight, Domain Modes, Ego, Cartridges, Cato Safety |
+
+**Think Tank Tenant Admin Dashboard** (`apps/thinktank-tenant-admin/app/(dashboard)/page.tsx`):
+| Widget | Description |
+|--------|-------------|
+| Metric Cards | Active users, conversations, API requests, credits used |
+| Credits Usage | Progress bar with remaining credits |
+| MLS Usage | Mid-Level Services spend vs limit |
+| Cartridges | Active/total count with manage link |
+| Usage Trends | 7-day area chart for requests/tokens |
+| Activity Feed | Recent tenant events |
+| Alerts | Budget warnings, security notices |
+| Quick Actions | Links to Users, Reports, Settings, Security |
+
+---
+
+### Documentation
+
+#### Think Tank Tenant Admin Guide v1.0.0
+
+Created dedicated documentation for the **Think Tank Tenant Admin** app - the company/team level administration interface.
+
+**New Documentation**:
+- **THINKTANK-TENANT-ADMIN-GUIDE.md**: Complete guide for tenant administrators managing their organization's settings
+
+**Features Documented**:
+| Section | Description |
+|---------|-------------|
+| Dashboard | Tenant health and usage overview |
+| User Management | Invite, roles, MFA, bulk actions |
+| Team Settings | Organization-wide AI configuration |
+| Cartridge Manager | Tenant cartridge management (implemented) |
+| Report Writer | Tenant-scoped reports and scheduling |
+| Usage & Billing | Usage tracking, alerts, limits |
+| AI Configuration | Model preferences, prompt templates |
+| Integrations | SSO, Slack, Teams, webhooks, API keys |
+| Security Settings | MFA, retention, compliance |
+| Audit Log | Tenant-scoped audit trail |
+
+**Policy Updates**:
+- Added `THINKTANK-TENANT-ADMIN-GUIDE.md` to `docs-update-all.md` workflow
+- Added `tenant_admin` change type to documentation triggers
+- Added to `DOCUMENTATION-MANIFEST.json` with triggers: tenant_admin, tenant_settings, tenant_reports, team_settings, org_admin, cartridge
+- Updated quick reference card with tenant admin documentation
+
+**App Location**: `apps/thinktank-tenant-admin/`
+- Currently implemented: Cartridge Manager
+- Pending: Dashboard, Users, Settings, Reports, Billing, AI Config, Integrations, Security, Audit
+
+---
+
+#### Mid-Level Services (MLS) Documentation v5.0.0
+
+Comprehensive documentation for Mid-Level Services (MLS) - domain-specific AI orchestration that combines multiple specialized models into unified service endpoints.
+
+**Documentation Added**:
+- **ENGINEERING-IMPLEMENTATION-VISION.md**: Section 29 - Complete MLS architecture with TypeScript interfaces, service configurations, model registry tables, thermal state management, graceful degradation, API examples, and database schema
+- **RADIANT-ADMIN-GUIDE.md**: Section 92 - Admin guide for MLS dashboard, service states, endpoint documentation, thermal management, and API reference
+- **THINKTANK-ADMIN-GUIDE.md**: Section 58 - Tenant admin guide for MLS services, configuration, usage/billing, thermal visibility, workflow integration, and troubleshooting
+- **RADIANT-PLATFORM-ARCHITECTURE.md**: Section 1.12 - Architecture diagrams, request flow, service summaries, and key files
+- **RADIANT-MOATS.md**: Moat #32 - MLS as Tier 1 Technical Moat (Score: 27/30) with defensibility analysis
+
+**MLS Services Documented**:
+| Service | Domain | Models | Key Endpoints |
+|---------|--------|--------|---------------|
+| Perception | Computer Vision | 9 (YOLO, SAM, CLIP) | detect, segment, classify, analyze |
+| Scientific | Computational Biology | 4 (ESM-2, AlphaFold2) | protein/embed, protein/fold, geometry/solve |
+| Medical | Healthcare Imaging | 3 (MedSAM, nnU-Net) | segment, segment/3d, transcribe |
+| Geospatial | Satellite Imagery | 2 (Prithvi 100M/600M) | classify, change-detect |
+| Reconstruction | 3D Generation | 2 (Nerfstudio, 3DGS) | nerf, gaussian-splat |
+
+**Key Features Documented**:
+- Thermal state management (OFF, COLD, WARM, HOT, AUTOMATIC)
+- Graceful degradation (FULL, REDUCED, MINIMAL)
+- 38 self-hosted model registry with detailed parameters
+- HIPAA compliance for Medical service
+- Tier-gated access (GROWTH tier 3+, SCALE tier 4+)
+- Unified per-use pricing model
+
+---
+
 ## [6.4.2] - 2026-02-02
 
 ### Fixed

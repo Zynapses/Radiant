@@ -25,8 +25,8 @@ This document provides a comprehensive, code-validated overview of RADIANT's fou
 |--------|---------|----------------------|
 | **Brain** | AGI planning, cognitive processing, model orchestration | `agi-brain-planner.service.ts`, `cognitive-brain.service.ts` |
 | **Genesis** | Developmental gates, capability unlocking, maturity stages | `cato/genesis.service.ts` |
-| **Cortex** | Tiered memory architecture, knowledge graph, Graph-RAG | `cortex-intelligence.service.ts`, `cortex/*.ts` |
-| **Cato** | Safety pipeline, governance, human-in-the-loop checkpoints | `cato/safety-pipeline.service.ts`, `cato-pipeline-orchestrator.service.ts` |
+| **Cortex** | Tiered memory architecture, knowledge graph, Graph-RAG | `cortex/tier-coordinator.service.ts`, `cortex/*.ts` |
+| **Cato** | Safety pipeline, governance, human-in-the-loop checkpoints | `cato/safety-pipeline.service.ts`, `cato-methods/*.ts` |
 
 ---
 

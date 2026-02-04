@@ -9,7 +9,19 @@
  * - Federated trust for multi-cluster deployments
  */
 
-import { KMSClient, SignCommand, VerifyCommand, GetPublicKeyCommand, SigningAlgorithmSpec } from '@aws-sdk/client-kms';
+import { 
+  KMSClient, 
+  SignCommand, 
+  VerifyCommand, 
+  GetPublicKeyCommand, 
+  CreateKeyCommand,
+  CreateAliasCommand,
+  ScheduleKeyDeletionCommand,
+  SigningAlgorithmSpec,
+  KeySpec,
+  KeyUsageType,
+  MessageType,
+} from '@aws-sdk/client-kms';
 import { createHash, createPrivateKey, createPublicKey, sign, verify } from 'crypto';
 import { executeStatement, stringParam, boolParam } from '../db/client';
 import { enhancedLogger as logger } from '../logging/enhanced-logger';
@@ -687,7 +699,10 @@ class CartridgePKIService {
   // ===========================================================================
 
   /**
-   * Generate a new Tenant CA certificate
+   * Generate a new Tenant CA certificate using real KMS
+   * 
+   * Creates an asymmetric signing key in KMS for the tenant,
+   * then signs it with the platform root CA.
    */
   async generateTenantCA(
     tenantId: string,
@@ -695,44 +710,127 @@ class CartridgePKIService {
     performedBy: string,
     validityDays: number = 365 * 5
   ): Promise<TenantCACertificate> {
+    const startTime = Date.now();
+    
     try {
+      // Validate platform key is configured
+      if (!PLATFORM_KEY_ID) {
+        throw new Error('Platform signing key not configured (RADIANT_PLATFORM_SIGNING_KEY_ID)');
+      }
+
       const rootCA = await this.getRootCA();
       if (!rootCA) {
         throw new Error('No active root CA - run Genesis first');
       }
 
-      // In production, this would generate a key pair in KMS/HSM
-      // For now, we'll create a placeholder that references KMS
-      const keyId = `tenant-ca-${tenantId}-${Date.now()}`;
-      
-      // Request KMS to create a new asymmetric key pair
-      // This is a placeholder - actual implementation would use CreateKeyCommand
-      const publicKey = `-----BEGIN PUBLIC KEY-----\nPLACEHOLDER_FOR_KMS_KEY_${keyId}\n-----END PUBLIC KEY-----`;
-      const fingerprint = createHash('sha256').update(publicKey).digest('hex');
+      const appId = process.env.APP_ID || 'radiant';
+      const environment = process.env.ENVIRONMENT || 'dev';
+      const keyAlias = `alias/${appId}-${environment}-tenant-ca-${tenantId}`;
 
+      // 1. Create asymmetric key for tenant in KMS
+      const createKeyResponse = await this.kmsClient.send(new CreateKeyCommand({
+        KeySpec: KeySpec.ECC_NIST_P256,
+        KeyUsage: KeyUsageType.SIGN_VERIFY,
+        Description: `Tenant CA signing key for ${tenantId} - ${tenantName}`,
+        Tags: [
+          { TagKey: 'TenantId', TagValue: tenantId },
+          { TagKey: 'Purpose', TagValue: 'TenantCA' },
+          { TagKey: 'Application', TagValue: 'RADIANT' },
+          { TagKey: 'Environment', TagValue: environment },
+        ],
+        MultiRegion: false,
+      }));
+
+      const kmsKeyId = createKeyResponse.KeyMetadata!.KeyId!;
+      const keyArn = createKeyResponse.KeyMetadata!.Arn!;
+
+      // 2. Create alias for easier reference
+      try {
+        await this.kmsClient.send(new CreateAliasCommand({
+          AliasName: keyAlias,
+          TargetKeyId: kmsKeyId,
+        }));
+      } catch (aliasError: any) {
+        // Alias might already exist from previous attempt
+        if (aliasError.name !== 'AlreadyExistsException') {
+          logger.warn('Failed to create key alias', { aliasError, keyAlias });
+        }
+      }
+
+      // 3. Get the public key
+      const pubKeyResponse = await this.kmsClient.send(new GetPublicKeyCommand({
+        KeyId: kmsKeyId,
+      }));
+
+      if (!pubKeyResponse.PublicKey) {
+        throw new Error('Failed to retrieve public key from KMS');
+      }
+
+      // Convert to PEM format
+      const publicKeyBase64 = Buffer.from(pubKeyResponse.PublicKey).toString('base64');
+      const publicKeyPem = `-----BEGIN PUBLIC KEY-----\n${publicKeyBase64.match(/.{1,64}/g)?.join('\n')}\n-----END PUBLIC KEY-----`;
+      
+      // 4. Calculate fingerprint (SHA-256 of DER-encoded public key)
+      const fingerprint = createHash('sha256')
+        .update(Buffer.from(pubKeyResponse.PublicKey))
+        .digest('hex');
+
+      // 5. Create certificate data to sign
       const validFrom = new Date();
       const validUntil = new Date(Date.now() + validityDays * 24 * 60 * 60 * 1000);
+      
+      const certificateData = {
+        version: 3,
+        serialNumber: `${Date.now()}-${tenantId}`,
+        issuer: 'RADIANT Platform Root CA',
+        subject: `Tenant CA - ${tenantName}`,
+        organization: tenantName,
+        tenantId,
+        keyId: kmsKeyId,
+        publicKey: publicKeyBase64,
+        fingerprint,
+        validFrom: validFrom.toISOString(),
+        validTo: validUntil.toISOString(),
+      };
 
-      // Sign with root CA (placeholder - would use KMS)
-      const rootSignature = `ROOT_SIGNED_${fingerprint}_WITH_${rootCA.fingerprint}`;
+      const certificateBuffer = Buffer.from(JSON.stringify(certificateData), 'utf-8');
 
+      // 6. Sign with platform root CA using KMS
+      const signResponse = await this.kmsClient.send(new SignCommand({
+        KeyId: PLATFORM_KEY_ID,
+        Message: createHash('sha256').update(certificateBuffer).digest(),
+        MessageType: MessageType.DIGEST,
+        SigningAlgorithm: SigningAlgorithmSpec.ECDSA_SHA_256,
+      }));
+
+      if (!signResponse.Signature) {
+        throw new Error('Failed to sign tenant certificate with platform CA');
+      }
+
+      const rootSignature = Buffer.from(signResponse.Signature).toString('base64');
+
+      // 7. Store in database
       const result = await executeStatement(
         `INSERT INTO tenant_ca_certificates (
           tenant_id, tenant_name, root_ca_id, public_key, fingerprint,
-          algorithm, valid_from, valid_until, status, root_signature
+          algorithm, valid_from, valid_until, status, root_signature,
+          key_id, key_arn
         ) VALUES (
           :tenant_id, :tenant_name, :root_ca_id, :public_key, :fingerprint,
-          'ed25519', :valid_from, :valid_until, 'active', :root_signature
+          'ecdsa_p256', :valid_from, :valid_until, 'active', :root_signature,
+          :key_id, :key_arn
         ) RETURNING *`,
         [
           stringParam('tenant_id', tenantId),
           stringParam('tenant_name', tenantName),
           stringParam('root_ca_id', rootCA.id),
-          stringParam('public_key', publicKey),
+          stringParam('public_key', publicKeyPem),
           stringParam('fingerprint', fingerprint),
           stringParam('valid_from', validFrom.toISOString()),
           stringParam('valid_until', validUntil.toISOString()),
           stringParam('root_signature', rootSignature),
+          stringParam('key_id', kmsKeyId),
+          stringParam('key_arn', keyArn),
         ]
       );
 
@@ -741,9 +839,18 @@ class CartridgePKIService {
       // Create signing keys for this tenant
       await this.createSigningKey(tenantId, tenantCA.id, 'author');
 
-      await this.logAudit('generate_ca', 'tenant_ca', tenantCA.id, tenantId, performedBy, undefined, true);
+      await this.logAudit('generate_ca', 'tenant_ca', tenantCA.id, tenantId, performedBy, undefined, true, undefined, {
+        fingerprint,
+        kmsKeyId,
+        durationMs: Date.now() - startTime,
+      });
 
-      logger.info('Tenant CA generated', { tenantId, fingerprint });
+      logger.info('Tenant CA generated with real KMS', { 
+        tenantId, 
+        fingerprint, 
+        kmsKeyId,
+        durationMs: Date.now() - startTime,
+      });
       return tenantCA;
     } catch (error) {
       logger.error('Failed to generate tenant CA', { error, tenantId });
@@ -752,41 +859,143 @@ class CartridgePKIService {
   }
 
   /**
-   * Create a signing key for a tenant
+   * Create a signing key for a tenant using real KMS
+   * 
+   * Creates an asymmetric signing key in KMS for the specified purpose,
+   * then signs it with the tenant's CA.
    */
   private async createSigningKey(
     tenantId: string,
     tenantCaId: string,
     purpose: 'author' | 'platform'
   ): Promise<CartridgeSigningKey> {
-    const keyId = `signing-${purpose}-${tenantId}-${Date.now()}`;
-    const publicKey = `-----BEGIN PUBLIC KEY-----\nPLACEHOLDER_SIGNING_KEY_${keyId}\n-----END PUBLIC KEY-----`;
-    const fingerprint = createHash('sha256').update(publicKey).digest('hex');
+    const startTime = Date.now();
+    const appId = process.env.APP_ID || 'radiant';
+    const environment = process.env.ENVIRONMENT || 'dev';
+    const keyAlias = `alias/${appId}-${environment}-signing-${purpose}-${tenantId}-${Date.now()}`;
 
-    const validFrom = new Date();
-    const validUntil = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000); // 1 year
+    try {
+      // 1. Get tenant CA to sign with
+      const tenantCA = await this.getTenantCA(tenantId);
+      if (!tenantCA || tenantCA.status !== 'active') {
+        throw new Error(`No active Tenant CA found for tenant ${tenantId}`);
+      }
 
-    const result = await executeStatement(
-      `INSERT INTO cartridge_signing_keys (
-        tenant_id, tenant_ca_id, key_id, public_key, fingerprint,
-        algorithm, purpose, valid_from, valid_until, status
-      ) VALUES (
-        :tenant_id, :tenant_ca_id, :key_id, :public_key, :fingerprint,
-        'ed25519', :purpose, :valid_from, :valid_until, 'active'
-      ) RETURNING *`,
-      [
-        stringParam('tenant_id', tenantId),
-        stringParam('tenant_ca_id', tenantCaId),
-        stringParam('key_id', keyId),
-        stringParam('public_key', publicKey),
-        stringParam('fingerprint', fingerprint),
-        stringParam('purpose', purpose),
-        stringParam('valid_from', validFrom.toISOString()),
-        stringParam('valid_until', validUntil.toISOString()),
-      ]
-    );
+      // 2. Create asymmetric key in KMS
+      const createKeyResponse = await this.kmsClient.send(new CreateKeyCommand({
+        KeySpec: KeySpec.ECC_NIST_P256,
+        KeyUsage: KeyUsageType.SIGN_VERIFY,
+        Description: `Signing key (${purpose}) for tenant ${tenantId}`,
+        Tags: [
+          { TagKey: 'TenantId', TagValue: tenantId },
+          { TagKey: 'Purpose', TagValue: purpose },
+          { TagKey: 'Application', TagValue: 'RADIANT' },
+          { TagKey: 'Environment', TagValue: environment },
+        ],
+      }));
 
-    return this.mapRowToSigningKey(result.rows?.[0]);
+      const kmsKeyId = createKeyResponse.KeyMetadata!.KeyId!;
+      const keyArn = createKeyResponse.KeyMetadata!.Arn!;
+
+      // 3. Create alias
+      try {
+        await this.kmsClient.send(new CreateAliasCommand({
+          AliasName: keyAlias,
+          TargetKeyId: kmsKeyId,
+        }));
+      } catch (aliasError: any) {
+        if (aliasError.name !== 'AlreadyExistsException') {
+          logger.warn('Failed to create signing key alias', { aliasError, keyAlias });
+        }
+      }
+
+      // 4. Get public key
+      const pubKeyResponse = await this.kmsClient.send(new GetPublicKeyCommand({
+        KeyId: kmsKeyId,
+      }));
+
+      if (!pubKeyResponse.PublicKey) {
+        throw new Error('Failed to retrieve public key from KMS');
+      }
+
+      const publicKeyBase64 = Buffer.from(pubKeyResponse.PublicKey).toString('base64');
+      const publicKeyPem = `-----BEGIN PUBLIC KEY-----\n${publicKeyBase64.match(/.{1,64}/g)?.join('\n')}\n-----END PUBLIC KEY-----`;
+      
+      const fingerprint = createHash('sha256')
+        .update(Buffer.from(pubKeyResponse.PublicKey))
+        .digest('hex');
+
+      // 5. Create key certificate data
+      const validFrom = new Date();
+      const validUntil = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000); // 1 year
+      
+      const keyData = {
+        keyId: kmsKeyId,
+        tenantId,
+        purpose,
+        publicKey: publicKeyBase64,
+        fingerprint,
+        issuer: tenantCA.fingerprint,
+        validFrom: validFrom.toISOString(),
+        validTo: validUntil.toISOString(),
+      };
+
+      const keyDataBuffer = Buffer.from(JSON.stringify(keyData), 'utf-8');
+
+      // 6. Sign with Tenant CA (if tenant CA has a KMS key)
+      let caSignature = '';
+      if (tenantCA.rootSignature && tenantCA.fingerprint) {
+        // Use the tenant CA's KMS key to sign this signing key
+        const tenantCAKeyId = (tenantCA as any).keyId || (tenantCA as any).key_id;
+        if (tenantCAKeyId) {
+          const signResponse = await this.kmsClient.send(new SignCommand({
+            KeyId: tenantCAKeyId,
+            Message: createHash('sha256').update(keyDataBuffer).digest(),
+            MessageType: MessageType.DIGEST,
+            SigningAlgorithm: SigningAlgorithmSpec.ECDSA_SHA_256,
+          }));
+          if (signResponse.Signature) {
+            caSignature = Buffer.from(signResponse.Signature).toString('base64');
+          }
+        }
+      }
+
+      // 7. Store in database
+      const result = await executeStatement(
+        `INSERT INTO cartridge_signing_keys (
+          tenant_id, tenant_ca_id, key_id, public_key, fingerprint,
+          algorithm, purpose, valid_from, valid_until, status, key_arn, ca_signature
+        ) VALUES (
+          :tenant_id, :tenant_ca_id, :key_id, :public_key, :fingerprint,
+          'ecdsa_p256', :purpose, :valid_from, :valid_until, 'active', :key_arn, :ca_signature
+        ) RETURNING *`,
+        [
+          stringParam('tenant_id', tenantId),
+          stringParam('tenant_ca_id', tenantCaId),
+          stringParam('key_id', kmsKeyId),
+          stringParam('public_key', publicKeyPem),
+          stringParam('fingerprint', fingerprint),
+          stringParam('purpose', purpose),
+          stringParam('valid_from', validFrom.toISOString()),
+          stringParam('valid_until', validUntil.toISOString()),
+          stringParam('key_arn', keyArn),
+          stringParam('ca_signature', caSignature),
+        ]
+      );
+
+      logger.info('Signing key created with real KMS', {
+        tenantId,
+        purpose,
+        kmsKeyId,
+        fingerprint,
+        durationMs: Date.now() - startTime,
+      });
+
+      return this.mapRowToSigningKey(result.rows?.[0]);
+    } catch (error) {
+      logger.error('Failed to create signing key', { error, tenantId, purpose });
+      throw error;
+    }
   }
 
   // ===========================================================================

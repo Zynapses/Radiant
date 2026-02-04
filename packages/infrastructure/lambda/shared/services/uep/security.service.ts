@@ -592,69 +592,34 @@ export class UEPSecurityService {
 }
 
 // ============================================================================
-// MLS (Message Layer Security) Integration Design
+// MLS (Message Layer Security) Integration - RFC 9420
 // ============================================================================
+// 
+// Full MLS implementation available in: ../mls/mls.service.ts
+// 
+// Provides:
+// - Forward secrecy through epoch-based key ratcheting
+// - Post-compromise security via key updates
+// - Efficient group key agreement using X25519
+// - Authenticated encryption with AES-256-GCM
+//
+// Use cases:
+// - Encrypted agent-to-agent communication
+// - Secure multi-tenant data sharing
+// - Federated AI orchestration
 
-/**
- * MLS Group for multi-agent encrypted communication
- * 
- * This is a design placeholder for future MLS (RFC 9420) integration.
- * MLS provides:
- * - Forward secrecy
- * - Post-compromise security
- * - Group key agreement
- * - Efficient key updates
- * 
- * Use cases:
- * - Encrypted agent-to-agent communication
- * - Secure multi-tenant data sharing
- * - Federated AI orchestration
- */
-export interface MLSGroupConfig {
-  groupId: string;
-  tenantId: string;
-  cipherSuite: 'MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519' | 'MLS_256_DHKEMP384_AES256GCM_SHA384_P384';
-  members: MLSGroupMember[];
-  epoch: number;
-  createdAt: string;
-  expiresAt?: string;
-}
-
-export interface MLSGroupMember {
-  memberId: string;
-  memberType: 'agent' | 'service' | 'user';
-  publicKey: string; // Base64 encoded
-  addedAt: string;
-  addedBy: string;
-}
-
-/**
- * Placeholder for MLS service (future implementation)
- */
-export class MLSService {
-  // Future: Implement MLS group management
-  // This would use a library like @aspect-dev/mls or similar
-  
-  async createGroup(config: Omit<MLSGroupConfig, 'epoch' | 'createdAt'>): Promise<MLSGroupConfig> {
-    throw new Error('MLS implementation pending - see RFC 9420');
-  }
-  
-  async addMember(groupId: string, member: Omit<MLSGroupMember, 'addedAt'>): Promise<void> {
-    throw new Error('MLS implementation pending - see RFC 9420');
-  }
-  
-  async removeMember(groupId: string, memberId: string): Promise<void> {
-    throw new Error('MLS implementation pending - see RFC 9420');
-  }
-  
-  async encryptForGroup(groupId: string, plaintext: Buffer): Promise<Buffer> {
-    throw new Error('MLS implementation pending - see RFC 9420');
-  }
-  
-  async decryptFromGroup(groupId: string, ciphertext: Buffer): Promise<Buffer> {
-    throw new Error('MLS implementation pending - see RFC 9420');
-  }
-}
+// Re-export MLS types and service for convenience
+export {
+  MLSService,
+  getMLSService,
+  type MLSCipherSuite,
+  type MLSKeyPackage,
+  type MLSGroupMember,
+  type MLSGroupState,
+  type MLSCommit,
+  type MLSMessage,
+  type MLSDecryptedMessage,
+} from '../mls';
 
 // Singleton instance
 let securityServiceInstance: UEPSecurityService | null = null;

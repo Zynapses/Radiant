@@ -805,32 +805,208 @@ Scorers have thermal states (cold/warm/hot) that control inference:
 
 ---
 
-## 1.12 Mid-Level Services
+## 1.12 Mid-Level Services (MLS) Architecture v5.0.0
+
+Mid-Level Services (MLS) are domain-specific orchestration services that combine multiple AI models to provide unified capabilities for specific use cases. MLS sits between the low-level model APIs and high-level application logic.
+
+### Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                     API Gateway (/api/v2/mls/*)                 │
+├─────────────────────────────────────────────────────────────────┤
+│                    MLS Router (Lambda)                          │
+│  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌───────────┐ │
+│  │Perception│ │Scientific│ │ Medical │ │Geospatial│ │Reconstruct│ │
+│  └────┬────┘ └────┬────┘ └────┬────┘ └────┬────┘ └─────┬─────┘ │
+├───────┼──────────┼──────────┼──────────┼─────────────┼─────────┤
+│       │          │          │          │             │         │
+│  ┌────▼────┐┌────▼────┐┌────▼────┐┌────▼────┐ ┌──────▼──────┐  │
+│  │ YOLOv8  ││ ESM-2   ││ MedSAM  ││ Prithvi ││ Nerfstudio  │  │
+│  │ SAM/SAM2││AlphaFold││ nnU-Net ││ 100M/   ││ 3D Gaussian │  │
+│  │ CLIP    ││AlphaGeom││ Whisper ││ 600M    ││             │  │
+│  │ Dino    ││ Protenix││         ││         ││             │  │
+│  └─────────┘└─────────┘└─────────┘└─────────┘ └─────────────┘  │
+│                    SageMaker Endpoints                          │
+├─────────────────────────────────────────────────────────────────┤
+│              Thermal Manager (EventBridge + SQS)                │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Key Design Principles
+
+| Principle | Description |
+|-----------|-------------|
+| **Orchestration** | Services combine 2-8 models for complex pipelines |
+| **Graceful Degradation** | Services remain functional when optional models are offline |
+| **Thermal Awareness** | Auto-warms models on first request, scales to zero when idle |
+| **Tier-Gated Access** | Different services available at different subscription tiers |
+| **Unified Pricing** | Per-use pricing abstracts underlying model costs |
+| **Compliance-Ready** | HIPAA, SOC 2, GDPR compliant by design |
+
+### Service Summary
+
+| Service | Domain | Min Tier | Required Models | Optional Models | Endpoints |
+|---------|--------|----------|-----------------|-----------------|-----------|
+| **Perception** | Computer Vision | 3 (GROWTH) | yolov8m, mobilesam | yolov8x, sam-vit-h, sam2, clip, grounding-dino | 4 |
+| **Scientific** | Computational Biology | 4 (SCALE) | esm2-3b | alphafold2, alphageometry, protenix | 3 |
+| **Medical** | Healthcare Imaging | 4 (SCALE) | medsam | nnunet, whisper-large-v3 | 3 |
+| **Geospatial** | Satellite Imagery | 4 (SCALE) | prithvi-100m | prithvi-600m | 2 |
+| **Reconstruction** | 3D Generation | 4 (SCALE) | nerfstudio | 3d-gaussian-splatting | 2 |
+
+### Request Flow
+
+```
+1. Request → API Gateway → MLS Router Lambda
+2. Router checks: tenant tier, service state, model availability
+3. If model COLD → Return 202 Accepted, queue warm-up via SQS
+4. If model WARM/HOT → Route to SageMaker endpoint
+5. Orchestrate multi-model pipeline if needed
+6. Return response with usage metrics
+7. EventBridge triggers scale-down after idle period
+```
 
 ### Perception Service
 
-| Endpoint | Models | Purpose |
-|----------|--------|---------|
-| `/perception/detect` | YOLOv8 | Object detection |
-| `/perception/segment` | SAM | Image segmentation |
-| `/perception/classify` | EfficientNet | Image classification |
-| `/perception/analyze` | Pipeline | Full analysis |
+**Purpose**: Unified computer vision pipeline for object detection, segmentation, classification, and analysis.
+
+| Endpoint | Description | Input | Output |
+|----------|-------------|-------|--------|
+| `/perception/detect` | Object detection with bounding boxes | image/* | JSON |
+| `/perception/segment` | Object/region segmentation | image/* | JSON, PNG mask |
+| `/perception/classify` | Image classification | image/* | JSON |
+| `/perception/analyze` | Full pipeline: detect + segment + classify | image/* | JSON |
+
+**Models**: YOLOv8m/x, YOLOv11x, MobileSAM, SAM-ViT-H, SAM2, CLIP-ViT-L14, Grounding-DINO, EfficientNetV2-L
+
+**Pricing**: $0.02/image, $0.50/minute video (40% margin)
 
 ### Scientific Service
 
-| Endpoint | Models | Purpose |
-|----------|--------|---------|
-| `/scientific/protein/embed` | ESM-2 | Protein embeddings |
-| `/scientific/protein/fold` | AlphaFold2 | Structure prediction |
-| `/scientific/geometry/solve` | AlphaGeometry | Math reasoning |
+**Purpose**: Protein analysis, embeddings, structure prediction, and computational biology pipelines.
 
-### Medical Service
+| Endpoint | Description | Input | Output |
+|----------|-------------|-------|--------|
+| `/scientific/protein/embed` | Generate protein sequence embeddings | FASTA, JSON | JSON |
+| `/scientific/protein/fold` | Predict protein 3D structure | FASTA | PDB, mmCIF, JSON |
+| `/scientific/geometry/solve` | Solve mathematical geometry problems | JSON | JSON |
 
-| Endpoint | Models | Purpose |
-|----------|--------|---------|
-| `/medical/segment` | MedSAM | Anatomical segmentation |
-| `/medical/segment/3d` | nnU-Net | Volumetric segmentation |
-| `/medical/transcribe` | Whisper | Medical dictation |
+**Models**: ESM-2 3B, AlphaFold2, AlphaGeometry, Protenix
+
+**Pricing**: $0.50/request (40% margin)
+
+### Medical Service (HIPAA Compliant)
+
+**Purpose**: HIPAA-compliant medical image segmentation, analysis, and transcription.
+
+| Endpoint | Description | Input | Output |
+|----------|-------------|-------|--------|
+| `/medical/segment` | 2D anatomical segmentation | DICOM, PNG, JPEG | JSON, PNG |
+| `/medical/segment/3d` | Volumetric 3D CT/MRI segmentation | DICOM, NIfTI | NIfTI, JSON |
+| `/medical/transcribe` | Medical dictation transcription | WAV, MP3, M4A | JSON, text |
+
+**Models**: MedSAM, nnU-Net, Whisper Large v3
+
+**Compliance**: PHI sanitization, 6-year retention, full audit logging, BAA required
+
+**Pricing**: $0.15/image, $0.08/minute audio (40% margin)
+
+### Geospatial Service
+
+**Purpose**: Satellite imagery analysis, land classification, and earth observation.
+
+| Endpoint | Description | Input | Output |
+|----------|-------------|-------|--------|
+| `/geospatial/classify` | Land use and land cover classification | GeoTIFF | JSON, GeoTIFF |
+| `/geospatial/change-detect` | Detect changes between satellite images | GeoTIFF | JSON, GeoTIFF |
+
+**Models**: Prithvi 100M, Prithvi 600M (NASA/IBM)
+
+**Pricing**: $0.05/image (40% margin)
+
+### 3D Reconstruction Service
+
+**Purpose**: Neural Radiance Fields (NeRF) and 3D Gaussian Splatting for 3D scene reconstruction.
+
+| Endpoint | Description | Input | Output |
+|----------|-------------|-------|--------|
+| `/reconstruction/nerf` | 3D scene from images using NeRF | MP4, images | GLTF, OBJ, MP4 |
+| `/reconstruction/gaussian` | Real-time 3D via Gaussian Splatting | MP4, images | PLY, GLTF |
+
+**Models**: Nerfstudio, 3D Gaussian Splatting
+
+**Pricing**: $5.00/3D model (40% margin)
+
+### Thermal State Management
+
+| State | Description | Response Time | Cost |
+|-------|-------------|---------------|------|
+| **OFF** | Model not deployed | N/A | $0 |
+| **COLD** | Endpoint exists, 0 instances | 2-5 min warm-up | Minimal |
+| **WARM** | 1+ instances running | Seconds | Instance hours |
+| **HOT** | Max instances, autoscaling | <1 second | Higher |
+| **AUTOMATIC** | System-managed | Variable | Optimized |
+
+**Warm-up Triggers**: On-Demand (202 Accepted), Scheduled (EventBridge), Predictive (usage patterns), Manual (admin)
+
+### Model Registry (38 Self-Hosted Models)
+
+| Category | Count | Examples |
+|----------|-------|----------|
+| Computer Vision | 19 | YOLOv8/11, SAM/SAM2, CLIP, EfficientNet |
+| Audio/Speech | 6 | Whisper, TitaNet, pyannote |
+| Scientific | 4 | AlphaFold2, ESM-2, AlphaGeometry |
+| Medical | 2 | MedSAM, nnU-Net |
+| Geospatial | 2 | Prithvi 100M/600M |
+| Generative/3D | 5 | Nerfstudio, 3D Gaussian, Llama 3, Qwen |
+
+### Graceful Degradation
+
+| Level | Description | Example |
+|-------|-------------|---------|
+| **FULL** | All models available | All capabilities active |
+| **REDUCED** | Only required models | HD features disabled |
+| **MINIMAL** | Partial required models | Limited capabilities |
+
+### Database Schema
+
+```sql
+-- Thermal state tracking
+CREATE TABLE mls_model_thermal_states (
+    model_id TEXT PRIMARY KEY,
+    thermal_state thermal_state_enum DEFAULT 'OFF',
+    current_instances INTEGER DEFAULT 0,
+    max_instances INTEGER DEFAULT 10,
+    last_request_at TIMESTAMPTZ,
+    warm_up_started_at TIMESTAMPTZ,
+    warm_up_completed_at TIMESTAMPTZ,
+    scale_down_scheduled_at TIMESTAMPTZ,
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Service state and health
+CREATE TABLE mls_service_states (
+    service_id TEXT PRIMARY KEY,
+    tenant_id UUID REFERENCES tenants(id),
+    state service_state_enum DEFAULT 'RUNNING',
+    degradation_level TEXT DEFAULT 'FULL',
+    required_models_available BOOLEAN DEFAULT true,
+    optional_models_count INTEGER DEFAULT 0,
+    last_health_check_at TIMESTAMPTZ,
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+### Key Files
+
+| Component | Path |
+|-----------|------|
+| Model Configurations | `packages/infrastructure/lib/config/models/` |
+| Service Definitions | `packages/infrastructure/lib/config/services/` |
+| Thermal Management | `packages/infrastructure/lambda/thermal/` |
+| Service Orchestrators | `packages/infrastructure/lambda/services/` |
+| Database Schema | `migrations/006_self_hosted_models.sql` |
+| LiteLLM Routing | `litellm/config/self-hosted.yaml` |
 
 ---
 
@@ -1293,6 +1469,367 @@ Execute in this order:
 8. **V2026_01_20_009** - Execution History
 9. **V2026_01_20_010** - Seed Data (Built-in Agents, Sample Apps)
 10. **V2026_01_21_005** - AI Reports (brand_kits, report_templates, generated_reports, report_smart_insights, report_exports, report_chat_history, report_schedules)
+11. **139_cartridge_pki_kms.sql** - Cartridge PKI KMS Integration (key_id, key_arn columns, pki_audit_log table)
+12. **140_mls_message_layer_security.sql** - MLS RFC 9420 (7 tables for group encryption)
+
+---
+
+## 3.2.2 MLS (Message Layer Security) RFC 9420 Implementation
+
+RFC 9420-inspired group encryption for secure agent-to-agent communication. Provides cryptographic guarantees essential for multi-agent AI systems where agents communicate across trust boundaries.
+
+### Why MLS for Agent-to-Agent Communication?
+
+| Challenge | MLS Solution |
+|-----------|--------------|
+| Agents join/leave dynamically | Epoch-based key rotation on membership changes |
+| Need end-to-end encryption | AES-256-GCM authenticated encryption |
+| Key compromise recovery | Post-compromise security via key updates |
+| Audit requirements | All operations logged with cryptographic binding |
+| Multi-tenant isolation | RLS on all tables with tenant_id |
+
+### Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                     MLS Group Encryption                         │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌──────────┐     ┌──────────┐     ┌──────────┐                │
+│  │ Agent A  │     │ Agent B  │     │ Agent C  │                │
+│  │ (leaf 0) │     │ (leaf 1) │     │ (leaf 2) │                │
+│  └────┬─────┘     └────┬─────┘     └────┬─────┘                │
+│       │                │                │                        │
+│       └────────────────┼────────────────┘                        │
+│                        │                                         │
+│                        ▼                                         │
+│           ┌────────────────────────┐                            │
+│           │     Ratchet Tree       │                            │
+│           │  (Key Agreement Tree)  │                            │
+│           └────────────┬───────────┘                            │
+│                        │                                         │
+│                        ▼                                         │
+│           ┌────────────────────────┐                            │
+│           │     Group Secret       │                            │
+│           │   (Epoch-specific)     │                            │
+│           └────────────┬───────────┘                            │
+│                        │                                         │
+│         ┌──────────────┼──────────────┐                         │
+│         ▼              ▼              ▼                         │
+│   ┌──────────┐  ┌──────────┐  ┌──────────┐                     │
+│   │ Message  │  │ Confirm  │  │  Epoch   │                     │
+│   │   Key    │  │   Key    │  │  Secret  │                     │
+│   └──────────┘  └──────────┘  └──────────┘                     │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Service Files
+
+| File | Purpose | Lines |
+|------|---------|-------|
+| `lambda/shared/services/mls/mls.service.ts` | Core MLS implementation | 936 |
+| `lambda/shared/services/mls/index.ts` | Module exports | 14 |
+| `lambda/admin/mls.ts` | Admin API endpoints | 551 |
+| `migrations/140_mls_message_layer_security.sql` | Database schema | ~300 |
+
+### Database Tables
+
+| Table | Columns | Purpose |
+|-------|---------|---------|
+| `mls_key_packages` | key_package_id, member_id, member_type, public_key, signature_key, private_key_encrypted, sig_private_key_encrypted, credential, cipher_suite, created_at, expires_at, revoked_at | X25519/Ed25519 key packages |
+| `mls_groups` | group_id, tenant_id, name, cipher_suite, epoch, tree_hash, confirmation_key, group_secret_encrypted, created_at, updated_at, expires_at | Group state with epoch tracking |
+| `mls_group_members` | id, group_id, member_id, member_type, key_package_id, public_key, leaf_index, added_at, added_by, removed_at, removed_by | Membership and ratchet tree positions |
+| `mls_commits` | commit_id, group_id, epoch, proposal_type, proposer_id, target_member_id, signature, created_at | State change proposals (add/remove/update) |
+| `mls_messages` | message_id, group_id, epoch, sender_id, content_type, ciphertext, iv, auth_tag, signature, sent_at | Encrypted messages |
+| `mls_epoch_secrets` | id, group_id, epoch, secret_encrypted, created_at, expires_at | Per-epoch secrets for forward secrecy |
+| `mls_audit_log` | id, tenant_id, action, group_id, member_id, performed_by, details, ip_address, user_agent, created_at | Operation audit trail |
+
+### Cryptographic Primitives
+
+| Primitive | Algorithm | Purpose |
+|-----------|-----------|---------|
+| Key Exchange | X25519 | ECDH key agreement between members |
+| Encryption | AES-256-GCM | Authenticated encryption of messages |
+| Signatures | Ed25519 | Signing commits and messages |
+| Key Derivation | HKDF-SHA256 | Deriving epoch and message keys |
+| Hashing | SHA-256 | Tree hashing, content binding |
+
+### Security Properties
+
+| Property | Implementation | Benefit |
+|----------|----------------|---------|
+| **Forward Secrecy** | HKDF key ratcheting per epoch | Past messages protected if current key compromised |
+| **Post-Compromise Security** | Key updates increment epoch, rotate all secrets | System heals after temporary compromise |
+| **Group Key Agreement** | Ratchet tree structure (O(log n) updates) | Efficient key distribution without n² exchanges |
+| **Authenticated Encryption** | AES-256-GCM with Ed25519 signatures | Confidentiality + integrity + authenticity |
+| **Transcript Integrity** | Epoch binding prevents replay | Messages can't be reordered or replayed |
+
+### Epoch Lifecycle
+
+```
+Epoch 0 (Group Created)
+    │
+    ├─── Add Member B ───────► Epoch 1
+    │
+    ├─── Add Member C ───────► Epoch 2
+    │
+    ├─── Member B Updates Key ─► Epoch 3  (Post-Compromise Security)
+    │
+    ├─── Remove Member A ─────► Epoch 4
+    │
+    └─── Messages encrypted with Epoch 4 secrets
+```
+
+### Admin API Endpoints
+
+| Endpoint | Method | Description | Request Body |
+|----------|--------|-------------|--------------|
+| `/api/admin/mls/dashboard` | GET | Dashboard stats | - |
+| `/api/admin/mls/key-packages` | POST | Create key package | `{memberId, memberType, credential, cipherSuite?, validityDays?}` |
+| `/api/admin/mls/key-packages/:id` | GET | Get key package | - |
+| `/api/admin/mls/groups` | GET | List groups | - |
+| `/api/admin/mls/groups` | POST | Create group | `{name, creatorMemberId, cipherSuite?, expiresAt?}` |
+| `/api/admin/mls/groups/:id` | GET | Get group with members | - |
+| `/api/admin/mls/groups/:id/members` | POST | Add member (increments epoch) | `{memberId, addedBy}` |
+| `/api/admin/mls/groups/:id/members/:mid` | DELETE | Remove member (increments epoch) | `{removedBy}` |
+| `/api/admin/mls/groups/:id/update-key` | POST | Update key (post-compromise) | `{memberId}` |
+| `/api/admin/mls/groups/:id/messages` | GET | Get encrypted messages | `?limit=100` |
+| `/api/admin/mls/groups/:id/messages` | POST | Send encrypted message | `{senderId, content}` |
+| `/api/admin/mls/audit` | GET | Audit log | `?limit=100&action=&groupId=` |
+
+### Integration with A2A Protocol
+
+MLS provides the encryption layer for RADIANT's Agent-to-Agent (A2A) protocol:
+
+```typescript
+// Create secure agent collaboration group
+const group = await mlsService.createGroup(tenantId, "Task Force Alpha", "agent-orchestrator");
+
+// Add participating agents
+await mlsService.addMember(group.groupId, "agent-researcher", "agent-orchestrator");
+await mlsService.addMember(group.groupId, "agent-validator", "agent-orchestrator");
+
+// Encrypted task distribution
+await mlsService.encryptForGroup(
+  group.groupId, 
+  "agent-orchestrator",
+  Buffer.from(JSON.stringify({ task: "analyze", data: sensitiveData }))
+);
+
+// Agent compromise recovery
+await mlsService.updateKey(group.groupId, "agent-researcher"); // Rotates all secrets
+```
+
+---
+
+## 3.2.1 Cartridge PKI KMS Integration (PROMPT-42)
+
+Real AWS KMS asymmetric signing for `.RADz` cartridge PKI system, replacing placeholder strings with production-ready cryptographic operations.
+
+### Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    CARTRIDGE PKI - REAL KMS ARCHITECTURE                     │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  Security Stack (CDK)                                                        │
+│  ┌────────────────────────────────────────────────────────────────────────┐ │
+│  │  cartridgeSigningKey: kms.Key                                          │ │
+│  │  ├── KeySpec: ECC_NIST_P256 (ECDSA)                                   │ │
+│  │  ├── KeyUsage: SIGN_VERIFY                                            │ │
+│  │  └── Alias: ${appId}-${env}-cartridge-signing                         │ │
+│  └────────────────────────────────────────────────────────────────────────┘ │
+│                                                                              │
+│  CartridgePKIService                                                         │
+│  ┌────────────────────────────────────────────────────────────────────────┐ │
+│  │  generateTenantCA() → CreateKeyCommand → GetPublicKeyCommand          │ │
+│  │  createSigningKey() → CreateKeyCommand → GetPublicKeyCommand          │ │
+│  │  signArtifact()     → SignCommand (ECDSA_SHA_256)                     │ │
+│  │  verifySignature()  → VerifyCommand                                   │ │
+│  └────────────────────────────────────────────────────────────────────────┘ │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### CDK Changes
+
+| Stack | Resource | Purpose |
+|-------|----------|---------|
+| `SecurityStack` | `cartridgeSigningKey` (ECC_NIST_P256) | Platform root CA for cartridge signing |
+| `ApiStack` | `RADIANT_PLATFORM_SIGNING_KEY_ID` env var | Lambda access to signing key |
+| `ApiStack` | `RADIANT_PLATFORM_SIGNING_KEY_ARN` env var | Full ARN for cross-account access |
+
+### IAM Policies
+
+| Policy | Actions | Condition |
+|--------|---------|-----------|
+| Platform Key Usage | `kms:Sign`, `kms:Verify`, `kms:GetPublicKey`, `kms:DescribeKey` | Platform key only |
+| Tenant Key Creation | `kms:CreateKey`, `kms:TagResource`, `kms:CreateAlias` | `KeySpec=ECC_NIST_P256`, `KeyUsage=SIGN_VERIFY` |
+
+### Service Changes
+
+| Method | Implementation | KMS Commands |
+|--------|----------------|--------------|
+| `generateTenantCA()` | Create tenant CA signed by platform root | `CreateKeyCommand` → `GetPublicKeyCommand` → `SignCommand` |
+| `createSigningKey()` | Create purpose-specific key signed by tenant CA | `CreateKeyCommand` → `GetPublicKeyCommand` → `SignCommand` |
+| `signArtifact()` | Sign cartridge content | `SignCommand` (ECDSA_SHA_256) |
+| `verifySignature()` | Verify cartridge signature | `VerifyCommand` |
+
+### Key Hierarchy
+
+```
+Platform Root CA (KMS ECC_NIST_P256)
+├── Created in CDK SecurityStack
+├── Signs Tenant CA certificates
+├── Key ID: RADIANT_PLATFORM_SIGNING_KEY_ID
+└── RETAIN policy in production
+
+Tenant CA Keys (KMS ECC_NIST_P256)  
+├── Created dynamically per tenant via generateTenantCA()
+├── Signed by Platform Root CA
+├── Signs cartridge artifacts (.RADz files)
+└── Stored in tenant_ca_certificates table
+
+Signing Keys (KMS ECC_NIST_P256)
+├── Purpose: author, publisher, validator, custom
+├── Created dynamically via createSigningKey()
+├── Signed by Tenant CA
+└── Stored in cartridge_signing_keys table
+```
+
+### Database Tables
+
+| Table | Purpose | Key Columns |
+|-------|---------|-------------|
+| `tenant_ca_certificates` | Tenant CA certificates | `key_id`, `key_arn`, `fingerprint`, `root_signature`, `status` |
+| `cartridge_signing_keys` | Purpose-specific signing keys | `key_id`, `purpose`, `ca_signature`, `status` |
+| `pki_audit_log` | PKI operations audit (partitioned) | `operation`, `resource_id`, `success`, `details` |
+
+### Security Considerations
+
+| Consideration | Mitigation |
+|---------------|------------|
+| **Key Rotation** | Asymmetric keys don't auto-rotate; manual rotation requires certificate reissuance |
+| **Key Deletion** | Extended pending window (30 days prod, 7 days dev); RETAIN removal policy |
+| **Tenant Isolation** | Each tenant gets own KMS key; RLS on all tables |
+| **Audit Trail** | All PKI ops logged to partitioned `pki_audit_log` |
+| **Least Privilege** | IAM conditions restrict key creation to ECC_NIST_P256 + SIGN_VERIFY |
+
+### Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `RADIANT_PLATFORM_SIGNING_KEY_ID` | KMS Key ID for platform root CA |
+| `RADIANT_PLATFORM_SIGNING_KEY_ARN` | KMS Key ARN for platform root CA |
+
+### Implementation Files
+
+| File | Purpose |
+|------|---------|
+| `lib/stacks/security-stack.ts` | CDK asymmetric key definition |
+| `lambda/shared/services/cartridge-pki.service.ts` | PKI service with real KMS |
+| `migrations/139_cartridge_pki_kms.sql` | Database schema for PKI keys |
+
+### Admin API
+
+**Base URL**: `/api/admin/pki` — 10 endpoints for tenant CA management, signing keys, verification, and audit.
+
+### Verification Checklist
+
+- [ ] CDK synth shows `CartridgeSigningKey` resource with ECC_NIST_P256
+- [ ] Lambda environment includes `RADIANT_PLATFORM_SIGNING_KEY_ID` and `_ARN`
+- [ ] `generateTenantCA()` creates real KMS key (no PLACEHOLDER strings)
+- [ ] `createSigningKey()` creates real KMS key signed by tenant CA
+- [ ] Cartridge signatures verify via `VerifyCommand`
+
+---
+
+## 2.9 Autonomous Organism Architecture (PROMPT-43) - v6.6.0
+
+**Project Metamorphosis** — Self-evolving AI system with neural routing, auto-tool generation, and predictive user modeling.
+
+### Core Services
+
+| Service | File | Purpose |
+|---------|------|---------|
+| **MCP Server Manager** | `mcp-server-manager.service.ts` | Neural Affinity Routing for MCP servers |
+| **Neural Schema Registry** | `neural-schema-registry.service.ts` | Tool embeddings for intelligent discovery |
+| **Genesis Auto-Tool** | `genesis-auto-tool.service.ts` | On-demand tool generation from APIs |
+| **Liquid Compute** | `liquid-compute.service.ts` | Dynamic compute location selection |
+| **Ghost Simulation** | `ghost-simulation.service.ts` | User digital twin for prediction |
+| **Tensor-Link** | `tensor-link.service.ts` | Vector-based transport protocol |
+| **Economic Cortex** | `economic-cortex.service.ts` | Autonomous budget management |
+| **Organism Integration** | `organism-integration.service.ts` | BrainRouter integration layer |
+
+**Location**: `lambda/shared/services/organism/`
+
+### Database Tables (Migration V2026_02_03_001)
+
+| Table | Purpose |
+|-------|---------|
+| `mcp_servers` | MCP server registry with neural embeddings |
+| `mcp_tool_schemas` | Tool schemas with neural signatures |
+| `mcp_routing_decisions` | Routing decision audit log |
+| `genesis_tool_requests` | Tool generation requests |
+| `genesis_tool_results` | Generated tool code and validation |
+| `genesis_api_discovery_cache` | Cached API discovery results |
+| `liquid_compute_topologies` | Compute topology per tenant |
+| `liquid_compute_decisions` | Compute location decisions |
+| `ghost_vectors` | User digital twin vectors (4096-dim) |
+| `ghost_simulations` | Simulation results and predictions |
+| `ghost_calibrations` | Prediction accuracy calibration |
+| `ghost_user_interactions` | User interaction training data |
+| `organism_telemetry` | System health telemetry |
+| `economic_cortex_configs` | Budget configuration |
+| `economic_cortex_budgets` | Multi-scope budgets |
+| `economic_cortex_alerts` | Budget alert thresholds |
+| `economic_cortex_negotiations` | Cost negotiation history |
+| `economic_cortex_spending` | Spending analytics |
+
+### Admin API
+
+**Base URL**: `/api/admin/organism`
+
+| Endpoint Group | Routes |
+|----------------|--------|
+| **Dashboard** | `GET /dashboard` |
+| **MCP Servers** | `GET/POST /mcp-servers`, `GET/PUT/DELETE /mcp-servers/:id`, `POST /mcp-servers/discover`, `POST /mcp-servers/route` |
+| **Tools** | `GET/POST /tools`, `GET /tools/:id`, `POST /tools/search`, `POST /tools/find-by-intent`, `POST /tools/:id/execution` |
+| **Genesis** | `GET/POST /genesis/requests`, `GET /genesis/requests/:id`, `GET /genesis/requests/:id/result` |
+| **Compute** | `GET/PUT /compute/topology`, `POST /compute/browser-capabilities`, `POST /compute/local-capabilities`, `POST /compute/select` |
+| **Ghost** | `GET /ghost/stats`, `GET /ghost/simulations`, `POST /ghost/simulate`, `GET /ghost/vectors/:userId`, `POST /ghost/calibrate` |
+| **Economic** | `GET/PUT /economic/config`, `GET /economic/budgets`, `GET /economic/analytics`, `POST /economic/negotiate`, `POST /economic/recommend-model` |
+
+### Admin Dashboard
+
+**Route**: `/platform/organism`
+
+| Tab | Features |
+|-----|----------|
+| **Overview** | Server health, tool counts, compute distribution, ghost stats |
+| **MCP Servers** | Server list, health status, latency, domain affinity |
+| **Tools** | Tool schema browser, search, metrics |
+| **Genesis** | Tool generation form, request history |
+| **Compute** | Browser/local capabilities, sensitivity rules |
+| **Ghost** | Simulation runner, prediction stats, calibration |
+
+### Key Features
+
+| Feature | Description |
+|---------|-------------|
+| **Neural Affinity Routing** | Semantic tool selection using 1536-dim embeddings |
+| **Genesis Pipeline** | API discovery → code gen → sandbox validation → deploy |
+| **Liquid Compute** | Browser/Local/Edge/Cloud selection based on privacy + cost |
+| **Ghost Vectors** | 4096-dim user digital twins with component vectors |
+| **Economic Negotiation** | Autonomous cost optimization with 3 strategies |
+
+### Shared Types
+
+**File**: `packages/shared/src/types/autonomous-organism.types.ts`
+
+~500 lines of TypeScript types for MCP protocol, neural routing, ghost simulation, and economic cortex.
 
 ---
 
@@ -2293,6 +2830,207 @@ LLMs receive competitive pre-prompts with:
 
 ---
 
+# PART 11: AUTONOMOUS ORGANISM ARCHITECTURE v6.6.0
+
+**Project Metamorphosis** — Complete evolution transforming RADIANT from Agentic Software into **Neural Infrastructure**—a self-evolving, self-optimizing AI system.
+
+## 11.1 Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    AUTONOMOUS ORGANISM ARCHITECTURE                          │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                         USER REQUEST                                 │   │
+│  └───────────────────────────────┬─────────────────────────────────────┘   │
+│                                  │                                          │
+│                                  ▼                                          │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                    ORGANISM INTEGRATION SERVICE                      │   │
+│  │                                                                      │   │
+│  │   ┌──────────────┐  ┌──────────────┐  ┌──────────────┐             │   │
+│  │   │    MCP       │  │   Neural     │  │   Genesis    │             │   │
+│  │   │   Server     │  │   Schema     │  │   Auto-Tool  │             │   │
+│  │   │   Manager    │  │   Registry   │  │   Pipeline   │             │   │
+│  │   └──────────────┘  └──────────────┘  └──────────────┘             │   │
+│  │                                                                      │   │
+│  │   ┌──────────────┐  ┌──────────────┐  ┌──────────────┐             │   │
+│  │   │   Liquid     │  │    Ghost     │  │   Economic   │             │   │
+│  │   │   Compute    │  │  Simulation  │  │   Cortex     │             │   │
+│  │   │   Topology   │  │    Layer     │  │   Budget     │             │   │
+│  │   └──────────────┘  └──────────────┘  └──────────────┘             │   │
+│  │                                                                      │   │
+│  │   ┌──────────────────────────────────────────────────────────┐     │   │
+│  │   │                   TENSOR-LINK PROTOCOL                    │     │   │
+│  │   │           Vector-based transport with quantization        │     │   │
+│  │   └──────────────────────────────────────────────────────────┘     │   │
+│  │                                                                      │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                  │                                          │
+│                                  ▼                                          │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                         BRAIN ROUTER                                 │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+## 11.2 Core Services (8 Total)
+
+| Service | File | Purpose |
+|---------|------|---------|
+| **MCP Server Manager** | `mcp-server-manager.service.ts` | Server registry, health checks, Neural Affinity Routing |
+| **Neural Schema Registry** | `neural-schema-registry.service.ts` | Tool schemas with neural embeddings |
+| **Genesis Auto-Tool** | `genesis-auto-tool.service.ts` | On-demand tool generation from API docs |
+| **Liquid Compute** | `liquid-compute.service.ts` | Privacy-aware compute location selection |
+| **Ghost Simulation** | `ghost-simulation.service.ts` | User digital twin for outcome prediction |
+| **Tensor-Link** | `tensor-link.service.ts` | Vector-based transport protocol |
+| **Economic Cortex** | `economic-cortex.service.ts` | Autonomous budget management |
+| **Organism Integration** | `organism-integration.service.ts` | BrainRouter integration layer |
+
+## 11.3 Neural Affinity Routing
+
+Semantic model/tool selection based on intent embeddings:
+
+```typescript
+affinityScore = (semantic × 0.35) + (domain × 0.25) + ((1-error) × 0.20)
+              + (latency × 0.10) + (cost × 0.10)
+```
+
+| Factor | Weight | Description |
+|--------|--------|-------------|
+| **Semantic Similarity** | 35% | Cosine similarity with intent embedding |
+| **Domain Proficiency** | 25% | Historical performance in domain |
+| **Error Rate** | 20% | Inverse of recent error rate |
+| **Latency** | 10% | Recent p95 latency |
+| **Cost** | 10% | Cost per call |
+
+## 11.4 Genesis Auto-Tool Pipeline
+
+7-phase pipeline for just-in-time tool generation:
+
+| Phase | Duration | Description |
+|-------|----------|-------------|
+| **Detection** | 100ms | No existing tool matches intent |
+| **Scouting** | 5-30s | Search API docs (OpenAPI, GraphQL, HTML) |
+| **Fabrication** | 30-60s | Generate MCP server code with Zod schemas |
+| **Sandboxing** | 10-20s | Firecracker microVM isolation |
+| **Validation** | 5-10s | SAST scan, functional tests |
+| **Mounting** | 1-2s | Hot-load into active session |
+| **Twilight Review** | Overnight | Promote to global library |
+
+## 11.5 Liquid Compute Topology
+
+Privacy-aware compute location selection:
+
+| Location | Privacy | Latency | Cost | Use Case |
+|----------|---------|---------|------|----------|
+| `browser` | ★★★★★ | 5ms | $0 | Sensitive local processing |
+| `local` | ★★★★★ | 1ms | $0 | Maximum privacy |
+| `edge` | ★★★☆☆ | 20ms | $0.0001 | Low latency |
+| `cloud` | ★★☆☆☆ | 100ms | $0.01 | Complex compute |
+
+**Sensitivity Rules**:
+- `public` → Any location
+- `internal` → Not browser
+- `confidential` → Local or cloud only
+- `restricted` → Local ONLY
+
+## 11.6 Ghost Simulation Layer
+
+4096-dimensional user digital twin:
+
+| Component | Dimensions | Captures |
+|-----------|------------|----------|
+| **Preference** | 1024 | Communication style, risk tolerance |
+| **Behavior** | 1024 | Usage patterns, time preferences |
+| **Emotional** | 1024 | Anxiety, frustration thresholds |
+| **Knowledge** | 1024 | Domain expertise, vocabulary |
+
+**Simulation Types**:
+- `user_reaction` - Predict emotional response
+- `outcome_prediction` - Predict task success
+- `safety_check` - Identify regret potential
+- `cost_estimation` - Predict financial impact
+
+## 11.7 Economic Cortex
+
+Hierarchical budget management:
+
+```
+Tenant Budget ($10,000/month)
+  └── User Budget ($500/month)
+       └── Session Budget ($20/day)
+            └── Task Budget ($5)
+```
+
+**Model Tiers**:
+
+| Tier | Cost/Token | Quality Score |
+|------|------------|---------------|
+| `economy` | $0.0001 | 0.70 |
+| `selfhosted` | $0.00005 | 0.75 |
+| `standard` | $0.0005 | 0.85 |
+| `premium` | $0.002 | 0.92 |
+| `flagship` | $0.006 | 0.98 |
+
+## 11.8 Tensor-Link Protocol
+
+Vector-based transport for AI communication:
+
+| Data Type | Precision | Size Reduction |
+|-----------|-----------|----------------|
+| `float32` | Full | Baseline |
+| `float16` | Half | 50% |
+| `int8` | Quantized | 75% |
+
+**Compression Options**: `none`, `lz4` (fast), `zstd` (better), `quantized`
+
+## 11.9 Database Schema
+
+**18 Tables**:
+
+| Category | Tables |
+|----------|--------|
+| **MCP** | `mcp_servers`, `mcp_tool_schemas`, `mcp_routing_decisions` |
+| **Genesis** | `genesis_tool_requests`, `genesis_tool_results`, `genesis_api_discovery_cache` |
+| **Compute** | `liquid_compute_topologies`, `liquid_compute_decisions` |
+| **Ghost** | `ghost_vectors`, `ghost_simulations`, `ghost_calibrations` |
+| **Economic** | `economic_cortex_configs`, `economic_cortex_budgets`, `economic_cortex_alerts`, `economic_cortex_negotiations`, `economic_cortex_spending` |
+| **Tensor** | `tensor_link_sessions`, `tensor_link_messages` |
+
+**13 Enums**: `mcp_transport`, `mcp_auth_type`, `mcp_server_status`, `mcp_health_status`, `tool_category`, `tool_sensitivity`, `genesis_tool_status`, `compute_location`, `compute_reason`, `ghost_simulation_type`, `ghost_confidence_level`, `budget_scope`, `negotiation_strategy`
+
+## 11.10 Admin API Endpoints
+
+**Base**: `/api/admin/organism`
+
+| Category | Endpoints |
+|----------|-----------|
+| **Dashboard** | `GET /dashboard` |
+| **MCP Servers** | `GET/POST /mcp-servers`, `GET/PUT/DELETE /mcp-servers/:id`, `POST /mcp-servers/:id/health`, `POST /mcp-servers/discover`, `POST /mcp-servers/route` |
+| **Tools** | `GET/POST /tools`, `GET /tools/:id`, `POST /tools/search`, `POST /tools/find-by-intent` |
+| **Genesis** | `GET/POST /genesis/requests`, `GET /genesis/requests/:id`, `GET /genesis/requests/:id/result` |
+| **Compute** | `GET/PUT /compute/topology`, `POST /compute/select`, `GET /compute/decisions` |
+| **Ghost** | `GET /ghost/vectors/:userId`, `POST /ghost/simulate`, `GET /ghost/calibration/:userId`, `POST /ghost/feedback` |
+| **Economic** | `GET/PUT /economic/config`, `GET/POST/PUT /economic/budgets`, `GET /economic/analytics`, `POST /economic/negotiate` |
+
+## 11.11 Admin Dashboard
+
+**URL**: `/platform/organism`
+
+| Tab | Features |
+|-----|----------|
+| **Overview** | Health metrics, system summary |
+| **MCP Servers** | Registry table, health badges, add/edit/remove |
+| **Tools** | Schema browser, semantic search |
+| **Genesis** | Request form, progress tracking, code viewer |
+| **Compute** | Topology configuration, decision history |
+| **Ghost** | Simulation runner, calibration charts |
+
+---
+
 # APPENDIX B: FILE STRUCTURE
 
 ```
@@ -2334,6 +3072,6 @@ packages/
 
 ---
 
-*Document Version: 6.3.0*
-*Last Updated: February 1, 2026*
-*Platform: RADIANT - The Sovereign Mesh*
+*Document Version: 6.6.0*
+*Last Updated: February 4, 2026*
+*Platform: RADIANT - The Autonomous Organism*

@@ -103,17 +103,17 @@ AGI Brain maps AI components to biological brain structures:
 
 | Service | File | Purpose |
 |---------|------|---------|
-| **Ego Context** | `ego-context.service.ts` | Persistent identity, traits, goals |
+| **Ego Context** | `identity-core.service.ts` | Persistent identity, traits, goals |
 | **Consciousness** | `consciousness.service.ts` | Self-model, world model, metrics |
 | **Consciousness Middleware** | `consciousness-middleware.service.ts` | State injection, affect mapping |
 | **Consciousness Engine** | `consciousness-engine.service.ts` | Drive states, beliefs, memory paging |
-| **Conscious Orchestrator** | `conscious-orchestrator.service.ts` | Full consciousness-aware request handling |
-| **Heartbeat** | `cato/heartbeat.service.ts` | Active inference loop at 0.5Hz |
+| **Conscious Orchestrator** | `agi-brain-planner.service.ts` | Full consciousness-aware request handling |
+| **Heartbeat** | `cato/consciousness-loop.service.ts` | Active inference loop at 0.5Hz |
 | **Brain Router** | `brain-router.ts` | Model selection with domain/affect/learning |
-| **Learning Influence** | `learning-influence.service.ts` | User→Tenant→Global learning hierarchy |
-| **Predictive Coding** | `predictive-coding.service.ts` | Active inference, surprise detection |
+| **Learning Influence** | `learning-hierarchy.service.ts` | User→Tenant→Global learning hierarchy |
+| **Predictive Coding** | `prediction-engine.service.ts` | Active inference, surprise detection |
 | **Learning Candidates** | `learning-candidate.service.ts` | Training data collection |
-| **Shadow Self** | `cato/shadow-self.client.ts` | Hidden state extraction, uncertainty |
+| **Shadow Self** | `cato/shadow-self.service.ts` | Hidden state extraction, uncertainty |
 
 ---
 

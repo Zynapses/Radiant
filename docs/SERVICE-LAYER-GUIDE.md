@@ -20,6 +20,7 @@ This guide covers RADIANT's three external service interfaces: **API**, **MCP** 
 8. [Admin Dashboard](#8-admin-dashboard)
 9. [Database Schema](#9-database-schema)
 10. [Troubleshooting](#10-troubleshooting)
+11. [MLS (Message Layer Security) for A2A Encryption](#11-mls-message-layer-security-for-a2a-encryption)
 
 ---
 
@@ -906,10 +907,150 @@ ORDER BY operations DESC;
 
 ---
 
+## 11. MLS (Message Layer Security) for A2A Encryption
+
+RADIANT implements **RFC 9420-inspired MLS** for secure agent-to-agent communication. MLS provides group encryption with forward secrecy and post-compromise security—critical for multi-agent AI systems.
+
+### Why MLS for A2A?
+
+| TLS Limitation | MLS Solution |
+|----------------|--------------|
+| Point-to-point only | Group encryption for multi-agent collaboration |
+| Static keys | Epoch-based key rotation |
+| No forward secrecy | HKDF ratcheting protects past messages |
+| No post-compromise security | Key updates heal from compromise |
+
+### MLS + A2A Integration
+
+```
+┌─────────────┐                           ┌─────────────┐
+│   Agent A   │◄──── MLS Encrypted ──────►│   Agent B   │
+│             │      (Group: proj-123)    │             │
+└──────┬──────┘                           └──────┬──────┘
+       │                                         │
+       │           A2A Protocol                  │
+       │     (mTLS + WebSocket + MLS)            │
+       │                                         │
+       └─────────────────┬───────────────────────┘
+                         │
+                         ▼
+              ┌─────────────────────┐
+              │    A2A Gateway      │
+              │  • mTLS termination │
+              │  • MLS group mgmt   │
+              │  • Message routing  │
+              └─────────────────────┘
+```
+
+### Creating Secure Agent Groups
+
+```typescript
+// 1. Generate key packages for agents
+const agentAKey = await mlsService.generateKeyPackage(
+  "agent-a-id",
+  "agent",
+  "urn:radiant:agent:agent-a"
+);
+
+const agentBKey = await mlsService.generateKeyPackage(
+  "agent-b-id", 
+  "agent",
+  "urn:radiant:agent:agent-b"
+);
+
+// 2. Create encrypted group
+const group = await mlsService.createGroup(
+  tenantId,
+  "Project Alpha Collaboration",
+  "agent-a-id"  // Creator
+);
+
+// 3. Add Agent B (increments epoch for forward secrecy)
+await mlsService.addMember(group.groupId, "agent-b-id", "agent-a-id");
+
+// 4. Send encrypted message
+const encryptedMsg = await mlsService.encryptForGroup(
+  group.groupId,
+  "agent-a-id",
+  Buffer.from(JSON.stringify({
+    action: "analyze",
+    data: sensitivePayload
+  }))
+);
+
+// 5. Agent B decrypts
+const decrypted = await mlsService.decryptFromGroup(
+  group.groupId,
+  "agent-b-id",
+  encryptedMsg
+);
+```
+
+### Security Properties
+
+| Property | How It Works |
+|----------|--------------|
+| **Forward Secrecy** | Each epoch derives new keys via HKDF. Compromising Epoch N doesn't reveal Epoch N-1 messages. |
+| **Post-Compromise Security** | Key updates rotate all group secrets. Temporary compromise doesn't persist. |
+| **Sender Authentication** | Ed25519 signatures bind messages to sender identity. |
+| **Group Key Agreement** | Ratchet tree allows O(log n) key updates instead of O(n²). |
+
+### Handling Agent Compromise
+
+If an agent's keys are suspected compromised:
+
+```typescript
+// Trigger key update (rotates all secrets, increments epoch)
+await mlsService.updateKey(group.groupId, "compromised-agent-id");
+
+// All future messages use new epoch secrets
+// Past messages remain protected (can't be decrypted with new keys)
+```
+
+### MLS Admin Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/admin/mls/dashboard` | GET | MLS statistics |
+| `/api/admin/mls/groups` | GET/POST | List/create groups |
+| `/api/admin/mls/groups/:id` | GET | Group details + members |
+| `/api/admin/mls/groups/:id/members` | POST | Add member |
+| `/api/admin/mls/groups/:id/members/:mid` | DELETE | Remove member |
+| `/api/admin/mls/groups/:id/update-key` | POST | Trigger key rotation |
+| `/api/admin/mls/audit` | GET | Audit log |
+
+### Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `mls_key_packages` | Agent key packages (X25519 + Ed25519) |
+| `mls_groups` | Group state with epoch tracking |
+| `mls_group_members` | Membership with ratchet tree positions |
+| `mls_commits` | State change records (add/remove/update) |
+| `mls_messages` | Encrypted messages |
+| `mls_epoch_secrets` | Per-epoch secrets for forward secrecy |
+| `mls_audit_log` | Compliance audit trail |
+
+### Configuration
+
+Set the MLS master key for encrypting private keys:
+
+```bash
+# Environment variable (Lambda)
+MLS_MASTER_KEY=base64-encoded-32-byte-key
+
+# Future: AWS KMS integration
+MLS_KMS_KEY_ARN=arn:aws:kms:region:account:key/key-id
+```
+
+---
+
 ## Related Documentation
 
 - [Multi-Protocol Gateway Architecture](MULTI-PROTOCOL-GATEWAY-ARCHITECTURE.md) - Detailed gateway design
 - [RADIANT Admin Guide](RADIANT-ADMIN-GUIDE.md) - Platform administration
+- [RADIANT Platform Architecture](RADIANT-PLATFORM-ARCHITECTURE.md) - Section 3.2.2 for MLS details
+- [Engineering Implementation Vision](ENGINEERING-IMPLEMENTATION-VISION.md) - Section 30 for MLS internals
 - [Authentication Overview](authentication/overview.md) - Authentication methods
 - [API Reference](API_REFERENCE.md) - Complete API documentation
 
@@ -919,4 +1060,5 @@ ORDER BY operations DESC;
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 6.5.0 | 2026-02-03 | Added MLS (Message Layer Security) section for A2A encryption |
 | 5.52.5 | 2026-01-25 | Initial comprehensive guide |

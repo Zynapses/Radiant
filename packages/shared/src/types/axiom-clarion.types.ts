@@ -273,6 +273,7 @@ export type AxiomPatternOrigin = 'human_curated' | 'evolved' | 'invented' | 'use
  */
 export interface AxiomPromptPattern {
   patternId: string;
+  tenantId?: string;             // Optional tenant scope (null = global)
   domainId: string;
   type: AxiomPatternType;
   content: string;

@@ -112,7 +112,7 @@ import { orchestrationPatternsService } from './orchestration-patterns.service';
 import { prepromptLearningService } from './preprompt-learning.service';
 import { providerRejectionService } from './provider-rejection.service';
 import { userPersistentContextService } from './user-persistent-context.service';
-import { egoContextService } from './ego-context.service';
+import { egoContextService } from './identity-core.service';
 import { libraryAssistService } from './library-assist.service';
 ```
 

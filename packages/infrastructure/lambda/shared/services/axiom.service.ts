@@ -329,7 +329,7 @@ Approach tasks thoughtfully and explain your reasoning when appropriate.`,
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NOW())`,
       [
         stringParam('patternId', patternId),
-        stringParam('tenantId', pattern.domainId), // Using domainId as placeholder
+        stringParam('tenantId', pattern.tenantId || ''),
         stringParam('domainId', pattern.domainId),
         stringParam('patternType', pattern.type),
         stringParam('content', pattern.content),
