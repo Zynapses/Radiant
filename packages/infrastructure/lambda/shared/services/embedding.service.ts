@@ -5,7 +5,13 @@
 
 import { BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime';
 import { callWithResilience } from './resilient-provider.service';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'embedding/main',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 // ============================================================================
 // Types

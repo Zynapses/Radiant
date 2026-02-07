@@ -8,7 +8,13 @@ import { sentinelAgentService } from '../shared/services/sentinel-agent.service'
 // Local type definitions
 type SentinelType = 'data_quality' | 'security' | 'compliance' | 'performance' | 'anomaly' | 'custom' | string;
 type SentinelStatus = 'active' | 'inactive' | 'triggered' | 'paused' | string;
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'thinktank/sentinel-agents',
+  category: 'application',
+  sourceType: 'lambda',
+});
 
 // ============================================================================
 // Helpers

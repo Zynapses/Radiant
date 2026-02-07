@@ -4,7 +4,13 @@
 
 import { randomUUID } from 'crypto';
 import { executeStatement, stringParam, longParam, doubleParam, boolParam } from '../../db/client';
-import { enhancedLogger as logger } from '../../logging/enhanced-logger';
+import { createRegisteredLogger } from '../logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'organism/mcp-server-manager',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { embeddingService } from '../embedding.service';
 // Types are defined locally to avoid import issues
 type MCPTransport = 'stdio' | 'sse' | 'streamable-http' | 'websocket' | 'wasm-local';

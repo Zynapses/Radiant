@@ -3,7 +3,13 @@
 // "The AI sees what you're doing. The UI reflects what the AI knows."
 
 import { executeStatement, stringParam } from '../../db/client';
-import { enhancedLogger as logger } from '../../logging/enhanced-logger';
+import { createRegisteredLogger } from '../logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'liquid-interface/ghost-state',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import {
   GhostBinding,
   GhostEvent,

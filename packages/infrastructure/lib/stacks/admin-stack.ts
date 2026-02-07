@@ -8,6 +8,8 @@ import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as logs from 'aws-cdk-lib/aws-logs';
+import * as events from 'aws-cdk-lib/aws-events';
+import * as targets from 'aws-cdk-lib/aws-events-targets';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 // dynamodb reserved for admin state tables
 import * as rds from 'aws-cdk-lib/aws-rds';
@@ -32,6 +34,8 @@ export class AdminStack extends cdk.Stack {
   public readonly adminDistribution: cloudfront.Distribution;
   public readonly adminApi: apigateway.RestApi;
   public readonly adminFunction: lambda.Function;
+  public readonly systemAdminUserPool: cognito.UserPool;
+  public readonly systemAdminUserPoolClient: cognito.UserPoolClient;
 
   constructor(scope: Construct, id: string, props: AdminStackProps) {
     super(scope, id, props);
@@ -139,7 +143,55 @@ export class AdminStack extends cdk.Stack {
       auroraCluster.secret.grantRead(adminLambdaRole);
     }
 
-    // Grant Cognito admin operations
+    // =========================================================================
+    // System Admin Cognito User Pool (Pool B)
+    // Separate identity domain for system administrators only.
+    // System admins CANNOT log into tenant/consumer apps.
+    // Tenant users CANNOT log into the admin API.
+    // =========================================================================
+
+    this.systemAdminUserPool = new cognito.UserPool(this, 'SystemAdminUserPool', {
+      userPoolName: `${appId}-${environment}-system-admins`,
+      selfSignUpEnabled: false, // Only invited by existing super_admin
+      signInAliases: { email: true },
+      autoVerify: { email: true },
+      mfa: cognito.Mfa.REQUIRED,
+      mfaSecondFactor: {
+        sms: true,
+        otp: true,
+      },
+      passwordPolicy: {
+        minLength: 16,
+        requireLowercase: true,
+        requireUppercase: true,
+        requireDigits: true,
+        requireSymbols: true,
+        tempPasswordValidity: cdk.Duration.days(1),
+      },
+      accountRecovery: cognito.AccountRecovery.EMAIL_ONLY,
+      customAttributes: {
+        admin_pool: new cognito.StringAttribute({ mutable: false }), // Always 'system'
+        admin_role: new cognito.StringAttribute({ mutable: true }), // super_admin|admin|operator|auditor
+        is_bootstrap: new cognito.StringAttribute({ mutable: false }), // 'true'|'false'
+        display_name: new cognito.StringAttribute({ mutable: true }),
+        status: new cognito.StringAttribute({ mutable: true }), // active|suspended|deactivated
+      },
+      removalPolicy: isProd ? cdk.RemovalPolicy.RETAIN : cdk.RemovalPolicy.DESTROY,
+    });
+
+    this.systemAdminUserPoolClient = this.systemAdminUserPool.addClient('SystemAdminClient', {
+      userPoolClientName: `${appId}-${environment}-system-admin-client`,
+      authFlows: {
+        userPassword: true,
+        userSrp: true,
+      },
+      generateSecret: isProd,
+      accessTokenValidity: cdk.Duration.minutes(30),
+      idTokenValidity: cdk.Duration.minutes(30),
+      refreshTokenValidity: cdk.Duration.hours(8),
+    });
+
+    // Grant Cognito admin operations on BOTH pools
     adminLambdaRole.addToPrincipalPolicy(new iam.PolicyStatement({
       effect: iam.Effect.ALLOW,
       actions: [
@@ -152,10 +204,14 @@ export class AdminStack extends cdk.Stack {
         'cognito-idp:AdminSetUserPassword',
         'cognito-idp:AdminEnableUser',
         'cognito-idp:AdminDisableUser',
+        'cognito-idp:AdminSetUserMFAPreference',
         'cognito-idp:ListUsers',
         'cognito-idp:ListGroups',
       ],
-      resources: [adminUserPool.userPoolArn],
+      resources: [
+        adminUserPool.userPoolArn,
+        this.systemAdminUserPool.userPoolArn,
+      ],
     }));
 
     // Grant AWS Monitoring permissions (CloudWatch, Cost Explorer, X-Ray, SNS, SES)
@@ -1005,6 +1061,325 @@ export class AdminStack extends cdk.Stack {
       authorizationType: apigateway.AuthorizationType.COGNITO,
     });
     queueItem.addResource('cancel').addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // =========================================================================
+    // Genesis/OMEGA v7.5.0 - Bio-Mimetic AI Admin Routes
+    // =========================================================================
+    const omega = admin.addResource('omega');
+    
+    // Dashboard
+    omega.addResource('dashboard').addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Configuration
+    const omegaConfig = omega.addResource('config');
+    omegaConfig.addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    omegaConfig.addMethod('PUT', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Shadow Mode
+    const omegaShadow = omega.addResource('shadow');
+    const shadowConfig = omegaShadow.addResource('config');
+    shadowConfig.addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    shadowConfig.addMethod('PUT', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    omegaShadow.addResource('stats').addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    omegaShadow.addResource('comparisons').addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Cortex (Brain) Management
+    const omegaCortex = omega.addResource('cortex');
+    omegaCortex.addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    const cortexByTenant = omegaCortex.addResource('{tenantId}');
+    cortexByTenant.addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    cortexByTenant.addResource('snapshot').addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    cortexByTenant.addResource('restore').addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    cortexByTenant.addResource('lobotomy').addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Firmware Management
+    const omegaFirmware = omega.addResource('firmware');
+    omegaFirmware.addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    omegaFirmware.addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    const firmwareByTenant = omegaFirmware.addResource('{tenantId}');
+    firmwareByTenant.addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    const firmwareById = firmwareByTenant.addResource('{firmwareId}');
+    firmwareById.addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    firmwareById.addResource('activate').addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // URL Configuration
+    const omegaUrls = omega.addResource('urls');
+    omegaUrls.addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    omegaUrls.addMethod('PUT', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // =========================================================================
+    // Aurelius Dojo v1.1.0 - Thematic Mastery Training Platform Routes
+    // =========================================================================
+    const dojoFunction = new lambda.Function(this, 'DojoFunction', {
+      functionName: `${appId}-${environment}-dojo`,
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: 'admin/dojo.handler',
+      code: lambda.Code.fromAsset('lambda/dist'),
+      memorySize: 512,
+      timeout: cdk.Duration.seconds(30),
+      environment: {
+        APP_ID: appId,
+        ENVIRONMENT: environment,
+        TIER: tier.toString(),
+        AURORA_SECRET_ARN: auroraCluster.secret?.secretArn || '',
+        AURORA_CLUSTER_ARN: auroraCluster.clusterArn,
+        LOG_LEVEL: isProd ? 'info' : 'debug',
+        RADIANT_VERSION,
+      },
+      vpc,
+      vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
+      securityGroups: [apiSecurityGroup],
+      role: adminLambdaRole,
+      tracing: tier >= 2 ? lambda.Tracing.ACTIVE : lambda.Tracing.DISABLED,
+      logRetention: logs.RetentionDays.ONE_MONTH,
+    });
+
+    const dojoIntegration = new apigateway.LambdaIntegration(dojoFunction, {
+      proxy: true,
+    });
+
+    // Dojo base resource: /admin/dojo
+    const dojo = admin.addResource('dojo');
+    dojo.addMethod('GET', dojoIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Dojo proxy: /admin/dojo/{proxy+} — routes all sub-paths to Dojo Lambda
+    const dojoProxy = dojo.addResource('{proxy+}');
+    dojoProxy.addMethod('GET', dojoIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    dojoProxy.addMethod('POST', dojoIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    dojoProxy.addMethod('PUT', dojoIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    dojoProxy.addMethod('DELETE', dojoIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // =========================================================================
+    // Spend Governor v7.39.0 — Budget Control & Cost Reporting
+    // =========================================================================
+
+    // IAM: Grant ECS, Lambda, SageMaker permissions for freeze/thaw
+    adminLambdaRole.addToPrincipalPolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: [
+        'ecs:ListServices',
+        'ecs:UpdateService',
+        'ecs:DescribeServices',
+        'ecs:ListClusters',
+      ],
+      resources: ['*'],
+    }));
+
+    adminLambdaRole.addToPrincipalPolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: [
+        'lambda:ListFunctions',
+        'lambda:PutFunctionConcurrency',
+        'lambda:DeleteFunctionConcurrency',
+        'lambda:GetFunctionConcurrency',
+      ],
+      resources: ['*'],
+    }));
+
+    adminLambdaRole.addToPrincipalPolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: [
+        'sagemaker:ListEndpoints',
+        'sagemaker:DescribeEndpoint',
+        'sagemaker:UpdateEndpointWeightsAndCapacities',
+      ],
+      resources: ['*'],
+    }));
+
+    // Spend Governor Monitor Lambda (EventBridge scheduled)
+    const spendGovernorMonitorFn = new lambda.Function(this, 'SpendGovernorMonitorFunction', {
+      functionName: `${appId}-${environment}-spend-governor-monitor`,
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: 'spend-governor/monitor.handler',
+      code: lambda.Code.fromAsset('lambda/dist'),
+      memorySize: 256,
+      timeout: cdk.Duration.seconds(60),
+      environment: {
+        APP_ID: appId,
+        ENVIRONMENT: environment,
+        TIER: tier.toString(),
+        AURORA_SECRET_ARN: auroraCluster.secret?.secretArn || '',
+        AURORA_CLUSTER_ARN: auroraCluster.clusterArn,
+        LOG_LEVEL: isProd ? 'info' : 'debug',
+        RADIANT_VERSION,
+      },
+      vpc,
+      vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
+      securityGroups: [apiSecurityGroup],
+      role: adminLambdaRole,
+      tracing: tier >= 2 ? lambda.Tracing.ACTIVE : lambda.Tracing.DISABLED,
+      logRetention: logs.RetentionDays.ONE_MONTH,
+    });
+
+    // Run monitor every 5 minutes
+    new events.Rule(this, 'SpendGovernorMonitorSchedule', {
+      ruleName: `${appId}-${environment}-spend-governor-monitor`,
+      description: 'Spend Governor: sync spend, check thresholds, auto-suspend/restore',
+      schedule: events.Schedule.rate(cdk.Duration.minutes(5)),
+      targets: [new targets.LambdaFunction(spendGovernorMonitorFn)],
+      enabled: true,
+    });
+
+    // Cost Report Lambda (EventBridge scheduled)
+    const costReportFn = new lambda.Function(this, 'SpendGovernorCostReportFunction', {
+      functionName: `${appId}-${environment}-spend-governor-cost-report`,
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: 'spend-governor/cost-report.handler',
+      code: lambda.Code.fromAsset('lambda/dist'),
+      memorySize: 256,
+      timeout: cdk.Duration.seconds(30),
+      environment: {
+        APP_ID: appId,
+        ENVIRONMENT: environment,
+        TIER: tier.toString(),
+        AURORA_SECRET_ARN: auroraCluster.secret?.secretArn || '',
+        AURORA_CLUSTER_ARN: auroraCluster.clusterArn,
+        LOG_LEVEL: isProd ? 'info' : 'debug',
+        RADIANT_VERSION,
+      },
+      vpc,
+      vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
+      securityGroups: [apiSecurityGroup],
+      role: adminLambdaRole,
+      tracing: tier >= 2 ? lambda.Tracing.ACTIVE : lambda.Tracing.DISABLED,
+      logRetention: logs.RetentionDays.ONE_MONTH,
+    });
+
+    // Run cost report check every hour (actual send frequency controlled by DB config)
+    new events.Rule(this, 'SpendGovernorCostReportSchedule', {
+      ruleName: `${appId}-${environment}-spend-governor-cost-report`,
+      description: 'Spend Governor: check if cost report is due and send to super admins',
+      schedule: events.Schedule.rate(cdk.Duration.hours(1)),
+      targets: [new targets.LambdaFunction(costReportFn)],
+      enabled: true,
+    });
+
+    // API Gateway routes for spend-governor and critical-alerts
+    // These are served by the main admin Lambda via the handler router
+    const spendGovernor = admin.addResource('spend-governor');
+    const sgInstance = spendGovernor.addResource('instance');
+    sgInstance.addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    sgInstance.addMethod('PUT', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    sgInstance.addResource('freeze').addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    sgInstance.addResource('thaw').addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    const sgTenants = spendGovernor.addResource('tenants');
+    sgTenants.addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    const sgTenantById = sgTenants.addResource('{tenantId}');
+    sgTenantById.addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    sgTenantById.addMethod('PUT', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    sgTenantById.addResource('restore').addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    spendGovernor.addResource('audit').addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    const criticalAlerts = admin.addResource('critical-alerts');
+    criticalAlerts.addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    criticalAlerts.addResource('{alertId}').addResource('dismiss').addMethod('POST', adminIntegration, {
       authorizer: adminAuthorizer,
       authorizationType: apigateway.AuthorizationType.COGNITO,
     });

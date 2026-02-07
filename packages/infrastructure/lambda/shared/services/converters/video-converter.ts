@@ -10,7 +10,13 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as os from 'os';
 import { describeImage } from './image-converter';
-import { enhancedLogger as logger } from '../../logging/enhanced-logger';
+import { createRegisteredLogger } from '../logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'converters/video-converter',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 // S3 client singleton
 let s3Client: S3Client | null = null;

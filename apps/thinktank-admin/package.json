@@ -45,7 +45,8 @@
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.22.4",
     "framer-motion": "^11.0.0",
-    "date-fns": "^3.0.0"
+    "date-fns": "^3.0.0",
+    "@radiant/delight-ui": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",

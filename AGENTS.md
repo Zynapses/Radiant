@@ -85,7 +85,9 @@ DYNAMIC: New policies in /.windsurf/workflows/ are AUTOMATICALLY enforced.
 | Change Type | Required Documentation |
 |-------------|----------------------|
 | **ANY change** | `CHANGELOG.md` |
-| **Think Tank feature** | `THINKTANK-USER-GUIDE.md` + `THINKTANK-ADMIN-GUIDE.md` + `THINKTANK-ADMIN-GUIDE-V2.md` |
+| **Think Tank feature** | `THINKTANK-USER-GUIDE.md` + `THINKTANK-ADMIN-GUIDE.md` + `THINKTANK-ADMIN-GUIDE-V2.md` + `THINKTANK-MAC-GUIDE.md` (dual-platform sync) |
+| **Tenant/Team admin** | `THINKTANK-TENANT-ADMIN-GUIDE.md` |
+| **Licensing/Seats/Compliance** | `THINKTANK-LICENSING-MODEL.md` + `THINKTANK-TENANT-ADMIN-GUIDE.md` |
 | **Platform feature** | `RADIANT-ADMIN-GUIDE.md` |
 | **Admin guide update** | `STRATEGIC-VISION-MARKETING.md` (auto-trigger) |
 | **Technical/Architecture** | `ENGINEERING-IMPLEMENTATION-VISION.md` |
@@ -93,6 +95,8 @@ DYNAMIC: New policies in /.windsurf/workflows/ are AUTOMATICALLY enforced.
 | **Competitive advantage** | `THINKTANK-MOATS.md` or `RADIANT-MOATS.md` |
 | **Swift Deployer change** | `SWIFT-DEPLOYER-USER-GUIDE.md` |
 | **Service layer (MCP/A2A/API)** | `SERVICE-LAYER-GUIDE.md` + `RADIANT-PLATFORM-ARCHITECTURE.md` |
+| **Delight system change** | `DELIGHT-SYSTEM-GUIDE.md` + `THINKTANK-ADMIN-GUIDE.md` + `RADIANT-PLATFORM-ARCHITECTURE.md` |
+| **OMEGA/Genesis change** | `OMEGA-USER-GUIDE.md` + `OMEGA-ADMIN-GUIDE.md` |
 
 ### The Golden Rule
 

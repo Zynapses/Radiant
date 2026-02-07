@@ -623,6 +623,7 @@ Suggest specific improvements to the skill steps.`;
   private async generateEmbedding(text: string): Promise<number[]> {
     try {
       await modelRouterService.invoke({
+        tenantId,
         modelId: 'amazon/titan-embed-text',
         messages: [{ role: 'user', content: text.substring(0, 8000) }],
       });
@@ -634,6 +635,7 @@ Suggest specific improvements to the skill steps.`;
 
   private async invokeModel(prompt: string): Promise<string> {
     const response = await modelRouterService.invoke({
+      tenantId,
       modelId: 'anthropic/claude-3-haiku',
       messages: [{ role: 'user', content: prompt }],
       maxTokens: 2048,

@@ -13,9 +13,17 @@
 
 import { modelRouterService } from './model-router.service';
 import { modelMetadataService, ModelMetadata } from './model-metadata.service';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'orchestration/methods',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { catoNeuralDecisionService } from './cato/neural-decision.service';
 import { uepIntegrationService } from './uep/index.js';
+import { heterogeneousConsensusService } from './heterogeneous-consensus.service';
+import { driftCorrectionService } from './drift-correction.service';
 import { v4 as uuidv4 } from 'uuid';
 
 // Gemini v5.53.0 Enhancement: Enhanced Uncertainty with Surprise scoring
@@ -92,6 +100,7 @@ class SemanticEntropyService {
     const samples: string[] = [];
     for (let i = 0; i < sampleCount; i++) {
       const result = await modelRouterService.invoke({
+        tenantId,
         modelId: 'anthropic/claude-3-5-sonnet-20241022',
         messages: [{ role: 'user', content: input.prompt }],
         temperature: temperature,
@@ -166,6 +175,7 @@ class SemanticEntropyService {
 
   private async areSemanticlyEquivalent(a: string, b: string): Promise<boolean> {
     const result = await modelRouterService.invoke({
+      tenantId,
       modelId: 'anthropic/claude-3-5-haiku-20241022',
       messages: [{
         role: 'user',
@@ -207,6 +217,7 @@ class SEProbesService {
 
     for (let i = 0; i < sampleCount; i++) {
       const result = await modelRouterService.invoke({
+        tenantId,
         modelId: 'openai/gpt-4o', // OpenAI supports logprobs
         messages: [{ role: 'user', content: input.prompt }],
         temperature: 0.7,
@@ -301,6 +312,7 @@ class KernelEntropyService {
     const samples: string[] = [];
     for (let i = 0; i < sampleCount; i++) {
       const result = await modelRouterService.invoke({
+        tenantId: input.tenantId,
         modelId: 'anthropic/claude-3-5-sonnet-20241022',
         messages: [{ role: 'user', content: input.prompt }],
         temperature: 0.7,
@@ -338,6 +350,7 @@ class KernelEntropyService {
     for (const text of texts) {
       try {
         const result = await modelRouterService.invoke({
+          tenantId: input.tenantId,
           modelId: 'openai/text-embedding-3-small',
           messages: [{ role: 'user', content: text.substring(0, 8000) }],
           maxTokens: 1, // Embedding models don't use this
@@ -501,6 +514,7 @@ class SelfConsistencyService {
 
     for (let i = 0; i < sampleCount; i++) {
       const result = await modelRouterService.invoke({
+        tenantId: input.tenantId,
         modelId: 'openai/gpt-4o',
         messages: [{
           role: 'user',
@@ -575,6 +589,7 @@ class PoLLJudgeService {
     for (const modelId of judgeModels) {
       try {
         const result = await modelRouterService.invoke({
+          tenantId: input.tenantId,
           modelId,
           messages: [{
             role: 'user',
@@ -653,6 +668,7 @@ class SelfCheckService {
     const additionalSamples: string[] = [];
     for (let i = 0; i < sampleCount; i++) {
       const result = await modelRouterService.invoke({
+        tenantId: input.tenantId,
         modelId: 'anthropic/claude-3-5-sonnet-20241022',
         messages: [{ role: 'user', content: input.prompt }],
         temperature: 0.7,
@@ -698,6 +714,7 @@ class SelfCheckService {
 
   private async extractClaims(text: string): Promise<string[]> {
     const result = await modelRouterService.invoke({
+      tenantId: input.tenantId,
       modelId: 'anthropic/claude-3-5-haiku-20241022',
       messages: [{
         role: 'user',
@@ -719,6 +736,7 @@ List claims (one per line):`,
 
   private async claimSupportedBySample(claim: string, sample: string): Promise<boolean> {
     const result = await modelRouterService.invoke({
+      tenantId: input.tenantId,
       modelId: 'anthropic/claude-3-5-haiku-20241022',
       messages: [{
         role: 'user',
@@ -845,6 +863,7 @@ class FrugalCascadeService {
 
     for (const modelId of modelCascade) {
       const result = await modelRouterService.invoke({
+        tenantId: input.tenantId,
         modelId,
         messages: [{
           role: 'user',
@@ -921,6 +940,7 @@ class DebateService {
     // Initial positions
     for (let i = 0; i < agentModels.length; i++) {
       const result = await modelRouterService.invoke({
+        tenantId: input.tenantId,
         modelId: agentModels[i],
         messages: [{
           role: 'user',
@@ -944,6 +964,7 @@ class DebateService {
         const neighborPositions = neighbors.map(n => agentPositions[n]);
 
         const result = await modelRouterService.invoke({
+          tenantId: input.tenantId,
           modelId: agentModels[i],
           messages: [{
             role: 'user',
@@ -969,6 +990,7 @@ Based on these perspectives, provide your updated position. You may change your 
 
     // Synthesize final answer
     const synthesis = await modelRouterService.invoke({
+      tenantId: input.tenantId,
       modelId: 'anthropic/claude-3-5-sonnet-20241022',
       messages: [{
         role: 'user',
@@ -1059,6 +1081,7 @@ class HallucinationDetectionService {
 
   private async checkAttribution(response: string, originalPrompt: string): Promise<number> {
     const result = await modelRouterService.invoke({
+      tenantId: input.tenantId,
       modelId: 'anthropic/claude-3-5-sonnet-20241022',
       messages: [{
         role: 'user',
@@ -1110,6 +1133,7 @@ class MoASynthesisService {
           : `Question: ${input.prompt}\n\nPrevious responses from other agents:\n${currentResponses.map((r, i) => `Agent ${i + 1}: ${r}`).join('\n\n')}\n\nSynthesize and improve upon these responses:`;
 
         const result = await modelRouterService.invoke({
+          tenantId: input.tenantId,
           modelId,
           messages: [{ role: 'user', content: prompt }],
           temperature: temperature * (1 - layer * 0.2), // Lower temp in later layers
@@ -1123,6 +1147,7 @@ class MoASynthesisService {
 
     // Final synthesis
     const finalResult = await modelRouterService.invoke({
+      tenantId: input.tenantId,
       modelId: 'anthropic/claude-3-5-sonnet-20241022',
       messages: [{
         role: 'user',
@@ -1161,6 +1186,7 @@ class ProcessRewardService {
       const currentStep = steps[i];
       
       const result = await modelRouterService.invoke({
+        tenantId: input.tenantId,
         modelId: 'openai/gpt-4o',
         messages: [{
           role: 'user',
@@ -1220,6 +1246,7 @@ FEEDBACK: [brief explanation]`,
 
     // Use LLM to extract steps
     const result = await modelRouterService.invoke({
+      tenantId: input.tenantId,
       modelId: 'anthropic/claude-3-5-haiku-20241022',
       messages: [{
         role: 'user',
@@ -1251,6 +1278,7 @@ class ConformalPredictionService {
     
     for (let i = 0; i < calibrationSamples; i++) {
       const result = await modelRouterService.invoke({
+        tenantId: input.tenantId,
         modelId: 'anthropic/claude-3-5-sonnet-20241022',
         messages: [{ role: 'user', content: input.prompt }],
         temperature: 0.8,
@@ -1259,6 +1287,7 @@ class ConformalPredictionService {
 
       // Self-score the response
       const scoreResult = await modelRouterService.invoke({
+        tenantId: input.tenantId,
         modelId: 'anthropic/claude-3-5-haiku-20241022',
         messages: [{
           role: 'user',
@@ -1350,6 +1379,7 @@ class HITLReviewService {
     flags: string[];
   }> {
     const result = await modelRouterService.invoke({
+      tenantId: input.tenantId,
       modelId: 'anthropic/claude-3-5-sonnet-20241022',
       messages: [{
         role: 'user',
@@ -1402,34 +1432,69 @@ class ParetoRoutingService {
     const qualityWeight = (params.quality_weight as number) || 0.7;
     const latencyWeight = (params.latency_weight as number) || 0.1;
     const costWeight = 1 - qualityWeight - latencyWeight;
+    const tenantId = input.tenantId;
 
     // Get available models with metadata
     const models = await modelMetadataService.getAllMetadata({ availableOnly: true });
 
-    // Calculate Pareto scores
-    const modelScores = models.map(model => {
-      const quality = model.qualityScore || 0.7;
-      const latency = 1 - Math.min(((model as any).averageLatencyMs || 1000) / 10000, 1); // Normalize to 0-1
-      const cost = 1 - Math.min((model.inputPricePer1M || 5) / 100, 1); // Normalize to 0-1
+    // =========================================================================
+    // DRIFT-AWARE MODEL SELECTION (v7.24.0)
+    // Fetch drift weights for all models in this tenant. Quarantined models
+    // are excluded. Drift composite weight is multiplied into the Pareto score
+    // so drifted models are naturally deprioritized.
+    // =========================================================================
+    let driftWeights: Map<string, { weight: number; driftScore: number; isQuarantined: boolean }> = new Map();
+    if (tenantId) {
+      try {
+        const weightedModels = await driftCorrectionService.getWeightedModels(tenantId, false);
+        for (const wm of weightedModels) {
+          driftWeights.set(wm.modelId, {
+            weight: wm.compositeWeight,
+            driftScore: wm.driftScore,
+            isQuarantined: wm.isQuarantined,
+          });
+        }
+      } catch (err) {
+        logger.debug('Failed to fetch drift weights for Pareto routing', { error: String(err) });
+      }
+    }
 
-      // Pareto score: weighted combination
-      const paretoScore = quality * qualityWeight + latency * latencyWeight + cost * costWeight;
+    // Calculate Pareto scores with drift awareness
+    const modelScores = models
+      .filter(model => {
+        const dw = driftWeights.get(model.modelId);
+        return !dw?.isQuarantined; // Exclude quarantined models
+      })
+      .map(model => {
+        const quality = model.qualityScore || 0.7;
+        const latency = 1 - Math.min(((model as any).averageLatencyMs || 1000) / 10000, 1);
+        const cost = 1 - Math.min((model.inputPricePer1M || 5) / 100, 1);
 
-      // Check budget constraint
-      const estimatedCost = ((model.inputPricePer1M || 5) / 1000000) * 1000 * 100; // Estimate for 1k tokens
-      const withinBudget = estimatedCost <= budgetCents;
+        // Base Pareto score
+        let paretoScore = quality * qualityWeight + latency * latencyWeight + cost * costWeight;
 
-      return {
-        modelId: model.modelId,
-        paretoScore,
-        quality,
-        latency,
-        cost,
-        estimatedCost,
-        withinBudget,
-        paretoOptimal: false, // Will be set below
-      };
-    });
+        // Apply drift weight as a multiplier (1.0 = no effect, 0.0 = fully penalized)
+        const dw = driftWeights.get(model.modelId);
+        const driftMultiplier = dw ? dw.weight : 1.0;
+        const driftScore = dw ? dw.driftScore : 1.0;
+        paretoScore *= driftMultiplier;
+
+        const estimatedCost = ((model.inputPricePer1M || 5) / 1000000) * 1000 * 100;
+        const withinBudget = estimatedCost <= budgetCents;
+
+        return {
+          modelId: model.modelId,
+          paretoScore,
+          quality,
+          latency,
+          cost,
+          driftScore,
+          driftMultiplier,
+          estimatedCost,
+          withinBudget,
+          paretoOptimal: false,
+        };
+      });
 
     // Find Pareto frontier (models not dominated by any other)
     for (const model of modelScores) {
@@ -1455,13 +1520,16 @@ class ParetoRoutingService {
       paretoOptimal: selected.paretoOptimal,
       withinBudget: selected.withinBudget,
       quality: selected.quality,
+      driftScore: selected.driftScore,
+      driftMultiplier: selected.driftMultiplier,
       estimatedCost: selected.estimatedCost,
       alternatives: eligible.slice(1, 4).map(m => ({
         modelId: m.modelId,
         paretoScore: m.paretoScore,
         paretoOptimal: m.paretoOptimal,
+        driftScore: m.driftScore,
       })),
-      reasoning: `Pareto routing: selected ${selected.modelId} with score ${selected.paretoScore.toFixed(3)}. ${selected.paretoOptimal ? 'Pareto-optimal.' : ''} Budget: ${selected.withinBudget ? 'within' : 'exceeded'}.`,
+      reasoning: `Pareto routing: selected ${selected.modelId} with score ${selected.paretoScore.toFixed(3)} (drift: ${selected.driftScore.toFixed(2)}, multiplier: ${selected.driftMultiplier.toFixed(2)}). ${selected.paretoOptimal ? 'Pareto-optimal.' : ''} Budget: ${selected.withinBudget ? 'within' : 'exceeded'}.`,
     };
   }
 }
@@ -1505,6 +1573,7 @@ class C3POCascadeService {
       const modelId = tier.models[0];
 
       const result = await modelRouterService.invoke({
+        tenantId,
         modelId,
         messages: [{
           role: 'user',
@@ -1600,6 +1669,7 @@ class AutoMixService {
 
     // Execute with selected model
     const result = await modelRouterService.invoke({
+      tenantId: input.tenantId,
       modelId: selectedModel.id,
       messages: [{ role: 'user', content: input.prompt }],
       temperature: 0.5,
@@ -1620,6 +1690,7 @@ class AutoMixService {
         const strongerModel = models.find(m => m.capability > selectedModel.capability);
         if (strongerModel) {
           const escalatedResult = await modelRouterService.invoke({
+            tenantId: input.tenantId,
             modelId: strongerModel.id,
             messages: [{ role: 'user', content: input.prompt }],
             temperature: 0.3,
@@ -1676,6 +1747,7 @@ class AutoMixService {
 
   private async verifyResponse(prompt: string, response: string): Promise<{ confidence: number }> {
     const result = await modelRouterService.invoke({
+      tenantId: input.tenantId,
       modelId: 'anthropic/claude-3-5-haiku-20241022',
       messages: [{
         role: 'user',
@@ -1724,6 +1796,7 @@ class ActiveLearningService {
           const responses: string[] = [];
           for (let i = 0; i < 3; i++) {
             const result = await modelRouterService.invoke({
+              tenantId: input.tenantId,
               modelId: 'anthropic/claude-3-5-haiku-20241022',
               messages: [{ role: 'user', content: candidate }],
               temperature: 0.8,
@@ -1907,6 +1980,15 @@ class OrchestrationMethodsService {
             methods: ['attribution'],
           });
 
+        // ================================================================
+        // Heterogeneous Model Consensus (v7.11.0)
+        // Cross-model agreement using diverse providers (Claude + GPT + Gemini + ...)
+        // Unlike self-consistency (same model, N samples), this queries N DIFFERENT
+        // models from M DIFFERENT providers and measures inter-model agreement.
+        // ================================================================
+        case 'heterogeneous-consensus-service':
+          return await this.executeHeterogeneousConsensus(input, params);
+
         default:
           logger.warn('Unknown orchestration service', { service, method });
           return { error: `Unknown service: ${service}`, availableServices: this.getAvailableServices() };
@@ -2050,6 +2132,65 @@ class OrchestrationMethodsService {
     };
   }
 
+  /**
+   * Execute Heterogeneous Model Consensus (v7.11.0)
+   * Queries multiple models from different providers in parallel,
+   * computes pairwise semantic similarity, and returns the response
+   * with highest cross-provider agreement.
+   *
+   * This strengthens the Truth Engine moat by providing epistemic convergence:
+   * when Claude, GPT-4, and Gemini all agree, the answer is very likely correct.
+   */
+  private async executeHeterogeneousConsensus(input: MethodInput, params: Record<string, unknown>): Promise<MethodOutput> {
+    try {
+      const result = await heterogeneousConsensusService.evaluate({
+        tenantId: input.tenantId || '',
+        userId: input.userId || '',
+        prompt: input.prompt,
+        systemPrompt: input.context,
+        taskType: (params.task_type as string) || undefined,
+        forceModels: (params.force_models as string[]) || undefined,
+        forceProviders: (params.force_providers as string[]) || undefined,
+        maxCostUsd: (params.max_cost_usd as number) || undefined,
+        maxLatencyMs: (params.max_latency_ms as number) || undefined,
+        temperature: (params.temperature as number) || 0.3,
+        maxTokens: (params.max_tokens as number) || 2048,
+        extractAnswer: (params.extract_answer as boolean) !== false,
+      });
+
+      return {
+        response: result.winningResponse,
+        confidence: result.confidence,
+        overallAgreement: result.overallAgreement,
+        crossProviderAgreement: result.crossProviderAgreement,
+        crossArchitectureAgreement: result.crossArchitectureAgreement,
+        hallucinationRisk: result.hallucinationRisk,
+        triggerReflexion: result.triggerReflexion,
+        reflexionReason: result.reflexionReason,
+        winningModel: result.winningModel,
+        winningProvider: result.winningProvider,
+        participantCount: result.participantCount,
+        providerCount: result.providerCount,
+        agreementCount: result.agreementCount,
+        dissentingModels: result.dissentingModels,
+        totalCostUsd: result.totalCostUsd,
+        totalLatencyMs: result.totalLatencyMs,
+        totalTokensUsed: result.totalTokensUsed,
+        consensusId: result.consensusId,
+        reasoning: `Heterogeneous Consensus (v7.11.0): ${result.participantCount} models from ${result.providerCount} providers. ` +
+          `Agreement: ${(result.overallAgreement * 100).toFixed(0)}% overall, ${(result.crossProviderAgreement * 100).toFixed(0)}% cross-provider. ` +
+          `Winner: ${result.winningModel} (${result.winningProvider}). ` +
+          `Confidence: ${(result.confidence * 100).toFixed(0)}%. ` +
+          `Hallucination risk: ${(result.hallucinationRisk * 100).toFixed(0)}%.` +
+          (result.triggerReflexion ? ` REFLEXION TRIGGERED: ${result.reflexionReason}` : ''),
+      };
+    } catch (error) {
+      logger.error('Heterogeneous consensus failed, falling back to self-consistency', { error });
+      // Fallback to standard self-consistency
+      return await this.selfConsistency.multiSampleVote(input, params);
+    }
+  }
+
   getAvailableServices(): string[] {
     return [
       // Core uncertainty/entropy implementations
@@ -2084,6 +2225,8 @@ class OrchestrationMethodsService {
       'tiered-eval-service',
       'metaqa-service',
       'factual-grounding-service',
+      // Heterogeneous consensus (v7.11.0)
+      'heterogeneous-consensus-service',
     ];
   }
 }

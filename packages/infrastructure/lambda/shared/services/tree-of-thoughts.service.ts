@@ -3,7 +3,13 @@
 
 import { executeStatement, stringParam } from '../db/client';
 import { modelRouterService, type ChatMessage } from './model-router.service';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'tree/of-thoughts',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import type {
   ThoughtNode,
   ReasoningTree,
@@ -324,6 +330,7 @@ Respond with ONLY valid JSON:
       ];
       
       const response = await modelRouterService.invoke({
+        tenantId: tree.tenantId,
         modelId: tree.config.generationModel || 'gpt-4o',
         messages,
         temperature: 0.8, // Higher temperature for diverse thoughts
@@ -391,6 +398,7 @@ Respond with ONLY valid JSON:
       ];
       
       const response = await modelRouterService.invoke({
+        tenantId: tree.tenantId,
         modelId: tree.config.scoringModel || 'gpt-4o-mini',
         messages,
         temperature: 0.1, // Low temperature for consistent scoring

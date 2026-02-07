@@ -8,7 +8,13 @@
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { v4 as uuidv4 } from 'uuid';
 import * as crypto from 'crypto';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from '../services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'shared/middleware-uep-middleware',
+  category: 'infrastructure',
+  sourceType: 'lambda',
+});
 
 // =============================================================================
 // Types

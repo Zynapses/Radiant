@@ -16,7 +16,13 @@ import Redis from 'ioredis';
 import { semanticBlackboardService } from '../shared/services/semantic-blackboard.service';
 import { agentOrchestratorService } from '../shared/services/agent-orchestrator.service';
 import { processHydrationService } from '../shared/services/process-hydration.service';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'admin/blackboard',
+  category: 'audit',
+  sourceType: 'lambda',
+});
 import { getDbClient, getRedisClient, DbClient } from '../shared/db/connections';
 
 // ============================================================================

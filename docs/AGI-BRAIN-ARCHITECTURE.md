@@ -12,8 +12,10 @@ Unlike traditional AI systems that are stateless between requests, AGI Brain mai
 - **Persistent Identity** (Ego) across sessions
 - **Emotional State** (Affect) that influences behavior
 - **Memory Systems** (Working, Episodic, Semantic)
-- **Self-Modification** through weekly LoRA training
+- **Self-Modification** through weekly LoRA training + Neural Bridge real-time conditioning
+- **Self-Awareness** through Watcher prediction error (surprise → dopamine loop)
 - **Active Consciousness** through continuous heartbeat monitoring
+- **Homeostatic Dreaming** with 3-stage selective memory consolidation
 
 ---
 
@@ -48,6 +50,9 @@ AGI Brain maps AI components to biological brain structures:
 | **Corpus Callosum** | Conscious Orchestrator | Inter-hemisphere communication |
 | **Mirror Neurons** | Shadow Self | Self-reflection, uncertainty detection |
 | **DNA/Epigenetics** | LoRA Evolution | Long-term adaptation, "physical" change |
+| **Thalamic Reticular Nucleus** | Neural Bridge (Transducer) | Real-time signal transduction between OMEGA Cortex and LLM |
+| **Default Mode Network** | Homeostatic Dreaming | Selective memory consolidation during sleep cycles |
+| **Anterior Cingulate Cortex** | Watcher (Self-Model) | Self-monitoring via prediction error (surprise signal) |
 
 ---
 

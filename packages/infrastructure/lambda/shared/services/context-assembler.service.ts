@@ -12,7 +12,13 @@
  */
 
 import { executeStatement } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'context/assembler',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { brainConfigService } from './brain-config.service';
 import { flashBufferService } from './flash-buffer.service';
 import { XMLEscaper } from '@radiant/shared';

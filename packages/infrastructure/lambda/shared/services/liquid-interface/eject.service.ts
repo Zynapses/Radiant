@@ -3,7 +3,13 @@
 // Zero-risk prototyping → Production-ready applications
 
 import { executeStatement, stringParam } from '../../db/client';
-import { enhancedLogger as logger } from '../../logging/enhanced-logger';
+import { createRegisteredLogger } from '../logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'liquid-interface/eject',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import {
   EjectConfig,
   EjectResult,

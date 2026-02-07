@@ -3,7 +3,13 @@
 // "If users frequently chain Tool A and Tool B, auto-chain them"
 
 import { executeStatement, stringParam, longParam } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'tool/entropy',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { v4 as uuidv4 } from 'uuid';
 
 // ============================================================================

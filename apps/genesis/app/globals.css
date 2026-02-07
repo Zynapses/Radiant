@@ -1,0 +1,173 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 10, 10, 20;
+  --background-end-rgb: 20, 20, 40;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+    to bottom,
+    rgb(var(--background-start-rgb)),
+    rgb(var(--background-end-rgb))
+  );
+  min-height: 100vh;
+}
+
+/* Neural Glow Effect */
+.neural-glow {
+  box-shadow: 0 0 20px rgba(14, 165, 233, 0.3),
+              0 0 40px rgba(14, 165, 233, 0.1);
+}
+
+.neural-glow-warm {
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.3),
+              0 0 40px rgba(239, 68, 68, 0.1);
+}
+
+.neural-glow-cold {
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.3),
+              0 0 40px rgba(99, 102, 241, 0.1);
+}
+
+/* Phase Ring Animation */
+@keyframes phase-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.phase-ring {
+  animation: phase-rotate 8s linear infinite;
+}
+
+/* Coherence Pulse */
+@keyframes coherence-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.coherence-pulse {
+  animation: coherence-pulse 2s ease-in-out infinite;
+}
+
+/* Grid Pattern Background */
+.grid-pattern {
+  background-image: 
+    linear-gradient(rgba(14, 165, 233, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(14, 165, 233, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(14, 165, 233, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(14, 165, 233, 0.5);
+}
+
+/* ============================================================================
+   GLASS FOUNDRY — Genesis Forge Styles
+   Aesthetic: Bioluminescent Industrial
+   ============================================================================ */
+
+/* JetBrains Mono for the "Dangerous" monospaced feel */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+
+/* React Flow canvas overrides */
+.glass-foundry-canvas .react-flow__node {
+  cursor: grab;
+}
+.glass-foundry-canvas .react-flow__node:active {
+  cursor: grabbing;
+}
+.glass-foundry-canvas .react-flow__edge-path {
+  stroke-linecap: round;
+}
+.glass-foundry-canvas .react-flow__handle {
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.glass-foundry-canvas .react-flow__handle:hover {
+  transform: scale(1.4);
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.5);
+}
+.glass-foundry-canvas .react-flow__controls {
+  border-radius: 8px;
+  overflow: hidden;
+}
+.glass-foundry-canvas .react-flow__minimap {
+  border-radius: 8px;
+}
+.glass-foundry-canvas .react-flow__background {
+  opacity: 0.5;
+}
+
+/* Frosted glass panel effect */
+.glass-panel {
+  background: rgba(5, 5, 5, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Wire spark animation for rejected connections */
+@keyframes wire-spark {
+  0%, 100% { filter: brightness(1) drop-shadow(0 0 2px #ef4444); }
+  50% { filter: brightness(1.5) drop-shadow(0 0 8px #ef4444); }
+}
+.wire-rejected {
+  animation: wire-spark 0.3s ease-in-out infinite;
+}
+
+/* Reactor Core charge glow */
+@keyframes reactor-charge {
+  0% { box-shadow: 0 0 10px rgba(56, 189, 248, 0.1); }
+  100% { box-shadow: 0 0 60px rgba(255, 255, 255, 0.6), 0 0 120px rgba(56, 189, 248, 0.3); }
+}
+
+/* Shockwave ripple */
+@keyframes shockwave {
+  0% { transform: translate(-50%, 0) scale(0); opacity: 0.8; }
+  100% { transform: translate(-50%, 0) scale(4); opacity: 0; }
+}
+
+/* Emergency mode red pulse (stability < 50%) */
+@keyframes emergency-pulse {
+  0%, 100% { border-color: rgba(239, 68, 68, 0.2); }
+  50% { border-color: rgba(239, 68, 68, 0.5); }
+}
+.emergency-mode {
+  animation: emergency-pulse 1s ease-in-out infinite;
+}
+
+/* Void Mode — pitch black with minimal chrome */
+.void-mode {
+  background: #000000 !important;
+}
+.void-mode * {
+  border-color: rgba(255, 255, 255, 0.03) !important;
+}

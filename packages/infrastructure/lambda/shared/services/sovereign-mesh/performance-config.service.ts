@@ -6,7 +6,13 @@
  */
 
 import { executeStatement, stringParam, longParam, doubleParam, boolParam } from '../../db/client';
-import { enhancedLogger } from '../../logging/enhanced-logger';
+import { createRegisteredLogger } from '../logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'sovereign-mesh/performance-config',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { redisCacheService } from './redis-cache.service';
 import { sqsDispatcherService } from './sqs-dispatcher.service';
 import type {
@@ -24,8 +30,6 @@ import type {
   CacheMetrics,
   getDefaultPerformanceConfig,
 } from '@radiant/shared';
-
-const logger = enhancedLogger;
 
 // ============================================================================
 // PERFORMANCE CONFIGURATION SERVICE

@@ -11,7 +11,13 @@
 import { modelRouterService } from './model-router.service';
 import { learningService } from './learning.service';
 import { feedbackService } from './feedback.service';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'superior/orchestration',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 // ============================================================================
 // Types
@@ -201,7 +207,7 @@ export class SuperiorOrchestrationService {
     const refinements: string[] = [];
     
     // Step 1: Get initial responses from all AIs
-    const initialResponses = await this.getMultipleResponses(request.prompt, models);
+    const initialResponses = await this.getMultipleResponses(request.prompt, models, request.tenantId);
     refinements.push(`Got ${initialResponses.length} initial responses`);
     
     // Step 2: Each AI challenges the others
@@ -216,7 +222,8 @@ export class SuperiorOrchestrationService {
           request.prompt,
           initialResponses[j].response,
           initialResponses[j].modelId,
-          initialResponses[i].modelId
+          initialResponses[i].modelId,
+          request.tenantId
         );
         
         challengeResults.push(challenge);
@@ -231,14 +238,16 @@ export class SuperiorOrchestrationService {
     const synthesizedResponse = await this.synthesizeFromChallenges(
       request.prompt,
       initialResponses,
-      challengeResults
+      challengeResults,
+      request.tenantId
     );
     
     // Step 4: Final verification
     const superiorityScore = await this.verifySuperiorityScore(
       request.prompt,
       synthesizedResponse,
-      initialResponses.map(r => r.response)
+      initialResponses.map(r => r.response),
+      request.tenantId
     );
     
     return {
@@ -273,11 +282,11 @@ export class SuperiorOrchestrationService {
     const refinements: string[] = [];
     
     // Step 1: Get responses from all AIs
-    const responses = await this.getMultipleResponses(request.prompt, models);
+    const responses = await this.getMultipleResponses(request.prompt, models, request.tenantId);
     refinements.push(`Got ${responses.length} responses for consensus building`);
     
     // Step 2: Extract key points from each response
-    const allKeyPoints = await this.extractKeyPoints(request.prompt, responses);
+    const allKeyPoints = await this.extractKeyPoints(request.prompt, responses, request.tenantId);
     refinements.push(`Extracted ${allKeyPoints.length} key points`);
     
     // Step 3: Check consensus on each point
@@ -293,14 +302,16 @@ export class SuperiorOrchestrationService {
     const consensusResponse = await this.buildConsensusResponse(
       request.prompt,
       agreedPoints,
-      consensusPoints.filter(p => p.agreedBy.length < Math.ceil(models.length * 0.7))
+      consensusPoints.filter(p => p.agreedBy.length < Math.ceil(models.length * 0.7)),
+      request.tenantId
     );
     
     // Step 5: Verify superiority
     const superiorityScore = await this.verifySuperiorityScore(
       request.prompt,
       consensusResponse,
-      responses.map(r => r.response)
+      responses.map(r => r.response),
+      request.tenantId
     );
     
     return {
@@ -335,7 +346,8 @@ export class SuperiorOrchestrationService {
     // Step 1: Get initial response from best general model
     const initialResponse = await this.getSingleResponse(
       request.prompt,
-      'anthropic/claude-3-5-sonnet-20241022'
+      'anthropic/claude-3-5-sonnet-20241022',
+      request.tenantId
     );
     refinements.push('Got initial response');
     
@@ -354,7 +366,8 @@ export class SuperiorOrchestrationService {
         initialResponse.response,
         expert,
         aspect,
-        evalPrompt
+        evalPrompt,
+        request.tenantId
       );
       expertEvaluations.push(evaluation);
     }
@@ -368,7 +381,8 @@ export class SuperiorOrchestrationService {
         improvedResponse = await this.incorporateImprovements(
           request.prompt,
           improvedResponse,
-          evaluation
+          evaluation,
+          request.tenantId
         );
         refinements.push(`Incorporated ${evaluation.aspect} improvements from ${evaluation.expert}`);
       }
@@ -412,7 +426,7 @@ export class SuperiorOrchestrationService {
     const defender = 'openai/gpt-4o';
     
     // Step 1: Generate initial response
-    let currentResponse = (await this.getSingleResponse(request.prompt, generator)).response;
+    let currentResponse = (await this.getSingleResponse(request.prompt, generator, request.tenantId)).response;
     refinements.push('Initial response generated');
     
     // Step 2: Adversarial rounds
@@ -424,7 +438,8 @@ export class SuperiorOrchestrationService {
       const attack = await this.adversarialAttack(
         request.prompt,
         currentResponse,
-        adversary
+        adversary,
+        request.tenantId
       );
       
       if (!attack.flawsFound || attack.flawsFound.length === 0) {
@@ -440,7 +455,8 @@ export class SuperiorOrchestrationService {
           request.prompt,
           currentResponse,
           flaw,
-          defender
+          defender,
+          request.tenantId
         );
         
         challengeResults.push({
@@ -462,7 +478,8 @@ export class SuperiorOrchestrationService {
     const superiorityScore = await this.verifySuperiorityScore(
       request.prompt,
       currentResponse,
-      []
+      [],
+      request.tenantId
     );
     
     return {
@@ -506,7 +523,7 @@ export class SuperiorOrchestrationService {
     const judge = 'openai/o1';
     
     // Get all responses
-    const responses = await this.getMultipleResponses(request.prompt, competitors);
+    const responses = await this.getMultipleResponses(request.prompt, competitors, request.tenantId);
     refinements.push(`${responses.length} competitors entered tournament`);
     
     // Tournament rounds
@@ -530,7 +547,8 @@ export class SuperiorOrchestrationService {
           request.prompt,
           remaining[i],
           remaining[i + 1],
-          judge
+          judge,
+          request.tenantId
         );
         
         nextRound.push(winner.winner);
@@ -556,13 +574,15 @@ export class SuperiorOrchestrationService {
     const enhancedResponse = await this.enhanceWithBestIdeas(
       request.prompt,
       champion.response,
-      responses.filter(r => r.modelId !== champion.modelId)
+      responses.filter(r => r.modelId !== champion.modelId),
+      request.tenantId
     );
     
     const superiorityScore = await this.verifySuperiorityScore(
       request.prompt,
       enhancedResponse,
-      responses.map(r => r.response)
+      responses.map(r => r.response),
+      request.tenantId
     );
     
     return {
@@ -608,7 +628,7 @@ export class SuperiorOrchestrationService {
       'google/gemini-2.0-flash',
     ];
     
-    const initialResponses = await this.getMultipleResponses(request.prompt, allModels);
+    const initialResponses = await this.getMultipleResponses(request.prompt, allModels, request.tenantId);
     refinements.push(`Phase 1: Got ${initialResponses.length} diverse responses`);
     
     // Phase 2: Challenge pattern - AIs challenge each other
@@ -640,14 +660,16 @@ export class SuperiorOrchestrationService {
       expertResult.response,
       allChallenges,
       allConsensus,
-      allExpert
+      allExpert,
+      request.tenantId
     );
     refinements.push('Phase 5: Supreme synthesis complete');
     
     // Phase 6: Adversarial hardening
     const hardenedResponse = await this.adversarialHarden(
       request.prompt,
-      supremeResponse
+      supremeResponse,
+      request.tenantId
     );
     refinements.push('Phase 6: Adversarial hardening complete');
     
@@ -655,7 +677,8 @@ export class SuperiorOrchestrationService {
     const superiorityScore = await this.verifySuperiorityScore(
       request.prompt,
       hardenedResponse,
-      initialResponses.map(r => r.response)
+      initialResponses.map(r => r.response),
+      request.tenantId
     );
     
     return {
@@ -757,11 +780,13 @@ export class SuperiorOrchestrationService {
 
   private async getMultipleResponses(
     prompt: string,
-    models: string[]
+    models: string[],
+    tenantId?: string
   ): Promise<Array<{ modelId: string; response: string }>> {
     const results = await Promise.all(
       models.map(async modelId => {
         const result = await modelRouterService.invoke({
+          tenantId,
           modelId,
           messages: [{ role: 'user', content: prompt }],
         });
@@ -773,9 +798,11 @@ export class SuperiorOrchestrationService {
 
   private async getSingleResponse(
     prompt: string,
-    modelId: string
+    modelId: string,
+    tenantId?: string
   ): Promise<{ modelId: string; response: string }> {
     const result = await modelRouterService.invoke({
+      tenantId,
       modelId,
       messages: [{ role: 'user', content: prompt }],
     });
@@ -786,7 +813,8 @@ export class SuperiorOrchestrationService {
     originalPrompt: string,
     response: string,
     respondent: string,
-    challenger: string
+    challenger: string,
+    tenantId?: string
   ): Promise<ChallengeResult> {
     const challengePrompt = `You are reviewing another AI's response. Find any issues, errors, or improvements.
 
@@ -804,6 +832,7 @@ Identify:
 If you find issues, explain them. If the response is good, say "NO_ISSUES_FOUND".`;
 
     const result = await modelRouterService.invoke({
+      tenantId,
       modelId: challenger,
       messages: [{ role: 'user', content: challengePrompt }],
     });
@@ -822,7 +851,8 @@ If you find issues, explain them. If the response is good, say "NO_ISSUES_FOUND"
   private async synthesizeFromChallenges(
     prompt: string,
     responses: Array<{ modelId: string; response: string }>,
-    challenges: ChallengeResult[]
+    challenges: ChallengeResult[],
+    tenantId?: string
   ): Promise<string> {
     const validChallenges = challenges.filter(c => c.improvedResponse);
     
@@ -844,6 +874,7 @@ Create a superior response that:
     const result = await modelRouterService.invoke({
       modelId: 'anthropic/claude-3-5-sonnet-20241022',
       messages: [{ role: 'user', content: synthesisPrompt }],
+      tenantId,
     });
 
     return result.content;
@@ -851,7 +882,8 @@ Create a superior response that:
 
   private async extractKeyPoints(
     prompt: string,
-    responses: Array<{ modelId: string; response: string }>
+    responses: Array<{ modelId: string; response: string }>,
+    tenantId?: string
   ): Promise<string[]> {
     const extractPrompt = `Extract the key points/claims from these responses.
 
@@ -865,6 +897,7 @@ List each distinct key point (one per line):`;
     const result = await modelRouterService.invoke({
       modelId: 'openai/gpt-4o',
       messages: [{ role: 'user', content: extractPrompt }],
+      tenantId,
     });
 
     return result.content.split('\n').filter(line => line.trim().length > 0);
@@ -897,7 +930,8 @@ List each distinct key point (one per line):`;
   private async buildConsensusResponse(
     prompt: string,
     agreedPoints: ConsensusPoint[],
-    disputedPoints: ConsensusPoint[]
+    disputedPoints: ConsensusPoint[],
+    tenantId?: string
   ): Promise<string> {
     const buildPrompt = `Build a response using ONLY the consensus points (agreed by multiple AIs).
 
@@ -914,6 +948,7 @@ Create a response that is solidly grounded in consensus:`;
     const result = await modelRouterService.invoke({
       modelId: 'anthropic/claude-3-5-sonnet-20241022',
       messages: [{ role: 'user', content: buildPrompt }],
+      tenantId,
     });
 
     return result.content;
@@ -924,7 +959,8 @@ Create a response that is solidly grounded in consensus:`;
     response: string,
     expert: string,
     aspect: string,
-    evalPrompt: string
+    evalPrompt: string,
+    tenantId?: string
   ): Promise<ExpertEvaluation> {
     const fullPrompt = `${evalPrompt} of this AI response.
 
@@ -943,6 +979,7 @@ IMPROVEMENTS: [comma-separated list of specific improvements]`;
     const result = await modelRouterService.invoke({
       modelId: expert,
       messages: [{ role: 'user', content: fullPrompt }],
+      tenantId,
     });
 
     const scoreMatch = result.content.match(/SCORE:\s*([\d.]+)/i);
@@ -963,7 +1000,8 @@ IMPROVEMENTS: [comma-separated list of specific improvements]`;
   private async incorporateImprovements(
     prompt: string,
     response: string,
-    evaluation: ExpertEvaluation
+    evaluation: ExpertEvaluation,
+    tenantId?: string
   ): Promise<string> {
     const improvePrompt = `Improve this response based on expert feedback.
 
@@ -983,6 +1021,7 @@ Provide an improved response:`;
     const result = await modelRouterService.invoke({
       modelId: 'anthropic/claude-3-5-sonnet-20241022',
       messages: [{ role: 'user', content: improvePrompt }],
+      tenantId,
     });
 
     return result.content;
@@ -991,7 +1030,8 @@ Provide an improved response:`;
   private async adversarialAttack(
     prompt: string,
     response: string,
-    adversary: string
+    adversary: string,
+    tenantId?: string
   ): Promise<{ flawsFound: string[] }> {
     const attackPrompt = `You are a critical reviewer. Find ALL possible flaws in this response.
 
@@ -1008,6 +1048,7 @@ Flaws:`;
     const result = await modelRouterService.invoke({
       modelId: adversary,
       messages: [{ role: 'user', content: attackPrompt }],
+      tenantId,
     });
 
     if (result.content.includes('NO_FLAWS_FOUND')) {
@@ -1025,7 +1066,8 @@ Flaws:`;
     prompt: string,
     response: string,
     flaw: string,
-    defender: string
+    defender: string,
+    tenantId?: string
   ): Promise<{ improved: boolean; resolution: string; improvedResponse: string }> {
     const defendPrompt = `A critic found this potential flaw in a response. Fix it if valid, or explain why it's not a flaw.
 
@@ -1047,6 +1089,7 @@ IMPROVED_RESPONSE: [the fixed response if needed, or "UNCHANGED"]`;
     const result = await modelRouterService.invoke({
       modelId: defender,
       messages: [{ role: 'user', content: defendPrompt }],
+      tenantId,
     });
 
     const isValidMatch = result.content.match(/IS_VALID_FLAW:\s*(true|false)/i);
@@ -1067,7 +1110,8 @@ IMPROVED_RESPONSE: [the fixed response if needed, or "UNCHANGED"]`;
     prompt: string,
     responseA: { modelId: string; response: string },
     responseB: { modelId: string; response: string },
-    judge: string
+    judge: string,
+    tenantId?: string
   ): Promise<{ winner: typeof responseA; loser: typeof responseA; reason: string }> {
     const judgePrompt = `Compare these two AI responses and pick the better one.
 
@@ -1087,6 +1131,7 @@ REASON: [brief explanation]`;
     const result = await modelRouterService.invoke({
       modelId: judge,
       messages: [{ role: 'user', content: judgePrompt }],
+      tenantId,
     });
 
     const winnerMatch = result.content.match(/WINNER:\s*([AB])/i);
@@ -1104,7 +1149,8 @@ REASON: [brief explanation]`;
   private async enhanceWithBestIdeas(
     prompt: string,
     winnerResponse: string,
-    otherResponses: Array<{ modelId: string; response: string }>
+    otherResponses: Array<{ modelId: string; response: string }>,
+    tenantId?: string
   ): Promise<string> {
     const enhancePrompt = `Enhance this winning response by incorporating any good ideas from the other responses.
 
@@ -1121,6 +1167,7 @@ Create an enhanced version that combines the best of all:`;
     const result = await modelRouterService.invoke({
       modelId: 'anthropic/claude-3-5-sonnet-20241022',
       messages: [{ role: 'user', content: enhancePrompt }],
+      tenantId,
     });
 
     return result.content;
@@ -1133,7 +1180,8 @@ Create an enhanced version that combines the best of all:`;
     expertResponse: string,
     challenges: ChallengeResult[],
     consensus: ConsensusPoint[],
-    experts: ExpertEvaluation[]
+    experts: ExpertEvaluation[],
+    tenantId?: string
   ): Promise<string> {
     const synthesisPrompt = `Create the ULTIMATE response by combining insights from multiple orchestration patterns.
 
@@ -1162,14 +1210,15 @@ Create a SUPREME response that:
     const result = await modelRouterService.invoke({
       modelId: 'anthropic/claude-3-5-sonnet-20241022',
       messages: [{ role: 'user', content: synthesisPrompt }],
+      tenantId,
     });
 
     return result.content;
   }
 
-  private async adversarialHarden(prompt: string, response: string): Promise<string> {
+  private async adversarialHarden(prompt: string, response: string, tenantId?: string): Promise<string> {
     // Quick adversarial check and fix
-    const attack = await this.adversarialAttack(prompt, response, 'openai/o1');
+    const attack = await this.adversarialAttack(prompt, response, 'openai/o1', tenantId);
     
     if (attack.flawsFound.length === 0) {
       return response;
@@ -1178,7 +1227,7 @@ Create a SUPREME response that:
     // Fix any remaining flaws
     let hardened = response;
     for (const flaw of attack.flawsFound.slice(0, 2)) {
-      const defense = await this.defendAndImprove(prompt, hardened, flaw, 'openai/gpt-4o');
+      const defense = await this.defendAndImprove(prompt, hardened, flaw, 'openai/gpt-4o', tenantId);
       if (defense.improved) {
         hardened = defense.improvedResponse;
       }
@@ -1190,7 +1239,8 @@ Create a SUPREME response that:
   private async verifySuperiorityScore(
     prompt: string,
     finalResponse: string,
-    individualResponses: string[]
+    individualResponses: string[],
+    tenantId?: string
   ): Promise<number> {
     if (individualResponses.length === 0) {
       return 0.9; // No comparison baseline
@@ -1214,6 +1264,7 @@ SUPERIORITY_SCORE: [0.0-1.0]`;
     const result = await modelRouterService.invoke({
       modelId: 'openai/o1',
       messages: [{ role: 'user', content: verifyPrompt }],
+      tenantId,
     });
 
     const scoreMatch = result.content.match(/SUPERIORITY_SCORE:\s*([\d.]+)/i);

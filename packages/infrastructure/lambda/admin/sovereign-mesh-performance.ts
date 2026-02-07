@@ -9,9 +9,13 @@ import { APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda';
 import { performanceConfigService } from '../shared/services/sovereign-mesh/performance-config.service';
 import { redisCacheService } from '../shared/services/sovereign-mesh/redis-cache.service';
 import { sqsDispatcherService } from '../shared/services/sovereign-mesh/sqs-dispatcher.service';
-import { enhancedLogger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
 
-const logger = enhancedLogger;
+const logger = createRegisteredLogger({
+  serviceName: 'admin/sovereign-mesh-performance',
+  category: 'audit',
+  sourceType: 'lambda',
+});
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',

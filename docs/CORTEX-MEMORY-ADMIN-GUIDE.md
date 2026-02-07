@@ -864,5 +864,41 @@ POST /api/admin/cortex/alerts/{alertId}/acknowledge
 
 ---
 
-*Document Version: 4.20.0*  
+## Drift-Aware Intelligence Integration (v7.36.0)
+
+Cortex Intelligence now includes **drift-aware model recommendations** in its insights output, enabling the AGI Brain Planner to make informed model selection decisions.
+
+### What Changed
+
+`CortexInsights` now includes two additional fields:
+- **`driftAwareRecommendations`**: Top 5 drift-aware model recommendations with composite scores, drift scores, trends, and warnings
+- **`driftWarnings`**: Array of drift warning strings for models currently experiencing issues
+
+### How It's Used
+
+When the AGI Brain Planner calls `cortexIntelligenceService.getInsights()`, it receives both knowledge density data AND drift health data. This allows the planner to:
+
+1. Select models that are both **domain-appropriate** (via knowledge density) and **drift-stable** (via drift scores)
+2. Avoid models that are drifting even if they have high domain scores
+3. Surface drift warnings to admin monitoring dashboards
+
+### Cortex App Weight Profile
+
+| Factor | Weight | Rationale |
+|--------|--------|-----------|
+| Drift | 0.30 | Moderate — knowledge accuracy needs stable models |
+| **Quality** | **0.35** | Highest — Cortex prioritizes response quality |
+| Latency | 0.10 | Low — knowledge retrieval is async |
+| Cost | 0.10 | Low — accuracy over savings |
+| Availability | 0.15 | Moderate — needs reliable access |
+| Min Drift Score | 0.45 | Moderate-strict |
+
+### Admin Access
+
+- **Drift Control Center**: Orchestration → Drift Control → App Weight Profiles → Cortex card
+- **Edit weights**: Expand Cortex card → Edit Weights → adjust factors → Save Profile
+
+---
+
+*Document Version: 4.21.0*  
 *For engineering implementation details, see CORTEX-ENGINEERING-GUIDE.md*

@@ -5,10 +5,13 @@
  * and working memory to improve performance at scale.
  */
 
-import { enhancedLogger } from '../../logging/enhanced-logger';
-import type { Agent, AgentExecution, OODAState } from './agent-runtime.service';
+import { createRegisteredLogger } from '../logging-registry.service';
 
-const logger = enhancedLogger;
+const logger = createRegisteredLogger({
+  serviceName: 'sovereign-mesh/redis-cache',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 // ============================================================================
 // TYPES

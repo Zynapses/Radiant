@@ -74,6 +74,9 @@ export * from './cato-twilight.types';
 export * from './safety-matrix.types';
 export * from './axiom-clarion.types';
 export * from './livs.types';
+export * from './environment-state.types';
+export * from './deployment-package.types';
+export * from './status-page.types';
 
 // Living Parchment 2029 Vision types (selective export to avoid SynthesisSession conflict)
 export type {
@@ -178,3 +181,18 @@ export * from './uep-v2.types';
 
 // The Crucible - Competitive Multi-LLM Deliberation
 export * from './crucible.types';
+
+// Inference Response Cache (v7.11.0)
+export * from './inference-cache.types';
+
+// Heterogeneous Model Consensus (v7.11.0)
+export * from './heterogeneous-consensus.types';
+
+// Anticipatory Memory Architecture (v7.12.0)
+export * from './anticipatory-memory.types';
+
+// User Memory Retention & Profile (v7.13.0)
+export * from './user-memory-retention.types';
+
+// User Identity & Multi-Tenant Membership (v7.22.0)
+export * from './user-identity.types';

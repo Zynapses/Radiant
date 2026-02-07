@@ -859,7 +859,8 @@ actor DeploymentService {
         app: ManagedApp,
         environment: DeployEnvironment,
         credentials: CredentialSet,
-        reason: DeploymentSnapshot.SnapshotReason
+        reason: DeploymentSnapshot.SnapshotReason,
+        preservationConfig: SnapshotService.DataPreservationConfig = .preserveAll
     ) async throws -> DeploymentSnapshot {
         let deployEnv = environment
         
@@ -872,16 +873,20 @@ actor DeploymentService {
         
         let snapshotId = "snapshot-\(UUID().uuidString.prefix(8))-\(Int(Date().timeIntervalSince1970))"
         
-        // Create RDS snapshot if database rollback is needed
+        // Create comprehensive snapshot using SnapshotService
         var dbSnapshotId: String? = nil
-        if reason == .preUpdate || reason == .manual {
-            let rdsSnapshotId = "radiant-\(app.id)-\(snapshotId)"
-            let clusterIdentifier = "radiant-\(app.id)-\(environment.rawValue.lowercased())"
-            
-            dbSnapshotId = await awsService.createDBClusterSnapshot(
-                snapshotId: rdsSnapshotId,
-                clusterIdentifier: clusterIdentifier
-            )
+        if (reason == .preUpdate || reason == .manual) && preservationConfig.preserveAurora {
+            // Use SnapshotService for real AWS snapshot creation
+            let manifest = try await SnapshotService.shared.createSnapshot(
+                appId: app.id,
+                environment: environment.rawValue,
+                version: currentParams.version,
+                credentials: credentials,
+                preservationConfig: preservationConfig
+            ) { message, progress in
+                RadiantLogger.info("Snapshot: \(message) (\(Int(progress * 100))%)", category: RadiantLogger.aws)
+            }
+            dbSnapshotId = manifest.resources.aurora?.snapshotId
         }
         
         let snapshot = DeploymentSnapshot(
@@ -1002,6 +1007,13 @@ actor DeploymentService {
     ) async throws {
         let startTime = Date()
         
+        // Generate CDK context from parameters
+        let cdkContext = generateCDKContext(
+            app: app,
+            environment: environment,
+            parameters: parameters
+        )
+        
         let phases: [(DeploymentPhase, String, Double)] = [
             (.bootstrapping, "Bootstrapping CDK...", 0.10),
             (.synthesizing, "Synthesizing CloudFormation templates...", 0.15),
@@ -1026,9 +1038,182 @@ actor DeploymentService {
                 ))
             }
             
-            // Simulate deployment step (actual CDK deployment would go here)
-            try await Task.sleep(nanoseconds: 500_000_000)  // 0.5s per step for demo
+            // Execute CDK deployment for this phase
+            try await executeCDKDeployment(
+                phase: phase,
+                app: app,
+                environment: environment,
+                cdkContext: cdkContext,
+                credentials: credentials
+            )
         }
+    }
+    
+    /// Generate CDK context parameters from installation parameters
+    private func generateCDKContext(
+        app: ManagedApp,
+        environment: DeployEnvironment,
+        parameters: InstallationParameters
+    ) -> [String: String] {
+        var context: [String: String] = [:]
+        
+        // Core identifiers
+        context["appId"] = app.id
+        context["appName"] = app.name
+        context["environment"] = environment.rawValue.lowercased()
+        context["radiantVersion"] = RADIANT_VERSION
+        
+        // Infrastructure parameters
+        context["tier"] = String(parameters.tier.rawValue)
+        context["region"] = parameters.region.rawValue
+        context["vpcCidr"] = parameters.vpcCidr
+        context["multiAz"] = String(parameters.multiAz)
+        
+        // Aurora configuration
+        context["auroraInstanceClass"] = parameters.auroraInstanceClass
+        context["auroraMinCapacity"] = String(parameters.auroraMinCapacity)
+        context["auroraMaxCapacity"] = String(parameters.auroraMaxCapacity)
+        
+        // Feature flags
+        context["enableSelfHostedModels"] = String(parameters.enableSelfHostedModels)
+        context["enableMultiRegion"] = String(parameters.enableMultiRegion)
+        context["enableWAF"] = String(parameters.enableWAF)
+        context["enableGuardDuty"] = String(parameters.enableGuardDuty)
+        context["enableHIPAACompliance"] = String(parameters.enableHIPAACompliance)
+        
+        // New feature flags (v7.4.0)
+        context["enableCurator"] = String(parameters.enableCurator)
+        context["enableCortexMemory"] = String(parameters.enableCortexMemory)
+        context["enableTimeMachine"] = String(parameters.enableTimeMachine)
+        context["enableCollaboration"] = String(parameters.enableCollaboration)
+        context["enableComplianceExport"] = String(parameters.enableComplianceExport)
+        context["enableEgoSystem"] = String(parameters.enableEgoSystem)
+        
+        // Domain configuration
+        if let domainConfig = parameters.domainConfig {
+            context["baseDomain"] = domainConfig.baseDomain
+            context["useSubdomains"] = String(domainConfig.useSubdomains)
+            
+            if let certArn = domainConfig.sslCertificateArn {
+                context["sslCertificateArn"] = certArn
+            }
+            if let cfId = domainConfig.cloudFrontDistributionId {
+                context["cloudFrontDistributionId"] = cfId
+            }
+            
+            // Serialize app paths as JSON
+            if let appPathsData = try? JSONEncoder().encode(domainConfig.appPaths),
+               let appPathsJson = String(data: appPathsData, encoding: .utf8) {
+                context["appPaths"] = appPathsJson
+            }
+        }
+        
+        // Billing configuration
+        context["externalProviderMarkup"] = String(parameters.externalProviderMarkup)
+        context["selfHostedMarkup"] = String(parameters.selfHostedMarkup)
+        
+        return context
+    }
+    
+    /// Execute CDK deployment for a specific phase
+    private func executeCDKDeployment(
+        phase: DeploymentPhase,
+        app: ManagedApp,
+        environment: DeployEnvironment,
+        cdkContext: [String: String],
+        credentials: CredentialSet
+    ) async throws {
+        let stackName = stackNameForPhase(phase, app: app, environment: environment)
+        guard !stackName.isEmpty else { return }
+        
+        // Build CDK deploy command
+        var arguments = [
+            "deploy", stackName,
+            "--require-approval", "never",
+            "--outputs-file", "/tmp/cdk-outputs-\(stackName).json"
+        ]
+        
+        // Add context parameters
+        for (key, value) in cdkContext {
+            arguments.append(contentsOf: ["-c", "\(key)=\(value)"])
+        }
+        
+        // Execute CDK command
+        let result = try await runCDKCommand(arguments: arguments, credentials: credentials)
+        
+        if result.exitCode != 0 {
+            throw DeploymentError.infrastructureDeploymentFailed(
+                "Stack \(stackName) deployment failed: \(result.stderr)"
+            )
+        }
+    }
+    
+    /// Get stack name for deployment phase
+    private func stackNameForPhase(
+        _ phase: DeploymentPhase,
+        app: ManagedApp,
+        environment: DeployEnvironment
+    ) -> String {
+        let prefix = "Radiant-\(app.id)-\(environment.rawValue)"
+        
+        switch phase {
+        case .bootstrapping, .synthesizing:
+            return ""  // No stack deployment
+        case .deployingFoundation:
+            return "\(prefix)-Foundation"
+        case .deployingNetworking:
+            return "\(prefix)-Networking"
+        case .deploySecurity:
+            return "\(prefix)-Security"
+        case .deployingData:
+            return "\(prefix)-Data"
+        case .deployingAI:
+            return "\(prefix)-AI"
+        case .deployingAPI:
+            return "\(prefix)-API"
+        case .deployingAdmin:
+            return "\(prefix)-Admin"
+        default:
+            return ""
+        }
+    }
+    
+    /// Run CDK command
+    private func runCDKCommand(
+        arguments: [String],
+        credentials: CredentialSet
+    ) async throws -> (exitCode: Int32, stdout: String, stderr: String) {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/local/bin/npx")
+        process.arguments = ["cdk"] + arguments
+        process.currentDirectoryURL = URL(fileURLWithPath: "/Users/\(NSUserName())/CascadeProjects/Radiant/packages/infrastructure")
+        
+        // Set AWS credentials
+        var env = ProcessInfo.processInfo.environment
+        env["AWS_ACCESS_KEY_ID"] = credentials.accessKeyId
+        env["AWS_SECRET_ACCESS_KEY"] = credentials.secretAccessKey
+        if let sessionToken = credentials.sessionToken {
+            env["AWS_SESSION_TOKEN"] = sessionToken
+        }
+        env["AWS_REGION"] = credentials.region ?? "us-east-1"
+        process.environment = env
+        
+        let stdoutPipe = Pipe()
+        let stderrPipe = Pipe()
+        process.standardOutput = stdoutPipe
+        process.standardError = stderrPipe
+        
+        try process.run()
+        process.waitUntilExit()
+        
+        let stdoutData = stdoutPipe.fileHandleForReading.readDataToEndOfFile()
+        let stderrData = stderrPipe.fileHandleForReading.readDataToEndOfFile()
+        
+        return (
+            exitCode: process.terminationStatus,
+            stdout: String(data: stdoutData, encoding: .utf8) ?? "",
+            stderr: String(data: stderrData, encoding: .utf8) ?? ""
+        )
     }
     
     // MARK: - Migrations

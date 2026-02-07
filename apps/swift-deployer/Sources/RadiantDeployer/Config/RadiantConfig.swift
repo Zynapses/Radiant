@@ -1,4 +1,4 @@
-// RADIANT v4.18.0 - Configuration
+// RADIANT v6.6.0 - Configuration
 // Centralized configuration with environment variable support
 
 import Foundation

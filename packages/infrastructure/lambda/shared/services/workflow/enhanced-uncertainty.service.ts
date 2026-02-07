@@ -13,7 +13,13 @@
  */
 
 import { v4 as uuidv4 } from 'uuid';
-import { enhancedLogger as logger } from '../../logging/enhanced-logger';
+import { createRegisteredLogger } from '../logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'workflow/enhanced-uncertainty',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { modelRouterService } from '../model-router.service';
 
 // =============================================================================
@@ -59,7 +65,8 @@ class EnhancedUncertaintyService {
   
   async computeEnhancedEntropy(
     prompt: string,
-    params: EntropyParams = {}
+    params: EntropyParams = {},
+    tenantId?: string
   ): Promise<EnhancedEntropyResult> {
     const startTime = Date.now();
     const sampleCount = params.sampleCount ?? this.DEFAULT_SAMPLE_COUNT;
@@ -77,6 +84,7 @@ class EnhancedUncertaintyService {
         messages: [{ role: 'user', content: prompt }],
         temperature,
         maxTokens: 1024,
+        tenantId,
       });
       samples.push({ content: result.content, tokens: result.inputTokens + result.outputTokens });
       totalTokens += result.inputTokens + result.outputTokens;
@@ -186,7 +194,7 @@ class EnhancedUncertaintyService {
     return clusters;
   }
   
-  private async areSemanticlyEquivalent(a: string, b: string): Promise<boolean> {
+  private async areSemanticlyEquivalent(a: string, b: string, tenantId?: string): Promise<boolean> {
     const result = await modelRouterService.invoke({
       modelId: 'anthropic/claude-3-5-haiku-20241022',
       messages: [{
@@ -195,6 +203,7 @@ class EnhancedUncertaintyService {
       }],
       maxTokens: 10,
       temperature: 0,
+      tenantId,
     });
     return result.content.toUpperCase().includes('YES');
   }

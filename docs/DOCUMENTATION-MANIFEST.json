@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "version": "1.2.0",
-  "lastUpdated": "2026-02-03",
+  "version": "1.4.0",
+  "lastUpdated": "2026-02-05",
   "description": "Master manifest of ALL documentation files in RADIANT. AI agents MUST update relevant docs when making code changes.",
   
   "primaryDocs": {
@@ -34,8 +34,14 @@
       {
         "path": "docs/THINKTANK-TENANT-ADMIN-GUIDE.md",
         "priority": "HIGH",
-        "triggers": ["tenant_admin", "tenant_settings", "tenant_reports", "team_settings", "org_admin", "cartridge"],
-        "description": "Tenant Admin app guide - company/team level settings, reports, users, cartridges"
+        "triggers": ["tenant_admin", "tenant_settings", "tenant_reports", "team_settings", "org_admin", "cartridge", "licensing", "seats", "compliance_license", "user_provisioning"],
+        "description": "Tenant Admin app guide - company/team level settings, reports, users, cartridges, licensing"
+      },
+      {
+        "path": "docs/THINKTANK-LICENSING-MODEL.md",
+        "priority": "HIGH",
+        "triggers": ["licensing", "seats", "seat_license", "compliance_license", "regulatory", "hipaa", "gdpr", "soc2", "ccpa", "iso27001", "tenant_licenses", "license_catalog", "license_enforcement", "app_access", "retention_license", "storage_license"],
+        "description": "Think Tank Licensing Model - per-app seats, storage, retention, compliance licenses, API enforcement middleware, tier defaults"
       },
       {
         "path": "docs/THINKTANK-USER-GUIDE.md",
@@ -139,6 +145,26 @@
         "description": "Service layer documentation - MCP, A2A, API interfaces, gateway, Cedar policies"
       },
       {
+        "path": "docs/PROJECT-GENESIS-OMEGA.md",
+        "triggers": ["genesis", "omega", "neural_net", "bicameral", "cvnn", "liquid_compute", "phase_dynamics"],
+        "description": "Project Genesis/Omega - Novel bicameral AI architecture with complex-valued neural networks"
+      },
+      {
+        "path": "docs/GENESIS-LAB.md",
+        "triggers": ["genesis", "genesis_lab", "visualization", "coherence", "shadow_training"],
+        "description": "Genesis Lab - 3D visualization dashboard for OMEGA training and coherence monitoring"
+      },
+      {
+        "path": "docs/GENESIS-FORGE.md",
+        "triggers": ["genesis", "genesis_forge", "tool_generation", "auto_tool"],
+        "description": "Genesis Forge - On-demand tool generation from API specifications"
+      },
+      {
+        "path": "docs/GENESIS-RESONANT-INDEX.md",
+        "triggers": ["genesis", "resonant_index", "frequency_addressing", "phase_resonance", "vector_db"],
+        "description": "Genesis Resonant Index - Frequency-based vector addressing for O(1) lookups"
+      },
+      {
         "path": "docs/CATO-COMPLETE-DOCUMENTATION.md",
         "triggers": ["cato", "safety", "genesis", "ethics"],
         "description": "Cato safety system documentation"
@@ -159,9 +185,34 @@
         "description": "Curator user guide - teaching AI, verification, overrides, cartridge management"
       },
       {
+        "path": "docs/DOJO-USER-GUIDE.md",
+        "triggers": ["dojo", "aurelius_dojo", "training", "thematic_gating", "spaced_repetition", "ebbinghaus", "decay_engine", "adversarial_scenario", "socratic_dialectic", "competency_mesh", "knowledge_pulse", "sparring", "lecture"],
+        "description": "Aurelius Dojo v1.2.0 - Thematic mastery training with Ebbinghaus decay, adversarial scenarios, Socratic dialectic, competency mesh, knowledge pulse. Backend: Lambda handler (35+ endpoints), 19 DB tables, 13 enums, CDK proxy routing"
+      },
+      {
+        "path": "docs/OMEGA-USER-GUIDE.md",
+        "triggers": ["omega", "genesis", "omega_protocol", "bicameral", "q_nodes", "helix_kernel", "cryogenic", "neural_bridge", "resonant_index", "genesis_forge", "genesis_lab", "shadow_mode", "omega_cortex", "broca", "bio_firmware", "homeostatic_dreaming", "watcher", "time_warp"],
+        "description": "OMEGA Protocol v2.0.0 - Synthetic Biological Intelligence user guide: Bicameral Mind, Q-Nodes, Helix Kernel, Cryogenic Engine, Neural Bridge, Resonant Index, Genesis Forge, Genesis Lab, Shadow Mode, Homeostatic Dreaming"
+      },
+      {
+        "path": "docs/OMEGA-ADMIN-GUIDE.md",
+        "triggers": ["omega", "omega_admin", "omega_config", "omega_cortex", "omega_firmware", "omega_shadow", "omega_dashboard", "genesis_admin", "brain_management", "lobotomy", "firmware_hotswap", "shadow_mode_admin", "neural_bridge_admin", "omega_instance_registry"],
+        "description": "OMEGA Administrator Guide v2.0.0 - Admin API (20+ endpoints), brain management, firmware CRUD, Shadow Mode config, Neural Bridge settings, Cortex Explorer, dream cycle monitoring, infrastructure ops"
+      },
+      {
+        "path": "docs/THINKTANK-MAC-GUIDE.md",
+        "triggers": ["thinktank_mac", "thinktank_swift", "think_tank_mac", "thinktank_dual_platform", "thinktank_feature", "thinktank_chat", "thinktank_brain_plan", "thinktank_conversation", "thinktank_streaming", "thinktank_domain", "thinktank_models", "thinktank_rules", "magic_carpet", "council_of_rivals", "grimoire", "flash_facts", "sentinel_agents", "economic_governor", "time_machine", "artifact_engine"],
+        "description": "Think Tank (Mac) v1.0.0 - Native macOS SwiftUI app guide: architecture, feature parity matrix (33 features), sync protocol, limitations, platform differences, build phases, API reference, risk register"
+      },
+      {
+        "path": "docs/CATO-TRAINER-USER-GUIDE.md",
+        "triggers": ["cato_trainer", "grounding_engine", "knowledge_base", "grounded_qa", "citation", "semantic_search", "document_library", "digest", "smart_links"],
+        "description": "Cato Trainer v1.0.0 - AI knowledge base with grounded Q&A, semantic search, multi-doc digest, smart links"
+      },
+      {
         "path": "docs/SWIFT-DEPLOYER-USER-GUIDE.md",
-        "triggers": ["deployer", "swift_app", "deployment", "domain_config", "tier", "installation", "aws_setup"],
-        "description": "Swift Deployer macOS app - installation, deployment, domain URLs, features"
+        "triggers": ["deployer", "swift_app", "deployment", "domain_config", "tier", "installation", "aws_setup", "credentials", "key_rotation", "instance_management", "drift_monitor", "snapshots", "migrations"],
+        "description": "Swift Deployer macOS app v7.0.0 - installation, deployment, credentials, instances, drift monitor, snapshots"
       },
       {
         "path": "docs/UDS-ADMIN-GUIDE.md",
@@ -222,6 +273,16 @@
         "path": "docs/api/search-api.md",
         "triggers": ["api", "search", "fts", "cjk", "multilang"],
         "description": "Multi-language search API - FTS, pg_bigm, CJK support"
+      },
+      {
+        "path": "docs/SYSTEM-HEALTH-GUIDE.md",
+        "triggers": ["health", "monitoring", "alerts", "litellm_gateway", "cloudwatch", "uptime", "system_health"],
+        "description": "System Health monitoring - CloudWatch metrics, component health, alerts, LiteLLM gateway, uptime tracking"
+      },
+      {
+        "path": "docs/DELIGHT-SYSTEM-GUIDE.md",
+        "triggers": ["delight", "delight_system", "personality_mode", "injection_point", "delight_ui", "delight_achievement", "delight_easter_egg", "delight_sound", "delight_events", "delight_orchestration", "delight_preference"],
+        "description": "Delight System v7.27.0 - Personality and UX experience layer: 5 personality modes, 11 injection points, achievements, easter eggs, sounds, SSE events, AGI Brain integration, cross-app @radiant/delight-ui package"
       }
     ]
   },
@@ -234,8 +295,12 @@
       "lambda": ["CHANGELOG.md", "docs/ENGINEERING-IMPLEMENTATION-VISION.md", "docs/RADIANT-PLATFORM-ARCHITECTURE.md"],
       "api_endpoint": ["CHANGELOG.md", "docs/ENGINEERING-IMPLEMENTATION-VISION.md", "docs/API_REFERENCE.md", "docs/RADIANT-PLATFORM-ARCHITECTURE.md"],
       "cdk": ["CHANGELOG.md", "docs/ENGINEERING-IMPLEMENTATION-VISION.md", "docs/RADIANT-PLATFORM-ARCHITECTURE.md"],
-      "thinktank_feature": ["CHANGELOG.md", "docs/THINKTANK-USER-GUIDE.md", "docs/THINKTANK-ADMIN-GUIDE.md", "docs/THINKTANK-ADMIN-GUIDE-V2.md"],
-      "thinktank_admin": ["CHANGELOG.md", "docs/THINKTANK-ADMIN-GUIDE.md", "docs/THINKTANK-ADMIN-GUIDE-V2.md", "docs/STRATEGIC-VISION-MARKETING.md"],
+      "thinktank_feature": ["CHANGELOG.md", "docs/THINKTANK-USER-GUIDE.md", "docs/THINKTANK-MAC-GUIDE.md", "docs/THINKTANK-ADMIN-GUIDE.md", "docs/THINKTANK-ADMIN-GUIDE-V2.md", "docs/THINKTANK-TENANT-ADMIN-GUIDE.md"],
+      "thinktank_admin": ["CHANGELOG.md", "docs/THINKTANK-ADMIN-GUIDE.md", "docs/THINKTANK-ADMIN-GUIDE-V2.md", "docs/THINKTANK-TENANT-ADMIN-GUIDE.md", "docs/STRATEGIC-VISION-MARKETING.md"],
+      "tenant_admin": ["CHANGELOG.md", "docs/THINKTANK-TENANT-ADMIN-GUIDE.md", "docs/THINKTANK-ADMIN-GUIDE.md", "docs/ENGINEERING-IMPLEMENTATION-VISION.md"],
+      "tenant_settings": ["CHANGELOG.md", "docs/THINKTANK-TENANT-ADMIN-GUIDE.md", "docs/RADIANT-ADMIN-GUIDE.md"],
+      "team_settings": ["CHANGELOG.md", "docs/THINKTANK-TENANT-ADMIN-GUIDE.md"],
+      "org_admin": ["CHANGELOG.md", "docs/THINKTANK-TENANT-ADMIN-GUIDE.md", "docs/RADIANT-ADMIN-GUIDE.md"],
       "platform_feature": ["CHANGELOG.md", "docs/RADIANT-ADMIN-GUIDE.md", "docs/STRATEGIC-VISION-MARKETING.md"],
       "user_facing": ["CHANGELOG.md", "docs/THINKTANK-USER-GUIDE.md"],
       "ui_component": ["CHANGELOG.md", "docs/THINKTANK-USER-GUIDE.md", "docs/UI-UX-PATTERNS.md"],
@@ -276,6 +341,62 @@
       "domain_config": ["CHANGELOG.md", "docs/SWIFT-DEPLOYER-USER-GUIDE.md", "docs/RADIANT-ADMIN-GUIDE.md"],
       "tier": ["CHANGELOG.md", "docs/SWIFT-DEPLOYER-USER-GUIDE.md", "docs/RADIANT-ADMIN-GUIDE.md"],
       "installation": ["CHANGELOG.md", "docs/SWIFT-DEPLOYER-USER-GUIDE.md"],
+      "credentials": ["CHANGELOG.md", "docs/SWIFT-DEPLOYER-USER-GUIDE.md"],
+      "key_rotation": ["CHANGELOG.md", "docs/SWIFT-DEPLOYER-USER-GUIDE.md"],
+      "instance_management": ["CHANGELOG.md", "docs/SWIFT-DEPLOYER-USER-GUIDE.md"],
+      "drift_monitor": ["CHANGELOG.md", "docs/SWIFT-DEPLOYER-USER-GUIDE.md"],
+      "snapshots": ["CHANGELOG.md", "docs/SWIFT-DEPLOYER-USER-GUIDE.md"],
+      "dojo": ["CHANGELOG.md", "docs/DOJO-USER-GUIDE.md", "docs/RADIANT-MOATS.md", "docs/RADIANT-PLATFORM-ARCHITECTURE.md", "docs/RADIANT-ADMIN-GUIDE.md"],
+      "aurelius_dojo": ["CHANGELOG.md", "docs/DOJO-USER-GUIDE.md"],
+      "training": ["CHANGELOG.md", "docs/DOJO-USER-GUIDE.md"],
+      "thematic_gating": ["CHANGELOG.md", "docs/DOJO-USER-GUIDE.md"],
+      "spaced_repetition": ["CHANGELOG.md", "docs/DOJO-USER-GUIDE.md"],
+      "ebbinghaus": ["CHANGELOG.md", "docs/DOJO-USER-GUIDE.md"],
+      "decay_engine": ["CHANGELOG.md", "docs/DOJO-USER-GUIDE.md"],
+      "adversarial_scenario": ["CHANGELOG.md", "docs/DOJO-USER-GUIDE.md"],
+      "socratic_dialectic": ["CHANGELOG.md", "docs/DOJO-USER-GUIDE.md"],
+      "competency_mesh": ["CHANGELOG.md", "docs/DOJO-USER-GUIDE.md"],
+      "knowledge_pulse": ["CHANGELOG.md", "docs/DOJO-USER-GUIDE.md"],
+      "sparring": ["CHANGELOG.md", "docs/DOJO-USER-GUIDE.md"],
+      "lecture": ["CHANGELOG.md", "docs/DOJO-USER-GUIDE.md"],
+      "dojo_lambda": ["CHANGELOG.md", "docs/DOJO-USER-GUIDE.md", "docs/RADIANT-PLATFORM-ARCHITECTURE.md"],
+      "dojo_migration": ["CHANGELOG.md", "docs/DOJO-USER-GUIDE.md", "docs/RADIANT-PLATFORM-ARCHITECTURE.md"],
+      "dojo_config": ["CHANGELOG.md", "docs/DOJO-USER-GUIDE.md"],
+      "dojo_archytas": ["CHANGELOG.md", "docs/DOJO-USER-GUIDE.md"],
+      "mobot": ["CHANGELOG.md", "docs/DOJO-USER-GUIDE.md"],
+      "dojo_multimodal": ["CHANGELOG.md", "docs/DOJO-USER-GUIDE.md"],
+      "omega": ["CHANGELOG.md", "docs/OMEGA-USER-GUIDE.md", "docs/OMEGA-ADMIN-GUIDE.md", "docs/RADIANT-MOATS.md", "docs/RADIANT-PLATFORM-ARCHITECTURE.md"],
+      "omega_protocol": ["CHANGELOG.md", "docs/OMEGA-USER-GUIDE.md", "docs/OMEGA-ADMIN-GUIDE.md"],
+      "genesis": ["CHANGELOG.md", "docs/OMEGA-USER-GUIDE.md", "docs/OMEGA-ADMIN-GUIDE.md"],
+      "genesis_forge": ["CHANGELOG.md", "docs/OMEGA-USER-GUIDE.md", "docs/OMEGA-ADMIN-GUIDE.md"],
+      "genesis_lab": ["CHANGELOG.md", "docs/OMEGA-USER-GUIDE.md"],
+      "bicameral": ["CHANGELOG.md", "docs/OMEGA-USER-GUIDE.md"],
+      "q_nodes": ["CHANGELOG.md", "docs/OMEGA-USER-GUIDE.md"],
+      "helix_kernel": ["CHANGELOG.md", "docs/OMEGA-USER-GUIDE.md", "docs/OMEGA-ADMIN-GUIDE.md"],
+      "cryogenic": ["CHANGELOG.md", "docs/OMEGA-USER-GUIDE.md"],
+      "neural_bridge": ["CHANGELOG.md", "docs/OMEGA-USER-GUIDE.md", "docs/OMEGA-ADMIN-GUIDE.md"],
+      "resonant_index": ["CHANGELOG.md", "docs/OMEGA-USER-GUIDE.md"],
+      "shadow_mode": ["CHANGELOG.md", "docs/OMEGA-USER-GUIDE.md", "docs/OMEGA-ADMIN-GUIDE.md"],
+      "omega_cortex": ["CHANGELOG.md", "docs/OMEGA-USER-GUIDE.md", "docs/OMEGA-ADMIN-GUIDE.md"],
+      "bio_firmware": ["CHANGELOG.md", "docs/OMEGA-USER-GUIDE.md", "docs/OMEGA-ADMIN-GUIDE.md"],
+      "homeostatic_dreaming": ["CHANGELOG.md", "docs/OMEGA-USER-GUIDE.md", "docs/OMEGA-ADMIN-GUIDE.md"],
+      "omega_firmware": ["CHANGELOG.md", "docs/OMEGA-ADMIN-GUIDE.md"],
+      "omega_dashboard": ["CHANGELOG.md", "docs/OMEGA-ADMIN-GUIDE.md"],
+      "lobotomy": ["CHANGELOG.md", "docs/OMEGA-ADMIN-GUIDE.md"],
+      "firmware_hotswap": ["CHANGELOG.md", "docs/OMEGA-ADMIN-GUIDE.md"],
+      "omega_instance_registry": ["CHANGELOG.md", "docs/OMEGA-ADMIN-GUIDE.md"],
+      "time_warp": ["CHANGELOG.md", "docs/OMEGA-USER-GUIDE.md"],
+      "watcher": ["CHANGELOG.md", "docs/OMEGA-USER-GUIDE.md"],
+      "broca": ["CHANGELOG.md", "docs/OMEGA-USER-GUIDE.md"],
+      "cato_trainer": ["CHANGELOG.md", "docs/CATO-TRAINER-USER-GUIDE.md", "docs/RADIANT-MOATS.md", "docs/RADIANT-PLATFORM-ARCHITECTURE.md"],
+      "grounding_engine": ["CHANGELOG.md", "docs/CATO-TRAINER-USER-GUIDE.md"],
+      "knowledge_base": ["CHANGELOG.md", "docs/CATO-TRAINER-USER-GUIDE.md"],
+      "grounded_qa": ["CHANGELOG.md", "docs/CATO-TRAINER-USER-GUIDE.md"],
+      "citation": ["CHANGELOG.md", "docs/CATO-TRAINER-USER-GUIDE.md"],
+      "semantic_search": ["CHANGELOG.md", "docs/CATO-TRAINER-USER-GUIDE.md"],
+      "document_library": ["CHANGELOG.md", "docs/CATO-TRAINER-USER-GUIDE.md"],
+      "digest": ["CHANGELOG.md", "docs/CATO-TRAINER-USER-GUIDE.md"],
+      "smart_links": ["CHANGELOG.md", "docs/CATO-TRAINER-USER-GUIDE.md"],
       "uds": ["CHANGELOG.md", "docs/UDS-ADMIN-GUIDE.md", "docs/RADIANT-PLATFORM-ARCHITECTURE.md"],
       "user_data": ["CHANGELOG.md", "docs/UDS-ADMIN-GUIDE.md"],
       "conversation": ["CHANGELOG.md", "docs/UDS-ADMIN-GUIDE.md"],
@@ -289,7 +410,44 @@
       "gateway": ["CHANGELOG.md", "docs/SERVICE-LAYER-GUIDE.md", "docs/RADIANT-PLATFORM-ARCHITECTURE.md"],
       "service_layer": ["CHANGELOG.md", "docs/SERVICE-LAYER-GUIDE.md", "docs/ENGINEERING-IMPLEMENTATION-VISION.md"],
       "cedar_policy": ["CHANGELOG.md", "docs/SERVICE-LAYER-GUIDE.md", "docs/RADIANT-ADMIN-GUIDE.md"],
-      "interface_type": ["CHANGELOG.md", "docs/SERVICE-LAYER-GUIDE.md"]
+      "interface_type": ["CHANGELOG.md", "docs/SERVICE-LAYER-GUIDE.md"],
+      "health": ["CHANGELOG.md", "docs/SYSTEM-HEALTH-GUIDE.md"],
+      "monitoring": ["CHANGELOG.md", "docs/SYSTEM-HEALTH-GUIDE.md", "docs/RADIANT-ADMIN-GUIDE.md"],
+      "alerts": ["CHANGELOG.md", "docs/SYSTEM-HEALTH-GUIDE.md"],
+      "litellm_gateway": ["CHANGELOG.md", "docs/SYSTEM-HEALTH-GUIDE.md", "docs/RADIANT-PLATFORM-ARCHITECTURE.md"],
+      "cloudwatch": ["CHANGELOG.md", "docs/SYSTEM-HEALTH-GUIDE.md"],
+      "uptime": ["CHANGELOG.md", "docs/SYSTEM-HEALTH-GUIDE.md"],
+      "system_health": ["CHANGELOG.md", "docs/SYSTEM-HEALTH-GUIDE.md", "docs/RADIANT-ADMIN-GUIDE.md"],
+      "delight": ["CHANGELOG.md", "docs/DELIGHT-SYSTEM-GUIDE.md", "docs/THINKTANK-ADMIN-GUIDE.md", "docs/THINKTANK-ADMIN-GUIDE-V2.md", "docs/RADIANT-PLATFORM-ARCHITECTURE.md"],
+      "delight_system": ["CHANGELOG.md", "docs/DELIGHT-SYSTEM-GUIDE.md", "docs/RADIANT-PLATFORM-ARCHITECTURE.md"],
+      "personality_mode": ["CHANGELOG.md", "docs/DELIGHT-SYSTEM-GUIDE.md"],
+      "injection_point": ["CHANGELOG.md", "docs/DELIGHT-SYSTEM-GUIDE.md"],
+      "delight_ui": ["CHANGELOG.md", "docs/DELIGHT-SYSTEM-GUIDE.md", "docs/RADIANT-PLATFORM-ARCHITECTURE.md"],
+      "delight_achievement": ["CHANGELOG.md", "docs/DELIGHT-SYSTEM-GUIDE.md"],
+      "delight_easter_egg": ["CHANGELOG.md", "docs/DELIGHT-SYSTEM-GUIDE.md"],
+      "delight_sound": ["CHANGELOG.md", "docs/DELIGHT-SYSTEM-GUIDE.md"],
+      "delight_events": ["CHANGELOG.md", "docs/DELIGHT-SYSTEM-GUIDE.md", "docs/ENGINEERING-IMPLEMENTATION-VISION.md"],
+      "delight_orchestration": ["CHANGELOG.md", "docs/DELIGHT-SYSTEM-GUIDE.md", "docs/ENGINEERING-IMPLEMENTATION-VISION.md"],
+      "delight_preference": ["CHANGELOG.md", "docs/DELIGHT-SYSTEM-GUIDE.md"],
+      "thinktank_mac": ["CHANGELOG.md", "docs/THINKTANK-MAC-GUIDE.md"],
+      "thinktank_swift": ["CHANGELOG.md", "docs/THINKTANK-MAC-GUIDE.md"],
+      "think_tank_mac": ["CHANGELOG.md", "docs/THINKTANK-MAC-GUIDE.md"],
+      "thinktank_dual_platform": ["CHANGELOG.md", "docs/THINKTANK-MAC-GUIDE.md", "docs/THINKTANK-USER-GUIDE.md"],
+      "thinktank_chat": ["CHANGELOG.md", "docs/THINKTANK-USER-GUIDE.md", "docs/THINKTANK-MAC-GUIDE.md"],
+      "thinktank_brain_plan": ["CHANGELOG.md", "docs/THINKTANK-USER-GUIDE.md", "docs/THINKTANK-MAC-GUIDE.md"],
+      "thinktank_conversation": ["CHANGELOG.md", "docs/THINKTANK-USER-GUIDE.md", "docs/THINKTANK-MAC-GUIDE.md"],
+      "thinktank_streaming": ["CHANGELOG.md", "docs/THINKTANK-MAC-GUIDE.md"],
+      "thinktank_domain": ["CHANGELOG.md", "docs/THINKTANK-USER-GUIDE.md", "docs/THINKTANK-MAC-GUIDE.md"],
+      "thinktank_models": ["CHANGELOG.md", "docs/THINKTANK-USER-GUIDE.md", "docs/THINKTANK-MAC-GUIDE.md"],
+      "thinktank_rules": ["CHANGELOG.md", "docs/THINKTANK-USER-GUIDE.md", "docs/THINKTANK-MAC-GUIDE.md"],
+      "council_of_rivals": ["CHANGELOG.md", "docs/THINKTANK-USER-GUIDE.md", "docs/THINKTANK-MAC-GUIDE.md"],
+      "grimoire": ["CHANGELOG.md", "docs/THINKTANK-USER-GUIDE.md", "docs/THINKTANK-MAC-GUIDE.md"],
+      "flash_facts": ["CHANGELOG.md", "docs/THINKTANK-USER-GUIDE.md", "docs/THINKTANK-MAC-GUIDE.md"],
+      "sentinel_agents": ["CHANGELOG.md", "docs/THINKTANK-USER-GUIDE.md", "docs/THINKTANK-MAC-GUIDE.md"],
+      "economic_governor": ["CHANGELOG.md", "docs/THINKTANK-USER-GUIDE.md", "docs/THINKTANK-MAC-GUIDE.md"],
+      "time_machine": ["CHANGELOG.md", "docs/THINKTANK-USER-GUIDE.md", "docs/THINKTANK-MAC-GUIDE.md"],
+      "artifact_engine": ["CHANGELOG.md", "docs/THINKTANK-USER-GUIDE.md", "docs/THINKTANK-MAC-GUIDE.md"],
+      "magic_carpet": ["CHANGELOG.md", "docs/THINKTANK-USER-GUIDE.md", "docs/THINKTANK-MAC-GUIDE.md"]
     }
   },
   
@@ -300,6 +458,7 @@
       "docs/THINKTANK-ADMIN-GUIDE.md",
       "docs/THINKTANK-ADMIN-GUIDE-V2.md",
       "docs/THINKTANK-USER-GUIDE.md",
+      "docs/THINKTANK-TENANT-ADMIN-GUIDE.md",
       "docs/STRATEGIC-VISION-MARKETING.md",
       "docs/ENGINEERING-IMPLEMENTATION-VISION.md",
       "docs/RADIANT-PLATFORM-ARCHITECTURE.md",
@@ -307,7 +466,9 @@
       "docs/UDS-ADMIN-GUIDE.md",
       "docs/SERVICE-LAYER-GUIDE.md",
       "docs/RADIANT-GLOSSARY.md",
-      "docs/UEP-V2-SPECIFICATION.md"
+      "docs/UEP-V2-SPECIFICATION.md",
+      "docs/SYSTEM-HEALTH-GUIDE.md",
+      "docs/DELIGHT-SYSTEM-GUIDE.md"
     ]
   },
 
@@ -316,6 +477,7 @@
     "syncTriggers": [
       "docs/RADIANT-ADMIN-GUIDE.md",
       "docs/THINKTANK-ADMIN-GUIDE.md",
+      "docs/THINKTANK-TENANT-ADMIN-GUIDE.md",
       "docs/THINKTANK-USER-GUIDE.md",
       "docs/ENGINEERING-IMPLEMENTATION-VISION.md",
       "docs/RADIANT-PLATFORM-ARCHITECTURE.md",

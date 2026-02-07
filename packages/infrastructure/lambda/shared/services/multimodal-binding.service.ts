@@ -4,7 +4,13 @@
 import { executeStatement } from '../db/client';
 import { modelRouterService } from './model-router.service';
 import { callLiteLLMEmbedding } from './litellm.service';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'multimodal/binding',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import * as crypto from 'crypto';
 
 // ============================================================================
@@ -204,7 +210,7 @@ Keep it under 300 words.`;
     }
   }
 
-  private async imageToText(image: string | Buffer): Promise<string> {
+  private async imageToText(image: string | Buffer, tenantId?: string): Promise<string> {
     // Convert image to base64 if it's a Buffer
     const base64Image = Buffer.isBuffer(image) 
       ? image.toString('base64')
@@ -214,6 +220,7 @@ Keep it under 300 words.`;
     try {
       const response = await modelRouterService.invoke({
         modelId: 'anthropic/claude-3-5-sonnet', // Vision-capable model
+        tenantId,
         messages: [{
           role: 'user',
           content: `Analyze this image and provide a detailed description including:
@@ -552,8 +559,9 @@ Summarize:
     }
   }
 
-  private async invokeModel(prompt: string): Promise<string> {
+  private async invokeModel(prompt: string, tenantId?: string): Promise<string> {
     const response = await modelRouterService.invoke({
+      tenantId,
       modelId: 'anthropic/claude-3-haiku',
       messages: [{ role: 'user', content: prompt }],
       maxTokens: 1024,

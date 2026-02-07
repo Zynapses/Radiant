@@ -5,7 +5,13 @@
  */
 
 import { CloudWatchClient, PutMetricDataCommand, StandardUnit, Dimension } from '@aws-sdk/client-cloudwatch';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'metrics/main',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 const cloudwatch = new CloudWatchClient({});
 const NAMESPACE = process.env.METRICS_NAMESPACE || 'Radiant';

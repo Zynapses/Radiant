@@ -1,4 +1,4 @@
-// RADIANT v5.52.17 - Radiant Application Registry
+// RADIANT v7.5.0 - Radiant Application Registry
 // Defines all deployable applications in the RADIANT platform
 
 import Foundation
@@ -12,6 +12,14 @@ enum RadiantApplication: String, CaseIterable, Codable, Sendable, Identifiable {
     case curator = "curator"
     case thinktank = "thinktank"
     case api = "api"
+    // v7.5.0 - Project Genesis/OMEGA
+    case genesisLab = "genesis-lab"
+    case genesisForge = "genesis-forge"
+    case omegaApi = "omega-api"
+    // v7.17.0 - Aurelius Dojo
+    case dojo = "dojo"
+    // v7.18.0 - Cato Trainer
+    case catoTrainer = "cato-trainer"
     
     var id: String { rawValue }
     
@@ -22,6 +30,11 @@ enum RadiantApplication: String, CaseIterable, Codable, Sendable, Identifiable {
         case .curator: return "Curator"
         case .thinktank: return "Think Tank"
         case .api: return "External API"
+        case .genesisLab: return "Genesis Lab"
+        case .genesisForge: return "Genesis Forge"
+        case .omegaApi: return "OMEGA API"
+        case .dojo: return "Aurelius Dojo"
+        case .catoTrainer: return "Cato Trainer"
         }
     }
     
@@ -32,6 +45,11 @@ enum RadiantApplication: String, CaseIterable, Codable, Sendable, Identifiable {
         case .curator: return "Curator"
         case .thinktank: return "Think Tank"
         case .api: return "API"
+        case .genesisLab: return "Genesis"
+        case .genesisForge: return "Forge"
+        case .omegaApi: return "OMEGA"
+        case .dojo: return "Dojo"
+        case .catoTrainer: return "Cato"
         }
     }
     
@@ -47,6 +65,16 @@ enum RadiantApplication: String, CaseIterable, Codable, Sendable, Identifiable {
             return "Consumer AI interface with chat, artifacts, collaboration, and compliance features"
         case .api:
             return "External REST and GraphQL API for integrations and third-party access"
+        case .genesisLab:
+            return "OMEGA brain monitoring dashboard with thermal visualization, coherence metrics, and Cortex Explorer"
+        case .genesisForge:
+            return "OMEGA firmware creation tool for .bio files with Helix rules, ambition settings, and personality traits"
+        case .omegaApi:
+            return "OMEGA bio-mimetic AI inference API with Time Warp, shadow mode, and brain management"
+        case .dojo:
+            return "Thematic mastery training platform with spaced repetition, scenario synthesis, and competency mapping"
+        case .catoTrainer:
+            return "AI-powered knowledge base delivering instant, citable responses with ground-truth accuracy from document libraries"
         }
     }
     
@@ -57,6 +85,11 @@ enum RadiantApplication: String, CaseIterable, Codable, Sendable, Identifiable {
         case .curator: return "curator"
         case .thinktank: return "app"
         case .api: return "api"
+        case .genesisLab: return "genesis"
+        case .genesisForge: return "forge"
+        case .omegaApi: return "omega"
+        case .dojo: return "dojo"
+        case .catoTrainer: return "cato"
         }
     }
     
@@ -67,6 +100,11 @@ enum RadiantApplication: String, CaseIterable, Codable, Sendable, Identifiable {
         case .curator: return "/curator"
         case .thinktank: return "/"
         case .api: return "/api"
+        case .genesisLab: return "/genesis"
+        case .genesisForge: return "/forge"
+        case .omegaApi: return "/omega"
+        case .dojo: return "/dojo"
+        case .catoTrainer: return "/cato"
         }
     }
     
@@ -77,6 +115,11 @@ enum RadiantApplication: String, CaseIterable, Codable, Sendable, Identifiable {
         case .curator: return "book.pages"
         case .thinktank: return "bubble.left.and.bubble.right"
         case .api: return "link"
+        case .genesisLab: return "waveform.path.ecg"
+        case .genesisForge: return "hammer.fill"
+        case .omegaApi: return "brain"
+        case .dojo: return "flame"
+        case .catoTrainer: return "shield.checkered"
         }
     }
     
@@ -87,13 +130,18 @@ enum RadiantApplication: String, CaseIterable, Codable, Sendable, Identifiable {
         case .curator: return .orange
         case .thinktank: return .green
         case .api: return .cyan
+        case .genesisLab: return .pink
+        case .genesisForge: return .red
+        case .omegaApi: return .indigo
+        case .dojo: return .orange
+        case .catoTrainer: return .teal
         }
     }
     
     var isRequired: Bool {
         switch self {
         case .radiantAdmin, .thinktank, .api: return true
-        case .thinktankAdmin, .curator: return false
+        case .thinktankAdmin, .curator, .genesisLab, .genesisForge, .omegaApi, .dojo, .catoTrainer: return false
         }
     }
     
@@ -102,6 +150,9 @@ enum RadiantApplication: String, CaseIterable, Codable, Sendable, Identifiable {
         case .radiantAdmin, .thinktank, .api: return .core
         case .thinktankAdmin: return .standard
         case .curator: return .advanced
+        case .genesisLab, .genesisForge, .omegaApi: return .enterprise
+        case .dojo: return .advanced
+        case .catoTrainer: return .advanced
         }
     }
     
@@ -112,6 +163,11 @@ enum RadiantApplication: String, CaseIterable, Codable, Sendable, Identifiable {
         case .curator: return "Next.js 14 + TypeScript"
         case .thinktank: return "Next.js 14 + TypeScript"
         case .api: return "AWS Lambda + API Gateway"
+        case .genesisLab: return "Next.js 14 + Three.js"
+        case .genesisForge: return "Next.js 14 + TypeScript"
+        case .omegaApi: return "AWS Lambda + Python 3.11"
+        case .dojo: return "Next.js 14 + TypeScript"
+        case .catoTrainer: return "Next.js 14 + TypeScript"
         }
     }
     
@@ -122,11 +178,20 @@ enum RadiantApplication: String, CaseIterable, Codable, Sendable, Identifiable {
         case .curator: return "apps/curator"
         case .thinktank: return "apps/thinktank"
         case .api: return "packages/infrastructure/lambda"
+        case .genesisLab: return "apps/genesis"
+        case .genesisForge: return "apps/genesis"
+        case .omegaApi: return "packages/infrastructure/omega"
+        case .dojo: return "apps/dojo"
+        case .catoTrainer: return "apps/cato-trainer"
         }
     }
     
     static var webApps: [RadiantApplication] {
-        [.radiantAdmin, .thinktankAdmin, .curator, .thinktank]
+        [.radiantAdmin, .thinktankAdmin, .curator, .thinktank, .genesisLab, .genesisForge, .dojo, .catoTrainer]
+    }
+    
+    static var genesisApps: [RadiantApplication] {
+        [.genesisLab, .genesisForge, .omegaApi]
     }
     
     static var requiredApps: [RadiantApplication] {
@@ -144,9 +209,10 @@ enum ApplicationTier: String, Codable, Sendable, Comparable {
     case core = "Core"
     case standard = "Standard"
     case advanced = "Advanced"
+    case enterprise = "Enterprise"
     
     static func < (lhs: ApplicationTier, rhs: ApplicationTier) -> Bool {
-        let order: [ApplicationTier] = [.core, .standard, .advanced]
+        let order: [ApplicationTier] = [.core, .standard, .advanced, .enterprise]
         return order.firstIndex(of: lhs)! < order.firstIndex(of: rhs)!
     }
     
@@ -155,6 +221,7 @@ enum ApplicationTier: String, Codable, Sendable, Comparable {
         case .core: return "Included in all tiers"
         case .standard: return "Starter tier and above"
         case .advanced: return "Growth tier and above"
+        case .enterprise: return "Scale tier and above (OMEGA)"
         }
     }
     
@@ -163,6 +230,7 @@ enum ApplicationTier: String, Codable, Sendable, Comparable {
         case .core: return .seed
         case .standard: return .starter
         case .advanced: return .growth
+        case .enterprise: return .scale
         }
     }
 }

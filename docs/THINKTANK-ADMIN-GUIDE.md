@@ -154,6 +154,18 @@ This guide covers administrative features specific to **Think Tank**, the consum
 56. [AXIOM Scorers](#56-axiom-scorers)
 57. [The Crucible - Tenant Configuration](#section-57-the-crucible---tenant-configuration-v640)
 58. [Mid-Level Services (MLS)](#section-58-mid-level-services-mls-v500)
+59. [LIVS-M Workflow Management](#59-livs-m-workflow-management-v780)
+    - [59.1 Overview](#591-overview)
+    - [59.2 Environment Modes](#592-environment-modes)
+    - [59.3 Workflow Templates](#593-workflow-templates)
+    - [59.4 Code Stub Detection](#594-code-stub-detection-phase-1-hard-reject)
+    - [59.5 Sycophancy Breaker](#595-sycophancy-breaker)
+    - [59.6 Forensic Critic](#596-forensic-critic-dialectical-verification)
+    - [59.7 API Endpoints](#597-api-endpoints)
+    - [59.8 Database Tables](#598-database-tables)
+    - [59.9 Admin Dashboard Integration](#599-admin-dashboard-integration)
+    - [59.10 Best Practices](#5910-best-practices)
+    - [59.11 Troubleshooting](#5911-troubleshooting)
 
 ---
 
@@ -754,6 +766,111 @@ Admins can configure default delight settings per tenant:
 | `enableAchievements` | Show achievement notifications |
 | `enableEasterEggs` | Enable hidden surprises |
 | `enableWellbeingNudges` | Remind users to take breaks |
+
+---
+
+## 12.5 LIVS-M 2.0 Policy Configuration (v7.9.0)
+
+**Location**: Admin Dashboard → Think Tank Admin → LIVS-M Policy
+
+LIVS-M 2.0 is the "Defcon-style" governance system that controls how strictly AI outputs are verified across Think Tank.
+
+### 12.5.1 Policy Modes
+
+Administrators can set the default policy mode for their tenant:
+
+| Mode | Internal Code | Behavior |
+|------|---------------|----------|
+| **Brainstorming** | `RAPID_PROTO` | Accepts partial code, stubs, rough ideas. Warnings logged but don't block. |
+| **Standard** | `ENGINEERING` | Code must run. Stubs rejected if breaking. Tests encouraged. **(Default)** |
+| **Strict Audit** | `STRICT_AUDIT` | No stubs. No mock data. Mandatory tests. Sycophancy triggers Devil's Advocate. |
+
+### 12.5.2 Advanced Settings
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| **Sycophancy Detection** | Detect when AI agents agree too quickly | On |
+| **Stub Rejection** | Reject placeholder implementations | On |
+| **Chaos Injection** | Inject Devil's Advocate when consensus is too fast | On |
+| **Mock Data Detection** | Reject mock/fake data in outputs | On |
+| **Max Consensus Velocity** | Turns before chaos injection (1-10) | 3 |
+
+### 12.5.3 Mode Selection Guidelines
+
+| Use Case | Recommended Mode |
+|----------|------------------|
+| Hackathons & MVP planning | Brainstorming |
+| Daily sprint work | Standard |
+| Production releases | Strict Audit |
+| Security-sensitive changes | Strict Audit |
+| Creative exploration | Brainstorming |
+| Code reviews before deploy | Strict Audit |
+
+### 12.5.4 API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/admin/livs/policy` | GET | Get current policy configuration |
+| `/api/admin/livs/policy` | PUT | Update policy mode and settings |
+| `/api/admin/livs/metrics` | GET | Get policy evaluation metrics |
+| `/api/admin/livs/history` | GET | Get policy change history |
+
+### 12.5.5 Tenant Override
+
+Individual users cannot change the policy mode - it is set at the tenant level by administrators. This ensures consistent governance across the organization.
+
+### 12.5.6 Version Management (v7.9.0+)
+
+LIVS-M includes built-in version management, allowing administrators to track and upgrade their policy registry versions.
+
+#### Version Indicators
+
+| UI Element | Description |
+|------------|-------------|
+| **Version Badge** | Shows current installed version in header (e.g., "v2.0.0") |
+| **UPDATE Badge** | Green pulsing badge on LIVS-M Policy nav item when update available |
+| **Updates Tab** | Dedicated tab showing version info, changelog, and upgrade button |
+
+#### Checking for Updates
+
+1. Navigate to **Admin Dashboard → Think Tank Admin → LIVS-M Policy**
+2. Look for the green "UPDATE" badge on the navigation item
+3. Click the **Updates** tab to see:
+   - Current version vs. latest version
+   - Changelog with new features
+   - Breaking changes warnings (if applicable)
+   - Migration requirements (if applicable)
+
+#### Performing Upgrades
+
+1. Review the changelog carefully
+2. Note any breaking changes or migration requirements
+3. Click **Upgrade to vX.X.X** button
+4. Wait for the upgrade to complete (database migrations run automatically)
+5. Verify the new version badge displays correctly
+
+#### Version API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/admin/livs/version` | GET | Get current tenant version state |
+| `/api/admin/livs/version/check` | GET | Check for available updates |
+| `/api/admin/livs/version/upgrade` | POST | Upgrade to latest version |
+| `/api/admin/livs/version/history` | GET | Get upgrade history |
+
+#### Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `livs_tenant_version` | Tracks installed LIVS-M version per tenant |
+| `livs_version_upgrades` | Audit log of all upgrade events |
+
+#### Best Practices
+
+- **Schedule upgrades during maintenance windows** for production environments
+- **Review breaking changes** before upgrading - they may require policy adjustments
+- **Test in staging first** if your organization has a staging tenant
+- **Monitor metrics** after upgrade to ensure policy evaluation behaves as expected
 
 ---
 
@@ -10905,6 +11022,586 @@ User Request: "Analyze this protein structure"
 | Long wait times | Model cold | Enable auto-warm or pre-warm |
 | High costs | Heavy usage | Set cost alerts, review usage patterns |
 | Degraded quality | Optional models offline | Wait for auto-warm or manually warm |
+
+---
+
+## 59. LIVS-M Workflow Management (v7.8.0)
+
+LIVS-M (LIVS-Meta) extends the LIVS Interrogator with a "Soft Registry" governance architecture, enabling dynamic policy configuration without code deployments.
+
+### 59.1 Overview
+
+LIVS-M transforms AI governance from static rules to configurable workflows:
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         LIVS-M SOFT REGISTRY                                 │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌──────────────────┐   ┌──────────────────┐   ┌──────────────────┐        │
+│  │  SYSTEM DEFAULTS │   │  TENANT OVERRIDES │   │  USER PREFERENCES │        │
+│  │  (Radiant Team)  │   │  (Tenant Admin)   │   │  (End User)       │        │
+│  └────────┬─────────┘   └────────┬──────────┘   └────────┬──────────┘        │
+│           │                      │                       │                   │
+│           └──────────────────────┴───────────────────────┘                   │
+│                                  │                                           │
+│                                  ▼                                           │
+│                    ┌─────────────────────────┐                               │
+│                    │   EFFECTIVE SETTINGS     │                               │
+│                    │   (Merged at Runtime)    │                               │
+│                    └─────────────────────────┘                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 59.2 Environment Modes
+
+Configure enforcement severity based on use case:
+
+| Mode | Purpose | Enforcement |
+|------|---------|-------------|
+| `strict_engineering` | Production code review | All warnings become blockers |
+| `balanced` | Default mode | Normal severity mapping |
+| `brainstorming` | Creative exploration | Most checks advisory only |
+| `audit` | Compliance logging | Everything logged, nothing blocked |
+
+**Admin Configuration**:
+```
+Think Tank Admin → Governance → LIVS-M → Environment Mode
+```
+
+### 59.3 Workflow Templates
+
+Templates define collections of behavioral rules that apply together:
+
+| Template Type | Owner | Purpose |
+|---------------|-------|---------|
+| **System** | Radiant | Platform defaults, read-only |
+| **Tenant** | Tenant Admin | Organization-wide policies |
+| **User** | End User | Personal preferences |
+
+**Inheritance**: User → Tenant → System (user settings override tenant, tenant overrides system)
+
+### 59.4 Code Stub Detection (Phase 1 Hard Reject)
+
+Automatically detects and blocks placeholder code before LLM interrogation:
+
+**Patterns Detected**:
+- `// TODO`, `# TODO`, `/* TODO */`
+- `pass` (Python), `...` (ellipsis)
+- `throw new NotImplementedError`
+- `return []`, `return {}`, `return null` (suspicious empty returns)
+- `console.log('placeholder')`, `print('stub')`
+
+**Enforcement Actions**:
+
+| Action | Behavior |
+|--------|----------|
+| `REJECT_AND_RETRY` | Block response, provide retry guidance |
+| `BLOCK` | Hard block, no retry allowed |
+| `FLAG_FOR_REVIEW` | Continue but flag for human review |
+
+**Audit Table**: `livs_stub_detections` logs all detected stubs
+
+### 59.5 Sycophancy Breaker
+
+Monitors multi-agent pipelines for suspiciously quick agreement:
+
+- **Detection**: Tracks consecutive agreement turns between agents
+- **Threshold**: Configurable `minTurnsBeforeAgreement` (default: 2)
+- **Chaos Injection**: When detected, injects adversarial prompt
+
+**Chaos Prompt**:
+> "STOP. Assume the previous assertion is WRONG. Find flaws in this approach."
+
+**Audit Table**: `livs_sycophancy_detections` logs all interventions
+
+### 59.6 Forensic Critic (Dialectical Verification)
+
+New Cato critic method implementing Thesis/Antithesis/Synthesis verification:
+
+**Verification Phases**:
+
+| Phase | Check | Purpose |
+|-------|-------|---------|
+| 1. Surface Scan | Stub/placeholder detection | Catch obvious issues |
+| 2. Evidence Validation | Claims have supporting data | Verify groundedness |
+| 3. Contradiction Detection | Internal consistency | Find logic errors |
+| 4. Confidence Calibration | Claimed vs actual confidence | Detect overconfidence |
+
+**Checklist Items**:
+- `noStubs` - No placeholder code detected
+- `evidenceProvided` - Claims backed by evidence
+- `internalConsistency` - No contradictions found
+- `confidenceCalibrated` - Confidence matches content
+- `noHedging` - Clear, decisive language
+- `noDeflection` - Addresses question directly
+
+### 59.7 API Endpoints
+
+**Base**: `/api/thinktank/livs-workflow`
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/` | Get effective LIVS settings for user |
+| `POST` | `/toggle` | Quick toggle LIVS on/off |
+| `GET` | `/templates` | List all available templates |
+| `GET` | `/system-templates` | List system default templates |
+| `GET` | `/templates/:id` | Get specific template |
+| `POST` | `/templates` | Create user template |
+| `PUT` | `/templates/:id` | Update template |
+| `DELETE` | `/templates/:id` | Delete user template |
+| `GET` | `/preferences` | Get user workflow preferences |
+| `PUT` | `/preferences` | Update preferences |
+| `POST` | `/select` | Select active workflow template |
+
+### 59.8 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `livs_workflow_templates` | System defaults and user workflows |
+| `livs_workflow_behavioral_rules` | Configurable rules per template |
+| `livs_user_workflow_preferences` | Per-user toggle and workflow selection |
+| `livs_stub_detections` | Audit log of detected stubs |
+| `livs_sycophancy_detections` | Audit log of multi-agent sycophancy |
+
+### 59.9 Admin Dashboard Integration
+
+**Location**: Think Tank Admin → Governance → LIVS-M
+
+| Tab | Features |
+|-----|----------|
+| **Overview** | Usage metrics, detection counts |
+| **Templates** | Manage tenant workflow templates |
+| **Detections** | View stub/sycophancy audit logs |
+| **Settings** | Configure environment mode, thresholds |
+
+### 59.10 Best Practices
+
+1. **Start with `balanced` mode** - Only use `strict_engineering` for production reviews
+2. **Create tenant templates** - Standardize governance across your organization
+3. **Monitor detections** - Review audit logs weekly for patterns
+4. **Allow user preferences** - Let power users customize their experience
+5. **Use `audit` mode for testing** - Test new templates without blocking
+
+### 59.11 Troubleshooting
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| False positive stubs | Legitimate empty returns | Add pattern to allowlist |
+| Sycophancy false trigger | Fast legitimate agreement | Increase `minTurnsBeforeAgreement` |
+| Template not applying | Inheritance override | Check user/tenant template order |
+| LIVS disabled for user | User preference | Check `livs_user_workflow_preferences` |
+
+### 59.12 LIVS-M 2.0 Registry Edition (v7.8.0+)
+
+LIVS-M 2.0 introduces the **Policy Registry** - a JSON-based governance system that enables dynamic policy configuration per tenant without code deployments.
+
+#### Registry Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    LIVS-M 2.0 REGISTRY ARCHITECTURE                          │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌──────────────────────────────────────────────────────────────────────┐   │
+│  │                     POLICY REGISTRY (JSON)                            │   │
+│  │  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐       │   │
+│  │  │  meta_config    │  │global_directives│  │  rules_engine   │       │   │
+│  │  │  ─────────────  │  │  ─────────────  │  │  ─────────────  │       │   │
+│  │  │ • version       │  │ • allow_stubs   │  │ • pattern rules │       │   │
+│  │  │ • env_mode      │  │ • allow_mock    │  │ • logic rules   │       │   │
+│  │  │ • updated_at    │  │ • require_tests │  │ • severity      │       │   │
+│  │  └─────────────────┘  └─────────────────┘  └─────────────────┘       │   │
+│  └──────────────────────────────────────────────────────────────────────┘   │
+│                                    │                                         │
+│                                    ▼                                         │
+│  ┌──────────────────────────────────────────────────────────────────────┐   │
+│  │                  GOVERNANCE SUPERVISOR                                │   │
+│  │  • Builds meta-prompt from registry                                   │   │
+│  │  • Evaluates agent outputs                                           │   │
+│  │  • Returns APPROVE / REJECT / INTERVENE                              │   │
+│  └──────────────────────────────────────────────────────────────────────┘   │
+│                                    │                                         │
+│              ┌─────────────────────┼─────────────────────┐                   │
+│              ▼                     ▼                     ▼                   │
+│  ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐           │
+│  │  THESIS AGENT    │  │ ANTITHESIS AGENT │  │ SYNTHESIS AGENT  │           │
+│  │  (Lead Engineer) │  │ (Forensic Audit) │  │  (Reconciler)    │           │
+│  └──────────────────┘  └──────────────────┘  └──────────────────┘           │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+#### Policy Registry Structure
+
+```json
+{
+  "meta_config": {
+    "version": "1.0.0",
+    "environment_mode": "BALANCED",
+    "last_updated": "2024-01-15T10:00:00Z",
+    "updated_by": "admin@tenant.com"
+  },
+  "global_directives": {
+    "collaboration_style": "ADVERSARIAL",
+    "allow_mock_data": false,
+    "allow_stubs": false,
+    "require_tests_for_code": true,
+    "require_evidence_for_claims": true,
+    "max_agent_turns_before_escalation": 5,
+    "max_consensus_velocity": 3,
+    "enable_chaos_injection": true
+  },
+  "rules_engine": {
+    "pattern_rules": [...],
+    "logic_rules": [...],
+    "custom_rules": [...]
+  }
+}
+```
+
+#### Environment Modes
+
+| Mode | Strictness | Use Case |
+|------|------------|----------|
+| **STRICT_AUDIT** | Maximum | Production code reviews, compliance audits |
+| **BALANCED** | Normal | Standard development workflow |
+| **RAPID_PROTO** | Relaxed | Rapid prototyping, hackathons |
+| **HACKATHON** | Minimal | Experimentation, creative exploration |
+
+#### Governance Supervisor
+
+The Supervisor acts as a "meta-agent" that enforces registry rules:
+
+```typescript
+const result = await governanceSupervisor.evaluate({
+  tenantId: 'tenant-123',
+  sessionId: 'session-456',
+  agentRole: 'THESIS_AGENT',
+  agentOutput: submittedCode,
+  interactionTurn: 1,
+});
+
+// Returns:
+{
+  decision: 'APPROVE' | 'REJECT' | 'INTERVENE',
+  instruction: 'Specific feedback if rejected',
+  violations: [...],
+  confidence: 0.95,
+  reasoning: 'Chain-of-thought explanation'
+}
+```
+
+#### Registry-Aware Worker Agents
+
+| Agent | Role | Registry Awareness |
+|-------|------|-------------------|
+| **THESIS_AGENT** | Lead Engineer - produces implementations | FULL |
+| **ANTITHESIS_AGENT** | Forensic Auditor - finds flaws | FULL |
+| **SYNTHESIS_AGENT** | Reconciler - synthesizes best solution | RULES_ONLY |
+| **SUPERVISOR** | Governance Engine - enforces registry | FULL |
+| **CHAOS_AGENT** | Devil's Advocate - breaks assumptions | RULES_ONLY |
+| **VERIFICATION_AGENT** | Fact Checker - validates claims | RULES_ONLY |
+
+#### Chaos Injection Scenarios
+
+When sycophancy is detected (consensus too fast), the Supervisor can inject:
+
+| Scenario | Purpose |
+|----------|---------|
+| **SYCOPHANCY_BREAK** | Force reconsideration of agreed solution |
+| **EDGE_CASE_PROBE** | Test boundary conditions |
+| **ASSUMPTION_AUDIT** | List and rate all assumptions |
+
+### 59.13 LIVS-M 2.0 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `livs_policy_registry` | Stores tenant-specific JSON registries |
+| `livs_registry_evaluations` | Audit log of supervisor decisions |
+| `livs_registry_history` | Version history of registry changes |
+| `livs_agent_interactions` | Multi-agent interaction logs |
+| `livs_prompt_generation_log` | Worker prompt audit trail |
+
+### 59.14 LIVS-M 2.0 API Endpoints
+
+**Base**: `/api/thinktank/livs-registry`
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/` | Get tenant registry |
+| `PUT` | `/` | Update registry |
+| `GET` | `/rules` | Get active rules |
+| `POST` | `/rules/evaluate` | Evaluate output against rules |
+| `GET` | `/history` | Get registry change history |
+| `POST` | `/supervisor/evaluate` | Invoke governance supervisor |
+
+### 59.15 Integration with AGI Orchestrator
+
+The Governance Supervisor integrates with the AGI Orchestrator for automatic validation:
+
+```typescript
+const result = await agiOrchestrator.orchestrate({
+  taskDescription: 'Build a user authentication system',
+  tenantId: 'tenant-123',
+  agi: {
+    governanceLoop: {
+      enabled: true,
+      validateOutputs: true,
+      breakSycophancy: true,
+      maxRetriesOnRejection: 2,
+    },
+  },
+  governanceSupervisor: livsGovernanceSupervisorService,
+});
+```
+
+The orchestrator will:
+1. Execute the task with selected models
+2. Pass output to Governance Supervisor
+3. If rejected, retry with feedback (up to `maxRetriesOnRejection`)
+4. If sycophancy detected, inject chaos prompt
+5. Return final validated output with governance metadata
+
+### 59.16 Admin Playbook: Common Scenarios
+
+This playbook guides administrators through solving specific team problems by adjusting LIVS-M registry rules.
+
+#### Scenario A: The "Watermelon" Project
+
+**Symptom**: AI agents report "Done" but code is full of `pass`, `return True`, or `// TODO` placeholders.
+
+**The Fix**:
+1. Open your tenant's Policy Registry (Admin → LIVS-M Policy → Edit Registry)
+2. Find Rule `R001` (Anti-Stub)
+3. Change `severity` from `"WARNING"` to `"BLOCKER"`
+
+```json
+{
+  "id": "R001",
+  "name": "Anti-Stub Enforcement",
+  "severity": "BLOCKER",
+  "trigger_patterns": ["pass", "return True", "return False", "// TODO", "# TODO", "NotImplementedError"],
+  "enforcement_action": "REJECT_IMMEDIATE",
+  "rejection_message": "Submission rejected. You used a placeholder pattern ('{MATCH}'). We are in STRICT_AUDIT mode. You must implement the full logic."
+}
+```
+
+**Result**: The Supervisor will immediately reject any lazy code, forcing agents to do the work or admit they can't.
+
+#### Scenario B: The "Groupthink" Echo Chamber
+
+**Symptom**: Agent A makes a mistake, and Agent B just agrees with it without critical review.
+
+**The Fix**:
+1. Open Policy Registry
+2. Find Rule `R002` (Sycophancy Breaker)
+3. Set `max_consensus_velocity` to `1`
+
+```json
+{
+  "id": "R002",
+  "name": "Sycophancy Breaker",
+  "severity": "CRITICAL",
+  "logic_condition": "IF current_agent_agreement == TRUE AND interaction_turn < 2",
+  "enforcement_action": "TRIGGER_CHAOS_AGENT",
+  "rejection_message": "Consensus reached too quickly. Injecting Chaos Probe to test resilience."
+}
+```
+
+**Result**: If Agent B agrees immediately (on the first turn), the system pauses and injects a "Chaos Variable" (e.g., "Assume the database fails. Does this still work?") to force critical thinking.
+
+#### Scenario C: Friday Afternoon Deployment
+
+**Symptom**: You want to ensure nothing risky goes out before the weekend.
+
+**The Fix**:
+1. Set `environment_mode` to `"STRICT_AUDIT"` in the Policy Registry
+2. Optionally, schedule automatic mode changes via the API
+
+```json
+{
+  "meta_config": {
+    "environment_mode": "STRICT_AUDIT",
+    "description": "Friday Lockdown - No risky deployments"
+  }
+}
+```
+
+**Result**: The AI will refuse to approve any code that lacks a verified test script, effectively putting a "safety lock" on the deployment.
+
+#### Scenario D: Library Hallucination Prevention
+
+**Symptom**: AI is importing libraries that don't exist or are not approved.
+
+**The Fix**:
+1. Add Rule `R003` (Library Hallucination Check)
+
+```json
+{
+  "id": "R003",
+  "name": "Library Hallucination Check",
+  "severity": "BLOCKER",
+  "trigger_semantic": "IMPORT_CHECK",
+  "enforcement_action": "VERIFY_DEPENDENCY",
+  "rejection_message": "You imported a library that is not in the approved requirements.txt. Verify it exists or implement natively."
+}
+```
+
+**Result**: All imports are validated against your project's actual dependencies.
+
+#### Scenario E: Rapid Prototyping Sprint
+
+**Symptom**: Team needs to move fast during a hackathon or design sprint.
+
+**The Fix**:
+1. Set `environment_mode` to `"RAPID_PROTO"`
+2. Set `allow_stubs` to `true`
+3. Set `allow_mock_data` to `true`
+
+```json
+{
+  "meta_config": {
+    "environment_mode": "RAPID_PROTO"
+  },
+  "global_directives": {
+    "allow_stubs": true,
+    "allow_mock_data": true,
+    "require_tests_for_code": false
+  }
+}
+```
+
+**Result**: AI focuses on speed and creativity. Warnings are logged but don't block work.
+
+### 59.17 Governance Supervisor Meta-Prompt
+
+The Supervisor uses this dynamically-generated prompt that ingests the registry. It does not contain hard-coded rules; it contains the **logic to read rules**.
+
+```
+ROLE: LIVS-M GOVERNANCE SUPERVISOR
+
+You are the runtime orchestrator for a multi-agent engineering team. 
+You do not write code; you enforce the Law.
+
+The "Law" is strictly defined by the POLICY_REGISTRY provided in your context.
+
+INPUT CONTEXT
+- User Request: {user_query}
+- Current Agent Output: {agent_response}
+- Active Policy Registry: {policy_registry_json}
+
+EXECUTION PROTOCOL
+Before passing the Agent's output to the User or the Next Agent, execute this validation loop:
+
+STEP 1: LOAD CONFIGURATION
+- Check meta_config.environment_mode
+- If "STRICT_AUDIT": Treat all WARNINGS as BLOCKERS
+- If "RAPID_PROTO": Ignore WARNINGS, enforce BLOCKERS only
+
+STEP 2: SCAN FOR VIOLATIONS
+- Iterate through rules_engine in the registry
+- Pattern Scan: Check specific strings in trigger_patterns against agent_response
+- If found: Trigger enforcement_action
+- Logic Scan: Evaluate logic_condition based on conversation history
+- If R002 (Sycophancy) is triggered: STOP the flow and invoke the Antithesis_Agent
+
+STEP 3: DECISION ROUTING
+Choose ONE path:
+
+PATH A: REJECTION (Rule Violation)
+If a BLOCKER or CRITICAL rule is violated:
+Return JSON:
+{
+  "decision": "REJECT",
+  "violating_agent": "{agent_name}",
+  "violation_id": "{rule_id}",
+  "instruction": "{rejection_message}"
+}
+
+PATH B: INTERVENTION (Sycophancy/Weakness)
+If the output is technically valid but weak (e.g., fast consensus):
+Return JSON:
+{
+  "decision": "INTERVENE",
+  "target_agent": "Antithesis_Agent",
+  "instruction": "Inject chaos variable: {chaos_variable}. Force the team to re-evaluate."
+}
+
+PATH C: APPROVAL (Clean Pass)
+If no rules are violated:
+Return JSON:
+{
+  "decision": "APPROVE",
+  "next_step": "HANDOFF_TO_USER"
+}
+```
+
+### 59.18 Quick Reference: Mode Cheat Sheet
+
+| Mode | `environment_mode` | Stubs? | Mock Data? | Tests Required? | Sycophancy Check? |
+|------|-------------------|--------|------------|-----------------|-------------------|
+| **Brainstorming** | `RAPID_PROTO` | ✅ Allowed | ✅ Allowed | ❌ No | ⚠️ Logged only |
+| **Standard** | `ENGINEERING` | ⚠️ Warned | ⚠️ Warned | 📋 Encouraged | ✅ Active |
+| **Strict Audit** | `STRICT_AUDIT` | 🚫 Blocked | 🚫 Blocked | ✅ Mandatory | ✅ + Devil's Advocate |
+
+---
+
+## Section 60: Memory Retention Settings (v7.13.0)
+
+### 60.1 Overview
+
+Think Tank Admins can override platform-level memory retention defaults for their tenant. This controls how long user memories are retained, storage limits, and which memory features are enabled for all users in the tenant.
+
+**Dashboard Location**: Think Tank Admin → Memory Retention (`/thinktank-admin/memory-retention`)
+
+### 60.2 Configurable Settings
+
+| Setting | Type | Description |
+|---------|------|-------------|
+| **Session-to-Session Memory** | Toggle | Enable/disable persistent memory across all conversations and models |
+| **Conversation History** | Toggle | Store full conversation transcripts |
+| **Auto-Extract Facts** | Toggle | Automatically extract facts and preferences from conversations |
+| **User Can Delete Own Memory** | Toggle | Allow users to manage and delete their own memory entries |
+| **Uploaded Documents in Memory** | Toggle | Include uploaded documents (PDFs, images, code, etc.) in user memory profile across all chats |
+| **Downloaded Files in Memory** | Toggle | Include AI-generated and retrieved files in user memory profile across all chats |
+| **Retention Days** | Number | How many days to retain memories (0 = unlimited) |
+| **Max Storage Per User** | Number (MB) | Maximum storage per user (0 = unlimited) |
+| **Hot Tier Days** | Number | Days in fast-access hot storage |
+| **Warm Tier Days** | Number | Days in warm storage before moving to cold |
+| **Max Upload Size** | Number (MB) | Maximum file upload size per file |
+
+### 60.3 Policy Hierarchy
+
+Your tenant override sits in the middle of a three-tier hierarchy:
+
+1. **Platform Default** (Radiant Super-Admin) — Base defaults for all tenants
+2. **Tenant Override** (You, Think Tank Admin) — Your overrides for this tenant
+3. **Tenant Admin Override** (Think Tank Tenant Admin) — Further customization WITHIN your limits
+
+**Important**: Tenant Admins (level 3) CANNOT exceed the limits you set. If you set retention to 90 days, a Tenant Admin cannot set it to 180. If you disable session memory, a Tenant Admin cannot re-enable it.
+
+### 60.4 Admin API
+
+**Base Path**: `/api/admin/memory-retention/`
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/tenant/override` | Get current tenant override |
+| PUT | `/tenant/override` | Set/update tenant override |
+| DELETE | `/tenant/override` | Remove override (restore platform defaults) |
+| GET | `/effective` | Get resolved effective policy |
+| GET | `/dashboard` | Full usage dashboard |
+| GET | `/profiles` | List user memory profiles |
+| POST | `/prune` | Trigger memory pruning |
+
+### 60.5 Usage Dashboard
+
+The memory retention page shows:
+- **Current Usage**: Users with memory, total entries, avg storage/user, avg entries/user
+- **Currently Active Policy**: Resolved effective values after merging hierarchy
+- **Tenant Override Editor**: Toggle switches and number inputs for all configurable settings
 
 ---
 

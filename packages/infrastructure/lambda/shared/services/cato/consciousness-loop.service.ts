@@ -8,7 +8,13 @@
  */
 
 import { executeStatement, stringParam, doubleParam } from '../../db/client';
-import { enhancedLogger as logger } from '../../logging/enhanced-logger';
+import { createRegisteredLogger } from '../logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'cato/consciousness-loop',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 export type LoopState = 'IDLE' | 'PROCESSING' | 'REFLECTING' | 'DREAMING' | 'PAUSED';
 /** @deprecated Use LoopState instead */

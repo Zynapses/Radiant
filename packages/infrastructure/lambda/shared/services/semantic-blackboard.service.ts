@@ -14,7 +14,13 @@
 import { Client } from 'pg';
 import { Redis } from 'ioredis';
 import { v4 as uuidv4 } from 'uuid';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'semantic/blackboard',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { modelRouterService } from './model-router.service';
 
 // ============================================================================
@@ -609,6 +615,7 @@ class SemanticBlackboardService {
   private async generateEmbedding(text: string): Promise<number[]> {
     try {
       const result = await modelRouterService.invoke({
+        tenantId,
         modelId: 'openai/text-embedding-ada-002',
         messages: [{ role: 'user', content: text }],
         maxTokens: 1,

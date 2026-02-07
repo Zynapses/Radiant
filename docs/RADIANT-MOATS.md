@@ -73,6 +73,12 @@ The Entity-Context Divergence (ECD) scoring system quantifies factual alignment.
 
 Active Inference-based safety system that replaces traditional reward maximization with Free Energy minimization, providing mathematically grounded safety guarantees. Cross-AI validated by both Claude Opus 4.5 and Google Gemini.
 
+#### Genesis/Omega Project (IMPLEMENTED v2.0.0)
+
+> **"This is the Jet Engine. Everyone else is building better propellers."**
+
+*A Complex-Valued Neural Network architecture with direct LLM integration. See [PROJECT-GENESIS-OMEGA.md](PROJECT-GENESIS-OMEGA.md) for full specification.*
+
 **Key Features**:
 - **9 Control Barrier Functions (CBFs)** that NEVER relax — shields stay UP
 - **Five-layer security stack**: Cognitive → Safety → Governance → Infrastructure → Recovery
@@ -80,9 +86,33 @@ Active Inference-based safety system that replaces traditional reward maximizati
 - **Immutable Merkle-hashed audit trail** for compliance
 - **Redundant perception** (Regex + BERT + Rules) prevents bypass attempts
 
+**Neural Bridge (Moonshot #1 — "Telepathy")**:
+- **NeuralTransducer**: Projects Complex^2048 brain state → [8, 4096] soft prompt tokens
+- **Custom vLLM Server**: `/inject` endpoint for embedding-level conditioning
+- **Shadow Mode**: Coexists with LoRA adapters (weight-level vs activation-level)
+- **Replication Barrier**: Requires the entire OMEGA physics engine + custom vLLM infrastructure
+
+**Homeostatic Dreaming (Moonshot #2 — "Reverse Entropy")**:
+- **3-Stage Selective Dreaming**: Magnitude gate + phase sharpening + experience replay
+- **The Watcher**: Self-awareness via prediction error → dopamine signal
+- **Biological Lock-In**: Brain physically densifies over time; impossible to export to competitors
+
+**Genesis Forge v3.0 — "The Glass Foundry" (Moonshot #3)**:
+- **Digital Smithy**: Not a code editor — a real-time physics simulation environment for neural firmware
+- **Shadow Omega Tether**: Permanently hard-wired WebSocket to simulation kernel; adversarial workflow
+- **Catenary Wire Physics**: Gravity-obeying data cables with light particle flow; heavier data = deeper sag
+- **Reactor Core Forge**: Hold-to-charge button emitting shockwave on release → compiled .bin firmware
+- **Instance Registry**: Every OMEGA brain has a unique ID/Name; Forge can address any instance
+- **Void Mode**: Pitch black full-screen PCB visualization for debugging
+- **Replication Barrier**: Requires the complete OMEGA physics engine, Shadow Omega simulation kernel, custom React Flow node types, and the catenary edge physics — none of which exist in any competitor product
+
 **Implementation**:
+- Core: `omega_core/bridge.py`, `omega_core/reflection.py`, `omega_core/physics.py`
+- Handler: `handlers/omega_vllm_server.py`, `handlers/omega_inference.py`
+- Glass Foundry: `apps/genesis/components/forge/` (GlassFoundry, TheArmory, TheOracle, OmegaSelector, ReactorCore, 3 node types, catenary edge)
+- State: `apps/genesis/lib/forge-store.ts` (Zustand), `hooks/useShadowOmega.ts` (WebSocket)
 - Admin API: `lambda/admin/cato.ts`
-- Database: `cato_cbf_config`, `cato_audit_log`
+- Database: `cato_cbf_config`, `cato_audit_log`, `omega_replay_logs`, `omega_bridge_state`, `omega_watcher_metrics`, `omega_dream_history`, `omega_instance_registry`, `omega_forge_sessions`, `omega_forge_artifacts`, `omega_telemetry_history`
 - CDK: `lib/stacks/cato-genesis-stack.ts`
 
 ---
@@ -508,9 +538,9 @@ W_Final = W_Genesis + (scale × W_Cato) + (scale × W_User) + (scale × W_Domain
 
 ---
 
-### Moat #6E: LLM Integrity Verification System (LIVS) — PROPOSED v6.3.0
+### Moat #6E: LIVS-M 2.0 Registry Edition — IMPLEMENTED v7.9.0
 
-**NEW** — Two-tier defense against AI "lying" behaviors that mirrors forensic management techniques used to catch human engineers who "stub" code and report it as "done."
+**LIVE** — Policy-driven AI governance with "Defcon-style" modes. Two-tier defense against AI "lying" behaviors that mirrors forensic management techniques used to catch human engineers who "stub" code and report it as "done."
 
 | Capability | Generic AI Platforms | RADIANT LIVS |
 |------------|---------------------|--------------|
@@ -574,13 +604,151 @@ Prevents multi-model pipelines from amplifying lies (like human "Watermelon Repo
 
 **Why It's a Moat**: No AI platform currently offers systematic lie detection for LLM outputs. The "Laziness Factor" in LLMs (satisficing with shallow answers to save compute) mirrors human engineer behavior—and requires the same forensic management techniques to overcome. RADIANT's accumulated integrity weights become more accurate over time, creating compounding trust advantage. The soft rule library represents proprietary operational knowledge that cannot be replicated.
 
-**Implementation** (Proposed):
+**Implementation** (Live v7.9.0):
+- Service: `lambda/shared/services/livs/policy-registry.service.ts`
+- Service: `lambda/shared/services/livs/livs-governance-supervisor.service.ts`
 - Service: `lambda/shared/services/livs/livs-interrogator.service.ts`
-- Service: `lambda/shared/services/livs/livs-orchestration.service.ts`
-- Service: `lambda/shared/services/livs/livs-weights.service.ts`
-- Database: `livs_config`, `livs_soft_rules`, `livs_interrogations`, `livs_model_weights`, `livs_orchestration_weights`
-- Admin API: `/api/admin/livs/*`
-- Proposal: `docs/proposals/LLM-INTEGRITY-VERIFICATION-PROPOSAL.md`
+- Integration: `lambda/shared/services/agi-orchestrator.service.ts` (governance loop)
+- Database: `livs_policy_registry`, `livs_registry_evaluations`, `livs_registry_history`, `livs_agent_interactions`
+- Admin API: `/api/admin/livs/policy`, `/api/admin/livs/metrics`, `/api/admin/livs/history`
+- Admin UI: `apps/admin-dashboard/app/(dashboard)/cato/livs-policy/page.tsx`
+- Think Tank UI: `apps/admin-dashboard/app/thinktank-admin/simulator/page.tsx` (LIVS-M Policy view)
+- Documentation: RADIANT-ADMIN-GUIDE.md Section 90.12, ENGINEERING-IMPLEMENTATION-VISION.md Section 33
+
+---
+
+### Moat #6F: Heterogeneous Model Consensus — Cross-Provider Truth Verification (NEW v7.11.0)
+
+**LIVE** — When Claude, GPT-4, and Gemini all independently agree on an answer, that answer is far more likely to be correct than any single model's output. This is **epistemic convergence** — the AI equivalent of peer review.
+
+| Capability | Standard Self-Consistency | RADIANT Heterogeneous Consensus |
+|------------|--------------------------|--------------------------------|
+| Model Diversity | ❌ Same model, N samples | ✅ N different models from M providers |
+| Provider Independence | ❌ Single provider biases | ✅ Cross-provider agreement isolates truth |
+| Architecture Diversity | ❌ Same architecture biases | ✅ Claude + GPT + Gemini + Mistral + Llama |
+| Hallucination Detection | ❌ Model agrees with itself | ✅ Disagreement = potential hallucination |
+| Reflexion Trigger | ❌ No self-correction | ✅ Auto-triggers when agreement < 60% |
+| Cost Efficiency | ❌ 5x same expensive model | ✅ Mix quality tiers within budget |
+
+**Scoring Algorithm**:
+```
+For each response pair (model_i, model_j):
+  semantic_similarity = cosine(embed(response_i), embed(response_j))
+
+Overall Agreement = weighted_mean(all pairwise similarities)
+Cross-Provider Agreement = mean(pairs from DIFFERENT providers)  ← strongest signal
+Confidence = 0.5 × cross_provider + 0.3 × overall + 0.2 × diversity_bonus
+Hallucination Risk = 1.0 - cross_provider_agreement (when low)
+```
+
+**Default Consensus Panel**:
+
+| Model | Provider | Family | Role |
+|-------|----------|--------|------|
+| Claude 3.5 Sonnet | Anthropic | claude | Frontier reasoning |
+| GPT-4o | OpenAI | gpt | Frontier reasoning |
+| Gemini 1.5 Pro | Google | gemini | Long-context reasoning |
+| Mistral Large | Mistral | mistral | European alternative |
+| Llama 3.1 70B | Meta/Bedrock | llama | Open-source verification |
+
+**Score: 28/30**
+
+| Criterion | Score | Rationale |
+|-----------|-------|-----------|
+| Uniqueness | 5 | NO competitor systematically cross-validates across model providers |
+| Replication Difficulty | 5 | Requires multi-provider routing + embedding similarity + panel selection |
+| Network Effect | 4 | Accumulated model performance data improves panel selection |
+| Switching Cost | 5 | Truth Engine accuracy depends on cross-provider validation |
+| Time Advantage | 5 | First-mover in heterogeneous consensus category |
+| Integration Depth | 4 | Feeds into orchestration, reflexion, hallucination detection |
+
+**Why It's a Moat**: Standard self-consistency asks the same model the same question 5 times — this just confirms the model's own biases. Heterogeneous consensus asks 5 DIFFERENT models from 5 DIFFERENT providers, measuring whether independent architectures trained on different data converge on the same answer. When they do, confidence is extremely high. When they don't, the system automatically flags potential hallucinations and triggers self-correction. No competitor offers this level of cross-model truth verification.
+
+**Implementation**:
+- Types: `packages/shared/src/types/heterogeneous-consensus.types.ts`
+- Service: `lambda/shared/services/heterogeneous-consensus.service.ts`
+- Integration: `lambda/shared/services/orchestration-methods.service.ts` (method: `heterogeneous-consensus-service`)
+- Admin API: `lambda/admin/heterogeneous-consensus.ts`
+- Admin UI: `apps/admin-dashboard/app/(dashboard)/orchestration/consensus/page.tsx`
+- Database: `consensus_config`, `consensus_evaluations`, `consensus_responses`, `consensus_pairwise_agreements`, `consensus_metrics`
+- Migration: `V2026_02_05_005__inference_cache_heterogeneous_consensus.sql`
+
+---
+
+### Moat #6G: Inference Response Cache — Cost Moat Through Intelligent Deduplication (NEW v7.11.0)
+
+**LIVE** — Hash-based semantic deduplication that eliminates redundant AI inference calls. Every repeated prompt+model+params combination is served from cache at zero cost and sub-10ms latency.
+
+| Capability | Generic AI Platforms | RADIANT Inference Cache |
+|------------|---------------------|------------------------|
+| Repeated queries | ❌ Full cost every time | ✅ Zero cost from cache |
+| Cache isolation | ❌ N/A | ✅ Tenant-isolated (SHA-256 with tenant_id) |
+| Smart exclusions | ❌ N/A | ✅ Skip creative tasks, high-temp, real-time models |
+| PII protection | ❌ N/A | ✅ Regex-based PII detection prevents caching |
+| Cost tracking | ❌ No visibility | ✅ Per-entry savings with projected monthly ROI |
+
+**Two-Layer Architecture**:
+- **L1**: In-memory LRU per Lambda instance (<1ms, ~100 entries)
+- **L2**: Aurora PostgreSQL with RLS (< 10ms, 10K+ entries per tenant)
+
+**Score: 22/30**
+
+| Criterion | Score | Rationale |
+|-----------|-------|-----------|
+| Uniqueness | 3 | Caching is common; tenant-isolated with PII protection is unique |
+| Replication Difficulty | 3 | Technically straightforward but requires deep integration |
+| Network Effect | 4 | Cache hits compound — more usage = more savings |
+| Switching Cost | 4 | Accumulated cost savings and performance gains create ROI lock-in |
+| Time Advantage | 4 | First-mover in tenant-isolated AI inference caching |
+| Integration Depth | 4 | Transparently integrated into every model invocation |
+
+**Why It's a Moat**: While caching itself isn't unique, the transparent integration into a multi-tenant AI platform with tenant isolation, PII protection, smart exclusions, and comprehensive cost tracking creates a cost advantage that compounds over time. Customers see measurable ROI dashboards showing exactly how much RADIANT saves them — making competitor cost comparisons unfavorable.
+
+**Implementation**:
+- Types: `packages/shared/src/types/inference-cache.types.ts`
+- Service: `lambda/shared/services/inference-cache.service.ts`
+- Integration: `lambda/shared/services/model-router.service.ts` (transparent in `invoke()`)
+- Admin API: `lambda/admin/inference-cache.ts`
+- Admin UI: `apps/admin-dashboard/app/(dashboard)/orchestration/inference-cache/page.tsx`
+- Database: `inference_cache_config`, `inference_cache_entries`, `inference_cache_events`, `inference_cache_metrics`
+- Migration: `V2026_02_05_005__inference_cache_heterogeneous_consensus.sql`
+
+---
+
+### Moat #6H: Drift-Aware Model Routing & Auto-Correction — Self-Healing AI Infrastructure (NEW v7.24.0)
+
+**LIVE** — When AI models silently degrade (drift), most platforms continue routing traffic to degraded models until a human notices. RADIANT automatically detects drift via statistical tests (KS, PSI, Chi-squared), quarantines drifted models, applies weight penalties, routes to fallbacks, and corrects temperature/prompts — all without human intervention.
+
+| Capability | Generic AI Platforms | RADIANT Drift Correction |
+|------------|---------------------|--------------------------|
+| Drift detection | ❌ Manual monitoring | ✅ Automatic statistical testing (KS, PSI, Chi²) |
+| Model quarantine | ❌ Manual disable | ✅ Auto-quarantine below threshold, auto-release |
+| Fallback routing | ❌ Hardcoded fallbacks | ✅ Dynamic best-model selection with composite weights |
+| Weight factors | ❌ Single dimension | ✅ 5-factor scoring (drift, quality, latency, cost, availability) |
+| Correction actions | ❌ None | ✅ Temperature adjust, prompt prefix inject, weight penalty |
+| Admin AI assistant | ❌ None | ✅ Bedrock-powered helper with causal analysis on every page |
+| Model auto-upgrade | ❌ Manual updates | ✅ Automatic Bedrock model discovery + family-aware upgrade |
+
+**Score: 27/30**
+
+| Criterion | Score | Rationale |
+|-----------|-------|-----------|
+| Uniqueness | 5 | No competitor has automatic drift correction with composite model weighting |
+| Replication Difficulty | 5 | Requires deep integration into routing, orchestration, and monitoring |
+| Network Effect | 4 | More models tracked = better drift baselines = more reliable routing |
+| Switching Cost | 5 | Accumulated drift history, weight configurations, and correction policies |
+| Time Advantage | 4 | 2+ year head start on self-healing AI infrastructure |
+| Integration Depth | 4 | Integrated into model-router invoke(), Pareto routing, security monitoring |
+
+**Why It's a Moat**: Self-healing AI infrastructure is the holy grail of enterprise AI operations. While competitors require manual intervention when models degrade, RADIANT automatically detects, corrects, and routes around problems. The combination of statistical drift detection, composite model weighting, automatic quarantine/fallback, and a Bedrock-powered AI admin assistant creates an operational advantage that compounds over time — administrators get smarter recommendations, drift baselines improve, and the platform becomes increasingly self-managing.
+
+**Implementation**:
+- Services: `drift-correction.service.ts`, `bedrock-model-discovery.service.ts`, `admin-ai-helper.service.ts`
+- Integration: `model-router.service.ts` (per-request drift check), `orchestration-methods.service.ts` (Pareto routing)
+- Admin APIs: `model-weights.ts` (12 endpoints), `bedrock-management.ts` (9 endpoints), `admin-ai-helper.ts` (4 endpoints)
+- Admin UI: `orchestration/model-weights/page.tsx`, `platform/bedrock-settings/page.tsx`, `components/admin-ai-helper.tsx`
+- EventBridge: `security/bedrock-poll.ts` (periodic polling + auto-upgrade + drift correction)
+- Database: 6 tables, 5 functions in `V2026_02_06_007`
 
 ---
 
@@ -937,6 +1105,7 @@ Metadata: fact_id: 892 | verified_by: Chief_Eng_Bob | date: 2026-01-24
 | 30 | Three-Tier Learning | Technical | Global/Tenant/User = personalization depth |
 | 31 | Cartridge PKI & Federation | Technical | Cryptographic signing = tamper-proof AI |
 | 32 | Mid-Level Services (MLS) | Technical | 5 domain services = orchestration moat |
+| 33 | Universal Drift Enforcement & Genesis Feedback | Technical | 52+ services drift-controlled + telemetry-gated Genesis = model reliability moat |
 
 ---
 
@@ -1236,6 +1405,346 @@ When optional models are unavailable, services automatically reduce capabilities
 - Service Orchestrators: `packages/infrastructure/lambda/services/`
 - Database: `migrations/006_self_hosted_models.sql`
 - LiteLLM Routing: `litellm/config/self-hosted.yaml`
+
+---
+
+### Moat #33: Enterprise Reliability Architecture - 99.99% SLA Guarantee (v7.1.0)
+
+**Tier 2 Operational Moat — 6+ Months Engineering Lead**
+
+Enterprise-grade reliability infrastructure for the State Registry that provides **configurable storage, automatic failover, and data integrity verification**. No competitor offers this level of reliability tooling for AI infrastructure management.
+
+| Capability | Competitors | RADIANT Reliability |
+|------------|-------------|---------------------|
+| Storage Configuration | Fixed paths | Admin-configurable (external drives, NAS) |
+| Retry Logic | Simple retry | Exponential backoff with jitter |
+| Conflict Resolution | Manual only | 6 strategies (source/target wins, merge, etc.) |
+| Data Integrity | Trust the system | SHA-256/512 checksums on all operations |
+| Backup Validation | None | Comprehensive pre-restore validation |
+| Graceful Degradation | Hard failures | Cache fallback, read-only mode, partial sync |
+| SLA Guarantee | Best effort | 99.99% availability target |
+
+**Key Features**:
+
+1. **Configurable Storage Paths**: Admins can point manifests, backups, and packages to external drives or network shares for large datasets (100GB+)
+
+2. **Retry with Exponential Backoff**:
+   - Network: 5 retries, 1s→30s delay
+   - Sync: 3 retries, 5s→60s delay  
+   - Backup: 3 retries, 10s→120s delay
+
+3. **Conflict Resolution Strategies**: Source wins, target wins, newest wins, manual, merge, skip
+
+4. **Data Integrity**: SHA-256 checksums computed and verified on all manifests and backups—100% data integrity guarantee
+
+5. **Backup Validation**: Before restore, validates checksum, components, dependencies, and recoverability
+
+6. **Fallback Mechanisms**:
+   - Network failure → Use cached data (configurable max age)
+   - Partial sync failure → Continue if >80% items succeed
+   - Write failure → Enter read-only mode
+   - Storage full → Automatic cleanup
+
+7. **Health Monitoring**: Real-time health checks on local cache, S3, API, and database connections
+
+**SLA Targets**:
+
+| Metric | Target |
+|--------|--------|
+| Availability | 99.99% (52 min downtime/year) |
+| Sync Success | 99.9% |
+| Backup Success | 99.99% |
+| Data Integrity | 100% |
+
+**Why This Is Defensible**:
+
+1. **Operational Maturity**: These reliability patterns (circuit breakers, exponential backoff, graceful degradation) require significant operational experience that newcomers lack.
+
+2. **Trust Barrier**: Enterprise customers require 99.99% guarantees with validated backups. Meeting this SLA consistently creates trust that competitors cannot shortcut.
+
+3. **Data Gravity**: The more backups and manifests stored, the harder to migrate. Configurable storage allows unlimited growth without technical barriers.
+
+4. **Compliance Integration**: Backup validation with checksums meets audit requirements for financial and healthcare industries.
+
+**Score: 23/30** — Tier 2 Operational Moat
+
+| Criterion | Score | Rationale |
+|-----------|-------|-----------|
+| Uniqueness | 3 | Reliability patterns are known but rarely implemented comprehensively |
+| Replication Difficulty | 4 | Requires operational expertise and extensive testing |
+| Network Effect | 3 | Usage patterns inform optimal retry/timeout configurations |
+| Switching Cost | 4 | Accumulated backups and manifests create data gravity |
+| Time Advantage | 4 | 6+ months to implement and validate reliability SLAs |
+| Integration Depth | 5 | Deeply integrated with State Registry and deployment workflows |
+
+**Implementation**:
+- Types: `packages/shared/src/types/environment-state.types.ts` (Reliability section)
+- Swift Models: `apps/swift-deployer/Sources/RadiantDeployer/Models/StateRegistryReliability.swift`
+- Swift Service: `apps/swift-deployer/Sources/RadiantDeployer/Services/StateRegistryReliabilityService.swift`
+- Swift UI: `apps/swift-deployer/Sources/RadiantDeployer/Views/StateRegistry/StorageConfigurationView.swift`
+
+---
+
+## Moat 7: Anticipatory Memory Architecture (v7.12.0)
+
+### Moat 7A: Autobiographical Knowledge Graph (AKG)
+
+**What it is**: Auto-extracted entity-relationship graph from every conversation. Not flat key-value facts (like Claude) — a traversable knowledge graph with 14 entity types, 20 relationship types, temporal edges with valid_from/valid_until dates, confidence scoring, and importance ranking using frequency (40%) + recency (30%) + centrality (30%).
+
+**Why it matters**: Claude stores "Robert works at Zynapses." We store `Robert →[works_at, since:2024]→ Zynapses →[builds]→ RADIANT →[uses]→ AWS CDK` and can traverse the graph to understand context without being told. This is the difference between a contact list and a relationship map.
+
+**Moat Dynamics**:
+1. **Contextual Gravity**: Every conversation makes the graph richer. The more a user interacts, the better RADIANT understands them. Switching to a competitor means starting from zero.
+2. **Graph Compound Effect**: Unlike flat memory, graph relationships create emergent knowledge — the AI can infer things never explicitly stated by traversing edges.
+3. **Temporal Intelligence**: Historical edges let RADIANT understand career changes, technology migrations, and preference evolution — something no competitor tracks.
+
+**Score: 29/30** — Tier 1 Strategic Moat
+
+| Criterion | Score | Rationale |
+|-----------|-------|-----------|
+| Uniqueness | 5 | No competitor has auto-extracted knowledge graphs from conversations |
+| Replication Difficulty | 5 | Requires LLM extraction pipeline, graph storage, temporal edges, deduplication |
+| Network Effect | 5 | Each conversation enriches the graph exponentially |
+| Switching Cost | 5 | Accumulated knowledge graph is irreplaceable — months/years of relationship data |
+| Time Advantage | 5 | 2+ years ahead of any competitor's roadmap |
+| Integration Depth | 4 | Integrated into Brain Router, prompt building, and Twilight Dreaming |
+
+**Implementation**: `packages/infrastructure/lambda/shared/services/akg.service.ts`
+
+---
+
+### Moat 7B: Predictive Memory Prefetch
+
+**What it is**: ML model trained on memory access patterns that predicts what memories will be needed BEFORE the user asks. Uses three prediction strategies — temporal patterns (time-of-day), topic co-occurrence, and sequential patterns — with weighted scoring (30/40/30) and a feedback loop for continuous improvement.
+
+**Why it matters**: Claude retrieves memories on-demand (50-200ms latency). RADIANT pre-warms the cache so recall latency drops to near-zero (<1ms). The AI appears to "already know" what you're about to ask about.
+
+**Moat Dynamics**:
+1. **Speed Moat**: Zero-latency recall creates a perception of intelligence that on-demand systems cannot match.
+2. **Learning Flywheel**: Prediction accuracy improves with every interaction, making the system harder to replicate over time.
+3. **Behavioral Lock-in**: The AI adapts to the user's daily patterns — switching means losing personalized timing intelligence.
+
+**Score: 26/30** — Tier 1 Strategic Moat
+
+| Criterion | Score | Rationale |
+|-----------|-------|-----------|
+| Uniqueness | 5 | No competitor does predictive memory prefetching |
+| Replication Difficulty | 4 | Requires access pattern storage, prediction model, cache infrastructure |
+| Network Effect | 4 | Cross-user patterns could improve predictions (future) |
+| Switching Cost | 4 | Learned access patterns are user-specific and non-transferable |
+| Time Advantage | 5 | 3+ years ahead — competitors haven't conceived this |
+| Integration Depth | 4 | Integrated into Brain Router and AKG access layer |
+
+**Implementation**: `packages/infrastructure/lambda/shared/services/predictive-prefetch.service.ts`
+
+---
+
+### Moat 7C: Memory Contradiction Detector
+
+**What it is**: Every new fact extracted by the AKG is checked against existing knowledge for contradictions. Uses LLM-based analysis to classify contradictions into 6 types (factual, temporal, preference, relationship, quantitative, sentiment), auto-resolves when possible, and prompts user resolution for ambiguous cases.
+
+**Why it matters**: Claude happily stores "User likes React" and "User likes Vue" without noticing. RADIANT detects this contradiction, classifies it (preference change vs. factual error), and resolves it — maintaining truth in the knowledge graph.
+
+**Moat Dynamics**:
+1. **Truth Moat**: The only AI memory system that maintains factual consistency across conversations.
+2. **Trust Accumulation**: Users learn to trust RADIANT's memory because it's never wrong — contradictions are caught and resolved.
+3. **Temporal Intelligence**: Understanding that preferences change over time (both_valid resolution) shows emotional intelligence no competitor has.
+
+**Score: 29/30** — Tier 1 Strategic Moat
+
+| Criterion | Score | Rationale |
+|-----------|-------|-----------|
+| Uniqueness | 5 | No competitor detects memory contradictions |
+| Replication Difficulty | 5 | Requires semantic similarity search, LLM classification, resolution engine |
+| Network Effect | 5 | Resolution patterns improve auto-resolution for all users |
+| Switching Cost | 5 | Resolved contradictions represent curated truth — irreplaceable |
+| Time Advantage | 5 | 3-5 years ahead — this concept doesn't exist in competitors |
+| Integration Depth | 4 | Integrated into AKG extraction pipeline |
+
+**Implementation**: `packages/infrastructure/lambda/shared/services/memory-contradiction-detector.service.ts`
+
+---
+
+### Moat 7D: Organizational Memory Mesh
+
+**What it is**: Tenant-wide shared knowledge that compounds across all users with 5 privacy tiers (personal→team→department→org→public), 7 data classifications, and full regulatory compliance (GDPR Art. 6/7, HIPAA §164.508, SOC2 Type II, CCPA §1798.100).
+
+**Why it matters**: Claude is single-user — an entire team using Claude has N isolated memory stores. RADIANT lets an organization build collective AI memory. A new employee onboards with instant organizational context, while maintaining strict privacy boundaries.
+
+**Moat Dynamics**:
+1. **Organizational Lock-in**: The entire organization's collective knowledge is stored — switching means losing institutional AI memory.
+2. **Compliance Moat**: GDPR consent tracking, HIPAA PHI scanning, SOC2 audit trails — competitors would need years of compliance work.
+3. **Network Effect**: Each contributing user makes the org memory more valuable for everyone.
+4. **Regulatory Barrier**: Enterprises in regulated industries (healthcare, finance) cannot use competitors without equivalent compliance.
+
+**Score: 27/30** — Tier 1 Strategic Moat
+
+| Criterion | Score | Rationale |
+|-----------|-------|-----------|
+| Uniqueness | 5 | No competitor has multi-user shared AI memory with privacy tiers |
+| Replication Difficulty | 5 | Requires consent management, PII scanning, audit trails, erasure cascade |
+| Network Effect | 5 | Every user contribution makes org memory more valuable |
+| Switching Cost | 4 | Accumulated org knowledge + compliance infrastructure |
+| Time Advantage | 4 | 2-3 years ahead — compliance alone takes 12+ months |
+| Integration Depth | 4 | Integrated into Twilight Dreaming and AKG |
+
+**Implementation**: `packages/infrastructure/lambda/shared/services/org-memory-mesh.service.ts`
+
+---
+
+### Moat 7E: Dream Insight Generator
+
+**What it is**: During Twilight Dreaming (nightly), analyzes memory patterns across the AKG to autonomously generate insights. 10 insight types (pattern, trend, connection, knowledge_gap, optimization, prediction, contradiction, milestone, risk, opportunity) with proactive surfacing, user feedback loop, and duplicate detection.
+
+**Why it matters**: Claude and GPT are purely reactive — they only respond when asked. RADIANT thinks about the user while they sleep and proactively surfaces discoveries. "I noticed you've been debugging auth issues for 2 weeks — here's a systematic approach."
+
+**Moat Dynamics**:
+1. **Proactive Intelligence Moat**: The only AI that generates insights without being asked. This fundamentally changes the user relationship from tool to partner.
+2. **Pattern Intelligence**: Cross-conversation pattern recognition is computationally expensive and requires the AKG — competitors without a knowledge graph cannot do this.
+3. **Emotional Moat**: Users develop attachment to an AI that "notices things" and "cares enough to mention it."
+
+**Score: 30/30** — Tier 1 Strategic Moat (Maximum Score)
+
+| Criterion | Score | Rationale |
+|-----------|-------|-----------|
+| Uniqueness | 5 | No competitor generates autonomous insights from memory |
+| Replication Difficulty | 5 | Requires AKG, trend analysis, LLM generation, surfacing engine, feedback loop |
+| Network Effect | 5 | Insight patterns from one user improve generation for others |
+| Switching Cost | 5 | Historical insights and learned patterns are irreplaceable |
+| Time Advantage | 5 | 5+ years ahead — this concept doesn't exist anywhere |
+| Integration Depth | 5 | Deeply integrated with AKG, Brain Router, Twilight Dreaming |
+
+**Implementation**: `packages/infrastructure/lambda/shared/services/dream-insight-generator.service.ts`
+
+---
+
+### Moat #7F: Three-Tier Admin-Configurable Memory Retention
+
+**What it is**: A three-tier retention policy hierarchy (Platform → Tenant → Tenant Admin) with constraint enforcement, giving enterprises granular control over how long user memories are retained, how much storage each user gets, and which memory features are enabled — all adjustable from three different admin dashboards.
+
+**Why it matters**: Claude's memory is all-or-nothing with zero admin controls. ChatGPT's memory has a single on/off toggle. RADIANT gives enterprises three levels of granular control with constraint enforcement between levels.
+
+**Moat Dynamics**:
+- No competitor offers admin-configurable memory retention at any level, let alone three
+- Constraint enforcement (tenant admin cannot exceed tenant limits) is enterprise-grade governance
+- Storage tier management (hot/warm/cold/archive) enables unlimited memory at reasonable cost
+- Unified user memory profile ensures consistent experience across all chats and all models
+- **Uploaded documents and downloaded files are included in the memory profile — no exceptions.** Every PDF, image, code file, and AI-generated artifact is tracked, stored, and available across all conversations and all models
+
+| Criterion | Score | Rationale |
+|-----------|-------|-----------|
+| Uniqueness | 5 | No competitor has admin-configurable memory retention |
+| Replication Difficulty | 4 | Requires multi-tenant architecture with policy hierarchy |
+| Network Effect | 3 | Retention policies inform platform-wide memory optimization |
+| Switching Cost | 5 | Years of user memory profiles are irreplaceable |
+| Time Advantage | 4 | 3+ years ahead of any competitor |
+| Integration Depth | 5 | Brain Router injects profile into every prompt on every model |
+
+**Implementation**: 
+- `packages/infrastructure/lambda/shared/services/memory-retention-policy.service.ts`
+- `packages/infrastructure/lambda/shared/services/user-memory-profile.service.ts`
+- Admin dashboards in all 3 apps: Radiant Admin, Think Tank Admin, Think Tank Tenant Admin
+
+---
+
+### Moat #32: Aurelius Dojo — Thematic Mastery Training (v7.17.0, upgraded from v7.16.0)
+
+**Tier 1 Technical Moat — 24+ Months Engineering Lead** *(upgraded from Tier 2)*
+
+| Dimension | Score | Notes |
+|-----------|-------|-------|
+| **Technical Depth** | 10/10 | 6 interlocking AI systems: TGP + Decay Engine + Scenario Synthesis + Dialectic + Competency Mesh + Knowledge Pulse |
+| **Data Gravity** | 10/10 | Per-atom decay curves, per-user competency scores, per-department health, per-scenario debrief — massive compounding |
+| **Switching Cost** | 9/10 | Decay half-lives, competency graphs, certification history, org-wide pulse data are non-transferable |
+| **Time to Replicate** | 9/10 | 6 specialized multi-agent systems with interlocking data models |
+| **Competitive Score** | **29/30** | No competitor has ANY of: Ebbinghaus decay tracking, Socratic dialectic, or org knowledge pulse |
+
+**6 Leapfrog Capabilities (3-5 Year Lead)**:
+
+1. **Ebbinghaus Decay Engine** — Per-concept neural decay model with individual half-life tracking. Axonify does simple flashcard scheduling; Dojo tracks retention probability per-atom, per-user, per-theme with calibrated half-life adjustments. **No competitor does per-concept decay modeling.**
+
+2. **Adversarial Scenario Synthesis** — AI-generated multi-turn branching scenarios with 9 persona archetypes, hidden objectives, emotional states, and consequence trees. Second Nature does scripted sales roleplay; Dojo generates org-specific scenarios with branch quality scoring. **No competitor has branching consequence trees.**
+
+3. **Socratic Dialectic Engine** — Multi-agent Thesis/Antithesis/Synthesis debate forcing critical thinking. Learners defend positions with evidence. Logical fallacy detection. **No competitor has this at all.**
+
+4. **Predictive Competency Mesh** — Auto-extracted competency graph from document library. Role readiness scores with estimated time-to-ready. Degreed does manual skill tagging; Dojo auto-discovers competencies from content. **No competitor has auto-extracted competency graphs from training content.**
+
+5. **Multimodal Lesson Synthesis** — Auto-generated audio, Mermaid diagrams, glossary, learning style adaptations. Docebo has AI video presenter; Dojo generates 6 diagram types + audio + glossary + 4 learning style adaptations. **No competitor has automated diagram generation from training content.**
+
+6. **Organizational Knowledge Pulse** — Real-time org-wide knowledge health with department heatmaps, decay alerts, compliance coverage, and ROI metrics. Absorb has basic analytics; Dojo shows "Sales team hasn't been tested on Return Policy in 90 days" with cost savings tracking. **No competitor has org-wide decay alerting.**
+
+**Competitors Cannot Replicate Because**:
+- ChatGPT/Claude have no concept of decay curves, competency graphs, or org-wide health
+- LMS platforms (Cornerstone, Docebo) have no multi-agent orchestration — their "AI" is content recommendation
+- Second Nature/Virti do scripted roleplay — no branching consequence trees or policy grounding
+- Axonify does spaced repetition — not per-concept neural decay with half-life calibration
+- Degreed does skill mapping — not auto-extracted competency meshes from document libraries
+- No competitor combines ALL SIX: decay engine + scenario synthesis + Socratic dialectic + competency mesh + multimodal synthesis + knowledge pulse
+
+---
+
+### Moat #33: Cato Trainer — Grounded Knowledge Intelligence (v7.18.0)
+
+**Tier 2 Technical Moat — 12+ Months Engineering Lead**
+
+| Dimension | Score | Notes |
+|-----------|-------|-------|
+| **Technical Depth** | 8/10 | 5 interlocking systems: Grounded Q&A + semantic/hybrid search + multi-doc digest + smart links + citation confidence |
+| **Data Gravity** | 8/10 | Per-chunk embeddings, citation trails, smart link graphs, digest history — all tenant-isolated |
+| **Switching Cost** | 7/10 | Chunked/embedded document libraries, citation-verified conversation history, smart link graphs are non-transferable |
+| **Time to Replicate** | 8/10 | Citation-guaranteed grounded Q&A with multi-doc contradiction detection requires deep RAG engineering |
+| **Competitive Score** | **24/30** | No competitor combines grounded Q&A + contradiction digest + auto smart links in a single platform |
+
+**5 Competitive Capabilities**:
+
+1. **Citation-Guaranteed Grounded Q&A** — Every response backed by verifiable citations with confidence tiers (exact ≥90%, high ≥70%, moderate ≥50%, low). Fabric.so has citations but no tiered confidence scoring. **No competitor shows confidence tiers per citation.**
+
+2. **Multi-Document Contradiction Detection** — Select documents and generate contradiction analysis revealing conflicts between sources. Notion AI summarizes; Cato Trainer finds where documents disagree. **No competitor has automated inter-document contradiction detection.**
+
+3. **Auto-Discovered Smart Links** — AI finds relationships between documents (references, contradicts, extends, summarizes, related) with confidence scores and shared concept extraction. Manual linking in Notion/Confluence; Cato Trainer discovers links autonomously. **No competitor has AI-discovered document relationships with typed edges.**
+
+4. **Six-Mode Document Digest** — Summary, comparison, contradiction, timeline, key facts, action items with custom instructions. Competitors offer summary only. **No competitor offers 6 specialized cross-document analysis modes.**
+
+5. **Triple Search Modality** — Semantic (meaning), full-text (keyword), hybrid (combined scoring) with sub-second results and query timing. Most competitors offer only one search mode. **No competitor offers all 3 modes with transparent scoring.**
+
+**Competitors Cannot Replicate Because**:
+- ChatGPT/Claude have no document library management — they process files one at a time
+- Notion AI has basic Q&A but no citation confidence scoring, no contradiction detection, no smart links
+- Fabric.so has citations but no multi-document digest, no contradiction analysis, no smart linking
+- Confluence AI Assistant has basic search but no grounded Q&A with verifiable citations
+- Google NotebookLM has citations but is single-notebook, no cross-document smart links or contradiction detection
+- No competitor combines ALL FIVE: citation-guaranteed Q&A + contradiction detection + smart links + 6-mode digest + triple search
+
+---
+
+### Moat #33: Universal Drift Enforcement & Genesis Feedback (v7.37.0)
+
+**Tier 1 Technical Moat — 18+ Months Engineering Lead**
+
+Centralized AI drift control covering ALL 52+ model-invoking services with real-time telemetry feeding into developmental gate decisions. Single `DriftAwareWeightingService` unifies drift detection (4 statistical tests), drift correction (quarantine, penalties, fallbacks), app-specific weight profiles, and invocation telemetry into one cross-component system. Two-phase drift handling at the model router layer means every service gets drift protection automatically.
+
+| Capability | Competitors | RADIANT |
+|------------|-------------|---------|
+| Drift Detection | Manual monitoring or none | Automated KS, PSI, χ², embedding distance |
+| Drift Correction | Manual intervention | Auto-quarantine, weight penalties, fallback routing |
+| App-Specific Tuning | One-size-fits-all | 7 tuned weight profiles per app |
+| Cross-Component | Siloed per service | ALL 52+ services covered at router layer |
+| Gate Control | None | Genesis blocks stages on drift + failure rate + reroute rate |
+| Real-Time Telemetry | None | Every invocation feeds health scoring for Genesis |
+| Enforcement Policy | None | Mandatory workflow ensures new services comply |
+
+**Score: 28/30**
+
+| Criterion | Score | Rationale |
+|-----------|-------|-----------|
+| Uniqueness | 5 | No competitor has real-time invocation telemetry feeding developmental gates |
+| Defensibility | 5 | 52+ services integrated, router-layer enforcement, mandatory policy |
+| Switching Cost | 4 | App weight profiles + drift history + telemetry history create deep gravity |
+| Network Effect | 4 | More services = better telemetry = better Genesis gate decisions |
+| Time Advantage | 5 | 18+ months to architect cross-component drift system with feedback loop |
+| Integration Depth | 5 | Affects model selection in every AI request across entire platform |
+
+**Why It's a Moat**: v7.37.0 closes the final gap — drift protection is no longer opt-in per service but universal at the routing layer. Every model call across 52+ services (causal reasoning, dream insight, consciousness, hallucination detection, etc.) automatically gets drift-aware selection AND reports telemetry that Genesis uses for stage advancement decisions. Competitors would need to: (1) build 4 statistical drift tests, (2) build correction mechanisms, (3) integrate across their entire service stack, (4) build a real-time telemetry pipeline, (5) wire it into developmental gating, and (6) create per-app weight profiles. This is 18+ months of architectural work that competitors haven't even started.
 
 ---
 

@@ -6,9 +6,33 @@ import type { NextRequest } from 'next/server';
  * 
  * Handles:
  * - Route protection (redirects unauthenticated users to login)
+ * - Admin role-based access control (super_admin, admin, operator, auditor)
  * - Rate limiting for API routes
  * - Security headers
  */
+
+// Admin role hierarchy (higher = more permissions)
+type AdminRole = 'super_admin' | 'admin' | 'operator' | 'auditor';
+
+const ROLE_HIERARCHY: Record<AdminRole, number> = {
+  super_admin: 4,
+  admin: 3,
+  operator: 2,
+  auditor: 1,
+};
+
+// Routes that require specific minimum roles
+const ROLE_RESTRICTED_ROUTES: Array<{ pattern: string; minRole: AdminRole }> = [
+  { pattern: '/administrators', minRole: 'super_admin' },
+  { pattern: '/security', minRole: 'super_admin' },
+  { pattern: '/security/', minRole: 'super_admin' },
+  { pattern: '/settings/security', minRole: 'super_admin' },
+  { pattern: '/billing', minRole: 'admin' },
+  { pattern: '/pricing', minRole: 'admin' },
+  { pattern: '/configuration', minRole: 'admin' },
+  { pattern: '/system-config', minRole: 'admin' },
+  { pattern: '/settings', minRole: 'admin' },
+];
 
 // Routes that don't require authentication
 const PUBLIC_ROUTES = [
@@ -122,6 +146,29 @@ function isTokenValid(token: string): boolean {
   }
 }
 
+function getAdminRoleFromToken(token: string): AdminRole {
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) return 'operator';
+    const payload = JSON.parse(atob(parts[1]));
+    const role = payload['custom:admin_role'] || payload.admin_role || 'operator';
+    return ROLE_HIERARCHY[role as AdminRole] ? (role as AdminRole) : 'operator';
+  } catch {
+    return 'operator';
+  }
+}
+
+function isRouteAllowedForRole(pathname: string, role: AdminRole): boolean {
+  for (const restriction of ROLE_RESTRICTED_ROUTES) {
+    if (pathname === restriction.pattern || pathname.startsWith(restriction.pattern + '/')) {
+      if (ROLE_HIERARCHY[role] < ROLE_HIERARCHY[restriction.minRole]) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   
@@ -202,8 +249,22 @@ export function middleware(request: NextRequest) {
     loginUrl.searchParams.set('returnUrl', pathname);
     return NextResponse.redirect(loginUrl);
   }
+
+  // Role-based access control
+  const adminRole = getAdminRoleFromToken(token);
   
-  return NextResponse.next();
+  if (!isRouteAllowedForRole(pathname, adminRole)) {
+    // Redirect to permission denied page
+    const deniedUrl = new URL('/permission-denied', request.url);
+    deniedUrl.searchParams.set('required', 'elevated_role');
+    deniedUrl.searchParams.set('path', pathname);
+    return NextResponse.redirect(deniedUrl);
+  }
+
+  // Pass role to downstream components via headers
+  const response = NextResponse.next();
+  response.headers.set('x-admin-role', adminRole);
+  return response;
 }
 
 export const config = {

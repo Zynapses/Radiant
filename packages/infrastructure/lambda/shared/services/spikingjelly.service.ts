@@ -426,6 +426,7 @@ Be concise (1-2 sentences). Focus on the phenomenological quality of the unified
 
     try {
       const response = await modelRouterService.invoke({
+        tenantId,
         modelId: 'anthropic/claude-3-haiku',
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.7,

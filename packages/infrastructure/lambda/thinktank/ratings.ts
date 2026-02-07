@@ -3,7 +3,13 @@
 
 import { APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda';
 import { bipolarRatingService } from '../shared/services/bipolar-rating.service';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'thinktank/ratings',
+  category: 'application',
+  sourceType: 'lambda',
+});
 import type { BipolarRatingValue, RatingDimension, RatingReason, QuickRating } from '@radiant/shared';
 
 // ============================================================================

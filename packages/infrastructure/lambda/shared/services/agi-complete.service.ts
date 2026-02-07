@@ -150,6 +150,7 @@ Generate a helpful proactive suggestion. Return JSON:
 
     try {
       const response = await modelRouterService.invoke({
+        tenantId,
         modelId: 'anthropic/claude-3-haiku',
         messages: [{ role: 'user', content: prompt }],
         maxTokens: 500,
@@ -317,6 +318,7 @@ Return JSON:
 
     try {
       const response = await modelRouterService.invoke({
+        tenantId: undefined, // TODO: Thread tenantId from caller
         modelId: 'anthropic/claude-3-haiku',
         messages: [{ role: 'user', content: prompt }],
         maxTokens: 1500,
@@ -402,6 +404,7 @@ Use the analogy to provide an inference. Return JSON:
         modelId: 'anthropic/claude-3-haiku',
         messages: [{ role: 'user', content: prompt }],
         maxTokens: 500,
+        tenantId: undefined, // TODO: Thread tenantId from caller
       });
 
       const jsonMatch = response.content.match(/\{[\s\S]*\}/);
@@ -792,6 +795,7 @@ Return JSON:
 
     try {
       const response = await modelRouterService.invoke({
+        tenantId,
         modelId: 'anthropic/claude-3-haiku',
         messages: [{ role: 'user', content: prompt }],
         maxTokens: 1500,
@@ -980,6 +984,7 @@ Rewrite the content applying these adaptations. Return only the adapted content.
 
     try {
       const response = await modelRouterService.invoke({
+        tenantId: undefined, // TODO: Thread tenantId from caller
         modelId: 'anthropic/claude-3-haiku',
         messages: [{ role: 'user', content: prompt }],
         maxTokens: 2000,

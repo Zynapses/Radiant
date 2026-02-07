@@ -7,7 +7,13 @@ import { APIGatewayProxyEvent, Context } from 'aws-lambda';
 import { Middleware, MiddlewareHandler } from './index';
 import { getPoolClient } from '../db/centralized-pool';
 import { UnauthorizedError, ForbiddenError } from '../errors';
-import { enhancedLogger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from '../services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'shared/middleware-auth',
+  category: 'access',
+  sourceType: 'lambda',
+});
 
 export interface AuthContext {
   tenantId: string;
@@ -214,7 +220,7 @@ async function validateJwt(token: string): Promise<AuthContext> {
     if (error instanceof UnauthorizedError || error instanceof ForbiddenError) {
       throw error;
     }
-    enhancedLogger.error('JWT validation failed', error instanceof Error ? error : undefined);
+    logger.error('JWT validation failed', error instanceof Error ? error : undefined);
     throw new UnauthorizedError('Invalid JWT token');
   }
 }

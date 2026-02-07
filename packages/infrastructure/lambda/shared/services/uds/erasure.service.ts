@@ -20,7 +20,13 @@ import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs';
 import { createHash } from 'crypto';
 import Redis from 'ioredis';
 import { executeStatement, stringParam, boolParam } from '../../db/client';
-import { enhancedLogger as logger } from '../../logging/enhanced-logger';
+import { createRegisteredLogger } from '../logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'uds/erasure',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { udsAuditService } from './audit.service';
 import type {
   UDSErasureRequest,

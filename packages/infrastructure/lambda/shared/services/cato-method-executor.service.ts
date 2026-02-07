@@ -26,6 +26,7 @@ import { CatoMethodRegistryService } from './cato-method-registry.service';
 import { CatoSchemaRegistryService } from './cato-schema-registry.service';
 import { ModelRouterService, modelRouterService, ModelRequest, ModelResponse } from './model-router.service.js';
 import { uepIntegrationService } from './uep/index.js';
+import { driftAwareWeightingService } from './drift-aware-weighting.service';
 
 export interface MethodExecutionContext {
   pipelineId: string;
@@ -287,6 +288,9 @@ export abstract class CatoBaseMethodExecutor<TInput = unknown, TOutput = unknown
   ): Promise<ModelInvocationResult> {
     const startTime = Date.now();
     
+    // v7.36.0: Pre-populate drift-aware model selection cache
+    await this.selectModelForMethodAsync(context);
+    
     // Select appropriate model based on method requirements
     const modelId = this.selectModelForMethod(context);
     
@@ -327,12 +331,36 @@ export abstract class CatoBaseMethodExecutor<TInput = unknown, TOutput = unknown
   }
 
   /**
-   * Select the appropriate model for this method based on requirements
-   * Subclasses can override for specific model preferences
+   * Select the appropriate model for this method based on requirements.
+   * v7.36.0: Uses drift-aware weighting service for model selection.
+   * Subclasses can override for specific model preferences.
    */
   protected selectModelForMethod(context: MethodExecutionContext): string {
-    // Default to Claude 3.5 Sonnet for most methods - good balance of capability/cost
-    // Subclasses can override for specific requirements (e.g., GPT-4o for vision)
+    // v7.36.0: Drift-aware selection is async, so we use the cached result
+    // populated by selectModelForMethodAsync called in invokeModel
+    return this._cachedDriftAwareModelId || 'anthropic/claude-3-5-sonnet-20241022';
+  }
+
+  private _cachedDriftAwareModelId: string | null = null;
+
+  /**
+   * v7.36.0: Async drift-aware model selection for Cato pipeline methods.
+   * Called before selectModelForMethod to populate the cache.
+   */
+  protected async selectModelForMethodAsync(context: MethodExecutionContext): Promise<string> {
+    try {
+      const best = await driftAwareWeightingService.getBestModel(
+        context.tenantId,
+        'cato',
+        'pipeline_method',
+      );
+      if (best) {
+        this._cachedDriftAwareModelId = best.modelId;
+        return best.modelId;
+      }
+    } catch {
+      // Drift-aware selection failed, fall through to default
+    }
     return 'anthropic/claude-3-5-sonnet-20241022';
   }
 

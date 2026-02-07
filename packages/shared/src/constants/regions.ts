@@ -47,3 +47,47 @@ export function getAvailableRegions(): RegionConfig[] {
 export function getGlobalRegions(): RegionConfig[] {
   return Object.values(REGIONS).filter(r => r.isGlobal);
 }
+
+// =============================================================================
+// Datacenter Groupings for Health Monitoring
+// =============================================================================
+
+export interface DatacenterGroup {
+  id: string;
+  name: string;
+  displayName: string;
+  regions: string[];
+  primaryRegion: string;
+}
+
+export const DATACENTER_GROUPS: DatacenterGroup[] = [
+  {
+    id: 'americas',
+    name: 'Americas',
+    displayName: 'Americas (US)',
+    regions: ['us-east-1', 'us-west-2'],
+    primaryRegion: 'us-east-1',
+  },
+  {
+    id: 'europe',
+    name: 'Europe',
+    displayName: 'Europe (EU)',
+    regions: ['eu-west-1', 'eu-central-1'],
+    primaryRegion: 'eu-west-1',
+  },
+  {
+    id: 'asia',
+    name: 'Asia Pacific',
+    displayName: 'Asia Pacific',
+    regions: ['ap-northeast-1', 'ap-southeast-1', 'ap-south-1'],
+    primaryRegion: 'ap-northeast-1',
+  },
+];
+
+export function getDatacenterForRegion(region: string): DatacenterGroup | undefined {
+  return DATACENTER_GROUPS.find(dc => dc.regions.includes(region));
+}
+
+export function getDatacenterById(id: string): DatacenterGroup | undefined {
+  return DATACENTER_GROUPS.find(dc => dc.id === id);
+}

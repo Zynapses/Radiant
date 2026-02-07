@@ -23,6 +23,7 @@ import {
 import { cn } from '@/lib/utils';
 import { GlassCard } from '@/components/ui/glass-card';
 import { toast } from 'sonner';
+import { useRadiantDelightOptional } from '@radiant/delight-ui';
 
 type RuleType = 'force_override' | 'conditional' | 'context_dependent';
 
@@ -61,6 +62,7 @@ function getPriorityLabel(priority: number): { label: string; color: string } {
 }
 
 export default function OverridesPage() {
+  const delight = useRadiantDelightOptional();
   const [overrides, setOverrides] = useState<Override[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -141,11 +143,13 @@ export default function OverridesPage() {
         });
         setShowCreateDialog(false);
         resetCreateForm();
+        delight?.triggerDelight('action_complete');
       } else {
         throw new Error('Failed to create');
       }
     } catch (error) {
       toast.error('Error', { description: 'Failed to create override. Please try again.' });
+      delight?.triggerDelight('error_recovery');
     } finally {
       setCreateLoading(false);
     }
@@ -171,6 +175,7 @@ export default function OverridesPage() {
           description: 'The override has been removed and the original fact restored.',
         });
         if (selectedOverride?.id === id) setSelectedOverride(null);
+        delight?.triggerDelight('action_complete');
       } else {
         throw new Error('Failed to delete');
       }
@@ -178,6 +183,7 @@ export default function OverridesPage() {
       toast.error('Error', {
         description: 'Failed to remove the override. Please try again.',
       });
+      delight?.triggerDelight('error_recovery');
     } finally {
       setDeleteLoading(null);
     }

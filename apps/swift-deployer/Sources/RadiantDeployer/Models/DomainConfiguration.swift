@@ -1,4 +1,4 @@
-// RADIANT v4.18.0 - Domain Configuration Models
+// RADIANT v6.6.0 - Domain Configuration Models
 // Models for domain and email setup with DNS records
 
 import Foundation

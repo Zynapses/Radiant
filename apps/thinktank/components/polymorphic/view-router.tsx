@@ -21,6 +21,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useUIStore } from '@/lib/stores/ui-store';
+import { useRadiantDelightOptional, getMotionTransition, getMorphAnimationStates, playSynthSound } from '@radiant/delight-ui';
 
 export type ViewType = 
   | 'chat'
@@ -113,6 +114,8 @@ export function ViewRouter({
   children,
 }: ViewRouterProps) {
   const { advancedMode } = useUIStore();
+  const delight = useRadiantDelightOptional();
+  const personalityMode = delight?.personalityMode ?? 'auto';
   
   const [viewState, setViewState] = useState<ViewState>({
     viewType: initialView,
@@ -141,7 +144,9 @@ export function ViewRouter({
       estimatedCostCents: mode === 'sniper' ? 1 : 50,
       rationale: `Switched to ${mode === 'sniper' ? 'Sniper' : 'War Room'} mode`,
     });
-  }, [updateViewState]);
+    delight?.triggerDelight('action_complete');
+    if (delight?.soundEnabled) playSynthSound(personalityMode, 'subtle', 0.2);
+  }, [updateViewState, delight, personalityMode]);
 
   const handleEscalate = useCallback((reason: string, additionalContext?: string) => {
     updateViewState({
@@ -149,9 +154,10 @@ export function ViewRouter({
       estimatedCostCents: 50,
       rationale: `Escalated: ${reason}`,
     });
-    
+    delight?.showDelightToast('Escalating to deeper analysis.', '🚀');
+    if (delight?.soundEnabled) playSynthSound(personalityMode, 'morph', 0.2);
     onEscalate?.(reason, additionalContext);
-  }, [updateViewState, onEscalate]);
+  }, [updateViewState, onEscalate, delight, personalityMode]);
 
   const CurrentIcon = VIEW_CONFIG[viewState.viewType].icon;
 
@@ -287,19 +293,18 @@ export function ViewMorphTransition({
   children: React.ReactNode; 
   viewType: ViewType;
 }) {
+  const delight = useRadiantDelightOptional();
+  const mode = delight?.personalityMode ?? 'auto';
+  const animStates = getMorphAnimationStates(mode);
+
   return (
     <AnimatePresence mode="wait">
       <motion.div
         key={viewType}
-        initial={{ opacity: 0, scale: 0.98, y: 10 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.98, y: -10 }}
-        transition={{ 
-          type: 'spring', 
-          stiffness: 300, 
-          damping: 25,
-          duration: 0.3 
-        }}
+        initial={animStates.initial}
+        animate={animStates.animate}
+        exit={animStates.exit}
+        transition={animStates.transition}
         className="h-full"
       >
         {children}

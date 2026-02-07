@@ -2,7 +2,13 @@
 // Explainability, Tool Use, Safety, Feedback Learning, Dialogue Management
 
 import { executeStatement } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'agi/extensions',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { modelRouterService } from './model-router.service';
 
 // ============================================================================
@@ -144,6 +150,7 @@ Return JSON:
 
     try {
       const response = await modelRouterService.invoke({
+        tenantId,
         modelId: 'anthropic/claude-3-haiku',
         messages: [{ role: 'user', content: prompt }],
         maxTokens: 2048,
@@ -445,10 +452,11 @@ Return JSON:
     };
   }
 
-  private async searchWithAI(query: string): Promise<{ results: string[] }> {
+  private async searchWithAI(query: string, tenantId?: string): Promise<{ results: string[] }> {
     // Use AI model to synthesize search-like results based on training knowledge
     const response = await modelRouterService.invoke({
       modelId: 'anthropic/claude-3-5-sonnet',
+      tenantId,
       messages: [{
         role: 'user',
         content: `Based on your knowledge, provide 3-5 informative results for this query. Format each result on a new line with a title and brief description:
@@ -747,6 +755,7 @@ Return JSON:
 
     try {
       const response = await modelRouterService.invoke({
+        tenantId: undefined, // TODO: Thread tenantId from caller
         modelId: 'anthropic/claude-3-haiku',
         messages: [{ role: 'user', content: prompt }],
         maxTokens: 200,
@@ -793,6 +802,7 @@ Return JSON:
 
     try {
       const response = await modelRouterService.invoke({
+        tenantId,
         modelId: 'anthropic/claude-3-haiku',
         messages: [{ role: 'user', content: prompt }],
         maxTokens: 1024,

@@ -1,6 +1,6 @@
 {
   "name": "@radiant/shared",
-  "version": "5.2.4",
+  "version": "6.6.0",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {

@@ -10,7 +10,13 @@
  */
 
 import { ScheduledEvent } from 'aws-lambda';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'brain/reconciliation',
+  category: 'infrastructure',
+  sourceType: 'lambda',
+});
 import { executeStatement } from '../shared/db/client';
 import { flashBufferService } from '../shared/services/flash-buffer.service';
 import { dreamSchedulerService } from '../shared/services/dream-scheduler.service';

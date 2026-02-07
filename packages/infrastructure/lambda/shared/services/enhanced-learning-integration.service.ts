@@ -5,7 +5,13 @@
 import { executeStatement, stringParam, longParam, doubleParam } from '../db/client';
 import { enhancedLearningService } from './enhanced-learning.service';
 import { learningCandidateService, type CandidateType } from './distillation-pipeline.service';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'enhanced/learning-integration',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 // ============================================================================
 // Types

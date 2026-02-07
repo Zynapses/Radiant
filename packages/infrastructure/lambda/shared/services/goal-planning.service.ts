@@ -2,7 +2,13 @@
 // AGI Enhancement Phase 5: Hierarchical Task Networks, long-horizon planning, multi-session continuity
 
 import { executeStatement } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'goal/planning',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { modelRouterService } from './model-router.service';
 import { callLiteLLMEmbedding } from './litellm.service';
 import { episodicMemoryService } from './episodic-memory.service';
@@ -927,6 +933,7 @@ Complete the task and provide the result.`;
 
   private async invokeModel(prompt: string): Promise<string> {
     const response = await modelRouterService.invoke({
+      tenantId,
       modelId: 'anthropic/claude-3-haiku',
       messages: [{ role: 'user', content: prompt }],
       maxTokens: 4096,

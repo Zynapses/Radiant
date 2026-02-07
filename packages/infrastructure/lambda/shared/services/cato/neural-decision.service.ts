@@ -12,7 +12,13 @@
  */
 
 import { executeStatement, stringParam, doubleParam } from '../../db/client';
-import { enhancedLogger as logger } from '../../logging/enhanced-logger';
+import { createRegisteredLogger } from '../logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'cato/neural-decision',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { CatoSafetyPipeline } from './safety-pipeline.service';
 import { precisionGovernorService } from './precision-governor.service';
 import { controlBarrierService } from './control-barrier.service';

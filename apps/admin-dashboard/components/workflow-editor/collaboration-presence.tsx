@@ -98,7 +98,7 @@ export function CollaboratorAvatar({
             )}
             style={{ 
               backgroundColor: collaborator.color,
-              ringColor: collaborator.color,
+              ['--tw-ring-color' as string]: collaborator.color,
             }}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}

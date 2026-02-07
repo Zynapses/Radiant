@@ -13,7 +13,13 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { v4 as uuidv4 } from 'uuid';
 import Redis from 'ioredis';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'brain/inference',
+  category: 'infrastructure',
+  sourceType: 'lambda',
+});
 import { executeStatement } from '../shared/db/client';
 import { brainConfigService } from '../shared/services/brain-config.service';
 import { ghostManagerService } from '../shared/services/ghost-manager.service';

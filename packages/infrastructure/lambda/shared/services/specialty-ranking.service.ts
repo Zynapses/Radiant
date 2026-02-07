@@ -196,7 +196,7 @@ export class SpecialtyRankingService {
     };
   }
 
-  async researchModelProficiency(modelId: string): Promise<RankingResearchResult> {
+  async researchModelProficiency(modelId: string, tenantId?: string): Promise<RankingResearchResult> {
     const startTime = Date.now();
     const specialties = Object.keys(SPECIALTY_CATEGORIES) as SpecialtyCategory[];
 
@@ -227,6 +227,7 @@ Return JSON:
       modelId: 'anthropic/claude-3-5-sonnet-20241022',
       messages: [{ role: 'user', content: prompt }],
       maxTokens: 4096,
+      tenantId,
     });
 
     const jsonMatch = response.content.match(/\{[\s\S]*\}/);
@@ -254,7 +255,7 @@ Return JSON:
     };
   }
 
-  async researchSpecialtyRankings(specialty: SpecialtyCategory): Promise<RankingResearchResult> {
+  async researchSpecialtyRankings(specialty: SpecialtyCategory, tenantId?: string): Promise<RankingResearchResult> {
     const startTime = Date.now();
 
     const modelsResult = await executeStatement(
@@ -283,6 +284,7 @@ Order by score descending. Be accurate based on real benchmark data.`;
       modelId: 'anthropic/claude-3-5-sonnet-20241022',
       messages: [{ role: 'user', content: prompt }],
       maxTokens: 4096,
+      tenantId,
     });
 
     const jsonMatch = response.content.match(/\{[\s\S]*\}/);
@@ -451,7 +453,7 @@ Order by score descending. Be accurate based on real benchmark data.`;
     };
   }
 
-  async researchModeRankings(mode: OrchestrationMode): Promise<RankingResearchResult> {
+  async researchModeRankings(mode: OrchestrationMode, tenantId?: string): Promise<RankingResearchResult> {
     const startTime = Date.now();
     const modeInfo = ORCHESTRATION_MODES[mode];
 
@@ -487,6 +489,7 @@ Return JSON:
       modelId: 'anthropic/claude-3-5-sonnet-20241022',
       messages: [{ role: 'user', content: prompt }],
       maxTokens: 4096,
+      tenantId,
     });
 
     const jsonMatch = response.content.match(/\{[\s\S]*\}/);

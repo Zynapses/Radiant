@@ -3,7 +3,13 @@
 // Novel UI: "Fuel Gauge" - budget meter with cost tracking
 
 import { executeStatement, stringParam, longParam, doubleParam, boolParam } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'economic/governor',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 // ============================================================================
 // Types

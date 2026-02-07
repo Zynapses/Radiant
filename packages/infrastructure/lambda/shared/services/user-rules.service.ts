@@ -4,7 +4,13 @@
  */
 
 import { executeStatement, stringParam, longParam } from '../db/client';
-import { enhancedLogger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'user/rules',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { v4 as uuidv4 } from 'uuid';
 
 import type {
@@ -21,8 +27,6 @@ import type {
   MemoryCategoryTree,
   MemoryByCategory,
 } from '@radiant/shared';
-
-const logger = enhancedLogger;
 
 // ============================================================================
 // User Rules Service

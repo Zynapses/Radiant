@@ -7,10 +7,13 @@
 
 import { ScheduledHandler } from 'aws-lambda';
 import { executeStatement, stringParam, longParam } from '../shared/db/client';
-import { enhancedLogger } from '../shared/logging/enhanced-logger';
-import { notificationService } from '../shared/services/sovereign-mesh/notification.service';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
 
-const logger = enhancedLogger;
+const logger = createRegisteredLogger({
+  serviceName: 'scheduled/hitl-sla-monitor',
+  category: 'infrastructure',
+  sourceType: 'lambda',
+});
 
 export const handler: ScheduledHandler = async (_event): Promise<void> => {
   logger.info('Starting HITL SLA monitor');

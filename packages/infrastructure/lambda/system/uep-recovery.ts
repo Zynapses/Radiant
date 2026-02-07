@@ -11,7 +11,13 @@
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult, ScheduledEvent, Context } from 'aws-lambda';
 import { uepSelfHealingService, HealingReport, HealingConfig } from '../shared/services/uep/index.js';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'system/uep-recovery',
+  category: 'infrastructure',
+  sourceType: 'lambda',
+});
 import { executeStatement, stringParam } from '../shared/db/client';
 
 // =============================================================================

@@ -6,7 +6,13 @@
  */
 
 import { DynamoDBClient, GetItemCommand, QueryCommand } from '@aws-sdk/client-dynamodb';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'feature/flags',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 const dynamodb = new DynamoDBClient({});
 const FLAGS_TABLE = process.env.FLAGS_TABLE || 'radiant-feature-flags';

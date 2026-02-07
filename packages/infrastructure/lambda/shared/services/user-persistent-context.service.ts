@@ -4,7 +4,13 @@
 
 import { BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime';
 import { executeStatement } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'user/persistent-context',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { modelRouterService } from './model-router.service';
 
 // ============================================================================
@@ -471,6 +477,7 @@ Only include items you're confident about. Quality over quantity.`;
 
     try {
       const response = await modelRouterService.invoke({
+        tenantId,
         modelId: await this.getExtractionModel(),
         messages: [{ role: 'user', content: prompt }],
         maxTokens: 1024,

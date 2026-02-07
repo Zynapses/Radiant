@@ -6,7 +6,13 @@
 import type { ScheduledEvent, Context } from 'aws-lambda';
 import { executeStatement, stringParam, longParam } from '../shared/db/client';
 import { enhancedLearningService } from '../shared/services/enhanced-learning.service';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'learning/activity-recorder',
+  category: 'application',
+  sourceType: 'lambda',
+});
 
 interface TenantActivityStats {
   tenantId: string;

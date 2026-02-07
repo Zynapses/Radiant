@@ -16,7 +16,13 @@
 
 import { createHash } from 'crypto';
 import { executeStatement, stringParam, boolParam } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'persistence/guard',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 // ============================================================================
 // Types

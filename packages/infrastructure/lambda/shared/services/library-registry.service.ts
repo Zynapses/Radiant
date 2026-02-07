@@ -5,7 +5,13 @@
 
 import { BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime';
 import { executeStatement } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'library/registry',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 // Proficiency scores for library matching (8 dimensions, 1-10 scale)
 export interface ProficiencyScores {

@@ -5,7 +5,13 @@
 
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import { safetyMatrixService } from '../shared/services/safety-matrix.service';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'admin/safety-matrix',
+  category: 'audit',
+  sourceType: 'lambda',
+});
 import type { EntityCategory } from '@radiant/shared';
 
 const corsHeaders = {

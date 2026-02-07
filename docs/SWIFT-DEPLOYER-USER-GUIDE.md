@@ -1,33 +1,39 @@
-# RADIANT Swift Deployer User Guide
+# RADIANT Swift Deployer - macOS App Documentation
 
-**Version**: 5.52.17  
+**Version**: 7.4.0  
 **Platform**: macOS 13.0+ (Ventura and later)  
-**Last Updated**: January 24, 2026
+**Last Updated**: February 4, 2026
 
 ---
 
 ## Table of Contents
 
 1. [Overview](#1-overview)
-2. [System Requirements](#2-system-requirements)
-3. [Installation](#3-installation)
-4. [First Launch & Setup](#4-first-launch--setup)
-5. [Main Interface](#5-main-interface)
-6. [Dashboard](#6-dashboard)
-7. [Applications Management](#7-applications-management)
-8. [Deployment](#8-deployment)
-9. [Domain URL Configuration](#9-domain-url-configuration)
-10. [Feature Flags](#10-feature-flags)
-11. [AI Registry](#11-ai-registry)
-12. [Self-Hosted Models](#12-self-hosted-models)
-13. [Multi-Region Deployment](#13-multi-region-deployment)
-14. [Security & Compliance](#14-security--compliance)
-15. [Cost Management](#15-cost-management)
-16. [Monitoring](#16-monitoring)
-17. [Snapshots & Rollbacks](#17-snapshots--rollbacks)
-18. [Package Management](#18-package-management)
-19. [Settings](#19-settings)
-20. [AI Assistant](#20-ai-assistant)
+2. [What's New in v7.0.0](#2-whats-new-in-v700)
+3. [System Requirements](#3-system-requirements)
+4. [Installation](#4-installation)
+5. [First Launch & Setup](#5-first-launch--setup)
+6. [Navigation Structure](#6-navigation-structure)
+7. [Dashboard](#7-dashboard)
+8. [Deploy](#8-deploy)
+9. [Credentials Management](#9-credentials-management)
+10. [Instance Management](#10-instance-management)
+11. [Packages](#11-packages)
+12. [Migrations](#12-migrations)
+13. [Snapshots](#13-snapshots)
+14. [History](#14-history)
+15. [Drift Monitor](#15-drift-monitor)
+    - 15.1 [Environment State Registry](#151-environment-state-registry)
+    - 15.2 [Reliability & Storage Configuration](#152-reliability--storage-configuration)
+    - 15.3 [AWS Snapshots (Disaster Recovery)](#153-aws-snapshots-disaster-recovery)
+16. [Settings](#16-settings)
+17. [AI Assistant](#17-ai-assistant)
+18. [AutoSetup Service](#18-autosetup-service)
+19. [Deployment Automation](#19-deployment-automation)
+    - 19.1 [Dependencies Manager](#191-dependencies-manager)
+    - 19.2 [Bash Script Runner](#192-bash-script-runner)
+    - 19.3 [Code Sync](#193-code-sync)
+20. [Security Architecture](#20-security-architecture)
 21. [Troubleshooting](#21-troubleshooting)
 22. [Keyboard Shortcuts](#22-keyboard-shortcuts)
 23. [Glossary](#23-glossary)
@@ -36,53 +42,175 @@
 
 ## 1. Overview
 
-The RADIANT Swift Deployer is a native macOS application for deploying and managing RADIANT AI platform infrastructure on AWS. It provides a visual interface for:
+The RADIANT Swift Deployer is a native macOS application for deploying and managing RADIANT AI platform infrastructure on AWS. **Version 7.0.0** introduces a dramatically simplified interface focused on deployment automation.
 
-- **Infrastructure Deployment**: Deploy complete RADIANT stacks to AWS
-- **Domain Configuration**: Configure URLs for all platform applications
-- **AI Model Management**: Configure external and self-hosted AI models
-- **Monitoring**: Real-time health checks and cost tracking
-- **Compliance**: HIPAA, SOC2, and GDPR compliance tools
+### Philosophy
+
+> **"One Click to Production"** - Everything should be automated. The Deployer handles infrastructure; configuration lives in the Admin Dashboard.
+
+### What the Deployer Does
+
+| Category | Capability |
+|----------|------------|
+| **Deploy** | One-click deployment to dev/staging/prod |
+| **Credentials** | AWS key management with automatic rotation |
+| **Instances** | Start, stop, or wipe entire environments |
+| **Migrate** | Promote versions through environments |
+| **Monitor** | Detect infrastructure drift from manual changes |
+| **Backup** | Snapshot and restore capabilities |
+
+### What Moved to Admin Dashboard
+
+AI providers, models, user management, domain configuration, and all business settings are now managed via the web-based Admin Dashboard after deployment.
 
 ### Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                    RADIANT Swift Deployer                        │
+│                 RADIANT Swift Deployer v7.0.0                    │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                  │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
-│  │  1Password   │  │  AWS CLI     │  │  CDK CLI     │          │
-│  │  Integration │  │  Credentials │  │  Deployment  │          │
+│  │ Credentials  │  │  AWS SDK     │  │  CDK CLI     │          │
+│  │  Manager     │  │  (Direct)    │  │  Deployment  │          │
 │  └──────────────┘  └──────────────┘  └──────────────┘          │
-│                            │                                     │
-│                            ▼                                     │
+│         │                 │                 │                    │
+│         ▼                 ▼                 ▼                    │
 │  ┌─────────────────────────────────────────────────────────┐   │
 │  │                    AWS Account                           │   │
 │  │  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐       │   │
-│  │  │ Aurora  │ │ Lambda  │ │ S3      │ │CloudFront│       │   │
-│  │  │ (DB)    │ │ (API)   │ │(Storage)│ │ (CDN)   │       │   │
+│  │  │ Secrets │ │ Aurora  │ │ Lambda  │ │CloudFront│       │   │
+│  │  │ Manager │ │ (DB)    │ │ (100+)  │ │ (CDN)   │       │   │
 │  │  └─────────┘ └─────────┘ └─────────┘ └─────────┘       │   │
 │  └─────────────────────────────────────────────────────────┘   │
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### RADIANT Applications
+---
 
-The deployer manages five core applications:
+## 2. What's New in v7.0.0
 
-| Application | Description | Required |
-|-------------|-------------|----------|
-| **RADIANT Admin** | Platform administration dashboard | ✓ Yes |
-| **Think Tank Admin** | Think Tank configuration and management | No |
-| **Curator** | Knowledge graph curation and fact verification | No |
-| **Think Tank** | Consumer AI chat interface | ✓ Yes |
-| **External API** | REST/GraphQL API for integrations | ✓ Yes |
+### Simplified Navigation
+
+**Before (v6.x)**: 22 tabs across 7 sidebar sections  
+**After (v7.0.0)**: 10 tabs in a single flat list
+
+| Change | Impact |
+|--------|--------|
+| **-12 views removed** | Configuration moved to Admin Dashboard |
+| **+Credentials tab** | AWS key management with rotation |
+| **+Instance Management** | Start/stop/wipe environments |
+| **+Drift Monitor** | AI-powered drift detection |
+| **+Migration Pipeline** | Visual dev→staging→prod promotion |
+
+### New Features
+
+| Feature | Description |
+|---------|-------------|
+| **AutoSetup** | Fully automated AWS configuration (Route53, ACM, SES, etc.) |
+| **Credentials Management** | Master key + environment keys with version history |
+| **Instance Lifecycle** | Start/stop/nuclear wipe per environment |
+| **Drift Detection** | Detect when manual AWS changes cause drift |
+| **Shadow Deployments** | Canary releases with traffic splitting |
+
+### Removed from Deployer
+
+These features are now **Admin Dashboard only**:
+- AI Provider configuration
+- Model settings
+- Self-hosted model management
+- Domain URL configuration
+- Multi-region setup
+- Curator configuration
+- A/B Testing setup
 
 ---
 
-## 2. System Requirements
+## 2.1 What's New in v7.4.0
+
+### Complete API Implementation
+
+The following features now have full AWS API integration:
+
+| Feature | Status | Description |
+|---------|--------|-------------|
+| **AWS Snapshots** | ✅ Complete | Full RDS, DynamoDB, and Secrets backup/restore |
+| **Domain Validation** | ✅ Complete | DNS, SSL, CloudFront validation service |
+| **CDK Context** | ✅ Complete | All feature flags passed to infrastructure |
+
+### New Navigation Tabs
+
+| Tab | Icon | Purpose |
+|-----|------|---------|
+| **Domain URLs** | 🌐 | Configure custom domains and routing |
+| **Curator** | 📚 | Knowledge graph curation settings |
+| **Cortex Memory** | 🧠 | Three-tier memory system configuration |
+
+### New Settings Views
+
+#### Cortex Memory Settings
+
+Configure the three-tier memory system:
+
+| Tier | Settings |
+|------|----------|
+| **Working Memory** | Enable, capacity (5-50 items), TTL (1-60 min) |
+| **Episodic Memory** | Enable, retention (7-365 days), max episodes |
+| **Semantic Memory** | Enable, consolidation schedule, quality threshold |
+
+Additional options:
+- Memory compression (0.3-0.9 ratio)
+- Auto-forget threshold
+- Cross-conversation memory
+- Privacy mode
+
+#### Curator Settings
+
+Configure knowledge graph curation:
+
+| Category | Settings |
+|----------|----------|
+| **Knowledge Graph** | Entity extraction, relationship inference, graph density |
+| **Document Processing** | Chunk size, overlap, embedding model, auto-summarize |
+| **Quality Control** | Deduplication, similarity threshold, fact verification |
+| **Retrieval** | Hybrid search, semantic/keyword weights, re-ranking |
+
+### DomainValidationService
+
+New service for comprehensive domain validation:
+
+```swift
+// DNS validation
+let dnsResult = await domainValidationService.validateDNS(domain: "api.example.com")
+
+// SSL certificate check
+let sslResult = await domainValidationService.checkSSLCertificate(arn: certArn)
+
+// CloudFront validation
+let cfResult = await domainValidationService.validateCloudFrontDistribution(id: distributionId)
+
+// Complete domain setup validation
+let fullResult = await domainValidationService.validateDomainSetup(
+    domain: "example.com",
+    certificateArn: certArn,
+    distributionId: cfId
+)
+```
+
+### CDK Context Parameters
+
+All feature flags are now properly passed to CDK:
+
+```
+enableCurator, enableCortexMemory, enableTimeMachine
+enableCollaboration, enableComplianceExport, enableEgoSystem
+baseDomain, useSubdomains, sslCertificateArn, appPaths
+```
+
+---
+
+## 3. System Requirements
 
 ### Minimum Requirements
 
@@ -98,807 +226,1380 @@ The deployer manages five core applications:
 
 | Software | Purpose | Installation |
 |----------|---------|--------------|
-| **1Password** | Credential management | [1password.com](https://1password.com) |
 | **AWS CLI v2** | AWS operations | `brew install awscli` |
-| **Node.js 18+** | CDK runtime | `brew install node@18` |
+| **Node.js 20+** | CDK runtime | `brew install node@20` |
 | **AWS CDK** | Infrastructure deployment | `npm install -g aws-cdk` |
+
+### Optional Software
+
+| Software | Purpose | When Needed |
+|----------|---------|-------------|
+| **1Password** | Alternative credential storage | If not using built-in |
+| **Docker** | Local testing | Development only |
 
 ### AWS Account Requirements
 
 - AWS account with administrator access
-- IAM user or role with deployment permissions
+- IAM user with deployment permissions (or use master key to create)
 - Sufficient service quotas for:
   - Aurora PostgreSQL clusters
   - Lambda functions (100+)
   - S3 buckets
   - CloudFront distributions
-  - SageMaker endpoints (for self-hosted models)
 
 ---
 
-## 3. Installation
+## 4. Installation
 
 ### Download
 
 1. Download `Radiant Deployer.app` from the releases page
 2. Move to `/Applications` folder
-3. Right-click → Open (first launch only, to bypass Gatekeeper)
+3. Right-click → **Open** (first launch only, to bypass Gatekeeper)
 
-### First Launch
+### First Launch Security
 
 On first launch, macOS may show a security warning:
 
 1. Click **Cancel** on the warning dialog
-2. Open **System Preferences** → **Privacy & Security**
-3. Click **Open Anyway** next to "Radiant Deployer was blocked"
+2. Open **System Settings** → **Privacy & Security**
+3. Scroll down and click **Open Anyway**
 4. Click **Open** in the confirmation dialog
 
 ### Verify Installation
 
-After launching, verify the version in the window header:
+After launching, verify the version in the title bar:
 
 ```
-RADIANT Deployer v5.52.17
+RADIANT Deployer v7.0.0
 ```
 
 ---
 
-## 4. First Launch & Setup
+## 5. First Launch & Setup
 
-### 1Password Setup
+### Step 1: Add Master AWS Key
 
-The deployer requires 1Password for secure credential management.
+The first thing you'll see is the **Credentials** tab prompting for your master AWS key.
 
-**Step 1**: Install 1Password CLI
-```bash
-brew install 1password-cli
-```
+1. Click **Add Master Key**
+2. Enter your AWS Access Key ID
+3. Enter your AWS Secret Access Key
+4. Select your default region (e.g., `us-east-1`)
+5. Click **Save & Validate**
 
-**Step 2**: Enable CLI integration
-1. Open 1Password app
-2. Go to **Settings** → **Developer**
-3. Enable **Integrate with 1Password CLI**
+The master key is:
+- Stored **locally** in encrypted storage (never uploaded)
+- Protected by macOS Keychain
+- Used to create environment-specific keys
 
-**Step 3**: Sign in to 1Password
-```bash
-op signin
-```
+### Step 2: AutoSetup (Recommended)
 
-**Step 4**: Verify in Deployer
-- The deployer will show a green checkmark when 1Password is configured
-- If not configured, you'll see the 1Password Setup screen
+Click **Run AutoSetup** to automatically configure:
 
-### AWS Credentials Setup
+| Service | What's Automated |
+|---------|-----------------|
+| **Route53** | Hosted zone creation |
+| **ACM** | SSL certificate request + DNS validation |
+| **SES** | Domain verification, DKIM setup |
+| **S3** | Required buckets (artifacts, uploads, backups) |
+| **Secrets Manager** | Secret creation structure |
+| **IAM** | Environment-specific deployer users |
 
-**Option A**: Store in 1Password (Recommended)
+You only need to provide:
+- AWS credentials (master key)
+- Domain name
+- AI provider API keys (OpenAI, Anthropic, etc.)
 
-1. Create a new item in 1Password with:
-   - **Title**: `RADIANT AWS Credentials`
-   - **AWS Access Key ID**: Your access key
-   - **AWS Secret Access Key**: Your secret key
-   - **Region**: e.g., `us-east-1`
+### Step 3: First Deployment
 
-2. Tag the item with `radiant` for easy discovery
+1. Go to **Deploy** tab
+2. Select **Development** environment
+3. Choose your tier (SEED for dev)
+4. Click **Deploy**
 
-**Option B**: Use AWS CLI profiles
-```bash
-aws configure --profile radiant-deploy
-```
-
-### Initial Configuration Checklist
-
-- [ ] 1Password installed and CLI enabled
-- [ ] AWS credentials stored securely
-- [ ] AWS CDK bootstrapped in target region
-- [ ] Domain purchased and DNS access available
-- [ ] SSL certificate requested (or will use ACM)
+The deployer will create all infrastructure automatically.
 
 ---
 
-## 5. Main Interface
+## 6. Navigation Structure
 
-### Window Layout
+### 10-Tab Layout
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  ◉ ◉ ◉                    RADIANT Deployer                      │
-├───────────┬─────────────────────────────────────────────────────┤
-│           │  ┌─────────────────────────────────────────────┐   │
-│  SIDEBAR  │  │              CONTENT TOOLBAR                │   │
-│           │  ├─────────────────────────────────────────────┤   │
-│  ┌──────┐ │  │                                             │   │
-│  │ MAIN │ │  │                                             │   │
-│  ├──────┤ │  │                                             │   │
-│  │ OPS  │ │  │            MAIN CONTENT AREA                │   │
-│  ├──────┤ │  │                                             │   │
-│  │ AI   │ │  │                                             │   │
-│  ├──────┤ │  │                                             │   │
-│  │CONFIG│ │  │                                             │   │
-│  ├──────┤ │  │                                             │   │
-│  │SYSTEM│ │  │                                             │   │
-│  └──────┘ │  └─────────────────────────────────────────────┘   │
-│           │                                                     │
-└───────────┴─────────────────────────────────────────────────────┘
+│  ◉ ◉ ◉                RADIANT Deployer v7.0.0                   │
+├──────────────┬──────────────────────────────────────────────────┤
+│              │                                                   │
+│  Dashboard   │     ┌────────────────────────────────────────┐   │
+│  Deploy      │     │                                        │   │
+│  Credentials │     │                                        │   │
+│  Instances   │     │         MAIN CONTENT AREA              │   │
+│  Packages    │     │                                        │   │
+│  Migrations  │     │                                        │   │
+│  Snapshots   │     │                                        │   │
+│  History     │     │                                        │   │
+│  Drift Mon.  │     │                                        │   │
+│  Settings    │     └────────────────────────────────────────┘   │
+│              │                                                   │
+└──────────────┴──────────────────────────────────────────────────┘
 ```
 
-### Sidebar Sections
+### Tab Reference
 
-| Section | Tabs | Purpose |
-|---------|------|---------|
-| **MAIN** | Dashboard, Apps, Deploy | Core operations |
-| **OPERATIONS** | Instances, Snapshots, Packages, History | Management |
-| **AI REGISTRY** | Providers, Models, Self-Hosted | AI configuration |
-| **CONFIGURATION** | Domain URLs, Email, Curator | Platform config |
-| **ADVANCED** | Multi-Region, A/B Testing, Cortex Memory | Advanced features |
-| **SECURITY** | Security, Compliance | Security settings |
-| **SYSTEM** | Costs, Monitoring, Settings | System management |
-
-### Environment Selector
-
-At the top of the sidebar, select the target environment:
-
-| Environment | Purpose | Color |
-|-------------|---------|-------|
-| **Development** | Testing and development | Blue |
-| **Staging** | Pre-production testing | Orange |
-| **Production** | Live production | Green |
+| Tab | Icon | Purpose |
+|-----|------|---------|
+| **Dashboard** | 📊 | Overview of all environments |
+| **Deploy** | 🚀 | One-click deployment wizard |
+| **Credentials** | 🔑 | AWS key management |
+| **Instances** | 🖥️ | Start/stop/wipe environments |
+| **Packages** | 📦 | Version management |
+| **Migrations** | ➡️ | dev→staging→prod promotion |
+| **Snapshots** | 💾 | Backup and restore |
+| **History** | 📜 | Deployment logs |
+| **Drift Monitor** | ⚠️ | Infrastructure drift detection |
+| **Settings** | ⚙️ | Preferences |
 
 ---
 
-## 6. Dashboard
+## 7. Dashboard
 
-The Dashboard provides an at-a-glance view of your RADIANT deployment.
+The Dashboard provides an at-a-glance view of all three environments.
 
-### Status Cards
+### Environment Cards
 
-| Card | Information |
-|------|-------------|
-| **Version** | Current deployed version with update indicator |
-| **Health** | Overall system health (Healthy/Degraded/Unhealthy) |
-| **Costs** | Month-to-date AWS costs |
-| **Active Users** | Current active user count |
+Each environment (dev, staging, prod) shows:
+
+| Metric | Description |
+|--------|-------------|
+| **Version** | Deployed RADIANT version |
+| **Status** | Running / Stopped / Not Deployed |
+| **Health** | Healthy / Degraded / Unhealthy |
+| **Last Deploy** | Timestamp of last deployment |
+| **Monthly Cost** | Estimated AWS costs |
 
 ### Quick Actions
 
-- **Deploy** → Jump to deployment view
-- **View Logs** → Open CloudWatch logs
-- **Health Check** → Run comprehensive health check
-- **Refresh** → Refresh all status indicators
+| Action | Description |
+|--------|-------------|
+| **Deploy All** | Deploy to all environments sequentially |
+| **Health Check** | Run comprehensive health check |
+| **Sync Status** | Refresh all status indicators |
+| **View Logs** | Open CloudWatch in browser |
 
 ### Recent Activity
 
-Shows the last 10 deployment and configuration changes.
+Shows the last 10 actions across all environments:
+- Deployments
+- Key rotations
+- Instance starts/stops
+- Snapshot creations
 
 ---
 
-## 7. Applications Management
+## 8. Deploy
 
-### Viewing Applications
+The Deploy tab provides one-click deployment to any environment.
 
-The **Apps** tab shows all RADIANT applications:
+### Deployment Wizard
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  RADIANT Applications                                            │
+│  Deploy to AWS                                                   │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                  │
-│  ⚙️  RADIANT Admin          ✓ Enabled    https://acme.com/admin │
-│      Platform administration                                     │
+│  Environment:   ○ Development  ○ Staging  ● Production          │
 │                                                                  │
-│  🧠 Think Tank Admin        ✓ Enabled    https://acme.com/tt-admin│
-│      Think Tank configuration                                    │
+│  Tier:          [GROWTH ▼]                                      │
 │                                                                  │
-│  📖 Curator                  ✓ Enabled    https://acme.com/curator│
-│      Knowledge graph curation                                    │
+│  Version:       7.0.0 (latest)                                  │
 │                                                                  │
-│  💬 Think Tank              ✓ Enabled    https://acme.com/       │
-│      Consumer AI interface                                       │
+│  Domain:        thinktank.acme.com                              │
 │                                                                  │
-│  🔗 External API            ✓ Enabled    https://acme.com/api   │
-│      REST/GraphQL API                                            │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │ Pre-flight Checks                                        │   │
+│  │ ✓ AWS credentials valid                                  │   │
+│  │ ✓ CDK bootstrapped                                       │   │
+│  │ ✓ DNS configured                                         │   │
+│  │ ✓ SSL certificate valid                                  │   │
+│  │ ✓ API keys configured                                    │   │
+│  └─────────────────────────────────────────────────────────┘   │
+│                                                                  │
+│                                    [Deploy Now]                  │
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘
 ```
-
-### Per-App Actions
-
-Click on any application to:
-- View health status
-- Open in browser
-- View CloudWatch logs
-- Restart (Lambda functions)
-- Scale (if applicable)
-
----
-
-## 8. Deployment
-
-### Deployment Modes
-
-| Mode | When Used | Description |
-|------|-----------|-------------|
-| **Fresh Install** | No existing deployment | Full infrastructure creation |
-| **Update** | Existing deployment, newer version | Incremental update |
-| **Rollback** | After failed update | Restore from snapshot |
-
-### Deployment Process
-
-**Step 1: Select Application**
-- Choose the RADIANT platform instance to deploy
-
-**Step 2: Select Environment**
-- Development, Staging, or Production
-
-**Step 3: Configure Parameters**
-
-| Parameter | Description | Default |
-|-----------|-------------|---------|
-| **Tier** | Infrastructure size | Based on use case |
-| **Region** | AWS region | us-east-1 |
-| **Multi-AZ** | High availability | Growth+ tiers |
-| **Self-Hosted Models** | SageMaker endpoints | Growth+ tiers |
-
-**Step 4: Review & Deploy**
-- Review all settings
-- Click **Deploy** to begin
-- Monitor progress in the deployment log
 
 ### Tier Levels
 
-| Tier | Monthly Cost | Use Case | Features |
-|------|--------------|----------|----------|
-| **SEED** | $50-150 | Development | Minimal resources |
-| **STARTER** | $200-400 | Small production | WAF, GuardDuty |
-| **GROWTH** | $1,000-2,500 | Medium production | Self-hosted models |
-| **SCALE** | $4,000-8,000 | Large production | Multi-region |
-| **ENTERPRISE** | $15,000-35,000 | Global deployment | Full features |
+| Tier | Monthly Cost | Use Case | Key Features |
+|------|--------------|----------|--------------|
+| **SEED** | $50-150 | Development | Minimal, single-AZ |
+| **STARTER** | $200-400 | Small teams | WAF, GuardDuty |
+| **GROWTH** | $1,000-2,500 | Medium orgs | Self-hosted models |
+| **SCALE** | $4,000-8,000 | Large orgs | Multi-region ready |
+| **ENTERPRISE** | $15,000-35,000 | Global | Full HA, compliance |
+
+### Deployment Modes
+
+| Mode | When Used | Behavior |
+|------|-----------|----------|
+| **Fresh Install** | No existing stack | Creates all infrastructure |
+| **Update** | Existing stack | Incremental CloudFormation update |
+| **Rollback** | After failure | Restores from snapshot |
 
 ### Deployment Log
 
-The deployment log shows real-time progress:
+Real-time progress display:
 
 ```
-[12:00:01] Starting deployment v5.52.17...
-[12:00:02] ✓ Credentials validated
-[12:00:05] ✓ Package downloaded (45.2 MB)
-[12:00:10] → Deploying NetworkStack...
-[12:02:30] ✓ NetworkStack deployed
-[12:02:31] → Deploying DatabaseStack...
-[12:05:45] ✓ DatabaseStack deployed
-...
-[12:15:00] ✓ Deployment complete!
+[12:00:01] Starting deployment v7.0.0 to production...
+[12:00:02] ✓ Pre-flight checks passed
+[12:00:03] ✓ Package validated (SHA256 match)
+[12:00:10] → Deploying FoundationStack...
+[12:02:30] ✓ FoundationStack complete
+[12:02:31] → Deploying DataStack...
+[12:05:45] ✓ DataStack complete
+[12:05:46] → Running database migrations (1 of 156)...
+[12:08:00] ✓ All 156 migrations applied
+[12:08:01] → Deploying ApiStack...
+[12:12:00] ✓ Deployment complete!
+[12:12:01] → Running health checks...
+[12:12:30] ✓ All services healthy
 ```
 
 ---
 
-## 9. Domain URL Configuration
+## 9. Credentials Management
+
+The Credentials tab manages AWS access keys with automatic rotation.
 
 ### Overview
 
-Configure how users access each RADIANT application.
+RADIANT uses a **two-tier key architecture**:
 
-### Routing Strategies
+| Key Type | Storage | Rotation | Purpose |
+|----------|---------|----------|---------|
+| **Master Key** | Local (encrypted) | Manual | Your admin AWS credentials |
+| **Environment Keys** | AWS Secrets Manager | Automatic | Per-environment deployment keys |
 
-**Subdomain-Based**:
+### Architecture
+
 ```
-admin.acme.radiant.ai      → RADIANT Admin
-thinktank-admin.acme.radiant.ai → Think Tank Admin
-curator.acme.radiant.ai    → Curator
-app.acme.radiant.ai        → Think Tank
-api.acme.radiant.ai        → External API
+┌─────────────────────────────────────────────────────────────────────────┐
+│                              AWS Cloud                                   │
+│                                                                          │
+│  ┌───────────────────┐         ┌────────────────────────────────────┐  │
+│  │  Secrets Manager  │◄────────│  Lambda: credential-rotation       │  │
+│  │                   │         │  • Creates new IAM access key      │  │
+│  │  radiant/dev/     │         │  • Updates secret in SM            │  │
+│  │    deployer-key   │         │  • Validates new key works         │  │
+│  │                   │         │  • Deletes old key after overlap   │  │
+│  │  radiant/staging/ │         └────────────────────────────────────┘  │
+│  │    deployer-key   │                        ▲                         │
+│  │                   │                        │                         │
+│  │  radiant/prod/    │         ┌──────────────┴─────────────────────┐  │
+│  │    deployer-key   │         │  EventBridge Schedule              │  │
+│  └─────────┬─────────┘         │  • Every 90 days (configurable)    │  │
+│            │                   │  • Or manual trigger               │  │
+│            │                   └────────────────────────────────────┘  │
+│            │                                                            │
+│  ┌─────────┴─────────┐                                                 │
+│  │  IAM Users        │                                                 │
+│  │  • radiant-dev-deployer                                             │
+│  │  • radiant-staging-deployer                                         │
+│  │  • radiant-prod-deployer                                            │
+│  └───────────────────┘                                                 │
+│                                                                          │
+└──────────────────────────────────────────────────────────────────────────┘
+              │
+              │ Sync on app launch
+              ▼
+┌──────────────────────────────────────────────────────────────────────────┐
+│                         Swift Deployer (macOS)                            │
+│                                                                           │
+│  ┌─────────────────────────────────────────────────────────────────────┐ │
+│  │  Master Key (Local Storage)                                          │ │
+│  │  • AES-256-GCM encryption                                            │ │
+│  │  • Encryption key in macOS Keychain                                  │ │
+│  │  • SQLCipher encrypted database                                      │ │
+│  │  • Version history with timestamps                                   │ │
+│  │  • NEVER leaves your machine                                         │ │
+│  └─────────────────────────────────────────────────────────────────────┘ │
+│                                                                           │
+│  ┌─────────────────────────────────────────────────────────────────────┐ │
+│  │  Environment Keys (Synced from AWS)                                  │ │
+│  │  • Fetched from Secrets Manager on launch                            │ │
+│  │  • Cached locally (encrypted) for offline use                        │ │
+│  │  • Auto-refreshed when rotation detected                             │ │
+│  │  • Version history maintained locally                                │ │
+│  └─────────────────────────────────────────────────────────────────────┘ │
+│                                                                           │
+└───────────────────────────────────────────────────────────────────────────┘
 ```
 
-**Path-Based** (Default):
-```
-acme.radiant.ai/admin           → RADIANT Admin
-acme.radiant.ai/thinktank-admin → Think Tank Admin
-acme.radiant.ai/curator         → Curator
-acme.radiant.ai/                → Think Tank
-acme.radiant.ai/api             → External API
-```
+### Master Key
 
-### Configuration Steps
+Your primary AWS admin credentials, stored **locally only**:
 
-**Step 1: Enter Base Domain**
-- Enter your domain without protocol: `acme.radiant.ai`
+#### Security Features
 
-**Step 2: Choose Routing Strategy**
-- Subdomain: Each app on its own subdomain
-- Path-Based: All apps under one domain with paths
+| Feature | Implementation |
+|---------|----------------|
+| **Encryption** | AES-256-GCM with random IV per encryption |
+| **Key Derivation** | PBKDF2 with 100,000 iterations |
+| **Key Storage** | macOS Keychain (hardware-backed on Apple Silicon) |
+| **Database** | SQLCipher with 256-bit AES |
+| **Memory Protection** | Keys cleared from memory on lock/quit |
 
-**Step 3: Configure Per-App Settings**
-- Enable/disable optional apps
-- Customize subdomains or paths
-- Set cache policies
+#### Version History
 
-**Step 4: Validate DNS**
-- Click **Validate** to check DNS configuration
-- Green checkmarks indicate proper setup
-
-### DNS Records
-
-For **subdomain-based** routing, create these DNS records:
-
-| Type | Name | Value |
-|------|------|-------|
-| CNAME | admin | d123456.cloudfront.net |
-| CNAME | app | d123456.cloudfront.net |
-| CNAME | api | d123456.cloudfront.net |
-| CNAME | curator | d123456.cloudfront.net |
-| CNAME | thinktank-admin | d123456.cloudfront.net |
-
-For **path-based** routing:
-
-| Type | Name | Value |
-|------|------|-------|
-| A (ALIAS) | @ | d123456.cloudfront.net |
-
-### SSL Certificates
-
-The deployer automatically provisions SSL certificates via AWS ACM:
-
-1. ACM requests certificate for your domain
-2. Validation records are displayed
-3. Add CNAME records to your DNS
-4. Wait for validation (usually 5-30 minutes)
-5. Certificate is automatically attached to CloudFront
-
----
-
-## 10. Feature Flags
-
-### Overview
-
-Control which platform features are enabled for deployment.
-
-### Core Features
-
-| Feature | Default | Description |
-|---------|---------|-------------|
-| **Cortex Memory** | ✓ On | Three-tier memory system (Hot/Warm/Cold) |
-| **Ego System** | ✓ On | Zero-cost persistent AI identity |
-| **Compliance Export** | ✓ On | HIPAA, SOC2, GDPR-formatted exports |
-
-### Think Tank Features
-
-| Feature | Default | Description |
-|---------|---------|-------------|
-| **Time Machine** | ✓ On | Fork conversations, create checkpoints |
-| **Collaboration** | ✓ On | Real-time multi-user sessions |
-
-### Optional Applications
-
-| Feature | Default | Minimum Tier |
-|---------|---------|--------------|
-| **Curator** | On | Growth |
-
-### Infrastructure Features
-
-| Feature | Default | Minimum Tier |
-|---------|---------|--------------|
-| **Self-Hosted Models** | Off | Growth |
-| **Multi-Region** | Off | Scale |
-
-### Accessing Feature Flags
-
-1. Go to **Settings** → **Features** tab
-2. Toggle features on/off
-3. Click **Apply** to save
-4. Redeploy to activate changes
-
----
-
-## 11. AI Registry
-
-### Providers Tab
-
-View and configure AI providers:
-
-| Provider | Models | Status |
-|----------|--------|--------|
-| **OpenAI** | GPT-4o, GPT-4-turbo, etc. | Active |
-| **Anthropic** | Claude 3.5 Sonnet, etc. | Active |
-| **Google** | Gemini 1.5 Pro, etc. | Active |
-| **Amazon Bedrock** | Claude, Titan, etc. | Active |
-| **Self-Hosted** | Custom models | Configure |
-
-### Adding Provider Keys
-
-1. Click **Add Provider**
-2. Select provider from dropdown
-3. Enter API key
-4. Click **Validate** to test connection
-5. Click **Save**
-
-Keys are securely stored in AWS Secrets Manager.
-
-### Models Tab
-
-View all available AI models:
+Every time you update the master key, the previous version is retained:
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  AI Models                                         Filter: All  │
+│  Master Key History                                              │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                  │
-│  GPT-4o                    OpenAI           $2.50/1M tokens     │
-│  ├─ Context: 128K          Speed: Fast      Quality: Excellent  │
+│  v3 (Current)    AKIA...WXYZ    Feb 4, 2026 10:30 AM           │
+│  v2              AKIA...QRST    Jan 15, 2026 2:15 PM            │
+│  v1              AKIA...MNOP    Dec 1, 2025 9:00 AM             │
 │                                                                  │
-│  Claude 3.5 Sonnet         Anthropic        $3.00/1M tokens     │
-│  ├─ Context: 200K          Speed: Fast      Quality: Excellent  │
-│                                                                  │
-│  Gemini 1.5 Pro            Google           $1.25/1M tokens     │
-│  ├─ Context: 1M            Speed: Medium    Quality: Very Good  │
+│  [Reveal Secret] [Restore v2] [Export Encrypted Backup]         │
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### Model Categories
+#### Master Key Actions
 
-Models are organized by capability:
+| Action | Description | Authentication |
+|--------|-------------|----------------|
+| **View Access Key ID** | Always visible | None |
+| **Reveal Secret Key** | Show secret temporarily | Touch ID / Password |
+| **Update Key** | Replace with new credentials | Touch ID / Password |
+| **View History** | See all previous versions | None |
+| **Restore Version** | Revert to previous key | Touch ID / Password |
+| **Export Backup** | Encrypted backup file | Touch ID / Password |
+| **Validate** | Test against AWS STS | None |
 
-| Category | Use Case |
-|----------|----------|
-| **Reasoning** | Complex analysis, decision-making |
-| **Creative** | Writing, brainstorming |
-| **Code** | Programming, debugging |
-| **Fast** | Quick responses, low latency |
-| **Vision** | Image analysis |
-| **Embedding** | Vector search |
+### Environment Keys
 
----
+Per-environment IAM users managed via AWS Secrets Manager:
 
-## 12. Self-Hosted Models
+#### IAM Users
 
-### Overview
+| Environment | IAM User | Policy |
+|-------------|----------|--------|
+| **dev** | `radiant-dev-deployer` | `RadiantDevDeployerPolicy` |
+| **staging** | `radiant-staging-deployer` | `RadiantStagingDeployerPolicy` |
+| **prod** | `radiant-prod-deployer` | `RadiantProdDeployerPolicy` |
 
-Deploy AI models on your own AWS infrastructure for:
-- Data sovereignty
-- Reduced latency
-- Cost optimization at scale
-- Custom fine-tuned models
+#### Least-Privilege Permissions
 
-### Supported Models
+Each environment IAM user has permissions scoped to only that environment:
 
-| Model | Size | Instance Type | Monthly Cost |
-|-------|------|---------------|--------------|
-| Llama 3.1 8B | 8B | ml.g5.xlarge | ~$150 |
-| Llama 3.1 70B | 70B | ml.g5.12xlarge | ~$1,200 |
-| Mixtral 8x7B | 46.7B | ml.g5.4xlarge | ~$400 |
-| CodeLlama 34B | 34B | ml.g5.2xlarge | ~$300 |
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": ["cloudformation:*"],
+      "Resource": "arn:aws:cloudformation:*:*:stack/radiant-dev-*/*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": ["lambda:*"],
+      "Resource": "arn:aws:lambda:*:*:function:radiant-dev-*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": ["s3:*"],
+      "Resource": "arn:aws:s3:::radiant-dev-*"
+    }
+  ]
+}
+```
 
-### Deployment Steps
+#### Key Status Indicators
 
-1. Go to **Self-Hosted** tab
-2. Click **Add Model**
-3. Select model from catalog
-4. Choose instance type
-5. Set scaling parameters
-6. Click **Deploy**
+| Status | Icon | Meaning |
+|--------|------|---------|
+| **Valid** | ✅ | Key works, rotation not due |
+| **Expiring Soon** | ⚠️ | Rotation due within warning period |
+| **Expired** | ❌ | Past rotation date (still works) |
+| **Invalid** | 🚫 | Key doesn't authenticate |
+| **Rotating** | 🔄 | Rotation in progress |
 
-### Thermal States
+### Automatic Rotation
 
-Self-hosted models have thermal states to optimize costs:
+Keys rotate automatically via AWS Lambda and Secrets Manager.
 
-| State | Description | Response Time |
-|-------|-------------|---------------|
-| **HOT** | Running, ready | Immediate |
-| **WARM** | Scaled down, quick start | 30-60 seconds |
-| **COLD** | Stopped | 3-5 minutes |
-| **OFF** | Deleted | Full deploy |
+#### Rotation Configuration
 
-### Auto-Scaling
+| Setting | Default | Options | Description |
+|---------|---------|---------|-------------|
+| **Interval** | 90 days | 30 / 60 / 90 / 180 days | Time between rotations |
+| **Overlap** | 24 hours | 1 / 6 / 12 / 24 / 48 hours | Both keys valid period |
+| **Warning** | 14 days | 7 / 14 / 30 days | Alert before rotation |
+| **Auto-Rotate** | On | On / Off | Enable per environment |
 
-Configure auto-scaling based on:
-- Request count
-- Queue depth
-- Time of day (scheduled)
+#### Rotation Process (4-Step)
 
----
+The Lambda function performs rotation in four steps per AWS Secrets Manager standard:
 
-## 13. Multi-Region Deployment
+```
+Step 1: createSecret
+├─ Generate new IAM access key for user
+├─ Store in Secrets Manager as AWSPENDING
+└─ Old key still works (AWSCURRENT)
 
-### Overview
+Step 2: setSecret
+├─ Mark new key as ready
+└─ Both keys now valid (overlap period)
 
-Deploy RADIANT across multiple AWS regions for:
-- Geographic redundancy
-- Reduced latency for global users
-- Disaster recovery
+Step 3: testSecret
+├─ Validate new key against AWS STS
+├─ Attempt API call with new credentials
+└─ Rollback if test fails
 
-### Supported Regions
+Step 4: finishSecret
+├─ Promote AWSPENDING → AWSCURRENT
+├─ Delete old IAM access key
+├─ Update version metadata
+└─ Emit CloudWatch metrics
+```
 
-| Region | Location | Latency Zone |
-|--------|----------|--------------|
-| us-east-1 | N. Virginia | Americas |
-| us-west-2 | Oregon | Americas |
-| eu-west-1 | Ireland | Europe |
-| eu-central-1 | Frankfurt | Europe |
-| ap-southeast-1 | Singapore | Asia |
-| ap-northeast-1 | Tokyo | Asia |
+#### Rotation Timeline
 
-### Configuration
+```
+Day 0         Day 89        Day 90        Day 91
+  │             │             │             │
+  │             │             │             │
+  ▼             ▼             ▼             ▼
+┌────┐       ┌────┐       ┌────┐       ┌────┐
+│Key1│       │Key1│       │Key1│       │    │
+│only│       │warn│       │Key2│       │Key2│
+│    │       │    │       │both│       │only│
+└────┘       └────┘       └────┘       └────┘
+                            │
+                            └─ 24hr overlap
+```
 
-1. Go to **Multi-Region** tab
-2. Select primary region
-3. Add secondary regions
-4. Configure replication:
-   - **Database**: Aurora Global Database
-   - **Storage**: S3 Cross-Region Replication
-   - **API**: Route53 latency-based routing
+#### CDK Infrastructure
 
-### Failover
+The rotation infrastructure is deployed via `deployer-key-rotation-stack.ts`:
 
-Automatic failover when:
-- Primary region health check fails
-- Manual failover triggered
-- Scheduled maintenance
+| Resource | Purpose |
+|----------|---------|
+| **Secrets** | 3 secrets (dev/staging/prod deployer keys) |
+| **Lambda** | `credential-rotation` function |
+| **IAM Role** | Lambda execution role with SM + IAM permissions |
+| **EventBridge** | Schedule rule for automatic rotation |
+| **CloudWatch** | Logs, metrics, alarms for rotation failures |
+| **SNS Topic** | Notifications for rotation events |
 
----
+### Manual Key Operations
 
-## 14. Security & Compliance
+#### Validate Key
 
-### Security Tab
+Test that a key works against AWS:
 
-Configure security features:
+1. Click **Validate** next to any key
+2. Deployer calls AWS STS `GetCallerIdentity`
+3. Result shows:
+   - Account ID
+   - IAM User ARN
+   - Permissions summary
 
-| Feature | Description | Default |
-|---------|-------------|---------|
-| **WAF** | Web Application Firewall | On (Starter+) |
-| **GuardDuty** | Threat detection | On (Starter+) |
-| **Shield** | DDoS protection | Standard |
-| **VPC Flow Logs** | Network monitoring | On |
+#### Rotate Now (Manual)
 
-### Compliance Tab
+Force immediate rotation for an environment:
 
-#### HIPAA Compliance
+1. Click **Rotate Now** for the environment
+2. Confirm the action
+3. Watch rotation progress:
+   - Creating new key...
+   - Testing new key...
+   - Updating secret...
+   - Deleting old key...
+4. New key syncs to local cache
 
-Enable for healthcare data:
-- PHI encryption at rest and in transit
-- Audit logging for all data access
-- BAA documentation
-- Access controls
+#### View Key History
 
-#### SOC2 Compliance
-
-Enable for enterprise:
-- Comprehensive audit trails
-- Access reviews
-- Incident response procedures
-- Vendor management
-
-#### GDPR Compliance
-
-Enable for EU data:
-- Data subject access requests
-- Right to erasure
-- Data portability
-- Consent management
-
-### Compliance Reports
-
-Generate compliance reports:
-
-1. Go to **Compliance** tab
-2. Select report type
-3. Choose date range
-4. Click **Generate**
-5. Download PDF or JSON
-
----
-
-## 15. Cost Management
-
-### Costs Tab
-
-View and manage AWS costs:
+See all versions of an environment key:
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  Cost Overview                              January 2026         │
+│  Production Key History                                          │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                  │
-│  Month-to-Date:  $1,234.56                                      │
-│  Projected:      $2,100.00                                      │
-│  Budget:         $2,500.00                    ████████░░ 84%    │
+│  v7 (Current)    AKIA...DEFG    Feb 4, 2026    Auto-rotated    │
+│  v6              AKIA...ABCD    Nov 6, 2025    Auto-rotated    │
+│  v5              AKIA...7890    Aug 8, 2025    Manual rotate   │
+│  v4              AKIA...5678    May 10, 2025   Auto-rotated    │
+│  ...                                                             │
 │                                                                  │
-│  ┌────────────────────────────────────────────────────────┐    │
-│  │  Cost Breakdown                                         │    │
-│  │  ────────────────────────────────────────────────────   │    │
-│  │  Aurora PostgreSQL    $450.00   ████████████░░░░ 36%   │    │
-│  │  Lambda               $280.00   ████████░░░░░░░░ 23%   │    │
-│  │  SageMaker            $200.00   ██████░░░░░░░░░░ 16%   │    │
-│  │  S3 Storage           $120.00   ████░░░░░░░░░░░░ 10%   │    │
-│  │  CloudFront           $100.00   ███░░░░░░░░░░░░░  8%   │    │
-│  │  Other                 $84.56   ██░░░░░░░░░░░░░░  7%   │    │
-│  └────────────────────────────────────────────────────────┘    │
+│  Showing 4 of 7 versions    [Load More]                         │
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### Cost Optimization
+#### Restore Previous Version
 
-The deployer includes automatic cost optimization:
+If a rotation causes issues:
 
-| Feature | Savings | Description |
-|---------|---------|-------------|
-| **Thermal Management** | 30-70% | Scale down idle models |
-| **Semantic Cache** | 20-40% | Cache repeated queries |
-| **Model Routing** | 40-60% | Route to cheaper models when appropriate |
-| **Reserved Capacity** | 30-50% | Pre-purchase compute capacity |
+1. Go to key history
+2. Select the version to restore
+3. Click **Restore This Version**
+4. Confirm (requires Touch ID / password)
+5. Previous key is reactivated in Secrets Manager
 
-### Budget Alerts
+**Note**: This only works if the old IAM key wasn't deleted from IAM.
 
-Set up budget alerts:
+### Troubleshooting Key Issues
 
-1. Go to **Costs** tab
-2. Click **Set Budget**
-3. Enter monthly budget amount
-4. Configure alert thresholds (50%, 75%, 90%, 100%)
-5. Add notification emails
+#### Rotation Failed
+
+**Symptom**: Rotation stuck or failed
+
+**Check**:
+1. Lambda logs in CloudWatch (`/aws/lambda/radiant-credential-rotation`)
+2. IAM user access key count (max 2 per user)
+3. Secrets Manager permissions
+
+**Common Causes**:
+
+| Cause | Solution |
+|-------|----------|
+| Max keys reached | Delete oldest IAM access key manually |
+| Lambda timeout | Increase timeout to 60s |
+| Permission denied | Check Lambda IAM role |
+| Network error | Check VPC configuration |
+
+#### Key Not Syncing
+
+**Symptom**: App shows old key after rotation
+
+**Solution**:
+1. Click **Refresh** in Credentials tab
+2. Or quit and relaunch the app
+3. Check AWS connectivity
+
+#### Invalid Key After Rotation
+
+**Symptom**: New key doesn't work
+
+**Solution**:
+1. Check Secrets Manager for AWSCURRENT version
+2. Verify IAM access key exists and is Active
+3. Restore previous version if needed
+4. Contact AWS support if IAM inconsistent
 
 ---
 
-## 16. Monitoring
+## 10. Instance Management
 
-### Monitoring Tab
+Control the lifecycle of each environment's AWS resources.
 
-Real-time monitoring dashboard:
+### Environment Panels
+
+Each environment (dev, staging, prod) shows:
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  System Health                                                   │
+│  DEVELOPMENT                                        [● Running]  │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                  │
-│  API Latency          45ms     ✓ Healthy                        │
-│  Database             12ms     ✓ Healthy                        │
-│  Lambda Cold Starts   2.3%     ✓ Healthy                        │
-│  Error Rate           0.01%    ✓ Healthy                        │
+│  Services:                                                       │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐           │
+│  │ API GW   │ │ Lambda   │ │ Aurora   │ │ S3       │           │
+│  │ ● Active │ │ ● Active │ │ ● Active │ │ ● Active │           │
+│  └──────────┘ └──────────┘ └──────────┘ └──────────┘           │
 │                                                                  │
-│  ┌────────────────────────────────────────────────────────┐    │
-│  │  Request Volume (Last 24h)                              │    │
-│  │  ▁▂▃▄▅▆▇█▇▆▅▄▃▂▁▂▃▄▅▆▇█▇▆▅▄▃▂▁▂▃▄▅▆▇█              │    │
-│  │  12am    6am    12pm    6pm    12am                     │    │
-│  └────────────────────────────────────────────────────────┘    │
+│  Resources: 45 Lambdas | 12 Tables | 5 Buckets                  │
+│  Monthly Cost: ~$450                                             │
+│                                                                  │
+│  [Start All]  [Stop All]  [Nuclear Wipe...]                     │
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### Health Checks
+### Start/Stop Controls
 
-Automatic health checks run every 60 seconds:
+| Action | What Happens |
+|--------|--------------|
+| **Start All** | Resume Aurora, restore Lambda concurrency |
+| **Stop All** | Pause Aurora, remove provisioned concurrency |
 
-| Check | Description | Threshold |
-|-------|-------------|-----------|
-| **API Gateway** | Endpoint availability | 99.9% |
-| **Lambda** | Function execution | <5s p99 |
-| **Database** | Connection pool | <90% utilized |
-| **Storage** | S3 availability | 99.99% |
+Cost savings when stopped: ~60-80% reduction.
 
-### Alerts
+### Nuclear Wipe (Double Confirmation)
 
-Configure alerts for:
-- Error rate spikes
-- Latency increases
-- Resource exhaustion
-- Security events
+Complete environment destruction with preservation options:
+
+**Step 1 - Select Preservations**:
+
+| Resource | Default | Description |
+|----------|---------|-------------|
+| DNS (Route53) | ✓ Keep | Hosted zone and records |
+| SSL (ACM) | ✓ Keep | Certificates |
+| SES Email | ✓ Keep | Verified domain, DKIM |
+| VPC | ○ Delete | Network infrastructure |
+| Logs | ○ Delete | CloudWatch log groups |
+| KMS Keys | ✓ Keep | Required for backup restore |
+
+**Step 2 - Type Confirmation**:
+
+Must type `WIPE DEV`, `WIPE STAGING`, or `WIPE PROD` to confirm.
 
 ---
 
-## 17. Snapshots & Rollbacks
+## 11. Packages
 
-### Snapshots Tab
+Manage RADIANT version packages.
 
-View and manage deployment snapshots:
+### Package List
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  Deployment Snapshots                                            │
+│  Available Packages                                              │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                  │
-│  📸 snap-2026-01-24-pre-update                                  │
-│     Created: Jan 24, 2026 6:00 AM   Size: 2.3 GB                │
-│     Version: 5.52.16   Reason: Pre-update backup                │
-│     [Restore] [Download] [Delete]                                │
+│  v7.0.0  [LATEST]     Feb 4, 2026    156 migrations             │
+│  ├─ Simplified navigation (10 tabs)                             │
+│  ├─ Credentials management                                       │
+│  └─ Instance lifecycle controls                                  │
 │                                                                  │
-│  📸 snap-2026-01-20-manual                                      │
-│     Created: Jan 20, 2026 3:00 PM   Size: 2.1 GB                │
-│     Version: 5.45.0    Reason: Manual backup                    │
-│     [Restore] [Download] [Delete]                                │
+│  v6.6.0               Jan 24, 2026   152 migrations             │
+│  ├─ Environment domains                                          │
+│  └─ DNS verification                                             │
+│                                                                  │
+│  v6.5.0               Jan 15, 2026   148 migrations             │
+│  └─ Feature flags system                                         │
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘
 ```
+
+### Package Actions
+
+| Action | Description |
+|--------|-------------|
+| **Download** | Fetch package to local cache |
+| **Verify** | Check SHA256 hash |
+| **View Changes** | See changelog and migrations |
+| **Deploy** | Jump to deploy with this version |
+
+---
+
+## 12. Migrations
+
+Visual pipeline for promoting deployments through environments.
+
+### Pipeline View
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  Migration Pipeline                                              │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│     DEV              STAGING           PROD                      │
+│  ┌─────────┐      ┌─────────┐      ┌─────────┐                  │
+│  │ v7.0.0  │ ───► │ v6.6.0  │ ───► │ v6.5.0  │                  │
+│  │ ● Ready │      │ ○ Ready │      │ ○ Ready │                  │
+│  └─────────┘      └─────────┘      └─────────┘                  │
+│                                                                  │
+│  [Promote to Staging]                                            │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Promotion Options
+
+| Option | Description |
+|--------|-------------|
+| **Direct Promote** | Immediate deployment to next environment |
+| **Shadow Mode** | Canary release with traffic splitting |
+
+### Shadow Mode (Canary Releases)
+
+Gradual traffic shifting for safe production rollouts:
+
+| Phase | Traffic | Duration | Rollback Trigger |
+|-------|---------|----------|------------------|
+| 1 | 5% | 1 hour | Error rate > 1% |
+| 2 | 25% | 4 hours | Error rate > 0.5% |
+| 3 | 50% | 12 hours | Error rate > 0.2% |
+| 4 | 100% | Complete | Manual |
+
+### Comparison Metrics
+
+During shadow mode, compare old vs new:
+
+| Metric | Old Version | New Version |
+|--------|-------------|-------------|
+| Error Rate | 0.12% | 0.08% |
+| P50 Latency | 145ms | 132ms |
+| P99 Latency | 890ms | 720ms |
+| Cost/Request | $0.0012 | $0.0011 |
+
+---
+
+## 13. Snapshots
+
+Backup and restore capabilities.
+
+### Snapshot Types
+
+| Type | Contents | Schedule |
+|------|----------|----------|
+| **Full** | Database + S3 + Config | Weekly |
+| **Incremental** | Changes since last | Daily |
+| **Pre-Deploy** | Auto before deployment | Automatic |
 
 ### Creating Snapshots
 
-Snapshots are created automatically:
-- Before every update deployment
-- Before rollbacks
-- On a scheduled basis (configurable)
-
-Manual snapshots:
 1. Click **Create Snapshot**
-2. Enter description
-3. Choose components to include
-4. Click **Create**
+2. Select environment
+3. Choose type (Full or Incremental)
+4. Add optional description
+5. Click **Create**
 
-### Rollback Process
+### Restoring from Snapshot
 
-1. Go to **Snapshots** tab
-2. Select snapshot to restore
-3. Click **Restore**
-4. Confirm the rollback
-5. Monitor restoration progress
+1. Select snapshot from list
+2. Click **Restore**
+3. Choose target environment
+4. Confirm (requires typing environment name)
+
+**Warning**: Restore overwrites current environment data.
 
 ---
 
-## 18. Package Management
+## 14. History
 
-### Packages Tab
+Complete deployment and action history.
 
-Manage deployment packages:
+### Log Entries
+
+Each entry shows:
+
+| Field | Description |
+|-------|-------------|
+| **Timestamp** | When action occurred |
+| **Action** | Deploy, Rotate, Snapshot, etc. |
+| **Environment** | dev, staging, prod |
+| **User** | Who initiated (if available) |
+| **Duration** | How long it took |
+| **Status** | Success, Failed, In Progress |
+
+### Filtering
+
+Filter by:
+- Environment
+- Action type
+- Date range
+- Status
+
+### Export
+
+Export history as:
+- CSV
+- JSON
+- PDF report
+
+---
+
+## 15. Drift Monitor
+
+Detect and reconcile infrastructure drift from manual AWS changes.
+
+### What is Drift?
+
+When someone (or Windsurf/Claude) changes AWS resources directly instead of through the Deployer, the actual state differs from the expected state. This is "drift."
+
+### Detection Methods
+
+| Method | Trigger | Frequency |
+|--------|---------|-----------|
+| **Scheduled** | EventBridge | Every 15 minutes |
+| **Event-Driven** | CloudFormation events | Real-time |
+| **Manual** | User clicks Scan | On-demand |
+
+### Drift Report
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  Deployment Packages                                             │
+│  Drift Detected: 3 resources                                     │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                  │
-│  📦 radiant-5.52.17-stable.tar.gz          ✓ Current            │
-│     Channel: Stable   Size: 45.2 MB   Downloaded: Jan 24        │
+│  ⚠️ Lambda: radiant-prod-api-handler                             │
+│     Property: MemorySize                                         │
+│     Expected: 512 MB                                             │
+│     Actual:   1024 MB                                            │
+│     AI Recommendation: ADOPT (performance improvement)           │
+│     [Adopt] [Revert] [Investigate]                               │
 │                                                                  │
-│  📦 radiant-5.52.16-stable.tar.gz                               │
-│     Channel: Stable   Size: 44.8 MB   Downloaded: Jan 20        │
-│                                                                  │
-│  📦 radiant-5.53.0-beta.tar.gz                                  │
-│     Channel: Beta     Size: 46.1 MB   Downloaded: Jan 23        │
+│  ⚠️ S3: radiant-prod-uploads                                     │
+│     Property: PublicAccessBlock                                  │
+│     Expected: All blocked                                        │
+│     Actual:   GetObject allowed                                  │
+│     AI Recommendation: REVERT (security risk)                    │
+│     [Adopt] [Revert] [Investigate]                               │
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### Release Channels
+### AI Recommendations
 
-| Channel | Description | Stability |
-|---------|-------------|-----------|
-| **Stable** | Production-ready releases | Highest |
-| **Beta** | Pre-release testing | Medium |
-| **Canary** | Experimental features | Low |
+The drift monitor uses AI to analyze changes and recommend action:
 
-### Package Operations
+| Recommendation | Meaning |
+|----------------|---------|
+| **ADOPT** | Keep the change, update IaC to match |
+| **REVERT** | Undo the change, restore expected state |
+| **INVESTIGATE** | Unclear, needs human review |
 
-- **Download**: Get latest package from channel
-- **Verify**: Check package integrity
-- **Inspect**: View package contents
-- **Delete**: Remove old packages
+### Actions
+
+| Action | What Happens |
+|--------|--------------|
+| **Adopt** | Update Deployer state to match AWS |
+| **Revert** | Reset AWS resource to expected state |
+| **Ignore** | Mark as known deviation |
 
 ---
 
-## 19. Settings
+## 15.1 Environment State Registry
 
-### General Settings
+**NEW in v7.1.0** - Comprehensive system for tracking, comparing, syncing, and backing up environment state across dev, staging, and prod.
+
+### Overview
+
+The Environment State Registry maintains versioned manifests of your AWS infrastructure, enabling:
+- Cross-environment comparison
+- Selective data synchronization
+- Point-in-time backups and restoration
+- Offline resilience with local caching
+
+### Navigation
+
+Access via the sidebar under "State Registry" or use keyboard shortcut **⌘ + Shift + S**.
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  State Registry                                                  │
+├─────────────────────────────────────────────────────────────────┤
+│  📊 Dashboard     Overview of all environments                   │
+│  🔨 Dev           Development environment state                  │
+│  🧪 Staging       Staging environment state                      │
+│  🌍 Prod          Production environment state                   │
+│  ↔️  Compare       Cross-environment comparison                   │
+│  🔄 Sync          Sync operations                                │
+│  💾 Backups       Backup management                              │
+│  ⚙️  Settings      Sync configuration                            │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Environment Manifests
+
+Each environment manifest captures a complete snapshot:
+
+| Category | Contents |
+|----------|----------|
+| **CloudFormation** | Stack status, outputs, parameters, drift status |
+| **Lambda** | Functions, runtime, memory, timeout, layers |
+| **S3** | Buckets, size, object count, versioning |
+| **DynamoDB** | Tables, item count, throughput |
+| **Aurora** | Cluster status, engine version, instances |
+| **Secrets** | Secret names, rotation status |
+| **API Gateway** | APIs, stages, usage plans |
+
+#### Capturing a Manifest
+
+1. Select environment (Dev, Staging, or Prod)
+2. Click **Capture Now** or wait for auto-capture
+3. Review the manifest summary
+
+Manifests are stored both locally (for offline access) and in S3 (for durability).
+
+### Persistent Data Management
+
+Control which data items sync between environments:
+
+| Column | Description |
+|--------|-------------|
+| **Name** | Data item identifier |
+| **Type** | database, s3, secret, config |
+| **Category** | user_data, system_config, ai_models, etc. |
+| **Size** | Storage size |
+| **Include** | Toggle to include/exclude from sync |
+| **Sensitivity** | Public, Internal, Confidential, Restricted |
+
+#### Sensitivity Levels
+
+| Level | Description | Sync Default |
+|-------|-------------|--------------|
+| **Public** | Non-sensitive data | Included |
+| **Internal** | Internal business data | Included |
+| **Confidential** | Business-critical data | Manual confirm |
+| **Restricted** | PII/PHI, highly sensitive | Excluded |
+
+### Cross-Environment Comparison
+
+Compare any two environments to see differences:
+
+1. Select **Source** environment (e.g., Dev)
+2. Select **Target** environment (e.g., Staging)
+3. Click **Compare Environments**
+
+#### Comparison Report
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  Comparison: Dev → Staging                                       │
+├─────────────────────────────────────────────────────────────────┤
+│  Summary                                                         │
+│    Total Changes: 15                                             │
+│    Breaking Changes: 2                                           │
+│    Data Changes: 8                                               │
+│    Estimated Duration: 12 minutes                                │
+│    Data Transfer: 2.4 GB                                         │
+│                                                                  │
+│  ➕ Added (3)                                                    │
+│    • Lambda: radiant-dev-new-handler                             │
+│    • S3 Bucket: radiant-dev-exports                              │
+│    • Secret: radiant/dev/new-api-key                             │
+│                                                                  │
+│  ➖ Removed (1)                                                  │
+│    • Lambda: radiant-dev-deprecated-fn                           │
+│                                                                  │
+│  ⚠️  Conflicts (2)                                               │
+│    • Config: max_tokens (Dev: 4096, Staging: 2048)               │
+│    • Feature: enable_beta (Dev: true, Staging: false)            │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Sync Operations
+
+Synchronize state from one environment to another:
+
+1. Select source and target environments
+2. Choose what to sync:
+   - **Infrastructure**: CloudFormation stacks, Lambdas
+   - **Persistent Data**: Databases, S3 objects
+   - **Feature Flags**: Feature toggles
+3. For production targets, enable **Confirm Production Sync**
+4. Click **Start Sync**
+
+#### Production Protection
+
+Syncing to production requires:
+- Explicit confirmation toggle
+- User acknowledgment of changes
+- Optional approval workflow (if enabled)
+
+#### Sync Progress
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  Active Sync: Dev → Staging                                      │
+│  Status: Syncing                                                 │
+│                                                                  │
+│  ████████████████░░░░░░░░░░░░░░  52%                            │
+│                                                                  │
+│  Phase: Migrating database tables                                │
+│  Items: 26/50 completed                                          │
+│  Transferred: 1.2 GB / 2.4 GB                                    │
+│                                                                  │
+│  [Cancel Sync]                                                   │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Backup & Restore
+
+Create point-in-time backups of any environment:
+
+#### Creating a Backup
+
+1. Go to **Backups** tab
+2. Select environment
+3. Click **Create Backup**
+4. Configure options:
+   - Include Infrastructure
+   - Include Database
+   - Include S3 Buckets
+   - Include Secrets (optional)
+5. Add optional description
+6. Click **Create**
+
+#### Backup Types
+
+| Type | Description | Retention |
+|------|-------------|-----------|
+| **Manual** | User-initiated | Until deleted |
+| **Pre-Deploy** | Auto before deployments | 30 days |
+| **Scheduled** | Daily/weekly automatic | Configurable |
+| **Incremental** | Changes only | 7 days |
+
+#### Restoring from Backup
+
+1. Find backup in list (filter by environment/date)
+2. Right-click → **Restore**
+3. Select target environment
+4. Choose components to restore
+5. Confirm restoration
+
+⚠️ **Warning**: Restoring overwrites current state. Always create a backup before restoring.
+
+### Sync Configuration
+
+Configure per-environment sync settings:
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| **Sync Enabled** | Master toggle | On (dev/staging), Off (prod) |
+| **Sync Infrastructure** | Include CloudFormation | Off |
+| **Sync Persistent Data** | Include databases/S3 | On |
+| **Sync Feature Flags** | Include feature toggles | On |
+| **Sync Secrets** | Include Secrets Manager | Off |
+| **Require Confirmation** | Prompt before sync | On |
+| **Allow Destructive** | Allow data deletion | Off |
+| **Auto-Sync** | Automatic scheduled sync | Off for prod |
+
+### Offline Resilience
+
+The State Registry works even when offline:
+
+- **Local Cache**: Manifests cached on your Mac
+- **Startup Sync**: Refreshes from server on launch
+- **Manual Refresh**: Force refresh when back online
+- **Queued Operations**: Operations queue until connectivity restored
+
+### API Integration
+
+The State Registry exposes REST endpoints for automation:
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/state-registry/manifests/{env}` | GET | Get manifest |
+| `/state-registry/manifests/{env}/capture` | POST | Capture new |
+| `/state-registry/compare` | POST | Compare environments |
+| `/state-registry/sync` | POST | Start sync |
+| `/state-registry/backups` | GET/POST | List/create backups |
+| `/state-registry/backups/{id}/restore` | POST | Restore backup |
+
+---
+
+## 15.2 Reliability & Storage Configuration
+
+**NEW in v7.1.0** - Enterprise-grade reliability features targeting 99.99% availability with configurable storage paths for large datasets.
+
+### Configurable Storage Paths
+
+Access via **State Registry → Settings → Storage Configuration** or **⌘ + Shift + ,**
+
+Administrators can configure custom storage locations for large datasets that may not fit on the system drive:
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| **Manifest Path** | Local path for state snapshots | ~/Library/Application Support/RadiantDeployer/StateRegistry/manifests |
+| **Backup Path** | Local path for backups | ~/Library/Application Support/RadiantDeployer/StateRegistry/backups |
+| **Package Path** | Local path for deployment packages | ~/Library/Application Support/RadiantDeployer/StateRegistry/packages |
+| **Cache Path** | Local path for temporary cache | ~/Library/Application Support/RadiantDeployer/StateRegistry/cache |
+
+#### Supported Storage Locations
+
+- **Internal SSD**: Default location, fastest performance
+- **External Drives**: USB, Thunderbolt, or network-attached storage
+- **Network Shares**: SMB/NFS mounts for centralized storage
+- **RAID Arrays**: For enterprise redundancy
+
+#### Changing Storage Paths
+
+1. Click **Browse...** next to any path
+2. Select the new directory (must be writable)
+3. Click **Save Configuration**
+4. Existing data is NOT moved automatically—use manual migration if needed
+
+⚠️ **Warning**: Ensure the new path has sufficient space. The app will warn if available space drops below 10GB.
+
+### Storage Limits
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| **Max Local Cache** | Maximum cache size before cleanup | 50 GB |
+| **Max Backup Retention** | Days to keep old backups | 90 days |
+| **Max Manifest Versions** | Number of manifest versions to retain | 100 |
+
+### Automatic Cleanup
+
+When enabled, the system automatically cleans up old data when disk usage exceeds the threshold:
+
+| What Gets Cleaned | Policy |
+|-------------------|--------|
+| **Old Manifests** | Keep only the newest N versions per environment |
+| **Expired Backups** | Remove backups older than retention period |
+| **Stale Cache** | Remove cache files older than 24 hours |
+
+To run cleanup manually: **State Registry → Settings → Storage → Run Cleanup Now**
+
+### Reliability Settings
+
+Access via **State Registry → Settings → Reliability**
+
+#### Retry Configuration
+
+| Operation | Max Retries | Initial Delay | Max Delay |
+|-----------|-------------|---------------|-----------|
+| **Network** | 5 | 1 second | 30 seconds |
+| **Sync** | 3 | 5 seconds | 60 seconds |
+| **Backup** | 3 | 10 seconds | 120 seconds |
+
+Retries use exponential backoff with optional jitter to prevent thundering herd.
+
+#### Conflict Resolution Strategies
+
+| Strategy | When to Use |
+|----------|-------------|
+| **Source Wins** | When source environment is authoritative |
+| **Target Wins** | When preserving target state is critical |
+| **Newest Wins** | For time-based resolution (recommended) |
+| **Manual** | When human review is required |
+| **Merge** | For compatible data types only |
+| **Skip** | To ignore conflicts and continue |
+
+#### Data Validation
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| **Validate Before Sync** | Check data integrity before transfer | On |
+| **Validate After Sync** | Verify data after transfer | On |
+| **Checksum Verification** | Use SHA-256 checksums | On |
+
+#### Rollback Settings
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| **Create Checkpoint** | Snapshot state before sync | On |
+| **Auto-Rollback** | Revert on failure | On |
+| **Rollback Threshold** | Max % of items that can fail | 20% |
+
+### Fallback Mechanisms
+
+The system gracefully degrades under failure conditions:
+
+| Scenario | Fallback Behavior |
+|----------|-------------------|
+| **Network Failure** | Use cached data (configurable max age: 60 min) |
+| **Partial Sync Failure** | Continue if >80% items succeed |
+| **Write Failure** | Enter read-only mode |
+| **Storage Full** | Trigger automatic cleanup |
+| **Repeated Failures** | Escalate via email/Slack/PagerDuty |
+
+### Health Dashboard
+
+Access via **State Registry → Health** or **⌘ + Shift + H**
+
+Real-time monitoring of all State Registry components:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  Health Dashboard                                                │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  Overall Status: ● Healthy                                       │
+│                                                                  │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐              │
+│  │ Local Cache │  │ S3 Connect  │  │ API Connect │              │
+│  │   ● OK      │  │   ● OK      │  │   ● OK      │              │
+│  │ 42GB free   │  │ 45ms        │  │ 120ms       │              │
+│  └─────────────┘  └─────────────┘  └─────────────┘              │
+│                                                                  │
+│  Reliability Metrics                                             │
+│    Uptime: 99.99%                                                │
+│    Success Rate: 99.95%                                          │
+│    Avg Latency: 85ms                                             │
+│    Errors (24h): 0                                               │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### SLA Targets
+
+The State Registry is designed to meet enterprise SLA requirements:
+
+| Metric | Target | Description |
+|--------|--------|-------------|
+| **Availability** | 99.99% | Max 52 minutes downtime per year |
+| **Sync Success** | 99.9% | Successful sync operations |
+| **Backup Success** | 99.99% | Successful backup operations |
+| **Restore Success** | 99.9% | Successful restore operations |
+| **Data Integrity** | 100% | No data corruption ever |
+| **Max API Latency** | 5 seconds | Response time threshold |
+
+### Backup Validation
+
+Before restoring a backup, the system validates:
+
+1. **Checksum Verification**: Confirms file integrity
+2. **Component Validation**: Checks each component (infrastructure, database, S3, secrets)
+3. **Dependency Validation**: Ensures all dependencies are present
+4. **Recoverability Assessment**: Estimates restore time and identifies blockers
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  Backup Validation: backup-2026-02-04-143052                     │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ✅ Overall: VALID                                               │
+│  ⏱️  Validation Time: 1.2 seconds                                │
+│                                                                  │
+│  Components:                                                     │
+│    ✅ Infrastructure: 14/14 items valid                          │
+│    ✅ Database: 42/42 tables valid                               │
+│    ✅ S3: 8/8 buckets valid                                      │
+│    ✅ Feature Flags: 24/24 flags valid                           │
+│                                                                  │
+│  Integrity:                                                      │
+│    Algorithm: SHA-256                                            │
+│    Checksum: a3f2c8...                                           │
+│    Status: ✅ Valid                                               │
+│                                                                  │
+│  Recoverability:                                                 │
+│    Can Restore: Yes                                              │
+│    Est. Time: 5 minutes                                          │
+│    Blockers: None                                                │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 15.3 AWS Snapshots (Disaster Recovery)
+
+**NEW in v7.1.0** - Automated AWS infrastructure snapshots for complete disaster recovery with zero downtime.
+
+### Overview
+
+AWS Snapshots provide an additional layer of protection beyond the State Registry backups. While State Registry captures application-level state, AWS Snapshots capture the underlying AWS infrastructure at the storage level.
+
+**Key Benefits**:
+- **Zero Downtime**: Snapshots are created without affecting running services
+- **Isolation**: Protected from application-level bugs (can't be accidentally deleted via app)
+- **Point-in-Time**: Restore to any snapshot within retention period
+- **Cross-Region**: Optional replication to another AWS region
+
+### Accessing AWS Snapshots
+
+In the Swift Deployer:
+1. Navigate to **State Registry** in the sidebar
+2. Click the **AWS Snapshots** tab
+3. Or use keyboard shortcut **⌘ + Shift + S**
+
+In the Radiant Admin Dashboard:
+1. Go to **Infrastructure → Snapshots**
+2. Or navigate to `/snapshots` in the URL
+
+### Creating a Manual Snapshot
+
+1. Click **Create Snapshot** button
+2. (Optional) Enter a description
+3. Select components to include:
+   - ☑️ Aurora PostgreSQL (RDS)
+   - ☑️ S3 Buckets
+   - ☑️ Secrets Manager
+   - ☑️ DynamoDB Tables
+4. Click **Create**
+
+The snapshot process runs in the background. You can continue working while it completes.
+
+### Scheduled Snapshots
+
+By default, snapshots run automatically at **2:00 AM Pacific Time** daily.
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| **Schedule** | 2:00 AM PT | Configurable to any time or interval |
+| **Retention** | 30 days | How long to keep snapshots |
+| **Components** | All | Which AWS resources to snapshot |
+
+To configure the schedule:
+1. Go to **AWS Snapshots → Configuration** tab
+2. Toggle **Enable Automated Snapshots**
+3. Set your preferred time or interval
+4. Click **Save Configuration**
+
+### Restoring from a Snapshot
+
+1. Select a snapshot from the list
+2. Click **Restore** (download icon)
+3. Confirm the restore operation
+4. Wait for restore to complete (5-15 minutes for RDS)
+
+**Important**: RDS restore creates a **new cluster**—it does not overwrite the existing database. After restore completes, you'll need to update your connection strings to point to the new cluster.
+
+### Restore Times
+
+| Component | Typical Time | Method |
+|-----------|--------------|--------|
+| **Aurora PostgreSQL** | 5-15 minutes | Creates new cluster from snapshot |
+| **S3 Buckets** | Near-instant | Object versioning (objects already versioned) |
+| **DynamoDB** | ~5 min/table | On-demand backup restore |
+| **Secrets Manager** | Near-instant | Version recovery |
+
+### Snapshot Validation
+
+Before restoring, validate the snapshot:
+
+1. Select a snapshot
+2. Click **Validate** (or right-click → Validate)
+3. Review the validation report:
+   - ✅ Checksum verification
+   - ✅ Component availability
+   - ✅ Estimated restore time
+   - ⚠️ Any blockers or warnings
+
+### Cost Estimation
+
+Snapshots incur AWS storage costs:
+
+| Component | Approximate Cost |
+|-----------|------------------|
+| **RDS Snapshots** | ~$0.02/GB-month |
+| **DynamoDB Backups** | ~$0.10/GB-month |
+| **S3 Versioning** | Same as standard S3 storage |
+
+The dashboard shows estimated monthly costs for all retained snapshots.
+
+### Snapshot vs State Registry Backup
+
+| Feature | AWS Snapshot | State Registry Backup |
+|---------|--------------|----------------------|
+| **Level** | AWS infrastructure | Application state |
+| **Downtime** | Zero | Zero |
+| **Restore Target** | Same or new cluster | Same environment |
+| **Isolation** | Protected from app bugs | Could be affected by app bugs |
+| **Speed** | 5-15 min (RDS) | Near-instant |
+| **Cross-Region** | Yes (optional) | No |
+
+**Recommendation**: Use both for comprehensive disaster recovery.
+
+---
+
+## 16. Settings
+
+Preferences and configuration options.
+
+### General Tab
 
 | Setting | Description | Default |
 |---------|-------------|---------|
 | **Theme** | Light/Dark/System | System |
 | **Notifications** | Desktop notifications | On |
-| **Auto-Update** | Check for updates | On |
-| **Telemetry** | Anonymous usage data | Off |
+| **Auto-Update** | Check for updates on launch | On |
 
-### Credentials Settings
-
-Manage 1Password integration and AWS credentials.
-
-### Features Settings
-
-Configure feature flags (see [Section 10](#10-feature-flags)).
-
-### AI Assistant Settings
-
-| Setting | Description | Default |
-|---------|-------------|---------|
-| **Enabled** | Use AI for assistance | On |
-| **Model** | AI model to use | GPT-4o |
-| **Voice Input** | Enable voice commands | Off |
-
-### Timeout Settings
+### Timeout Tab
 
 | Operation | Default | Range |
 |-----------|---------|-------|
@@ -906,7 +1607,7 @@ Configure feature flags (see [Section 10](#10-feature-flags)).
 | **Health Check** | 30 sec | 10-120 sec |
 | **API Calls** | 60 sec | 10-300 sec |
 
-### Storage Settings
+### Storage Tab
 
 | Setting | Description | Default |
 |---------|-------------|---------|
@@ -914,7 +1615,7 @@ Configure feature flags (see [Section 10](#10-feature-flags)).
 | **Max Cache Size** | Maximum cache | 5 GB |
 | **Log Retention** | Keep logs for | 30 days |
 
-### Advanced Settings
+### Advanced Tab
 
 | Setting | Description | Default |
 |---------|-------------|---------|
@@ -922,112 +1623,520 @@ Configure feature flags (see [Section 10](#10-feature-flags)).
 | **Dry Run** | Simulate deployments | Off |
 | **Parallel Stacks** | Concurrent deployments | 3 |
 
+### Admin Tools Tab (Updated in v7.3.0)
+
+Access advanced administrator tools organized into four categories:
+
+| Category | Tools |
+|----------|-------|
+| **Observability** | Monitoring Dashboard, Log Viewer |
+| **Operations** | Rollback Manager, Security Scanner, Network Diagnostics |
+| **Cost Management** | Resource Tags, Cost Estimator |
+| **Data & Compliance** | Database Export, Secrets Rotation, Environment Clone, Compliance Reports |
+
 ---
 
-## 20. AI Assistant
+#### Monitoring Dashboard (NEW in v7.3.0)
 
-### Overview
+Real-time CloudWatch metrics visualization for all RADIANT services:
 
-The built-in AI Assistant helps with:
-- Deployment planning
-- Troubleshooting
-- Cost optimization
-- Configuration recommendations
+| Service | Metrics |
+|---------|---------|
+| **Lambda** | Invocations, Errors, Duration, Throttles, Concurrent Executions |
+| **ECS** | CPU Utilization, Memory Utilization, Running Tasks, Pending Tasks |
+| **RDS** | CPU, Connections, Memory, Read/Write Latency, IOPS |
+| **API Gateway** | Request Count, 4XX/5XX Errors, Latency |
+| **DynamoDB** | Read/Write Capacity, Throttled Requests, Latency |
+| **ElastiCache** | CPU, Memory Usage, Hit Rate, Connections |
+
+Features:
+- **Service Health Cards**: Status indicators (Healthy/Degraded/Unhealthy)
+- **Real-time Alerts**: Critical and warning alerts with acknowledgment
+- **Metric Trends**: Up/Down/Stable indicators
+- **Cost Estimates**: Hourly/daily/monthly projections
+- **Auto-refresh**: 60-second interval with manual refresh
+- **Time Ranges**: 1h, 3h, 6h, 12h, 1d, 3d, 1w
+
+---
+
+#### Log Viewer (NEW in v7.3.0)
+
+CloudWatch logs aggregation with search and real-time tailing:
+
+| Feature | Description |
+|---------|-------------|
+| **Log Groups** | Browse by Lambda, ECS, RDS, API Gateway |
+| **Search** | Pattern matching in log messages |
+| **Filter by Level** | ALL, ERROR, WARN, INFO, DEBUG |
+| **Time Range** | 15min, 1h, 6h, 24h presets |
+| **Tailing** | Real-time log streaming |
+
+Log Level Colors:
+- 🔴 **ERROR**: Red - Exceptions, failures
+- 🟠 **WARN**: Orange - Warnings, deprecations
+- 🔵 **INFO**: Blue - Informational messages
+- 🟢 **DEBUG**: Green - Debug output
+
+---
+
+#### Rollback Manager (NEW in v7.3.0)
+
+Version tracking and automated rollback for AWS resources:
+
+| Resource Type | Rollback Method | Est. Downtime |
+|---------------|-----------------|---------------|
+| **Lambda** | Alias update | ~5 seconds |
+| **ECS** | Task definition update | ~2 minutes |
+| **CloudFormation** | Stack rollback | ~5 minutes |
+| **RDS** | Snapshot restore | ~10 minutes |
+
+Features:
+- **Version History**: List all available versions with timestamps
+- **Rollback Plans**: Step-by-step execution with estimates
+- **Progress Tracking**: Real-time progress logs
+- **Safety Checks**: Approval required for RDS and CloudFormation
+- **Metadata**: Runtime, code size, deployment status
+
+---
+
+#### Security Scanner (NEW in v7.3.0)
+
+Automated security configuration audit:
+
+| Category | Checks |
+|----------|--------|
+| **IAM Policies** | Administrator access, wildcard policies |
+| **Security Groups** | 0.0.0.0/0 access, SSH/RDP exposure |
+| **Encryption** | S3 bucket encryption, RDS storage encryption |
+| **Public Access** | S3 public access block configuration |
+| **Logging** | CloudTrail configuration, log validation |
+
+Severity Levels:
+- 🔴 **Critical**: Immediate action required (e.g., admin access on roles)
+- 🟠 **High**: Important security risk (e.g., open ports)
+- 🟡 **Medium**: Should be addressed (e.g., single-region trail)
+- 🔵 **Low**: Best practice recommendation
+- ⚪ **Info**: Informational only
+
+Compliance Score: 0-100% based on weighted severity of findings.
+
+---
+
+#### Network Diagnostics (NEW in v7.3.0)
+
+Comprehensive connectivity testing suite:
+
+| Test | Purpose | Metrics |
+|------|---------|---------|
+| **DNS** | Hostname resolution | Resolved IPs, response time |
+| **SSL** | Certificate validation | Expiry date, issuer, days remaining |
+| **Connectivity** | HTTP reachability | Status code, response time, bytes |
+| **Latency** | Network performance | Min/avg/max, packet loss |
+| **Port Scan** | Service availability | Open/closed status, response time |
+
+SSL Certificate Warnings:
+- 🟢 **>30 days**: Healthy
+- 🟠 **≤30 days**: Warning - renew soon
+- 🔴 **Expired**: Failed - immediate action
+
+---
+
+#### Resource Tags Manager (NEW in v7.3.0)
+
+AWS resource tagging for cost allocation and compliance:
+
+| Resource Type | Supported |
+|---------------|-----------|
+| **Lambda** | ✅ Functions |
+| **ECS** | ✅ Clusters, Services |
+| **RDS** | ✅ Aurora Clusters |
+| **S3** | ✅ Buckets |
+| **DynamoDB** | ✅ Tables |
+
+Standard Tag Policies:
+
+| Tag Key | Required | Allowed Values |
+|---------|----------|----------------|
+| **Environment** | ✅ | dev, staging, prod |
+| **Project** | ✅ | radiant |
+| **Owner** | ✅ | Any |
+| **CostCenter** | ✅ | Any |
+| **ManagedBy** | ❌ | cdk, terraform, manual |
+| **Version** | ❌ | Any |
+
+Features:
+- **Compliance Checking**: Identify missing/invalid tags
+- **Bulk Tagging**: Apply tags to multiple resources
+- **Tag Editing**: Add, modify, remove tags per resource
+- **Cost Allocation**: Group resources by CostCenter
+
+---
+
+#### Database Export
+
+Export PostgreSQL and DynamoDB data for backup or migration:
+
+| Mode | Description | Target |
+|------|-------------|--------|
+| **Schema Only** | Database structure without data | Any environment |
+| **Seed Data** | AI Registry and system config | Any environment |
+| **Masked Data** | PII anonymized (GDPR compliant) | Dev/Staging only |
+| **Full Export** | Complete database | Dev only |
+
+Features:
+- Compression with gzip
+- Checksum verification
+- Progress tracking
+- GDPR consent for PII data
+
+#### Secrets Rotation
+
+Manage AWS Secrets Manager secrets lifecycle:
+
+| Urgency | Age | Action |
+|---------|-----|--------|
+| **Critical** | >180 days | Rotate immediately |
+| **Urgent** | >90 days | Rotate soon |
+| **Warning** | >60 days | Plan rotation |
+| **Healthy** | <60 days | No action needed |
+
+Features:
+- Bulk rotation for urgent secrets
+- Rotation scheduling
+- Compliance tracking by framework
+- Audit trail
+
+#### Cost Estimator
+
+Preview deployment costs before committing:
+
+| Tier | Monthly Estimate |
+|------|------------------|
+| **Seed** | ~$100-200 |
+| **Starter** | ~$400-800 |
+| **Growth** | ~$1,500-3,000 |
+| **Scale** | ~$5,000-10,000 |
+| **Enterprise** | ~$15,000+ |
+
+Breakdown categories:
+- Compute (ECS, Lambda, GPU)
+- Database (Aurora, DynamoDB, ElastiCache)
+- Storage (S3, EFS, Backups)
+- Networking (Transfer, NAT, ALB, API Gateway)
+- Security (WAF, GuardDuty, Secrets Manager, KMS)
+- AI (External providers, Self-hosted inference)
+
+#### Environment Clone
+
+Clone environments with optional data masking:
+
+| Clone Mode | Data Included | Allowed Targets |
+|------------|---------------|-----------------|
+| **Schema Only** | Structure only | Dev, Staging, Prod |
+| **With Seed Data** | System config | Dev, Staging, Prod |
+| **With Masked Data** | Anonymized PII | Dev, Staging |
+| **Full Clone** | All data | Dev only |
+
+Features:
+- Promotion workflow (Dev → Staging → Production)
+- Automatic secrets rotation for target
+- Dry run validation
+- Pre/post-clone checks
+
+#### Compliance Reports
+
+Generate regulatory compliance reports:
+
+| Framework | Controls | Focus |
+|-----------|----------|-------|
+| **HIPAA** | 45.308, 45.310, 45.312 | Healthcare data |
+| **SOC 2** | CC1-CC9, A1, C1, P1 | Service organization |
+| **GDPR** | Art. 6, 7, 15-22, 25, 32, 33, 46 | EU data protection |
+| **PCI-DSS** | Requirements 1-12 | Payment card data |
+| **ISO 27001** | Annex A controls | Information security |
+
+Report contents:
+- Control assessment with status
+- Evidence collection
+- Findings by severity (Critical/High/Medium/Low)
+- Remediation recommendations
+- Export to JSON, CSV, PDF
+
+---
+
+## 17. AI Assistant
+
+Built-in AI assistance for deployment and troubleshooting.
 
 ### Activation
 
-Press **⌘ + Shift + A** or click the sparkles icon in the toolbar.
+- Press **⌘ + Shift + A**
+- Or click the ✨ sparkles icon in toolbar
 
-### Example Queries
+### Capabilities
 
-```
-"What's the best tier for 500 users?"
-"Why is my deployment failing?"
-"How can I reduce costs?"
-"Explain the Cortex memory system"
-"Generate a compliance report for SOC2"
-```
+| Category | Examples |
+|----------|----------|
+| **Planning** | "What tier for 500 users?" |
+| **Troubleshooting** | "Why is deployment failing?" |
+| **Cost** | "How can I reduce costs?" |
+| **Explanation** | "Explain drift detection" |
 
 ### Voice Commands
 
-Enable voice input in Settings → AI Assistant:
-
-1. Click the microphone icon
-2. Speak your command
+Enable in Settings → AI Assistant → Voice Input:
+1. Click microphone icon
+2. Speak command
 3. Review and confirm
 
 ---
 
-## 21. Troubleshooting
+## 18. AutoSetup Service
 
-### Common Issues
+Fully automated AWS configuration service.
 
-#### 1Password Not Detected
+### What's Automated
 
-**Symptom**: "1Password CLI not found" error
+| Service | Configuration |
+|---------|---------------|
+| **Route53** | Hosted zone creation, DNS records |
+| **ACM** | SSL certificate request, DNS validation |
+| **SES** | Domain verification, DKIM setup, sandbox exit |
+| **SNS** | SMS configuration, spending limits |
+| **S3** | 5 buckets (artifacts, uploads, backups, static, logs) |
+| **Secrets Manager** | Secret structure for API keys |
+| **CloudWatch** | Dashboard and alarm creation |
 
-**Solution**:
-```bash
-# Install CLI
-brew install 1password-cli
+### What You Provide
 
-# Enable integration in 1Password app
-# Settings → Developer → Integrate with 1Password CLI
+Only these inputs are required:
+- AWS credentials (master key)
+- Domain name
+- Environment (dev/staging/prod)
+- Tier selection
+- AI provider API keys (OpenAI, Anthropic)
 
-# Test
-op signin
-```
+### Running AutoSetup
 
-#### Deployment Stuck
-
-**Symptom**: Deployment hangs at a specific stack
-
-**Solution**:
-1. Check CloudFormation console for detailed error
-2. Review deployment logs in the app
-3. Check AWS service quotas
-4. Ensure IAM permissions are correct
-
-#### DNS Validation Failing
-
-**Symptom**: SSL certificate stuck in "Pending Validation"
-
-**Solution**:
-1. Verify CNAME records are correct
-2. Wait up to 30 minutes for DNS propagation
-3. Use `dig` to verify records:
-   ```bash
-   dig _acme-challenge.yourdomain.com CNAME
-   ```
-
-#### Health Check Failures
-
-**Symptom**: Applications showing "Unhealthy"
-
-**Solution**:
-1. Check CloudWatch logs for errors
-2. Verify Lambda functions are not timing out
-3. Check database connectivity
-4. Review security group rules
-
-### Getting Help
-
-1. **Documentation**: Press **⌘ + ?** for contextual help
-2. **AI Assistant**: Ask the built-in assistant
-3. **Logs**: Export logs from Settings → Storage → Export Logs
-4. **Support**: Contact support@radiant.ai
+1. Go to **Deploy** tab
+2. Click **Run AutoSetup**
+3. Enter required information
+4. AutoSetup configures all services
+5. Deploy when ready
 
 ---
 
-## 22. Keyboard Shortcuts
+## 19. Deployment Automation
+
+**NEW in v7.2.0** - Complete automation of CLI dependencies, script execution, and code sync.
+
+### 19.1 Dependencies Manager
+
+The Dependencies Manager automatically detects and installs required CLI tools.
+
+#### Supported Dependencies
+
+| Dependency | Min Version | Required | Purpose |
+|------------|-------------|----------|---------|
+| **Homebrew** | Latest | ✅ | Package manager (installed first) |
+| **AWS CLI** | 2.0.0 | ✅ | AWS cloud operations |
+| **Node.js** | 18.0.0 | ✅ | Build tools and CDK |
+| **npm** | Latest | ✅ | Package management |
+| **AWS CDK** | 2.0.0 | ✅ | Infrastructure deployment |
+| **Git** | Latest | ✅ | Version control |
+| **Python 3** | 3.9.0 | Optional | Cato Genesis system |
+| **Docker** | Latest | Optional | Container operations |
+
+#### How It Works
+
+1. **Automatic Detection**: On app launch, checks all dependencies
+2. **Version Validation**: Ensures installed versions meet minimums
+3. **One-Click Install**: Click "Install Missing" to install all at once
+4. **Path Resolution**: Searches `/opt/homebrew/bin`, `/usr/local/bin`, `~/.local/bin`
+
+#### Using the Dependencies View
+
+1. Navigate to **Dependencies** tab in sidebar
+2. View status of each dependency (green = installed, red = missing)
+3. Click **Refresh** to re-check all dependencies
+4. Click **Install Missing** to auto-install required tools
+5. Individual **Install** buttons available for each dependency
+
+### 19.2 Bash Script Runner
+
+Discover and execute deployment bash scripts directly from the Deployer.
+
+#### Script Discovery
+
+Scripts are automatically discovered from:
+- `scripts/` - Main deployment scripts
+- `tools/scripts/` - Utility scripts
+- `packages/infrastructure/scripts/` - Infrastructure scripts
+
+#### Script Categories
+
+| Category | Icon | Description |
+|----------|------|-------------|
+| **Deployment** | ▲ | Full CDK deployments (deploy.sh) |
+| **Database** | ⬡ | Migrations (run-migrations.sh) |
+| **Build** | 🔨 | Package building |
+| **Testing** | ✓ | Verification scripts |
+| **Backup** | ↻ | Backup/restore operations |
+| **Sync** | ⇄ | Synchronization scripts |
+| **Utility** | 🔧 | General utilities |
+
+#### Executing Scripts
+
+1. Navigate to **Scripts** tab
+2. Select environment (Dev/Staging/Prod)
+3. Browse or search for scripts
+4. Select a script to view details
+5. Configure arguments (if applicable)
+6. Click **Run Script**
+7. Watch real-time output with color coding
+
+#### Automatic Dependency Resolution
+
+Before running a script, the system:
+1. Parses script content for CLI tool usage
+2. Checks if required tools are installed
+3. Offers to install missing dependencies
+4. Only proceeds when all dependencies are met
+
+### 19.3 Code Sync
+
+Sync local code changes to AWS instances for rapid iteration.
+
+#### How Code Sync Works
+
+```
+Local Changes → Git Analysis → Package → S3 Upload → Lambda Trigger → Apply
+```
+
+1. **Change Detection**: Uses `git status` to find modified files
+2. **Selective Sync**: Choose which files to include
+3. **Package Building**: Creates compressed tar.gz archive
+4. **S3 Upload**: Uploads to `radiant-{env}-artifacts/code-sync/`
+5. **Lambda Trigger**: Invokes code-sync Lambda function
+6. **Verification**: Confirms changes applied to instances
+
+#### Using Code Sync
+
+1. Navigate to **Code Sync** tab
+2. Select target environment (Dev/Staging/Prod)
+3. Click **Refresh** to scan for local changes
+4. Review changed files (added/modified/deleted)
+5. Select/deselect files as needed
+6. Click **Sync to {Environment}**
+7. Monitor progress and verification
+
+#### Change Types
+
+| Type | Color | Description |
+|------|-------|-------------|
+| **Added** | Green | New files |
+| **Modified** | Orange | Changed files |
+| **Deleted** | Red | Removed files |
+| **Renamed** | Blue | Moved/renamed files |
+
+#### Best Practices
+
+- Sync to **Dev** first, verify, then promote
+- Use selective sync for targeted changes
+- Monitor Lambda logs for sync issues
+- Keep changes small for faster syncs
+
+---
+
+## 20. Security Architecture
+
+### Local Security
+
+| Component | Protection |
+|-----------|------------|
+| **Master Key** | AES-256-GCM + macOS Keychain |
+| **Local Storage** | SQLCipher encrypted database |
+| **Memory** | Cleared on lock/quit |
+
+### AWS Security
+
+| Feature | Tier | Description |
+|---------|------|-------------|
+| **WAF** | Starter+ | Web Application Firewall |
+| **GuardDuty** | Starter+ | Threat detection |
+| **Shield** | All | DDoS protection (Standard) |
+| **KMS** | All | Encryption at rest |
+| **VPC** | All | Network isolation |
+
+### Compliance
+
+Configure in Admin Dashboard after deployment:
+
+| Standard | Features |
+|----------|----------|
+| **HIPAA** | PHI encryption, audit logging, BAA |
+| **SOC2** | Audit trails, access reviews |
+| **GDPR** | Data erasure, portability, consent |
+
+---
+
+## 20. Troubleshooting
+
+### Common Issues
+
+#### Credentials Not Validated
+
+**Symptom**: "Invalid credentials" error
+
+**Solution**:
+1. Verify Access Key ID and Secret Access Key
+2. Check IAM user has required permissions
+3. Ensure region is correct
+
+#### Deployment Stuck
+
+**Symptom**: Deployment hangs at a stack
+
+**Solution**:
+1. Check CloudFormation console for errors
+2. Review deployment logs
+3. Check AWS service quotas
+4. Verify IAM permissions
+
+#### Key Rotation Failed
+
+**Symptom**: Rotation Lambda error
+
+**Solution**:
+1. Check Lambda logs in CloudWatch
+2. Verify Secrets Manager permissions
+3. Check IAM user access key count (max 2)
+
+#### Drift Detection Errors
+
+**Symptom**: Scan fails or times out
+
+**Solution**:
+1. Verify CloudFormation stack exists
+2. Check IAM permissions for drift detection
+3. Reduce scan scope if too many resources
+
+### Getting Help
+
+1. **AI Assistant**: Press ⌘ + Shift + A
+2. **Logs**: Settings → Storage → Export Logs
+3. **Support**: support@radiant.ai
+
+---
+
+## 21. Keyboard Shortcuts
 
 ### Global
 
 | Shortcut | Action |
 |----------|--------|
-| **⌘ + ,** | Open Settings |
+| **⌘ + ,** | Settings |
 | **⌘ + R** | Refresh |
-| **⌘ + N** | New Deployment |
 | **⌘ + Shift + A** | AI Assistant |
 | **⌘ + ?** | Help |
 | **⌘ + Q** | Quit |
@@ -1037,38 +2146,45 @@ op signin
 | Shortcut | Action |
 |----------|--------|
 | **⌘ + 1** | Dashboard |
-| **⌘ + 2** | Apps |
-| **⌘ + 3** | Deploy |
+| **⌘ + 2** | Deploy |
+| **⌘ + 3** | Credentials |
 | **⌘ + 4** | Instances |
-| **⌘ + 5** | Settings |
+| **⌘ + 5** | Packages |
+| **⌘ + 6** | Migrations |
+| **⌘ + 7** | Snapshots |
+| **⌘ + 8** | History |
+| **⌘ + 9** | Drift Monitor |
+| **⌘ + 0** | Settings |
 
-### Deployment
+### Actions
 
 | Shortcut | Action |
 |----------|--------|
-| **⌘ + D** | Start Deployment |
-| **⌘ + .** | Cancel Deployment |
-| **⌘ + L** | View Logs |
+| **⌘ + D** | Deploy |
+| **⌘ + .** | Cancel |
+| **⌘ + L** | Logs |
 
 ---
 
-## 23. Glossary
+## 22. Glossary
 
 | Term | Definition |
 |------|------------|
-| **Aurora** | AWS managed PostgreSQL database service |
-| **CDK** | AWS Cloud Development Kit for infrastructure as code |
-| **CloudFront** | AWS content delivery network (CDN) |
-| **Cortex** | RADIANT's three-tier memory system |
-| **Curator** | Knowledge graph curation application |
-| **Ego System** | Zero-cost persistent AI identity system |
-| **Lambda** | AWS serverless compute service |
-| **Multi-AZ** | Multiple availability zones for high availability |
-| **SageMaker** | AWS machine learning service for self-hosted models |
-| **Think Tank** | RADIANT's consumer AI chat application |
-| **Thermal State** | Model readiness level (HOT/WARM/COLD/OFF) |
-| **Tier** | Infrastructure size level (SEED to ENTERPRISE) |
-| **WAF** | Web Application Firewall |
+| **Aurora** | AWS managed PostgreSQL database |
+| **CDK** | Cloud Development Kit (infrastructure as code) |
+| **CloudFront** | AWS content delivery network |
+| **Drift** | Difference between expected and actual AWS state |
+| **Environment** | Deployment target (dev, staging, prod) |
+| **IAM** | AWS Identity and Access Management |
+| **KMS** | AWS Key Management Service |
+| **Lambda** | AWS serverless compute |
+| **Master Key** | Your admin AWS credentials |
+| **Migration** | Promoting versions through environments |
+| **Rotation** | Automatic key replacement |
+| **Secrets Manager** | AWS service for storing secrets |
+| **Snapshot** | Point-in-time backup |
+| **Tier** | Infrastructure size (SEED to ENTERPRISE) |
+| **Wipe** | Complete environment destruction |
 
 ---
 
@@ -1076,8 +2192,8 @@ op signin
 
 | Field | Value |
 |-------|-------|
-| **Version** | 5.52.17 |
-| **Last Updated** | January 24, 2026 |
+| **Version** | 7.17.0 |
+| **Last Updated** | February 6, 2026 |
 | **Author** | RADIANT Team |
 | **Status** | Published |
 

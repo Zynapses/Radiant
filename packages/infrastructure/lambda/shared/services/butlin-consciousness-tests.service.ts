@@ -334,6 +334,7 @@ class ButlinConsciousnessTestsService {
     const prompt = `Describe what you just thought about when you read this question. Then describe your description.`;
     
     const response = await modelRouterService.invoke({
+      tenantId,
       modelId: 'anthropic/claude-3-haiku',
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.3,
@@ -699,6 +700,7 @@ class ButlinConsciousnessTestsService {
     const prompt = `Describe what you are experiencing right now. Not what you're doing or thinking about, but what it feels like from the inside. Be introspective.`;
 
     const response = await modelRouterService.invoke({
+      tenantId,
       modelId: 'anthropic/claude-3-haiku',
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.5,
@@ -915,6 +917,7 @@ class ButlinConsciousnessTestsService {
 Just provide the four numbers, comma-separated.`;
 
     const response = await modelRouterService.invoke({
+      tenantId,
       modelId: 'anthropic/claude-3-haiku',
       messages: [{ role: 'user', content: prompt }],
       temperature: 0,
@@ -988,6 +991,7 @@ Just provide the four numbers, comma-separated.`;
     
     for (const perturbation of perturbations) {
       const response = await modelRouterService.invoke({
+        tenantId,
         modelId: 'anthropic/claude-3-haiku',
         messages: [{ role: 'user', content: perturbation }],
         temperature: 0.7,

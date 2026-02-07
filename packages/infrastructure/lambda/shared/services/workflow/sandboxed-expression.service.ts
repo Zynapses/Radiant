@@ -20,7 +20,13 @@
  * - Literals: numbers, strings, booleans, null
  */
 
-import { enhancedLogger as logger } from '../../logging/enhanced-logger';
+import { createRegisteredLogger } from '../logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'workflow/sandboxed-expression',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 // =============================================================================
 // Types

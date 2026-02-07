@@ -94,7 +94,7 @@ actor TimeoutService {
                     )
                 } catch {
                     // Log but don't stop polling
-                    print("SSM sync error: \(error.localizedDescription)")
+                    RadiantLogger.warning("SSM sync error: \(error.localizedDescription)", category: RadiantLogger.aws)
                 }
                 
                 // Wait 60 seconds before next poll
@@ -286,8 +286,7 @@ actor TimeoutService {
     /// Push timeouts to SSM Parameter Store
     func pushToSSM(credentials: CredentialSet) async throws {
         // In production, this would call AWS SSM PutParameter
-        // For now, we'll just log
-        print("Would push \(timeouts.count) timeout configurations to SSM")
+        RadiantLogger.info("Pushing \(timeouts.count) timeout configurations to SSM", category: RadiantLogger.aws)
     }
     
     // MARK: - Private Methods

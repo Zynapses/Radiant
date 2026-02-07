@@ -3,7 +3,13 @@
 // Uses Winner/Loser pairs from skeletonized episodes
 
 import { executeStatement, stringParam, longParam, doubleParam, boolParam } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'dpo/trainer',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { skeletonizerService, SkeletonizedEpisode } from './skeletonizer.service';
 import { v4 as uuidv4 } from 'uuid';
 

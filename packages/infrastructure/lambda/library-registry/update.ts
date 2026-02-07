@@ -4,7 +4,13 @@
 
 import { libraryRegistryService } from '../shared/services/library-registry.service';
 import { executeStatement } from '../shared/db/client';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'library-registry/update',
+  category: 'infrastructure',
+  sourceType: 'lambda',
+});
 
 // Seed data will be loaded dynamically
 // Located at: config/library-registry/seed-libraries.json

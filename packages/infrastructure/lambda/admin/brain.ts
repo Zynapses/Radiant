@@ -4,7 +4,13 @@
  */
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'admin/brain',
+  category: 'audit',
+  sourceType: 'lambda',
+});
 import type { ParameterKey } from '@radiant/shared';
 
 // Minimal context for handler routing

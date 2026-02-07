@@ -15,7 +15,13 @@
  */
 
 import { v4 as uuidv4 } from 'uuid';
-import { enhancedLogger as logger } from '../../logging/enhanced-logger';
+import { createRegisteredLogger } from '../logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'curator/ai-curator',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { modelRouterService } from '../model-router.service';
 import { uepIntegrationService } from '../uep/index.js';
 import { persistenceGuard } from '../persistence-guard.service';

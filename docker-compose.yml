@@ -67,11 +67,51 @@ services:
     depends_on:
       - postgres
 
+  # OMEGA vLLM Server (Neural Bridge - The Mouth)
+  # Custom FastAPI wrapper with vector injection support
+  # GPU required for production; CPU mode for local dev (slow but functional)
+  vllm:
+    build:
+      context: ./infrastructure/docker/vllm
+      dockerfile: Dockerfile
+    container_name: radiant-vllm
+    environment:
+      - VLLM_MODEL=${VLLM_MODEL:-meta-llama/Meta-Llama-3-8B-Instruct}
+      - VLLM_DEVICE=${VLLM_DEVICE:-auto}
+      - VLLM_DTYPE=${VLLM_DTYPE:-auto}
+      - VLLM_GPU_UTIL=0.85
+      - VLLM_MAX_MODEL_LEN=4096
+      - VLLM_PORT=8100
+      - SOFT_TOKEN_DIM=4096
+      - HF_TOKEN=${HF_TOKEN:-}
+    ports:
+      - "8100:8100"
+    volumes:
+      - vllm_models:/root/.cache/huggingface
+      - omega_state:/mnt/omega_state
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    profiles:
+      - gpu
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8100/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+
 volumes:
   postgres_data:
   redis_data:
   localstack_data:
   pgadmin_data:
+  vllm_models:
+  omega_state:
 
 networks:
   default:

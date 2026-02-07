@@ -7,6 +7,7 @@ import { Pool } from 'pg';
 import { S3Client, PutObjectCommand, DeleteObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { v4 as uuidv4 } from 'uuid';
+import { CollaborationPolicyService } from './collaboration-policy.service';
 // Local type definitions for enhanced collaboration features - using flexible interfaces
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type FlexRecord = Record<string, any>;
@@ -42,7 +43,11 @@ const s3Client = new S3Client({ region: process.env.AWS_REGION || 'us-east-1' })
 const COLLABORATION_BUCKET = process.env.COLLABORATION_BUCKET || 'radiant-collaboration-assets';
 
 export class EnhancedCollaborationService {
-  constructor(private pool: Pool) {}
+  private policyService: CollaborationPolicyService;
+
+  constructor(private pool: Pool) {
+    this.policyService = new CollaborationPolicyService(pool);
+  }
 
   // ============================================================================
   // CROSS-TENANT GUEST ACCESS
@@ -52,24 +57,55 @@ export class EnhancedCollaborationService {
     tenantId: string,
     userId: string,
     request: CreateGuestInviteRequest
-  ): Promise<GuestInvite> {
+  ): Promise<GuestInvite & { complianceRestrictions: string[]; requiresAcknowledgment: boolean; notificationMessage: string | null }> {
+    // ── Compliance gate ──────────────────────────────────────────────
+    const complianceCheck = await this.policyService.checkComplianceForGuestInvite(tenantId);
+    if (!complianceCheck.allowed) {
+      throw new Error(complianceCheck.restrictions.join(' '));
+    }
+
+    // Resolve what the guest will actually be able to do
+    const permission = (request.permission || 'commenter') as 'viewer' | 'commenter' | 'editor';
+    const capabilities = await this.policyService.resolveCapabilities(tenantId, permission);
+
     const result = await this.pool.query(
       `INSERT INTO collaboration_guest_invites 
-       (session_id, invite_type, guest_email, guest_name, permission, expires_at, max_uses, created_by)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+       (session_id, invite_type, guest_email, guest_name, permission, expires_at, max_uses, created_by,
+        compliance_acknowledged, compliance_restrictions, cost_attribution_user_id)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
        RETURNING *`,
       [
         request.sessionId,
         request.inviteType,
         request.guestEmail,
         request.guestName,
-        request.permission || 'commenter',
+        permission,
         request.expiresAt,
         request.maxUses || 1,
         userId,
+        complianceCheck.requiresAcknowledgment ? (request as any).complianceAcknowledged ?? false : true,
+        JSON.stringify(complianceCheck.restrictions),
+        userId,
       ]
     );
-    return this.mapGuestInvite(result.rows[0]);
+
+    // Log restrictions if any
+    if (complianceCheck.restrictions.length > 0) {
+      await this.policyService.logRestriction(
+        tenantId, request.sessionId, null,
+        'guest_invite_created',
+        `Guest invite created with ${complianceCheck.restrictions.length} compliance restrictions`,
+        complianceCheck.activeComplianceLicenses,
+        complianceCheck.notificationMessage
+      );
+    }
+
+    return {
+      ...this.mapGuestInvite(result.rows[0]),
+      complianceRestrictions: complianceCheck.restrictions,
+      requiresAcknowledgment: complianceCheck.requiresAcknowledgment,
+      notificationMessage: complianceCheck.notificationMessage,
+    };
   }
 
   async getInviteByToken(token: string): Promise<GuestInvite | null> {
@@ -78,7 +114,7 @@ export class EnhancedCollaborationService {
     return result.rows[0] ? this.mapGuestInvite(result.rows[0]) : null;
   }
 
-  async joinAsGuest(request: JoinAsGuestRequest): Promise<CollaborationGuest> {
+  async joinAsGuest(request: JoinAsGuestRequest): Promise<CollaborationGuest & { capabilities: import('./collaboration-policy.service').GuestCapabilities; restrictionNotification: ReturnType<CollaborationPolicyService['buildRestrictionNotification']> }> {
     const invite = await this.getInviteByToken(request.inviteToken);
     if (!invite) throw new Error('Invalid invite token');
     if (invite.expiresAt && new Date(invite.expiresAt) < new Date()) {
@@ -88,15 +124,39 @@ export class EnhancedCollaborationService {
       throw new Error('Invite has reached maximum uses');
     }
 
+    // Resolve the session's tenant to check capabilities
+    const sessionResult = await this.pool.query(
+      `SELECT tenant_id FROM collaborative_sessions WHERE id = $1`,
+      [invite.sessionId]
+    );
+    if (sessionResult.rows.length === 0) throw new Error('Session not found');
+    const tenantId = sessionResult.rows[0].tenant_id as string;
+
+    const capabilities = await this.policyService.resolveCapabilities(
+      tenantId,
+      invite.permission as 'viewer' | 'commenter' | 'editor'
+    );
+
+    if (!capabilities.canView) {
+      throw new Error('Guest access is disabled for this organization.');
+    }
+
     const colors = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#14b8a6', '#3b82f6', '#8b5cf6', '#ec4899'];
     const color = colors[Math.floor(Math.random() * colors.length)];
 
     const result = await this.pool.query(
       `INSERT INTO collaboration_guests 
-       (invite_id, session_id, display_name, email, permission, color, is_online)
-       VALUES ($1, $2, $3, $4, $5, $6, true)
+       (invite_id, session_id, display_name, email, permission, color, is_online,
+        can_execute_prompts, can_upload_files, can_download_files)
+       VALUES ($1, $2, $3, $4, $5, $6, true, $7, $8, $9)
        RETURNING *`,
-      [invite.id, invite.sessionId, request.displayName, request.email, invite.permission, color]
+      [
+        invite.id, invite.sessionId, request.displayName, request.email,
+        invite.permission, color,
+        capabilities.canExecutePrompts,
+        capabilities.canUploadFiles,
+        capabilities.canDownloadFiles,
+      ]
     );
 
     await this.pool.query(
@@ -106,7 +166,14 @@ export class EnhancedCollaborationService {
       [invite.id]
     );
 
-    return this.mapCollaborationGuest(result.rows[0]);
+    const settings = await this.policyService.getSettings(tenantId);
+    const restrictionNotification = this.policyService.buildRestrictionNotification(capabilities, settings);
+
+    return {
+      ...this.mapCollaborationGuest(result.rows[0]),
+      capabilities,
+      restrictionNotification,
+    };
   }
 
   async getSessionGuests(sessionId: string): Promise<CollaborationGuest[]> {

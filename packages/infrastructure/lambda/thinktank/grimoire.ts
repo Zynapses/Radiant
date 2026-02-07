@@ -4,7 +4,13 @@
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { grimoireService, SpellCategory, SpellSchool, SpellStatus } from '../shared/services/grimoire.service';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'thinktank/grimoire',
+  category: 'application',
+  sourceType: 'lambda',
+});
 
 // ============================================================================
 // Helpers

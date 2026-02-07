@@ -6,7 +6,13 @@
 import { SageMakerRuntimeClient, InvokeEndpointCommand } from '@aws-sdk/client-sagemaker-runtime';
 import { callWithResilience } from './resilient-provider.service';
 import { executeStatement } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'translation/middleware',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { createHash } from 'crypto';
 import {
   LanguageCode,

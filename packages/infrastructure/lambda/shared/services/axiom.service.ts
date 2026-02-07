@@ -16,7 +16,13 @@
  */
 
 import { executeStatement, stringParam, doubleParam, longParam } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'axiom/main',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { clarionService } from './clarion.service';
 import { domainTaxonomyService } from './domain-taxonomy.service';
 import { axiomNeuralCortexService } from './axiom-neural-cortex.service';

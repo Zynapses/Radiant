@@ -5976,6 +5976,1459 @@ export function resolveAlert(
 
 ---
 
+---
+
+## Inference Response Cache Tables (v7.11.0)
+
+Migration: `V2026_02_05_005__inference_cache_heterogeneous_consensus.sql`
+
+| Table | Purpose | RLS |
+|-------|---------|-----|
+| `inference_cache_config` | Per-tenant cache configuration (TTL, exclusions, capacity, PII settings) | ✅ tenant_id |
+| `inference_cache_entries` | Cached AI responses keyed by SHA-256(tenant+model+prompt+params). Tracks hit count, cost saved, last accessed. | ✅ tenant_id |
+| `inference_cache_events` | Audit log of all cache operations (hit, miss, store, evict, invalidate, expire) | ✅ tenant_id |
+| `inference_cache_metrics` | Aggregated metrics snapshots (hit rate, cost savings, latency reduction) | ✅ tenant_id |
+
+**Key columns on `inference_cache_entries`**:
+- `cache_key` VARCHAR(128) — SHA-256 hash of tenant+model+prompt+systemPrompt+temperature+maxTokens
+- `tenant_id` UUID — Tenant isolation (part of composite PK)
+- `model_id` VARCHAR(256) — Model that produced the response
+- `provider` VARCHAR(64) — Provider that served the response
+- `prompt_hash` VARCHAR(128) — SHA-256 of just the prompt (for analytics)
+- `cached_response` TEXT — The full cached response text
+- `input_tokens` INTEGER, `output_tokens` INTEGER — Token counts
+- `original_cost_usd` DECIMAL(10,8) — Cost of the original API call
+- `original_latency_ms` INTEGER — Latency of the original call
+- `hit_count` INTEGER DEFAULT 0 — Number of times this entry was served from cache
+- `total_cost_saved_usd` DECIMAL(10,6) — Cumulative cost savings
+- `status` VARCHAR(20) DEFAULT 'active' — active, invalidated, expired
+- `expires_at` TIMESTAMPTZ — TTL expiration timestamp
+- `last_accessed_at` TIMESTAMPTZ — For LRU eviction
+
+**Helper functions**:
+- `expire_stale_cache_entries()` — Marks expired entries, returns count
+- `evict_cache_entries_for_tenant(p_tenant_id UUID, p_max_entries INT)` — LRU eviction with 10% buffer
+- `compute_cache_metrics(p_tenant_id UUID, p_period_hours INT)` — Aggregates metrics for dashboard
+
+---
+
+## Heterogeneous Model Consensus Tables (v7.11.0)
+
+Same migration file as above.
+
+| Table | Purpose | RLS |
+|-------|---------|-----|
+| `consensus_config` | Per-tenant consensus configuration (thresholds, panel, strategies) | ✅ tenant_id |
+| `consensus_evaluations` | Complete evaluation results (agreement scores, winner, hallucination risk) | ✅ tenant_id |
+| `consensus_responses` | Individual model responses within an evaluation | ✅ tenant_id |
+| `consensus_pairwise_agreements` | Pairwise semantic similarity scores between model responses | ✅ tenant_id |
+| `consensus_metrics` | Aggregated performance metrics | ✅ tenant_id |
+
+**Key columns on `consensus_evaluations`**:
+- `consensus_id` UUID PK — Unique evaluation identifier
+- `tenant_id` UUID — Tenant isolation
+- `prompt_hash` VARCHAR(128) — SHA-256 of prompt
+- `participant_count` INTEGER — Number of models queried
+- `provider_count` INTEGER — Number of unique providers
+- `architecture_family_count` INTEGER — Number of unique architecture families
+- `overall_agreement` DECIMAL(5,4) — Weighted mean of all pairwise similarities
+- `cross_provider_agreement` DECIMAL(5,4) — Agreement between different providers (strongest signal)
+- `cross_architecture_agreement` DECIMAL(5,4) — Agreement between different model families
+- `confidence` DECIMAL(5,4) — Composite confidence score
+- `winning_response` TEXT — The selected best response
+- `winning_model` VARCHAR(256) — Model that produced the winning response
+- `winning_provider` VARCHAR(64) — Provider of the winning model
+- `hallucination_risk` DECIMAL(5,4) — Estimated hallucination probability
+- `trigger_reflexion` BOOLEAN — Whether reflexion self-correction was triggered
+- `total_cost_usd` DECIMAL(10,6) — Total cost of all model invocations
+- `total_latency_ms` INTEGER — Wall-clock time for the evaluation
+
+**Key columns on `consensus_pairwise_agreements`**:
+- `model_a`, `model_b` VARCHAR(256) — The two models being compared
+- `provider_a`, `provider_b` VARCHAR(64) — Their providers
+- `semantic_similarity` DECIMAL(5,4) — Cosine similarity or Jaccard coefficient
+- `exact_match` BOOLEAN — Whether extracted answers are identical
+- `cross_provider` BOOLEAN — Whether models are from different providers
+- `cross_architecture` BOOLEAN — Whether models are from different architecture families
+
+---
+
+## Anticipatory Memory Architecture Tables (v7.12.0)
+
+### AKG Configuration (`akg_config`)
+
+Per-tenant configuration for the Autobiographical Knowledge Graph extraction system.
+
+- `tenant_id` UUID PK FK → tenants(id)
+- `enabled` BOOLEAN NOT NULL DEFAULT true
+- `extraction_model` VARCHAR(256) NOT NULL DEFAULT 'openai/gpt-4o-mini'
+- `min_entity_confidence` DECIMAL(3,2) NOT NULL DEFAULT 0.60
+- `min_edge_confidence` DECIMAL(3,2) NOT NULL DEFAULT 0.50
+- `max_nodes_per_user` INTEGER NOT NULL DEFAULT 5000
+- `max_edges_per_user` INTEGER NOT NULL DEFAULT 20000
+- `prune_after_days` INTEGER NOT NULL DEFAULT 365
+- `enabled_entity_types` akg_entity_type[] DEFAULT '{}'
+- `generate_embeddings` BOOLEAN NOT NULL DEFAULT true
+- `max_extraction_tokens` INTEGER NOT NULL DEFAULT 500
+- `created_at` / `updated_at` TIMESTAMPTZ
+
+RLS: `tenant_id = current_setting('app.current_tenant_id')::uuid`
+
+### AKG Nodes (`akg_nodes`)
+
+Entities extracted from user conversations forming a living knowledge graph.
+
+- `node_id` UUID PK DEFAULT gen_random_uuid()
+- `tenant_id` UUID NOT NULL FK → tenants(id)
+- `user_id` UUID NOT NULL
+- `entity_type` akg_entity_type NOT NULL (14 values: person, organization, project, technology, concept, location, event, product, skill, preference, goal, problem, decision, custom)
+- `label` VARCHAR(512) NOT NULL
+- `aliases` TEXT[] DEFAULT '{}'
+- `properties` JSONB DEFAULT '{}'
+- `embedding` vector(1536) — pgvector IVFFlat index (100 lists)
+- `confidence` DECIMAL(5,4) NOT NULL DEFAULT 0.5000
+- `mention_count` INTEGER NOT NULL DEFAULT 1
+- `first_seen_at` / `last_seen_at` TIMESTAMPTZ
+- `importance` DECIMAL(5,4) NOT NULL DEFAULT 0.5000 — Computed: 40% frequency + 30% recency + 30% centrality
+- `source_conversation_ids` TEXT[] DEFAULT '{}'
+- `created_at` / `updated_at` TIMESTAMPTZ
+
+Indexes: `(tenant_id, user_id)`, `(tenant_id, user_id, entity_type)`, `(tenant_id, user_id, label)`, `(tenant_id, user_id, importance DESC)`, `(tenant_id, user_id, last_seen_at DESC)`, IVFFlat on embedding
+
+### AKG Edges (`akg_edges`)
+
+Directed relationships between AKG entities with temporal context.
+
+- `edge_id` UUID PK DEFAULT gen_random_uuid()
+- `tenant_id` UUID NOT NULL FK → tenants(id)
+- `user_id` UUID NOT NULL
+- `source_node_id` UUID NOT NULL FK → akg_nodes(node_id)
+- `target_node_id` UUID NOT NULL FK → akg_nodes(node_id)
+- `relationship_type` akg_relationship_type NOT NULL (20 values: works_at, builds, uses, knows, prefers, manages, created, depends_on, part_of, located_in, interested_in, skilled_in, concerned_about, decided, avoids, collaborates_with, reports_to, owns, studies, custom)
+- `label` VARCHAR(256) NOT NULL
+- `properties` JSONB DEFAULT '{}'
+- `confidence` DECIMAL(5,4) NOT NULL DEFAULT 0.5000
+- `valid_from` / `valid_until` TIMESTAMPTZ — Temporal context
+- `source_conversation_id` VARCHAR(256)
+- `weight` DECIMAL(5,4) NOT NULL DEFAULT 1.0000
+- UNIQUE constraint: `(tenant_id, user_id, source_node_id, target_node_id, relationship_type)`
+
+### AKG Extraction Log (`akg_extraction_log`)
+
+Audit trail of entity extraction runs per conversation.
+
+- `extraction_id` UUID PK
+- `tenant_id` UUID NOT NULL FK
+- `user_id` UUID NOT NULL
+- `conversation_id` VARCHAR(256) NOT NULL
+- `new_nodes_count` / `updated_nodes_count` / `new_edges_count` / `updated_edges_count` INTEGER
+- `contradictions_found` INTEGER
+- `extraction_latency_ms` / `tokens_used` INTEGER
+- `model_used` VARCHAR(256)
+- `error_message` TEXT
+
+### Prefetch Configuration (`prefetch_config`)
+
+- `tenant_id` UUID PK FK
+- `enabled` BOOLEAN DEFAULT true
+- `max_prefetch_nodes` INTEGER DEFAULT 20
+- `min_prefetch_confidence` DECIMAL(3,2) DEFAULT 0.60
+- `prediction_interval_sec` INTEGER DEFAULT 30
+- `use_temporal_features` / `use_topic_features` BOOLEAN DEFAULT true
+- `max_cache_size` INTEGER DEFAULT 200
+- `cache_ttl_sec` INTEGER DEFAULT 300
+
+### Memory Access Patterns (`memory_access_patterns`) — Partitioned Monthly
+
+Training data for the prefetch prediction model.
+
+- `pattern_id` UUID PK
+- `tenant_id` / `user_id` UUID NOT NULL
+- `accessed_node_ids` TEXT[] NOT NULL
+- `trigger_prompt_hash` VARCHAR(128)
+- `hour_of_day` SMALLINT (0-23), `day_of_week` SMALLINT (0-6)
+- `topic_context` TEXT[]
+- `session_duration_sec` INTEGER
+- `was_useful` BOOLEAN DEFAULT true
+- PARTITION BY RANGE (created_at)
+
+### Prefetch Predictions (`prefetch_predictions`)
+
+- `prediction_id` UUID PK
+- `predicted_node_ids` TEXT[], `confidences` DECIMAL(5,4)[]
+- `features` JSONB (hour, day, topics, session age, last accessed)
+- `was_used` BOOLEAN — Feedback loop
+
+### Contradiction Configuration (`contradiction_config`)
+
+- `tenant_id` UUID PK FK
+- `enabled` BOOLEAN DEFAULT true
+- `min_similarity_for_check` DECIMAL(3,2) DEFAULT 0.70
+- `auto_resolve_confidence_gap` DECIMAL(3,2) DEFAULT 0.30
+- `auto_resolve_recency_days` INTEGER DEFAULT 90
+- `prompt_user_resolution` BOOLEAN DEFAULT true
+- `max_unresolved_alert` INTEGER DEFAULT 50
+- `detection_model` VARCHAR(256) DEFAULT 'openai/gpt-4o-mini'
+
+### Memory Contradictions (`memory_contradictions`)
+
+- `contradiction_id` UUID PK
+- `new_fact_node_id` UUID FK → akg_nodes, `new_fact_text` TEXT, `new_fact_source` VARCHAR, `new_fact_date` TIMESTAMPTZ
+- `existing_fact_node_id` UUID FK → akg_nodes, `existing_fact_text` TEXT, `existing_fact_source` VARCHAR, `existing_fact_date` TIMESTAMPTZ
+- `contradiction_type` contradiction_type (6 values: factual, temporal, preference, relationship, quantitative, sentiment)
+- `severity` DECIMAL(5,4), `explanation` TEXT
+- `status` contradiction_status (5 values: detected, auto_resolved, user_resolved, accepted, dismissed)
+- `resolution` JSONB (method, winner, userExplanation, resolvedBy)
+- `detection_confidence` DECIMAL(5,4)
+
+### Org Memory Configuration (`org_memory_config`)
+
+- `tenant_id` UUID PK FK
+- `enabled` BOOLEAN DEFAULT false
+- `require_explicit_consent` BOOLEAN DEFAULT true
+- `default_privacy_tier` memory_privacy_tier DEFAULT 'team'
+- `min_contributors_for_visibility` INTEGER DEFAULT 2
+- `auto_anonymize` BOOLEAN DEFAULT true
+- `run_compliance_scan` BOOLEAN DEFAULT true
+- `hipaa_mode` BOOLEAN DEFAULT false
+- `max_org_nodes` INTEGER DEFAULT 50000
+- `require_admin_review` BOOLEAN DEFAULT false
+- `auto_share_during_dreaming` BOOLEAN DEFAULT true
+- `retention_days` INTEGER DEFAULT 0 (0 = indefinite)
+- `consent_renewal_days` INTEGER DEFAULT 365
+
+### Org Memory Nodes (`org_memory_nodes`)
+
+- `node_id` UUID PK
+- `tenant_id` UUID FK
+- `privacy_tier` memory_privacy_tier (5 values: personal, team, department, org, public)
+- `data_classification` VARCHAR(32) (7 values: public, internal, confidential, highly_confidential, phi, pii, restricted)
+- `scope_id` UUID — Team/department scope
+- `label` VARCHAR(512), `entity_type` akg_entity_type, `properties` JSONB
+- `embedding` vector(1536) — IVFFlat index
+- `confidence` / `importance` DECIMAL(5,4)
+- `contributor_count` INTEGER
+- `admin_reviewed` / `compliance_scan_passed` BOOLEAN
+- `last_compliance_scan_at` TIMESTAMPTZ
+
+### Org Memory Consents (`org_memory_consents`)
+
+GDPR Art. 6/7 consent records.
+
+- `consent_id` UUID PK
+- `consented_tiers` memory_privacy_tier[], `allowed_classifications` TEXT[], `allowed_entity_types` akg_entity_type[]
+- `is_active` BOOLEAN — UNIQUE constraint: one active per (tenant_id, user_id)
+- `processing_purpose` TEXT, `legal_basis` VARCHAR(32)
+- `consented_at` / `renewed_at` / `revoked_at` TIMESTAMPTZ
+- `consent_ip_address` INET, `consent_user_agent` TEXT
+
+### Org Memory Contributions (`org_memory_contributions`)
+
+Tracks which user memories contributed to org knowledge (for GDPR erasure cascade).
+
+- `contribution_id` UUID PK
+- `user_id` UUID, `source_node_id` UUID FK → akg_nodes, `org_node_id` UUID FK → org_memory_nodes
+- `consent_id` UUID FK → org_memory_consents
+- `contributed_content` TEXT, `is_anonymized` BOOLEAN, `sharing_method` VARCHAR(32)
+
+### Org Memory Audit Log (`org_memory_audit_log`) — Partitioned Monthly
+
+SOC2 Type II compliance audit log.
+
+- `audit_id` UUID PK
+- `user_id` UUID, `action` VARCHAR(32) (14 values: consent_granted/revoked, memory_shared/accessed/modified/deleted, erasure_requested/completed, compliance_scan, admin_review, classification/privacy_tier_changed, phi/pii_detected)
+- `target_node_id` UUID, `details` JSONB
+- `compliance_framework` TEXT[] (gdpr, hipaa, soc2, ccpa)
+- `ip_address` INET
+- PARTITION BY RANGE (created_at)
+
+### Dream Insight Configuration (`dream_insight_config`)
+
+- `tenant_id` UUID PK FK
+- `enabled` BOOLEAN DEFAULT true
+- `insight_model` VARCHAR(256) DEFAULT 'anthropic/claude-3.5-sonnet'
+- `max_insights_per_cycle` INTEGER DEFAULT 10
+- `min_insight_confidence` DECIMAL(3,2) DEFAULT 0.60
+- `max_tokens_per_cycle` INTEGER DEFAULT 5000
+- `enabled_insight_types` TEXT[]
+- `proactive_surfacing` BOOLEAN DEFAULT true
+- `max_unsurfaced_insights` INTEGER DEFAULT 50
+- `analyze_org_memory` BOOLEAN DEFAULT false
+
+### Dream Insights (`dream_insights`)
+
+Insights generated during Twilight Dreaming.
+
+- `insight_id` UUID PK
+- `insight_type` VARCHAR(32) (10 values: pattern, trend, connection, knowledge_gap, optimization, prediction, contradiction, milestone, risk, opportunity)
+- `title` VARCHAR(512), `description` TEXT, `recommendation` TEXT
+- `evidence` JSONB — Array of {sourceId, sourceType, excerpt, timestamp, weight}
+- `confidence` / `relevance` DECIMAL(5,4), `priority` INTEGER
+- `surfaced` BOOLEAN DEFAULT false, `user_reaction` VARCHAR(32)
+- `generated_during_dream_cycle` VARCHAR(256), `model_used` VARCHAR(256), `tokens_used` INTEGER
+
+### Helper Functions
+
+1. **`compute_akg_node_importance(tenant_id, user_id)`** — Recomputes importance: 40% frequency (log-scaled mentions) + 30% recency (30-day half-life exponential decay) + 30% centrality (log-scaled edge count)
+2. **`prune_stale_akg_nodes(tenant_id, prune_after_days)`** — Removes nodes not seen in N days with importance < 0.2 and mentions < 3
+3. **`org_memory_erasure_cascade(tenant_id, user_id)`** — GDPR right-to-erasure: revokes consents, deletes contributions, recalculates org nodes, deletes empty nodes, writes audit log
+4. **`compute_prefetch_accuracy(tenant_id, user_id, period_hours)`** — Computes prediction accuracy for feedback loop
+
+---
+
+## 7.18 User Memory Retention & Unified Profile Tables (v7.13.0)
+
+6 tables + 3 helper functions implementing three-tier retention policy hierarchy and unified user memory profiles.
+
+### 7.18.1 `platform_retention_policies`
+
+Platform-level default retention policy set by Radiant super-admins. Applies to ALL tenants unless overridden.
+
+| Column | Type | Default | Description |
+|--------|------|---------|-------------|
+| `policy_id` | UUID PK | `gen_random_uuid()` | Primary key |
+| `target_type` | VARCHAR(32) | `'all'` | Memory type this policy applies to (`all`, `conversation_history`, `user_context`, `akg_nodes`, `akg_edges`, `memories`, `preferences`, `dream_insights`, `access_patterns`) |
+| `retention_days` | INTEGER | `0` | Days to retain (0 = unlimited) |
+| `max_storage_per_user_mb` | INTEGER | `0` | Max storage per user in MB (0 = unlimited) |
+| `max_entries_per_user` | INTEGER | `0` | Max entries per user (0 = unlimited) |
+| `hot_tier_days` | INTEGER | `30` | Days in hot storage |
+| `warm_tier_days` | INTEGER | `180` | Days in warm storage |
+| `cold_tier_days` | INTEGER | `365` | Days in cold storage |
+| `archive_after_days` | INTEGER | `0` | Days before archival (0 = never) |
+| `auto_prune_enabled` | BOOLEAN | `true` | Enable automatic pruning |
+| `prune_min_importance` | DECIMAL(3,2) | `0.10` | Only prune below this importance |
+| `prune_min_access_count` | INTEGER | `0` | Only prune below this access count |
+| `session_to_session_memory_enabled` | BOOLEAN | `true` | Master toggle for cross-session memory |
+| `conversation_history_enabled` | BOOLEAN | `true` | Store full conversation history |
+| `auto_extract_enabled` | BOOLEAN | `true` | Auto-extract facts from conversations |
+| `user_can_delete_own_memory` | BOOLEAN | `true` | Allow users to manage their own memory |
+| `created_at` | TIMESTAMPTZ | `NOW()` | Created timestamp |
+| `updated_at` | TIMESTAMPTZ | `NOW()` | Last updated |
+
+**Constraints**: `UNIQUE (target_type)`. Seeded with default `'all'` policy: unlimited retention, all features enabled.
+
+### 7.18.2 `tenant_retention_overrides`
+
+Tenant-level retention override set by Think Tank Admin. Overrides platform defaults for a specific tenant.
+
+| Column | Type | Nullable | Description |
+|--------|------|----------|-------------|
+| `override_id` | UUID PK | No | Primary key |
+| `tenant_id` | UUID FK | No | References `tenants(id)` |
+| `target_type` | VARCHAR(32) | No | Memory type targeted |
+| `retention_days` | INTEGER | Yes | Override retention days |
+| `max_storage_per_user_mb` | INTEGER | Yes | Override max storage |
+| `max_entries_per_user` | INTEGER | Yes | Override max entries |
+| `hot_tier_days` | INTEGER | Yes | Override hot tier threshold |
+| `warm_tier_days` | INTEGER | Yes | Override warm tier threshold |
+| `cold_tier_days` | INTEGER | Yes | Override cold tier threshold |
+| `archive_after_days` | INTEGER | Yes | Override archive threshold |
+| `auto_prune_enabled` | BOOLEAN | Yes | Override auto-prune |
+| `prune_min_importance` | DECIMAL(3,2) | Yes | Override prune importance |
+| `prune_min_access_count` | INTEGER | Yes | Override prune access count |
+| `session_to_session_memory_enabled` | BOOLEAN | Yes | Override session memory |
+| `conversation_history_enabled` | BOOLEAN | Yes | Override conversation history |
+| `auto_extract_enabled` | BOOLEAN | Yes | Override auto-extract |
+| `user_can_delete_own_memory` | BOOLEAN | Yes | Override user delete |
+| `overridden_by` | UUID | No | Admin user ID who set this |
+| `override_reason` | TEXT | Yes | Reason for override |
+
+**RLS**: `tenant_id = current_setting('app.current_tenant_id')::uuid`
+**Constraints**: `UNIQUE (tenant_id, target_type)`
+
+### 7.18.3 `tenant_admin_retention_overrides`
+
+Tenant Admin-level override set by Think Tank Tenant Admin. CANNOT exceed tenant-level limits.
+
+Same schema as `tenant_retention_overrides` but with fewer overridable fields (no `cold_tier_days`, `archive_after_days`, `auto_prune_enabled`, `prune_min_importance`, `prune_min_access_count`).
+
+**RLS**: `tenant_id = current_setting('app.current_tenant_id')::uuid`
+**Constraints**: `UNIQUE (tenant_id, target_type)`
+
+### 7.18.4 `user_memory_profiles`
+
+Unified user memory profile tracking across all chats and all models.
+
+| Column | Type | Default | Description |
+|--------|------|---------|-------------|
+| `profile_id` | UUID PK | `gen_random_uuid()` | Primary key |
+| `tenant_id` | UUID FK | — | References `tenants(id)` |
+| `user_id` | UUID | — | User identifier |
+| `total_memory_entries` | INTEGER | `0` | Total entries across all memory types |
+| `total_storage_bytes` | BIGINT | `0` | Total storage consumption |
+| `current_storage_tier` | VARCHAR(16) | `'hot'` | Current primary storage tier |
+| `profile_quality` | DECIMAL(5,4) | `0.0000` | Profile completeness (0-1) |
+| `facts_count` | INTEGER | `0` | Number of facts |
+| `preferences_count` | INTEGER | `0` | Number of preferences |
+| `instructions_count` | INTEGER | `0` | Standing instructions |
+| `projects_count` | INTEGER | `0` | Active projects |
+| `skills_count` | INTEGER | `0` | Known skills |
+| `relationships_count` | INTEGER | `0` | Relationships |
+| `corrections_count` | INTEGER | `0` | Corrections |
+| `akg_nodes_count` | INTEGER | `0` | AKG entities |
+| `akg_edges_count` | INTEGER | `0` | AKG relationships |
+| `conversation_memories_count` | INTEGER | `0` | General memories |
+| `last_interaction_at` | TIMESTAMPTZ | — | Last user interaction |
+| `last_memory_update_at` | TIMESTAMPTZ | — | Last memory change |
+| `total_conversations` | INTEGER | `0` | Total conversations |
+| `total_models_used` | INTEGER | `0` | Unique models used |
+| `models_used` | TEXT[] | `'{}'` | Array of model IDs |
+
+**RLS**: `tenant_id = current_setting('app.current_tenant_id')::uuid`
+**Constraints**: `UNIQUE (tenant_id, user_id)`
+
+### 7.18.5 `user_memory_usage`
+
+Per-user storage consumption tracking with computed totals.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `usage_id` | UUID PK | Primary key |
+| `tenant_id` | UUID FK | Tenant |
+| `user_id` | UUID | User |
+| `conversation_history_bytes/count` | BIGINT/INTEGER | Conversation storage |
+| `user_context_bytes/count` | BIGINT/INTEGER | Context storage |
+| `akg_bytes/count` | BIGINT/INTEGER | AKG storage |
+| `memories_bytes/count` | BIGINT/INTEGER | General memory storage |
+| `preferences_bytes/count` | BIGINT/INTEGER | Preferences storage |
+| `hot/warm/cold/archive_tier_entries` | INTEGER | Entries per tier |
+| `total_bytes` | BIGINT (GENERATED) | Sum of all byte columns |
+| `total_entries` | INTEGER (GENERATED) | Sum of all count columns |
+
+**RLS**: `tenant_id = current_setting('app.current_tenant_id')::uuid`
+**Constraints**: `UNIQUE (tenant_id, user_id)`
+
+### 7.18.6 `memory_retention_audit`
+
+Audit log for all retention policy changes across all three admin levels.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `audit_id` | UUID PK | Primary key |
+| `tenant_id` | UUID FK | Tenant |
+| `action` | VARCHAR(64) | Action performed |
+| `scope` | VARCHAR(16) | `'platform'`, `'tenant'`, or `'tenant_admin'` |
+| `performed_by` | UUID | Admin who performed the action |
+| `target_type` | VARCHAR(32) | Memory type targeted |
+| `old_value` | JSONB | Previous value |
+| `new_value` | JSONB | New value |
+| `affected_users` | INTEGER | Users affected |
+| `affected_entries` | INTEGER | Entries affected |
+
+**RLS**: `tenant_id = current_setting('app.current_tenant_id')::uuid`
+
+### Helper Functions
+
+5. **`resolve_effective_retention(tenant_id, target_type)`** — Merges platform → tenant → tenant_admin overrides using COALESCE cascade. Returns JSONB with resolved values and provenance tracking (which level each value came from)
+6. **`prune_user_memories(tenant_id, user_id)`** — Applies effective retention policy to prune expired/low-importance memories. Skips if retention is unlimited. Returns count of deleted entries
+7. **`refresh_user_memory_profile(tenant_id, user_id)`** — Recomputes user_memory_profiles stats by counting across user_persistent_context, akg_nodes, akg_edges, and memory_stores. Calculates profile_quality based on category coverage
+
+---
+
+## 7.19 Aurelius Dojo Tables (Migration V2026_02_06_005)
+
+### 7.19.1 `dojo_libraries`
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | UUID PK | Library ID |
+| `tenant_id` | UUID | Tenant |
+| `name` | TEXT | Library name |
+| `description` | TEXT | Library description |
+| `document_count` | INTEGER | Number of documents |
+| `chunk_count` | INTEGER | Total chunks across documents |
+| `theme_count` | INTEGER | Discovered themes |
+| `status` | `dojo_library_status` | pending/ingesting/analyzing/ready/error |
+| `created_at` | TIMESTAMPTZ | Created timestamp |
+| `updated_at` | TIMESTAMPTZ | Updated timestamp |
+
+**RLS**: `tenant_id = current_setting('app.current_tenant_id')::uuid`
+
+### 7.19.2 `dojo_documents`
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | UUID PK | Document ID |
+| `library_id` | UUID FK | Parent library |
+| `tenant_id` | UUID | Tenant |
+| `filename` | TEXT | Original filename |
+| `mime_type` | TEXT | MIME type |
+| `size_bytes` | BIGINT | File size |
+| `chunk_count` | INTEGER | Chunks generated |
+| `status` | `dojo_document_status` | pending/chunked/embedded/error |
+| `s3_key` | TEXT | S3 storage key |
+| `uploaded_at` | TIMESTAMPTZ | Upload timestamp |
+
+### 7.19.3 `dojo_themes`
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | UUID PK | Theme ID |
+| `library_id` | UUID FK | Parent library |
+| `tenant_id` | UUID | Tenant |
+| `name` | TEXT | Theme name |
+| `description` | TEXT | AI-generated description |
+| `icon` | TEXT | Emoji icon |
+| `color` | TEXT | Hex color |
+| `chunk_count` | INTEGER | Chunks in theme |
+| `difficulty_tier` | `dojo_difficulty_tier` | fundamental/intermediate/advanced/expert |
+| `prerequisites` | TEXT[] | Prerequisite theme names |
+| `unlock_rank` | `dojo_rank_tier` | Minimum rank required |
+
+### 7.19.4 `dojo_sessions`
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | UUID PK | Session ID |
+| `tenant_id` | UUID | Tenant |
+| `user_id` | UUID | Learner |
+| `library_id` | UUID FK | Active library |
+| `theme_ids` | UUID[] | Selected themes |
+| `mode` | `dojo_session_mode` | lecture/sparring/review |
+| `status` | `dojo_session_status` | active/paused/completed |
+| `xp_earned` | INTEGER | XP earned in session |
+| `questions_asked` | INTEGER | Total questions |
+| `questions_correct` | INTEGER | Correct answers |
+
+### 7.19.5 `dojo_lesson_blocks`
+
+LLM-generated lesson content with source citations.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | UUID PK | Block ID |
+| `session_id` | UUID FK | Parent session |
+| `tenant_id` | UUID | Tenant |
+| `theme_id` | UUID FK | Theme |
+| `title` | TEXT | Lesson title |
+| `content` | TEXT | Lesson content |
+| `source_citations` | JSONB | Array of citation objects |
+| `difficulty` | REAL | 0.0–1.0 difficulty |
+| `sequence` | INTEGER | Block ordering |
+
+### 7.19.6 `dojo_sparring_questions`
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | UUID PK | Question ID |
+| `session_id` | UUID FK | Parent session |
+| `tenant_id` | UUID | Tenant |
+| `theme_id` | UUID FK | Theme |
+| `question_type` | `dojo_question_type` | multiple_choice/scenario/open_ended/true_false |
+| `question` | TEXT | Question text |
+| `options` | TEXT[] | Answer options (for MC) |
+| `correct_answer` | TEXT | Correct answer |
+| `explanation` | TEXT | Answer explanation |
+| `difficulty` | REAL | 0.0–1.0 difficulty |
+| `source_citations` | JSONB | Supporting citations |
+
+### 7.19.7 `dojo_sparring_results`
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | UUID PK | Result ID |
+| `question_id` | UUID FK | Question answered |
+| `session_id` | UUID FK | Parent session |
+| `tenant_id` | UUID | Tenant |
+| `user_id` | UUID | Learner |
+| `answer` | TEXT | User's answer |
+| `correct` | BOOLEAN | Correctness |
+| `partial_credit` | REAL | 0.0–1.0 partial credit |
+| `reasoning_analysis` | TEXT | LLM analysis of answer |
+| `xp_awarded` | INTEGER | XP earned |
+| `time_taken_seconds` | REAL | Response time |
+
+### 7.19.8 `dojo_user_progress`
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | UUID PK | Progress ID |
+| `tenant_id` | UUID | Tenant |
+| `user_id` | UUID | Learner |
+| `overall_rank` | `dojo_rank_tier` | novice/initiate/adept/master/radiant |
+| `overall_xp` | INTEGER | Total XP |
+| `total_sessions` | INTEGER | Completed sessions |
+| `total_time_minutes` | INTEGER | Training time |
+| `streak_days` | INTEGER | Consecutive days |
+
+**Unique**: `(tenant_id, user_id)`
+
+### 7.19.9 `dojo_theme_progress`
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | UUID PK | ID |
+| `tenant_id` | UUID | Tenant |
+| `user_id` | UUID | Learner |
+| `theme_id` | UUID FK | Theme |
+| `rank` | `dojo_rank_tier` | Theme-specific rank |
+| `xp` | INTEGER | Theme XP |
+| `mastery_percentage` | REAL | 0–100% mastery |
+| `questions_attempted` | INTEGER | Questions attempted |
+| `questions_correct` | INTEGER | Correct answers |
+| `weaknesses` | TEXT[] | Identified weak areas |
+| `strengths` | TEXT[] | Identified strong areas |
+
+**Unique**: `(tenant_id, user_id, theme_id)`
+
+### 7.19.10 `dojo_certifications`
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | UUID PK | Certification ID |
+| `tenant_id` | UUID | Tenant |
+| `user_id` | UUID | Learner |
+| `theme_id` | UUID FK | Certified theme |
+| `rank_achieved` | `dojo_rank_tier` | Rank at certification |
+| `score` | REAL | Exam score |
+| `max_score` | REAL | Maximum possible score |
+| `passed` | BOOLEAN | Pass/fail |
+| `proctored` | BOOLEAN | Proctored exam flag |
+| `exam_duration_minutes` | INTEGER | Duration |
+
+### 7.19.11 `dojo_knowledge_atoms`
+
+Per-concept units for the Ebbinghaus Decay Engine.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | UUID PK | Atom ID |
+| `theme_id` | UUID FK | Parent theme |
+| `tenant_id` | UUID | Tenant |
+| `concept` | TEXT | Concept name |
+| `description` | TEXT | Concept description |
+| `source_citations` | JSONB | Source citations |
+| `difficulty` | REAL | 0.0–1.0 difficulty |
+
+### 7.19.12 `dojo_decay_curves`
+
+Per-atom, per-user Ebbinghaus decay tracking.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | UUID PK | Curve ID |
+| `atom_id` | UUID FK | Knowledge atom |
+| `tenant_id` | UUID | Tenant |
+| `user_id` | UUID | Learner |
+| `half_life_hours` | REAL | Current half-life |
+| `stability` | REAL | 0.0–1.0 stability |
+| `last_reviewed_at` | TIMESTAMPTZ | Last review |
+| `next_review_at` | TIMESTAMPTZ | Next scheduled review |
+| `review_count` | INTEGER | Total reviews |
+| `retention_probability` | REAL | Current retention (0.0–1.0) |
+| `streak` | INTEGER | Consecutive correct |
+| `lapse_count` | INTEGER | Lapses (incorrect after correct) |
+
+**Unique**: `(atom_id, user_id)`
+
+### 7.19.13 `dojo_scenario_sessions`
+
+Adversarial scenario instances with persona and scoring.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | UUID PK | Scenario ID |
+| `session_id` | UUID FK | Parent training session |
+| `tenant_id` | UUID | Tenant |
+| `persona` | JSONB | Persona archetype + backstory |
+| `theme_ids` | UUID[] | Related themes |
+| `situation` | TEXT | Scenario situation |
+| `objective` | TEXT | Learning objective |
+| `status` | TEXT | active/completed/failed |
+| `emotional_intelligence_score` | REAL | EI score |
+| `policy_adherence_score` | REAL | Policy score |
+| `resolution_score` | REAL | Resolution score |
+| `total_score` | REAL | Combined score |
+| `debrief` | TEXT | AI-generated debrief |
+
+### 7.19.14 `dojo_scenario_branches`
+
+Branching consequence trees within scenarios.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | UUID PK | Branch ID |
+| `scenario_id` | UUID FK | Parent scenario |
+| `parent_id` | UUID FK (self) | Parent branch |
+| `turn_number` | INTEGER | Turn sequence |
+| `persona_message` | TEXT | Persona's message |
+| `learner_response` | TEXT | Learner's response |
+| `consequence` | TEXT | Consequence description |
+| `emotional_shift` | TEXT | Persona emotional change |
+| `branch_quality` | `dojo_branch_quality` | optimal/acceptable/suboptimal/critical_error |
+| `available_actions` | TEXT[] | Next possible actions |
+
+### 7.19.15 `dojo_competencies`
+
+Auto-extracted competency graph nodes.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | UUID PK | Competency ID |
+| `library_id` | UUID FK | Source library |
+| `tenant_id` | UUID | Tenant |
+| `name` | TEXT | Competency name |
+| `description` | TEXT | Description |
+| `category` | TEXT | Category |
+| `related_themes` | UUID[] | Related theme IDs |
+| `prerequisite_competencies` | UUID[] | Prerequisites |
+| `proficiency_levels` | JSONB | Array of level definitions |
+
+### 7.19.16 `dojo_user_competency_scores`
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | UUID PK | Score ID |
+| `tenant_id` | UUID | Tenant |
+| `user_id` | UUID | Learner |
+| `competency_id` | UUID FK | Competency |
+| `current_level` | INTEGER | Current proficiency level |
+| `max_level` | INTEGER | Maximum level |
+| `confidence` | REAL | Assessment confidence |
+| `evidence_count` | INTEGER | Evidence count |
+| `trend` | TEXT | improving/stable/declining |
+| `gap_to_target` | REAL | Gap to target level |
+
+**Unique**: `(tenant_id, user_id, competency_id)`
+
+### 7.19.17 `dojo_dialectic_sessions` + `dojo_dialectic_turns`
+
+Socratic dialectic sessions with multi-agent turns.
+
+**Sessions**: proposition, context, status, scoring (reasoning_chain, argument_quality, evidence_usage, critical_thinking), logical_fallacies_detected, synthesis_quality.
+
+**Turns**: role (thesis/antithesis/synthesis/moderator/learner), content, reasoning_type (claim/evidence/rebuttal/concession/synthesis/question), citations, quality_score.
+
+### 7.19.18 `dojo_multimodal_content`
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | UUID PK | Content ID |
+| `lesson_id` | UUID FK | Parent lesson block |
+| `tenant_id` | UUID | Tenant |
+| `audio_url` | TEXT | TTS audio URL |
+| `audio_duration_seconds` | INTEGER | Duration |
+| `diagrams` | JSONB | Mermaid diagrams array |
+| `glossary` | JSONB | Term definitions array |
+| `key_takeaways` | TEXT[] | Key takeaways |
+| `learning_style_adaptations` | JSONB | Visual/auditory/kinesthetic/reading |
+
+### 7.19.19 `dojo_knowledge_pulse`
+
+Org-wide knowledge health snapshots.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | UUID PK | Pulse ID |
+| `tenant_id` | UUID | Tenant |
+| `snapshot_at` | TIMESTAMPTZ | Snapshot timestamp |
+| `overall_health` | REAL | 0–100 health score |
+| `total_users` | INTEGER | Total users |
+| `active_users_30d` | INTEGER | Active in last 30 days |
+| `department_health` | JSONB | Per-department health |
+| `theme_coverage` | JSONB | Per-theme coverage |
+| `decay_alerts` | JSONB | Active decay alerts |
+| `trends` | JSONB | 7d/30d trend data |
+| `roi_metrics` | JSONB | ROI calculations |
+
+### 7.19.20 `dojo_archytas_tool_calls`
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | UUID PK | Call ID |
+| `session_id` | UUID FK | Parent session |
+| `tenant_id` | UUID | Tenant |
+| `tool_type` | `dojo_archytas_tool` | code_execution/simulation/web_research/data_analysis/api_call/file_generation |
+| `input` | TEXT | Tool input |
+| `output` | TEXT | Tool output |
+| `status` | TEXT | pending/running/completed/failed/timeout |
+| `execution_time_ms` | INTEGER | Execution time |
+| `sandbox_id` | TEXT | Sandbox identifier |
+
+### 7.19.21 `dojo_config`
+
+Per-tenant Dojo configuration.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | UUID PK | Config ID |
+| `tenant_id` | UUID UNIQUE | One config per tenant |
+| `enabled` | BOOLEAN | Dojo enabled |
+| `ai_model` | TEXT | Primary AI model |
+| `embedding_model` | TEXT | Embedding model |
+| `max_themes_per_library` | INTEGER | Theme limit |
+| `sparring_difficulty_scaling` | BOOLEAN | Auto-scale difficulty |
+| `certification_enabled` | BOOLEAN | Allow certifications |
+| `min_sessions_for_cert` | INTEGER | Sessions required before cert |
+| `rank_thresholds` | JSONB | XP thresholds per rank |
+| `archytas_enabled` | BOOLEAN | Enable Tool Master |
+| `archytas_config` | JSONB | Archytas configuration |
+
+### Dojo Helper Functions
+
+8. **`dojo_calculate_retention(half_life_hours, hours_since_review)`** — Returns retention probability using Ebbinghaus exponential decay: `2^(-hours/half_life)`
+9. **`dojo_xp_to_rank(xp)`** — Maps XP to rank tier: novice(<500), initiate(<2000), adept(<5000), master(<10000), radiant(≥10000)
+10. **`dojo_update_decay_after_review(curve_id, correct)`** — Adjusts half-life after review: correct → `half_life * (1 + 0.1 * (streak+1))`, incorrect → `max(half_life * 0.5, 1.0)`. Updates streak, lapse count, next review time.
+
+### Dojo Enums
+
+| Enum | Values |
+|------|--------|
+| `dojo_rank_tier` | novice, initiate, adept, master, radiant |
+| `dojo_library_status` | pending, ingesting, analyzing, ready, error |
+| `dojo_document_status` | pending, chunked, embedded, error |
+| `dojo_session_mode` | lecture, sparring, review |
+| `dojo_session_status` | active, paused, completed |
+| `dojo_question_type` | multiple_choice, scenario, open_ended, true_false |
+| `dojo_difficulty_tier` | fundamental, intermediate, advanced, expert |
+| `dojo_persona_archetype` | confused_customer, angry_customer, detail_oriented, time_pressured, price_sensitive, vip_escalation, compliance_auditor, new_employee, hostile_negotiator |
+| `dojo_dialectic_role` | thesis, antithesis, synthesis, moderator, learner |
+| `dojo_branch_quality` | optimal, acceptable, suboptimal, critical_error |
+| `dojo_archytas_tool` | code_execution, simulation, web_research, data_analysis, api_call, file_generation |
+| `dojo_archytas_sandbox` | strict, standard, permissive |
+
+---
+
+## Single-Tenant User Model, Licensing & Auth Config (v7.23.0)
+
+> **Replaces v7.22.0 multi-tenant user model.** Each user belongs to exactly ONE tenant.
+
+### Architecture
+
+```
+users (Per-Tenant)                     tenant_licenses (Flexible Licensing)
+┌──────────────────────────────┐       ┌────────────────────────────────────┐
+│ id (PK)                      │       │ id (PK)                            │
+│ tenant_id (FK, NOT NULL)     │       │ tenant_id (FK, NOT NULL)           │
+│ cognito_user_id              │       │ license_type (seat/storage/etc.)   │
+│ email                        │       │ app_id (think_tank/curator/etc.)   │
+│ UNIQUE(tenant_id, email)     │       │ feature_code (hipaa/gdpr/etc.)     │
+│ UNIQUE(tenant_id, cognito_id)│       │ quantity, used, reserved           │
+│ tenant_role, status, features│       │ overage_allowed, is_active         │
+│ SSO, MFA, invitation, perms  │       └────────────────────────────────────┘
+│ deactivation, deletion       │
+│ RLS: tenant isolation        │       tenant_auth_config (Per-Tenant Auth)
+└──────────────────────────────┘       ┌────────────────────────────────────┐
+                                       │ tenant_id (PK, FK)                 │
+license_catalog (Available Types)      │ allow_password/google/apple/ms     │
+┌──────────────────────────────┐       │ require_sso_only, require_mfa      │
+│ id (PK, e.g. seat:think_tank)│       │ session_timeout, invitation_expiry │
+│ tier defaults (1-5)          │       │ hipaa_mode                         │
+│ pricing, constraints         │       └────────────────────────────────────┘
+└──────────────────────────────┘
+```
+
+### Table: users (Refactored — Single-Tenant, v7.23.0)
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | UUID | PK | User ID |
+| tenant_id | UUID | FK tenants(id) CASCADE, NOT NULL | Owning tenant |
+| cognito_user_id | VARCHAR(128) | NOT NULL | Cognito sub |
+| email | VARCHAR(255) | NOT NULL | User email |
+| display_name | VARCHAR(200) | | Display name |
+| first_name | VARCHAR(100) | | First name |
+| last_name | VARCHAR(100) | | Last name |
+| avatar_url | VARCHAR(500) | | Profile image |
+| email_verified | BOOLEAN | DEFAULT false | Email verified |
+| role | VARCHAR(50) | | Legacy role field |
+| tenant_role | VARCHAR(50) | CHECK(standard_user, tenant_admin, tenant_owner, viewer) | Tenant role |
+| status | VARCHAR(20) | CHECK(active, suspended, pending, invited, deactivated) | User status |
+| has_access_think_tank | BOOLEAN | DEFAULT true | Think Tank access |
+| has_access_curator | BOOLEAN | DEFAULT false | Curator access |
+| has_access_dojo | BOOLEAN | DEFAULT false | Dojo access |
+| has_access_cato_trainer | BOOLEAN | DEFAULT false | Cato Trainer access |
+| has_access_genesis | BOOLEAN | DEFAULT false | Genesis access |
+| has_access_tenant_admin | BOOLEAN | DEFAULT false | Tenant admin access |
+| sso_provider | VARCHAR(100) | | SSO provider |
+| sso_provider_user_id | VARCHAR(255) | | SSO user ID |
+| mfa_enabled | BOOLEAN | DEFAULT false | MFA enabled |
+| mfa_methods | JSONB | DEFAULT '[]' | MFA methods |
+| invitation_token | VARCHAR(255) | | Invitation token |
+| invitation_expires_at | TIMESTAMPTZ | | Invitation expiry |
+| invited_by | UUID | | Who invited |
+| deactivated_at | TIMESTAMPTZ | | Deactivation time |
+| deactivated_by | UUID | | Who deactivated |
+| deactivation_reason | TEXT | | Why deactivated |
+| deletion_requested_at | TIMESTAMPTZ | | GDPR deletion request time |
+| deletion_scheduled_for | TIMESTAMPTZ | | Scheduled deletion date |
+| last_login_at | TIMESTAMPTZ | | Last login |
+| login_count | INTEGER | DEFAULT 0 | Total logins |
+| last_active_at | TIMESTAMPTZ | | Last activity |
+| message_count | INTEGER | DEFAULT 0 | Messages sent |
+| token_usage | BIGINT | DEFAULT 0 | Tokens used |
+| permissions | JSONB | DEFAULT '{}' | Soft permissions (admin-configurable) |
+| settings | JSONB | DEFAULT '{}' | User preferences |
+| created_at | TIMESTAMPTZ | DEFAULT NOW() | |
+| updated_at | TIMESTAMPTZ | DEFAULT NOW() | |
+
+**Unique**: UNIQUE(tenant_id, email), UNIQUE(tenant_id, cognito_user_id)
+**RLS**: `tenant_id = current_setting('app.current_tenant_id')::uuid`
+
+### Table: tenant_licenses (v7.23.0)
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | UUID | PK | License ID |
+| tenant_id | UUID | FK tenants(id) CASCADE, NOT NULL | Owning tenant |
+| license_type | VARCHAR(50) | CHECK(seat, storage, retention, compliance, feature, api_rate, addon) | Type of license |
+| app_id | VARCHAR(50) | CHECK(think_tank, curator, dojo, cato_trainer, genesis, platform) | Which app |
+| feature_code | VARCHAR(100) | | Compliance/feature code (e.g. hipaa, gdpr) |
+| quantity | INTEGER | NOT NULL, DEFAULT 0 | Licensed amount |
+| used | INTEGER | NOT NULL, DEFAULT 0 | Currently consumed |
+| reserved | INTEGER | NOT NULL, DEFAULT 0 | Reserved (pending invitations) |
+| unit | VARCHAR(20) | CHECK(user, gb, days, requests, boolean, token, unit) | Unit of measurement |
+| included_in_tier | INTEGER | NOT NULL, DEFAULT 0 | Included in subscription tier |
+| additional_purchased | INTEGER | NOT NULL, DEFAULT 0 | Purchased beyond tier |
+| price_per_unit_cents | INTEGER | | Price for additional units |
+| overage_allowed | BOOLEAN | NOT NULL, DEFAULT false | Can exceed quantity? |
+| overage_price_per_unit_cents | INTEGER | | Overage price |
+| is_active | BOOLEAN | NOT NULL, DEFAULT true | License active |
+| expires_at | TIMESTAMPTZ | | Expiry date (NULL = no expiry) |
+| notes | TEXT | | Notes |
+| created_at | TIMESTAMPTZ | DEFAULT NOW() | |
+| updated_at | TIMESTAMPTZ | DEFAULT NOW() | |
+
+**RLS**: `tenant_id = current_setting('app.current_tenant_id')::uuid`
+
+### Table: license_catalog (v7.23.0)
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | VARCHAR(100) | PK | e.g. 'seat:think_tank', 'compliance:hipaa' |
+| license_type | VARCHAR(50) | NOT NULL | Type |
+| app_id | VARCHAR(50) | NOT NULL, DEFAULT 'platform' | App |
+| feature_code | VARCHAR(100) | | Feature code |
+| display_name | VARCHAR(200) | NOT NULL | Human-readable name |
+| description | TEXT | | Description |
+| category | VARCHAR(50) | CHECK(app_access, capacity, compliance, addon) | Category |
+| unit | VARCHAR(20) | NOT NULL | Unit |
+| default_price_per_unit_cents | INTEGER | | Default pricing |
+| included_tier_1..5 | INTEGER | NOT NULL, DEFAULT 0 | Tier inclusions (SEED→ENTERPRISE) |
+| min_quantity | INTEGER | DEFAULT 0 | Min allowed |
+| max_quantity | INTEGER | | Max allowed (NULL=unlimited) |
+| requires_license_ids | TEXT[] | | Prerequisite licenses |
+| is_public | BOOLEAN | NOT NULL, DEFAULT true | Visible in catalog |
+| sort_order | INTEGER | NOT NULL, DEFAULT 0 | Display order |
+
+**Seeded with**: 5 app seats, 1 storage, 1 retention, 12 compliance, 5 add-ons (24 catalog entries)
+
+### Table: license_audit (v7.23.0)
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | UUID | PK | Audit ID |
+| tenant_id | UUID | FK tenants(id) CASCADE, NOT NULL | Tenant |
+| license_id | UUID | FK tenant_licenses(id) SET NULL | License |
+| action | VARCHAR(50) | CHECK(11 values) | Action type |
+| old_value | JSONB | | Previous state |
+| new_value | JSONB | | New state |
+| performed_by | UUID | | Who made the change |
+| performed_by_app | VARCHAR(50) | CHECK(radiant_admin, thinktank_tenant_admin, system, billing, api) | Which app |
+| reason | TEXT | | Reason for change |
+| created_at | TIMESTAMPTZ | DEFAULT NOW() | |
+
+**RLS**: `tenant_id = current_setting('app.current_tenant_id')::uuid`
+
+### Table: tenant_auth_config (v7.23.0)
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| tenant_id | UUID | PK, FK tenants(id) CASCADE | Tenant |
+| allow_password_login | BOOLEAN | NOT NULL, DEFAULT true | Email+password login |
+| allow_google_login | BOOLEAN | NOT NULL, DEFAULT true | Google federation |
+| allow_apple_login | BOOLEAN | NOT NULL, DEFAULT true | Apple federation |
+| allow_microsoft_login | BOOLEAN | NOT NULL, DEFAULT true | Microsoft federation |
+| require_sso_only | BOOLEAN | NOT NULL, DEFAULT false | SSO-only mode |
+| require_mfa | BOOLEAN | NOT NULL, DEFAULT false | Mandatory MFA |
+| sso_provider_type | VARCHAR(50) | | SAML or OIDC |
+| sso_metadata_url | TEXT | | SSO metadata URL |
+| sso_entity_id | VARCHAR(255) | | SSO entity ID |
+| session_timeout_minutes | INTEGER | NOT NULL, DEFAULT 60 | Session timeout |
+| max_failed_attempts | INTEGER | NOT NULL, DEFAULT 5 | Lockout threshold |
+| lockout_duration_minutes | INTEGER | NOT NULL, DEFAULT 30 | Lockout duration |
+| invitation_expiry_days | INTEGER | NOT NULL, DEFAULT 7 | Invite expiry (tenant-configurable) |
+| hipaa_mode | BOOLEAN | NOT NULL, DEFAULT false | HIPAA-restricted auth |
+| updated_at | TIMESTAMPTZ | DEFAULT NOW() | |
+| updated_by | UUID | | Last editor |
+
+### Table: user_admin_actions (v7.23.0)
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | UUID | PK | Action ID |
+| user_id | UUID | FK users(id) SET NULL | Target user |
+| tenant_id | UUID | FK tenants(id) SET NULL | Target tenant |
+| action | VARCHAR(50) | CHECK(18 values) | Action type (user_invited, user_activated, user_deactivated, user_reactivated, role_changed, feature_toggled, app_access_changed, deletion_requested, deletion_cancelled, deletion_executed, cognito_disabled, cognito_enabled, mfa_enabled, mfa_disabled, license_created, license_changed, seat_consumed, seat_released) |
+| details | JSONB | DEFAULT '{}' | Action details |
+| performed_by | UUID | | Admin who performed |
+| admin_app | VARCHAR(50) | CHECK(radiant_admin, thinktank_admin, thinktank_tenant_admin, system, billing, api) | Which admin app |
+| ip_address | INET | | Admin IP |
+| created_at | TIMESTAMPTZ | DEFAULT NOW() | |
+
+**RLS**: Tenant isolation with global action visibility
+
+### Safety & Licensing Functions (v7.23.0)
+
+| Function | Arguments | Returns | Description |
+|----------|-----------|---------|-------------|
+| `deactivate_user` | user_id, reason?, deactivated_by? | TABLE(success, seats_freed[], message) | Deactivate user, free all seat licenses |
+| `request_user_deletion` | user_id, requested_by?, reason? | TABLE(success, legal_holds, retention_days, blocked_reason, scheduled_for, message) | Schedule deletion respecting retention license |
+| `cancel_user_deletion` | user_id, cancelled_by? | TABLE(success, message) | Cancel pending deletion |
+| `check_tenant_license` | tenant_id, license_type, app_id?, feature_code? | BOOLEAN | Check if tenant has active license |
+| `get_available_seats` | tenant_id, app_id | INTEGER | Available seats (quantity - used - reserved) |
+| `consume_seat` | tenant_id, app_id | BOOLEAN | Consume a seat on user activation |
+| `release_seat` | tenant_id, app_id | BOOLEAN | Release a seat on user deactivation |
+| `reserve_seat` | tenant_id, app_id | BOOLEAN | Reserve a seat on invitation |
+| `activate_reserved_seat` | tenant_id, app_id | BOOLEAN | Convert reserved → used on invite acceptance |
+
+### Dropped Tables
+
+- **`tenant_users`** — DROPPED. Fields consolidated into `users` table.
+- **`users_by_tenant`** view — DROPPED. No longer needed (query `users` directly).
+
+---
+
+## Model Weights, Drift Correction & Admin AI Helper (v7.24.0)
+
+Migration: `V2026_02_06_007__model_weights_drift_correction_admin_ai.sql`
+
+### model_weight_config
+
+Per-tenant per-model weight configuration with 5-factor composite scoring.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | UUID | PK, DEFAULT gen_random_uuid() | Row ID |
+| tenant_id | UUID | NOT NULL, FK tenants(id) ON DELETE CASCADE | Tenant |
+| model_id | VARCHAR(200) | NOT NULL | Model identifier |
+| manual_weight_override | DOUBLE PRECISION | | NULL = auto-calculated |
+| drift_factor_weight | DOUBLE PRECISION | NOT NULL DEFAULT 0.25 | Drift factor weight |
+| quality_factor_weight | DOUBLE PRECISION | NOT NULL DEFAULT 0.30 | Quality factor weight |
+| latency_factor_weight | DOUBLE PRECISION | NOT NULL DEFAULT 0.15 | Latency factor weight |
+| cost_factor_weight | DOUBLE PRECISION | NOT NULL DEFAULT 0.15 | Cost factor weight |
+| availability_factor_weight | DOUBLE PRECISION | NOT NULL DEFAULT 0.15 | Availability factor weight |
+| current_drift_score | DOUBLE PRECISION | NOT NULL DEFAULT 1.0 | Current drift score (0-1) |
+| current_quality_score | DOUBLE PRECISION | NOT NULL DEFAULT 1.0 | Current quality score (0-1) |
+| current_latency_score | DOUBLE PRECISION | NOT NULL DEFAULT 1.0 | Current latency score (0-1) |
+| current_cost_score | DOUBLE PRECISION | NOT NULL DEFAULT 1.0 | Current cost score (0-1) |
+| current_availability_score | DOUBLE PRECISION | NOT NULL DEFAULT 1.0 | Current availability score (0-1) |
+| current_composite_weight | DOUBLE PRECISION | NOT NULL DEFAULT 1.0 | Final computed weight |
+| drift_quarantine_threshold | DOUBLE PRECISION | NOT NULL DEFAULT 0.3 | Below this = quarantine |
+| drift_penalty_threshold | DOUBLE PRECISION | NOT NULL DEFAULT 0.6 | Below this = penalized |
+| drift_auto_quarantine | BOOLEAN | NOT NULL DEFAULT true | Auto-quarantine on drift |
+| drift_auto_fallback_model_id | VARCHAR(200) | | Fallback model when quarantined |
+| drift_temperature_correction | DOUBLE PRECISION | | Temperature override for drifting model |
+| drift_prompt_prefix_correction | TEXT | | Prompt prefix for drift mitigation |
+| is_quarantined | BOOLEAN | NOT NULL DEFAULT false | Quarantine state |
+| quarantined_at | TIMESTAMPTZ | | When quarantined |
+| quarantine_reason | TEXT | | Why quarantined |
+| quarantine_expires_at | TIMESTAMPTZ | | Auto-release time |
+| quarantine_auto_release | BOOLEAN | NOT NULL DEFAULT true | Auto-release when expired |
+| last_weight_calculation_at | TIMESTAMPTZ | | Last composite calc |
+| last_drift_check_at | TIMESTAMPTZ | | Last drift check |
+| created_at | TIMESTAMPTZ | NOT NULL DEFAULT NOW() | Created |
+| updated_at | TIMESTAMPTZ | NOT NULL DEFAULT NOW() | Updated (auto-trigger) |
+
+**Unique**: `(tenant_id, model_id)`. **RLS**: `tenant_id = app.current_tenant_id`.
+
+### model_weight_history
+
+Weight calculation audit trail.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | UUID | PK | Row ID |
+| tenant_id | UUID | NOT NULL, FK tenants(id) | Tenant |
+| model_id | VARCHAR(200) | NOT NULL | Model |
+| drift_score | DOUBLE PRECISION | | Drift score at time of calc |
+| quality_score | DOUBLE PRECISION | | Quality score |
+| latency_score | DOUBLE PRECISION | | Latency score |
+| cost_score | DOUBLE PRECISION | | Cost score |
+| availability_score | DOUBLE PRECISION | | Availability score |
+| composite_weight | DOUBLE PRECISION | NOT NULL | Resulting composite weight |
+| calculation_method | VARCHAR(50) | NOT NULL DEFAULT 'auto' | auto, manual_override, quarantine |
+| factors | JSONB | NOT NULL DEFAULT '{}' | Factor weights used |
+| trigger_source | VARCHAR(100) | | What triggered the calc |
+| created_at | TIMESTAMPTZ | NOT NULL DEFAULT NOW() | Created |
+
+**RLS**: `tenant_id = app.current_tenant_id`.
+
+### drift_correction_actions
+
+Log of all drift correction actions taken (automatic and manual).
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | UUID | PK | Row ID |
+| tenant_id | UUID | NOT NULL, FK tenants(id) | Tenant |
+| model_id | VARCHAR(200) | NOT NULL | Model |
+| action_type | VARCHAR(50) | NOT NULL, CHECK | quarantine, unquarantine, weight_penalty, weight_restore, fallback_activated, temperature_adjust, prompt_adjust, manual_override, auto_correction |
+| trigger_type | VARCHAR(50) | NOT NULL, CHECK | auto_drift, manual, scheduled, ai_recommendation, threshold_breach, quarantine_expiry |
+| previous_state | JSONB | NOT NULL DEFAULT '{}' | State before action |
+| new_state | JSONB | NOT NULL DEFAULT '{}' | State after action |
+| drift_report | JSONB | | Full drift report if applicable |
+| reason | TEXT | | Human-readable reason |
+| performed_by | UUID | | User who triggered (NULL for auto) |
+| reverted_at | TIMESTAMPTZ | | If/when reverted |
+| reverted_by | UUID | | Who reverted |
+| created_at | TIMESTAMPTZ | NOT NULL DEFAULT NOW() | Created |
+
+**RLS**: `tenant_id = app.current_tenant_id`.
+
+### bedrock_model_registry
+
+Global registry of discovered Bedrock foundation models (not per-tenant).
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | VARCHAR(200) | PK | Bedrock model ID |
+| model_name | VARCHAR(200) | NOT NULL | Human-readable name |
+| provider_name | VARCHAR(100) | NOT NULL | Provider (Anthropic, Meta, etc.) |
+| model_arn | VARCHAR(500) | | Bedrock ARN |
+| input_modalities | TEXT[] | DEFAULT '{}' | TEXT, IMAGE, etc. |
+| output_modalities | TEXT[] | DEFAULT '{}' | TEXT, IMAGE, etc. |
+| response_streaming_supported | BOOLEAN | DEFAULT false | Streaming support |
+| customizations_supported | TEXT[] | DEFAULT '{}' | Fine-tuning options |
+| inference_types_supported | TEXT[] | DEFAULT '{}' | ON_DEMAND, PROVISIONED |
+| model_lifecycle_status | VARCHAR(50) | | ACTIVE, LEGACY, etc. |
+| model_version | VARCHAR(50) | | Version string |
+| is_active | BOOLEAN | NOT NULL DEFAULT true | Currently in Bedrock listing |
+| is_available_for_inference | BOOLEAN | NOT NULL DEFAULT true | Can be used |
+| input_price_per_1k_tokens | DOUBLE PRECISION | | Estimated input pricing |
+| output_price_per_1k_tokens | DOUBLE PRECISION | | Estimated output pricing |
+| discovered_at | TIMESTAMPTZ | NOT NULL DEFAULT NOW() | First discovery |
+| last_checked_at | TIMESTAMPTZ | NOT NULL DEFAULT NOW() | Last poll |
+| metadata | JSONB | NOT NULL DEFAULT '{}' | Extra metadata |
+
+### admin_ai_helper_config
+
+Per-tenant configuration for the Bedrock-powered AI admin helper.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| tenant_id | UUID | PK, FK tenants(id) | Tenant |
+| enabled | BOOLEAN | NOT NULL DEFAULT true | Helper enabled |
+| bedrock_model_id | VARCHAR(200) | NOT NULL DEFAULT 'anthropic.claude-3-5-sonnet-20241022-v2:0' | Bedrock model |
+| bedrock_region | VARCHAR(50) | NOT NULL DEFAULT 'us-east-1' | AWS region |
+| auto_upgrade_model | BOOLEAN | NOT NULL DEFAULT true | Auto-upgrade to latest |
+| preferred_model_family | VARCHAR(100) | DEFAULT 'anthropic.claude' | Family for auto-upgrade |
+| max_tokens | INTEGER | NOT NULL DEFAULT 4096 | Response token limit |
+| temperature | DOUBLE PRECISION | NOT NULL DEFAULT 0.3 | Model temperature |
+| model_poll_interval_hours | INTEGER | NOT NULL DEFAULT 24 | How often to check for new models |
+| last_model_poll_at | TIMESTAMPTZ | | Last poll time |
+| last_auto_upgrade_at | TIMESTAMPTZ | | Last upgrade time |
+| last_auto_upgrade_from | VARCHAR(200) | | Previous model ID |
+| last_auto_upgrade_to | VARCHAR(200) | | New model ID |
+| include_page_data | BOOLEAN | NOT NULL DEFAULT true | Send page context to AI |
+| include_system_metrics | BOOLEAN | NOT NULL DEFAULT true | Include system metrics |
+| max_context_tokens | INTEGER | NOT NULL DEFAULT 8000 | Context window limit |
+| system_prompt_override | TEXT | | Custom system prompt |
+| total_requests | INTEGER | NOT NULL DEFAULT 0 | Usage: total requests |
+| total_input_tokens | BIGINT | NOT NULL DEFAULT 0 | Usage: input tokens |
+| total_output_tokens | BIGINT | NOT NULL DEFAULT 0 | Usage: output tokens |
+| total_cost_cents | DOUBLE PRECISION | NOT NULL DEFAULT 0 | Usage: total cost |
+| updated_at | TIMESTAMPTZ | NOT NULL DEFAULT NOW() | Updated |
+| updated_by | UUID | | Who updated |
+
+### admin_ai_helper_conversations
+
+Conversation history for the AI admin helper (per-page, per-user).
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | UUID | PK | Row ID |
+| tenant_id | UUID | NOT NULL, FK tenants(id) | Tenant |
+| user_id | UUID | | Admin user |
+| admin_page | VARCHAR(200) | NOT NULL | Dashboard page path |
+| role | VARCHAR(20) | NOT NULL, CHECK | user, assistant, system |
+| content | TEXT | NOT NULL | Message content |
+| model_id | VARCHAR(200) | | Bedrock model used |
+| input_tokens | INTEGER | | Token count |
+| output_tokens | INTEGER | | Token count |
+| latency_ms | INTEGER | | Response time |
+| cost_cents | DOUBLE PRECISION | | Estimated cost |
+| page_context | JSONB | | Page data sent as context |
+| metadata | JSONB | NOT NULL DEFAULT '{}' | Extra metadata |
+| created_at | TIMESTAMPTZ | NOT NULL DEFAULT NOW() | Created |
+
+**RLS**: `tenant_id = app.current_tenant_id`.
+
+### Functions
+
+| Function | Purpose |
+|----------|---------|
+| `calculate_composite_weight(tenant_id, model_id)` | Compute composite weight from 5 factor scores × weights |
+| `apply_drift_penalty(tenant_id, model_id, drift_score, performed_by)` | Apply drift score, auto-quarantine if below threshold |
+| `quarantine_model(tenant_id, model_id, reason, duration_hours, performed_by)` | Manually quarantine a model |
+| `unquarantine_model(tenant_id, model_id, performed_by)` | Remove quarantine, recalculate weight |
+| `get_weighted_models(tenant_id, capability, exclude_quarantined)` | Get models sorted by composite weight |
+
+---
+
+### drift_invocation_telemetry (v7.37.0)
+
+Migration: `V2026_02_07_014__drift_invocation_telemetry.sql`
+
+Records every model invocation across all 52+ services for Genesis gate feedback. Partitioned by month. RLS per tenant. 7-day retention via `cleanup_drift_telemetry()`.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | BIGSERIAL | PK (composite with invoked_at) | Row ID |
+| tenant_id | UUID | NOT NULL | Tenant |
+| model_id | TEXT | NOT NULL | Model that was actually invoked |
+| original_model_id | TEXT | NOT NULL | Model originally requested (before drift rerouting) |
+| was_rerouted | BOOLEAN | NOT NULL DEFAULT FALSE | Whether drift handling replaced the model |
+| success | BOOLEAN | NOT NULL DEFAULT TRUE | Whether invocation succeeded |
+| latency_ms | DOUBLE PRECISION | NOT NULL DEFAULT 0 | Invocation latency |
+| tokens_used | INTEGER | NOT NULL DEFAULT 0 | Total tokens (input + output) |
+| cost_cents | DOUBLE PRECISION | NOT NULL DEFAULT 0 | Cost in cents |
+| invoked_at | TIMESTAMPTZ | NOT NULL DEFAULT NOW() | Invocation timestamp (partition key) |
+
+**Partitioning**: `RANGE (invoked_at)` — monthly partitions auto-created for current + 3 months.
+
+**Indexes**:
+- `idx_drift_telemetry_tenant_time` — (tenant_id, invoked_at DESC)
+- `idx_drift_telemetry_model_time` — (tenant_id, model_id, invoked_at DESC)
+- `idx_drift_telemetry_rerouted` — partial index on rerouted rows
+- `idx_drift_telemetry_failures` — partial index on failed rows
+
+**RLS**: `tenant_id = current_setting('app.current_tenant_id')::uuid`.
+
+**Helper Functions**:
+
+| Function | Description |
+|----------|---------|
+| `get_genesis_drift_feedback(tenant_id, window_hours)` | Aggregates total/rerouted/failed invocations, rates, avg latency, and composite health score for Genesis gate decisions |
+| `cleanup_drift_telemetry(retention_days)` | Deletes telemetry older than retention period (default 7 days) |
+
+---
+
+### system_admins (v7.38.0)
+
+Migration: `V2026_02_07_015__system_admin_separation.sql`
+
+Global system administrator accounts. **No tenant_id, no RLS** — system admins manage the platform, not individual tenants. Authenticates via Cognito Pool B (separate from tenant Pool A).
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | UUID | PK | System admin ID |
+| cognito_user_id | VARCHAR(128) | NOT NULL, UNIQUE | Cognito Pool B sub |
+| email | VARCHAR(320) | NOT NULL, UNIQUE | Login email |
+| display_name | VARCHAR(255) | NOT NULL | Display name |
+| first_name | VARCHAR(100) | | First name |
+| last_name | VARCHAR(100) | | Last name |
+| role | system_admin_role | NOT NULL DEFAULT 'operator' | super_admin/admin/operator/auditor |
+| is_bootstrap | BOOLEAN | NOT NULL DEFAULT false | First admin created during deployment |
+| mfa_enabled | BOOLEAN | NOT NULL DEFAULT true | MFA status |
+| mfa_method | VARCHAR(20) | NOT NULL DEFAULT 'authenticator' | authenticator or sms |
+| timezone | VARCHAR(50) | NOT NULL DEFAULT 'UTC' | Profile timezone |
+| locale | VARCHAR(10) | NOT NULL DEFAULT 'en-US' | Profile locale |
+| status | VARCHAR(20) | NOT NULL DEFAULT 'pending_setup' | pending_setup/active/suspended/deactivated |
+| last_login_at | TIMESTAMPTZ | | Last successful login |
+| last_login_ip | INET | | Last login IP |
+| failed_login_attempts | INT | NOT NULL DEFAULT 0 | Consecutive failed logins |
+| locked_until | TIMESTAMPTZ | | Lockout expiry |
+| phone_verified | BOOLEAN | NOT NULL DEFAULT false | Has verified phone |
+| email_verified | BOOLEAN | NOT NULL DEFAULT false | Has verified email |
+| setup_completed_at | TIMESTAMPTZ | | When initial setup was completed |
+| created_by | UUID | | Creating admin (NULL for bootstrap) |
+| created_at | TIMESTAMPTZ | NOT NULL DEFAULT NOW() | |
+| updated_at | TIMESTAMPTZ | NOT NULL DEFAULT NOW() | |
+
+**Trigger**: `prevent_last_super_admin_removal` — prevents demoting or deactivating the last active super_admin.
+
+---
+
+### system_admin_contacts (v7.38.0)
+
+Verified email/phone for system admin SENTINEL alert routing. Max 3 emails + 3 phones per admin (enforced by trigger). Same verification flow as `user_contacts` but no tenant scope.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | UUID | PK | Contact ID |
+| admin_id | UUID | NOT NULL, FK → system_admins | Owner |
+| contact_type | contact_type | NOT NULL | email or phone |
+| label | contact_label | NOT NULL DEFAULT 'work' | work/personal/on_call/backup/custom |
+| value | VARCHAR(320) | NOT NULL | E.164 phone or email |
+| country_code | VARCHAR(2) | | ISO 3166-1 (phones only) |
+| is_primary | BOOLEAN | NOT NULL DEFAULT false | Primary contact for type |
+| verification_status | contact_verification_status | NOT NULL DEFAULT 'unverified' | |
+| verified_at | TIMESTAMPTZ | | When verified |
+
+---
+
+### system_admin_alert_routing (v7.38.0)
+
+SENTINEL alert → system admin contact mapping. **Global** (no tenant scope). When an alert fires, `resolve_system_admin_contacts()` queries this table to find matching contacts.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | UUID | PK | Routing rule ID |
+| admin_id | UUID | NOT NULL, FK → system_admins | Recipient |
+| alert_category | VARCHAR(20) | NOT NULL DEFAULT '*' | Alert category filter (* = all) |
+| min_severity | INT | NOT NULL DEFAULT 3, CHECK 1-5 | Minimum severity to trigger |
+| contact_id | UUID | NOT NULL, FK → system_admin_contacts | Target contact |
+| contact_type | contact_type | NOT NULL | Denormalized for fast lookup |
+| contact_value | VARCHAR(320) | NOT NULL | Denormalized |
+| enabled | BOOLEAN | NOT NULL DEFAULT true | |
+
+---
+
+### system_admin_audit_log (v7.38.0)
+
+All system admin lifecycle events: creation, role changes, deactivation, login failures, setup completion.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | UUID | PK | |
+| admin_id | UUID | NOT NULL, FK → system_admins | Target admin |
+| action | VARCHAR(50) | NOT NULL | Event type |
+| old_role | system_admin_role | | Previous role |
+| new_role | system_admin_role | | New role |
+| performed_by | UUID | | Acting admin (NULL for system/bootstrap) |
+| reason | TEXT | | Human-readable reason |
+| details | JSONB | | Additional structured data |
+| ip_address | INET | | Request IP |
+| created_at | TIMESTAMPTZ | NOT NULL DEFAULT NOW() | |
+
+---
+
+### Helper Functions (v7.38.0)
+
+| Function | Description |
+|----------|-------------|
+| `resolve_system_admin_contacts(category, severity)` | Returns all matching system admin contacts for alert dispatch (global, no tenant) |
+| `check_system_admin_permission(admin_id, permission)` | Checks if system admin has a specific permission based on role |
+| `bootstrap_system_admin(cognito_id, email, name)` | Creates first system admin; fails if any active admin exists |
+
+---
+
+### Spend Governor Tables (v7.39.0, Migration 175)
+
+#### `spend_governor_instance`
+
+Singleton table for global instance budget configuration.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | UUID | PK | |
+| budget_usd | NUMERIC(12,2) | NOT NULL DEFAULT 5000 | Maximum spend for period |
+| period_hours | INTEGER | NOT NULL DEFAULT 720 | Rolling window in hours |
+| warning_threshold | NUMERIC(3,2) | NOT NULL DEFAULT 0.90 | Alert at this percentage |
+| suspend_threshold | NUMERIC(3,2) | NOT NULL DEFAULT 1.00 | Freeze at this percentage |
+| aws_budget_id | TEXT | | AWS Budgets resource ID |
+| is_frozen | BOOLEAN | NOT NULL DEFAULT false | True when services frozen |
+| frozen_at | TIMESTAMPTZ | | When freeze occurred |
+| frozen_reason | TEXT | | Why services were frozen |
+| current_spend_usd | NUMERIC(12,2) | NOT NULL DEFAULT 0 | Cached current spend |
+| cost_report_interval_hours | INTEGER | NOT NULL DEFAULT 24 | Email report frequency |
+| last_cost_report_at | TIMESTAMPTZ | | Last report sent |
+| created_at | TIMESTAMPTZ | NOT NULL DEFAULT NOW() | |
+
+Unique index on `((true))` ensures singleton.
+
+#### `spend_governor_config`
+
+Per-tenant AI budget configuration.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | UUID | PK | |
+| tenant_id | UUID | NOT NULL, UNIQUE | Target tenant |
+| budget_usd | NUMERIC(12,2) | NOT NULL DEFAULT 1000 | Budget amount |
+| period_hours | INTEGER | NOT NULL DEFAULT 720 | Rolling window |
+| warning_threshold | NUMERIC(3,2) | NOT NULL DEFAULT 0.90 | Warning percentage |
+| suspend_threshold | NUMERIC(3,2) | NOT NULL DEFAULT 1.00 | Suspend percentage |
+| per_model_limit_usd | NUMERIC(12,2) | DEFAULT 0 | Per-model cap |
+| is_enabled | BOOLEAN | NOT NULL DEFAULT true | |
+| is_suspended | BOOLEAN | NOT NULL DEFAULT false | Models quarantined |
+| suspended_at | TIMESTAMPTZ | | When suspension occurred |
+| current_spend_usd | NUMERIC(12,2) | NOT NULL DEFAULT 0 | Cached spend |
+| created_at | TIMESTAMPTZ | NOT NULL DEFAULT NOW() | |
+
+#### `spend_governor_audit`
+
+Every governor action with full context.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | UUID | PK | |
+| tenant_id | UUID | | NULL for instance events |
+| action | TEXT | NOT NULL | warning_sent, models_suspended, instance_frozen, etc. |
+| scope | TEXT | NOT NULL DEFAULT 'tenant' | 'tenant' or 'instance' |
+| budget_usd | NUMERIC(12,2) | | Budget at time of action |
+| spent_usd | NUMERIC(12,2) | | Spend at time of action |
+| percent_used | NUMERIC(5,4) | | Calculated percentage |
+| reason | TEXT | | Human-readable reason |
+| performed_by | TEXT | NOT NULL | Actor ID |
+| metadata | JSONB | DEFAULT '{}' | Additional context |
+| created_at | TIMESTAMPTZ | NOT NULL DEFAULT NOW() | |
+
+#### `spend_governor_overrides`
+
+Temporary budget override tracking.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | UUID | PK | |
+| tenant_id | UUID | | NULL for instance |
+| scope | TEXT | NOT NULL DEFAULT 'tenant' | |
+| granted_by | TEXT | NOT NULL | Super admin ID |
+| expires_at | TIMESTAMPTZ | NOT NULL | Auto-expiry time |
+| is_active | BOOLEAN | NOT NULL DEFAULT true | |
+| created_at | TIMESTAMPTZ | NOT NULL DEFAULT NOW() | |
+
+#### `spend_governor_cost_reports`
+
+Scheduled cost report history.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | UUID | PK | |
+| report_type | TEXT | NOT NULL DEFAULT 'scheduled' | scheduled, on_demand, alert |
+| scope | TEXT | NOT NULL DEFAULT 'instance' | |
+| period_start | TIMESTAMPTZ | NOT NULL | Report window start |
+| period_end | TIMESTAMPTZ | NOT NULL | Report window end |
+| total_spend_usd | NUMERIC(12,2) | NOT NULL DEFAULT 0 | |
+| ai_spend_usd | NUMERIC(12,2) | NOT NULL DEFAULT 0 | |
+| aws_spend_usd | NUMERIC(12,2) | NOT NULL DEFAULT 0 | |
+| breakdown | JSONB | NOT NULL DEFAULT '{}' | By model/tenant/service |
+| recipients | JSONB | NOT NULL DEFAULT '[]' | Who received report |
+| sent_at | TIMESTAMPTZ | NOT NULL DEFAULT NOW() | |
+
+#### `critical_alerts`
+
+Platform-wide critical alert queue for admin banner.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | UUID | PK | |
+| alert_type | TEXT | NOT NULL | spend_warning, instance_frozen, etc. |
+| severity | TEXT | NOT NULL DEFAULT 'critical' | warning, critical, info |
+| title | TEXT | NOT NULL | Banner title |
+| message | TEXT | NOT NULL | Banner message |
+| scope | TEXT | NOT NULL DEFAULT 'instance' | instance or tenant |
+| tenant_id | UUID | | For tenant-scoped alerts |
+| is_active | BOOLEAN | NOT NULL DEFAULT true | |
+| is_dismissed | BOOLEAN | NOT NULL DEFAULT false | |
+| dismissed_by | TEXT | | Who dismissed |
+| auto_resolve | BOOLEAN | NOT NULL DEFAULT false | Auto-dismiss when cleared |
+| metadata | JSONB | DEFAULT '{}' | |
+| created_at | TIMESTAMPTZ | NOT NULL DEFAULT NOW() | |
+
+---
+
+### Helper Functions (v7.39.0)
+
+| Function | Description |
+|----------|-------------|
+| `check_spend_budget(tenant_id)` | Fast budget check returning blocked/warning/percent/budget/spent/reason/has_override |
+| `get_spend_summary(tenant_id, period_hours)` | Aggregated spend from cost_events over rolling period with by-model and by-provider breakdowns |
+| `record_spend_event(...)` | Insert audit log entry with auto-calculated percent_used |
+
+---
+
 ## NEXT PROMPTS
 
 Continue with:

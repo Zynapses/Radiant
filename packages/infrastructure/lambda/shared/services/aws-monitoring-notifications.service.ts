@@ -11,7 +11,13 @@ import {
   GetCostAndUsageCommand,
 } from '@aws-sdk/client-cost-explorer';
 import { executeStatement, stringParam, longParam, doubleParam, boolParam, setTenantContext } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'aws/monitoring-notifications',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 const sns = new SNSClient({});
 const ses = new SESClient({});

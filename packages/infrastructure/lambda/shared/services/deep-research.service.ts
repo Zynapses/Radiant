@@ -2,7 +2,13 @@
 // Asynchronous background research with browser automation
 
 import { executeStatement, stringParam } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'deep/research',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import pdfParse from 'pdf-parse';
 import type {
   ResearchJob,

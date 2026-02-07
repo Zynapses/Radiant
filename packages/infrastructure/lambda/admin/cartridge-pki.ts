@@ -8,7 +8,13 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { cartridgePKIService } from '../shared/services/cartridge-pki.service';
 import { executeStatement, stringParam, boolParam } from '../shared/db/client';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'admin/cartridge-pki',
+  category: 'audit',
+  sourceType: 'lambda',
+});
 
 // =============================================================================
 // Types

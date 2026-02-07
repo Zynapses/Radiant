@@ -3,7 +3,13 @@
 
 import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
 import { executeStatement } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'huggingface/discovery',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import type {
   ModelVersion,
   ModelFamilyWatchlist,

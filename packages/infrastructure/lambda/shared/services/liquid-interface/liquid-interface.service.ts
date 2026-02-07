@@ -3,7 +3,13 @@
 // The chat interface morphs into the tool the user needs
 
 import { executeStatement, stringParam, longParam, boolParam } from '../../db/client';
-import { enhancedLogger as logger } from '../../logging/enhanced-logger';
+import { createRegisteredLogger } from '../logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'liquid-interface/liquid-interface',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { COMPONENT_REGISTRY, suggestComponents, getComponent } from './component-registry';
 import {
   LiquidSchema,

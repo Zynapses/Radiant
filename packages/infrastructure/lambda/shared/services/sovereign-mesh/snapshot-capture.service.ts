@@ -5,9 +5,13 @@
  */
 
 import { executeStatement, stringParam, longParam, doubleParam } from '../../db/client';
-import { enhancedLogger } from '../../logging/enhanced-logger';
+import { createRegisteredLogger } from '../logging-registry.service';
 
-const logger = enhancedLogger;
+const logger = createRegisteredLogger({
+  serviceName: 'sovereign-mesh/snapshot-capture',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 // ============================================================================
 // TYPES

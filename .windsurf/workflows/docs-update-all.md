@@ -35,6 +35,9 @@ Before making ANY code change, identify what type of change it is:
 | `thinktank_feature` | Think Tank, chat, UI, morphing, liquid |
 | `thinktank_admin` | admin config, user rules, delight, domains |
 | `tenant_admin` | tenant settings, team config, tenant reports, org admin |
+| `tenant_settings` | company settings, tenant configuration, org preferences |
+| `team_settings` | team management, team configuration, workspace settings |
+| `org_admin` | organization admin, company admin, enterprise settings |
 | `platform_feature` | tenant, billing, models, providers |
 | `user_facing` | UI component, user interaction, visible to user |
 | `ui_component` | component, button, panel, view, design |
@@ -45,6 +48,8 @@ Before making ANY code change, identify what type of change it is:
 | `dependency` | npm, package, library, import |
 | `consciousness` | ego, affect, consciousness, identity |
 | `cato` | safety, genesis, ethics, CBF |
+| `omega` | OMEGA Protocol, Genesis, Cortex, Helix Kernel, firmware, shadow mode |
+| `genesis` | Genesis Lab, Genesis Forge, firmware, brain monitoring |
 | `cortex` | memory, blackboard, context |
 | `architecture` | service, pattern, design, system |
 | `competitive_advantage` | moat, unique feature, differentiator |
@@ -56,6 +61,13 @@ Before making ANY code change, identify what type of change it is:
 | `api_keys` | API key, interface type, scopes, key validation |
 | `gateway` | Go gateway, NATS, WebSocket, SSE, protocol |
 | `service_layer` | MCP worker, A2A worker, Cedar policy |
+| `health` | system health, monitoring, alerts, uptime |
+| `monitoring` | CloudWatch, metrics, alerts, dashboard |
+| `litellm_gateway` | LiteLLM proxy, AI gateway, ECS tasks |
+| `delight` | Delight system, personality mode, injection point, UX touches |
+| `delight_ui` | @radiant/delight-ui package, cross-app Delight provider |
+| `delight_achievement` | achievement, easter egg, sound effect, celebration |
+| `delight_orchestration` | Delight-Brain integration, SSE events, workflow messages |
 | `new_term` | New AI term, technology concept, definition |
 | `new_subsystem` | New service, component, feature system |
 | `new_acronym` | New abbreviation introduced |
@@ -150,6 +162,41 @@ Use the trigger matrix to find ALL required documentation:
 ✅ docs/RADIANT-ADMIN-GUIDE.md (if affects deployment options)
 ```
 
+### System Health / Monitoring Changes
+```
+✅ CHANGELOG.md
+✅ docs/SYSTEM-HEALTH-GUIDE.md
+✅ docs/RADIANT-ADMIN-GUIDE.md (if admin-configurable)
+✅ docs/RADIANT-PLATFORM-ARCHITECTURE.md (if architectural)
+```
+
+### OMEGA / Genesis Changes
+```
+✅ CHANGELOG.md
+✅ docs/OMEGA-USER-GUIDE.md (architecture, Q-Nodes, Cortex, Resonant Index)
+✅ docs/OMEGA-ADMIN-GUIDE.md (admin API, brain management, firmware, Shadow Mode)
+✅ docs/RADIANT-PLATFORM-ARCHITECTURE.md (if architectural)
+✅ docs/RADIANT-MOATS.md (if competitive advantage)
+```
+
+### Licensing / Seats / Compliance Changes
+```
+✅ CHANGELOG.md
+✅ docs/THINKTANK-LICENSING-MODEL.md (license types, tiers, enforcement)
+✅ docs/THINKTANK-TENANT-ADMIN-GUIDE.md (tenant admin UI for licenses)
+✅ docs/RADIANT-ADMIN-GUIDE.md (if platform-level license overrides)
+✅ docs/architecture/ADR-USER-PROVISIONING-SEAT-LICENSING-AUTH.md (if policy changes)
+```
+
+### Think Tank Feature Changes (Dual-Platform)
+```
+✅ CHANGELOG.md — with platform annotation: [Web], [Mac], or [Both]
+✅ docs/THINKTANK-USER-GUIDE.md (user-facing features)
+✅ docs/THINKTANK-MAC-GUIDE.md (Feature Parity Matrix update)
+✅ docs/THINKTANK-ADMIN-GUIDE.md (if admin-configurable)
+⚠️ ALSO: Run /.windsurf/workflows/thinktank-dual-platform.md sync checklist
+```
+
 ### Curator / Knowledge Changes
 ```
 ✅ CHANGELOG.md
@@ -183,6 +230,16 @@ Use the trigger matrix to find ALL required documentation:
 ✅ docs/RADIANT-PLATFORM-ARCHITECTURE.md
 ✅ docs/RADIANT-ADMIN-GUIDE.md (if admin-configurable)
 ✅ docs/ENGINEERING-IMPLEMENTATION-VISION.md (if architectural)
+```
+
+### Delight System Changes
+```
+✅ CHANGELOG.md
+✅ docs/DELIGHT-SYSTEM-GUIDE.md
+✅ docs/THINKTANK-ADMIN-GUIDE.md (if admin-configurable)
+✅ docs/THINKTANK-ADMIN-GUIDE-V2.md (if admin-configurable)
+✅ docs/RADIANT-PLATFORM-ARCHITECTURE.md (if architectural)
+✅ docs/ENGINEERING-IMPLEMENTATION-VISION.md (if events/orchestration)
 ```
 
 ### New Terms, Subsystems, or Acronyms
@@ -293,6 +350,10 @@ When updating these documents, also update the version number in the header:
 - `docs/SWIFT-DEPLOYER-USER-GUIDE.md`
 - `docs/SERVICE-LAYER-GUIDE.md`
 - `docs/RADIANT-GLOSSARY.md`
+- `docs/SYSTEM-HEALTH-GUIDE.md`
+- `docs/DELIGHT-SYSTEM-GUIDE.md`
+- `docs/OMEGA-USER-GUIDE.md`
+- `docs/OMEGA-ADMIN-GUIDE.md`
 
 ---
 
@@ -312,7 +373,12 @@ Before marking task complete, verify:
 □ Swift Deployer guide updated (if deployer changes)
 □ Service Layer guide updated (if MCP, A2A, API, gateway changes)
 □ Curator guide updated (if knowledge, verification, or cartridge changes)
+□ Tenant Admin guide updated (if tenant/team settings, org admin, cartridge management)
 □ **Glossary updated (if new terms, subsystems, acronyms, or AWS services)**
+□ System Health guide updated (if monitoring, alerts, or health changes)
+□ OMEGA User Guide updated (if OMEGA/Genesis architecture, features, or Q-Nodes)
+□ OMEGA Admin Guide updated (if OMEGA admin API, firmware, Shadow Mode, or brain ops)
+□ Delight System Guide updated (if personality modes, injection points, achievements, easter eggs, sounds, events, or orchestration)
 □ Version numbers updated in all touched docs
 ```
 
@@ -368,6 +434,22 @@ Use this manifest to programmatically determine which docs need updating.
 │  ✅ SERVICE-LAYER-GUIDE.md                                              │
 │  ✅ RADIANT-PLATFORM-ARCHITECTURE.md                                    │
 │                                                                          │
+│  FOR OMEGA / GENESIS CHANGES:                                            │
+│  ✅ OMEGA-USER-GUIDE.md (architecture, features)                        │
+│  ✅ OMEGA-ADMIN-GUIDE.md (admin ops, API, firmware)                     │
+│                                                                          │
+│  FOR SWIFT DEPLOYER CHANGES:                                             │
+│  ✅ SWIFT-DEPLOYER-USER-GUIDE.md                                        │
+│  (credentials, instances, drift, snapshots, migrations)                  │
+│                                                                          │
+│  FOR SYSTEM HEALTH / MONITORING:                                         │
+│  ✅ SYSTEM-HEALTH-GUIDE.md                                              │
+│  (alerts, uptime, CloudWatch, LiteLLM gateway)                           │
+│                                                                          │
+│  FOR DELIGHT SYSTEM CHANGES:                                             │
+│  ✅ DELIGHT-SYSTEM-GUIDE.md                                             │
+│  (personality, injection points, achievements, easter eggs, sounds)       │
+│                                                                          │
 │  FOR NEW TERMS/SUBSYSTEMS/ACRONYMS:                                      │
 │  ✅ RADIANT-GLOSSARY.md (MANDATORY)                                     │
 │                                                                          │
@@ -387,6 +469,7 @@ Use this manifest to programmatically determine which docs need updating.
 ❌ Skipping admin guide for admin-facing changes
 ❌ Forgetting STRATEGIC-VISION-MARKETING.md when updating admin guides
 ❌ **Introducing new terms/acronyms without updating RADIANT-GLOSSARY.md**
+❌ Changing Delight features without updating DELIGHT-SYSTEM-GUIDE.md
 
 ---
 

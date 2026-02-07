@@ -1,7 +1,7 @@
 # Think Tank User Guide
 
-> **Version**: 6.6.0  
-> **Last Updated**: February 3, 2026  
+> **Version**: 7.9.0  
+> **Last Updated**: February 5, 2026  
 > **Audience**: End Users of Think Tank
 
 ---
@@ -23,7 +23,8 @@
 12. [Decision Records](#12-decision-records)
 13. [Living Parchment](#13-living-parchment)
 14. [Safety & Governance](#14-safety--governance)
-15. [Time Machine - Conversation Forking](#15-time-machine---conversation-forking)
+15. [LIVS-M Policy Modes - AI Quality Control](#15-livs-m-policy-modes---ai-quality-control)
+16. [Time Machine - Conversation Forking](#16-time-machine---conversation-forking)
 16. [The Grimoire - Procedural Memory](#16-the-grimoire---procedural-memory)
 17. [Flash Facts - Quick Knowledge Capture](#17-flash-facts---quick-knowledge-capture)
 18. [Sentinel Agents - Background Monitors](#18-sentinel-agents---background-monitors)
@@ -1054,6 +1055,138 @@ These are hardcoded safety limits that cannot be changed:
 - ❌ Bypass safety barriers
 - ❌ Delete audit logs
 - ❌ Expose sensitive data
+
+### LIVS-M 2.0 Policy Modes (v7.9.0)
+
+Think Tank includes **LIVS-M 2.0** - a "Defcon-style" governance system that controls how strictly AI outputs are verified. Think of it as a dial that controls the rigor of AI quality checks.
+
+**Access**: Settings → Advanced → LIVS-M Policy
+
+#### The Three Policy Modes
+
+| Mode | Nickname | Best For | Behavior |
+|------|----------|----------|----------|
+| **Brainstorming** | "Yes, and..." | Hackathons, MVP planning, early drafting | Accepts partial code, stubs, rough ideas. Warnings logged but don't stop work. |
+| **Standard** | "Trust but Verify" | Daily development, Sprint work | Code must run. Stubs rejected if breaking. Tests encouraged. **(Default)** |
+| **Strict Audit** | "Zero Trust" | Production releases, medical/legal, security | No stubs. No mock data. Mandatory tests. Sycophancy triggers Devil's Advocate. |
+
+#### What Each Mode Does
+
+**🔶 Brainstorming Mode**
+- AI accepts "TODO" comments and placeholder code
+- Focus on speed and creativity over perfection
+- Warnings are logged but don't block responses
+- Best when you're exploring ideas, not shipping code
+
+**🔵 Standard Mode** (Default)
+- Code must actually work - no broken implementations
+- Stubs are rejected if they break functionality
+- Tests are encouraged but not mandatory for everything
+- Sycophancy detection warns when AI agrees too quickly
+
+**🔴 Strict Audit Mode**
+- Zero tolerance for stubs, placeholders, or mock data
+- Every output must include appropriate test coverage
+- If AI agents agree too quickly, a "Devil's Advocate" challenge is injected
+- Maximum verification before any response is approved
+
+#### Visual Indicators
+
+When LIVS-M detects potential issues in AI responses, you'll see:
+- ⚠️ **Warning badge** - Minor issue, response continues
+- 🛑 **Block indicator** - Response blocked, AI will retry with stricter guidelines
+- 😈 **Devil's Advocate** - Consensus was too fast, alternative viewpoint injected
+- 📋 **Review flag** - Flagged for human review
+
+#### Common Scenarios
+
+| Scenario | Recommended Mode |
+|----------|------------------|
+| Brainstorming a new feature | Brainstorming |
+| Writing production code | Standard |
+| Code review before deploy | Strict Audit |
+| Exploring creative ideas | Brainstorming |
+| Security-sensitive changes | Strict Audit |
+| Day-to-day development | Standard |
+
+#### Understanding What LIVS-M Catches
+
+**The "Watermelon" Problem**: AI agents reporting "Done" when code is full of `pass`, `return True`, or `// TODO` placeholders. LIVS-M detects these patterns and rejects lazy implementations.
+
+**The "Groupthink" Problem**: When Agent A makes a mistake and Agent B just agrees with it. LIVS-M detects suspiciously fast consensus and injects a "Devil's Advocate" challenge.
+
+**The "Hallucination" Problem**: AI importing libraries that don't exist or making up APIs. LIVS-M verifies dependencies against approved lists.
+
+#### How LIVS-M Works Behind the Scenes
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                    LIVS-M 2.0 VERIFICATION FLOW                      │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  YOUR QUESTION                                                       │
+│       │                                                              │
+│       ▼                                                              │
+│  ┌─────────────┐                                                    │
+│  │  AI AGENT   │ ─────────────────────────┐                         │
+│  │  (Worker)   │                          │                         │
+│  └─────────────┘                          ▼                         │
+│                                   ┌───────────────┐                 │
+│                                   │  SUPERVISOR   │                 │
+│                                   │  (Governance) │                 │
+│                                   └───────┬───────┘                 │
+│                                           │                         │
+│                          ┌────────────────┼────────────────┐        │
+│                          ▼                ▼                ▼        │
+│                    ┌──────────┐    ┌──────────┐    ┌──────────┐    │
+│                    │ APPROVE  │    │  REJECT  │    │INTERVENE │    │
+│                    │ (Pass)   │    │ (Retry)  │    │(Devil's  │    │
+│                    │          │    │          │    │Advocate) │    │
+│                    └──────────┘    └──────────┘    └──────────┘    │
+│                          │                │                │        │
+│                          ▼                ▼                ▼        │
+│                    YOUR ANSWER      AI RETRIES      CHALLENGE       │
+│                                     WITH FIX        INJECTED        │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+#### Switching Modes
+
+You can switch modes anytime:
+1. Click the **⚙️ Settings** icon
+2. Go to **Advanced → LIVS-M Policy**
+3. Select your preferred mode
+4. Changes apply to your next conversation
+
+#### Version Updates (v7.9.0+)
+
+LIVS-M now includes automatic version management. When updates are available:
+
+- **Update Badge**: A green "UPDATE" badge appears on the LIVS-M Policy navigation item
+- **Version Display**: Your current version is shown in the header (e.g., "v2.0.0")
+- **Updates Tab**: Navigate to the "Updates" tab to see what's new
+
+**Checking for Updates**:
+1. Go to **Settings → Advanced → LIVS-M Policy**
+2. Click the **Updates** tab
+3. If an update is available, you'll see:
+   - Current vs. latest version comparison
+   - Changelog with new features
+   - One-click **Upgrade** button
+
+**Update Alerts**:
+- ⚠️ **Breaking Changes**: Review changelog carefully before upgrading
+- 🔄 **Migration Required**: Database changes will be handled automatically
+- ✅ **Up to Date**: Green checkmark when you're on the latest version
+
+> **Note**: Upgrades are typically seamless, but your administrator may schedule them during maintenance windows for production environments.
+
+#### Pro Tips
+
+- **Friday Deployments**: Switch to Strict Audit mode before any end-of-week releases
+- **Creative Sessions**: Use Brainstorming mode when exploring new ideas—you can always tighten later
+- **Code Reviews**: Strict Audit mode acts as an automated code quality gate
 
 ### Reporting Issues
 
@@ -2181,6 +2314,7 @@ To see how these systems are working for you:
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 7.9.0 | Feb 5, 2026 | **LIVS-M 2.0 Policy Modes**: Added comprehensive documentation for "Defcon-style" AI governance with Brainstorming, Standard, and Strict Audit policy modes. Updated Settings → Advanced → LIVS-M Policy access path. |
 | 6.6.0 | Feb 3, 2026 | **Autonomous Organism Architecture (Project Metamorphosis)**: Added Section 29 covering Liquid Compute (data sovereignty), Ghost Simulation (personalized safety), Economic Cortex (budget management), Genesis Auto-Tool (capability expansion), and Neural Affinity Routing (model selection) |
 | 6.0.0 | Jan 31, 2026 | **Neural Architecture v6.0.0**: Added RADIANT Cartridges section, Domain Selector guide, Cartridge Indicator documentation, Three Learning Tiers explanation, expanded Glossary with neural architecture terms |
 | 5.52.58 | Jan 31, 2026 | Added Workflows & Orchestration Methods section (multi-AI selection, stream evaluation, workflow templates, configurable parameters) |

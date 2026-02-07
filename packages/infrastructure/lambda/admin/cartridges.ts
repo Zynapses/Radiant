@@ -5,7 +5,13 @@
 
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import { cartridgeService } from '../shared/services/cartridge.service';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'admin/cartridges',
+  category: 'audit',
+  sourceType: 'lambda',
+});
 import type { CartridgeScope } from '@radiant/shared';
 
 const corsHeaders = {

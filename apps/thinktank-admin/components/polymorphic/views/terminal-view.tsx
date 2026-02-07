@@ -7,6 +7,8 @@
  * 
  * Fast execution view for quick commands and lookups.
  * Shows output in terminal-style format with execution feedback.
+ * 
+ * Integrates with Sniper service for fast AI-powered command execution.
  */
 
 import React, { useState, useRef, useEffect } from 'react';
@@ -17,7 +19,19 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Zap, Send, Copy, Check, Clock, Terminal, ArrowUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { api } from '@/lib/api/client';
 import type { ViewComponentProps } from '../view-router';
+
+interface SniperExecuteResponse {
+  success: boolean;
+  data: {
+    output: string;
+    executionMs: number;
+    costCents: number;
+    model: string;
+    contextHydrated: boolean;
+  };
+}
 
 interface TerminalEntry {
   id: string;
@@ -83,20 +97,36 @@ export function TerminalView({
     const startTime = Date.now();
     
     try {
-      // TODO: Replace with actual API call to Sniper service
-      // In production: const response = await sniperService.execute(command, projectId);
+      // Execute through Sniper service with Ghost Memory context hydration
+      const response = await api.post<SniperExecuteResponse>(
+        '/api/thinktank-admin/polymorphic/sniper',
+        {
+          command,
+          projectId,
+          context: {
+            recentCommands: entries
+              .filter(e => e.type === 'command')
+              .slice(-5)
+              .map(e => e.content),
+          },
+        }
+      );
+
       const executionMs = Date.now() - startTime;
-      
-      const outputEntry: TerminalEntry = {
-        id: crypto.randomUUID(),
-        type: 'output',
-        content: `[Sniper] Processing: ${command}\n\nExecuting with Ghost Memory context hydration...\nResponse generated in ${executionMs}ms.\n\n> Ready for next command.`,
-        timestamp: new Date(),
-        executionMs,
-        costCents: 1,
-      };
-      setEntries(prev => [...prev, outputEntry]);
-      
+
+      if (response.success && response.data) {
+        const outputEntry: TerminalEntry = {
+          id: crypto.randomUUID(),
+          type: 'output',
+          content: response.data.output,
+          timestamp: new Date(),
+          executionMs: response.data.executionMs || executionMs,
+          costCents: response.data.costCents,
+        };
+        setEntries(prev => [...prev, outputEntry]);
+      } else {
+        throw new Error('Invalid response from Sniper service');
+      }
     } catch (error) {
       const errorEntry: TerminalEntry = {
         id: crypto.randomUUID(),

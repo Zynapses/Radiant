@@ -4,7 +4,13 @@
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { economicGovernorService, GovernorMode, ModelTier } from '../shared/services/economic-governor.service';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'thinktank/economic-governor',
+  category: 'application',
+  sourceType: 'lambda',
+});
 
 // ============================================================================
 // Helpers

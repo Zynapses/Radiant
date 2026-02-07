@@ -5,7 +5,13 @@
  * to failing services.
  */
 
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from '../services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'shared/utils-circuit-breaker',
+  category: 'infrastructure',
+  sourceType: 'lambda',
+});
 
 export type CircuitState = 'closed' | 'open' | 'half-open';
 

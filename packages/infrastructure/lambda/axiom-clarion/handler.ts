@@ -13,7 +13,13 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { axiomService } from '../shared/services/axiom.service';
 import { clarionService } from '../shared/services/clarion.service';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'axiom-clarion/handler',
+  category: 'infrastructure',
+  sourceType: 'lambda',
+});
 import { 
   axiomEventsService, 
   getSSEHeaders, 

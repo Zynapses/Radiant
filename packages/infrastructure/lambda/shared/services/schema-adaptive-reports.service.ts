@@ -1,7 +1,13 @@
 // @ts-ignore - module may not exist in all environments
 import { executeStatement } from '../utils/aurora';
 // @ts-ignore - module may not exist in all environments
-import { enhancedLogger as logger } from './enhanced-logger.service';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'schema/adaptive-reports',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 export interface SchemaColumn {
   name: string;

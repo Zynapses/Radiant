@@ -19,7 +19,13 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import { createHash } from 'crypto';
-import { enhancedLogger as logger } from '../../logging/enhanced-logger';
+import { createRegisteredLogger } from '../logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'uep/self-healing',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { executeStatement, stringParam, boolParam } from '../../db/client';
 import { persistenceGuard } from '../persistence-guard.service';
 import type { UEPEnvelope } from './integration.service';

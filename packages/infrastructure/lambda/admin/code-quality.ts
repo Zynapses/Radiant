@@ -7,10 +7,13 @@
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { executeStatement, stringParam } from '../shared/db/client';
-import { enhancedLogger } from '../shared/logging/enhanced-logger';
-import { createResponse, createErrorResponse } from '../shared/utils/response';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
 
-const logger = enhancedLogger;
+const logger = createRegisteredLogger({
+  serviceName: 'admin/code-quality',
+  category: 'audit',
+  sourceType: 'lambda',
+});
 
 // ============================================================================
 // Types

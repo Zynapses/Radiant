@@ -24,7 +24,13 @@ import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { createHash } from 'crypto';
 import { executeStatement, stringParam, boolParam } from '../../db/client';
-import { enhancedLogger as logger } from '../../logging/enhanced-logger';
+import { createRegisteredLogger } from '../logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'uds/upload',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { udsEncryptionService } from './encryption.service';
 import { udsAuditService } from './audit.service';
 // v5.53.1 Gemini Enhancement: Multimedia Sidecar Service for cognitive processing

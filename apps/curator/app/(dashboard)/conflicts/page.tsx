@@ -19,6 +19,7 @@ import {
 import { cn } from '@/lib/utils';
 import { GlassCard } from '@/components/ui/glass-card';
 import { toast } from 'sonner';
+import { useRadiantDelightOptional } from '@radiant/delight-ui';
 
 type ResolutionType = 'supersede_old' | 'supersede_new' | 'merge' | 'context_dependent' | 'ignore';
 
@@ -90,6 +91,8 @@ export default function ConflictsPage() {
     fetchConflicts();
   }, [filter]);
 
+  const delight = useRadiantDelightOptional();
+
   const handleResolve = async (resolution: ResolutionType, winningNodeId?: string) => {
     if (!selectedConflict || !resolutionReason) {
       toast.error('Error', { description: 'Please provide a reason for this resolution.' });
@@ -121,11 +124,13 @@ export default function ConflictsPage() {
         setSelectedConflict(null);
         setResolutionReason('');
         setMergedValue('');
+        delight?.triggerDelight('action_complete');
       } else {
         throw new Error('Failed to resolve');
       }
     } catch (error) {
       toast.error('Error', { description: 'Failed to resolve conflict. Please try again.' });
+      delight?.triggerDelight('error_recovery');
     } finally {
       setResolving(false);
     }

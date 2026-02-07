@@ -4,7 +4,13 @@
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { councilOfRivalsService, PresetCouncilType } from '../shared/services/council-of-rivals.service';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'thinktank/council-of-rivals',
+  category: 'application',
+  sourceType: 'lambda',
+});
 
 // ============================================================================
 // Helpers

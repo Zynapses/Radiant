@@ -71,13 +71,16 @@ export function extractAuthContext(event: APIGatewayProxyEvent): AuthContext {
   const groups = claims['cognito:groups'] || [];
   const roles = claims['custom:role'] ? [claims['custom:role']] : [];
   
-  const isAdmin = groups.some(g => 
-    ['super_admin', 'admin', 'operator', 'auditor'].includes(g)
-  );
-  const isSuperAdmin = groups.includes('super_admin');
+  // v7.38.0: System admin roles (super_admin, admin, operator, auditor) are NO LONGER
+  // recognized in tenant auth. They authenticate via Pool B and system-admin-auth.ts.
+  // Tenant auth only recognizes tenant-scoped admin roles.
+  const TENANT_ADMIN_ROLES = ['TenantAdmin', 'tenant_admin'];
+  const isAdmin = groups.some(g => TENANT_ADMIN_ROLES.includes(g)) ||
+    TENANT_ADMIN_ROLES.includes(claims['custom:role'] || '');
+  const isSuperAdmin = false; // No super_admin in tenant context
 
   const environment = (process.env.ENVIRONMENT as 'dev' | 'staging' | 'prod') || 'dev';
-  const primaryRole = roles[0] || groups.find(g => ['super_admin', 'admin', 'operator', 'auditor'].includes(g)) || 'user';
+  const primaryRole = roles[0] || groups.find(g => TENANT_ADMIN_ROLES.includes(g)) || 'user';
 
   return {
     userId,

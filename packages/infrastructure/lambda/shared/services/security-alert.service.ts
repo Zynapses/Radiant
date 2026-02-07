@@ -3,8 +3,14 @@
 // ============================================================================
 
 import { executeStatement, stringParam, longParam, doubleParam, boolParam } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
 import * as crypto from 'crypto';
+
+const logger = createRegisteredLogger({
+  serviceName: 'security/alert-service',
+  category: 'security',
+  sourceType: 'application',
+});
 
 // ============================================================================
 // Types

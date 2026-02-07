@@ -37,11 +37,81 @@ export interface User {
   cognito_user_id: string;
   email: string;
   display_name?: string;
-  role: 'user' | 'power_user' | 'admin';
-  status: 'active' | 'suspended' | 'pending';
+  first_name?: string;
+  last_name?: string;
+  avatar_url?: string;
+  email_verified?: boolean;
+  role: string;
+  tenant_role: 'standard_user' | 'tenant_admin' | 'tenant_owner' | 'viewer';
+  status: 'active' | 'suspended' | 'pending' | 'invited' | 'deactivated';
+  has_access_think_tank: boolean;
+  has_access_curator: boolean;
+  has_access_dojo: boolean;
+  has_access_cato_trainer: boolean;
+  has_access_genesis: boolean;
+  has_access_tenant_admin: boolean;
+  sso_provider?: string;
+  mfa_enabled: boolean;
+  mfa_methods?: unknown[];
+  invitation_token?: string;
+  invitation_expires_at?: string;
+  invited_by?: string;
+  deactivated_at?: string;
+  deactivated_by?: string;
+  deactivation_reason?: string;
+  deletion_requested_at?: string;
+  deletion_scheduled_for?: string;
+  last_login_at?: string;
+  login_count?: number;
+  last_active_at?: string;
+  message_count?: number;
+  token_usage?: number;
+  permissions: Record<string, boolean>;
   settings: Record<string, unknown>;
   created_at: string;
   updated_at: string;
+}
+
+export interface TenantLicense {
+  id: string;
+  tenant_id: string;
+  license_type: string;
+  app_id: string;
+  feature_code?: string;
+  quantity: number;
+  used: number;
+  reserved: number;
+  unit: string;
+  included_in_tier: number;
+  additional_purchased: number;
+  price_per_unit_cents?: number;
+  overage_allowed: boolean;
+  overage_price_per_unit_cents?: number;
+  is_active: boolean;
+  expires_at?: string;
+  notes?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TenantAuthConfig {
+  tenant_id: string;
+  allow_password_login: boolean;
+  allow_google_login: boolean;
+  allow_apple_login: boolean;
+  allow_microsoft_login: boolean;
+  require_sso_only: boolean;
+  require_mfa: boolean;
+  sso_provider_type?: string;
+  sso_metadata_url?: string;
+  sso_entity_id?: string;
+  session_timeout_minutes: number;
+  max_failed_attempts: number;
+  lockout_duration_minutes: number;
+  invitation_expiry_days: number;
+  hipaa_mode: boolean;
+  updated_at: string;
+  updated_by?: string;
 }
 
 export interface Administrator {

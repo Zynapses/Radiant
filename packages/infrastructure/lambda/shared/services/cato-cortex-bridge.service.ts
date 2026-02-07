@@ -45,7 +45,13 @@
  */
 
 import { executeStatement, stringParam, doubleParam } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'cato/cortex-bridge',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { globalMemoryService, type MemoryEntry } from './cato/global-memory.service';
 import { tierCoordinatorService } from './cortex/tier-coordinator.service';
 

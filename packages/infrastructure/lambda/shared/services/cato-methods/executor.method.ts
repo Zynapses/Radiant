@@ -14,7 +14,13 @@ import { CatoMethodRegistryService } from '../cato-method-registry.service';
 import { CatoSchemaRegistryService } from '../cato-schema-registry.service';
 import { CatoToolRegistryService } from '../cato-tool-registry.service';
 import { CatoCompensationService } from '../cato-compensation.service';
-import { enhancedLogger as logger } from '../../logging/enhanced-logger';
+import { createRegisteredLogger } from '../logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'cato-methods/executor.method',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 const lambdaClient = new LambdaClient({});
 

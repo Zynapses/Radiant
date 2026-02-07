@@ -181,6 +181,7 @@
     {"number": 172, "name": "white_label", "filename": "172_white_label.sql", "hash": "8eb7318fca02b1f089c9a0a768141529bdae81a2f008278599acd5b6c1bf2444"},
     {"number": 173, "name": "user_violations", "filename": "173_user_violations.sql", "hash": "30584b6edded03238f4b38df9f97196435fd6764320d77cfab1fbb1eb622a909"},
     {"number": 174, "name": "thinktank_missing_features", "filename": "174_thinktank_missing_features.sql", "hash": "437be819f648f6cf59c49ccf810c992b462b44dcb9c3f23ddad3ef4234eaa9a3"},
+    {"number": 175, "name": "spend_governor", "filename": "175_spend_governor.sql", "hash": "pending_deployment"},
     {"number": 1, "name": "demo_data", "filename": "001_demo_data.sql", "hash": "4c428a9d6509513c9ac5f19fcf4dec3dbb8bb5a15c1615adda8003d4c4627c93"}
   ]
 }

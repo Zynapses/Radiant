@@ -5,7 +5,13 @@
  */
 
 import type { KnowledgeGap, Goal, GoalType, GoalStatus, GoalGuardrails, Milestone } from '@radiant/shared';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'curiosity/engine',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { DEFAULT_GOAL_GUARDRAILS } from '@radiant/shared/constants';
 import { getDbPool } from './database';
 import { callLiteLLM } from './litellm.service';

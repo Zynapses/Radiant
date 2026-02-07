@@ -24,7 +24,13 @@ import {
 } from '@aws-sdk/client-kms';
 import { createHash, createPrivateKey, createPublicKey, sign, verify } from 'crypto';
 import { executeStatement, stringParam, boolParam } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'cartridge/pki',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import type {
   CartridgeSignatureBlock,
   CartridgeSignature,

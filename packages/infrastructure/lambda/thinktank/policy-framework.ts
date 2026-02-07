@@ -4,7 +4,13 @@
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { policyFrameworkService, PolicyDomain, StancePosition, PresetProfileType } from '../shared/services/policy-framework.service';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'thinktank/policy-framework',
+  category: 'application',
+  sourceType: 'lambda',
+});
 
 // ============================================================================
 // Helpers

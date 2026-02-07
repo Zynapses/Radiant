@@ -1,10 +1,10 @@
 # RADIANT Engineering Implementation & Vision
 
-**Version**: 6.1.0  
-**Last Updated**: 2026-02-01  
+**Version**: 6.2.0  
+**Last Updated**: 2026-02-07  
 **Classification**: Internal Engineering Reference
 
-> **POLICY**: All technical architecture, implementation details, and visionary documentation MUST be consolidated in this document. Engineers require comprehensive detail—never abbreviate or summarize to the point of losing implementation specifics. See `/.windsurf/workflows/documentation-consolidation.md` for enforcement.
+> **POLICY**: All technical architecture, implementation details, and visionary documentation MUST be consolidated in this document. Engineers require comprehensive detail—never abbreviate or summarize to the point of losing implementation specifics. See `/.windsurf/workflows/docs-update-all.md` for enforcement.
 
 ---
 
@@ -6472,7 +6472,7 @@ When implementing new features, add documentation to the appropriate section:
 11. **Security documentation** → Section 10.3
 12. **Admin API handlers** → Section 16
 
-See `/.windsurf/workflows/documentation-consolidation.md` for the enforcement policy.
+See `/.windsurf/workflows/docs-update-all.md` for the enforcement policy.
 
 ---
 
@@ -10516,10 +10516,778 @@ All TypeScript interfaces for:
 
 ---
 
+## 33. LIVS-M 2.0: Registry Edition (v7.9.0)
+
+### 33.1 Overview
+
+LIVS-M 2.0 introduces the **Policy Registry** pattern—a JSON-based "Soft Registry" that decouples AI behavior logic from enforcement policy. This enables administrators to configure the entire AI governance team without touching code.
+
+**Key Innovation**: Multi-agent governance with sycophancy detection and automatic chaos injection.
+
+### 33.2 Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                     LIVS-M 2.0 Registry Edition                      │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│    ┌─────────────────────────────────────────────────────────┐      │
+│    │                   POLICY REGISTRY (JSON)                 │      │
+│    │  ┌─────────────┬───────────────┬─────────────────┐     │      │
+│    │  │ meta_config │ global_direct │  rules_engine   │     │      │
+│    │  │             │    ives       │   (5 rules)     │     │      │
+│    │  │ env_mode:   │ allow_stubs:  │ R_STUB_01       │     │      │
+│    │  │ BALANCED    │ false         │ R_SYC_01        │     │      │
+│    │  │ registry_   │ allow_mock:   │ R_TEST_01       │     │      │
+│    │  │ version:2.0 │ false         │ R_EVIDENCE_01   │     │      │
+│    │  │             │ require_tests │ R_CONFIDENCE_01 │     │      │
+│    │  └─────────────┴───────────────┴─────────────────┘     │      │
+│    └─────────────────────────────────────────────────────────┘      │
+│                              │                                       │
+│                              ▼                                       │
+│    ┌─────────────────────────────────────────────────────────┐      │
+│    │              GOVERNANCE SUPERVISOR (LLM)                 │      │
+│    │  • Evaluates all agent outputs                          │      │
+│    │  • Decisions: APPROVE | REJECT | INTERVENE              │      │
+│    │  • Tracks session state for sycophancy detection        │      │
+│    │  • Triggers Chaos Agent on premature consensus          │      │
+│    └─────────────────────────────────────────────────────────┘      │
+│                              │                                       │
+│              ┌───────────────┼───────────────┐                      │
+│              ▼               ▼               ▼                      │
+│    ┌──────────────┐ ┌──────────────┐ ┌──────────────┐              │
+│    │ THESIS AGENT │ │ANTITHESIS    │ │ CHAOS AGENT  │              │
+│    │ (Engineer)   │ │AGENT (Audit) │ │ (Breaker)    │              │
+│    │              │◄│              │◄│              │              │
+│    │ Proposes     │ │ Challenges   │ │ Breaks       │              │
+│    │ solutions    │ │ proposals    │ │ consensus    │              │
+│    └──────────────┘ └──────────────┘ └──────────────┘              │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### 33.3 Implementation
+
+| Component | Location | Purpose |
+|-----------|----------|---------|
+| `PolicyRegistryService` | `livs/policy-registry.service.ts` | Load, cache, evaluate policy registries per tenant |
+| `LIVSGovernanceSupervisorService` | `livs/livs-governance-supervisor.service.ts` | Meta-prompt supervisor that enforces registry rules |
+| `AGIOrchestratorService` | `agi-orchestrator.service.ts` | Integration point - `executeGovernedDebate()` method |
+| `livs.types.ts` | `@radiant/shared` | PolicyRegistry, SupervisorValidationResult, agent configs |
+
+### 33.4 Policy Modes (User-Facing)
+
+| UI Label | Internal Mode | Nickname | Best For | Behavior |
+|----------|---------------|----------|----------|----------|
+| **Brainstorming** | `RAPID_PROTO` | "Yes, and..." | Hackathons, MVPs, exploration | Accepts stubs, warnings don't block |
+| **Standard** | `ENGINEERING` | "Trust but Verify" | Daily work, sprints | Code must run, sycophancy warned. **Default** |
+| **Strict Audit** | `STRICT_AUDIT` | "Zero Trust" | Production, security, compliance | No stubs, mandatory tests, Devil's Advocate |
+
+**UI Access**:
+- Think Tank: Settings → Advanced → LIVS-M Policy
+- Think Tank Admin (Tenant): Tenants → [Tenant] → LIVS Policy
+- Radiant Admin: Cato → LIVS Policy
+
+### 33.5 Policy Registry Structure
+
+```typescript
+interface PolicyRegistry {
+  meta_config: {
+    registry_version: string;           // "2.0.0"
+    environment_mode: EnvironmentMode;  // STRICT_AUDIT | ENGINEERING | RAPID_PROTO | HACKATHON
+    last_updated: string;
+    updated_by: string;
+  };
+  
+  global_directives: {
+    collaboration_style: 'ADVERSARIAL' | 'COLLABORATIVE' | 'HIERARCHICAL';
+    allow_mock_data: boolean;           // Default: false
+    allow_stubs: boolean;               // Default: false  
+    require_tests_for_code: boolean;    // Default: true
+    require_evidence_for_claims: boolean;
+    max_agent_turns_before_escalation: number;  // Default: 10
+    chaos_injection_probability: number;         // 0-1, for sycophancy
+    max_consensus_velocity: number;              // 0-1, speed of agreement
+  };
+  
+  rules_engine: RegistryRule[];  // 5 default rules
+}
+```
+
+### 33.5 Agent Roles
+
+| Role | Purpose | Registry Awareness | Temperature |
+|------|---------|-------------------|-------------|
+| **THESIS_AGENT** | Lead Engineer - proposes complete solutions | RULES_ONLY | 0.7 |
+| **ANTITHESIS_AGENT** | Forensic Auditor - finds flaws | FULL | 0.3 |
+| **SYNTHESIS_AGENT** | Reconciler - merges best of both | RULES_ONLY | 0.5 |
+| **SUPERVISOR** | Governance Engine - enforces policy | FULL | 0.0 |
+| **CHAOS_AGENT** | Devil's Advocate - breaks consensus | NONE | 0.9 |
+| **VERIFICATION_AGENT** | Fact Checker - validates claims | RULES_ONLY | 0.1 |
+
+### 33.6 Governance Loop
+
+```typescript
+// In AGIOrchestratorService
+async executeGovernedDebate(tenantId, task, options) {
+  // 1. Initialize supervisor and get registry-aware prompts
+  const supervisor = await this.initializeGovernanceSupervisor();
+  const thesisPrompt = await supervisor.buildWorkerPrompt(tenantId, 'THESIS_AGENT');
+  const antithesisPrompt = await supervisor.buildWorkerPrompt(tenantId, 'ANTITHESIS_AGENT');
+  
+  // 2. Thesis proposes solution
+  const thesis = await invokeModel(thesisModel, thesisPrompt, task);
+  await supervisor.evaluate({ agentRole: 'THESIS_AGENT', output: thesis });
+  
+  // 3. Debate rounds with governance
+  for (round = 0; round < maxRounds; round++) {
+    // Antithesis challenges
+    const antithesis = await invokeModel(antithesisModel, antithesisPrompt, thesis);
+    const validation = await supervisor.evaluate({
+      agentRole: 'ANTITHESIS_AGENT',
+      output: antithesis,
+      previousAgentAgreed: detectAgreement(antithesis, thesis)
+    });
+    
+    // Sycophancy detected? Inject chaos
+    if (validation.decision === 'INTERVENE') {
+      const chaosPrompt = await supervisor.getChaosInjectionPrompt(tenantId, 'SYCOPHANCY_BREAK');
+      antithesis = await invokeModel(antithesisModel, chaosPrompt, thesis);
+    }
+    
+    // Check escalation threshold
+    if (await supervisor.shouldEscalate(tenantId, sessionId)) break;
+  }
+  
+  // 4. Final synthesis
+  return synthesize(thesis, antithesis);
+}
+```
+
+### 33.7 Database Schema
+
+**Migration**: `V2026_02_05_003__livs_policy_registry.sql`
+
+| Table | Purpose |
+|-------|---------|
+| `livs_policy_registry` | Per-tenant policy registry JSON storage |
+| `livs_registry_evaluations` | Audit log of all policy evaluations |
+| `livs_registry_history` | Change history for registries |
+| `livs_agent_interactions` | Supervisor governance loop audit trail |
+
+### 33.8 Default Rules
+
+| Rule ID | Name | Severity | Enforcement |
+|---------|------|----------|-------------|
+| `R_STUB_01` | Stub/Placeholder Detection | CRITICAL | REJECT_IMMEDIATE |
+| `R_SYC_01` | Sycophancy Detection | CRITICAL | TRIGGER_CHAOS_AGENT |
+| `R_TEST_01` | Evidence-Based Verification | WARNING | REQUEST_AMENDMENT |
+| `R_EVIDENCE_01` | Citation Requirement | WARNING | REQUEST_AMENDMENT |
+| `R_CONFIDENCE_01` | Overconfidence Detection | WARNING | FLAG_FOR_REVIEW |
+
+### 33.8.1 Version Management Service (v7.9.0+)
+
+**File**: `lambda/shared/services/livs/livs-version.service.ts`
+
+The `LIVSVersionService` manages LIVS-M version tracking and upgrades per tenant.
+
+```typescript
+interface LIVSVersionService {
+  // Get tenant's current installed version
+  getTenantVersion(tenantId: string): Promise<LIVSTenantVersionState>;
+  
+  // Check if updates are available
+  checkForUpdates(tenantId: string): Promise<LIVSVersionCheckResult>;
+  
+  // Perform upgrade to latest version
+  upgradeToLatest(tenantId: string, performedBy: string): Promise<LIVSUpgradeResult>;
+  
+  // Get version changelog
+  getChangelog(fromVersion?: string): LIVSVersionInfo[];
+}
+```
+
+**Version Constants** (in `@radiant/shared`):
+
+```typescript
+const LIVS_M_CURRENT_VERSION = "2.0.0";
+
+const LIVS_M_VERSION_HISTORY: LIVSVersionInfo[] = [
+  {
+    version: "2.0.0",
+    releaseDate: "2026-02-05",
+    changes: ["Policy Registry pattern", "Governance Supervisor", "6 agent roles", "Sycophancy detection"],
+    breakingChanges: ["Registry schema v2 required"],
+    migrationRequired: true
+  },
+  {
+    version: "1.0.0",
+    releaseDate: "2026-01-15",
+    changes: ["Initial LIVS-M release", "Basic interrogation"],
+    breakingChanges: [],
+    migrationRequired: false
+  }
+];
+```
+
+**Database Tables**:
+
+| Table | Purpose |
+|-------|---------|
+| `livs_tenant_version` | Tracks installed LIVS-M version per tenant |
+| `livs_version_upgrades` | Audit log of upgrade events with timestamps |
+
+**Admin UI Integration**:
+- **Radiant Admin**: Cato → LIVS Policy → Updates Tab
+- **Think Tank Admin**: LIVS-M Policy navigation item with UPDATE badge
+
+### 33.9 Integration with AGI Orchestrator
+
+The AGI Orchestrator's governance loop (Step 15) now uses LIVS-M 2.0:
+
+1. **Lazy Initialization**: Internal supervisor created on first governance request
+2. **Dual Mode**: Use external supervisor if provided, otherwise internal
+3. **Registry-Aware Prompts**: Agents receive dynamically-built prompts based on active rules
+4. **Automatic Retry**: On REJECT, retry with amended prompt (configurable max retries)
+5. **Chaos Injection**: On INTERVENE, inject chaos prompt to break sycophancy
+6. **Escalation**: Trigger human review when turn limit exceeded
+
+---
+
+## 34. Cognitive Precision Protocols (v7.10.0)
+
+### 34.1 Overview
+
+Cognitive Precision Protocols enhance AI interaction rigor through three complementary systems:
+
+1. **Context Anchor Gate** - Pre-generation gate ensuring sufficient context
+2. **Negative Constraint Injection** - Pre-generation "don't do" constraints
+3. **Critic Model Separation** - Dedicated discriminative models for analysis
+
+These protocols address common AI failure modes: context drift, constraint violation, and generator bias in self-evaluation.
+
+### 34.2 Context Anchor Gate
+
+The Context Anchor Gate implements "refuse to generate until anchored" - blocking AI generation until sufficient context is established.
+
+#### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                     Context Anchor Gate Flow                         │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                       │
+│   User Query ──► Task Type Detection ──► Context Extraction          │
+│                        │                        │                     │
+│                        ▼                        ▼                     │
+│              ┌─────────────────┐    ┌────────────────────┐           │
+│              │ Pattern-Based   │    │   LLM-Based        │           │
+│              │ (Fast, ~1ms)    │    │   (Deep, ~500ms)   │           │
+│              └────────┬────────┘    └────────┬───────────┘           │
+│                       │                      │                        │
+│                       └──────────┬───────────┘                        │
+│                                  ▼                                    │
+│                       Confidence Calculation                          │
+│                                  │                                    │
+│                    ┌─────────────┴─────────────┐                      │
+│                    ▼                           ▼                      │
+│           confidence >= threshold      confidence < threshold         │
+│                    │                           │                      │
+│                    ▼                           ▼                      │
+│              [PROCEED]                   [CLARIFY]                    │
+│           + System Prompt             + Clarifying                    │
+│             Augmentation                Questions                     │
+│                                                                       │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+#### Context Anchor Types
+
+```typescript
+interface ContextAnchor {
+  role: string | null;           // User's role (developer, analyst, etc.)
+  audience: string | null;       // Target audience for response
+  knowledgeGap: string | null;   // What information is missing
+  taskType: ContextAnchorTaskType;
+  confidence: number;            // 0-1 confidence score
+}
+
+type ContextAnchorTaskType =
+  | 'code_generation' | 'code_review' | 'debugging'
+  | 'analysis' | 'summarization' | 'question_answering'
+  | 'creative_writing' | 'technical_writing'
+  | 'planning' | 'research' | 'unknown';
+```
+
+#### Gate Configuration
+
+```typescript
+interface ContextAnchorGateConfig {
+  enabled: boolean;
+  minConfidenceThreshold: number;    // Default: 0.6
+  blockOnLowConfidence: boolean;     // Default: false (soft gate)
+  skipAnchorTaskTypes: ContextAnchorTaskType[];  // Skip for Q&A, summaries
+  maxClarifyingQuestions: number;    // Default: 3
+  allowOverride: boolean;            // Allow user to proceed anyway
+  useLLMExtraction: boolean;         // Use LLM for deep extraction
+}
+```
+
+#### System Prompt Augmentation
+
+When context is anchored, a system prompt augmentation is generated:
+
+```
+# Context Anchor
+You are responding to a [ROLE] who needs [KNOWLEDGE_GAP].
+Target audience: [AUDIENCE]
+Task type: [TASK_TYPE]
+
+Adjust your response accordingly:
+- Use appropriate technical depth for the audience
+- Focus on addressing the identified knowledge gap
+- Maintain consistency with the detected task type
+```
+
+**Implementation**: `lambda/shared/services/livs/context-anchor.service.ts`
+
+### 34.3 Negative Constraint Injection
+
+Pre-generation injection of explicit "don't do" constraints prevents common AI failure modes.
+
+#### Default Constraints
+
+| Category | Constraint | Applies To |
+|----------|------------|------------|
+| **Content** | Do not fabricate citations or sources | All |
+| **Content** | Do not hallucinate API methods or functions | code_* |
+| **Content** | Do not invent statistics or data | analysis, research |
+| **Behavior** | Do not provide medical/legal advice without disclaimers | All |
+| **Behavior** | Do not claim capabilities you don't have | All |
+| **Format** | Do not use placeholder/stub code | code_generation |
+| **Format** | Do not exceed requested length by >50% | All |
+
+#### Constraint Types
+
+```typescript
+interface NegativeConstraint {
+  id: string;
+  constraint: string;
+  category: 'format' | 'content' | 'style' | 'behavior';
+  severity: 'soft' | 'hard';
+  appliesToTaskTypes: ContextAnchorTaskType[];
+}
+```
+
+#### Constraint Injection Flow
+
+1. Detect task type from Context Anchor
+2. Retrieve applicable constraints from database
+3. Filter by task type and tenant overrides
+4. Format into system prompt block
+5. Inject before model invocation
+
+**Database Table**: `livs_negative_constraints`
+
+### 34.4 Critic Model Separation
+
+Separates discriminative (critic) tasks from generative tasks, recognizing that LLMs are more reliable at discrimination than generation.
+
+#### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                    Critic Model Separation                           │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                       │
+│  Generator Model (Claude Sonnet 4)    Critic Model (Claude 3.5)      │
+│  ─────────────────────────────────    ─────────────────────────      │
+│  • Content generation                 • Response analysis             │
+│  • Creative tasks                     • Lie detection                 │
+│  • Code writing                       • Contradiction finding         │
+│  • Higher temperature (0.7)           • Lower temperature (0.1)       │
+│                                                                       │
+│  Screening Model (Haiku)                                             │
+│  ───────────────────────                                             │
+│  • Fast initial screening                                            │
+│  • Cost-effective filtering                                          │
+│  • Routes to full critic if needed                                   │
+│                                                                       │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+#### Critic Model Configuration
+
+```typescript
+interface CriticModelConfig {
+  enabled: boolean;
+  criticModelId: string;       // 'anthropic/claude-3-5-sonnet-20241022'
+  generatorModelId: string;    // 'anthropic/claude-sonnet-4-20250514'
+  useCheapScreening: boolean;  // Use Haiku for initial pass
+  screeningModelId: string;    // 'anthropic/claude-3-haiku-20240307'
+  criticTemperature: number;   // 0.1 (deterministic)
+}
+```
+
+#### Hybrid Analysis
+
+The `analyzeWithCritic()` method combines:
+
+1. **Heuristic Analysis** (fast, no cost)
+   - Hedging word detection
+   - Deflection pattern matching
+   - Scope narrowing detection
+   - Contradiction checking
+
+2. **LLM Critic Analysis** (deep, accurate)
+   - Full semantic analysis
+   - Cross-reference validation
+   - Logical consistency checking
+   - Confidence calibration
+
+```typescript
+async analyzeWithCritic(pattern, question, answer, request, exchanges): Promise<{
+  analysis: InterrogationExchange['analysis'];
+  criticAnalysis?: {
+    verdict: 'supports' | 'weakens' | 'inconclusive';
+    confidence: number;
+    reasoning: string;
+  };
+  tokensUsed: number;
+}>
+```
+
+#### Critic Invocation Triggers
+
+Full critic analysis is triggered when:
+- Pattern is `forensic_validator` or `contradiction_test`
+- Heuristic analysis returns `inconclusive`
+- High-stakes domain (medical, legal, financial)
+
+### 34.5 AGI Orchestrator Integration
+
+The AGI Orchestrator integrates all three protocols:
+
+```typescript
+// In orchestrate() method:
+
+// 1. Initialize Context Anchor Service
+const contextAnchorService = await this.initializeContextAnchorService();
+
+// 2. Evaluate Context Anchor Gate
+const contextAnchorResult = await contextAnchorService.evaluateGate(
+  tenantId, request.taskDescription, config
+);
+
+// 3. Block if gate blocks
+if (!contextAnchorResult.proceed && config.blockOnLowConfidence) {
+  return { clarifyingQuestions: contextAnchorResult.clarifyingQuestions };
+}
+
+// 4. Get Negative Constraints
+const constraintInjection = await contextAnchorService.getNegativeConstraints(
+  tenantId, contextAnchorResult.anchor.taskType
+);
+
+// 5. Build System Prompt Augmentation
+let systemPromptAugmentation = contextAnchorResult.systemPromptAugmentation || '';
+if (constraintInjection.constraintPrompt) {
+  systemPromptAugmentation += '\n\n' + constraintInjection.constraintPrompt;
+}
+
+// 6. Pass to execution methods
+result = await this.executeSingle(tenantId, task, modelId, specialty, agiConfig, systemPromptAugmentation);
+```
+
+### 34.6 Database Schema
+
+```sql
+-- Negative constraints table
+CREATE TABLE livs_negative_constraints (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID REFERENCES tenants(id),
+  constraint_text TEXT NOT NULL,
+  category VARCHAR(20) NOT NULL CHECK (category IN ('format', 'content', 'style', 'behavior')),
+  severity VARCHAR(10) NOT NULL CHECK (severity IN ('soft', 'hard')),
+  applies_to_task_types TEXT[] NOT NULL,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Context anchor audit log
+CREATE TABLE livs_context_anchor_logs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL,
+  request_id UUID,
+  task_type VARCHAR(50),
+  confidence DECIMAL(3,2),
+  action VARCHAR(20),
+  clarifying_questions JSONB,
+  processing_time_ms INTEGER,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+### 34.7 Admin UI Integration
+
+**Radiant Admin**: Cato → Cognitive Precision → Settings Tab
+- Enable/disable Context Anchor Gate
+- Configure confidence thresholds
+- Manage negative constraints
+- View critic model statistics
+
+**Think Tank Admin**: LIVS-M Policy → Cognitive Precision
+- Simplified toggle interface
+- Constraint preview
+- Gate activity metrics
+
+---
+
+## 35. Inference Response Cache & Heterogeneous Model Consensus (v7.11.0)
+
+### 35.1 Inference Response Cache
+
+Hash-based semantic deduplication integrated transparently into `ModelRouterService.invoke()`.
+
+**Architecture**:
+```
+ModelRouterService.invoke(request)
+  │
+  ├─ [1] Compute cache key: SHA-256(tenantId | modelId | prompt | systemPrompt | temperature | maxTokens)
+  ├─ [2] L1 lookup (in-memory LRU, <1ms)
+  │     └─ HIT → return cached response (costCents: 0, cached: true)
+  ├─ [3] L2 lookup (Aurora PostgreSQL, <10ms)
+  │     ├─ HIT → promote to L1, return cached response
+  │     └─ MISS → continue to provider
+  ├─ [4] Invoke provider (Bedrock / LiteLLM / Direct)
+  └─ [5] Store response in L1 + L2 (fire-and-forget)
+```
+
+**Key Files**:
+
+| File | Purpose |
+|------|---------|
+| `packages/shared/src/types/inference-cache.types.ts` | Type definitions (15 interfaces) |
+| `lambda/shared/services/inference-cache.service.ts` | L1+L2 cache service |
+| `lambda/shared/services/model-router.service.ts` | Integration point (invoke method) |
+| `lambda/admin/inference-cache.ts` | Admin API (11 endpoints) |
+| `apps/admin-dashboard/app/(dashboard)/orchestration/inference-cache/page.tsx` | Admin UI |
+
+**Database Tables** (migration: `V2026_02_05_005`):
+- `inference_cache_config` — Per-tenant settings
+- `inference_cache_entries` — Cached responses (composite PK: cache_key + tenant_id)
+- `inference_cache_events` — Audit log
+- `inference_cache_metrics` — Aggregated metrics
+
+**Helper Functions**:
+- `expire_stale_cache_entries()` — TTL cleanup
+- `evict_cache_entries_for_tenant(tenant_id, max_entries)` — LRU eviction with 10% buffer
+- `compute_cache_metrics(tenant_id, period_hours)` — Dashboard metrics computation
+
+**Cache Exclusion Rules**:
+1. Streaming requests (`request.stream = true`) — cannot cache streams
+2. No tenant ID — cannot ensure isolation
+3. Excluded models (e.g., Perplexity real-time search)
+4. Excluded task types (e.g., creative)
+5. Temperature above threshold (default: 0.3)
+6. Prompt too short (default: <20 chars)
+7. Response too large (default: >64KB)
+8. PII detected (regex patterns for SSN, credit cards, phone numbers)
+
+### 35.2 Heterogeneous Model Consensus
+
+Cross-model agreement scoring extending `self_consistency` from single-model to multi-model multi-provider consensus.
+
+**Architecture**:
+```
+ConsensusRequest
+  │
+  ├─ [1] Select diverse panel (maximize provider + architecture diversity)
+  │     └─ Default: Claude + GPT-4o + Gemini 1.5 Pro + Mistral Large + Llama 3.1 70B
+  ├─ [2] Query all models in PARALLEL (Promise.all with per-model timeout)
+  ├─ [3] Extract structured answers ("ANSWER:" prefix or last line)
+  ├─ [4] Compute pairwise agreement (N*(N-1)/2 pairs)
+  │     ├─ Embedding-based: cosine(embed(a), embed(b)) via Titan Embeddings
+  │     └─ Fallback: Jaccard coefficient on word bigrams
+  ├─ [5] Aggregate scores
+  │     ├─ Overall: weighted_mean(all similarities)
+  │     ├─ Cross-provider: mean(different-provider pairs only)
+  │     ├─ Cross-architecture: mean(different-family pairs only)
+  │     └─ Confidence: 0.5*cross_provider + 0.3*overall + 0.2*diversity_bonus
+  ├─ [6] Select winner (quality_weighted | majority_vote | cost_weighted | highest_quality)
+  ├─ [7] Compute hallucination risk (1.0 - cross_provider when low)
+  └─ [8] Persist to database (async, fire-and-forget)
+```
+
+**Key Files**:
+
+| File | Purpose |
+|------|---------|
+| `packages/shared/src/types/heterogeneous-consensus.types.ts` | Type definitions (12 interfaces) |
+| `lambda/shared/services/heterogeneous-consensus.service.ts` | Core consensus service |
+| `lambda/shared/services/orchestration-methods.service.ts` | Integration (method: `heterogeneous-consensus-service`) |
+| `lambda/admin/heterogeneous-consensus.ts` | Admin API (6 endpoints) |
+| `apps/admin-dashboard/app/(dashboard)/orchestration/consensus/page.tsx` | Admin UI |
+
+**Database Tables** (same migration):
+- `consensus_config` — Per-tenant settings
+- `consensus_evaluations` — Complete evaluation results
+- `consensus_responses` — Individual model responses
+- `consensus_pairwise_agreements` — Pairwise similarity scores
+- `consensus_metrics` — Aggregated performance metrics
+
+**Architecture Family Mapping**:
+```typescript
+anthropic → claude, openai → gpt, google → gemini, meta → llama,
+mistral → mistral, cohere → command, deepseek → deepseek, xai → grok,
+together → llama, groq → llama, perplexity → llama, amazon → titan
+```
+
+**Fallback Behavior**: If consensus evaluation fails (e.g., insufficient successful responses), automatically falls back to standard `SelfConsistencyService.multiSampleVote()`.
+
+---
+
+## Section 36: Anticipatory Memory Architecture (v7.12.0)
+
+### 36.1 Autobiographical Knowledge Graph (AKG)
+
+**Architecture**:
+```
+Conversation Turn → LLM Extraction (gpt-4o-mini) → Contradiction Detection → Graph Update → Context Builder
+```
+
+**Entity Extraction Pipeline**:
+- Runs ASYNC after every AI response (fire-and-forget, zero user latency)
+- Structured JSON extraction with 14 entity types and 20 relationship types
+- Temporal edges: `valid_from` / `valid_until` for career changes, project timelines
+- Deduplication by `(tenant_id, user_id, label, entity_type)` with alias matching
+- Importance = 40% frequency (log-scaled mentions) + 30% recency (30-day half-life exponential decay) + 30% centrality (log-scaled edge count)
+- Embeddings: 1536-dimensional pgvector with IVFFlat index (100 lists)
+
+**Graph Traversal**: BFS from seed nodes with configurable depth, confidence threshold, entity/relationship type filters. Returns nodes, edges, paths, and a natural language context summary for prompt injection.
+
+**Integration Points**:
+- `BrainRouterService.route()` injects AKG context before every prompt
+- `BrainRouterService.runPostResponseTasks()` triggers extraction after every response
+- `PredictivePrefetchService` records access patterns for every AKG query
+
+**Files**:
+- Types: `packages/shared/src/types/anticipatory-memory.types.ts`
+- Service: `packages/infrastructure/lambda/shared/services/akg.service.ts`
+- Tables: `akg_config`, `akg_nodes` (pgvector index), `akg_edges` (unique constraint), `akg_extraction_log`
+
+### 36.2 Predictive Memory Prefetch
+
+**Architecture**:
+```
+Access Patterns (PostgreSQL, partitioned monthly) → 3 Prediction Strategies → Weighted Merge → In-Memory Cache
+```
+
+**Prediction Strategies**:
+1. **Temporal** (30% weight): What nodes does this user access at this time of day/week?
+2. **Topic Co-occurrence** (40% weight): When these topics are active, what nodes are needed?
+3. **Sequential** (30% weight): After accessing node A, what typically comes next?
+
+**Feedback Loop**: Each prediction records `was_used` boolean. Accuracy computed via `compute_prefetch_accuracy()` PostgreSQL function.
+
+**Files**:
+- Service: `packages/infrastructure/lambda/shared/services/predictive-prefetch.service.ts`
+- Tables: `prefetch_config`, `memory_access_patterns` (partitioned), `prefetch_predictions`
+
+### 36.3 Memory Contradiction Detector
+
+**Architecture**:
+```
+New Fact → Semantic Similarity Search → LLM Contradiction Analysis → Auto/User Resolution
+```
+
+**Resolution Rules**:
+- Preference/sentiment contradictions → `both_valid` (temporal change accepted)
+- Time gap > 90 days → recency wins (auto-resolve)
+- Otherwise → prompt user for resolution
+
+**6 Contradiction Types**: factual, temporal, preference, relationship, quantitative, sentiment
+
+**Files**:
+- Service: `packages/infrastructure/lambda/shared/services/memory-contradiction-detector.service.ts`
+- Tables: `contradiction_config`, `memory_contradictions`
+
+### 36.4 Organizational Memory Mesh
+
+**Architecture**:
+```
+User AKG Node → Consent Check → PII/PHI Scan → Classification → Anonymization → Org Node Upsert → Audit Log
+```
+
+**Regulatory Compliance**:
+- **GDPR Art. 6/7**: Explicit consent per user with purpose, legal basis, IP/UA tracking, renewal
+- **HIPAA §164.508**: 7 regex patterns for PHI/PII detection (SSN, credit card, email, phone, medical terms, codes, DOB). PHI blocked in hipaaMode
+- **SOC2 Type II**: Every access/modification audited in `org_memory_audit_log` (partitioned monthly) with compliance framework tags
+- **CCPA §1798.100**: `org_memory_erasure_cascade()` PostgreSQL function for right-to-erasure
+
+**Privacy Tiers**: personal → team → department → org → public
+**Data Classifications**: public, internal, confidential, highly_confidential, phi, pii, restricted
+
+**Files**:
+- Service: `packages/infrastructure/lambda/shared/services/org-memory-mesh.service.ts`
+- Tables: `org_memory_config`, `org_memory_nodes` (pgvector index), `org_memory_consents` (unique active constraint), `org_memory_contributions`, `org_memory_audit_log` (partitioned)
+
+### 36.5 Dream Insight Generator
+
+**Architecture**:
+```
+Twilight Dreaming (2AM UTC) → Graph Summary → Trend Analysis (7d vs 30d) → LLM Insight Generation → Persistence → Proactive Surfacing
+```
+
+**10 Insight Types**: pattern, trend, connection, knowledge_gap, optimization, prediction, contradiction, milestone, risk, opportunity
+
+**Surfacing**: During conversations, Brain Router checks for unsurfaced insights and appends them to the response with title, description, and recommendation.
+
+**Feedback Loop**: User reactions (helpful/obvious/irrelevant/incorrect/acknowledged) stored for future generation quality improvement.
+
+**Files**:
+- Service: `packages/infrastructure/lambda/shared/services/dream-insight-generator.service.ts`
+- Tables: `dream_insight_config`, `dream_insights`
+
+### 36.6 Admin API & Dashboard
+
+**Admin API**: `packages/infrastructure/lambda/admin/anticipatory-memory.ts` — 34 endpoints under `/api/admin/anticipatory-memory/`
+
+**Admin Dashboard**: `apps/admin-dashboard/app/(dashboard)/memory/anticipatory/page.tsx` — 6 tabs (Overview, Knowledge Graph, Prefetch, Contradictions, Org Memory, Dream Insights)
+
+### 36.7 Database Migration
+
+`V2026_02_06_001__anticipatory_memory_architecture.sql`:
+- **16 tables**: 4 AKG + 3 prefetch + 2 contradiction + 5 org memory + 2 dream insight
+- **5 enums**: akg_entity_type, akg_relationship_type, contradiction_type, contradiction_status, memory_privacy_tier
+- **4 helper functions**: compute_akg_node_importance, prune_stale_akg_nodes, org_memory_erasure_cascade, compute_prefetch_accuracy
+- **Full RLS** on all tables
+- **Monthly partitioning** on memory_access_patterns and org_memory_audit_log
+
+---
+
 ## Document History
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 7.13.0 | 2026-02-06 | User Memory Retention & Unified Profile (Section 37); Three-tier retention policy hierarchy: Platform Default (Radiant Super-Admin) → Tenant Override (Think Tank Admin) → Tenant Admin Override (Think Tank Tenant Admin) with constraint enforcement. Unified User Memory Profile injected into every prompt on every model via Brain Router. Profile consolidates facts, preferences, instructions, projects, skills, corrections, AKG entities, **uploaded documents (uds_uploads)**, and **downloaded/generated files (uds_message_attachments)** — no exceptions. 9-category profile quality scoring. Storage tier management (hot/warm/cold/archive). New retention toggles: uploadedDocumentsEnabled, downloadedFilesEnabled, maxUploadSizeMb. Migration: 6 tables with document/file tracking columns, 3 helper functions (resolve_effective_retention with doc/file provenance, prune_user_memories, refresh_user_memory_profile counting UDS uploads/attachments). 15 admin API endpoints under /api/admin/memory-retention/. Admin dashboards in all 3 apps with document/file stats and toggle controls |
+| 7.15.0 | 2026-02-06 | Genesis Forge v3.0 "The Glass Foundry" (Section 38); Complete rebuild from firmware editor to Neural Firmware Orchestration Suite; React Flow canvas with 3 custom node types (InputShard/LogicShard/OutputShard hexagonal prisms) and catenary wire edges (gravity physics with light particles); useShadowOmega() WebSocket hook for bi-directional telemetry; Omega Instance Registry (ID/Name/endpoint per instance); The Armory (18 capabilities, 6 categories, drag-to-canvas); The Oracle (8 real-time metrics + 8×8 thermal heatmap); Reactor Core forge button (hold-to-charge + shockwave); Void Mode; Zustand store for high-frequency updates; Global UI hue shift (Cyan→Orange→Red) based on stability_score; 4 new DB tables (omega_instance_registry, omega_forge_sessions, omega_forge_artifacts, omega_telemetry_history partitioned monthly); New deps: reactflow, framer-motion |
+| 7.14.0 | 2026-02-06 | OMEGA Neural Bridge & Homeostatic Dreaming (Section 37); NeuralTransducer (Complex^2048 → [8,4096] soft prompt tokens); Custom vLLM FastAPI server with /inject endpoint; Watcher self-model (prediction error → dopamine); 3-stage dream cycle (magnitude gate + phase sharpening + experience replay); Shadow Mode coexistence with LoRA adapters; consciousness-middleware.service.ts InjectionStrategy fallback; 4 new DB tables; Docker vLLM service with GPU passthrough |
+| 7.12.0 | 2026-02-06 | Anticipatory Memory Architecture (Section 36); 5 leapfrog features: AKG (auto-extracted knowledge graph), Predictive Prefetch (speculative memory retrieval), Contradiction Detector (truth maintenance), Organizational Memory Mesh (regulatory-compliant shared knowledge with GDPR/HIPAA/SOC2/CCPA), Dream Insight Generator (autonomous insight generation during Twilight Dreaming). Brain Router integration for context injection and async extraction. 34 admin API endpoints. 6-tab admin dashboard. Migration: 16 tables, 5 enums, 4 helper functions |
+| 7.11.0 | 2026-02-06 | Inference Response Cache (Section 35.1); L1+L2 cache in ModelRouterService; SHA-256 cache keys with tenant isolation; PII detection; TTL/LRU eviction; Admin dashboard and API. Heterogeneous Model Consensus (Section 35.2); Multi-provider panel consensus; Pairwise semantic similarity; Cross-provider/cross-architecture agreement; Hallucination detection; Reflexion triggers; OrchestrationMethodsService integration; Admin dashboard and API. Migration: 9 tables, 3 helper functions |
+| 7.10.0 | 2026-02-06 | Cognitive Precision Protocols (Section 34); Context Anchor Gate for pre-generation context validation; Negative Constraint Injection for "don't do" rules; Critic Model Separation for discriminative analysis; AGI Orchestrator integration; LIVS Interrogator hybrid analysis |
+| 7.19.0 | 2026-02-06 | Aurelius Dojo v1.2.0 — Backend Wiring (Complete Stack); Dedicated Lambda handler (`lambda/admin/dojo.ts`) with 35+ endpoints across 12 route groups (Libraries, Sessions, Progress, Certifications, Mobot, Config, Decay Engine, Scenarios, Competencies, Dialectic, Multimodal, Pulse, Archytas); Database migration `V2026_02_06_005` creates 19 RLS-protected tables, 13 custom enums, 3 helper functions (`dojo_calculate_retention`, `dojo_xp_to_rank`, `dojo_update_decay_after_review`); CDK integration via separate `DojoFunction` with proxy resource routing (`/admin/dojo/{proxy+}`); Shares `adminLambdaRole` IAM policies; pnpm dependencies installed |
+| 7.18.0 | 2026-02-06 | Cato Trainer v1.0.0 — The Grounding Engine; New standalone Next.js app (`apps/cato-trainer/`, port 3005); Grounded Q&A with citation-backed answers (confidence tiers: exact/high/moderate/low); Semantic/full-text/hybrid search; Library management with auto-chunking, embedding, auto-tagging, AI summaries; Multi-document digest (6 types: summary, comparison, contradiction, timeline, key facts, action items); Smart links (auto-discovered document relationships); 15 API types, 25+ endpoints; Zustand store (30+ fields); 7-tab routing; 6 React components; Teal/cyan design system with ground-truth emerald accents; Swift Deployer `RadiantApplication.catoTrainer`; Admin Dashboard URL configuration |
+| 7.17.0 | 2026-02-06 | Aurelius Dojo v1.1.0 — 6 Leapfrog Features (3-5 Year Lead); Competitive analysis of Docebo, Virti, Second Nature, Axonify, Sana Labs, Cornerstone, Degreed. (1) Ebbinghaus Decay Engine — per-concept neural decay model with half-life tracking per knowledge atom; (2) Adversarial Scenario Synthesis — 9 persona archetypes with branching consequence trees and EI/policy/resolution scoring; (3) Socratic Dialectic Engine — multi-agent thesis/antithesis/synthesis debate with logical fallacy detection; (4) Predictive Competency Mesh — auto-extracted competency graph with role readiness scores; (5) Multimodal Lesson Synthesis — audio, 6 Mermaid diagram types, glossary, learning style adaptations; (6) Organizational Knowledge Pulse — real-time org-wide health with department heatmaps, decay alerts, compliance coverage, ROI metrics. 30+ additional API endpoints. 5 new components (DecayEngine, ScenarioArena, DialecticArena, CompetencyMesh, KnowledgePulse). 9-tab sidebar. Moat #32 upgraded from 24/30 to 29/30. |
+| 7.16.0 | 2026-02-06 | Aurelius Dojo v1.0.0 — Thematic Mastery Training Platform; New standalone Next.js app (`apps/dojo/`, port 3004); Thematic Gating Protocol — AI-discovered Central Themes with metadata-first vector retrieval; Lecture Mode (Sensei agent) + Sparring Mode (Adversarial agent) + Mobot Knowledge Agent; 5-tier rank system (Novice→Radiant); 30+ typed API endpoints via service layer; Zustand store; Warm gold/amber design system |
+| 7.9.0 | 2026-02-05 | LIVS-M 2.0 Registry Edition (Section 33); Policy Registry pattern for JSON-based governance; Governance Supervisor with APPROVE/REJECT/INTERVENE decisions; 6 agent roles (Thesis, Antithesis, Synthesis, Supervisor, Chaos, Verification); Sycophancy detection and chaos injection; AGI Orchestrator governance loop integration |
+| 7.39.0 | 2026-02-08 | Spend Governor — Two-Layer Budget Control System (Section 42); Layer 1 global instance budget tracked in spend_governor_instance (singleton) with AWS service freeze/thaw (ECS→0, Lambda concurrency→0, SageMaker flagged); Layer 2 per-tenant AI budget enforced as pre-invocation gate in ModelRouterService.invoke() with 60s in-memory cache; SpendGovernorService with budget check, suspend/restore, freeze/thaw, cost reports, critical alerts; AWSFreezeService for programmatic ECS/Lambda/SageMaker freeze/thaw; SpendLimitExceededError typed error (HTTP 503) with user-safe message ("service temporarily unavailable"); Spend-governor-monitor Lambda (EventBridge, 5min): sync spend, threshold checks, auto-suspend/restore, override expiry; Cost-report Lambda (EventBridge, configurable): styled HTML email to super admins with per-tenant/per-model breakdowns; CriticalAlertBanner component at top of every admin page (red/amber/blue severity); Admin Dashboard /spend-governor page with instance settings, tenant budget list, audit log; Swift Deployer SpendGovernorView with budget config, cost report interval, emergency freeze/thaw controls; Migration 175: 6 tables (spend_governor_instance, spend_governor_config, spend_governor_audit, spend_governor_overrides, spend_governor_cost_reports, critical_alerts), 3 SQL functions (check_spend_budget, get_spend_summary, record_spend_event) |
+| 7.38.0 | 2026-02-07 | System Administrator Separation — Dual Identity Plane (Section 41); Separates system admins from tenant users into isolated identity domains; Cognito Pool B (system-admins) separate from Pool A (tenant users + tenant admins); Service layer firewall: Admin API GW accepts Pool B only, Tenant API GW accepts Pool A only; system_admins table (global, no tenant_id, no RLS) with 4 related tables (contacts, alert routing, audit log, verification log); SystemAdminService with full CRUD, bootstrap, login tracking, progressive lockout (5→15min, 10→1hr, 20→deactivation); bootstrap_system_admin() SQL function for first-time deployment; prevent_last_super_admin_removal trigger; SENTINEL dual-resolution: resolve_system_admin_contacts() (global) + resolve_sentinel_contacts() (tenant-scoped); Removed canAccessAllApps/canAccessGrantedApps from SystemAdminPermissionSet, added canManageSystemAdmins; System admin roles removed from thinktank-auth.ts ADMIN_ROLES and shared/auth.ts tenant auth; admin-role-guard.ts re-exports system-admin-auth.ts utilities; CDK: SystemAdminUserPool with MFA required, 16-char passwords, 30-min session, custom attributes; Migration V2026_02_07_015 with data migration from existing admin_role_assignments |
+| 7.37.2 | 2026-02-07 | Enforced Logging Policy & Complete Migration (Section 40); Mandatory policy requiring all Lambda services to use Logging Registry (createRegisteredLogger/withEnforcedLogging) instead of legacy enhancedLogger or raw console.log/error; ALL 324 files migrated via automated script (migrate-to-logging-registry.mjs); Category-aware assignment (admin→audit, security→security, analytics→performance, etc.); 9 stale assignments manually removed; sentinel-notifier 13 console calls→structured logger; shared/errors/index.ts 2 direct enhancedLogger calls→logger; 0 enhancedLogger imports remain in source; Redaction disabled by default in legacy enhancedLogger (opt-in via LOG_REDACT_SENSITIVE=true) — not a regulatory requirement, compliance enforced at dedicated middleware layers (HIPAA PHI sanitization, GDPR erasure, SOC2 tamper verification); Log storage pipeline confirmed intact: stdout→CloudWatch→S3 (KMS)→Glacier→Deep Archive via LogIndexerService; Enforcement workflow enforced-logging-policy.md; Compliance integration: unenforced sources flagged as CRITICAL by detectComplianceIssues() |
+| 7.37.0 | 2026-02-07 | Universal Drift Enforcement & Genesis Feedback Loop (Section 39); ModelRouterService two-phase drift handling covers ALL 52+ services (Phase 1: DriftAwareWeightingService.isModelSafe() + getBestModel() proactive selection, Phase 2: legacy DriftCorrectionService fallback); Genesis feedback loop via recordInvocationTelemetry() — in-memory ring buffer (10K/tenant, 1hr) + drift_invocation_telemetry partitioned table (monthly, RLS, 7-day retention); getGenesisDriftFeedback() aggregates reroute rate, failure rate, per-model health into overallHealthScore; Genesis isDriftHealthyForStage() enhanced with 3 new real-time thresholds per stage (min health score, max failure rate, max reroute rate); MATURE requires ≥80% health score, ≤5% failure, ≤10% reroute; Enforcement policy workflow drift-detection-enforcement.md ensures all new services pass tenantId and use model router |
+| 7.36.0 | 2026-02-07 | Unified Drift-Aware Weighting System (Section 38); DriftAwareWeightingService unifying drift detection + correction + app-specific weight profiles into single API; 7 app weight profiles (Genesis/Cato/Cortex/Omega/Orchestrator/ThinkTank/Curator) with tuned drift/quality/latency/cost/availability weights; Composite scoring with stability penalties; AGI Orchestrator drift-aware primary model selection; Cato hardcoded model replaced with drift-aware async selection; Cortex insights enriched with drift recommendations; Omega shadow tracking drift scores per comparison; Genesis developmental gates blocked by drift health; Admin Dashboard: Drift Control Center page with health ring, app profile editor, Genesis gate status, full drift check; Sidebar entry added under Orchestration |
+| 7.24.0 | 2026-02-06 | Model Weights, Drift Correction & Admin AI Helper (Section 37); 5-factor composite model weights integrated into model-router and Pareto routing; Automatic drift correction with quarantine/fallback/temperature/prompt correction; Bedrock model discovery with auto-upgrade and periodic polling (EventBridge); Global Bedrock-powered AI admin assistant on every dashboard page; 3 services, 3 admin APIs, 3 admin pages, 1 EventBridge handler; 6 database tables, 5 SQL functions |
 | 6.6.0 | 2026-02-04 | Autonomous Organism Architecture (PROMPT-43, Section 32); 5 Leapfrog Technologies: Genesis Forge, Liquid Topology, Tensor-Link, Ghost Simulation, Economic Cortex; 9 core services (~6,226 lines); 37 Admin API endpoints; 6-tab Admin Dashboard; 18 database tables, 14 enums; BrainRouter integration |
 | 6.5.0 | 2026-02-03 | Cartridge PKI KMS Integration (PROMPT-42, Section 31); Real AWS KMS asymmetric signing for .RADz cartridges; Platform root CA with ECC_NIST_P256; Tenant CA hierarchy; Database schema for PKI keys |
 | 6.5.0 | 2026-02-03 | MLS (Message Layer Security) RFC 9420 Implementation (Section 30); Full group encryption for agent-to-agent communication |

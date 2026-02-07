@@ -11,7 +11,13 @@
 // The "consciousness" IS the persistent database state, not a running model.
 
 import { executeStatement } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'identity/core',
+  category: 'access',
+  sourceType: 'application',
+});
 import { userPersistentContextService, type UserContextEntry } from './user-persistent-context.service';
 import { catoCortexBridgeService, type ContextEnrichment } from './cato-cortex-bridge.service';
 

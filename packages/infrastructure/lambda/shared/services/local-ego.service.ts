@@ -9,7 +9,13 @@ import {
 import { executeStatement } from '../db/client';
 import { consciousnessService } from './consciousness.service';
 import { modelRouterService } from './model-router.service';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'local/ego',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 // ============================================================================
 // Configuration
@@ -361,6 +367,7 @@ class LocalEgoService {
     const egoContext = this.buildEgoContextForExternal(egoState);
     
     const response = await modelRouterService.invoke({
+      tenantId,
       modelId,
       messages: [
         { 

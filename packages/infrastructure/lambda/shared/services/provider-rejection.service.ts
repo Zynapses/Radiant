@@ -5,7 +5,13 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import { executeStatement, stringParam, boolParam } from '../db/client';
-import { enhancedLogger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'provider/rejection',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import type {
   ProviderRejection,
   RejectionType,
@@ -22,8 +28,6 @@ import type {
   MIN_MODELS_FOR_TASK,
   MAX_FALLBACK_ATTEMPTS,
 } from '@radiant/shared';
-
-const logger = enhancedLogger;
 
 // ============================================================================
 // Provider Rejection Service

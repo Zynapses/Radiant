@@ -3,7 +3,13 @@
 // "The strongest negative signal available"
 
 import { executeStatement, stringParam, longParam, boolParam } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'paste/back-detection',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { episodeLoggerService } from './episode-logger.service';
 import { v4 as uuidv4 } from 'uuid';
 import * as crypto from 'crypto';

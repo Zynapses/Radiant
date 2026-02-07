@@ -4,8 +4,18 @@ import { useState, useEffect } from 'react';
 import {
   Zap, Database, Bot, RefreshCw, Settings,
   Play, Pause, CheckCircle, XCircle, Clock, AlertTriangle,
-  ChevronRight, Network, Layers, Cpu, Eye, Shield, Activity
+  ChevronRight, Network, Layers, Cpu, Eye, Shield, Activity, Loader2
 } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Slider } from '@/components/ui/slider';
 
 interface CausalNode {
   nodeId: string;
@@ -87,11 +97,11 @@ interface CognitionSettings {
   maxAutonomousActionsPerDay: number;
 }
 
-const impactColors: Record<string, string> = {
-  none: '#6b7280',
-  low: '#10b981',
-  medium: '#f59e0b',
-  high: '#ef4444',
+const impactStyles: Record<string, string> = {
+  none: 'bg-muted text-muted-foreground border-border',
+  low: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
+  medium: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
+  high: 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20',
 };
 
 export default function CognitionPage() {
@@ -144,7 +154,7 @@ export default function CognitionPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600" />
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -154,28 +164,28 @@ export default function CognitionPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-            <Cpu className="h-7 w-7 text-indigo-600" />
+          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
+            <Cpu className="h-7 w-7 text-primary" />
             Advanced Cognition
           </h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-1">
+          <p className="text-muted-foreground mt-1">
             Causal reasoning, memory consolidation, multimodal binding, skills, and autonomous agents
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <button onClick={loadData} className="p-2 text-gray-600 hover:text-gray-900 dark:text-gray-400">
+          <Button variant="ghost" size="icon" onClick={loadData}>
             <RefreshCw className="h-5 w-5" />
-          </button>
-          <button className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-2">
-            <Settings className="h-4 w-4" />
+          </Button>
+          <Button>
+            <Settings className="h-4 w-4 mr-2" />
             Configure
-          </button>
+          </Button>
         </div>
       </div>
 
       {/* Stats Cards */}
       {stats && (
-        <div className="grid grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
           <StatCard title="Causal Nodes" value={stats.causalNodes} icon={Network} color="indigo" />
           <StatCard title="Representations" value={stats.multimodalRepresentations} icon={Layers} color="blue" />
           <StatCard title="Skills" value={stats.executableSkills} icon={Zap} color="green" />
@@ -185,62 +195,46 @@ export default function CognitionPage() {
         </div>
       )}
 
-      {/* Tab Navigation */}
-      <div className="border-b border-gray-200 dark:border-gray-700">
-        <nav className="flex space-x-8">
-          {[
-            { id: 'overview', label: 'Overview', icon: Eye },
-            { id: 'causal', label: 'Causal Graph', icon: Network },
-            { id: 'memory', label: 'Memory', icon: Database },
-            { id: 'skills', label: 'Skills', icon: Zap },
-            { id: 'autonomous', label: 'Autonomous', icon: Bot },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as typeof activeTab)}
-              className={`py-3 px-1 border-b-2 font-medium text-sm transition-colors flex items-center gap-2 ${
-                activeTab === tab.id
-                  ? 'border-indigo-600 text-indigo-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              <tab.icon className="h-4 w-4" />
-              {tab.label}
-            </button>
-          ))}
-        </nav>
-      </div>
+      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as typeof activeTab)}>
+        <TabsList>
+          <TabsTrigger value="overview"><Eye className="h-4 w-4 mr-1.5" />Overview</TabsTrigger>
+          <TabsTrigger value="causal"><Network className="h-4 w-4 mr-1.5" />Causal Graph</TabsTrigger>
+          <TabsTrigger value="memory"><Database className="h-4 w-4 mr-1.5" />Memory</TabsTrigger>
+          <TabsTrigger value="skills"><Zap className="h-4 w-4 mr-1.5" />Skills</TabsTrigger>
+          <TabsTrigger value="autonomous"><Bot className="h-4 w-4 mr-1.5" />Autonomous</TabsTrigger>
+        </TabsList>
 
-      {/* Tab Content */}
-      {activeTab === 'overview' && settings && (
+        <TabsContent value="overview">
+        {settings && (
         <div className="grid grid-cols-2 gap-6">
           {/* Feature Status */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Feature Status</h2>
-            </div>
-            <div className="p-4 space-y-3">
+          <Card>
+            <CardHeader>
+              <CardTitle>Feature Status</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
               <FeatureToggle name="Causal Reasoning" enabled={settings.causalReasoningEnabled} description="Do-calculus and counterfactual reasoning" />
               <FeatureToggle name="Memory Consolidation" enabled={settings.consolidationEnabled} description={`Schedule: ${settings.consolidationSchedule}`} />
               <FeatureToggle name="Multimodal Binding" enabled={settings.multimodalBindingEnabled} description="Cross-modal search and grounding" />
               <FeatureToggle name="Skill Execution" enabled={settings.skillExecutionEnabled} description="Procedural memory replay" />
               <FeatureToggle name="Autonomous Agent" enabled={settings.autonomousEnabled} description={settings.autonomousApprovalRequired ? 'Approval required' : 'Auto-execute'} warning={!settings.autonomousApprovalRequired} />
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
           {/* Pending Approvals */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Pending Approvals</h2>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0">
+              <CardTitle>Pending Approvals</CardTitle>
               {pendingApprovals.length > 0 && (
-                <span className="px-2 py-0.5 bg-orange-100 text-orange-700 rounded-full text-xs font-medium">
+                <Badge variant="outline" className="bg-orange-500/10 text-orange-500 border-orange-500/20">
                   {pendingApprovals.length} pending
-                </span>
+                </Badge>
               )}
-            </div>
-            <div className="divide-y divide-gray-200 dark:divide-gray-700 max-h-80 overflow-y-auto">
+            </CardHeader>
+            <CardContent className="p-0">
+            <div className="divide-y divide-border max-h-80 overflow-y-auto">
               {pendingApprovals.length === 0 ? (
-                <div className="p-6 text-center text-gray-500">
+                <div className="p-6 text-center text-muted-foreground">
                   <CheckCircle className="h-8 w-8 mx-auto mb-2 text-green-500" />
                   <p>No pending approvals</p>
                 </div>
@@ -250,21 +244,23 @@ export default function CognitionPage() {
                 ))
               )}
             </div>
-          </div>
+            </CardContent>
+          </Card>
 
           {/* Memory Conflicts */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Memory Conflicts</h2>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0">
+              <CardTitle>Memory Conflicts</CardTitle>
               {memoryConflicts.length > 0 && (
-                <span className="px-2 py-0.5 bg-red-100 text-red-700 rounded-full text-xs font-medium">
+                <Badge variant="destructive">
                   {memoryConflicts.length} unresolved
-                </span>
+                </Badge>
               )}
-            </div>
-            <div className="divide-y divide-gray-200 dark:divide-gray-700 max-h-80 overflow-y-auto">
+            </CardHeader>
+            <CardContent className="p-0">
+            <div className="divide-y divide-border max-h-80 overflow-y-auto">
               {memoryConflicts.length === 0 ? (
-                <div className="p-6 text-center text-gray-500">
+                <div className="p-6 text-center text-muted-foreground">
                   <CheckCircle className="h-8 w-8 mx-auto mb-2 text-green-500" />
                   <p>No memory conflicts</p>
                 </div>
@@ -274,46 +270,48 @@ export default function CognitionPage() {
                 ))
               )}
             </div>
-          </div>
+            </CardContent>
+          </Card>
 
           {/* Consolidation Jobs */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Consolidation Jobs</h2>
-              <button className="px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700">
-                Run Now
-              </button>
-            </div>
-            <div className="divide-y divide-gray-200 dark:divide-gray-700">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0">
+              <CardTitle>Consolidation Jobs</CardTitle>
+              <Button size="sm">Run Now</Button>
+            </CardHeader>
+            <CardContent className="p-0">
+            <div className="divide-y divide-border">
               {consolidationJobs.map((job) => (
                 <JobRow key={job.jobId} job={job} />
               ))}
             </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
       )}
+        </TabsContent>
 
-      {activeTab === 'causal' && (
-        <div className="grid grid-cols-3 gap-6">
-          <div className="col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Causal Knowledge Graph</h2>
-              <p className="text-sm text-gray-500">Nodes and edges representing causal relationships</p>
-            </div>
-            <div className="p-4">
+        <TabsContent value="causal">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <Card className="col-span-2">
+            <CardHeader>
+              <CardTitle>Causal Knowledge Graph</CardTitle>
+              <p className="text-sm text-muted-foreground">Nodes and edges representing causal relationships</p>
+            </CardHeader>
+            <CardContent>
               {/* Simple graph visualization - in production would use D3 or similar */}
-              <div className="h-96 bg-gray-50 dark:bg-gray-900 rounded-lg p-4 relative overflow-hidden">
+              <div className="h-96 bg-muted rounded-lg p-4 relative overflow-hidden">
                 {causalNodes.map((node, i) => {
                   const x = 50 + (i % 4) * 150;
                   const y = 50 + Math.floor(i / 4) * 100;
                   return (
                     <div
                       key={node.nodeId}
-                      className="absolute p-2 bg-white dark:bg-gray-700 rounded-lg shadow border border-gray-200 dark:border-gray-600 cursor-pointer hover:ring-2 hover:ring-indigo-500"
+                      className="absolute p-2 bg-card rounded-lg shadow border border-border cursor-pointer hover:ring-2 hover:ring-primary"
                       style={{ left: x, top: y }}
                     >
-                      <div className="text-sm font-medium text-gray-900 dark:text-white">{node.name}</div>
-                      <div className="text-xs text-gray-500">{node.nodeType}</div>
+                      <div className="text-sm font-medium text-foreground">{node.name}</div>
+                      <div className="text-xs text-muted-foreground">{node.nodeType}</div>
                     </div>
                   );
                 })}
@@ -333,7 +331,7 @@ export default function CognitionPage() {
                         y1={y1}
                         x2={x2}
                         y2={y2}
-                        stroke="#6366f1"
+                        className="stroke-primary"
                         strokeWidth={Math.max(1, edge.causalStrength * 3)}
                         strokeOpacity={edge.confidence}
                         markerEnd="url(#arrowhead)"
@@ -342,48 +340,54 @@ export default function CognitionPage() {
                   })}
                   <defs>
                     <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-                      <polygon points="0 0, 10 3.5, 0 7" fill="#6366f1" />
+                      <polygon points="0 0, 10 3.5, 0 7" className="fill-primary" />
                     </marker>
                   </defs>
                 </svg>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
           <div className="space-y-6">
             {/* Intervention Panel */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-              <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                <h3 className="font-semibold text-gray-900 dark:text-white">Causal Intervention</h3>
-              </div>
-              <div className="p-4 space-y-4">
-                <div>
-                  <label className="text-sm text-gray-500">Target Variable</label>
-                  <select className="mt-1 w-full p-2 border rounded-lg">
-                    {causalNodes.filter((n) => n.isManipulable).map((n) => (
-                      <option key={n.nodeId} value={n.nodeId}>{n.name}</option>
-                    ))}
-                  </select>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Causal Intervention</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Target Variable</Label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select variable..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {causalNodes.filter((n) => n.isManipulable).map((n) => (
+                        <SelectItem key={n.nodeId} value={n.nodeId}>{n.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
-                <div>
-                  <label className="text-sm text-gray-500">Set Value To</label>
-                  <input type="text" className="mt-1 w-full p-2 border rounded-lg" placeholder="New value..." />
+                <div className="space-y-2">
+                  <Label>Set Value To</Label>
+                  <Input type="text" placeholder="New value..." />
                 </div>
-                <button className="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+                <Button className="w-full">
                   do(X = value)
-                </button>
-                <button className="w-full py-2 border border-indigo-600 text-indigo-600 rounded-lg hover:bg-indigo-50">
+                </Button>
+                <Button variant="outline" className="w-full">
                   Counterfactual Query
-                </button>
-              </div>
-            </div>
+                </Button>
+              </CardContent>
+            </Card>
 
             {/* Edge List */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-              <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                <h3 className="font-semibold text-gray-900 dark:text-white">Causal Edges</h3>
-              </div>
-              <div className="divide-y divide-gray-200 dark:divide-gray-700 max-h-60 overflow-y-auto">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Causal Edges</CardTitle>
+              </CardHeader>
+              <CardContent className="p-0">
+              <div className="divide-y divide-border max-h-60 overflow-y-auto">
                 {causalEdges.map((edge) => {
                   const cause = causalNodes.find((n) => n.nodeId === edge.causeNodeId);
                   const effect = causalNodes.find((n) => n.nodeId === edge.effectNodeId);
@@ -391,194 +395,195 @@ export default function CognitionPage() {
                     <div key={edge.edgeId} className="p-3">
                       <div className="flex items-center gap-2 text-sm">
                         <span className="font-medium">{cause?.name || '?'}</span>
-                        <ChevronRight className="h-4 w-4 text-gray-400" />
+                        <ChevronRight className="h-4 w-4 text-muted-foreground" />
                         <span className="font-medium">{effect?.name || '?'}</span>
                       </div>
-                      <div className="text-xs text-gray-500 mt-1">
+                      <div className="text-xs text-muted-foreground mt-1">
                         Strength: {(edge.causalStrength * 100).toFixed(0)}% • Confidence: {(edge.confidence * 100).toFixed(0)}%
                       </div>
                     </div>
                   );
                 })}
               </div>
-            </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
-      )}
+        </TabsContent>
 
-      {activeTab === 'autonomous' && (
-        <div className="grid grid-cols-3 gap-6">
-          <div className="col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+        <TabsContent value="autonomous">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <Card className="col-span-2">
+            <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Autonomous Tasks</h2>
-                <p className="text-sm text-gray-500">Background tasks with bounded autonomy</p>
+                <CardTitle>Autonomous Tasks</CardTitle>
+                <p className="text-sm text-muted-foreground">Background tasks with bounded autonomy</p>
               </div>
-              <button className="px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700">
-                + Add Task
-              </button>
-            </div>
-            <div className="divide-y divide-gray-200 dark:divide-gray-700">
+              <Button size="sm">+ Add Task</Button>
+            </CardHeader>
+            <CardContent className="p-0">
+            <div className="divide-y divide-border">
               {autonomousTasks.map((task) => (
                 <TaskRow key={task.taskId} task={task} />
               ))}
             </div>
-          </div>
+            </CardContent>
+          </Card>
 
           <div className="space-y-6">
             {/* Safety Controls */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-              <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                <h3 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
                   <Shield className="h-5 w-5 text-green-500" />
                   Safety Controls
-                </h3>
-              </div>
-              <div className="p-4 space-y-4">
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-700 dark:text-gray-300">Require Approval</span>
-                  <div className="w-10 h-5 bg-green-500 rounded-full relative">
-                    <div className="absolute right-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow" />
-                  </div>
+                  <Label>Require Approval</Label>
+                  <Switch defaultChecked />
                 </div>
-                <div>
-                  <label className="text-sm text-gray-500">Max Actions/Day</label>
-                  <input type="number" defaultValue={10} className="mt-1 w-full p-2 border rounded-lg" />
+                <div className="space-y-2">
+                  <Label>Max Actions/Day</Label>
+                  <Input type="number" defaultValue={10} />
                 </div>
-                <div>
-                  <label className="text-sm text-gray-500">Max Tokens/Day</label>
-                  <input type="number" defaultValue={100000} className="mt-1 w-full p-2 border rounded-lg" />
+                <div className="space-y-2">
+                  <Label>Max Tokens/Day</Label>
+                  <Input type="number" defaultValue={100000} />
                 </div>
-                <div>
-                  <label className="text-sm text-gray-500">Allowed Task Types</label>
-                  <div className="mt-2 space-y-1">
+                <div className="space-y-2">
+                  <Label>Allowed Task Types</Label>
+                  <div className="mt-2 space-y-2">
                     {['suggestion', 'maintenance', 'background_learning', 'monitoring'].map((type) => (
-                      <label key={type} className="flex items-center gap-2">
-                        <input type="checkbox" defaultChecked={['suggestion', 'maintenance'].includes(type)} />
-                        <span className="text-sm capitalize">{type.replace('_', ' ')}</span>
-                      </label>
+                      <div key={type} className="flex items-center gap-2">
+                        <Checkbox id={`task-type-${type}`} defaultChecked={['suggestion', 'maintenance'].includes(type)} />
+                        <Label htmlFor={`task-type-${type}`} className="text-sm font-normal capitalize cursor-pointer">{type.replace('_', ' ')}</Label>
+                      </div>
                     ))}
                   </div>
                 </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
 
             {/* Activity Log */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-              <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                <h3 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
                   <Activity className="h-5 w-5 text-blue-500" />
                   Recent Activity
-                </h3>
-              </div>
-              <div className="p-4 space-y-2 text-sm max-h-60 overflow-y-auto">
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm max-h-60 overflow-y-auto">
                 <ActivityItem time="2m ago" action="Memory consolidation completed" status="success" />
                 <ActivityItem time="15m ago" action="Suggestion approved by admin" status="success" />
                 <ActivityItem time="1h ago" action="Pattern analysis triggered" status="pending" />
                 <ActivityItem time="3h ago" action="Skill extraction failed" status="failed" />
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
-      )}
+        </TabsContent>
 
-      {activeTab === 'memory' && (
+        <TabsContent value="memory">
         <div className="grid grid-cols-2 gap-6">
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Consolidation Settings</h2>
-            </div>
-            <div className="p-4 space-y-4">
-              <div>
-                <label className="text-sm text-gray-500">Schedule</label>
-                <select className="mt-1 w-full p-2 border rounded-lg">
-                  <option value="hourly">Hourly</option>
-                  <option value="daily" selected>Daily</option>
-                  <option value="weekly">Weekly</option>
-                  <option value="manual">Manual Only</option>
-                </select>
+          <Card>
+            <CardHeader>
+              <CardTitle>Consolidation Settings</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label>Schedule</Label>
+                <Select defaultValue="daily">
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select schedule..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="hourly">Hourly</SelectItem>
+                    <SelectItem value="daily">Daily</SelectItem>
+                    <SelectItem value="weekly">Weekly</SelectItem>
+                    <SelectItem value="manual">Manual Only</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-              <div>
-                <label className="text-sm text-gray-500">Compression Ratio</label>
-                <input type="range" min="0" max="100" defaultValue="70" className="w-full" />
-                <div className="flex justify-between text-xs text-gray-400">
+              <div className="space-y-2">
+                <Label>Compression Ratio</Label>
+                <Slider defaultValue={[70]} min={0} max={100} step={1} />
+                <div className="flex justify-between text-xs text-muted-foreground">
                   <span>Keep All</span>
                   <span>70%</span>
                   <span>Max Compression</span>
                 </div>
               </div>
-              <div>
-                <label className="text-sm text-gray-500">Importance Decay Rate (per day)</label>
-                <input type="number" defaultValue="0.05" step="0.01" className="mt-1 w-full p-2 border rounded-lg" />
+              <div className="space-y-2">
+                <Label>Importance Decay Rate (per day)</Label>
+                <Input type="number" defaultValue={0.05} step={0.01} />
               </div>
-              <div>
-                <label className="text-sm text-gray-500">Auto-Prune Threshold</label>
-                <input type="number" defaultValue="0.1" step="0.01" className="mt-1 w-full p-2 border rounded-lg" />
+              <div className="space-y-2">
+                <Label>Auto-Prune Threshold</Label>
+                <Input type="number" defaultValue={0.1} step={0.01} />
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-700">Auto-Resolve Conflicts</span>
-                <div className="w-10 h-5 bg-green-500 rounded-full relative">
-                  <div className="absolute right-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow" />
-                </div>
+                <Label>Auto-Resolve Conflicts</Label>
+                <Switch defaultChecked />
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Memory Statistics</h2>
-            </div>
-            <div className="p-4 space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Memory Statistics</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
-                <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg text-center">
-                  <p className="text-2xl font-bold text-indigo-600">1,247</p>
-                  <p className="text-xs text-gray-500">Episodic Memories</p>
+                <div className="p-3 bg-muted rounded-lg text-center">
+                  <p className="text-2xl font-bold text-primary">1,247</p>
+                  <p className="text-xs text-muted-foreground">Episodic Memories</p>
                 </div>
-                <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg text-center">
+                <div className="p-3 bg-muted rounded-lg text-center">
                   <p className="text-2xl font-bold text-blue-600">438</p>
-                  <p className="text-xs text-gray-500">Semantic Memories</p>
+                  <p className="text-xs text-muted-foreground">Semantic Memories</p>
                 </div>
-                <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg text-center">
+                <div className="p-3 bg-muted rounded-lg text-center">
                   <p className="text-2xl font-bold text-green-600">56</p>
-                  <p className="text-xs text-gray-500">Procedural Memories</p>
+                  <p className="text-xs text-muted-foreground">Procedural Memories</p>
                 </div>
-                <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg text-center">
+                <div className="p-3 bg-muted rounded-lg text-center">
                   <p className="text-2xl font-bold text-purple-600">89</p>
-                  <p className="text-xs text-gray-500">Consolidated</p>
+                  <p className="text-xs text-muted-foreground">Consolidated</p>
                 </div>
               </div>
               <div>
                 <div className="flex justify-between text-sm mb-1">
-                  <span className="text-gray-500">Storage Used</span>
+                  <span className="text-muted-foreground">Storage Used</span>
                   <span className="font-medium">2.4 GB / 10 GB</span>
                 </div>
-                <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                  <div className="h-full bg-indigo-500" style={{ width: '24%' }} />
+                <div className="h-2 bg-muted rounded-full overflow-hidden">
+                  <div className="h-full bg-primary rounded-full" style={{ width: '24%' }} />
                 </div>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
-      )}
+        </TabsContent>
 
-      {activeTab === 'skills' && (
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-          <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+        <TabsContent value="skills">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Executable Skills</h2>
-              <p className="text-sm text-gray-500">Learned procedures that can be replayed</p>
+              <CardTitle>Executable Skills</CardTitle>
+              <p className="text-sm text-muted-foreground">Learned procedures that can be replayed</p>
             </div>
-            <button className="px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700">
-              + Learn Skill
-            </button>
-          </div>
-          <div className="divide-y divide-gray-200 dark:divide-gray-700">
+            <Button size="sm">+ Learn Skill</Button>
+          </CardHeader>
+          <CardContent className="divide-y divide-border p-0">
             {([] as Array<{skillId: string; name: string; skillType: string; executionCount: number; successRate: number}>).map((skill) => (
               <SkillRow key={skill.skillId} skill={skill} />
             ))}
-          </div>
-        </div>
-      )}
+          </CardContent>
+        </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
@@ -590,42 +595,42 @@ function StatCard({ title, value, icon: Icon, color }: {
   color: 'indigo' | 'blue' | 'green' | 'purple' | 'orange' | 'red' | 'gray';
 }) {
   const colors = {
-    indigo: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20',
-    blue: 'bg-blue-50 text-blue-600 dark:bg-blue-900/20',
-    green: 'bg-green-50 text-green-600 dark:bg-green-900/20',
-    purple: 'bg-purple-50 text-purple-600 dark:bg-purple-900/20',
-    orange: 'bg-orange-50 text-orange-600 dark:bg-orange-900/20',
-    red: 'bg-red-50 text-red-600 dark:bg-red-900/20',
-    gray: 'bg-gray-50 text-gray-600 dark:bg-gray-700',
+    indigo: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400',
+    blue: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
+    green: 'bg-green-500/10 text-green-600 dark:text-green-400',
+    purple: 'bg-purple-500/10 text-purple-600 dark:text-purple-400',
+    orange: 'bg-orange-500/10 text-orange-600 dark:text-orange-400',
+    red: 'bg-red-500/10 text-red-600 dark:text-red-400',
+    gray: 'bg-muted text-muted-foreground',
   };
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-xs text-gray-500">{title}</p>
-          <p className="text-2xl font-bold text-gray-900 dark:text-white">{value}</p>
+    <Card>
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-xs text-muted-foreground">{title}</p>
+            <p className="text-2xl font-bold">{value}</p>
+          </div>
+          <div className={`p-2 rounded-lg ${colors[color]}`}>
+            <Icon className="h-5 w-5" />
+          </div>
         </div>
-        <div className={`p-2 rounded-lg ${colors[color]}`}>
-          <Icon className="h-5 w-5" />
-        </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
 
 function FeatureToggle({ name, enabled, description, warning }: { name: string; enabled: boolean; description: string; warning?: boolean }) {
   return (
-    <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+    <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
       <div>
         <div className="flex items-center gap-2">
-          <span className="font-medium text-gray-900 dark:text-white">{name}</span>
+          <span className="font-medium">{name}</span>
           {warning && <AlertTriangle className="h-4 w-4 text-orange-500" />}
         </div>
-        <p className="text-xs text-gray-500">{description}</p>
+        <p className="text-xs text-muted-foreground">{description}</p>
       </div>
-      <div className={`w-10 h-5 rounded-full relative ${enabled ? 'bg-green-500' : 'bg-gray-300'}`}>
-        <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-all ${enabled ? 'right-0.5' : 'left-0.5'}`} />
-      </div>
+      <Switch checked={enabled} />
     </div>
   );
 }
@@ -635,25 +640,25 @@ function ApprovalRow({ approval }: { approval: PendingApproval }) {
     <div className="p-4">
       <div className="flex items-center justify-between">
         <div>
-          <h4 className="font-medium text-gray-900 dark:text-white">{approval.taskName}</h4>
-          <p className="text-xs text-gray-500">{new Date(approval.triggeredAt).toLocaleString()}</p>
+          <h4 className="font-medium">{approval.taskName}</h4>
+          <p className="text-xs text-muted-foreground">{new Date(approval.triggeredAt).toLocaleString()}</p>
         </div>
         <div className="flex gap-2">
-          <button className="p-1.5 text-green-600 hover:bg-green-50 rounded">
+          <Button variant="ghost" size="icon" className="text-green-600 hover:text-green-700 hover:bg-green-500/10">
             <CheckCircle className="h-5 w-5" />
-          </button>
-          <button className="p-1.5 text-red-600 hover:bg-red-50 rounded">
+          </Button>
+          <Button variant="ghost" size="icon" className="text-red-600 hover:text-red-700 hover:bg-red-500/10">
             <XCircle className="h-5 w-5" />
-          </button>
+          </Button>
         </div>
       </div>
       <div className="mt-2 space-y-1">
         {approval.proposedActions.map((action, i) => (
           <div key={i} className="text-sm flex items-center gap-2">
-            <span className="px-1.5 py-0.5 rounded text-xs" style={{ backgroundColor: `${impactColors[action.impactAssessment.level]}20`, color: impactColors[action.impactAssessment.level] }}>
+            <Badge variant="outline" className={impactStyles[action.impactAssessment.level] || impactStyles.none}>
               {action.impactAssessment.level}
-            </span>
-            <span className="text-gray-600 dark:text-gray-400">{action.action}</span>
+            </Badge>
+            <span className="text-muted-foreground">{action.action}</span>
           </div>
         ))}
       </div>
@@ -661,43 +666,52 @@ function ApprovalRow({ approval }: { approval: PendingApproval }) {
   );
 }
 
+const severityStyles: Record<string, string> = {
+  critical: 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20',
+  major: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
+  minor: 'bg-muted text-muted-foreground border-border',
+};
+
 function ConflictRow({ conflict }: { conflict: MemoryConflict }) {
-  const severityColors: Record<string, string> = { critical: '#ef4444', major: '#f59e0b', minor: '#6b7280' };
-  const color = severityColors[conflict.severity] || '#6b7280';
   return (
     <div className="p-4">
       <div className="flex items-center gap-2">
-        <span className="px-1.5 py-0.5 rounded text-xs font-medium" style={{ backgroundColor: `${color}20`, color }}>
+        <Badge variant="outline" className={severityStyles[conflict.severity] || severityStyles.minor}>
           {conflict.severity}
-        </span>
-        <span className="text-sm text-gray-500 capitalize">{conflict.conflictType.replace('_', ' ')}</span>
+        </Badge>
+        <span className="text-sm text-muted-foreground capitalize">{conflict.conflictType.replace('_', ' ')}</span>
       </div>
-      <div className="mt-2 text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+      <div className="mt-2 text-sm text-muted-foreground line-clamp-2">
         A: {conflict.memoryAContent.substring(0, 50)}...
       </div>
-      <div className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+      <div className="text-sm text-muted-foreground line-clamp-2">
         B: {conflict.memoryBContent.substring(0, 50)}...
       </div>
-      <button className="mt-2 text-sm text-indigo-600 hover:underline">Resolve</button>
+      <Button variant="link" size="sm" className="mt-1 px-0 h-auto">Resolve</Button>
     </div>
   );
 }
 
+const jobStatusStyles: Record<string, string> = {
+  pending: 'bg-muted text-muted-foreground border-border',
+  running: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
+  completed: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
+  failed: 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20',
+};
+
 function JobRow({ job }: { job: ConsolidationJob }) {
-  const statusColors: Record<string, string> = { pending: '#6b7280', running: '#3b82f6', completed: '#10b981', failed: '#ef4444' };
-  const color = statusColors[job.status] || '#6b7280';
   return (
     <div className="p-4 flex items-center justify-between">
       <div>
         <div className="flex items-center gap-2">
-          <span className="font-medium text-gray-900 dark:text-white capitalize">{job.jobType}</span>
-          <span className="px-1.5 py-0.5 rounded text-xs" style={{ backgroundColor: `${color}20`, color }}>
+          <span className="font-medium capitalize">{job.jobType}</span>
+          <Badge variant="outline" className={jobStatusStyles[job.status] || jobStatusStyles.pending}>
             {job.status}
-          </span>
+          </Badge>
         </div>
-        <p className="text-xs text-gray-500">{job.memoriesProcessed} processed • {job.conflictsFound} conflicts</p>
+        <p className="text-xs text-muted-foreground">{job.memoriesProcessed} processed • {job.conflictsFound} conflicts</p>
       </div>
-      {job.status === 'running' && <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-indigo-600" />}
+      {job.status === 'running' && <Loader2 className="h-4 w-4 animate-spin text-primary" />}
     </div>
   );
 }
@@ -706,30 +720,30 @@ function TaskRow({ task }: { task: AutonomousTask }) {
   return (
     <div className="p-4 flex items-center justify-between">
       <div className="flex items-center gap-3">
-        <div className={`p-2 rounded-lg ${task.isEnabled && !task.isPaused ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'}`}>
+        <div className={`p-2 rounded-lg ${task.isEnabled && !task.isPaused ? 'bg-green-500/10 text-green-600 dark:text-green-400' : 'bg-muted text-muted-foreground'}`}>
           <Bot className="h-5 w-5" />
         </div>
         <div>
           <div className="flex items-center gap-2">
-            <span className="font-medium text-gray-900 dark:text-white">{task.name}</span>
+            <span className="font-medium">{task.name}</span>
             {task.requiresApproval && <Shield className="h-3.5 w-3.5 text-green-500" />}
           </div>
-          <p className="text-xs text-gray-500">{task.taskType} • {task.runCount} runs</p>
+          <p className="text-xs text-muted-foreground">{task.taskType} • {task.runCount} runs</p>
         </div>
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1">
         {task.isEnabled && !task.isPaused ? (
-          <button className="p-1.5 text-yellow-600 hover:bg-yellow-50 rounded">
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-yellow-600 hover:text-yellow-700 hover:bg-yellow-500/10">
             <Pause className="h-4 w-4" />
-          </button>
+          </Button>
         ) : (
-          <button className="p-1.5 text-green-600 hover:bg-green-50 rounded">
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-green-600 hover:text-green-700 hover:bg-green-500/10">
             <Play className="h-4 w-4" />
-          </button>
+          </Button>
         )}
-        <button className="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded">
+        <Button variant="ghost" size="icon" className="h-8 w-8 text-primary hover:bg-primary/10">
           <Zap className="h-4 w-4" />
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -739,17 +753,15 @@ function SkillRow({ skill }: { skill: { skillId: string; name: string; skillType
   return (
     <div className="p-4 flex items-center justify-between">
       <div className="flex items-center gap-3">
-        <div className="p-2 bg-purple-100 text-purple-600 rounded-lg">
+        <div className="p-2 bg-purple-500/10 text-purple-600 dark:text-purple-400 rounded-lg">
           <Zap className="h-5 w-5" />
         </div>
         <div>
-          <span className="font-medium text-gray-900 dark:text-white">{skill.name}</span>
-          <p className="text-xs text-gray-500">{skill.skillType} • {skill.executionCount} executions • {(skill.successRate * 100).toFixed(0)}% success</p>
+          <span className="font-medium">{skill.name}</span>
+          <p className="text-xs text-muted-foreground">{skill.skillType} • {skill.executionCount} executions • {(skill.successRate * 100).toFixed(0)}% success</p>
         </div>
       </div>
-      <button className="px-3 py-1.5 border border-indigo-600 text-indigo-600 rounded-lg text-sm hover:bg-indigo-50">
-        Execute
-      </button>
+      <Button variant="outline" size="sm">Execute</Button>
     </div>
   );
 }
@@ -762,8 +774,8 @@ function ActivityItem({ time, action, status }: { time: string; action: string; 
     <div className="flex items-start gap-2">
       <Icon className={`h-4 w-4 mt-0.5 ${colors[status]}`} />
       <div className="flex-1">
-        <p className="text-gray-700 dark:text-gray-300">{action}</p>
-        <p className="text-xs text-gray-400">{time}</p>
+        <p className="text-sm">{action}</p>
+        <p className="text-xs text-muted-foreground">{time}</p>
       </div>
     </div>
   );

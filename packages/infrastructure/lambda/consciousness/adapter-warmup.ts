@@ -15,7 +15,13 @@
 
 import { Handler, ScheduledEvent, CloudFormationCustomResourceEvent } from 'aws-lambda';
 import { loraInferenceService, WarmUpResult, WarmUpStatus } from '../shared/services/lora-inference.service';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'consciousness/adapter-warmup',
+  category: 'infrastructure',
+  sourceType: 'lambda',
+});
 
 // ============================================================================
 // Types

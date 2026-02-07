@@ -1,7 +1,13 @@
 import { APIGatewayProxyWebsocketHandlerV2, APIGatewayProxyWebsocketEventV2 } from 'aws-lambda';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb';
-import { enhancedLogger as logger } from '../../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'collaboration/connect-index',
+  category: 'infrastructure',
+  sourceType: 'lambda',
+});
 import { requireEnv } from '../../shared/config/env';
 
 const ddbClient = new DynamoDBClient({});

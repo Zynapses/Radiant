@@ -1,5 +1,5 @@
-// RADIANT v4.18.0 - Think Tank Admin Consolidated Lambda Handler
-// Combines dashboard, analytics, settings, my-rules, and shadow-testing APIs
+// RADIANT v5.52.0 - Think Tank Admin Consolidated Lambda Handler
+// Combines dashboard, analytics, settings, my-rules, shadow-testing, and polymorphic APIs
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 
@@ -17,6 +17,7 @@ import {
   getSettings as getShadowSettings,
   updateSettings as updateShadowSettings,
 } from '../thinktank/shadow-testing';
+import { handleChat, handleSniper } from './polymorphic';
 
 const corsHeaders = {
   'Content-Type': 'application/json',
@@ -86,6 +87,16 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
       
       if (method === 'GET') return await listTests(event);
       if (method === 'POST') return await createTest(event);
+    }
+
+    // Polymorphic UI routes - Economic Governor integration
+    if (path.includes('/thinktank-admin/polymorphic')) {
+      if (path.includes('/chat') && method === 'POST') {
+        return await handleChat(event);
+      }
+      if (path.includes('/sniper') && method === 'POST') {
+        return await handleSniper(event);
+      }
     }
 
     // Route not found

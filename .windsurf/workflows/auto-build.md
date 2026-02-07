@@ -10,7 +10,7 @@ description: Policy - All builds, features, and metadata changes must be tracked
 
 **⚠️ CRITICAL: Documentation is part of the build, not a separate step.**
 
-See also: `/documentation-required` and `/documentation-standards` workflows.
+See also: `/docs-update-all` workflow for all documentation requirements.
 
 When making ANY of the following changes, you MUST update the corresponding files:
 

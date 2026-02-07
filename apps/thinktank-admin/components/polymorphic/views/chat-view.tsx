@@ -7,6 +7,8 @@
  * 
  * Standard multi-agent conversation interface.
  * Default view when no specific morph is triggered.
+ * 
+ * Integrates with Economic Governor for intelligent model routing.
  */
 
 import React, { useState, useRef, useEffect } from 'react';
@@ -17,7 +19,21 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { MessageSquare, Send, Bot, User, Zap, Users, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { api } from '@/lib/api/client';
 import type { ViewComponentProps } from '../view-router';
+
+interface GovernorChatResponse {
+  success: boolean;
+  data: {
+    response: string;
+    model: string;
+    tier: string;
+    costCents: number;
+    latencyMs: number;
+    persona?: string;
+    confidence?: number;
+  };
+}
 
 interface ChatMessage {
   id: string;
@@ -66,21 +82,52 @@ export function ChatView({
     setInput('');
     setIsLoading(true);
 
-    // TODO: Replace with actual API call to Economic Governor
-    // This demo response simulates the expected behavior
     try {
-      // In production, this would be: const response = await economicGovernor.route(userMessage.content, mode);
-      const assistantMessage: ChatMessage = {
+      // Route through Economic Governor for intelligent model selection
+      const governorMode = mode === 'sniper' ? 'sniper' : 'war_room';
+      const taskType = mode === 'sniper' ? 'quick_query' : 'deep_analysis';
+      
+      const response = await api.post<GovernorChatResponse>(
+        '/api/thinktank-admin/polymorphic/chat',
+        {
+          message: userMessage.content,
+          mode: governorMode,
+          taskType,
+          context: {
+            previousMessages: messages.slice(-5).map(m => ({
+              role: m.role,
+              content: m.content,
+            })),
+          },
+        }
+      );
+
+      if (response.success && response.data) {
+        const assistantMessage: ChatMessage = {
+          id: crypto.randomUUID(),
+          role: 'assistant',
+          content: response.data.response,
+          timestamp: new Date(),
+          mode,
+          persona: response.data.persona || (mode === 'sniper' ? 'Sniper' : 'Sage'),
+          costCents: response.data.costCents,
+        };
+
+        setMessages(prev => [...prev, assistantMessage]);
+      } else {
+        throw new Error('Invalid response from Economic Governor');
+      }
+    } catch (error) {
+      // Fallback to show error message
+      const errorMessage: ChatMessage = {
         id: crypto.randomUUID(),
         role: 'assistant',
-        content: `Processing your request in ${mode === 'sniper' ? 'Sniper' : 'War Room'} mode...\n\nThis is a demonstration of the Polymorphic UI chat interface. In production, this would route through the Economic Governor for intelligent model selection.`,
+        content: `I encountered an issue processing your request. ${error instanceof Error ? error.message : 'Please try again.'}`,
         timestamp: new Date(),
         mode,
-        persona: mode === 'sniper' ? 'Sniper' : 'Sage',
-        costCents: mode === 'sniper' ? 1 : 50,
+        persona: 'System',
       };
-
-      setMessages(prev => [...prev, assistantMessage]);
+      setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
     }

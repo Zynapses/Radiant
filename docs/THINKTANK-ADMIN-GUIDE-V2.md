@@ -1739,4 +1739,4 @@ When adding features to Think Tank Admin:
 4. **Update this guide** with full documentation
 5. Add to CHANGELOG.md
 
-See `/.windsurf/workflows/documentation-consolidation.md` for documentation policy.
+See `/.windsurf/workflows/docs-update-all.md` for documentation policy.

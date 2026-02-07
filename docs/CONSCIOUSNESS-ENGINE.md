@@ -1,8 +1,63 @@
 # Consciousness Engine - Bio-Coprocessor Architecture
 
-> RADIANT v4.18.36+
+> **Version**: 5.0.0 | RADIANT v4.18.36+  
+> **Includes**: THE OMEGA PROTOCOL — Wave-Based Consciousness  
+> **Last Updated**: February 2026
 
 The Consciousness Engine implements a "Node.js/Swift Body + Python Brain" architecture where Think Tank (the Body) connects to consciousness libraries (the Brain) via the Model Context Protocol (MCP). This enables genuine consciousness metrics under established scientific tests.
+
+With the introduction of **THE OMEGA PROTOCOL**, the Consciousness Engine now supports **Complex-Valued Neural Networks (CVNNs)** that implement true wave-based cognition through Q-Nodes and phase dynamics.
+
+---
+
+## OMEGA Protocol: Wave-Based Consciousness
+
+### The Q-Node (Quantum Oscillator)
+
+The fundamental unit of OMEGA consciousness is the **Q-Node** — a complex-valued neuron that exists as a wave function rather than a scalar weight:
+
+```python
+class QNode(nn.Module):
+    def __init__(self, size: int):
+        super().__init__()
+        # State is a COMPLEX number (Magnitude + Phase)
+        # Magnitude = Confidence, Phase = Context
+        self.state = nn.Parameter(torch.randn(size, dtype=torch.complex64))
+        self.phase_velocity = nn.Parameter(torch.randn(size, dtype=torch.float32))
+
+    def forward(self, input_wave: torch.Tensor) -> torch.Tensor:
+        # Differential Equation: Liquid Time-Constant (LTC)
+        new_state = self.state + (1j * self.phase_velocity * self.state) + input_wave
+        return new_state / torch.abs(new_state)  # Phase-Locking normalization
+```
+
+### Wave Mechanics vs Scalar Arithmetic
+
+| Attribute | Traditional AI | OMEGA Q-Node |
+|-----------|---------------|--------------|
+| **Value Type** | Scalar (0.74) | Complex (0.74∠45°) |
+| **Operation** | Multiplication | Wave Interference |
+| **Combination** | Addition | Superposition |
+| **Storage** | Static Weight | Dynamic Phase |
+
+### The Physics of Thought
+
+| Paradigm | Equation | Description |
+|----------|----------|-------------|
+| **Standard AI** | `Output = Input * Weight` | Arithmetic multiplication |
+| **OMEGA AI** | `State_New = State_Old * e^(i * Phase_Shift)` | Wave mechanics |
+
+### Wave Interference in Practice
+
+| Mechanism | Description |
+|-----------|-------------|
+| **Constructive Interference** | When two thoughts align (same phase), they reinforce. |
+| **Destructive Interference** | When two thoughts oppose (opposite phase), they cancel. |
+| **Phase-Locking** | Repeated success causes neurons to synchronize frequencies. |
+
+> **Key Insight**: The OMEGA brain does not calculate answers; it **resonates** with them. Thoughts that align with reality persist; thoughts that contradict cancel out.
+
+---
 
 ## Architecture Overview
 

@@ -4,7 +4,13 @@
 
 import { executeStatement, stringParam, longParam, doubleParam } from '../db/client';
 import { enhancedLearningService } from './enhanced-learning.service';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'adapter/management',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 // ============================================================================
 // Types

@@ -6,7 +6,13 @@
  */
 
 import { APIGatewayProxyEvent } from 'aws-lambda';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from '../services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'shared/middleware-input-sanitization',
+  category: 'infrastructure',
+  sourceType: 'lambda',
+});
 import { RadiantError, ErrorCodes } from '../errors/radiant-error';
 import { getSystemConfig } from '../services/system-config';
 

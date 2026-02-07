@@ -1,0 +1,427 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  OMEGA - Bio-Mimetic AI Organism Infrastructure
+  Serverless Cryogenic Architecture with EFS hot storage, S3 cold storage, and Graviton Lambdas
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - staging
+      - prod
+    Description: Deployment environment
+  
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC ID for Lambda and EFS
+  
+  SubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: Subnet IDs for Lambda and EFS (minimum 2 for HA)
+  
+  RadiantDomain:
+    Type: String
+    Default: "{{RADIANT_DOMAIN}}"
+    Description: Domain placeholder for Radiant integration
+
+Globals:
+  Function:
+    Runtime: python3.11
+    Architectures:
+      - arm64
+    Timeout: 30
+    MemorySize: 1024
+    Environment:
+      Variables:
+        ENVIRONMENT: !Ref Environment
+        OMEGA_EFS_MOUNT: /mnt/omega_state
+        OMEGA_BACKUP_BUCKET: !Ref OmegaBackupBucket
+        OMEGA_FIRMWARE_BUCKET: !Ref OmegaFirmwareBucket
+        RADIANT_DOMAIN: !Ref RadiantDomain
+    VpcConfig:
+      SecurityGroupIds:
+        - !Ref OmegaSecurityGroup
+      SubnetIds: !Ref SubnetIds
+
+Resources:
+  # =============================================================================
+  # SECURITY
+  # =============================================================================
+  OmegaSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for OMEGA Lambda functions
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 2049
+          ToPort: 2049
+          SourceSecurityGroupId: !Ref EfsSecurityGroup
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: !Sub omega-lambda-${Environment}
+
+  EfsSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for OMEGA EFS
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 2049
+          ToPort: 2049
+          SourceSecurityGroupId: !Ref OmegaSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub omega-efs-${Environment}
+
+  # =============================================================================
+  # STORAGE - EFS (Hot/Warm)
+  # =============================================================================
+  OmegaEfsFileSystem:
+    Type: AWS::EFS::FileSystem
+    Properties:
+      Encrypted: true
+      PerformanceMode: generalPurpose
+      ThroughputMode: elastic
+      LifecyclePolicies:
+        - TransitionToIA: AFTER_30_DAYS
+        - TransitionToPrimaryStorageClass: AFTER_1_ACCESS
+      BackupPolicy:
+        Status: ENABLED
+      FileSystemTags:
+        - Key: Name
+          Value: !Sub omega-brain-storage-${Environment}
+        - Key: Purpose
+          Value: OMEGA brain state persistence
+
+  OmegaEfsMountTargetA:
+    Type: AWS::EFS::MountTarget
+    Properties:
+      FileSystemId: !Ref OmegaEfsFileSystem
+      SubnetId: !Select [0, !Ref SubnetIds]
+      SecurityGroups:
+        - !Ref EfsSecurityGroup
+
+  OmegaEfsMountTargetB:
+    Type: AWS::EFS::MountTarget
+    Properties:
+      FileSystemId: !Ref OmegaEfsFileSystem
+      SubnetId: !Select [1, !Ref SubnetIds]
+      SecurityGroups:
+        - !Ref EfsSecurityGroup
+
+  OmegaEfsAccessPoint:
+    Type: AWS::EFS::AccessPoint
+    Properties:
+      FileSystemId: !Ref OmegaEfsFileSystem
+      PosixUser:
+        Uid: "1000"
+        Gid: "1000"
+      RootDirectory:
+        CreationInfo:
+          OwnerUid: "1000"
+          OwnerGid: "1000"
+          Permissions: "0755"
+        Path: /omega
+
+  # =============================================================================
+  # STORAGE - S3 (Cold/Archive)
+  # =============================================================================
+  OmegaBackupBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      BucketName: !Sub radiant-omega-backups-${Environment}-${AWS::AccountId}
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      VersioningConfiguration:
+        Status: Enabled
+      LifecycleConfiguration:
+        Rules:
+          - Id: TransitionToGlacier
+            Status: Enabled
+            Transitions:
+              - StorageClass: GLACIER
+                TransitionInDays: 90
+          - Id: DeleteOldVersions
+            Status: Enabled
+            NoncurrentVersionExpirationInDays: 365
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      Tags:
+        - Key: Purpose
+          Value: OMEGA brain cold storage backups
+
+  OmegaFirmwareBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      BucketName: !Sub radiant-omega-firmware-${Environment}-${AWS::AccountId}
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      VersioningConfiguration:
+        Status: Enabled
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      Tags:
+        - Key: Purpose
+          Value: OMEGA firmware .bio files
+
+  # =============================================================================
+  # LAMBDA LAYERS
+  # =============================================================================
+  OmegaCoreLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: !Sub omega-core-${Environment}
+      Description: OMEGA core libraries (PyTorch, numpy, omega_core)
+      ContentUri: ../lambda/
+      CompatibleRuntimes:
+        - python3.11
+      CompatibleArchitectures:
+        - arm64
+    Metadata:
+      BuildMethod: python3.11
+      BuildArchitecture: arm64
+
+  # =============================================================================
+  # LAMBDA FUNCTIONS
+  # =============================================================================
+  OmegaInferenceFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub omega-inference-${Environment}
+      Description: OMEGA brain wake cycle - handles inference requests
+      Handler: handlers.omega_inference.handler
+      CodeUri: ../lambda/
+      Timeout: 300
+      MemorySize: 3008
+      Layers:
+        - !Ref OmegaCoreLayer
+      FileSystemConfigs:
+        - Arn: !GetAtt OmegaEfsAccessPoint.Arn
+          LocalMountPath: /mnt/omega_state
+      Policies:
+        - S3CrudPolicy:
+            BucketName: !Ref OmegaBackupBucket
+        - S3ReadPolicy:
+            BucketName: !Ref OmegaFirmwareBucket
+        - EFSWriteAccessPolicy:
+            FileSystem: !Ref OmegaEfsFileSystem
+            AccessPoint: !Ref OmegaEfsAccessPoint
+      Events:
+        InferenceApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref OmegaApi
+            Path: /inference
+            Method: POST
+      Tags:
+        Purpose: OMEGA inference engine
+
+  OmegaHeartbeatFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub omega-heartbeat-${Environment}
+      Description: OMEGA pacemaker - scheduled brain maintenance
+      Handler: handlers.omega_heartbeat.handler
+      CodeUri: ../lambda/
+      Timeout: 900
+      MemorySize: 2048
+      Layers:
+        - !Ref OmegaCoreLayer
+      FileSystemConfigs:
+        - Arn: !GetAtt OmegaEfsAccessPoint.Arn
+          LocalMountPath: /mnt/omega_state
+      Policies:
+        - S3CrudPolicy:
+            BucketName: !Ref OmegaBackupBucket
+        - S3ReadPolicy:
+            BucketName: !Ref OmegaFirmwareBucket
+        - EFSWriteAccessPolicy:
+            FileSystem: !Ref OmegaEfsFileSystem
+            AccessPoint: !Ref OmegaEfsAccessPoint
+      Events:
+        ScheduledHeartbeat:
+          Type: Schedule
+          Properties:
+            Schedule: rate(5 minutes)
+            Description: OMEGA heartbeat pacemaker
+            Enabled: true
+      Tags:
+        Purpose: OMEGA maintenance pacemaker
+
+  OmegaAdminFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub omega-admin-${Environment}
+      Description: OMEGA Cortex Explorer admin API
+      Handler: handlers.omega_admin.handler
+      CodeUri: ../lambda/
+      Timeout: 60
+      MemorySize: 1024
+      Layers:
+        - !Ref OmegaCoreLayer
+      FileSystemConfigs:
+        - Arn: !GetAtt OmegaEfsAccessPoint.Arn
+          LocalMountPath: /mnt/omega_state
+      Policies:
+        - S3CrudPolicy:
+            BucketName: !Ref OmegaBackupBucket
+        - S3CrudPolicy:
+            BucketName: !Ref OmegaFirmwareBucket
+        - EFSWriteAccessPolicy:
+            FileSystem: !Ref OmegaEfsFileSystem
+            AccessPoint: !Ref OmegaEfsAccessPoint
+      Events:
+        AdminApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref OmegaApi
+            Path: /admin/{proxy+}
+            Method: ANY
+      Tags:
+        Purpose: OMEGA admin API
+
+  # =============================================================================
+  # API GATEWAY
+  # =============================================================================
+  OmegaApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub omega-api-${Environment}
+      StageName: !Ref Environment
+      Description: OMEGA Bio-Mimetic AI API
+      Cors:
+        AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+        AllowHeaders: "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
+        AllowOrigin: "'*'"
+      Auth:
+        DefaultAuthorizer: NONE
+        AddDefaultAuthorizerToCorsPreflight: false
+      TracingEnabled: true
+      MethodSettings:
+        - ResourcePath: "/*"
+          HttpMethod: "*"
+          ThrottlingBurstLimit: 100
+          ThrottlingRateLimit: 50
+      Tags:
+        Purpose: OMEGA API Gateway
+
+  # =============================================================================
+  # CLOUDWATCH ALARMS
+  # =============================================================================
+  InferenceFunctionAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub omega-inference-errors-${Environment}
+      AlarmDescription: OMEGA inference function error rate
+      MetricName: Errors
+      Namespace: AWS/Lambda
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 2
+      Threshold: 5
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref OmegaInferenceFunction
+      TreatMissingData: notBreaching
+
+  HeartbeatFunctionAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub omega-heartbeat-errors-${Environment}
+      AlarmDescription: OMEGA heartbeat function error rate
+      MetricName: Errors
+      Namespace: AWS/Lambda
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 2
+      Threshold: 3
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref OmegaHeartbeatFunction
+      TreatMissingData: notBreaching
+
+  EfsStorageAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub omega-efs-storage-${Environment}
+      AlarmDescription: OMEGA EFS storage utilization
+      MetricName: StorageBytes
+      Namespace: AWS/EFS
+      Statistic: Average
+      Period: 3600
+      EvaluationPeriods: 1
+      Threshold: 107374182400  # 100 GB
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: FileSystemId
+          Value: !Ref OmegaEfsFileSystem
+        - Name: StorageClass
+          Value: Total
+      TreatMissingData: notBreaching
+
+Outputs:
+  OmegaApiEndpoint:
+    Description: OMEGA API Gateway endpoint URL
+    Value: !Sub https://${OmegaApi}.execute-api.${AWS::Region}.amazonaws.com/${Environment}
+    Export:
+      Name: !Sub omega-api-endpoint-${Environment}
+
+  OmegaInferenceFunctionArn:
+    Description: OMEGA Inference Lambda function ARN
+    Value: !GetAtt OmegaInferenceFunction.Arn
+    Export:
+      Name: !Sub omega-inference-arn-${Environment}
+
+  OmegaHeartbeatFunctionArn:
+    Description: OMEGA Heartbeat Lambda function ARN
+    Value: !GetAtt OmegaHeartbeatFunction.Arn
+    Export:
+      Name: !Sub omega-heartbeat-arn-${Environment}
+
+  OmegaAdminFunctionArn:
+    Description: OMEGA Admin Lambda function ARN
+    Value: !GetAtt OmegaAdminFunction.Arn
+    Export:
+      Name: !Sub omega-admin-arn-${Environment}
+
+  OmegaEfsFileSystemId:
+    Description: OMEGA EFS File System ID
+    Value: !Ref OmegaEfsFileSystem
+    Export:
+      Name: !Sub omega-efs-id-${Environment}
+
+  OmegaBackupBucketName:
+    Description: OMEGA S3 backup bucket name
+    Value: !Ref OmegaBackupBucket
+    Export:
+      Name: !Sub omega-backup-bucket-${Environment}
+
+  OmegaFirmwareBucketName:
+    Description: OMEGA S3 firmware bucket name
+    Value: !Ref OmegaFirmwareBucket
+    Export:
+      Name: !Sub omega-firmware-bucket-${Environment}

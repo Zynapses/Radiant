@@ -8,7 +8,13 @@
  */
 
 import { executeStatement, stringParam, doubleParam, boolParam } from '../../db/client';
-import { enhancedLogger as logger } from '../../logging/enhanced-logger';
+import { createRegisteredLogger } from '../logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'cato/twilight-dreaming',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { promptBreederService } from './prompt-breeder.service';
 import type {
   PromptBreederOperator,

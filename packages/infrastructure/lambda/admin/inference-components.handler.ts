@@ -3,7 +3,13 @@
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 import * as handlers from './inference-components';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'admin/inference-components',
+  category: 'audit',
+  sourceType: 'lambda',
+});
 
 // Minimal context for handler routing (actual context passed by Lambda runtime)
 const emptyContext: Context = {

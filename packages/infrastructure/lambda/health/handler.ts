@@ -8,7 +8,13 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { S3Client, HeadBucketCommand } from '@aws-sdk/client-s3';
 import { getPoolClient, poolHealthCheck } from '../shared/db/centralized-pool';
-import { enhancedLogger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'health/handler',
+  category: 'infrastructure',
+  sourceType: 'lambda',
+});
 const s3 = new S3Client({});
 const MEDIA_BUCKET = process.env.MEDIA_BUCKET || 'radiant-media';
 
@@ -248,7 +254,7 @@ async function checkExternalApis(): Promise<HealthCheck> {
           degradedCount++;
         }
       } catch (error) {
-        enhancedLogger.warn(`Health check failed for ${provider.name}`, { error: error instanceof Error ? error.message : 'Unknown' });
+        logger.warn(`Health check failed for ${provider.name}`, { error: error instanceof Error ? error.message : 'Unknown' });
         results[provider.name] = 'unreachable';
         degradedCount++;
       }

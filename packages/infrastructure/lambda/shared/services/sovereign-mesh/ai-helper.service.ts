@@ -11,10 +11,13 @@
  */
 
 import { executeStatement, stringParam, longParam, doubleParam, boolParam, param } from '../../db/client';
-import { enhancedLogger } from '../../logging/enhanced-logger';
-import * as crypto from 'crypto';
+import { createRegisteredLogger } from '../logging-registry.service';
 
-const logger = enhancedLogger;
+const logger = createRegisteredLogger({
+  serviceName: 'sovereign-mesh/ai-helper',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 // ============================================================================
 // TYPES

@@ -12,9 +12,13 @@
  */
 
 import { executeStatement } from '../db/client';
-import { enhancedLogger } from '../logging/enhanced-logger.js';
+import { createRegisteredLogger } from './logging-registry.service';
 
-const logger = enhancedLogger.child({ module: 'iit-phi-calculation' });
+const logger = createRegisteredLogger({
+  serviceName: 'iit/phi-calculation',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 // ============================================================================
 // Types

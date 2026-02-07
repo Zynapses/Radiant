@@ -3,7 +3,13 @@
 // If a tool sequence succeeds 3+ times for a user, save as a reusable recipe
 
 import { executeStatement, stringParam, longParam, doubleParam } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'recipe/extractor',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { v4 as uuidv4 } from 'uuid';
 
 // ============================================================================

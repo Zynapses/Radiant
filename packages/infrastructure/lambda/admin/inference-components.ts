@@ -3,7 +3,13 @@
 
 import { APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda';
 import { inferenceComponentsService } from '../shared/services/inference-components.service';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'admin/inference-components',
+  category: 'audit',
+  sourceType: 'lambda',
+});
 import type { ModelHostingTier } from '@radiant/shared';
 
 const headers = {

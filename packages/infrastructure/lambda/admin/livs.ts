@@ -378,6 +378,253 @@ export const handler = async (
       }
     }
 
+    // =========================================================================
+    // Cognitive Precision Protocol Endpoints (v7.10.0)
+    // =========================================================================
+    
+    if (resource === 'cognitive-precision') {
+      // GET /api/admin/livs/cognitive-precision/config - Get cognitive precision configuration
+      if (httpMethod === 'GET' && resourceId === 'config') {
+        const result = await pool.query(
+          `SELECT * FROM livs_cognitive_precision_config WHERE tenant_id = $1`,
+          [tenantId]
+        );
+        
+        if (result.rows.length === 0) {
+          // Return defaults if no custom config
+          return response(200, { 
+            config: {
+              contextAnchorEnabled: true,
+              contextAnchorMinConfidence: 0.7,
+              constraintInjectionEnabled: true,
+              criticEnabled: true,
+              tieredEscalationEnabled: true,
+              ensembleEnabled: false,
+            }
+          });
+        }
+        return response(200, { config: result.rows[0] });
+      }
+
+      // PUT /api/admin/livs/cognitive-precision/config - Update cognitive precision configuration
+      if (httpMethod === 'PUT' && resourceId === 'config') {
+        const updates = JSON.parse(body || '{}');
+        
+        const result = await pool.query(`
+          INSERT INTO livs_cognitive_precision_config (
+            tenant_id, context_anchor_enabled, context_anchor_min_confidence,
+            context_anchor_allow_override, constraint_injection_enabled,
+            critic_enabled, critic_model_id, screening_model_id,
+            tiered_escalation_enabled, ensemble_enabled, ensemble_voting_strategy,
+            isolation_enabled, isolation_level, track_performance
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+          ON CONFLICT (tenant_id) DO UPDATE SET
+            context_anchor_enabled = COALESCE($2, livs_cognitive_precision_config.context_anchor_enabled),
+            context_anchor_min_confidence = COALESCE($3, livs_cognitive_precision_config.context_anchor_min_confidence),
+            context_anchor_allow_override = COALESCE($4, livs_cognitive_precision_config.context_anchor_allow_override),
+            constraint_injection_enabled = COALESCE($5, livs_cognitive_precision_config.constraint_injection_enabled),
+            critic_enabled = COALESCE($6, livs_cognitive_precision_config.critic_enabled),
+            critic_model_id = COALESCE($7, livs_cognitive_precision_config.critic_model_id),
+            screening_model_id = COALESCE($8, livs_cognitive_precision_config.screening_model_id),
+            tiered_escalation_enabled = COALESCE($9, livs_cognitive_precision_config.tiered_escalation_enabled),
+            ensemble_enabled = COALESCE($10, livs_cognitive_precision_config.ensemble_enabled),
+            ensemble_voting_strategy = COALESCE($11, livs_cognitive_precision_config.ensemble_voting_strategy),
+            isolation_enabled = COALESCE($12, livs_cognitive_precision_config.isolation_enabled),
+            isolation_level = COALESCE($13, livs_cognitive_precision_config.isolation_level),
+            track_performance = COALESCE($14, livs_cognitive_precision_config.track_performance),
+            updated_at = NOW()
+          RETURNING *
+        `, [
+          tenantId,
+          updates.contextAnchorEnabled,
+          updates.contextAnchorMinConfidence,
+          updates.contextAnchorAllowOverride,
+          updates.constraintInjectionEnabled,
+          updates.criticEnabled,
+          updates.criticModelId,
+          updates.screeningModelId,
+          updates.tieredEscalationEnabled,
+          updates.ensembleEnabled,
+          updates.ensembleVotingStrategy,
+          updates.isolationEnabled,
+          updates.isolationLevel,
+          updates.trackPerformance,
+        ]);
+
+        return response(200, { config: result.rows[0] });
+      }
+
+      // GET /api/admin/livs/cognitive-precision/constraints - List negative constraints
+      if (httpMethod === 'GET' && resourceId === 'constraints') {
+        const taskType = event.queryStringParameters?.taskType;
+        const includeSystem = event.queryStringParameters?.includeSystem !== 'false';
+        
+        let query = `
+          SELECT * FROM livs_negative_constraints 
+          WHERE (tenant_id = $1 OR (is_system_default = true AND $2 = true))
+            AND is_active = true
+        `;
+        const params: unknown[] = [tenantId, includeSystem];
+        
+        if (taskType) {
+          query += ` AND $3 = ANY(task_types)`;
+          params.push(taskType);
+        }
+        
+        query += ` ORDER BY is_system_default ASC, severity DESC, created_at DESC`;
+        
+        const result = await pool.query(query, params);
+        return response(200, { constraints: result.rows, count: result.rows.length });
+      }
+
+      // POST /api/admin/livs/cognitive-precision/constraints - Create negative constraint
+      if (httpMethod === 'POST' && resourceId === 'constraints') {
+        const { constraintText, taskTypes, category, severity } = JSON.parse(body || '{}');
+        
+        if (!constraintText) {
+          return response(400, { error: 'constraintText is required' });
+        }
+
+        const result = await pool.query(`
+          INSERT INTO livs_negative_constraints (tenant_id, constraint_text, task_types, category, severity)
+          VALUES ($1, $2, $3, $4, $5)
+          RETURNING *
+        `, [tenantId, constraintText, taskTypes || ['unknown'], category || 'custom', severity || 'medium']);
+
+        return response(201, { constraint: result.rows[0] });
+      }
+
+      // PUT /api/admin/livs/cognitive-precision/constraints/:id - Update negative constraint
+      if (httpMethod === 'PUT' && resourceId === 'constraints' && subResource) {
+        const updates = JSON.parse(body || '{}');
+        
+        const result = await pool.query(`
+          UPDATE livs_negative_constraints 
+          SET constraint_text = COALESCE($3, constraint_text),
+              task_types = COALESCE($4, task_types),
+              category = COALESCE($5, category),
+              severity = COALESCE($6, severity),
+              is_active = COALESCE($7, is_active),
+              updated_at = NOW()
+          WHERE tenant_id = $1 AND id = $2 AND is_system_default = false
+          RETURNING *
+        `, [tenantId, subResource, updates.constraintText, updates.taskTypes, updates.category, updates.severity, updates.isActive]);
+
+        if (result.rows.length === 0) {
+          return response(404, { error: 'Constraint not found or is a system default' });
+        }
+        return response(200, { constraint: result.rows[0] });
+      }
+
+      // DELETE /api/admin/livs/cognitive-precision/constraints/:id - Delete negative constraint
+      if (httpMethod === 'DELETE' && resourceId === 'constraints' && subResource) {
+        const result = await pool.query(`
+          DELETE FROM livs_negative_constraints 
+          WHERE tenant_id = $1 AND id = $2 AND is_system_default = false
+          RETURNING id
+        `, [tenantId, subResource]);
+
+        if (result.rows.length === 0) {
+          return response(404, { error: 'Constraint not found or is a system default' });
+        }
+        return response(200, { deleted: true, id: subResource });
+      }
+
+      // GET /api/admin/livs/cognitive-precision/metrics - Get critic performance metrics
+      if (httpMethod === 'GET' && resourceId === 'metrics') {
+        const days = parseInt(event.queryStringParameters?.days || '30');
+        
+        const result = await pool.query(`
+          SELECT 
+            SUM(total_invocations) as total_invocations,
+            SUM(screening_invocations) as screening_invocations,
+            SUM(full_invocations) as full_invocations,
+            SUM(ensemble_invocations) as ensemble_invocations,
+            AVG(escalation_rate) as avg_escalation_rate,
+            AVG(heuristic_agreement_rate) as avg_heuristic_agreement_rate,
+            AVG(avg_confidence_screening) as avg_confidence_screening,
+            AVG(avg_confidence_full) as avg_confidence_full,
+            AVG(avg_confidence_ensemble) as avg_confidence_ensemble,
+            SUM(verdict_supports) as verdict_supports,
+            SUM(verdict_weakens) as verdict_weakens,
+            SUM(verdict_inconclusive) as verdict_inconclusive,
+            AVG(avg_processing_time_screening_ms) as avg_processing_time_screening_ms,
+            AVG(avg_processing_time_full_ms) as avg_processing_time_full_ms,
+            AVG(avg_processing_time_ensemble_ms) as avg_processing_time_ensemble_ms
+          FROM livs_critic_performance_metrics
+          WHERE (tenant_id = $1 OR tenant_id IS NULL)
+            AND metric_period >= CURRENT_DATE - $2::integer
+        `, [tenantId, days]);
+
+        return response(200, { metrics: result.rows[0] || {}, periodDays: days });
+      }
+
+      // GET /api/admin/livs/cognitive-precision/anchor-logs - Get context anchor logs
+      if (httpMethod === 'GET' && resourceId === 'anchor-logs') {
+        const limit = parseInt(event.queryStringParameters?.limit || '50');
+        const gateAction = event.queryStringParameters?.gateAction;
+        
+        let query = `
+          SELECT * FROM livs_context_anchor_logs 
+          WHERE tenant_id = $1
+        `;
+        const params: unknown[] = [tenantId];
+        
+        if (gateAction) {
+          query += ` AND gate_action = $2`;
+          params.push(gateAction);
+        }
+        
+        query += ` ORDER BY created_at DESC LIMIT $${params.length + 1}`;
+        params.push(limit);
+        
+        const result = await pool.query(query, params);
+        return response(200, { logs: result.rows, count: result.rows.length });
+      }
+
+      // GET /api/admin/livs/cognitive-precision/dashboard - Get cognitive precision dashboard
+      if (httpMethod === 'GET' && (resourceId === 'dashboard' || !resourceId)) {
+        const configResult = await pool.query(
+          `SELECT * FROM livs_cognitive_precision_config WHERE tenant_id = $1`,
+          [tenantId]
+        );
+
+        const anchorStatsResult = await pool.query(`
+          SELECT 
+            gate_action,
+            COUNT(*) as count,
+            AVG(confidence_score) as avg_confidence,
+            AVG(constraints_applied) as avg_constraints
+          FROM livs_context_anchor_logs
+          WHERE tenant_id = $1 AND created_at >= NOW() - INTERVAL '7 days'
+          GROUP BY gate_action
+        `, [tenantId]);
+
+        const constraintCountResult = await pool.query(`
+          SELECT COUNT(*) as custom_count
+          FROM livs_negative_constraints
+          WHERE tenant_id = $1 AND is_system_default = false AND is_active = true
+        `, [tenantId]);
+
+        const criticMetricsResult = await pool.query(`
+          SELECT 
+            SUM(total_invocations) as total_invocations,
+            AVG(escalation_rate) as avg_escalation_rate,
+            SUM(verdict_weakens)::float / NULLIF(SUM(total_invocations), 0) as lie_detection_rate
+          FROM livs_critic_performance_metrics
+          WHERE (tenant_id = $1 OR tenant_id IS NULL)
+            AND metric_period >= CURRENT_DATE - 7
+        `, [tenantId]);
+
+        return response(200, {
+          config: configResult.rows[0] || null,
+          anchorStats: anchorStatsResult.rows,
+          customConstraintCount: parseInt(constraintCountResult.rows[0]?.custom_count) || 0,
+          criticMetrics: criticMetricsResult.rows[0] || {},
+        });
+      }
+    }
+
     return response(404, { error: 'Endpoint not found' });
 
   } catch (error) {

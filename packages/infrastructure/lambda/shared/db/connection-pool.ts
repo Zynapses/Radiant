@@ -5,7 +5,13 @@
  */
 
 import { executeStatement } from './client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from '../services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'shared/db-connection-pool',
+  category: 'infrastructure',
+  sourceType: 'lambda',
+});
 
 // Connection pool configuration
 const POOL_CONFIG = {

@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Plus, MessageSquare, Star, Clock, Settings, Search, 
   Sparkles, Trash2, BookOpen, MoreVertical, FileText, 
-  Shield, ClipboardCheck
+  Shield, ClipboardCheck, Layers, Cpu
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -172,9 +172,22 @@ export function Sidebar({
           <Clock className="h-4 w-4" />
           <span className="text-sm">History</span>
         </Link>
+        <Link href="/artifacts" className="flex items-center gap-2 text-slate-400 hover:bg-slate-800/50 rounded-lg px-2 py-2 transition-colors">
+          <Layers className="h-4 w-4" />
+          <span className="text-sm">Artifacts</span>
+        </Link>
         <Link href="/settings" className="flex items-center gap-2 text-slate-400 hover:bg-slate-800/50 rounded-lg px-2 py-2 transition-colors">
           <Settings className="h-4 w-4" />
           <span className="text-sm">Settings</span>
+        </Link>
+      </div>
+
+      {/* Advanced Links */}
+      <div className="px-3 pb-3 space-y-1">
+        <Link href="/simulator" className="flex items-center gap-2 text-slate-500 hover:bg-slate-800/50 rounded-lg px-2 py-1.5 transition-colors">
+          <Cpu className="h-3.5 w-3.5" />
+          <span className="text-xs">Simulator</span>
+          <span className="ml-auto text-[10px] bg-violet-500/20 text-violet-400 px-1.5 py-0.5 rounded">ADV</span>
         </Link>
       </div>
 

@@ -4,8 +4,12 @@ import { useState, useEffect } from 'react';
 import {
   Users, Brain, MessageSquare, GitBranch, Play, RefreshCw,
   ChevronRight, Circle, CheckCircle, XCircle, Clock,
-  Target, Activity, Eye
+  Target, Activity, Eye, Loader2
 } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface CognitiveAgent {
   agentId: string;
@@ -73,18 +77,6 @@ const roleColors: Record<string, string> = {
   devils_advocate: '#f97316',
 };
 
-// Role icons mapping for future use
-const _roleIcons: Record<string, string> = {
-  planner: 'map',
-  critic: 'search',
-  executor: 'zap',
-  verifier: 'check-circle',
-  researcher: 'book-open',
-  synthesizer: 'git-merge',
-  devils_advocate: 'alert-triangle',
-};
-void _roleIcons;
-
 const patternLabels: Record<string, string> = {
   debate: 'Structured Debate',
   consensus: 'Consensus Building',
@@ -101,14 +93,13 @@ export default function AgentsPage() {
   const [selectedAgent, setSelectedAgent] = useState<CognitiveAgent | null>(null);
   const [selectedSession, setSelectedSession] = useState<CollaborationSession | null>(null);
   const [sessionMessages, setSessionMessages] = useState<AgentMessage[]>([]);
-  const [activeTab, setActiveTab] = useState<'agents' | 'sessions' | 'live'>('agents');
 
   useEffect(() => {
     loadData();
   }, []);
 
   const [_error, setError] = useState<string | null>(null);
-  void _error; // Used for error state management
+  void _error;
 
   useEffect(() => {
     if (selectedSession) {
@@ -143,7 +134,7 @@ export default function AgentsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600" />
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -153,318 +144,345 @@ export default function AgentsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-            <Users className="h-7 w-7 text-indigo-600" />
+          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
+            <Users className="h-7 w-7 text-primary" />
             Multi-Agent Collaboration
           </h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-1">
+          <p className="text-muted-foreground mt-1">
             Cognitive agents with debate, consensus, and emergent intelligence
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <button onClick={loadData} className="p-2 text-gray-600 hover:text-gray-900 dark:text-gray-400">
-            <RefreshCw className="h-5 w-5" />
-          </button>
-          <button className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-2">
-            <Play className="h-4 w-4" />
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="icon" onClick={loadData}>
+            <RefreshCw className="h-4 w-4" />
+          </Button>
+          <Button>
+            <Play className="h-4 w-4 mr-2" />
             Start Collaboration
-          </button>
+          </Button>
         </div>
       </div>
 
       {/* Stats Cards */}
       {stats && (
-        <div className="grid grid-cols-5 gap-4">
-          <StatCard title="Total Agents" value={stats.totalAgents} subtitle={`${stats.activeAgents} active`} icon={Users} color="indigo" />
-          <StatCard title="Sessions" value={stats.totalSessions} subtitle={`${stats.activeSessions} active`} icon={MessageSquare} color="blue" />
-          <StatCard title="Consensus Rate" value={`${(stats.avgConsensusRate * 100).toFixed(0)}%`} icon={CheckCircle} color="green" />
-          <StatCard title="Avg Duration" value={`${(stats.avgSessionDuration / 1000).toFixed(1)}s`} icon={Clock} color="orange" />
-          <StatCard title="Messages" value={stats.totalMessages} icon={Activity} color="purple" />
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+          <StatCard title="Total Agents" value={stats.totalAgents} subtitle={`${stats.activeAgents} active`} icon={Users} variant="primary" />
+          <StatCard title="Sessions" value={stats.totalSessions} subtitle={`${stats.activeSessions} active`} icon={MessageSquare} variant="primary" />
+          <StatCard title="Consensus Rate" value={`${(stats.avgConsensusRate * 100).toFixed(0)}%`} icon={CheckCircle} variant="success" />
+          <StatCard title="Avg Duration" value={`${(stats.avgSessionDuration / 1000).toFixed(1)}s`} icon={Clock} variant="warning" />
+          <StatCard title="Messages" value={stats.totalMessages} icon={Activity} variant="default" />
         </div>
       )}
 
-      {/* Tab Navigation */}
-      <div className="border-b border-gray-200 dark:border-gray-700">
-        <nav className="flex space-x-8">
-          {(['agents', 'sessions', 'live'] as const).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`py-3 px-1 border-b-2 font-medium text-sm transition-colors ${
-                activeTab === tab
-                  ? 'border-indigo-600 text-indigo-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
-              }`}
-            >
-              {tab === 'agents' && <><Users className="inline h-4 w-4 mr-2" />Agents ({agents.length})</>}
-              {tab === 'sessions' && <><MessageSquare className="inline h-4 w-4 mr-2" />Sessions ({sessions.length})</>}
-              {tab === 'live' && <><Activity className="inline h-4 w-4 mr-2" />Live View</>}
-            </button>
-          ))}
-        </nav>
-      </div>
+      {/* Tabs */}
+      <Tabs defaultValue="agents" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="agents">
+            <Users className="h-4 w-4 mr-2" />
+            Agents ({agents.length})
+          </TabsTrigger>
+          <TabsTrigger value="sessions">
+            <MessageSquare className="h-4 w-4 mr-2" />
+            Sessions ({sessions.length})
+          </TabsTrigger>
+          <TabsTrigger value="live">
+            <Activity className="h-4 w-4 mr-2" />
+            Live View
+          </TabsTrigger>
+        </TabsList>
 
-      {/* Content */}
-      <div className="grid grid-cols-3 gap-6">
-        {/* Main Content */}
-        <div className="col-span-2">
-          {activeTab === 'agents' && (
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-              <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Cognitive Agents</h2>
-                <p className="text-sm text-gray-500">Specialized AI agents with distinct roles and personalities</p>
-              </div>
-              <div className="divide-y divide-gray-200 dark:divide-gray-700">
-                {agents.map((agent) => (
-                  <AgentRow
-                    key={agent.agentId}
-                    agent={agent}
-                    selected={selectedAgent?.agentId === agent.agentId}
-                    onSelect={() => setSelectedAgent(agent)}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'sessions' && (
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-              <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Collaboration Sessions</h2>
-                <p className="text-sm text-gray-500">Multi-agent working sessions with shared context</p>
-              </div>
-              <div className="divide-y divide-gray-200 dark:divide-gray-700">
-                {sessions.map((session) => (
-                  <SessionRow
-                    key={session.sessionId}
-                    session={session}
-                    agents={agents}
-                    selected={selectedSession?.sessionId === session.sessionId}
-                    onSelect={() => setSelectedSession(session)}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'live' && (
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Live Collaboration Feed</h2>
-              <div className="space-y-4">
-                {sessionMessages.map((message, i) => (
-                  <MessageBubble key={message.messageId} message={message} agents={agents} isLeft={i % 2 === 0} />
-                ))}
-                {sessionMessages.length === 0 && (
-                  <div className="text-center py-12 text-gray-500">
-                    <MessageSquare className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                    <p>No active collaboration. Start a new session to see live agent communication.</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Detail Panel */}
-        <div className="space-y-6">
-          {/* Selected Agent Details */}
-          {selectedAgent && activeTab === 'agents' && (
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-              <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                <div className="flex items-center gap-3">
-                  <div className="p-3 rounded-lg" style={{ backgroundColor: `${roleColors[selectedAgent.role]}20`, color: roleColors[selectedAgent.role] }}>
-                    <Brain className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900 dark:text-white">{selectedAgent.name}</h3>
-                    <p className="text-sm text-gray-500 capitalize">{selectedAgent.role.replace('_', ' ')}</p>
-                  </div>
-                </div>
-              </div>
-              <div className="p-4 space-y-4">
-                <div>
-                  <label className="text-xs text-gray-500 uppercase tracking-wider">Description</label>
-                  <p className="text-sm text-gray-700 dark:text-gray-300 mt-1">{selectedAgent.description}</p>
-                </div>
-                <div>
-                  <label className="text-xs text-gray-500 uppercase tracking-wider">Model</label>
-                  <p className="text-sm font-mono text-gray-700 dark:text-gray-300 mt-1">{selectedAgent.primaryModelId}</p>
-                </div>
-                <div>
-                  <label className="text-xs text-gray-500 uppercase tracking-wider">Capabilities</label>
-                  <div className="flex flex-wrap gap-1 mt-1">
-                    {selectedAgent.capabilities.map((cap, i) => (
-                      <span key={i} className="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-xs">{cap}</span>
+        {/* Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main Content */}
+          <div className="lg:col-span-2">
+            <TabsContent value="agents" className="mt-0">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Cognitive Agents</CardTitle>
+                  <CardDescription>Specialized AI agents with distinct roles and personalities</CardDescription>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <div className="divide-y">
+                    {agents.map((agent) => (
+                      <AgentRow
+                        key={agent.agentId}
+                        agent={agent}
+                        selected={selectedAgent?.agentId === agent.agentId}
+                        onSelect={() => setSelectedAgent(agent)}
+                      />
                     ))}
-                  </div>
-                </div>
-                <div>
-                  <label className="text-xs text-gray-500 uppercase tracking-wider">Personality</label>
-                  <div className="mt-2 space-y-2">
-                    <PersonalityBar label="Assertiveness" value={selectedAgent.personality.assertiveness} color="blue" />
-                    <PersonalityBar label="Detail Orientation" value={selectedAgent.personality.detailOrientation} color="green" />
-                    <PersonalityBar label="Creativity" value={selectedAgent.personality.creativity} color="purple" />
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                  <div>
-                    <label className="text-xs text-gray-500 uppercase tracking-wider">Activations</label>
-                    <p className="text-xl font-bold text-gray-900 dark:text-white">{selectedAgent.totalActivations.toLocaleString()}</p>
-                  </div>
-                  <div>
-                    <label className="text-xs text-gray-500 uppercase tracking-wider">Success Rate</label>
-                    <p className="text-xl font-bold text-green-600">{(selectedAgent.successRate * 100).toFixed(0)}%</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Selected Session Details */}
-          {selectedSession && activeTab === 'sessions' && (
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-              <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-semibold text-gray-900 dark:text-white">Session Details</h3>
-                  <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                    selectedSession.status === 'completed' ? 'bg-green-100 text-green-700' :
-                    selectedSession.status === 'active' ? 'bg-blue-100 text-blue-700' :
-                    'bg-red-100 text-red-700'
-                  }`}>{selectedSession.status}</span>
-                </div>
-              </div>
-              <div className="p-4 space-y-4">
-                <div>
-                  <label className="text-xs text-gray-500 uppercase tracking-wider">Goal</label>
-                  <p className="text-sm text-gray-700 dark:text-gray-300 mt-1">{selectedSession.goal}</p>
-                </div>
-                <div>
-                  <label className="text-xs text-gray-500 uppercase tracking-wider">Pattern</label>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">
-                    {patternLabels[selectedSession.collaborationPattern] || selectedSession.collaborationPattern}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-xs text-gray-500 uppercase tracking-wider">Participating Agents</label>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {selectedSession.participatingAgents.map((agentId) => {
-                      const agent = agents.find(a => a.agentId === agentId);
-                      return agent ? (
-                        <div key={agentId} className="flex items-center gap-1 px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-xs">
-                          <Circle className="h-2 w-2" fill={roleColors[agent.role]} stroke="none" />
-                          {agent.name}
-                        </div>
-                      ) : null;
-                    })}
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-xs text-gray-500 uppercase tracking-wider">Rounds</label>
-                    <p className="text-lg font-bold text-gray-900 dark:text-white">{selectedSession.totalRounds}</p>
-                  </div>
-                  <div>
-                    <label className="text-xs text-gray-500 uppercase tracking-wider">Messages</label>
-                    <p className="text-lg font-bold text-gray-900 dark:text-white">{selectedSession.totalMessages}</p>
-                  </div>
-                </div>
-                {selectedSession.consensusReached !== undefined && (
-                  <div className="flex items-center gap-2">
-                    {selectedSession.consensusReached ? (
-                      <CheckCircle className="h-5 w-5 text-green-500" />
-                    ) : (
-                      <XCircle className="h-5 w-5 text-red-500" />
+                    {agents.length === 0 && (
+                      <div className="text-center py-12 text-muted-foreground">
+                        <Users className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                        <p className="font-medium">No agents configured</p>
+                        <p className="text-sm mt-1">Start a collaboration to create cognitive agents.</p>
+                      </div>
                     )}
-                    <span className="text-sm">
-                      {selectedSession.consensusReached ? 'Consensus Reached' : 'No Consensus'}
-                    </span>
-                    {selectedSession.finalConfidence && (
-                      <span className="text-sm text-gray-500">
-                        ({(selectedSession.finalConfidence * 100).toFixed(0)}% confidence)
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="sessions" className="mt-0">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Collaboration Sessions</CardTitle>
+                  <CardDescription>Multi-agent working sessions with shared context</CardDescription>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <div className="divide-y">
+                    {sessions.map((session) => (
+                      <SessionRow
+                        key={session.sessionId}
+                        session={session}
+                        agents={agents}
+                        selected={selectedSession?.sessionId === session.sessionId}
+                        onSelect={() => setSelectedSession(session)}
+                      />
+                    ))}
+                    {sessions.length === 0 && (
+                      <div className="text-center py-12 text-muted-foreground">
+                        <MessageSquare className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                        <p className="font-medium">No sessions yet</p>
+                        <p className="text-sm mt-1">Start a collaboration to create a session.</p>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="live" className="mt-0">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Live Collaboration Feed</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {sessionMessages.map((message, i) => (
+                      <MessageBubble key={message.messageId} message={message} agents={agents} isLeft={i % 2 === 0} />
+                    ))}
+                    {sessionMessages.length === 0 && (
+                      <div className="text-center py-12 text-muted-foreground">
+                        <MessageSquare className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                        <p className="font-medium">No active collaboration</p>
+                        <p className="text-sm mt-1">Start a new session to see live agent communication.</p>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </div>
+
+          {/* Detail Panel */}
+          <div className="space-y-6">
+            {/* Selected Agent Details */}
+            {selectedAgent && (
+              <Card>
+                <CardHeader className="pb-3">
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 rounded-lg" style={{ backgroundColor: `${roleColors[selectedAgent.role]}20`, color: roleColors[selectedAgent.role] }}>
+                      <Brain className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg">{selectedAgent.name}</CardTitle>
+                      <CardDescription className="capitalize">{selectedAgent.role.replace('_', ' ')}</CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <p className="text-xs text-muted-foreground uppercase tracking-wider">Description</p>
+                    <p className="text-sm mt-1">{selectedAgent.description}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground uppercase tracking-wider">Model</p>
+                    <p className="text-sm font-mono mt-1">{selectedAgent.primaryModelId}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground uppercase tracking-wider">Capabilities</p>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {selectedAgent.capabilities.map((cap, i) => (
+                        <Badge key={i} variant="secondary" className="text-xs">{cap}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground uppercase tracking-wider">Personality</p>
+                    <div className="mt-2 space-y-2">
+                      <PersonalityBar label="Assertiveness" value={selectedAgent.personality.assertiveness} color="bg-blue-500" />
+                      <PersonalityBar label="Detail Orientation" value={selectedAgent.personality.detailOrientation} color="bg-emerald-500" />
+                      <PersonalityBar label="Creativity" value={selectedAgent.personality.creativity} color="bg-violet-500" />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4 pt-4 border-t">
+                    <div>
+                      <p className="text-xs text-muted-foreground uppercase tracking-wider">Activations</p>
+                      <p className="text-xl font-bold">{selectedAgent.totalActivations.toLocaleString()}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground uppercase tracking-wider">Success Rate</p>
+                      <p className="text-xl font-bold text-emerald-500">{(selectedAgent.successRate * 100).toFixed(0)}%</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Selected Session Details */}
+            {selectedSession && (
+              <Card>
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg">Session Details</CardTitle>
+                    <Badge
+                      variant="outline"
+                      className={
+                        selectedSession.status === 'completed' ? 'text-emerald-500 border-emerald-500/30' :
+                        selectedSession.status === 'active' ? 'text-blue-500 border-blue-500/30' :
+                        'text-red-500 border-red-500/30'
+                      }
+                    >
+                      {selectedSession.status}
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <p className="text-xs text-muted-foreground uppercase tracking-wider">Goal</p>
+                    <p className="text-sm mt-1">{selectedSession.goal}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground uppercase tracking-wider">Pattern</p>
+                    <p className="text-sm font-medium mt-1">
+                      {patternLabels[selectedSession.collaborationPattern] || selectedSession.collaborationPattern}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground uppercase tracking-wider">Participating Agents</p>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {selectedSession.participatingAgents.map((agentId) => {
+                        const agent = agents.find(a => a.agentId === agentId);
+                        return agent ? (
+                          <Badge key={agentId} variant="secondary" className="text-xs">
+                            <Circle className="h-2 w-2 mr-1" fill={roleColors[agent.role]} stroke="none" />
+                            {agent.name}
+                          </Badge>
+                        ) : null;
+                      })}
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-xs text-muted-foreground uppercase tracking-wider">Rounds</p>
+                      <p className="text-lg font-bold">{selectedSession.totalRounds}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground uppercase tracking-wider">Messages</p>
+                      <p className="text-lg font-bold">{selectedSession.totalMessages}</p>
+                    </div>
+                  </div>
+                  {selectedSession.consensusReached !== undefined && (
+                    <div className="flex items-center gap-2">
+                      {selectedSession.consensusReached ? (
+                        <CheckCircle className="h-5 w-5 text-emerald-500" />
+                      ) : (
+                        <XCircle className="h-5 w-5 text-red-500" />
+                      )}
+                      <span className="text-sm">
+                        {selectedSession.consensusReached ? 'Consensus Reached' : 'No Consensus'}
                       </span>
-                    )}
-                  </div>
-                )}
-                <button
-                  onClick={() => { setActiveTab('live'); if (selectedSession) loadSessionMessages(selectedSession.sessionId); }}
-                  className="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center justify-center gap-2"
-                >
-                  <Eye className="h-4 w-4" />
-                  View Conversation
-                </button>
-              </div>
-            </div>
-          )}
+                      {selectedSession.finalConfidence && (
+                        <span className="text-sm text-muted-foreground">
+                          ({(selectedSession.finalConfidence * 100).toFixed(0)}% confidence)
+                        </span>
+                      )}
+                    </div>
+                  )}
+                  <Button
+                    className="w-full"
+                    onClick={() => { if (selectedSession) loadSessionMessages(selectedSession.sessionId); }}
+                  >
+                    <Eye className="h-4 w-4 mr-2" />
+                    View Conversation
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
 
-          {/* Quick Actions */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-              <h3 className="font-semibold text-gray-900 dark:text-white">Quick Collaboration</h3>
-            </div>
-            <div className="p-4 space-y-3">
-              <CollaborationButton pattern="debate" icon={MessageSquare} label="Start Debate" description="Agents debate to find best solution" />
-              <CollaborationButton pattern="consensus" icon={CheckCircle} label="Build Consensus" description="Reach agreement through voting" />
-              <CollaborationButton pattern="divide_conquer" icon={GitBranch} label="Divide & Conquer" description="Split task among executors" />
-              <CollaborationButton pattern="critical_review" icon={Target} label="Critical Review" description="Iterative critique and revision" />
-            </div>
+            {/* Quick Actions */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Quick Collaboration</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <CollaborationButton icon={MessageSquare} label="Start Debate" description="Agents debate to find best solution" />
+                <CollaborationButton icon={CheckCircle} label="Build Consensus" description="Reach agreement through voting" />
+                <CollaborationButton icon={GitBranch} label="Divide & Conquer" description="Split task among executors" />
+                <CollaborationButton icon={Target} label="Critical Review" description="Iterative critique and revision" />
+              </CardContent>
+            </Card>
           </div>
         </div>
-      </div>
+      </Tabs>
     </div>
   );
 }
 
-function StatCard({ title, value, subtitle, icon: Icon, color }: {
+function StatCard({ title, value, subtitle, icon: Icon, variant }: {
   title: string;
   value: string | number;
   subtitle?: string;
   icon: React.ElementType;
-  color: 'indigo' | 'blue' | 'green' | 'orange' | 'purple';
+  variant: 'default' | 'primary' | 'success' | 'warning' | 'danger';
 }) {
-  const colors = {
-    indigo: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20',
-    blue: 'bg-blue-50 text-blue-600 dark:bg-blue-900/20',
-    green: 'bg-green-50 text-green-600 dark:bg-green-900/20',
-    orange: 'bg-orange-50 text-orange-600 dark:bg-orange-900/20',
-    purple: 'bg-purple-50 text-purple-600 dark:bg-purple-900/20',
+  const styles = {
+    default: 'bg-muted/50 text-muted-foreground',
+    primary: 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
+    success: 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400',
+    warning: 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400',
+    danger: 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400',
   };
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm text-gray-500">{title}</p>
-          <p className="text-2xl font-bold text-gray-900 dark:text-white">{value}</p>
-          {subtitle && <p className="text-xs text-gray-400">{subtitle}</p>}
+    <Card>
+      <CardContent className="pt-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm text-muted-foreground">{title}</p>
+            <p className="text-2xl font-bold">{value}</p>
+            {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
+          </div>
+          <div className={`p-3 rounded-lg ${styles[variant]}`}>
+            <Icon className="h-5 w-5" />
+          </div>
         </div>
-        <div className={`p-3 rounded-lg ${colors[color]}`}>
-          <Icon className="h-5 w-5" />
-        </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
 
 function AgentRow({ agent, selected, onSelect }: { agent: CognitiveAgent; selected: boolean; onSelect: () => void }) {
   const color = roleColors[agent.role] || '#6366f1';
   return (
-    <div onClick={onSelect} className={`p-4 cursor-pointer transition-colors ${selected ? 'bg-indigo-50 dark:bg-indigo-900/20' : 'hover:bg-gray-50 dark:hover:bg-gray-700/50'}`}>
+    <div onClick={onSelect} className={`p-4 cursor-pointer transition-colors ${selected ? 'bg-primary/5' : 'hover:bg-muted/50'}`}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-lg" style={{ backgroundColor: `${color}20`, color }}>
             <Brain className="h-5 w-5" />
           </div>
           <div>
-            <h4 className="font-medium text-gray-900 dark:text-white">{agent.name}</h4>
-            <p className="text-sm text-gray-500">{agent.role.replace('_', ' ')} • {agent.primaryModelId.split('/')[1]}</p>
+            <h4 className="font-medium">{agent.name}</h4>
+            <p className="text-sm text-muted-foreground">{agent.role.replace('_', ' ')} • {agent.primaryModelId.split('/')[1]}</p>
           </div>
         </div>
         <div className="flex items-center gap-4">
           <div className="text-right">
             <p className="text-sm font-medium">{agent.totalActivations.toLocaleString()}</p>
-            <p className="text-xs text-gray-500">{(agent.successRate * 100).toFixed(0)}% success</p>
+            <p className="text-xs text-muted-foreground">{(agent.successRate * 100).toFixed(0)}% success</p>
           </div>
-          <div className={`w-2 h-2 rounded-full ${agent.isActive ? 'bg-green-500' : 'bg-gray-300'}`} />
-          <ChevronRight className="h-5 w-5 text-gray-400" />
+          <div className={`w-2 h-2 rounded-full ${agent.isActive ? 'bg-emerald-500' : 'bg-muted-foreground/30'}`} />
+          <ChevronRight className="h-5 w-5 text-muted-foreground" />
         </div>
       </div>
     </div>
@@ -478,35 +496,40 @@ function SessionRow({ session, agents, selected, onSelect }: { session: Collabor
   });
 
   return (
-    <div onClick={onSelect} className={`p-4 cursor-pointer transition-colors ${selected ? 'bg-indigo-50 dark:bg-indigo-900/20' : 'hover:bg-gray-50 dark:hover:bg-gray-700/50'}`}>
+    <div onClick={onSelect} className={`p-4 cursor-pointer transition-colors ${selected ? 'bg-primary/5' : 'hover:bg-muted/50'}`}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="flex -space-x-2">
             {participantColors.map((color, i) => (
-              <div key={i} className="w-8 h-8 rounded-full border-2 border-white dark:border-gray-800 flex items-center justify-center" style={{ backgroundColor: color }}>
+              <div key={i} className="w-8 h-8 rounded-full border-2 border-card flex items-center justify-center" style={{ backgroundColor: color }}>
                 <Brain className="h-4 w-4 text-white" />
               </div>
             ))}
             {session.participatingAgents.length > 3 && (
-              <div className="w-8 h-8 rounded-full border-2 border-white dark:border-gray-800 bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-xs">
+              <div className="w-8 h-8 rounded-full border-2 border-card bg-muted flex items-center justify-center text-xs">
                 +{session.participatingAgents.length - 3}
               </div>
             )}
           </div>
           <div>
-            <h4 className="font-medium text-gray-900 dark:text-white truncate max-w-md">{session.goal}</h4>
-            <p className="text-sm text-gray-500">
+            <h4 className="font-medium truncate max-w-md">{session.goal}</h4>
+            <p className="text-sm text-muted-foreground">
               {patternLabels[session.collaborationPattern]} • {session.totalRounds} rounds • {session.totalMessages} messages
             </p>
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-            session.status === 'completed' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
-            session.status === 'active' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
-            'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-          }`}>{session.status}</span>
-          <ChevronRight className="h-5 w-5 text-gray-400" />
+          <Badge
+            variant="outline"
+            className={
+              session.status === 'completed' ? 'text-emerald-500 border-emerald-500/30' :
+              session.status === 'active' ? 'text-blue-500 border-blue-500/30' :
+              'text-red-500 border-red-500/30'
+            }
+          >
+            {session.status}
+          </Badge>
+          <ChevronRight className="h-5 w-5 text-muted-foreground" />
         </div>
       </div>
     </div>
@@ -524,15 +547,15 @@ function MessageBubble({ message, agents, isLeft }: { message: AgentMessage; age
       </div>
       <div className={`flex-1 max-w-lg ${isLeft ? '' : 'text-right'}`}>
         <div className="flex items-center gap-2 mb-1">
-          <span className="text-sm font-medium text-gray-900 dark:text-white">{agent?.name || 'System'}</span>
+          <span className="text-sm font-medium">{agent?.name || 'System'}</span>
           <span className="text-xs px-1.5 py-0.5 rounded capitalize" style={{ backgroundColor: `${color}20`, color }}>
             {message.messageType}
           </span>
         </div>
-        <div className={`p-3 rounded-lg ${isLeft ? 'bg-gray-100 dark:bg-gray-700' : 'bg-indigo-100 dark:bg-indigo-900/30'}`}>
-          <p className="text-sm text-gray-700 dark:text-gray-300">{message.content}</p>
+        <div className={`p-3 rounded-lg ${isLeft ? 'bg-muted' : 'bg-primary/10'}`}>
+          <p className="text-sm">{message.content}</p>
         </div>
-        <p className="text-xs text-gray-400 mt-1">
+        <p className="text-xs text-muted-foreground mt-1">
           Round {message.roundNumber} • {message.confidence ? `${(message.confidence * 100).toFixed(0)}% confident` : ''}
         </p>
       </div>
@@ -540,35 +563,33 @@ function MessageBubble({ message, agents, isLeft }: { message: AgentMessage; age
   );
 }
 
-function PersonalityBar({ label, value, color }: { label: string; value: number; color: 'blue' | 'green' | 'purple' }) {
-  const colors = { blue: 'bg-blue-500', green: 'bg-green-500', purple: 'bg-purple-500' };
+function PersonalityBar({ label, value, color }: { label: string; value: number; color: string }) {
   return (
     <div>
       <div className="flex justify-between text-xs mb-1">
-        <span className="text-gray-500">{label}</span>
-        <span className="text-gray-700 dark:text-gray-300">{(value * 100).toFixed(0)}%</span>
+        <span className="text-muted-foreground">{label}</span>
+        <span>{(value * 100).toFixed(0)}%</span>
       </div>
-      <div className="h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-        <div className={`h-full ${colors[color]}`} style={{ width: `${value * 100}%` }} />
+      <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+        <div className={`h-full rounded-full ${color}`} style={{ width: `${value * 100}%` }} />
       </div>
     </div>
   );
 }
 
-function CollaborationButton({ pattern: _pattern, icon: Icon, label, description }: { pattern: string; icon: React.ElementType; label: string; description: string }) {
-  void _pattern; // Reserved for future pattern-specific styling
+function CollaborationButton({ icon: Icon, label, description }: { icon: React.ElementType; label: string; description: string }) {
   return (
-    <button className="w-full p-3 text-left rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+    <Button variant="outline" className="w-full justify-start h-auto p-3" asChild>
       <div className="flex items-center gap-3">
-        <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 rounded-lg">
+        <div className="p-2 bg-primary/10 text-primary rounded-lg">
           <Icon className="h-5 w-5" />
         </div>
-        <div>
-          <p className="font-medium text-gray-900 dark:text-white">{label}</p>
-          <p className="text-xs text-gray-500">{description}</p>
+        <div className="text-left">
+          <p className="font-medium">{label}</p>
+          <p className="text-xs text-muted-foreground font-normal">{description}</p>
         </div>
       </div>
-    </button>
+    </Button>
   );
 }
 

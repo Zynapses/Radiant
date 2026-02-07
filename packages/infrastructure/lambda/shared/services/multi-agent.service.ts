@@ -355,6 +355,7 @@ Format your response as JSON:
       messages: [{ role: 'user', content: prompt }],
       temperature: agent.temperature,
       maxTokens: agent.maxTokens,
+      tenantId: undefined, // TODO: Thread tenantId from caller
     });
 
     try {
@@ -408,6 +409,7 @@ Format your response as JSON:
       messages: [{ role: 'user', content: prompt }],
       temperature: agent.temperature,
       maxTokens: agent.maxTokens,
+      tenantId: undefined, // TODO: Thread tenantId from caller
     });
 
     try {
@@ -954,9 +956,10 @@ Format your response as JSON:
     return subtasks.slice(0, 5); // Limit to 5 subtasks
   }
 
-  private async generateEmbedding(text: string): Promise<number[]> {
+  private async generateEmbedding(text: string, tenantId?: string): Promise<number[]> {
     try {
       const response = await modelRouterService.invoke({
+        tenantId,
         modelId: 'amazon/titan-embed-text',
         messages: [{ role: 'user', content: text.substring(0, 8000) }],
       });

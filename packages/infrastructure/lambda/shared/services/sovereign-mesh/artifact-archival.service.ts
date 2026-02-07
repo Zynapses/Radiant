@@ -9,9 +9,13 @@ import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } fro
 import { createHash } from 'crypto';
 import { gzipSync, gunzipSync } from 'zlib';
 import { executeStatement, stringParam, longParam } from '../../db/client';
-import { enhancedLogger } from '../../logging/enhanced-logger';
+import { createRegisteredLogger } from '../logging-registry.service';
 
-const logger = enhancedLogger;
+const logger = createRegisteredLogger({
+  serviceName: 'sovereign-mesh/artifact-archival',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 // ============================================================================
 // TYPES

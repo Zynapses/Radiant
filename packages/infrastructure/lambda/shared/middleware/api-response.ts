@@ -7,7 +7,13 @@
 
 import { APIGatewayProxyResult } from 'aws-lambda';
 import { RadiantError, toRadiantError, isRadiantError } from '../errors/radiant-error';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from '../services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'shared/middleware-api-response',
+  category: 'infrastructure',
+  sourceType: 'lambda',
+});
 import { getRequestContext } from '../utils/request-context';
 
 export interface ApiResponseOptions {

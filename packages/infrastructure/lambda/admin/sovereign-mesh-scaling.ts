@@ -7,9 +7,13 @@
 
 import { APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda';
 import { scalingService } from '../shared/services/sovereign-mesh/scaling.service';
-import { enhancedLogger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
 
-const logger = enhancedLogger;
+const logger = createRegisteredLogger({
+  serviceName: 'admin/sovereign-mesh-scaling',
+  category: 'audit',
+  sourceType: 'lambda',
+});
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',

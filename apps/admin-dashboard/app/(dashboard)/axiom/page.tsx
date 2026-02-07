@@ -44,7 +44,7 @@ import {
 import { 
   Sparkles, 
   Brain, 
-  MessageSquareQuestion,
+  MessageSquareQuote,
   FlaskConical,
   Settings,
   TrendingUp,
@@ -251,7 +251,7 @@ export default function AxiomAdminPage() {
             Patterns
           </TabsTrigger>
           <TabsTrigger value="questions" className="flex items-center gap-2">
-            <MessageSquareQuestion className="w-4 h-4" />
+            <MessageSquareQuote className="w-4 h-4" />
             Questions
           </TabsTrigger>
           <TabsTrigger value="ab-tests" className="flex items-center gap-2">
@@ -879,6 +879,67 @@ function InjectPatternDialog({ onSuccess }: { onSuccess: () => void }) {
 
 function CreateQuestionDialog({ onSuccess }: { onSuccess: () => void }) {
   const [open, setOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+  
+  // Form state
+  const [questionText, setQuestionText] = useState('');
+  const [questionType, setQuestionType] = useState<'choice' | 'multi_select' | 'text' | 'scale' | 'boolean'>('choice');
+  const [category, setCategory] = useState<'intent' | 'scope' | 'constraints' | 'format' | 'context'>('intent');
+  const [domainApplicability, setDomainApplicability] = useState('*');
+  const [options, setOptions] = useState('');
+  const [priority, setPriority] = useState(0.5);
+  const [informationGain, setInformationGain] = useState(0.5);
+
+  const resetForm = () => {
+    setQuestionText('');
+    setQuestionType('choice');
+    setCategory('intent');
+    setDomainApplicability('*');
+    setOptions('');
+    setPriority(0.5);
+    setInformationGain(0.5);
+  };
+
+  const handleSubmit = async () => {
+    if (!questionText.trim()) return;
+    
+    setSaving(true);
+    try {
+      const domains = domainApplicability.split(',').map(d => d.trim()).filter(Boolean);
+      const optionsList = options ? options.split('\n').map(o => o.trim()).filter(Boolean) : undefined;
+      
+      const payload = {
+        text: { en: questionText },
+        type: questionType,
+        category,
+        domainApplicability: domains.length > 0 ? domains : ['*'],
+        options: optionsList ? { en: optionsList } : undefined,
+        priority,
+        informationGain,
+      };
+
+      const res = await fetch(`${API_BASE}/questions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || 'Failed to create question');
+      }
+
+      resetForm();
+      setOpen(false);
+      onSuccess();
+    } catch (error) {
+      console.error('Failed to create question:', error);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const showOptionsField = questionType === 'choice' || questionType === 'multi_select';
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -888,19 +949,123 @@ function CreateQuestionDialog({ onSuccess }: { onSuccess: () => void }) {
           Create Question
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>Create New Question</DialogTitle>
           <DialogDescription>
             Add a new CLARION question to the system
           </DialogDescription>
         </DialogHeader>
-        <p className="text-muted-foreground text-center py-8">
-          Question creation form - coming soon
-        </p>
+        
+        <div className="space-y-4 py-4">
+          {/* Question Text */}
+          <div className="space-y-2">
+            <Label htmlFor="questionText">Question Text *</Label>
+            <Input
+              id="questionText"
+              placeholder="e.g., What is your primary use case?"
+              value={questionText}
+              onChange={(e) => setQuestionText(e.target.value)}
+            />
+          </div>
+
+          {/* Type and Category */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Question Type *</Label>
+              <select
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                value={questionType}
+                onChange={(e) => setQuestionType(e.target.value as typeof questionType)}
+              >
+                <option value="choice">Single Choice</option>
+                <option value="multi_select">Multi Select</option>
+                <option value="text">Free Text</option>
+                <option value="scale">Scale (1-10)</option>
+                <option value="boolean">Yes/No</option>
+              </select>
+            </div>
+            <div className="space-y-2">
+              <Label>Category *</Label>
+              <select
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                value={category}
+                onChange={(e) => setCategory(e.target.value as typeof category)}
+              >
+                <option value="intent">Intent</option>
+                <option value="scope">Scope</option>
+                <option value="constraints">Constraints</option>
+                <option value="format">Format</option>
+                <option value="context">Context</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Domain Applicability */}
+          <div className="space-y-2">
+            <Label htmlFor="domains">Domain Applicability</Label>
+            <Input
+              id="domains"
+              placeholder="* (all domains) or comma-separated: technology, healthcare"
+              value={domainApplicability}
+              onChange={(e) => setDomainApplicability(e.target.value)}
+            />
+            <p className="text-xs text-muted-foreground">
+              Use * for all domains, or specify comma-separated domain IDs
+            </p>
+          </div>
+
+          {/* Options (for choice types) */}
+          {showOptionsField && (
+            <div className="space-y-2">
+              <Label htmlFor="options">Answer Options</Label>
+              <textarea
+                id="options"
+                className="w-full min-h-[80px] rounded-md border border-input bg-background px-3 py-2 text-sm"
+                placeholder="Enter one option per line:&#10;Option 1&#10;Option 2&#10;Option 3"
+                value={options}
+                onChange={(e) => setOptions(e.target.value)}
+              />
+            </div>
+          )}
+
+          {/* Priority and Information Gain */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Priority: {priority.toFixed(2)}</Label>
+              <Slider
+                value={[priority]}
+                onValueChange={([v]) => setPriority(v)}
+                min={0}
+                max={1}
+                step={0.05}
+              />
+              <p className="text-xs text-muted-foreground">
+                How often this question should be asked
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Label>Information Gain: {informationGain.toFixed(2)}</Label>
+              <Slider
+                value={[informationGain]}
+                onValueChange={([v]) => setInformationGain(v)}
+                min={0}
+                max={1}
+                step={0.05}
+              />
+              <p className="text-xs text-muted-foreground">
+                Expected uncertainty reduction
+              </p>
+            </div>
+          </div>
+        </div>
+
         <DialogFooter>
-          <Button variant="outline" onClick={() => setOpen(false)}>
-            Close
+          <Button variant="outline" onClick={() => setOpen(false)} disabled={saving}>
+            Cancel
+          </Button>
+          <Button onClick={handleSubmit} disabled={saving || !questionText.trim()}>
+            {saving ? 'Creating...' : 'Create Question'}
           </Button>
         </DialogFooter>
       </DialogContent>

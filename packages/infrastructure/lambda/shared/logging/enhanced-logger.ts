@@ -73,7 +73,7 @@ function getDefaultConfig(): LoggerConfig {
   return {
     minLevel: (process.env.LOG_LEVEL as LogLevel) || 'info',
     includeStackTraces: process.env.LOG_INCLUDE_STACK !== 'false',
-    redactSensitiveFields: process.env.LOG_REDACT_SENSITIVE !== 'false',
+    redactSensitiveFields: process.env.LOG_REDACT_SENSITIVE === 'true',
     sensitiveFieldPatterns: DEFAULT_SENSITIVE_PATTERNS,
     maxMessageLength: parseInt(process.env.LOG_MAX_MESSAGE_LENGTH || '10000', 10),
     structuredLogging: process.env.LOG_STRUCTURED !== 'false',

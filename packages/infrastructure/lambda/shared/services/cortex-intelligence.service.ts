@@ -10,7 +10,14 @@
  */
 
 import { executeStatement, stringParam } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'cortex/intelligence',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
+import { driftAwareWeightingService, type DriftAwareModelRecommendation } from './drift-aware-weighting.service';
 
 // ============================================================================
 // Types
@@ -56,6 +63,9 @@ export interface CortexInsights {
   knowledgeDensity: KnowledgeDensity;
   modelRecommendation: ModelRecommendation;
   domainBoosts: Map<string, number>;
+  // v7.36.0: Drift-aware model recommendations
+  driftAwareRecommendations?: DriftAwareModelRecommendation[];
+  driftWarnings?: string[];
 }
 
 // ============================================================================
@@ -103,10 +113,29 @@ class CortexIntelligenceService {
       // Calculate domain-specific confidence boosts
       const domainBoosts = this.calculateDomainBoosts(knowledgeDensity);
 
+      // v7.36.0: Get drift-aware model recommendations for Cortex
+      let driftAwareRecommendations: DriftAwareModelRecommendation[] | undefined;
+      let driftWarnings: string[] | undefined;
+      try {
+        const driftResult = await driftAwareWeightingService.recommendModels(tenantId, {
+          app: 'cortex',
+          taskType: 'knowledge_graph',
+          maxResults: 5,
+        });
+        if (driftResult.recommendations.length > 0) {
+          driftAwareRecommendations = driftResult.recommendations;
+          driftWarnings = driftResult.warnings.length > 0 ? driftResult.warnings : undefined;
+        }
+      } catch {
+        // Drift-aware selection failed, continue without it
+      }
+
       const insights: CortexInsights = {
         knowledgeDensity,
         modelRecommendation,
         domainBoosts,
+        driftAwareRecommendations,
+        driftWarnings,
       };
 
       this.insightsCache.set(cacheKey, { insights, cachedAt: Date.now() });

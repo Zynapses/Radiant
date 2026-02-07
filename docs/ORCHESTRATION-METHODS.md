@@ -1,7 +1,7 @@
 # RADIANT Orchestration Methods Reference
 
-> Version: 4.18.0
-> Last Updated: 2024-12-28
+> Version: 4.19.0
+> Last Updated: 2026-02-07
 
 ## Related Documentation
 
@@ -1491,3 +1491,44 @@ Admins can:
 - **View leaderboards**: See top models per specialty
 - **Trigger research**: Refresh rankings from latest data
 - **Configure weights**: Adjust benchmark vs community vs internal weighting
+
+---
+
+## Drift-Aware Model Selection (v7.36.0)
+
+All orchestration methods now use **drift-aware model selection** as the primary selection mechanism via the `DriftAwareWeightingService`.
+
+### Selection Priority
+
+1. **Forced models** (`request.forceModels`) — bypass all checks
+2. **Drift-aware selection** — composite scoring with app-specific weight profiles
+3. **Domain taxonomy** — fallback using domain proficiencies
+4. **Specialty ranking** — fallback using specialty scores
+
+### How It Works
+
+The `DriftAwareWeightingService` computes a composite score for each model:
+
+```
+compositeScore = Σ(normalizedWeight[i] × factorScore[i])
+  factors = [drift, quality, latency, cost, availability]
+  weights are app-specific and sum to 1.0
+```
+
+Models below the app's `minAcceptableDriftScore` are excluded. Quarantined models are excluded. Stability penalties are applied for borderline drift scores when the app prefers stable models.
+
+### App Integration
+
+| Component | Method | Behavior |
+|-----------|--------|----------|
+| **AGI Orchestrator** | `selectModels()` | Primary selection, falls back to domain/specialty |
+| **Cato Pipeline** | `selectModelForMethod()` | Async drift-aware cache, falls back to Claude 3.5 Sonnet |
+| **Cortex Intelligence** | `getInsights()` | Enriches insights with drift recommendations |
+| **Omega Shadow** | `executeShadow()` | Records drift health per comparison |
+| **Genesis Gates** | `isDriftHealthyForStage()` | Blocks stage advancement on poor drift |
+
+### Admin Controls
+
+- **Drift Control Center**: `/orchestration/drift-control` — app weight profiles, drift health dashboard, Genesis gate status
+- **Model Weights**: `/orchestration/model-weights` — per-model weight tuning, quarantine, drift checks
+- **Full Drift Check**: Trigger detection + correction for all tenant models

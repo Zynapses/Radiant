@@ -4,7 +4,13 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { createHash } from 'crypto';
 import { getPoolClient } from '../shared/db/centralized-pool';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'experiments/tracker',
+  category: 'infrastructure',
+  sourceType: 'lambda',
+});
 import { corsHeaders } from '../shared/middleware/api-response';
 
 export interface Experiment {

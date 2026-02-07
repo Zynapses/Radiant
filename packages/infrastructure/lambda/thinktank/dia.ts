@@ -7,7 +7,13 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { corsHeaders } from '../shared/middleware/api-response';
 import { createResponse, createErrorResponse } from '../shared/utils/response';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'thinktank/dia',
+  category: 'application',
+  sourceType: 'lambda',
+});
 import { generateArtifact } from '../shared/services/dia/miner.service';
 import { exportArtifact } from '../shared/services/dia/compliance-exporter';
 import { executeStatement, stringParam } from '../shared/db/client';

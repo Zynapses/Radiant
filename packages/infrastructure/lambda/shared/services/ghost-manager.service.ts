@@ -20,7 +20,13 @@
  */
 
 import { executeStatement } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'ghost/manager',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { brainConfigService } from './brain-config.service';
 import {
   type GhostVector,

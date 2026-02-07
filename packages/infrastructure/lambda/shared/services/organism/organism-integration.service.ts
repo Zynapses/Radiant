@@ -2,7 +2,13 @@
 // Connects organism services with BrainRouter and orchestration layer
 // Version: 1.0.0
 
-import { enhancedLogger as logger } from '../../logging/enhanced-logger';
+import { createRegisteredLogger } from '../logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'organism/organism-integration',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { mcpServerManager } from './mcp-server-manager.service';
 import { neuralSchemaRegistry } from './neural-schema-registry.service';
 import { liquidCompute } from './liquid-compute.service';

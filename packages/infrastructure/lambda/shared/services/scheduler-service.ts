@@ -7,7 +7,13 @@ import {
   DeleteRuleCommand,
   RemoveTargetsCommand,
 } from '@aws-sdk/client-eventbridge';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'scheduler/service',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 const eventBridge = new EventBridgeClient({});
 const SCHEDULER_LAMBDA_ARN = process.env.SCHEDULER_LAMBDA_ARN;

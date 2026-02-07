@@ -221,6 +221,12 @@ async function routeRequest(
     return awsCostsHandler(event);
   }
 
+  // Spend Governor & Critical Alerts (v7.39.0)
+  if (pathParts[1] === 'spend-governor' || pathParts[1] === 'critical-alerts') {
+    const { handler: spendGovernorHandler } = await import('./spend-governor.js');
+    return spendGovernorHandler(event);
+  }
+
   // Ethics
   if (pathParts[1] === 'ethics') {
     const { handler: ethicsHandler } = await import('./ethics.js');

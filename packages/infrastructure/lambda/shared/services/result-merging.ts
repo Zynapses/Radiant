@@ -2,7 +2,13 @@
 // AI response synthesis from concurrent/multi-model queries
 
 import { withRetry, isRetryableHttpStatus } from '../utils/retry';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'result/merging',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { getPoolClient } from '../db/centralized-pool';
 const AI_SERVICE_URL = process.env.AI_SERVICE_URL || process.env.LITELLM_ENDPOINT;
 const AI_SERVICE_API_KEY = process.env.AI_SERVICE_API_KEY || process.env.LITELLM_API_KEY;

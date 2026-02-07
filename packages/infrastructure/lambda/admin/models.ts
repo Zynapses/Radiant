@@ -6,7 +6,13 @@
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { getPoolClient } from '../shared/db/centralized-pool';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'admin/models',
+  category: 'audit',
+  sourceType: 'lambda',
+});
 
 interface Model {
   id: string;

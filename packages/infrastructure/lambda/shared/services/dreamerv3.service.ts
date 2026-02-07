@@ -201,6 +201,7 @@ Format your response as JSON:
 
     try {
       const response = await modelRouterService.invoke({
+        tenantId,
         modelId: 'anthropic/claude-3-haiku',
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.4,
@@ -279,6 +280,7 @@ Format as JSON:
 
       try {
         const response = await modelRouterService.invoke({
+          tenantId,
           modelId: 'anthropic/claude-3-haiku',
           messages: [{ role: 'user', content: prompt }],
           temperature: 0.8, // Higher temperature for creative variation
@@ -439,6 +441,7 @@ Format as JSON array:
 
     try {
       const response = await modelRouterService.invoke({
+        tenantId,
         modelId: 'anthropic/claude-3-haiku',
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.5,

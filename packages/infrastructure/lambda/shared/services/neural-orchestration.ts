@@ -1,6 +1,12 @@
 import { BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime';
 import { executeStatement } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'neural/orchestration',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 type PatternComplexity = 'low' | 'medium' | 'high' | 'very_high';
 type ExecutionType = 'serial' | 'parallel' | 'hybrid';

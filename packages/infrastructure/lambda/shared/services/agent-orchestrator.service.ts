@@ -18,7 +18,13 @@ import { Client } from 'pg';
 import { Redis } from 'ioredis';
 import { v4 as uuidv4 } from 'uuid';
 import * as crypto from 'crypto';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'agent/orchestrator',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 // ============================================================================
 // Types

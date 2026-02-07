@@ -5,9 +5,19 @@
 
 import { BedrockRuntimeClient, InvokeModelCommand, InvokeModelWithResponseStreamCommand } from '@aws-sdk/client-bedrock-runtime';
 import { callWithResilience, isProviderHealthy, CircuitOpenError } from './resilient-provider.service';
+import { inferenceCacheService } from './inference-cache.service';
+import { driftCorrectionService } from './drift-correction.service';
+import { driftAwareWeightingService } from './drift-aware-weighting.service';
+import { spendGovernorService } from './spend-governor.service';
 import { executeStatement } from '../db/client';
 import { checkProviderRateLimit, getProviderRateLimitStatus, PROVIDER_RATE_LIMITS } from '../middleware/rate-limiter';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'model/router',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 // ============================================================================
 // Types
@@ -394,10 +404,182 @@ export class ModelRouterService {
 
   async invoke(request: ModelRequest): Promise<ModelResponse> {
     const startTime = Date.now();
-    const config = MODEL_REGISTRY[request.modelId];
+    let config = MODEL_REGISTRY[request.modelId];
     
     if (!config) {
       throw new Error(`Unknown model: ${request.modelId}`);
+    }
+
+    // =========================================================================
+    // SPEND GOVERNOR GATE (v7.39.0)
+    // Pre-invocation budget check. If the tenant has exceeded their spend limit,
+    // this throws SpendLimitExceededError (503) with a user-safe message.
+    // End users NEVER see "out of credits" — they see "service temporarily
+    // unavailable". Admins see the real reason in logs and the admin dashboard.
+    // Fails open: if the governor itself errors, requests are not blocked.
+    // =========================================================================
+    if (request.tenantId) {
+      await spendGovernorService.enforceOrThrow(request.tenantId, request.modelId);
+    }
+
+    // =========================================================================
+    // DRIFT-AWARE MODEL SELECTION & CORRECTION (v7.37.0)
+    // Two-phase drift handling:
+    //   Phase 1: Proactive selection — use DriftAwareWeightingService to check
+    //            if the requested model is safe and suggest a better alternative.
+    //   Phase 2: Correction fallback — if Phase 1 unavailable, use legacy
+    //            driftCorrectionService for quarantine/fallback/temperature.
+    // After invocation, telemetry is reported for Genesis gate feedback.
+    // This covers ALL 52+ services that call modelRouterService.invoke().
+    // =========================================================================
+    let driftCorrected = false;
+    let driftCorrections: { temperature?: number; promptPrefix?: string } = {};
+    const originalModelId = request.modelId;
+    if (request.tenantId) {
+      try {
+        // Phase 1: Proactive drift-aware selection via unified service
+        const safetyCheck = await driftAwareWeightingService.isModelSafe(
+          request.tenantId,
+          request.modelId,
+          'orchestrator', // Default app profile for generic model-router calls
+        );
+
+        if (!safetyCheck.safe) {
+          // Model is unsafe — find a better one
+          const best = await driftAwareWeightingService.getBestModel(
+            request.tenantId,
+            'orchestrator',
+            'general',
+            [request.modelId], // exclude the unsafe model
+          );
+
+          if (best) {
+            const bestConfig = MODEL_REGISTRY[best.modelId];
+            if (bestConfig) {
+              logger.info('Drift-aware selection: replaced unsafe model', {
+                tenantId: request.tenantId,
+                originalModel: request.modelId,
+                replacedWith: best.modelId,
+                originalDriftScore: safetyCheck.driftScore,
+                newDriftScore: best.driftScore,
+                reason: safetyCheck.reason,
+              });
+              config = bestConfig;
+              driftCorrected = true;
+            }
+          } else if (safetyCheck.fallbackModelId) {
+            // No drift-aware recommendation, but safety check has a fallback
+            const fallbackConfig = MODEL_REGISTRY[safetyCheck.fallbackModelId];
+            if (fallbackConfig) {
+              config = fallbackConfig;
+              driftCorrected = true;
+            }
+          }
+
+          // Apply temperature/prompt corrections if available
+          const weightConfig = await driftCorrectionService.getWeightConfig(
+            request.tenantId, request.modelId,
+          );
+          if (weightConfig) {
+            if (weightConfig.driftTemperatureCorrection != null) {
+              request = { ...request, temperature: weightConfig.driftTemperatureCorrection };
+              driftCorrected = true;
+            }
+            if (weightConfig.driftPromptPrefixCorrection) {
+              const originalSystem = request.systemPrompt || '';
+              request = { ...request, systemPrompt: weightConfig.driftPromptPrefixCorrection + '\n' + originalSystem };
+              driftCorrected = true;
+            }
+          }
+        }
+      } catch (phase1Error) {
+        // Phase 1 failed — fall back to Phase 2
+        logger.debug('Phase 1 drift-aware selection failed, trying Phase 2', {
+          modelId: request.modelId,
+          error: phase1Error instanceof Error ? phase1Error.message : 'unknown',
+        });
+
+        try {
+          // Phase 2: Legacy drift correction fallback
+          const bestModel = await driftCorrectionService.getBestModel(
+            request.tenantId,
+            request.modelId
+          );
+
+          if (bestModel.modelId !== request.modelId) {
+            const fallbackConfig = MODEL_REGISTRY[bestModel.modelId];
+            if (fallbackConfig) {
+              config = fallbackConfig;
+              driftCorrected = true;
+            }
+          }
+
+          if (bestModel.corrected) {
+            driftCorrections = bestModel.corrections;
+            driftCorrected = true;
+
+            if (driftCorrections.temperature != null) {
+              request = { ...request, temperature: driftCorrections.temperature };
+            }
+            if (driftCorrections.promptPrefix) {
+              const originalSystem = request.systemPrompt || '';
+              request = { ...request, systemPrompt: driftCorrections.promptPrefix + '\n' + originalSystem };
+            }
+          }
+        } catch (phase2Error) {
+          logger.debug('Phase 2 drift correction also failed, using original model', {
+            modelId: request.modelId,
+            error: phase2Error instanceof Error ? phase2Error.message : 'unknown',
+          });
+        }
+      }
+    }
+
+    // =========================================================================
+    // INFERENCE CACHE CHECK (v7.11.0)
+    // Before hitting any provider, check if we have a cached response.
+    // Cache key = SHA-256(tenantId + modelId + prompt + systemPrompt + temperature + maxTokens)
+    // Cache is tenant-isolated and respects TTL, temperature, and exclusion rules.
+    // =========================================================================
+    if (!request.stream && request.tenantId) {
+      try {
+        const promptText = request.messages.map(m => m.content).join('\n');
+        const cacheResult = await inferenceCacheService.lookup({
+          tenantId: request.tenantId,
+          modelId: request.modelId,
+          prompt: promptText,
+          systemPrompt: request.systemPrompt,
+          temperature: request.temperature ?? 0.7,
+          maxTokens: request.maxTokens || config.maxTokens,
+        });
+
+        if (cacheResult.hit && cacheResult.entry) {
+          logger.info('Inference cache hit — returning cached response', {
+            modelId: request.modelId,
+            tenantId: request.tenantId,
+            cacheSource: cacheResult.source,
+            lookupTimeMs: cacheResult.lookupTimeMs,
+            originalCostCents: cacheResult.entry.originalCostUsd * 100,
+          });
+
+          return {
+            content: cacheResult.entry.cachedResponse,
+            modelUsed: cacheResult.entry.modelId,
+            provider: cacheResult.entry.provider as ModelProvider,
+            inputTokens: cacheResult.entry.inputTokens,
+            outputTokens: cacheResult.entry.outputTokens,
+            latencyMs: cacheResult.lookupTimeMs,
+            costCents: 0, // Zero cost — served from cache
+            cached: true,
+          };
+        }
+      } catch (cacheError) {
+        // Cache lookup failed — continue with normal invocation
+        logger.debug('Cache lookup failed, proceeding without cache', {
+          modelId: request.modelId,
+          error: cacheError instanceof Error ? cacheError.message : 'unknown',
+        });
+      }
     }
 
     // Try primary provider
@@ -408,12 +590,79 @@ export class ModelRouterService {
       this.recordModelUsage(config.modelId, config.provider, true, response.latencyMs, response.inputTokens, response.outputTokens, response.costCents).catch(err => {
         logger.debug('Failed to record model usage', { modelId: config.modelId, error: err instanceof Error ? err.message : 'unknown' });
       });
+
+      // =====================================================================
+      // INFERENCE CACHE STORE (v7.11.0)
+      // After a successful response, store it in the cache for future reuse.
+      // This is fire-and-forget — cache storage failure does not affect the response.
+      // =====================================================================
+      if (!request.stream && request.tenantId) {
+        const promptText = request.messages.map(m => m.content).join('\n');
+        inferenceCacheService.store(
+          {
+            tenantId: request.tenantId,
+            modelId: request.modelId,
+            prompt: promptText,
+            systemPrompt: request.systemPrompt,
+            temperature: request.temperature ?? 0.7,
+            maxTokens: request.maxTokens || config.maxTokens,
+          },
+          response.content,
+          {
+            inputTokens: response.inputTokens,
+            outputTokens: response.outputTokens,
+            costUsd: response.costCents / 100,
+            latencyMs: response.latencyMs,
+            provider: response.provider,
+          }
+        ).catch(err => {
+          logger.debug('Failed to store in inference cache', {
+            modelId: config.modelId,
+            error: err instanceof Error ? err.message : 'unknown',
+          });
+        });
+      }
+
+      // =====================================================================
+      // GENESIS DRIFT TELEMETRY (v7.37.0)
+      // After every successful invocation, report telemetry to the
+      // drift-aware weighting service for Genesis gate feedback.
+      // Fire-and-forget — telemetry failure does not affect the response.
+      // =====================================================================
+      if (request.tenantId) {
+        driftAwareWeightingService.recordInvocationTelemetry({
+          tenantId: request.tenantId,
+          modelId: config.modelId,
+          originalRequestedModelId: originalModelId,
+          wasRerouted: driftCorrected,
+          success: true,
+          latencyMs: response.latencyMs,
+          tokensUsed: response.inputTokens + response.outputTokens,
+          costCents: response.costCents,
+          timestamp: new Date().toISOString(),
+        }).catch(() => {});
+      }
+
       return response;
     } catch (primaryError) {
+      // Report failure telemetry for Genesis
+      if (request.tenantId) {
+        driftAwareWeightingService.recordInvocationTelemetry({
+          tenantId: request.tenantId,
+          modelId: config.modelId,
+          originalRequestedModelId: originalModelId,
+          wasRerouted: driftCorrected,
+          success: false,
+          latencyMs: Date.now() - startTime,
+          tokensUsed: 0,
+          costCents: 0,
+          timestamp: new Date().toISOString(),
+        }).catch(() => {});
+      }
+
       const errorMsg = primaryError instanceof Error ? primaryError.message : 'Unknown error';
       logger.warn(`Primary provider ${config.provider} failed for ${request.modelId}`, { error: primaryError });
       this.recordFailure(config.provider, errorMsg);
-    }
 
     // Try fallback providers
     const fallbackOrder = this.getFallbackOrder(config);

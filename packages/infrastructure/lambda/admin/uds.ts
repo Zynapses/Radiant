@@ -16,7 +16,13 @@ import {
   udsEncryptionService,
 } from '../shared/services/uds';
 import { executeStatement, stringParam } from '../shared/db/client';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'admin/uds',
+  category: 'audit',
+  sourceType: 'lambda',
+});
 
 // =============================================================================
 // Types

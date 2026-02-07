@@ -3,7 +3,13 @@
 
 import { APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda';
 import { libraryRegistryService } from '../shared/services/library-registry.service';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'admin/library-registry',
+  category: 'audit',
+  sourceType: 'lambda',
+});
 
 const headers = {
   'Content-Type': 'application/json',

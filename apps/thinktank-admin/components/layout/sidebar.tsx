@@ -38,6 +38,17 @@ import {
   Brain,
   Globe,
   Languages,
+  Key,
+  FlaskConical,
+  ClipboardList,
+  ScrollText,
+  Lightbulb,
+  MessageCircle,
+  TrendingUp,
+  Database,
+  Crosshair,
+  Cpu,
+  Layers as LayersIcon,
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -115,10 +126,25 @@ const navigation: NavSection[] = [
     ],
   },
   {
+    label: 'Living Parchment',
+    items: [
+      { name: 'Parchment', href: '/living-parchment', icon: ScrollText },
+      { name: 'Cognitive', href: '/living-parchment/cognitive', icon: Brain },
+      { name: 'Council', href: '/living-parchment/council', icon: Swords },
+      { name: 'Debate', href: '/living-parchment/debate', icon: MessageCircle },
+      { name: 'Drift', href: '/living-parchment/drift', icon: TrendingUp },
+      { name: 'Memory Palace', href: '/living-parchment/memory-palace', icon: Database },
+      { name: 'Oracle', href: '/living-parchment/oracle', icon: Crosshair },
+      { name: 'Synthesis', href: '/living-parchment/synthesis', icon: Cpu },
+      { name: 'War Room', href: '/living-parchment/war-room', icon: Swords },
+    ],
+  },
+  {
     label: 'Infrastructure',
     items: [
       { name: 'Gateway Status', href: '/gateway', icon: Network },
       { name: 'Code Quality', href: '/code-quality', icon: Beaker },
+      { name: 'Crucible', href: '/crucible', icon: FlaskConical },
     ],
   },
   {
@@ -132,6 +158,8 @@ const navigation: NavSection[] = [
     label: 'Administration',
     items: [
       { name: 'Compliance', href: '/compliance', icon: ShieldCheck },
+      { name: 'Decision Records', href: '/decision-records', icon: ClipboardList },
+      { name: 'API Keys', href: '/api-keys', icon: Key },
       { name: 'Analytics', href: '/analytics', icon: BarChart3 },
       { name: 'Reports', href: '/reports', icon: FileText },
       { name: 'Localization', href: '/localization', icon: Globe },

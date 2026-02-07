@@ -12,7 +12,13 @@ import {
   DescribeEndpointCommand,
 } from '@aws-sdk/client-sagemaker';
 import { executeStatement } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'model/version-manager',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import type {
   ModelVersion,
   ModelThermalState,

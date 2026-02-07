@@ -4,7 +4,13 @@ import { extractUserFromEvent, type AuthContext } from '../shared/auth';
 import { UnauthorizedError, NotFoundError, ValidationError } from '../shared/errors';
 import { metricsCollector } from '../shared/services';
 import { executeStatement } from '../shared/db/client';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'analytics/handler',
+  category: 'performance',
+  sourceType: 'lambda',
+});
 
 type PeriodType = 'hourly' | 'daily' | 'weekly' | 'monthly';
 

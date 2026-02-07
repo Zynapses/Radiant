@@ -4,7 +4,13 @@
 // Uses PersistenceGuard for atomic writes with integrity checks
 
 import { executeStatement, stringParam, doubleParam, boolParam, longParam } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'episode/logger',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { v4 as uuidv4 } from 'uuid';
 import { persistenceGuard } from './persistence-guard.service';
 

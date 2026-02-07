@@ -7,10 +7,13 @@
 
 import { SQSHandler, SQSRecord } from 'aws-lambda';
 import { executeStatement, stringParam } from '../shared/db/client';
-import { enhancedLogger } from '../shared/logging/enhanced-logger';
-import { aiHelperService } from '../shared/services/sovereign-mesh';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
 
-const logger = enhancedLogger;
+const logger = createRegisteredLogger({
+  serviceName: 'workers/transparency-compiler',
+  category: 'application',
+  sourceType: 'lambda',
+});
 
 interface CompileMessage {
   type: 'compile_explanation';

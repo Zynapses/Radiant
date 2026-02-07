@@ -3,7 +3,13 @@
 // Integrates with learning candidates for LoRA training
 
 import { executeStatement } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'bipolar/rating',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { learningCandidateService } from './distillation-pipeline.service';
 import type {
   BipolarRating,

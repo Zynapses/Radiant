@@ -7,7 +7,13 @@ import type { ScheduledEvent, Context } from 'aws-lambda';
 import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
 import { executeStatement, stringParam, longParam, doubleParam } from '../shared/db/client';
 import { enhancedLearningService } from '../shared/services/enhanced-learning.service';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'learning/learning-alerts',
+  category: 'application',
+  sourceType: 'lambda',
+});
 
 const sesClient = new SESClient({ region: process.env.AWS_REGION || 'us-east-1' });
 const ALERT_SOURCE_EMAIL = process.env.ALERT_SOURCE_EMAIL || 'alerts@radiant.ai';

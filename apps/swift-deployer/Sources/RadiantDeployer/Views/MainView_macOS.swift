@@ -82,111 +82,16 @@ struct AppSidebar: View {
             // Search (Pattern 6)
             SidebarSearch(text: $searchText)
             
-            // Navigation List
+            // Navigation List (v7.0.0 - Simplified)
             List(selection: $appState.selectedTab) {
-                // Main Navigation
-                SidebarSection(title: "MAIN") {
-                    ForEach(NavigationTab.mainTabs) { tab in
-                        NavigationLink(value: tab) {
-                            SidebarRow(
-                                title: tab.rawValue,
-                                icon: tab.icon,
-                                iconColor: tab.color,
-                                badge: badgeCount(for: tab)
-                            )
-                        }
-                    }
-                }
-                
-                // Operations
-                SidebarSection(title: "OPERATIONS") {
-                    ForEach(NavigationTab.operationTabs) { tab in
-                        NavigationLink(value: tab) {
-                            SidebarRow(
-                                title: tab.rawValue,
-                                icon: tab.icon,
-                                iconColor: tab.color,
-                                badge: badgeCount(for: tab)
-                            )
-                        }
-                    }
-                }
-                
-                // AI Registry
-                SidebarSection(title: "AI REGISTRY") {
-                    ForEach(NavigationTab.aiTabs) { tab in
-                        NavigationLink(value: tab) {
-                            SidebarRow(
-                                title: tab.rawValue,
-                                icon: tab.icon,
-                                iconColor: tab.color
-                            )
-                        }
-                    }
-                }
-                
-                // Configuration (Domain & Email)
-                SidebarSection(title: "CONFIGURATION") {
-                    ForEach(NavigationTab.configTabs) { tab in
-                        NavigationLink(value: tab) {
-                            SidebarRow(
-                                title: tab.rawValue,
-                                icon: tab.icon,
-                                iconColor: tab.color
-                            )
-                        }
-                    }
-                }
-                
-                // Advanced
-                SidebarSection(title: "ADVANCED") {
-                    ForEach(NavigationTab.advancedTabs) { tab in
-                        NavigationLink(value: tab) {
-                            SidebarRow(
-                                title: tab.rawValue,
-                                icon: tab.icon,
-                                iconColor: tab.color
-                            )
-                        }
-                    }
-                }
-                
-                // Security
-                SidebarSection(title: "SECURITY") {
-                    ForEach(NavigationTab.securityTabs) { tab in
-                        NavigationLink(value: tab) {
-                            SidebarRow(
-                                title: tab.rawValue,
-                                icon: tab.icon,
-                                iconColor: tab.color
-                            )
-                        }
-                    }
-                }
-                
-                // System
-                SidebarSection(title: "SYSTEM") {
-                    ForEach(NavigationTab.systemTabs) { tab in
-                        NavigationLink(value: tab) {
-                            SidebarRow(
-                                title: tab.rawValue,
-                                icon: tab.icon,
-                                iconColor: tab.color
-                            )
-                        }
-                    }
-                }
-                
-                // Saved Views (Smart Filters)
-                if !savedViews.isEmpty {
-                    SidebarSection(title: "SAVED VIEWS") {
-                        ForEach(savedViews, id: \.self) { view in
-                            HStack(spacing: RadiantSpacing.sm) {
-                                Image(systemName: "line.3.horizontal.decrease.circle")
-                                    .foregroundStyle(.purple)
-                                Text(view)
-                            }
-                        }
+                ForEach(NavigationTab.allTabs) { tab in
+                    NavigationLink(value: tab) {
+                        SidebarRow(
+                            title: tab.rawValue,
+                            icon: tab.icon,
+                            iconColor: tab.color,
+                            badge: badgeCount(for: tab)
+                        )
                     }
                 }
             }
@@ -202,23 +107,11 @@ struct AppSidebar: View {
         .background(.bar)
     }
     
-    private var savedViews: [String] {
-        ["Production Apps", "Recent Deployments", "Failed Instances"]
-    }
-    
     private func badgeCount(for tab: NavigationTab) -> Int? {
         switch tab {
-        case .apps: return appState.apps.count
-        case .instances: return deployedInstancesCount
+        case .driftMonitor: return nil // Would show drift count from service
+        case .packages: return nil // Would show pending updates
         default: return nil
-        }
-    }
-    
-    private var deployedInstancesCount: Int {
-        appState.apps.reduce(0) { count, app in
-            count + (app.environments.dev.deployed ? 1 : 0)
-                  + (app.environments.staging.deployed ? 1 : 0)
-                  + (app.environments.prod.deployed ? 1 : 0)
         }
     }
 }
@@ -599,44 +492,38 @@ struct DetailContentView: View {
         switch appState.selectedTab {
         case .dashboard:
             DashboardView()
-        case .apps:
-            AppsView()
         case .deploy:
             DeployView()
+        case .bidirectionalSync:
+            BidirectionalSyncView()
+        case .scripts:
+            DeploymentScriptsView(projectPath: FileManager.default.currentDirectoryPath)
+        case .codeSync:
+            CodeSyncView(projectPath: FileManager.default.currentDirectoryPath)
+        case .dependencies:
+            DependencyManagerView()
+        case .credentials:
+            CredentialsManagementView()
         case .instances:
-            InstancesView()
-        case .snapshots:
-            SnapshotsView()
+            InstanceManagementView()
         case .packages:
             PackagesView()
+        case .migrations:
+            MigrationsView()
+        case .snapshots:
+            SnapshotManagementView()
         case .history:
             HistoryView()
-        case .providers:
-            ProvidersView()
-        case .models:
-            ModelsView()
-        case .selfHosted:
-            SelfHostedModelsView()
-        case .domainUrls:
-            DomainSetupView()
-        case .email:
-            EmailSetupView()
+        case .driftMonitor:
+            DriftMonitorView()
+        case .spendGovernor:
+            SpendGovernorView()
+        case .domainURLs:
+            SettingsView() // Domain URLs configured in Settings
         case .curator:
-            CuratorConfigView()
-        case .multiRegion:
-            MultiRegionView()
-        case .abTesting:
-            ABTestingView()
-        case .cortex:
-            CortexMemoryView()
-        case .security:
-            SecurityView()
-        case .compliance:
-            ComplianceView()
-        case .costs:
-            CostsView()
-        case .monitoring:
-            AWSMonitoringView()
+            SettingsView() // Curator configured in Settings
+        case .cortexMemory:
+            SettingsView() // Cortex Memory configured in Settings
         case .settings:
             SettingsView()
         }

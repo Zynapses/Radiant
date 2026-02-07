@@ -16,7 +16,13 @@
 import type { APIGatewayProxyEvent } from 'aws-lambda';
 import { v4 as uuidv4 } from 'uuid';
 import * as crypto from 'crypto';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'thinktank/uep-integration',
+  category: 'application',
+  sourceType: 'lambda',
+});
 
 // =============================================================================
 // Types

@@ -559,7 +559,7 @@ actor LocalStorageManager {
                 ofItemAtPath: keyFile.path
             )
         } catch {
-            print("Warning: Could not persist encryption key to secure file")
+            RadiantLogger.warning("Could not persist encryption key to secure file", category: RadiantLogger.security)
         }
         
         return newKey

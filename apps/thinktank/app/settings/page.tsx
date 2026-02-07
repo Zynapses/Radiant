@@ -17,6 +17,7 @@ import { LanguageSelector } from '@/components/ui/language-selector';
 import { useSettingsStore, type PersonalityMode } from '@/lib/stores/settings-store';
 import { useUIStore } from '@/lib/stores/ui-store';
 import { useTranslation, T } from '@/lib/i18n';
+import { useDelightSync } from '@/lib/hooks/useDelightSync';
 import { cn } from '@/lib/utils';
 
 const PERSONALITY_MODES: Array<{
@@ -37,6 +38,7 @@ export default function SettingsPage() {
   const settings = useSettingsStore();
   const { soundEnabled, setSoundEnabled } = useUIStore();
   const [activeSection, setActiveSection] = useState('personality');
+  useDelightSync();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 relative">

@@ -7,7 +7,13 @@
  */
 
 import { APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'admin/cato-dialogue',
+  category: 'audit',
+  sourceType: 'lambda',
+});
 import {
   CatoDialogueService,
   createCatoDialogueService,

@@ -7,10 +7,13 @@
  */
 
 import { executeStatement, stringParam, longParam, doubleParam, boolParam } from '../../db/client';
-import { enhancedLogger } from '../../logging/enhanced-logger';
-import { aiHelperService, type AIHelperConfig } from './ai-helper.service';
+import { createRegisteredLogger } from '../logging-registry.service';
 
-const logger = enhancedLogger;
+const logger = createRegisteredLogger({
+  serviceName: 'sovereign-mesh/agent-runtime',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 // ============================================================================
 // TYPES

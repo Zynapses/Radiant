@@ -14,7 +14,11 @@ export type AdminViewType =
   | 'domains'
   | 'costs'
   | 'users'
-  | 'analytics';
+  | 'analytics'
+  | 'livs-policy';
+
+// LIVS-M Policy Mode
+export type LIVSMPolicyMode = 'RAPID_PROTO' | 'ENGINEERING' | 'STRICT_AUDIT';
 
 // Polymorphic UI Configuration
 export type ExecutionMode = 'sniper' | 'war_room';

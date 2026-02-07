@@ -3,7 +3,13 @@
 
 import { APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda';
 import { selfAuditService, AuditFramework } from '../shared/services/self-audit.service';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'admin/self-audit',
+  category: 'audit',
+  sourceType: 'lambda',
+});
 
 const headers = {
   'Content-Type': 'application/json',

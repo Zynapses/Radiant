@@ -1,6 +1,6 @@
 import Foundation
 
-let RADIANT_VERSION = "5.52.17"
+let RADIANT_VERSION = "6.6.0"
 
 struct DeploymentProgress: Identifiable, Sendable {
     let id = UUID()

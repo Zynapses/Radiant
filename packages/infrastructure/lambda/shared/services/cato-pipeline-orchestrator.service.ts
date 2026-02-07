@@ -6,6 +6,10 @@
  * - Context management and pruning
  * - Checkpoint integration
  * - Error handling and compensation
+ * 
+ * LIVS-M Extension (v6.4.0):
+ * - Sycophancy breaker for multi-agent agreement monitoring
+ * - Chaos injection when agents agree too quickly
  */
 
 import { Pool } from 'pg';
@@ -22,6 +26,8 @@ import {
   CatoTriageDecision,
   CatoPipelineEvent,
   CatoPipelineEventHandler,
+  LIVSEffectiveSettings,
+  SycophancyDetectionResult,
 } from '@radiant/shared';
 import { CatoMethodRegistryService } from './cato-method-registry.service';
 import { CatoSchemaRegistryService } from './cato-schema-registry.service';
@@ -46,12 +52,24 @@ export interface PipelineExecutionOptions {
   governancePreset?: 'COWBOY' | 'BALANCED' | 'PARANOID';
   config?: Record<string, unknown>;
   complianceFrameworks?: string[];
+  livsSettings?: LIVSEffectiveSettings;
+}
+
+/**
+ * Sycophancy detection context for tracking agent agreements
+ */
+interface SycophancyContext {
+  turnsSinceLastDisagreement: number;
+  agreementScores: number[];
+  lastAgentId?: string;
+  chaosInjected: boolean;
 }
 
 export interface PipelineExecutionResult {
   execution: CatoPipelineExecution;
   finalEnvelope?: CatoMethodEnvelope;
   checkpointsPending: string[];
+  sycophancyDetections?: SycophancyDetectionResult[];
 }
 
 export class CatoPipelineOrchestratorService {
@@ -125,6 +143,12 @@ export class CatoPipelineOrchestratorService {
 
     const envelopes: CatoMethodEnvelope[] = [];
     const checkpointsPending: string[] = [];
+    const sycophancyDetections: SycophancyDetectionResult[] = [];
+    const sycophancyContext: SycophancyContext = {
+      turnsSinceLastDisagreement: 0,
+      agreementScores: [],
+      chaosInjected: false,
+    };
 
     try {
       for (let i = 0; i < methodChain.length; i++) {
@@ -217,6 +241,36 @@ export class CatoPipelineOrchestratorService {
 
         // Update execution metrics
         await this.updateExecutionMetrics(pipelineId, result);
+
+        // LIVS-M: Check for sycophancy (quick agreement between agents)
+        if (options.livsSettings?.sycophancyDetectionEnabled) {
+          const sycophancyResult = await this.checkSycophancy(
+            options.tenantId,
+            pipelineId,
+            result.envelope,
+            sycophancyContext,
+            options.livsSettings
+          );
+
+          if (sycophancyResult.detected) {
+            sycophancyDetections.push(sycophancyResult);
+
+            if (sycophancyResult.chaosInjected) {
+              await this.emitEvent({
+                eventType: 'CHAOS_INJECTED',
+                pipelineId,
+                tenantId: options.tenantId,
+                methodId,
+                data: {
+                  reason: sycophancyResult.reason,
+                  chaosPrompt: sycophancyResult.chaosPrompt,
+                  turnsBeforeAgreement: sycophancyResult.turnsBeforeAgreement,
+                },
+                timestamp: new Date(),
+              });
+            }
+          }
+        }
       }
 
       // Pipeline completed successfully
@@ -233,7 +287,12 @@ export class CatoPipelineOrchestratorService {
       });
 
       const completedExecution = await this.getExecution(pipelineId);
-      return { execution: completedExecution!, finalEnvelope, checkpointsPending };
+      return { 
+        execution: completedExecution!, 
+        finalEnvelope, 
+        checkpointsPending,
+        sycophancyDetections: sycophancyDetections.length > 0 ? sycophancyDetections : undefined,
+      };
 
     } catch (error) {
       await this.handlePipelineError(pipelineId, options.tenantId, error, envelopes);
@@ -641,6 +700,140 @@ export class CatoPipelineOrchestratorService {
       createdAt: new Date(row.created_at),
       updatedAt: new Date(row.updated_at),
     };
+  }
+
+  /**
+   * LIVS-M: Check for sycophancy (agents agreeing too quickly)
+   */
+  private async checkSycophancy(
+    tenantId: string,
+    pipelineId: string,
+    envelope: CatoMethodEnvelope,
+    context: SycophancyContext,
+    settings: LIVSEffectiveSettings
+  ): Promise<SycophancyDetectionResult> {
+    // Calculate agreement score from envelope
+    const agreementScore = this.calculateAgreementScore(envelope);
+    context.agreementScores.push(agreementScore);
+
+    // Check if this is agreement (high score)
+    const isAgreement = agreementScore > settings.maxConsensusThreshold;
+
+    if (isAgreement) {
+      context.turnsSinceLastDisagreement++;
+    } else {
+      context.turnsSinceLastDisagreement = 0;
+    }
+
+    // Check if sycophancy detected
+    const detected = context.turnsSinceLastDisagreement >= settings.minTurnsBeforeAgreement;
+
+    if (detected && !context.chaosInjected) {
+      // Inject chaos
+      context.chaosInjected = true;
+
+      const chaosPrompt = settings.chaosInjectionPrompt ||
+        'STOP. Assume the previous assertion is WRONG. Find flaws in this approach.';
+
+      // Log sycophancy detection
+      await this.logSycophancyDetection(tenantId, pipelineId, {
+        turnsBeforeAgreement: context.turnsSinceLastDisagreement,
+        consensusScore: agreementScore,
+        chaosInjected: true,
+        chaosPrompt,
+        reason: `Agents agreed for ${context.turnsSinceLastDisagreement} consecutive turns without critical analysis`,
+      });
+
+      return {
+        detected: true,
+        turnsBeforeAgreement: context.turnsSinceLastDisagreement,
+        consensusScore: agreementScore,
+        reason: `Quick agreement detected after ${context.turnsSinceLastDisagreement} turns`,
+        chaosInjected: true,
+        chaosPrompt,
+      };
+    }
+
+    return {
+      detected,
+      turnsBeforeAgreement: context.turnsSinceLastDisagreement,
+      consensusScore: agreementScore,
+      chaosInjected: false,
+    };
+  }
+
+  /**
+   * Calculate agreement score from envelope output
+   */
+  private calculateAgreementScore(envelope: CatoMethodEnvelope): number {
+    const output = envelope.output?.data as Record<string, unknown> | undefined;
+    if (!output) return 0.5;
+
+    // Look for explicit agreement indicators
+    if (output.agreement !== undefined) {
+      return typeof output.agreement === 'number' ? output.agreement : (output.agreement ? 1.0 : 0.0);
+    }
+
+    // Look for sentiment/confidence
+    if (output.sentiment !== undefined) {
+      return typeof output.sentiment === 'number' ? output.sentiment : 0.5;
+    }
+
+    // Look for verdict
+    if (output.verdict === 'AGREE' || output.verdict === 'APPROVED' || output.verdict === 'ACCEPT') {
+      return 0.95;
+    }
+    if (output.verdict === 'DISAGREE' || output.verdict === 'REJECTED' || output.verdict === 'DENY') {
+      return 0.1;
+    }
+
+    // Check critique output - disagreements lower the score
+    if (envelope.output.outputType === 'CRITIQUE') {
+      const critiques = (output.critiques || output.issues || output.concerns) as unknown[];
+      if (Array.isArray(critiques) && critiques.length > 0) {
+        return Math.max(0.2, 0.9 - (critiques.length * 0.15));
+      }
+    }
+
+    // Default to moderate agreement
+    return 0.7;
+  }
+
+  /**
+   * Log sycophancy detection to database
+   */
+  private async logSycophancyDetection(
+    tenantId: string,
+    pipelineId: string,
+    detection: {
+      turnsBeforeAgreement: number;
+      consensusScore: number;
+      chaosInjected: boolean;
+      chaosPrompt?: string;
+      reason: string;
+    }
+  ): Promise<void> {
+    try {
+      await this.pool.query(
+        `INSERT INTO livs_sycophancy_detections (
+          id, tenant_id, pipeline_execution_id,
+          turns_before_agreement, consensus_score, detection_reason,
+          chaos_injected, chaos_prompt_used, created_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())`,
+        [
+          uuidv4(),
+          tenantId,
+          pipelineId,
+          detection.turnsBeforeAgreement,
+          detection.consensusScore,
+          detection.reason,
+          detection.chaosInjected,
+          detection.chaosPrompt,
+        ]
+      );
+    } catch (error) {
+      logger.error('Failed to log sycophancy detection', { error, tenantId, pipelineId });
+    }
   }
 
   private mapRowToExecution(row: Record<string, unknown>): CatoPipelineExecution {

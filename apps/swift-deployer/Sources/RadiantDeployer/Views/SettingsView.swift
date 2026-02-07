@@ -1,4 +1,4 @@
-// RADIANT v5.52.17 - Settings View
+// RADIANT v7.2.0 - Settings View
 // Comprehensive settings for all deployer configuration
 
 import SwiftUI
@@ -46,6 +46,11 @@ struct SettingsView: View {
                     Label("Packages", systemImage: "shippingbox")
                 }
             
+            AdminToolsSettingsView()
+                .tabItem {
+                    Label("Admin Tools", systemImage: "hammer.fill")
+                }
+            
             QATestingView()
                 .tabItem {
                     Label("QA & Testing", systemImage: "checkmark.seal")
@@ -55,115 +60,497 @@ struct SettingsView: View {
     }
 }
 
-// MARK: - Cognitive Brain Settings
+// MARK: - Admin Tools Settings
 
-struct CognitiveBrainSettingsView: View {
-    @AppStorage("cognitiveBrainEnabled") private var cognitiveBrainEnabled = true
-    @AppStorage("cognitiveBrainLearningEnabled") private var learningEnabled = true
-    @AppStorage("cognitiveBrainAdaptationEnabled") private var adaptationEnabled = true
-    @AppStorage("cognitiveBrainMaxConcurrentRegions") private var maxConcurrentRegions = 5
-    @AppStorage("cognitiveBrainMaxTokensPerRequest") private var maxTokensPerRequest = 16000
-    @AppStorage("cognitiveBrainDailyCostLimitCents") private var dailyCostLimitCents = 10000
-    @AppStorage("cognitiveBrainGlobalLearningRate") private var globalLearningRate = 0.01
-    @AppStorage("cognitiveBrainMemoryRetentionDays") private var memoryRetentionDays = 90
-    @AppStorage("cognitiveBrainEnableMetacognition") private var enableMetacognition = true
-    @AppStorage("cognitiveBrainEnableTheoryOfMind") private var enableTheoryOfMind = true
-    @AppStorage("cognitiveBrainEnableCreativeSynthesis") private var enableCreativeSynthesis = true
-    @AppStorage("cognitiveBrainEnableSelfCorrection") private var enableSelfCorrection = true
+struct AdminToolsSettingsView: View {
+    @State private var selectedTool: AdminTool = .monitoringDashboard
+    
+    enum AdminTool: String, CaseIterable {
+        case monitoringDashboard = "Monitoring Dashboard"
+        case logViewer = "Log Viewer"
+        case rollbackManager = "Rollback Manager"
+        case securityScanner = "Security Scanner"
+        case networkDiagnostics = "Network Diagnostics"
+        case resourceTags = "Resource Tags"
+        case databaseExport = "Database Export"
+        case secretsRotation = "Secrets Rotation"
+        case costEstimator = "Cost Estimator"
+        case environmentClone = "Environment Clone"
+        case complianceReports = "Compliance Reports"
+        
+        var icon: String {
+            switch self {
+            case .monitoringDashboard: return "chart.bar.xaxis"
+            case .logViewer: return "doc.text.magnifyingglass"
+            case .rollbackManager: return "arrow.uturn.backward.circle"
+            case .securityScanner: return "shield.checkered"
+            case .networkDiagnostics: return "network"
+            case .resourceTags: return "tag"
+            case .databaseExport: return "cylinder.split.1x2"
+            case .secretsRotation: return "key.horizontal.fill"
+            case .costEstimator: return "dollarsign.circle"
+            case .environmentClone: return "doc.on.doc"
+            case .complianceReports: return "checkmark.shield"
+            }
+        }
+        
+        var description: String {
+            switch self {
+            case .monitoringDashboard: return "Real-time CloudWatch metrics and alerts"
+            case .logViewer: return "CloudWatch logs with search and tailing"
+            case .rollbackManager: return "Version tracking and rollback automation"
+            case .securityScanner: return "IAM, security groups, encryption audit"
+            case .networkDiagnostics: return "DNS, SSL, connectivity testing"
+            case .resourceTags: return "AWS resource tagging for cost allocation"
+            case .databaseExport: return "Export/import PostgreSQL and DynamoDB data"
+            case .secretsRotation: return "Manage and rotate AWS secrets"
+            case .costEstimator: return "Estimate deployment costs"
+            case .environmentClone: return "Clone environments with data masking"
+            case .complianceReports: return "Generate HIPAA, SOC2, GDPR reports"
+            }
+        }
+        
+        var color: Color {
+            switch self {
+            case .monitoringDashboard: return .cyan
+            case .logViewer: return .indigo
+            case .rollbackManager: return .mint
+            case .securityScanner: return .yellow
+            case .networkDiagnostics: return .teal
+            case .resourceTags: return .pink
+            case .databaseExport: return .blue
+            case .secretsRotation: return .orange
+            case .costEstimator: return .green
+            case .environmentClone: return .purple
+            case .complianceReports: return .red
+            }
+        }
+        
+        var category: String {
+            switch self {
+            case .monitoringDashboard, .logViewer: return "Observability"
+            case .rollbackManager, .securityScanner, .networkDiagnostics: return "Operations"
+            case .resourceTags, .costEstimator: return "Cost Management"
+            case .databaseExport, .secretsRotation, .environmentClone, .complianceReports: return "Data & Compliance"
+            }
+        }
+    }
+    
+    var body: some View {
+        HSplitView {
+            // Tool List
+            List(selection: $selectedTool) {
+                Section("Observability") {
+                    ForEach([AdminTool.monitoringDashboard, .logViewer], id: \.self) { tool in
+                        toolRow(tool: tool)
+                    }
+                }
+                
+                Section("Operations") {
+                    ForEach([AdminTool.rollbackManager, .securityScanner, .networkDiagnostics], id: \.self) { tool in
+                        toolRow(tool: tool)
+                    }
+                }
+                
+                Section("Cost Management") {
+                    ForEach([AdminTool.resourceTags, .costEstimator], id: \.self) { tool in
+                        toolRow(tool: tool)
+                    }
+                }
+                
+                Section("Data & Compliance") {
+                    ForEach([AdminTool.databaseExport, .secretsRotation, .environmentClone, .complianceReports], id: \.self) { tool in
+                        toolRow(tool: tool)
+                    }
+                }
+            }
+            .listStyle(.sidebar)
+            .frame(minWidth: 220, maxWidth: 280)
+            
+            // Tool Content
+            toolContent
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+    }
+    
+    private func toolRow(tool: AdminTool) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: tool.icon)
+                .font(.title2)
+                .foregroundColor(tool.color)
+                .frame(width: 32)
+            
+            VStack(alignment: .leading, spacing: 2) {
+                Text(tool.rawValue)
+                    .font(.body.weight(.medium))
+                Text(tool.description)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .lineLimit(2)
+            }
+        }
+        .padding(.vertical, 6)
+        .tag(tool)
+    }
+    
+    @ViewBuilder
+    private var toolContent: some View {
+        switch selectedTool {
+        case .monitoringDashboard:
+            MonitoringDashboardView()
+        case .logViewer:
+            LogViewerView()
+        case .rollbackManager:
+            RollbackView()
+        case .securityScanner:
+            SecurityScannerView()
+        case .networkDiagnostics:
+            NetworkDiagnosticsView()
+        case .resourceTags:
+            ResourceTagsView()
+        case .databaseExport:
+            DatabaseExportView()
+        case .secretsRotation:
+            SecretsRotationView()
+        case .costEstimator:
+            CostEstimatorView()
+        case .environmentClone:
+            EnvironmentCloneView()
+        case .complianceReports:
+            ComplianceReportView()
+        }
+    }
+}
+
+// MARK: - Environment Clone View (Placeholder with full implementation)
+
+struct EnvironmentCloneView: View {
+    @EnvironmentObject var appState: AppState
+    @State private var sourceEnvironment: EnvironmentCloneService.EnvironmentType = .production
+    @State private var targetEnvironment: EnvironmentCloneService.EnvironmentType = .staging
+    @State private var targetName: String = ""
+    @State private var cloneMode: EnvironmentCloneService.CloneMode = .withSeedData
+    @State private var includeInfrastructure: Bool = true
+    @State private var includeDatabases: Bool = true
+    @State private var includeSecrets: Bool = true
+    @State private var includeS3Data: Bool = false
+    @State private var dryRun: Bool = true
+    @State private var isCloning: Bool = false
+    @State private var cloneProgress: Double = 0
+    @State private var progressMessage: String = ""
+    @State private var showingResult: Bool = false
+    @State private var cloneResult: EnvironmentCloneService.CloneResult?
+    @State private var showingError: Bool = false
+    @State private var errorMessage: String = ""
+    
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                // Header
+                HStack {
+                    Image(systemName: "doc.on.doc.fill")
+                        .font(.title)
+                        .foregroundColor(.purple)
+                    VStack(alignment: .leading) {
+                        Text("Environment Clone")
+                            .font(.title2.weight(.semibold))
+                        Text("Clone environments with optional data masking for dev/staging")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    Spacer()
+                }
+                .padding()
+                .background(Color.purple.opacity(0.1))
+                .cornerRadius(12)
+                
+                // Source & Target
+                GroupBox("Environments") {
+                    VStack(alignment: .leading, spacing: 16) {
+                        HStack {
+                            Text("Source")
+                                .frame(width: 80, alignment: .leading)
+                            Picker("Source", selection: $sourceEnvironment) {
+                                ForEach(EnvironmentCloneService.EnvironmentType.allCases, id: \.self) { env in
+                                    Text(env.displayName).tag(env)
+                                }
+                            }
+                            .labelsHidden()
+                        }
+                        
+                        HStack {
+                            Text("Target")
+                                .frame(width: 80, alignment: .leading)
+                            Picker("Target", selection: $targetEnvironment) {
+                                ForEach(EnvironmentCloneService.EnvironmentType.allCases, id: \.self) { env in
+                                    Text(env.displayName).tag(env)
+                                }
+                            }
+                            .labelsHidden()
+                        }
+                        
+                        HStack {
+                            Text("Name")
+                                .frame(width: 80, alignment: .leading)
+                            TextField("clone-name", text: $targetName)
+                                .textFieldStyle(.roundedBorder)
+                        }
+                    }
+                    .padding(.vertical, 8)
+                }
+                
+                // Clone Mode
+                GroupBox("Clone Mode") {
+                    VStack(alignment: .leading, spacing: 12) {
+                        ForEach(EnvironmentCloneService.CloneMode.allCases, id: \.self) { mode in
+                            HStack {
+                                Image(systemName: cloneMode == mode ? "checkmark.circle.fill" : "circle")
+                                    .foregroundColor(cloneMode == mode ? .accentColor : .secondary)
+                                
+                                Image(systemName: mode.icon)
+                                    .foregroundColor(.secondary)
+                                
+                                VStack(alignment: .leading) {
+                                    Text(mode.displayName)
+                                        .font(.body.weight(.medium))
+                                    Text(mode.description)
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                                
+                                Spacer()
+                                
+                                if !mode.allowedTargets.contains(targetEnvironment) {
+                                    Text("Not allowed")
+                                        .font(.caption2)
+                                        .foregroundColor(.orange)
+                                }
+                            }
+                            .padding(.vertical, 4)
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                if mode.allowedTargets.contains(targetEnvironment) {
+                                    cloneMode = mode
+                                }
+                            }
+                            .opacity(mode.allowedTargets.contains(targetEnvironment) ? 1.0 : 0.5)
+                        }
+                    }
+                    .padding(.vertical, 8)
+                }
+                
+                // Options
+                GroupBox("Include") {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Toggle("Infrastructure (VPC, ECS, ALB)", isOn: $includeInfrastructure)
+                        Toggle("Databases (Aurora, DynamoDB, ElastiCache)", isOn: $includeDatabases)
+                        Toggle("Secrets (rotated for target)", isOn: $includeSecrets)
+                        Toggle("S3 Data", isOn: $includeS3Data)
+                        
+                        Divider()
+                        
+                        Toggle("Dry Run (validate only)", isOn: $dryRun)
+                            .foregroundColor(.blue)
+                    }
+                    .padding(.vertical, 8)
+                }
+                
+                // Progress
+                if isCloning {
+                    GroupBox("Clone Progress") {
+                        VStack(alignment: .leading, spacing: 8) {
+                            ProgressView(value: cloneProgress)
+                            Text(progressMessage)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        .padding(.vertical, 8)
+                    }
+                }
+                
+                // Actions
+                HStack {
+                    Button {
+                        Task { await performClone() }
+                    } label: {
+                        Label(dryRun ? "Validate Clone" : "Start Clone", systemImage: dryRun ? "checkmark.circle" : "play.fill")
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(isCloning || targetName.isEmpty)
+                    
+                    if !dryRun {
+                        Text("⚠️ This will create real resources")
+                            .font(.caption)
+                            .foregroundColor(.orange)
+                    }
+                }
+            }
+            .padding()
+        }
+        .alert("Clone Complete", isPresented: $showingResult) {
+            Button("OK") { }
+        } message: {
+            if let result = cloneResult {
+                Text("Clone \(result.status == .completed ? "succeeded" : "failed") in \(String(format: "%.1f", result.duration)) seconds")
+            }
+        }
+        .alert("Error", isPresented: $showingError) {
+            Button("OK") { }
+        } message: {
+            Text(errorMessage)
+        }
+    }
+    
+    private func performClone() async {
+        guard let selectedApp = appState.apps.first else {
+            errorMessage = "No application selected"
+            showingError = true
+            return
+        }
+        
+        isCloning = true
+        cloneProgress = 0
+        progressMessage = "Preparing clone..."
+        
+        var config = EnvironmentCloneService.CloneConfiguration.defaults(
+            source: sourceEnvironment,
+            target: targetEnvironment,
+            targetName: targetName
+        )
+        config.mode = cloneMode
+        config.includeInfrastructure = includeInfrastructure
+        config.includeDatabases = includeDatabases
+        config.includeSecrets = includeSecrets
+        config.includeS3Data = includeS3Data
+        config.validationOptions.dryRun = dryRun
+        
+        do {
+            cloneResult = try await EnvironmentCloneService.shared.cloneEnvironment(
+                appId: selectedApp.id,
+                region: "us-east-1",
+                configuration: config
+            ) { progress, message in
+                Task { @MainActor in
+                    self.cloneProgress = progress
+                    self.progressMessage = message
+                }
+            }
+            showingResult = true
+        } catch {
+            errorMessage = error.localizedDescription
+            showingError = true
+        }
+        
+        isCloning = false
+    }
+}
+
+// MARK: - Cortex Memory Settings (Replaces deprecated CognitiveBrainSettingsView)
+
+struct CortexMemorySettingsView: View {
+    @AppStorage("cortexMemoryEnabled") private var cortexMemoryEnabled = true
+    @AppStorage("workingMemoryEnabled") private var workingMemoryEnabled = true
+    @AppStorage("episodicMemoryEnabled") private var episodicMemoryEnabled = true
+    @AppStorage("semanticMemoryEnabled") private var semanticMemoryEnabled = true
+    @AppStorage("workingMemoryCapacity") private var workingMemoryCapacity = 10
+    @AppStorage("episodicRetentionDays") private var episodicRetentionDays = 90
+    @AppStorage("semanticConsolidationEnabled") private var semanticConsolidationEnabled = true
+    @AppStorage("memoryCompressionRatio") private var memoryCompressionRatio = 0.7
+    @AppStorage("crossConversationMemory") private var crossConversationMemory = true
+    @AppStorage("memoryPrivacyMode") private var memoryPrivacyMode = "standard"
+    @AppStorage("autoForgetThreshold") private var autoForgetThreshold = 0.1
     
     var body: some View {
         Form {
             Section {
-                Toggle("Enable Cognitive Brain", isOn: $cognitiveBrainEnabled)
-                Text("AGI-like cognitive mesh with specialized brain regions")
+                Toggle("Enable Cortex Memory System", isOn: $cortexMemoryEnabled)
+                Text("Three-tier memory: Working, Episodic, and Semantic")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             } header: {
-                Label("Cognitive Brain System", systemImage: "brain")
+                Label("Cortex Memory", systemImage: "brain.head.profile")
             }
             
-            Section("Learning & Adaptation") {
-                Toggle("Enable Learning", isOn: $learningEnabled)
-                    .disabled(!cognitiveBrainEnabled)
-                Toggle("Enable Adaptation", isOn: $adaptationEnabled)
-                    .disabled(!cognitiveBrainEnabled)
+            Section("Memory Tiers") {
+                Toggle("Working Memory", isOn: $workingMemoryEnabled)
+                    .disabled(!cortexMemoryEnabled)
+                Text("Short-term context within conversation")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
                 
+                if workingMemoryEnabled && cortexMemoryEnabled {
+                    Stepper("Capacity: \(workingMemoryCapacity) items", value: $workingMemoryCapacity, in: 5...50)
+                }
+                
+                Toggle("Episodic Memory", isOn: $episodicMemoryEnabled)
+                    .disabled(!cortexMemoryEnabled)
+                Text("Long-term conversation history")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                
+                if episodicMemoryEnabled && cortexMemoryEnabled {
+                    Stepper("Retention: \(episodicRetentionDays) days", value: $episodicRetentionDays, in: 7...365, step: 7)
+                }
+                
+                Toggle("Semantic Memory", isOn: $semanticMemoryEnabled)
+                    .disabled(!cortexMemoryEnabled)
+                Text("Extracted facts and knowledge")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                
+                if semanticMemoryEnabled && cortexMemoryEnabled {
+                    Toggle("Auto-Consolidation", isOn: $semanticConsolidationEnabled)
+                }
+            }
+            
+            Section("Memory Processing") {
                 HStack {
-                    Text("Learning Rate")
+                    Text("Compression Ratio")
                     Spacer()
-                    Text(String(format: "%.3f", globalLearningRate))
+                    Text(String(format: "%.0f%%", memoryCompressionRatio * 100))
                         .foregroundStyle(.secondary)
                 }
-                Slider(value: $globalLearningRate, in: 0...0.1, step: 0.001)
-                    .disabled(!cognitiveBrainEnabled || !learningEnabled)
-                
-                Stepper("Memory Retention: \(memoryRetentionDays) days", value: $memoryRetentionDays, in: 7...365, step: 7)
-                    .disabled(!cognitiveBrainEnabled)
-            }
-            
-            Section("Cognitive Capabilities") {
-                Toggle("Metacognition", isOn: $enableMetacognition)
-                Text("Self-awareness of knowledge and limitations")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                
-                Toggle("Theory of Mind", isOn: $enableTheoryOfMind)
-                Text("Model user mental state and anticipate needs")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                
-                Toggle("Creative Synthesis", isOn: $enableCreativeSynthesis)
-                Text("Generate novel ideas by combining concepts")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                
-                Toggle("Self-Correction", isOn: $enableSelfCorrection)
-                Text("Detect and fix errors during processing")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-            .disabled(!cognitiveBrainEnabled)
-            
-            Section("Performance Limits") {
-                Stepper("Max Concurrent Regions: \(maxConcurrentRegions)", value: $maxConcurrentRegions, in: 1...10)
+                Slider(value: $memoryCompressionRatio, in: 0.5...0.95, step: 0.05)
+                    .disabled(!cortexMemoryEnabled)
                 
                 HStack {
-                    Text("Max Tokens per Request")
+                    Text("Auto-Forget Threshold")
                     Spacer()
-                    TextField("Tokens", value: $maxTokensPerRequest, format: .number)
-                        .textFieldStyle(.roundedBorder)
-                        .frame(width: 100)
+                    Text(String(format: "%.0f%%", autoForgetThreshold * 100))
+                        .foregroundStyle(.secondary)
                 }
-            }
-            .disabled(!cognitiveBrainEnabled)
-            
-            Section("Cost Controls") {
-                HStack {
-                    Text("Daily Cost Limit")
-                    Spacer()
-                    Text("$")
-                    TextField("Amount", value: Binding(
-                        get: { Double(dailyCostLimitCents) / 100.0 },
-                        set: { dailyCostLimitCents = Int($0 * 100) }
-                    ), format: .number.precision(.fractionLength(2)))
-                        .textFieldStyle(.roundedBorder)
-                        .frame(width: 100)
-                }
-            }
-            .disabled(!cognitiveBrainEnabled)
-            
-            Section("Brain Regions") {
-                BrainRegionRow(name: "Reasoning Engine", function: "prefrontal_cortex", model: "claude-3-5-sonnet", icon: "lightbulb", color: .purple)
-                BrainRegionRow(name: "Memory Center", function: "hippocampus", model: "text-embedding-3-large", icon: "cylinder", color: .cyan)
-                BrainRegionRow(name: "Language Production", function: "broca_area", model: "gpt-4o", icon: "text.bubble", color: .green)
-                BrainRegionRow(name: "Emotional Intelligence", function: "amygdala", model: "gpt-4o-mini", icon: "heart", color: .red)
-                BrainRegionRow(name: "Visual Processing", function: "visual_cortex", model: "claude-3-5-sonnet-vision", icon: "eye", color: .orange)
-                BrainRegionRow(name: "Procedural Skills", function: "cerebellum", model: "claude-3-5-sonnet-code", icon: "chevron.left.forwardslash.chevron.right", color: .pink)
-                BrainRegionRow(name: "Creative Synthesis", function: "default_mode_network", model: "claude-3-5-sonnet", icon: "sparkles", color: .purple)
-                
-                Text("Configure brain regions in the Admin Dashboard")
+                Slider(value: $autoForgetThreshold, in: 0.05...0.3, step: 0.05)
+                    .disabled(!cortexMemoryEnabled)
+                Text("Memories below this importance are automatically pruned")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+            }
+            
+            Section("Privacy & Sharing") {
+                Toggle("Cross-Conversation Memory", isOn: $crossConversationMemory)
+                    .disabled(!cortexMemoryEnabled)
+                Text("Allow memory to persist across conversations")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                
+                Picker("Privacy Mode", selection: $memoryPrivacyMode) {
+                    Text("Standard").tag("standard")
+                    Text("Enhanced").tag("enhanced")
+                    Text("Ephemeral").tag("ephemeral")
+                }
+                .disabled(!cortexMemoryEnabled)
+            }
+            
+            Section {
+                MemoryTierStatusRow(tier: "Working", icon: "bolt.fill", color: .yellow, status: workingMemoryEnabled ? "Active" : "Disabled")
+                MemoryTierStatusRow(tier: "Episodic", icon: "clock.fill", color: .blue, status: episodicMemoryEnabled ? "Active" : "Disabled")
+                MemoryTierStatusRow(tier: "Semantic", icon: "brain", color: .purple, status: semanticMemoryEnabled ? "Active" : "Disabled")
+                
+                Text("Configure detailed memory settings in Think Tank Admin")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            } header: {
+                Text("Memory Status")
             }
         }
         .formStyle(.grouped)
@@ -171,12 +558,11 @@ struct CognitiveBrainSettingsView: View {
     }
 }
 
-struct BrainRegionRow: View {
-    let name: String
-    let function: String
-    let model: String
+struct MemoryTierStatusRow: View {
+    let tier: String
     let icon: String
     let color: Color
+    let status: String
     
     var body: some View {
         HStack(spacing: 12) {
@@ -186,259 +572,205 @@ struct BrainRegionRow: View {
                 .frame(width: 24)
             
             VStack(alignment: .leading, spacing: 2) {
-                Text(name)
+                Text("\(tier) Memory")
                     .font(.subheadline.weight(.medium))
-                HStack(spacing: 8) {
-                    Text(function)
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                    Text("•")
-                        .foregroundStyle(.secondary)
-                    Text(model)
-                        .font(.caption2.monospaced())
-                        .foregroundStyle(.secondary)
-                }
+                Text(status)
+                    .font(.caption)
+                    .foregroundStyle(status == "Active" ? .green : .secondary)
             }
             
             Spacer()
             
             Circle()
-                .fill(.green)
+                .fill(status == "Active" ? .green : .gray)
                 .frame(width: 8, height: 8)
         }
         .padding(.vertical, 4)
     }
 }
 
-// MARK: - Advanced Cognition Settings
+// MARK: - Curator Settings (Knowledge Graph Curation)
 
-struct AdvancedCognitionSettingsView: View {
-    // Causal Reasoning
-    @AppStorage("causalReasoningEnabled") private var causalReasoningEnabled = true
-    @AppStorage("causalConfidenceThreshold") private var causalConfidenceThreshold = 0.6
-    @AppStorage("maxCausalChainDepth") private var maxCausalChainDepth = 5
-    @AppStorage("counterfactualEnabled") private var counterfactualEnabled = true
+struct CuratorSettingsView: View {
+    // Curator Core
+    @AppStorage("curatorEnabled") private var curatorEnabled = true
+    @AppStorage("autoIndexEnabled") private var autoIndexEnabled = true
+    @AppStorage("indexingSchedule") private var indexingSchedule = "realtime"
     
-    // Memory Consolidation
-    @AppStorage("memoryConsolidationEnabled") private var consolidationEnabled = true
-    @AppStorage("consolidationSchedule") private var consolidationSchedule = "daily"
-    @AppStorage("consolidationHour") private var consolidationHour = 3
-    @AppStorage("compressionRatio") private var compressionRatio = 0.7
-    @AppStorage("importanceDecayRate") private var importanceDecayRate = 0.05
-    @AppStorage("autoPruneThreshold") private var autoPruneThreshold = 0.1
-    @AppStorage("autoResolveConflicts") private var autoResolveConflicts = true
+    // Knowledge Graph
+    @AppStorage("knowledgeGraphEnabled") private var knowledgeGraphEnabled = true
+    @AppStorage("entityExtractionEnabled") private var entityExtractionEnabled = true
+    @AppStorage("relationshipInferenceEnabled") private var relationshipInferenceEnabled = true
+    @AppStorage("graphDensityThreshold") private var graphDensityThreshold = 0.3
+    @AppStorage("maxGraphDepth") private var maxGraphDepth = 5
     
-    // Multimodal Binding
-    @AppStorage("multimodalBindingEnabled") private var multimodalBindingEnabled = true
-    @AppStorage("autoEmbedUploads") private var autoEmbedUploads = true
-    @AppStorage("crossModalSearchEnabled") private var crossModalSearchEnabled = true
-    @AppStorage("bindingQualityThreshold") private var bindingQualityThreshold = 0.7
+    // Document Processing
+    @AppStorage("documentChunkSize") private var documentChunkSize = 1000
+    @AppStorage("chunkOverlap") private var chunkOverlap = 200
+    @AppStorage("embeddingModel") private var embeddingModel = "text-embedding-3-large"
+    @AppStorage("autoSummarizeEnabled") private var autoSummarizeEnabled = true
     
-    // Skill Execution
-    @AppStorage("skillExecutionEnabled") private var skillExecutionEnabled = true
-    @AppStorage("autoSkillSuggestion") private var autoSkillSuggestion = true
-    @AppStorage("skillLearningEnabled") private var skillLearningEnabled = true
-    @AppStorage("maxSkillChainDepth") private var maxSkillChainDepth = 3
+    // Quality Control
+    @AppStorage("deduplicationEnabled") private var deduplicationEnabled = true
+    @AppStorage("similarityThreshold") private var similarityThreshold = 0.85
+    @AppStorage("factVerificationEnabled") private var factVerificationEnabled = false
+    @AppStorage("sourceAttributionEnabled") private var sourceAttributionEnabled = true
     
-    // Autonomous Agent
-    @AppStorage("autonomousEnabled") private var autonomousEnabled = false
-    @AppStorage("autonomousApprovalRequired") private var autonomousApprovalRequired = true
-    @AppStorage("maxAutonomousActionsPerDay") private var maxAutonomousActionsPerDay = 10
-    @AppStorage("maxAutonomousTokensPerDay") private var maxAutonomousTokensPerDay = 100000
-    @AppStorage("maxAutonomousApiCallsPerDay") private var maxAutonomousApiCallsPerDay = 500
-    
-    // Global Safety
-    @AppStorage("maxTokensPerOperation") private var maxTokensPerOperation = 50000
-    @AppStorage("maxApiCallsPerOperation") private var maxApiCallsPerOperation = 100
-    @AppStorage("operationTimeoutSeconds") private var operationTimeoutSeconds = 300
+    // Retrieval Settings
+    @AppStorage("hybridSearchEnabled") private var hybridSearchEnabled = true
+    @AppStorage("semanticWeight") private var semanticWeight = 0.7
+    @AppStorage("keywordWeight") private var keywordWeight = 0.3
+    @AppStorage("maxRetrievalResults") private var maxRetrievalResults = 10
+    @AppStorage("rerankingEnabled") private var rerankingEnabled = true
     
     var body: some View {
         Form {
-            // Causal Reasoning Section
+            // Curator Core Section
             Section {
-                Toggle("Enable Causal Reasoning", isOn: $causalReasoningEnabled)
-                Text("Do-calculus, interventions, and counterfactual simulation")
+                Toggle("Enable Curator", isOn: $curatorEnabled)
+                Text("Knowledge graph curation and document processing")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 
-                if causalReasoningEnabled {
-                    HStack {
-                        Text("Confidence Threshold")
-                        Spacer()
-                        Text(String(format: "%.0f%%", causalConfidenceThreshold * 100))
-                            .foregroundStyle(.secondary)
-                    }
-                    Slider(value: $causalConfidenceThreshold, in: 0.3...0.9, step: 0.05)
+                if curatorEnabled {
+                    Toggle("Auto-Index Documents", isOn: $autoIndexEnabled)
                     
-                    Stepper("Max Chain Depth: \(maxCausalChainDepth)", value: $maxCausalChainDepth, in: 2...10)
-                    
-                    Toggle("Enable Counterfactuals", isOn: $counterfactualEnabled)
-                }
-            } header: {
-                Label("Causal Reasoning", systemImage: "arrow.triangle.branch")
-            }
-            
-            // Memory Consolidation Section
-            Section {
-                Toggle("Enable Memory Consolidation", isOn: $consolidationEnabled)
-                Text("Compression, decay curves, and conflict resolution")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                
-                if consolidationEnabled {
-                    Picker("Schedule", selection: $consolidationSchedule) {
+                    Picker("Indexing Schedule", selection: $indexingSchedule) {
+                        Text("Real-time").tag("realtime")
                         Text("Hourly").tag("hourly")
                         Text("Daily").tag("daily")
-                        Text("Weekly").tag("weekly")
                         Text("Manual").tag("manual")
                     }
-                    
-                    if consolidationSchedule == "daily" {
-                        Stepper("Run at: \(consolidationHour):00 UTC", value: $consolidationHour, in: 0...23)
-                    }
-                    
-                    HStack {
-                        Text("Compression Ratio")
-                        Spacer()
-                        Text(String(format: "%.0f%%", compressionRatio * 100))
-                            .foregroundStyle(.secondary)
-                    }
-                    Slider(value: $compressionRatio, in: 0.5...0.9, step: 0.05)
-                    
-                    HStack {
-                        Text("Importance Decay Rate")
-                        Spacer()
-                        Text(String(format: "%.2f/day", importanceDecayRate))
-                            .foregroundStyle(.secondary)
-                    }
-                    Slider(value: $importanceDecayRate, in: 0.01...0.2, step: 0.01)
-                    
-                    HStack {
-                        Text("Auto-Prune Threshold")
-                        Spacer()
-                        Text(String(format: "%.0f%%", autoPruneThreshold * 100))
-                            .foregroundStyle(.secondary)
-                    }
-                    Slider(value: $autoPruneThreshold, in: 0.05...0.3, step: 0.05)
-                    
-                    Toggle("Auto-Resolve Conflicts", isOn: $autoResolveConflicts)
                 }
             } header: {
-                Label("Memory Consolidation", systemImage: "externaldrive.badge.timemachine")
+                Label("Curator", systemImage: "book.pages")
             }
             
-            // Multimodal Binding Section
+            // Knowledge Graph Section
             Section {
-                Toggle("Enable Multimodal Binding", isOn: $multimodalBindingEnabled)
-                Text("Shared embedding space and cross-modal retrieval")
+                Toggle("Enable Knowledge Graph", isOn: $knowledgeGraphEnabled)
+                    .disabled(!curatorEnabled)
+                Text("Entity extraction and relationship mapping")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 
-                if multimodalBindingEnabled {
-                    Toggle("Auto-Embed Uploads", isOn: $autoEmbedUploads)
-                    Toggle("Cross-Modal Search", isOn: $crossModalSearchEnabled)
+                if knowledgeGraphEnabled && curatorEnabled {
+                    Toggle("Entity Extraction", isOn: $entityExtractionEnabled)
+                    Toggle("Relationship Inference", isOn: $relationshipInferenceEnabled)
                     
                     HStack {
-                        Text("Quality Threshold")
+                        Text("Graph Density Threshold")
                         Spacer()
-                        Text(String(format: "%.0f%%", bindingQualityThreshold * 100))
+                        Text(String(format: "%.0f%%", graphDensityThreshold * 100))
                             .foregroundStyle(.secondary)
                     }
-                    Slider(value: $bindingQualityThreshold, in: 0.5...0.9, step: 0.05)
+                    Slider(value: $graphDensityThreshold, in: 0.1...0.7, step: 0.05)
+                    
+                    Stepper("Max Graph Depth: \(maxGraphDepth)", value: $maxGraphDepth, in: 2...10)
                 }
             } header: {
-                Label("Multimodal Binding", systemImage: "square.stack.3d.up")
+                Label("Knowledge Graph", systemImage: "point.3.connected.trianglepath.dotted")
             }
             
-            // Skill Execution Section
+            // Document Processing Section
             Section {
-                Toggle("Enable Skill Execution", isOn: $skillExecutionEnabled)
-                Text("Procedural memory replay and skill learning")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                
-                if skillExecutionEnabled {
-                    Toggle("Auto-Suggest Skills", isOn: $autoSkillSuggestion)
-                    Toggle("Enable Skill Learning", isOn: $skillLearningEnabled)
-                    Stepper("Max Skill Chain: \(maxSkillChainDepth)", value: $maxSkillChainDepth, in: 1...5)
-                }
-            } header: {
-                Label("Skill Execution", systemImage: "bolt.fill")
-            }
-            
-            // Autonomous Agent Section
-            Section {
-                Toggle("Enable Autonomous Agent", isOn: $autonomousEnabled)
                 HStack {
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .foregroundStyle(.orange)
-                    Text("Allows system to perform actions proactively")
+                    Text("Chunk Size")
+                    Spacer()
+                    TextField("Tokens", value: $documentChunkSize, format: .number)
+                        .textFieldStyle(.roundedBorder)
+                        .frame(width: 80)
+                    Text("tokens")
+                        .foregroundStyle(.secondary)
+                }
+                
+                HStack {
+                    Text("Chunk Overlap")
+                    Spacer()
+                    TextField("Tokens", value: $chunkOverlap, format: .number)
+                        .textFieldStyle(.roundedBorder)
+                        .frame(width: 80)
+                    Text("tokens")
+                        .foregroundStyle(.secondary)
+                }
+                
+                Picker("Embedding Model", selection: $embeddingModel) {
+                    Text("text-embedding-3-large").tag("text-embedding-3-large")
+                    Text("text-embedding-3-small").tag("text-embedding-3-small")
+                    Text("voyage-3").tag("voyage-3")
+                    Text("Self-Hosted").tag("self-hosted")
+                }
+                
+                Toggle("Auto-Summarize Documents", isOn: $autoSummarizeEnabled)
+            } header: {
+                Label("Document Processing", systemImage: "doc.text.magnifyingglass")
+            }
+            .disabled(!curatorEnabled)
+            
+            // Quality Control Section
+            Section {
+                Toggle("Deduplication", isOn: $deduplicationEnabled)
+                
+                if deduplicationEnabled {
+                    HStack {
+                        Text("Similarity Threshold")
+                        Spacer()
+                        Text(String(format: "%.0f%%", similarityThreshold * 100))
+                            .foregroundStyle(.secondary)
+                    }
+                    Slider(value: $similarityThreshold, in: 0.7...0.99, step: 0.01)
+                }
+                
+                Toggle("Fact Verification", isOn: $factVerificationEnabled)
+                Text("Cross-reference facts against trusted sources")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                
+                Toggle("Source Attribution", isOn: $sourceAttributionEnabled)
+            } header: {
+                Label("Quality Control", systemImage: "checkmark.seal")
+            }
+            .disabled(!curatorEnabled)
+            
+            // Retrieval Settings Section
+            Section {
+                Toggle("Hybrid Search", isOn: $hybridSearchEnabled)
+                Text("Combines semantic and keyword search")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                
+                if hybridSearchEnabled {
+                    HStack {
+                        Text("Semantic Weight")
+                        Spacer()
+                        Text(String(format: "%.0f%%", semanticWeight * 100))
+                            .foregroundStyle(.secondary)
+                    }
+                    Slider(value: $semanticWeight, in: 0...1, step: 0.1) { _ in
+                        keywordWeight = 1 - semanticWeight
+                    }
+                    
+                    Text("Keyword Weight: \(String(format: "%.0f%%", keywordWeight * 100))")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
                 
-                if autonomousEnabled {
-                    Toggle("Require Approval", isOn: $autonomousApprovalRequired)
-                    if !autonomousApprovalRequired {
-                        HStack {
-                            Image(systemName: "exclamationmark.shield.fill")
-                                .foregroundStyle(.red)
-                            Text("Actions will execute without user confirmation")
-                                .font(.caption)
-                                .foregroundStyle(.red)
-                        }
-                    }
-                    
-                    Stepper("Max Actions/Day: \(maxAutonomousActionsPerDay)", value: $maxAutonomousActionsPerDay, in: 1...100)
-                    
-                    HStack {
-                        Text("Max Tokens/Day")
-                        Spacer()
-                        TextField("Tokens", value: $maxAutonomousTokensPerDay, format: .number)
-                            .textFieldStyle(.roundedBorder)
-                            .frame(width: 100)
-                    }
-                    
-                    HStack {
-                        Text("Max API Calls/Day")
-                        Spacer()
-                        TextField("Calls", value: $maxAutonomousApiCallsPerDay, format: .number)
-                            .textFieldStyle(.roundedBorder)
-                            .frame(width: 100)
-                    }
-                }
-            } header: {
-                Label("Autonomous Agent", systemImage: "figure.walk.motion")
-            }
-            
-            // Global Safety Section
-            Section {
-                HStack {
-                    Text("Max Tokens per Operation")
-                    Spacer()
-                    TextField("Tokens", value: $maxTokensPerOperation, format: .number)
-                        .textFieldStyle(.roundedBorder)
-                        .frame(width: 100)
-                }
+                Stepper("Max Results: \(maxRetrievalResults)", value: $maxRetrievalResults, in: 5...50)
                 
-                HStack {
-                    Text("Max API Calls per Operation")
-                    Spacer()
-                    TextField("Calls", value: $maxApiCallsPerOperation, format: .number)
-                        .textFieldStyle(.roundedBorder)
-                        .frame(width: 80)
-                }
-                
-                Stepper("Operation Timeout: \(operationTimeoutSeconds)s", value: $operationTimeoutSeconds, in: 30...600, step: 30)
+                Toggle("Re-ranking", isOn: $rerankingEnabled)
+                Text("Use cross-encoder for result re-ranking")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             } header: {
-                Label("Global Safety Limits", systemImage: "shield.checkered")
+                Label("Retrieval", systemImage: "magnifyingglass")
             }
+            .disabled(!curatorEnabled)
             
             Section {
                 HStack {
                     Image(systemName: "info.circle")
                         .foregroundStyle(.blue)
-                    Text("Advanced settings are applied on next deployment. Fine-tune individual features in the Admin Dashboard.")
+                    Text("Curator settings are applied on next deployment. Manage knowledge sources in the Curator app.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }

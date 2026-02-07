@@ -4,7 +4,13 @@
 // Model Selection: Dynamic from metadata service with modes (Thinking, Deep Research, etc.)
 
 import { executeStatement } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'orchestration/patterns',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { modelRouterService } from './model-router.service';
 import { learningService } from './learning.service';
 import { modelMetadataService, ModelMetadata } from './model-metadata.service';
@@ -534,7 +540,8 @@ export class OrchestrationPatternsService {
     context: Record<string, unknown>,
     config: Record<string, unknown>,
     userModelPreferences?: Record<string, string>,
-    tenantModelPreferences?: Record<string, string>
+    tenantModelPreferences?: Record<string, string>,
+    tenantId?: string
   ): Promise<Omit<StepExecutionResult, 'iteration'>> {
     const startTime = Date.now();
     
@@ -575,6 +582,7 @@ export class OrchestrationPatternsService {
         messages: [{ role: 'user', content: prompt }],
         temperature: parameters.temperature as number | undefined,
         maxTokens: parameters.max_tokens as number | undefined,
+        tenantId,
       });
       
       output = {
@@ -1028,7 +1036,8 @@ export class OrchestrationPatternsService {
     context: Record<string, unknown>,
     parameters: Record<string, unknown>,
     input: Record<string, unknown>,
-    startTime: number
+    startTime: number,
+    tenantId?: string
   ): Promise<Omit<StepExecutionResult, 'iteration'>> {
     const parallelConfig = step.parallelExecution!;
     const timeoutMs = parallelConfig.timeoutMs || 30000;
@@ -1069,6 +1078,7 @@ export class OrchestrationPatternsService {
             messages: [{ role: 'user', content: prompt }],
             temperature: modeParams.temperature as number | undefined,
             maxTokens: modeParams.maxTokens as number | undefined,
+            tenantId,
             ...modeParams.extra,
           }),
           this.createTimeout(timeoutMs, modelId),
@@ -1329,7 +1339,7 @@ export class OrchestrationPatternsService {
     return response.toLowerCase().trim().replace(/[^\w\s]/g, '').substring(0, 200);
   }
 
-  private async mergeResponses(results: ParallelExecutionResult[]): Promise<string> {
+  private async mergeResponses(results: ParallelExecutionResult[], tenantId?: string): Promise<string> {
     if (results.length === 1) return results[0].response;
     
     // Use AI to synthesize multiple responses
@@ -1340,6 +1350,7 @@ export class OrchestrationPatternsService {
       
       const synthesisResponse = await modelRouterService.invoke({
         modelId: 'anthropic/claude-3-haiku',
+        tenantId,
         messages: [
           { 
             role: 'system', 
@@ -1631,6 +1642,7 @@ Your task is to:
     switch (method) {
       case 'invoke':
         const response = await modelRouterService.invoke({
+          tenantId: input.tenantId,
           modelId: String(parameters.modelId || input.modelId || 'anthropic/claude-3-5-sonnet'),
           messages: (input.messages as Array<{ role: 'user' | 'system' | 'assistant'; content: string }>) || [],
           maxTokens: Number(parameters.maxTokens || 4096),
@@ -1692,6 +1704,7 @@ Your task is to:
     switch (method) {
       case 'summarize':
         const summaryResponse = await modelRouterService.invoke({
+          tenantId: input.tenantId,
           modelId: 'anthropic/claude-3-5-sonnet',
           messages: [{ role: 'user', content: `Summarize this content concisely:\n\n${String(input.content || '')}` }],
           maxTokens: Number(parameters.maxTokens || 500),
@@ -1699,6 +1712,7 @@ Your task is to:
         return { summary: summaryResponse.content };
       case 'extractEntities':
         const entityResponse = await modelRouterService.invoke({
+          tenantId: input.tenantId,
           modelId: 'anthropic/claude-3-5-sonnet',
           messages: [{ 
             role: 'user', 
@@ -1709,6 +1723,7 @@ Your task is to:
         return { entities: entityResponse.content };
       case 'classify':
         const classifyResponse = await modelRouterService.invoke({
+          tenantId: input.tenantId,
           modelId: 'anthropic/claude-3-5-sonnet',
           messages: [{ 
             role: 'user', 

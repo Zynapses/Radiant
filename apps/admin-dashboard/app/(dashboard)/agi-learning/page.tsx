@@ -1,7 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Brain, Play, Pause, Settings, DollarSign, Clock, Calendar, TrendingUp, Zap } from 'lucide-react';
+import { Brain, Play, Pause, Settings, DollarSign, Clock, Calendar, TrendingUp, Zap, Loader2 } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 type ThrottleLevel = 'off' | 'minimal' | 'low' | 'medium' | 'high' | 'maximum';
 
@@ -10,10 +15,10 @@ interface LearningConfig { enabled: boolean; throttleLevel: ThrottleLevel; maxHo
 interface LearningStatus { isRunning: boolean; currentThrottle: ThrottleLevel; lastLearningAt?: string; samplesProcessedToday: number; costs: LearningCosts; config: LearningConfig; }
 
 const THROTTLE_LABELS: Record<ThrottleLevel, { label: string; color: string; desc: string }> = {
-  off: { label: 'Off', color: 'bg-gray-500', desc: 'Learning disabled' },
+  off: { label: 'Off', color: 'bg-muted-foreground/50', desc: 'Learning disabled' },
   minimal: { label: 'Minimal', color: 'bg-blue-400', desc: '10% capacity' },
-  low: { label: 'Low', color: 'bg-green-500', desc: '25% capacity' },
-  medium: { label: 'Medium', color: 'bg-yellow-500', desc: '50% capacity' },
+  low: { label: 'Low', color: 'bg-emerald-500', desc: '25% capacity' },
+  medium: { label: 'Medium', color: 'bg-amber-500', desc: '50% capacity' },
   high: { label: 'High', color: 'bg-orange-500', desc: '75% capacity' },
   maximum: { label: 'Maximum', color: 'bg-red-500', desc: '100% capacity' },
 };
@@ -59,9 +64,23 @@ export default function AGILearningPage() {
     setSaving(false);
   }
 
-  if (loading) return <div className="flex items-center justify-center h-96"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600" /></div>;
-  if (error) return <div className="flex flex-col items-center justify-center h-96 text-red-500"><p className="text-lg font-medium">Error</p><p className="text-sm">{error}</p><button onClick={loadStatus} className="mt-4 px-4 py-2 bg-purple-600 text-white rounded-lg">Retry</button></div>;
-  if (!status) return <div className="flex items-center justify-center h-96 text-gray-500">No learning status available</div>;
+  if (loading) return (
+    <div className="flex items-center justify-center h-96">
+      <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+    </div>
+  );
+
+  if (error) return (
+    <div className="flex flex-col items-center justify-center h-96 text-destructive">
+      <p className="text-lg font-medium">Error</p>
+      <p className="text-sm text-muted-foreground">{error}</p>
+      <Button onClick={loadStatus} className="mt-4">Retry</Button>
+    </div>
+  );
+
+  if (!status) return (
+    <div className="flex items-center justify-center h-96 text-muted-foreground">No learning status available</div>
+  );
 
   const costs = status.costs;
 
@@ -69,28 +88,40 @@ export default function AGILearningPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2"><Brain className="h-7 w-7 text-purple-500" /> AGI Background Learning</h1>
-          <p className="text-sm text-gray-500 mt-1">Monitor and control continuous learning with cost throttling</p>
+          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
+            <Brain className="h-7 w-7 text-primary" />
+            AGI Background Learning
+          </h1>
+          <p className="text-muted-foreground mt-1">Monitor and control continuous learning with cost throttling</p>
         </div>
-        <button onClick={toggleLearning} className={`flex items-center gap-2 px-4 py-2 rounded-lg text-white ${status.isRunning ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'}`}>
-          {status.isRunning ? <><Pause className="h-4 w-4" /> Pause Learning</> : <><Play className="h-4 w-4" /> Start Learning</>}
-        </button>
+        <Button
+          variant={status.isRunning ? 'destructive' : 'default'}
+          onClick={toggleLearning}
+        >
+          {status.isRunning ? <><Pause className="h-4 w-4 mr-2" /> Pause Learning</> : <><Play className="h-4 w-4 mr-2" /> Start Learning</>}
+        </Button>
       </div>
 
       {/* Status Banner */}
-      <div className={`p-4 rounded-xl ${status.isRunning ? 'bg-green-50 border border-green-200 dark:bg-green-900/20' : 'bg-gray-50 border border-gray-200 dark:bg-gray-800'}`}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className={`h-3 w-3 rounded-full ${status.isRunning ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`} />
-            <span className="font-medium">{status.isRunning ? 'Learning Active' : 'Learning Paused'}</span>
-            <span className="text-sm text-gray-500">• Throttle: {THROTTLE_LABELS[status.currentThrottle].label}</span>
+      <Card className={status.isRunning ? 'border-emerald-500/30 bg-emerald-500/5' : ''}>
+        <CardContent className="py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className={`h-3 w-3 rounded-full ${status.isRunning ? 'bg-emerald-500 animate-pulse' : 'bg-muted-foreground/30'}`} />
+              <span className="font-medium">{status.isRunning ? 'Learning Active' : 'Learning Paused'}</span>
+              <Badge variant="secondary">{THROTTLE_LABELS[status.currentThrottle].label}</Badge>
+            </div>
+            {status.lastLearningAt && (
+              <span className="text-sm text-muted-foreground">
+                Last activity: {new Date(status.lastLearningAt).toLocaleString()}
+              </span>
+            )}
           </div>
-          {status.lastLearningAt && <span className="text-sm text-gray-500">Last activity: {new Date(status.lastLearningAt).toLocaleString()}</span>}
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       {/* Cost Cards */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <CostCard title="This Hour" value={costs.currentHour} limit={status.config.maxHourlyCostCents} icon={Clock} />
         <CostCard title="Today" value={costs.currentDay} limit={status.config.maxDailyCostCents} icon={Calendar} />
         <CostCard title="This Month" value={costs.currentMonth} limit={status.config.maxMonthlyCostCents} icon={TrendingUp} />
@@ -98,58 +129,91 @@ export default function AGILearningPage() {
       </div>
 
       {/* Throttle Control */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border p-6">
-        <h2 className="text-lg font-semibold mb-4 flex items-center gap-2"><Zap className="h-5 w-5 text-yellow-500" /> Learning Throttle</h2>
-        <div className="grid grid-cols-6 gap-2">
-          {(Object.keys(THROTTLE_LABELS) as ThrottleLevel[]).map(level => (
-            <button key={level} onClick={() => updateThrottle(level)} disabled={saving}
-              className={`p-3 rounded-lg border-2 transition-all ${status.currentThrottle === level ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/30' : 'border-gray-200 hover:border-gray-300'}`}>
-              <div className={`h-2 rounded-full mb-2 ${THROTTLE_LABELS[level].color}`} />
-              <div className="font-medium text-sm">{THROTTLE_LABELS[level].label}</div>
-              <div className="text-xs text-gray-500">{THROTTLE_LABELS[level].desc}</div>
-            </button>
-          ))}
-        </div>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Zap className="h-5 w-5 text-amber-500" />
+            Learning Throttle
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+            {(Object.keys(THROTTLE_LABELS) as ThrottleLevel[]).map(level => (
+              <button
+                key={level}
+                onClick={() => updateThrottle(level)}
+                disabled={saving}
+                className={`p-3 rounded-lg border-2 transition-all text-left ${
+                  status.currentThrottle === level
+                    ? 'border-primary bg-primary/5'
+                    : 'border-border hover:border-primary/30'
+                }`}
+              >
+                <div className={`h-2 rounded-full mb-2 ${THROTTLE_LABELS[level].color}`} />
+                <div className="font-medium text-sm">{THROTTLE_LABELS[level].label}</div>
+                <div className="text-xs text-muted-foreground">{THROTTLE_LABELS[level].desc}</div>
+              </button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Cost Limits */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border p-6">
-        <h2 className="text-lg font-semibold mb-4 flex items-center gap-2"><Settings className="h-5 w-5 text-gray-500" /> Cost Limits</h2>
-        <div className="grid grid-cols-3 gap-6">
-          <LimitInput label="Max Hourly (¢)" value={status.config.maxHourlyCostCents} onChange={v => updateConfig({ maxHourlyCostCents: v })} />
-          <LimitInput label="Max Daily (¢)" value={status.config.maxDailyCostCents} onChange={v => updateConfig({ maxDailyCostCents: v })} />
-          <LimitInput label="Max Monthly (¢)" value={status.config.maxMonthlyCostCents} onChange={v => updateConfig({ maxMonthlyCostCents: v })} />
-        </div>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Settings className="h-5 w-5 text-muted-foreground" />
+            Cost Limits
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <LimitInput label="Max Hourly (¢)" value={status.config.maxHourlyCostCents} onChange={v => updateConfig({ maxHourlyCostCents: v })} />
+            <LimitInput label="Max Daily (¢)" value={status.config.maxDailyCostCents} onChange={v => updateConfig({ maxDailyCostCents: v })} />
+            <LimitInput label="Max Monthly (¢)" value={status.config.maxMonthlyCostCents} onChange={v => updateConfig({ maxMonthlyCostCents: v })} />
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
 
 function CostCard({ title, value, limit, icon: Icon }: { title: string; value: number; limit: number | null; icon: React.ElementType }) {
   const pct = limit ? (value / limit) * 100 : 0;
-  const color = pct > 80 ? 'text-red-500' : pct > 50 ? 'text-yellow-500' : 'text-green-500';
+  const color = pct > 80 ? 'text-red-500' : pct > 50 ? 'text-amber-500' : 'text-emerald-500';
+  const barColor = pct > 80 ? 'bg-red-500' : pct > 50 ? 'bg-amber-500' : 'bg-emerald-500';
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border p-4">
-      <div className="flex items-center gap-2 mb-2"><Icon className="h-4 w-4 text-gray-400" /><span className="text-sm text-gray-500">{title}</span></div>
-      <div className="text-2xl font-bold">${(value / 100).toFixed(2)}</div>
-      {limit && (
-        <div className="mt-2">
-          <div className="flex justify-between text-xs mb-1"><span className={color}>{pct.toFixed(0)}% used</span><span className="text-gray-400">/${(limit / 100).toFixed(2)}</span></div>
-          <div className="h-1.5 bg-gray-200 rounded-full"><div className={`h-full rounded-full ${pct > 80 ? 'bg-red-500' : pct > 50 ? 'bg-yellow-500' : 'bg-green-500'}`} style={{ width: `${Math.min(pct, 100)}%` }} /></div>
+    <Card>
+      <CardContent className="pt-6">
+        <div className="flex items-center gap-2 mb-2">
+          <Icon className="h-4 w-4 text-muted-foreground" />
+          <span className="text-sm text-muted-foreground">{title}</span>
         </div>
-      )}
-    </div>
+        <div className="text-2xl font-bold">${(value / 100).toFixed(2)}</div>
+        {limit && (
+          <div className="mt-2">
+            <div className="flex justify-between text-xs mb-1">
+              <span className={color}>{pct.toFixed(0)}% used</span>
+              <span className="text-muted-foreground">/${(limit / 100).toFixed(2)}</span>
+            </div>
+            <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+              <div className={`h-full rounded-full ${barColor}`} style={{ width: `${Math.min(pct, 100)}%` }} />
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }
 
 function LimitInput({ label, value, onChange }: { label: string; value: number; onChange: (v: number) => void }) {
   const [v, setV] = useState(value);
   return (
-    <div>
-      <label className="block text-sm font-medium mb-1">{label}</label>
+    <div className="space-y-2">
+      <Label>{label}</Label>
       <div className="flex gap-2">
-        <input type="number" value={v} onChange={e => setV(+e.target.value)} className="flex-1 px-3 py-2 border rounded-lg" />
-        <button onClick={() => onChange(v)} className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">Save</button>
+        <Input type="number" value={v} onChange={e => setV(+e.target.value)} />
+        <Button onClick={() => onChange(v)}>Save</Button>
       </div>
     </div>
   );

@@ -22,7 +22,13 @@
  */
 
 import { executeStatement, stringParam, boolParam } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'ethics/enforcement',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { ethicsPipelineService, EthicsPipelineResult } from './ethics-pipeline.service';
 
 // ============================================================================

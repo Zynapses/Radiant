@@ -3,7 +3,13 @@
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { getPoolClient } from '../shared/db/centralized-pool';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'admin/pricing',
+  category: 'audit',
+  sourceType: 'lambda',
+});
 import { UnauthorizedError, ForbiddenError, ValidationError } from '../shared/errors';
 import { corsHeaders } from '../shared/middleware/api-response';
 

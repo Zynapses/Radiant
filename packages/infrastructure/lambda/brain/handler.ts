@@ -4,7 +4,13 @@ import { extractUserFromEvent, type AuthContext } from '../shared/auth';
 import { UnauthorizedError, NotFoundError, ValidationError } from '../shared/errors';
 import { brainRouter, type TaskType } from '../shared/services';
 import { executeStatement } from '../shared/db/client';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'brain/handler',
+  category: 'infrastructure',
+  sourceType: 'lambda',
+});
 
 interface RouteRequest {
   taskType: TaskType;

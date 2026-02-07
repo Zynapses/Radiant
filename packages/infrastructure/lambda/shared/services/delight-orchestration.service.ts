@@ -5,9 +5,13 @@
 
 import { delightService, type OrchestrationDelightContext, type DelightMessageResponse, type TimeContext } from './delight.service';
 import type { AGIBrainPlan, PlanStep, OrchestrationMode, StepType } from './agi-brain-planner.service';
-import { enhancedLogger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
 
-const logger = enhancedLogger;
+const logger = createRegisteredLogger({
+  serviceName: 'delight/orchestration',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 // ============================================================================
 // Types

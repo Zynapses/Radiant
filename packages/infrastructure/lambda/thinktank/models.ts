@@ -4,7 +4,13 @@
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { getPoolClient } from '../shared/db/centralized-pool';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'thinktank/models',
+  category: 'application',
+  sourceType: 'lambda',
+});
 import { UnauthorizedError, ValidationError } from '../shared/errors';
 import { corsHeaders } from '../shared/middleware/api-response';
 import { domainTaxonomyService } from '../shared/services';

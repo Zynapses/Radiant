@@ -3,7 +3,13 @@
 // Learns from conversion outcomes to improve future decisions
 
 import { executeStatement, stringParam } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'file/conversion-learning',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { v4 as uuidv4 } from 'uuid';
 
 // ============================================================================

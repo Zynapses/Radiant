@@ -3,7 +3,13 @@
 
 import { SageMakerRuntimeClient, InvokeEndpointCommand } from '@aws-sdk/client-sagemaker-runtime';
 import { executeStatement } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'ml/training',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 const sagemakerClient = new SageMakerRuntimeClient({});
 

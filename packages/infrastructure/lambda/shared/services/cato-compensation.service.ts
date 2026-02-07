@@ -11,7 +11,13 @@ import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
 import { SNSClient, PublishCommand } from '@aws-sdk/client-sns';
 import { CatoCompensationType, CatoCompensationEntry, CatoAffectedResource } from '@radiant/shared';
 import { CatoToolRegistryService } from './cato-tool-registry.service';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'cato/compensation',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 const lambdaClient = new LambdaClient({});
 const snsClient = new SNSClient({});

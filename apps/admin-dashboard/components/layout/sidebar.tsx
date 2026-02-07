@@ -61,6 +61,22 @@ import {
   Thermometer,
   Network,
   Database,
+  Cloud,
+  Archive,
+  Package,
+  Eye,
+  Boxes,
+  KeyRound,
+  Handshake,
+  Link2,
+  Fingerprint,
+  Radar,
+  Weight,
+  Timer,
+  Antenna,
+  BookOpen,
+  Swords,
+  Snowflake,
 } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -86,7 +102,9 @@ const navigation: NavigationItem[] = [
   // AI & Models Section
   { type: 'separator', label: 'AI & Models' },
   { name: 'Models', href: '/models', icon: Cpu },
+  { name: 'Model Registry', href: '/model-registry', icon: BookOpen },
   { name: 'LoRA Adapters', href: '/lora', icon: Layers },
+  { name: 'LoRA Detail', href: '/models/lora-adapters', icon: Layers },
   { name: 'Inference Components', href: '/inference-components', icon: Thermometer },
   { name: 'Model Pricing', href: '/models/pricing', icon: DollarSign },
   { name: 'Model Metadata', href: '/model-metadata', icon: FileText },
@@ -111,6 +129,11 @@ const navigation: NavigationItem[] = [
   // Orchestration Section
   { type: 'separator', label: 'Orchestration' },
   { name: 'Orchestration', href: '/orchestration', icon: Brain },
+  { name: 'Model Weights', href: '/orchestration/model-weights', icon: Weight },
+  { name: 'Drift Control', href: '/orchestration/drift-control', icon: Activity },
+  { name: 'Inference Cache', href: '/orchestration/inference-cache', icon: Database },
+  { name: 'Model Consensus', href: '/orchestration/consensus', icon: Handshake },
+  { name: 'Templates', href: '/orchestration/templates', icon: Workflow },
   { name: 'HITL Orchestration', href: '/hitl-orchestration', icon: UsersRound },
   { name: 'Workflows', href: '/orchestration/workflows', icon: Workflow },
   { name: 'Pre-Prompts', href: '/orchestration/preprompts', icon: ListChecks },
@@ -120,12 +143,31 @@ const navigation: NavigationItem[] = [
   { name: 'Patterns', href: '/orchestration-patterns', icon: Layers },
   { name: 'Pattern Editor', href: '/orchestration-patterns/editor', icon: Edit3 },
   
+  // Platform Section
+  { type: 'separator', label: 'Platform' },
+  { name: 'Bedrock Settings', href: '/platform/bedrock-settings', icon: Cloud },
+  { name: 'User Data (UDS)', href: '/platform/uds', icon: Database },
+  { name: 'Cartridge Ops', href: '/platform/cartridge-operations', icon: Package },
+  { name: 'System Cartridges', href: '/platform/system-cartridges', icon: Boxes },
+  { name: 'Crucible', href: '/platform/crucible', icon: FlaskConical },
+  { name: 'Deployer Sync', href: '/platform/deployer-sync', icon: Antenna },
+  { name: 'LIVS', href: '/platform/livs', icon: Eye },
+  { name: 'Organism', href: '/platform/organism', icon: Radar },
+  { name: 'PKI', href: '/platform/pki', icon: Fingerprint },
+  { name: 'RNIR', href: '/platform/rnir', icon: Network },
+  { name: 'Snapshots', href: '/platform/snapshots', icon: Timer },
+  { name: 'Vault', href: '/platform/vault', icon: Archive },
+  { name: 'MLS Encryption', href: '/platform/mls', icon: Lock },
+  { name: 'State Registry', href: '/platform/state-registry', icon: Database },
+  
   // System Section
   { type: 'separator', label: 'System' },
   { name: 'System Overview', href: '/system/overview', icon: Activity },
   { name: 'Gateway Config', href: '/system/gateway', icon: Zap },
+  { name: 'Ghost Inference', href: '/system/ghost-inference', icon: Cpu },
   { name: 'Infrastructure Tier', href: '/system/infrastructure', icon: Server },
   { name: 'PostgreSQL Scaling', href: '/infrastructure/postgresql-scaling', icon: Database },
+  { name: 'Neural Operations', href: '/neural-operations', icon: Brain },
   
   // Memory Section
   { type: 'separator', label: 'Memory' },
@@ -134,6 +176,8 @@ const navigation: NavigationItem[] = [
   { name: 'Graph Explorer', href: '/cortex/graph', icon: Network },
   { name: 'Conflicts', href: '/cortex/conflicts', icon: GitPullRequest },
   { name: 'GDPR Erasure', href: '/cortex/gdpr', icon: Shield },
+  { name: 'Anticipatory', href: '/memory/anticipatory', icon: Sparkles },
+  { name: 'Retention', href: '/memory/retention', icon: Timer },
   
   // AGI & Cognition Section
   { type: 'separator', label: 'AGI & Cognition' },
@@ -150,10 +194,15 @@ const navigation: NavigationItem[] = [
   { name: 'Consciousness', href: '/consciousness', icon: Sparkles },
   { name: 'Ego System', href: '/ego', icon: Heart },
   { name: 'Empiricism', href: '/empiricism', icon: FlaskConical },
-  { name: 'Cato', href: '/cato', icon: Heart },
-  { name: 'Cato Global', href: '/cato', icon: GlobeIcon },
+  { name: 'Blackboard', href: '/blackboard', icon: Edit3 },
+  { name: 'AXIOM', href: '/axiom', icon: Target },
+  
+  // Cato Section
+  { type: 'separator', label: 'Cato' },
+  { name: 'Cato Dashboard', href: '/cato', icon: Heart },
   { name: 'Cato Genesis', href: '/cato/genesis', icon: Rocket },
-  { name: 'Cato Safety', href: '/cato', icon: ShieldCheck },
+  { name: 'Cato Safety', href: '/cato/safety', icon: ShieldCheck },
+  { name: 'Cato Governance', href: '/cato/governance', icon: Shield },
   { name: 'Cato Pipeline', href: '/cato/pipeline', icon: Workflow },
   { name: 'Cato Methods', href: '/cato/methods', icon: Route },
   { name: 'Cato Checkpoints', href: '/cato/checkpoints', icon: ListChecks },
@@ -161,7 +210,17 @@ const navigation: NavigationItem[] = [
   { name: 'Cato Recovery', href: '/cato/recovery', icon: Activity },
   { name: 'Cato Audit', href: '/cato/audit', icon: FileText },
   { name: 'Cato Advanced', href: '/cato/advanced', icon: Settings },
+  { name: 'Cognitive Precision', href: '/cato/cognitive-precision', icon: Target },
+  { name: 'LIVS Policy', href: '/cato/livs-policy', icon: Eye },
+  { name: 'War Room', href: '/cato/war-room', icon: AlertTriangle },
   { name: 'Scout HITL', href: '/cato/scout-hitl', icon: Compass },
+  { name: 'Cato Twilight', href: '/cato-twilight', icon: Clock },
+  { name: 'Council of Rivals', href: '/cato/council', icon: Swords },
+  { name: 'Cato Dialogue', href: '/cato/dialogue', icon: MessageSquare },
+  { name: 'Safety Matrix', href: '/safety-matrix', icon: ShieldCheck },
+  
+  // Consciousness Section
+  { type: 'separator', label: 'Consciousness' },
   { name: 'Engine', href: '/consciousness/engine', icon: Cpu },
   { name: 'Empiricism Loop', href: '/consciousness/empiricism', icon: Beaker },
   { name: 'Ethics-Free', href: '/consciousness/ethics-free', icon: Brain },
@@ -189,10 +248,8 @@ const navigation: NavigationItem[] = [
   { name: 'Ethics', href: '/ethics', icon: Heart },
   { name: 'Moral Compass', href: '/moral-compass', icon: Compass },
   { name: 'Domain Ethics', href: '/domain-ethics', icon: Shield },
+  { name: 'Domain Experts', href: '/domain-experts', icon: Star },
   { name: 'Ethics-Free Mode', href: '/ethics-free-reasoning', icon: AlertTriangle },
-  
-  // Think Tank Section - REMOVED: Think Tank is now a separate app (apps/thinktank-admin)
-  // See docs/APP-ISOLATION-ARCHITECTURE.md for details
   
   // Analytics & Reports Section
   { type: 'separator', label: 'Analytics' },
@@ -200,13 +257,17 @@ const navigation: NavigationItem[] = [
   { name: 'Metrics', href: '/metrics', icon: Gauge },
   { name: 'Rejections', href: '/analytics/rejections', icon: AlertTriangle },
   { name: 'Reports', href: '/reports', icon: FileBarChart },
+  { name: 'Dynamic Reports', href: '/reports/dynamic', icon: FileBarChart },
+  { name: 'Scheduled Reports', href: '/reports/scheduled', icon: Clock },
   { name: 'SaaS Metrics', href: '/saas-metrics', icon: TrendingUp },
   { name: 'Revenue', href: '/revenue', icon: DollarSign },
   { name: 'Costs', href: '/costs', icon: CreditCard },
   { name: 'AWS Costs', href: '/aws-costs', icon: DollarSign },
+  { name: 'Spend Governor', href: '/spend-governor', icon: Snowflake },
   
   // Operations Section
   { type: 'separator', label: 'Operations' },
+  { name: 'SENTINEL', href: '/sentinel', icon: Bell },
   { name: 'Gateway', href: '/gateway', icon: Network },
   { name: 'Code Quality', href: '/code-quality', icon: FlaskConical },
   { name: 'Time Machine', href: '/time-machine', icon: History },
@@ -216,6 +277,9 @@ const navigation: NavigationItem[] = [
   { name: 'Services', href: '/services', icon: Server },
   { name: 'Multi-Region', href: '/multi-region', icon: Map },
   { name: 'Geographic', href: '/geographic', icon: GlobeIcon },
+  { name: 'Collaborate', href: '/collaborate', icon: UsersRound },
+  { name: 'Snapshots', href: '/snapshots', icon: Timer },
+  { name: 'Cartridges', href: '/cartridges', icon: Package },
   
   // Security & Compliance Section
   { type: 'separator', label: 'Security' },
@@ -226,17 +290,24 @@ const navigation: NavigationItem[] = [
   { name: 'Sec Advanced', href: '/security/advanced', icon: Lock },
   { name: 'Attack Defense', href: '/security/attacks', icon: Shield },
   { name: 'Sec Feedback', href: '/security/feedback', icon: MessageSquare },
+  { name: 'Sec Policies', href: '/security/policies', icon: FileText },
   { name: 'Compliance', href: '/compliance', icon: ShieldCheck },
+  { name: 'Log Retention', href: '/log-retention', icon: Archive },
   { name: 'Violations', href: '/compliance/violations', icon: AlertTriangle },
   { name: 'Checklists', href: '/compliance/checklists', icon: ListChecks },
   { name: 'Self-Audit', href: '/compliance/self-audit', icon: Activity },
   { name: 'Reg Standards', href: '/compliance/regulatory-standards', icon: FileBarChart },
+  
+  // Users & Access Section
+  { type: 'separator', label: 'Users & Access' },
+  { name: 'My Profile', href: '/profile', icon: UserCircle },
   { name: 'Tenants', href: '/tenants', icon: Users },
   { name: 'Administrators', href: '/administrators', icon: Users },
   { name: 'Users', href: '/users', icon: UsersRound },
   { name: 'User Registry', href: '/user-registry', icon: FileText },
   { name: 'Invitations', href: '/invitations', icon: Bell },
   { name: 'Approvals', href: '/approvals', icon: ShieldCheck },
+  { name: 'API Keys', href: '/api-keys', icon: Key },
   { name: 'Audit Logs', href: '/audit-logs', icon: FileText },
   { name: 'AWS Logs', href: '/aws-logs', icon: ScrollText },
   
@@ -248,7 +319,13 @@ const navigation: NavigationItem[] = [
   
   // Settings Section
   { type: 'separator', label: 'Settings' },
+  { name: 'Settings', href: '/settings', icon: Settings },
+  { name: 'URLs', href: '/settings/urls', icon: Link2 },
+  { name: 'Security Settings', href: '/settings/security', icon: Lock },
+  { name: 'Collaboration', href: '/settings/collaboration', icon: UsersRound },
+  { name: 'Connected Apps', href: '/settings/connected-apps', icon: Grid },
   { name: 'OAuth Apps', href: '/oauth/apps', icon: Key },
+  { name: 'OAuth Developer', href: '/oauth/developer', icon: KeyRound },
   { name: 'SSO Connections', href: '/settings/sso', icon: Lock },
   { name: 'Cognitive Arch', href: '/settings/cognitive', icon: Brain },
   { name: 'Intelligence', href: '/settings/intelligence', icon: Zap },
@@ -269,7 +346,6 @@ const navigation: NavigationItem[] = [
   { name: 'Platform Learning', href: '/platform/learning', icon: GraduationCap },
   { name: 'Migrations', href: '/migrations', icon: GitPullRequest },
   { name: 'Notifications', href: '/notifications', icon: Bell },
-  { name: 'Settings', href: '/settings', icon: Settings },
 ];
 
 export function Sidebar() {

@@ -4,7 +4,13 @@
  */
 
 import { semanticCache } from '../semantic-cache.service';
-import { enhancedLogger as logger } from '../../logging/enhanced-logger';
+import { createRegisteredLogger } from '../logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'cognition/integration',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { rewardModel } from '../reward-model.service';
 import { inferenceStudent } from '../inference-student.service';
 import { counterfactualSimulator } from '../counterfactual-simulator.service';

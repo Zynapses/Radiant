@@ -6,9 +6,13 @@
 
 import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
 import { executeStatement, stringParam } from '../../db/client';
-import { enhancedLogger } from '../../logging/enhanced-logger';
+import { createRegisteredLogger } from '../logging-registry.service';
 
-const logger = enhancedLogger;
+const logger = createRegisteredLogger({
+  serviceName: 'sovereign-mesh/notification',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 const ses = new SESClient({ region: process.env.AWS_REGION || 'us-east-1' });
 
 // ============================================================================

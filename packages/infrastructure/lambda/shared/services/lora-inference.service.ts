@@ -6,7 +6,13 @@
 import { SageMakerRuntimeClient, InvokeEndpointCommand } from '@aws-sdk/client-sagemaker-runtime';
 import { S3Client, GetObjectCommand, HeadObjectCommand } from '@aws-sdk/client-s3';
 import { executeStatement } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'lora/inference',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { adapterManagementService } from './adapter-management.service';
 import { enhancedLearningService } from './enhanced-learning.service';
 

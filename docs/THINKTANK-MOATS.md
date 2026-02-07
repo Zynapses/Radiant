@@ -88,6 +88,7 @@ Multi-user same-conversation collaboration with:
 - Service: `lambda/shared/services/enhanced-collaboration.service.ts`
 - CRDT Workflow Service: `lambda/shared/services/workflow/crdt-workflow.service.ts`
 - Admin UI: `apps/thinktank-admin/app/(dashboard)/collaborate/enhanced/page.tsx`
+- Complete Guide: `docs/COLLABORATION-COMPLETE-GUIDE.md`
 
 **v5.53.0 Enhancement - CRDT Workflow Editing**:
 
@@ -100,6 +101,104 @@ Multi-user same-conversation collaboration with:
 | Node/Edge Operations | Insert, delete, move, update with CRDT semantics |
 
 This foundation enables **multiplayer workflow editing** where multiple users can simultaneously edit the same workflow without conflicts.
+
+#### Extended Collaboration Features (v6.6.0)
+
+The collaboration system has expanded to include enterprise-grade features that no competitor offers:
+
+**1. AI Roundtables (Multi-Model Debates)**
+
+| Feature | Description |
+|---------|-------------|
+| Debate Orchestration | Multiple AI models discuss topics with structured rounds |
+| Synthesis Engine | Automatic synthesis of key points and consensus |
+| Model Dynamics | Visual representation of model contributions and confidence |
+| Debate Styles | Roundtable, Adversarial, Consensus-Building, Devil's Advocate |
+
+**2. Conversation Branching (Git for Conversations)**
+
+| Feature | Description |
+|---------|-------------|
+| Branch Creation | Fork any point in conversation for exploration |
+| Branch Merging | Combine insights from multiple branches |
+| Branch Visualization | Tree and timeline views of conversation history |
+| Checkpoint System | Mark important points for easy navigation |
+
+**3. Knowledge Graph Visualization**
+
+| Feature | Description |
+|---------|-------------|
+| Auto-Extraction | AI extracts entities and relationships from conversations |
+| Interactive Graph | Visual exploration of extracted knowledge |
+| Entity Types | Concept, Person, Organization, Technology, Event, Document |
+| Relationship Types | Related_to, Caused_by, Depends_on, Part_of, Contradicts, Supports |
+
+**4. Guest Access System**
+
+| Feature | Description |
+|---------|-------------|
+| Secure Invites | Time-limited, permission-scoped invite tokens |
+| Role-Based Access | View-only, Comment, Contribute, Moderate roles |
+| No Account Required | External collaborators don't need Think Tank accounts |
+| Audit Trail | Full tracking of guest activities |
+
+**5. Session Recording & Playback**
+
+| Feature | Description |
+|---------|-------------|
+| Automatic Recording | All session activity captured for compliance |
+| Playback Controls | VCR-style controls with speed adjustment |
+| Event Timeline | Visual timeline of all session events |
+| Export Formats | Video, transcript, JSON for external tools |
+
+#### Collaboration Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                    COLLABORATION ARCHITECTURE                        │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  ┌─────────────┐  WebSocket  ┌─────────────┐  Yjs CRDT  ┌────────┐ │
+│  │   Client    │◀──────────▶│  Presence   │◀──────────▶│  Doc   │ │
+│  │  (Browser)  │            │   Server    │            │ Store  │ │
+│  └─────────────┘            └─────────────┘            └────────┘ │
+│        │                          │                         │      │
+│        │                          │                         │      │
+│        ▼                          ▼                         ▼      │
+│  ┌─────────────┐            ┌─────────────┐            ┌────────┐ │
+│  │  RealTime   │            │  Collab     │            │ Aurora │ │
+│  │    Chat     │            │  History    │            │   DB   │ │
+│  └─────────────┘            └─────────────┘            └────────┘ │
+│                                                                      │
+│  ┌──────────────────────────────────────────────────────────────┐  │
+│  │                    AI ROUNDTABLE ENGINE                       │  │
+│  │  ┌──────┐  ┌──────┐  ┌──────┐  ┌──────┐  ┌──────┐           │  │
+│  │  │GPT-4 │  │Claude│  │Gemini│  │Llama │  │Mixtral│           │  │
+│  │  └──────┘  └──────┘  └──────┘  └──────┘  └──────┘           │  │
+│  │       └───────────┬───────────┬───────────┘                  │  │
+│  │                   ▼           ▼                               │  │
+│  │            ┌─────────────────────────┐                       │  │
+│  │            │  Synthesis & Consensus  │                       │  │
+│  │            └─────────────────────────┘                       │  │
+│  └──────────────────────────────────────────────────────────────┘  │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+#### Why This Moat Is Unassailable
+
+| Dimension | ChatGPT/Claude/Gemini | Think Tank Collaboration |
+|-----------|----------------------|--------------------------|
+| Real-time editing | ✗ None | ✓ Yjs CRDT (< 50ms sync) |
+| Multi-user presence | ✗ None | ✓ Cursors, typing, selection |
+| AI Roundtables | ✗ Single model only | ✓ Multi-model debates |
+| Conversation branching | ✗ Linear only | ✓ Git-like branching |
+| Knowledge extraction | ✗ None | ✓ Auto graph building |
+| Guest access | ✗ Account required | ✓ Secure invite links |
+| Session recording | ✗ None | ✓ Full playback |
+| Compliance exports | ✗ None | ✓ Audit-ready bundles |
+
+**Enterprise Value**: Teams can collaborate on AI-assisted decisions in real-time, with full audit trails, multi-model perspectives, and structured knowledge extraction. This is **the killer feature for enterprise AI adoption**.
 
 ---
 
@@ -255,6 +354,45 @@ Information has a heartbeat. No competitor offers sensory UI that communicates t
 **Competitive Gap**: ChatGPT, Claude, and Gemini all use static text. Think Tank's sensory UI creates immediate trust differentiation visible in demos.
 
 **Documentation**: THINKTANK-ADMIN-GUIDE.md Section 54
+
+---
+
+### Moat #21: LIVS-M 2.0 Policy Modes (AI Quality Governance)
+
+**NEW in v7.9.0** — User-configurable "Defcon-style" governance that controls how strictly AI outputs are verified. No competitor offers user-facing AI quality control with adjustable rigor.
+
+| Mode | Nickname | Best For | Behavior |
+|------|----------|----------|----------|
+| **Brainstorming** | "Yes, and..." | Hackathons, MVPs, exploration | Accepts stubs, warnings don't block |
+| **Standard** | "Trust but Verify" | Daily work, sprints | Code must run, sycophancy warned |
+| **Strict Audit** | "Zero Trust" | Production, security, compliance | No stubs, mandatory tests, Devil's Advocate |
+
+**Competitor Comparison**:
+
+| Capability | ChatGPT/Claude/Gemini | Think Tank LIVS-M 2.0 |
+|------------|----------------------|------------------------|
+| Quality Control | ❌ Accept output at face value | ✅ Policy-driven verification |
+| Stub Detection | ❌ None | ✅ Automatic rejection of placeholder code |
+| Sycophancy Breaking | ❌ Agents agree too quickly | ✅ Devil's Advocate chaos injection |
+| User-Configurable | ❌ Fixed behavior | ✅ 3 modes via Settings UI |
+| Audit Trail | ❌ None | ✅ Full policy evaluation history |
+
+**Why It's a Moat**: 
+- **No competitor** offers user-adjustable AI quality rigor
+- Accumulated policy rules become proprietary operational knowledge
+- First-mover in "AI governance as a feature" category
+- Deep integration with multi-agent orchestration (AGI Orchestrator)
+
+**User Value**:
+- Brainstorming mode lets creative exploration flow without friction
+- Standard mode catches AI shortcuts during normal work
+- Strict Audit mode ensures production-quality outputs for releases
+
+**Implementation**:
+- UI: Settings → Advanced → LIVS-M Policy (Think Tank)
+- UI: Cato → LIVS Policy (Radiant Admin)
+- Services: `livs/policy-registry.service.ts`, `livs/livs-governance-supervisor.service.ts`
+- Docs: THINKTANK-USER-GUIDE.md Section 15, THINKTANK-ADMIN-GUIDE.md Section 12.5 & 59
 
 ---
 
@@ -456,9 +594,10 @@ Achievement notifications, progress tracking, and engagement features:
 | 18 | Council of Experts | Feature | **No competitor offers multi-persona consultation** |
 | 19 | Debate Arena | Feature | **No competitor offers adversarial exploration UI** |
 | 20 | Living Parchment UI | UX | **No competitor offers sensory decision interfaces** |
-| 21 | Domain Selector | Feature | **800+ domains with auto-detection** |
-| 22 | Cartridge Indicator | Feature | **Visible AI intelligence status** |
-| 23 | Three-Tier Personalization | Technical | **70% user weight for returning users** |
+| 21 | LIVS-M 2.0 Policy Modes | Governance | **No competitor offers user-configurable AI quality control** |
+| 22 | Domain Selector | Feature | **800+ domains with auto-detection** |
+| 23 | Cartridge Indicator | Feature | **Visible AI intelligence status** |
+| 24 | Three-Tier Personalization | Technical | **70% user weight for returning users** |
 | — | Persistent Memory | Memory | Contextual gravity compounds |
 | — | Twilight Dreaming | Memory | Appreciating asset |
 | — | Economic Governor | UX | Cost transparency |

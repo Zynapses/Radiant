@@ -1,6 +1,6 @@
 # RADIANT Platform Documentation
 ## Complete System Architecture Reference
-### Version 5.52.57 | January 2026
+### Version 5.52.60 | February 2026
 
 ---
 
@@ -15,6 +15,23 @@
 - **Pre-Flight Provisioning** - Check requirements before execution
 - **Transparency Layer** - Full visibility into Cato's decisions
 - **Enhanced HITL** - First-class approval workflows
+
+**THE OMEGA PROTOCOL** (Synthetic Biological Intelligence):
+- 🟣 **Q-Nodes** - Complex-valued neurons using wave mechanics instead of scalar weights
+- 🟣 **Bicameral Mind** - Two-chambered architecture (OMEGA Cortex + Broca Interface)
+- 🟣 **Helix Kernel** - Deterministic safety via destructive interference (impossible to bypass)
+- 🟣 **Resonant Index** - O(1) frequency-based document lookup (infinite scaling)
+- 🟣 **Cryogenic Engine** - Serverless persistence with Time Warp ($0 idle cost)
+- 🟣 **Genesis Ecosystem** - .bio firmware, Genesis Lab, Genesis Forge
+- 🔴 **Neural Bridge** - NeuralTransducer projects Complex^2048 → [8, 4096] soft prompt tokens for direct vLLM injection (Shadow Mode)
+- 🔴 **Homeostatic Dreaming** - 3-stage selective dreaming: magnitude gate + phase sharpening + experience replay
+- 🔴 **The Watcher** - Self-awareness via prediction error; surprise → dopamine loop
+- 🔴 **Custom vLLM Server** - FastAPI wrapper with `/inject` endpoint for embedding-level conditioning
+- 🔥 **Genesis Forge v3.0 "The Glass Foundry"** - Full neural firmware orchestration suite with React Flow canvas, catenary wire physics, Shadow Omega WebSocket tether, Omega Instance Registry, Reactor Core forge button, Void Mode
+- 🔥 **Omega Instance Registry** - Every OMEGA instance has unique ID/Name/endpoint; addressable by Forge via `omega_instance_registry` table
+- 🔥 **Shadow Omega Wiring** - Bi-directional WebSocket (`useShadowOmega()` hook) for real-time telemetry, edge rejection, stability-driven UI hue shift
+
+> **Reference**: [PROJECT-GENESIS-OMEGA.md](PROJECT-GENESIS-OMEGA.md) for complete OMEGA Protocol specification
 
 ---
 
@@ -1471,6 +1488,10 @@ Execute in this order:
 10. **V2026_01_21_005** - AI Reports (brand_kits, report_templates, generated_reports, report_smart_insights, report_exports, report_chat_history, report_schedules)
 11. **139_cartridge_pki_kms.sql** - Cartridge PKI KMS Integration (key_id, key_arn columns, pki_audit_log table)
 12. **140_mls_message_layer_security.sql** - MLS RFC 9420 (7 tables for group encryption)
+13. **V2026_01_28_001__environment_state_registry.sql** - Environment State Registry (manifests, sync_config, sync_operations, backups, restores, persistent_data, audit_log)
+14. **V2026_02_05_005__inference_cache_heterogeneous_consensus.sql** - Inference Response Cache (4 tables: config, entries, events, metrics; 3 helper functions) + Heterogeneous Model Consensus (5 tables: config, evaluations, responses, pairwise_agreements, metrics). Full RLS on all tables.
+15. **V2026_02_06_006__user_identity_refactor.sql** - Single-Tenant User Model, Licensing & Auth Config (v7.23.0). Reverses v7.22.0 multi-tenant model: `users.tenant_id` NOT NULL, UNIQUE(tenant_id, email), UNIQUE(tenant_id, cognito_user_id). Adds feature access flags (6 apps), invitation tracking, deactivation/deletion, soft permissions (JSONB), usage tracking directly on `users` table. Creates `tenant_licenses` (flexible multi-dimension licensing: seats, storage, retention, compliance, add-ons), `license_catalog` (24 seeded entries: 5 app seats, 1 storage, 1 retention, 12 compliance, 5 add-ons), `license_audit` (all license changes logged), `tenant_auth_config` (per-tenant MFA, SSO, session timeout, invitation expiry, HIPAA mode). 9 functions: `deactivate_user`, `request_user_deletion`, `cancel_user_deletion`, `check_tenant_license`, `get_available_seats`, `consume_seat`, `release_seat`, `reserve_seat`, `activate_reserved_seat`. Updates `user_admin_actions` with 18 action types including licensing events. Drops `tenant_users`, `users_by_tenant` view. RLS on all new tables.
+16. **V2026_02_06_007__model_weights_drift_correction_admin_ai.sql** - Model Weights, Drift Correction & Admin AI Helper (v7.24.0). 6 tables: `model_weight_config` (per-tenant per-model 5-factor composite weights with quarantine/fallback/correction), `model_weight_history` (weight calculation audit trail), `drift_correction_actions` (correction action log), `bedrock_model_registry` (global discovered Bedrock models), `admin_ai_helper_config` (per-tenant AI helper settings with auto-upgrade and polling), `admin_ai_helper_conversations` (conversation history). 5 functions: `calculate_composite_weight`, `apply_drift_penalty`, `quarantine_model`, `unquarantine_model`, `get_weighted_models`. RLS on tenant-scoped tables. Auto-update trigger on model_weight_config.
 
 ---
 
@@ -1846,6 +1867,198 @@ Signing Keys (KMS ECC_NIST_P256)
 | `/sovereign-mesh/transparency/[id]` | Transparency | Decision detail + War Room |
 | `/sovereign-mesh/approvals` | HITL | Approval queue |
 | `/sovereign-mesh/ai-helper` | AI Helper | System configuration |
+| `/orchestration/inference-cache` | Inference Cache | Hit rate, cost savings, events, model breakdown, config |
+| `/orchestration/consensus` | Consensus | Agreement scores, evaluations, model leaderboard, test runner, config |
+| `/orchestration/model-weights` | Model Weights | Drift correction, composite weights, quarantine management |
+| `/orchestration/templates` | Templates | User-saved workflow templates with categories and duplication |
+| `/platform/bedrock-settings` | Bedrock | Model discovery, auto-upgrade, polling config |
+| `/platform/uds` | UDS | User Data Service: encryption, audit, GDPR erasure, tier management |
+| `/platform/mls` | MLS | RFC 9420 group encryption: groups, key packages, audit |
+| `/platform/state-registry` | State Registry | Environment manifests, sync operations, backups |
+| `/platform/cartridge-operations` | Cartridges | Cartridge operations management |
+| `/platform/crucible` | Crucible | Testing sandbox and validation |
+| `/platform/deployer-sync` | Deployer Sync | Swift Deployer synchronization |
+| `/platform/livs` | LIVS | Live verification system |
+| `/platform/organism` | Organism | Autonomous organism architecture |
+| `/platform/pki` | PKI | Certificate and key management |
+| `/platform/rnir` | RNIR | Neural inference routing |
+| `/platform/snapshots` | Snapshots | System state snapshots |
+| `/platform/vault` | Vault | Secure secret storage |
+| `/cato/council` | Council of Rivals | Multi-agent adversarial debate management |
+| `/cato/dialogue` | Cato Dialogue | Consciousness dialogue sessions |
+| `/cato/cognitive-precision` | Cognitive Precision | Context anchoring, negative constraints, critic separation |
+| `/cato/governance` | Governance | Policy and governance management |
+| `/cato/livs-policy` | LIVS Policy | Live verification policy configuration |
+| `/cato/safety` | Safety | Cato safety configuration |
+| `/cato/war-room` | War Room | Critical incident management |
+| `/reports/dynamic` | Dynamic Reports | Schema-adaptive report builder |
+| `/reports/scheduled` | Scheduled Reports | Automated report generation |
+| `/memory/anticipatory` | Anticipatory Memory | Predictive prefetch, contradiction detection |
+| `/memory/retention` | Memory Retention | Retention policies and lifecycle management |
+
+#### Cross-App Delight UX System (v7.27.0 + v7.28.0)
+
+| Package / File | Purpose |
+|----------------|---------|
+| `packages/delight-ui/` | `@radiant/delight-ui` — Shared React Delight provider, hook, toast, types |
+| `packages/delight-ui/src/RadiantDelightProvider.tsx` | Universal provider with personality modes, injection points, toast UI |
+| `packages/delight-ui/src/types.ts` | PersonalityMode, InjectionPoint, DisplayStyle, AppDelightConfig |
+| `packages/delight-ui/src/animations.ts` | Personality-aware animation configs, morph narration, spring constants |
+| `packages/delight-ui/src/sounds.ts` | Web Audio API sound synthesis — no mp3 files needed |
+| `apps/thinktank/app/providers.tsx` | Think Tank delight config + RadiantDelightProvider wrapping |
+| `apps/thinktank/lib/hooks/useDelightSync.ts` | Settings sync hook (Zustand → backend preferences API) |
+| `apps/curator/app/providers.tsx` | Curator delight config (ingest, verify, graph UX touches) |
+| `apps/dojo/app/providers.tsx` | Dojo delight config (sparring, mastery, belt-earned messages) |
+| `apps/thinktank-admin/app/providers.tsx` | TT Admin delight config (config saves, user mgmt, delight publishing) |
+| `apps/thinktank-tenant-admin/app/providers.tsx` | Tenant Admin delight config (invitations, security, org management) |
+| `.windsurf/workflows/delight-ux-policy.md` | Enforcement policy — all apps MUST integrate Delight |
+
+#### Delight ↔ Polymorphic UI Integration (v7.28.0)
+
+| Component | File | Delight Integration |
+|-----------|------|---------------------|
+| `ViewRouter` | `apps/thinktank/components/polymorphic/view-router.tsx` | Mode switch/escalation triggers delight + synth sounds |
+| `ViewMorphTransition` | Same file | Animation spring constants adapt to personality mode |
+| `LiquidMorphPanel` | `apps/thinktank/components/liquid/LiquidMorphPanel.tsx` | Open/close animations use personality-aware configs |
+| `MorphTransitionEffect` | Same file | Personality narration, suppressed in professional/subtle modes |
+| Chat page | `apps/thinktank/app/(chat)/page.tsx` | Full lifecycle: pre/during/post execution, error, session, morph |
+
+#### Delight ↔ Dojo Integration (v7.29.0)
+
+| Component | Actions Wired | Injection Points |
+|-----------|--------------|-----------------|
+| `LibraryView` | Create library, upload/delete doc, discover themes | `action_complete`, `milestone` |
+| `TrainingArena` | Start session, submit answer, complete session | `session_start`, `action_complete`, `milestone` |
+| `ScenarioArena` | Start/respond/conclude scenario | `session_start`, `action_complete`, `milestone` |
+| `DialecticArena` | Start/respond/conclude dialectic | `session_start`, `action_complete`, `milestone` |
+| `DecayEngine` | Trigger reinforcement, submit answer | `session_start`, `action_complete` |
+| `ArchytasSettings` | Update config (tools, sandbox, limits) | `action_complete` |
+| `CompetencyMesh` | Extract competencies | `milestone` |
+
+#### Delight Tenant Governance (v7.29.0)
+
+| Control | Type | Location | Effect |
+|---------|------|----------|--------|
+| `tenantDelightEnabled` | `boolean` | Tenant Admin → Settings | Master kill switch for all delight output |
+| `tenantDefaultMode` | `PersonalityMode` | Tenant Admin → Settings | Force mode for all users (e.g., `professional` for law firms) |
+| `tenantAllowUserOverride` | `boolean` | Tenant Admin → Settings | Lock users to tenant mode when `false` |
+
+#### Comprehensive Documentation (v7.29.0)
+
+| Document | Sections | Coverage |
+|----------|----------|----------|
+| `docs/POLYMORPHIC-LIQUID-UI-GUIDE.md` | 15 sections | Full guide: Polymorphic UI, Liquid UI, Delight integration, animations, sounds, settings, tenant controls, guest behavior, API reference |
+
+#### Guest Collaboration Policy (v7.30.0)
+
+| Component | Location | Purpose |
+|-----------|----------|---------|
+| `tenant_collaboration_settings` | Migration 008 | Per-tenant guest access, prompt execution, file permissions, cost attribution, cross-tenant settings |
+| `guest_cost_attribution_log` | Migration 008 | Every guest AI action with cost breakdown, cross-tenant splits |
+| `guest_compliance_restriction_log` | Migration 008 | Audit trail of compliance-restricted guest actions |
+| `CollaborationPolicyService` | `lambda/shared/services/collaboration-policy.service.ts` | Compliance gates, capability resolution, cost attribution routing |
+| `GuestRestrictionBanner` | `apps/thinktank/components/collaboration/GuestRestrictionBanner.tsx` | UI notification when features disabled by compliance |
+| `guardGuestPrompt()` | `lambda/shared/middleware/guest-prompt-guard.ts` | Pre-execution guard: checks permissions, limits, resolves attribution |
+| `recordGuestPromptUsage()` | `lambda/shared/middleware/guest-prompt-guard.ts` | Post-execution: logs cost attribution, updates guest running totals |
+| Collaboration Settings Page | `apps/thinktank-tenant-admin/app/(dashboard)/collaboration/page.tsx` | Tenant admin UI for all guest collaboration controls |
+| Per-user rollup | `lambda/billing/metering.ts` → `radiant-user-usage-rollups` DynamoDB | Costs tracked per-user (incl. guest-originated), aggregated to tenant |
+| `GET /metering/user-rollups` | `lambda/billing/metering.ts` | Per-user cost breakdown with guest-originated subtotals |
+| `GET /metering/guest-usage` | `lambda/billing/metering.ts` | Aggregate guest cost attribution from `guest_cost_attribution_log` |
+
+**Permission → Capability Matrix:**
+
+| Permission | View | Comment | Edit | Prompts | Upload | Download | Branch | Roundtable |
+|------------|------|---------|------|---------|--------|----------|--------|------------|
+| `viewer` | ✅ | ❌ | ❌ | ❌ | ❌ | ✅* | ❌ | ❌ |
+| `commenter` | ✅ | ✅ | ❌ | ❌ | ❌ | ✅* | ❌ | ✅* |
+| `editor` | ✅ | ✅ | ✅ | ✅** | ✅** | ✅* | ✅* | ✅* |
+
+*\* Disabled when compliance licenses active and `compliance_auto_restrict=true`*
+*\*\* Requires explicit tenant opt-in (`guestPromptExecutionEnabled=true`)*
+
+**Cost Attribution Modes:**
+
+| Mode | Description |
+|------|-------------|
+| `inviting_user` (default) | All guest costs billed to the user who created the invite |
+| `session_owner` | Costs billed to the collaborative session creator |
+| `tenant_pool` | Costs attributed to shared tenant pool |
+| `cross_tenant_split` | Auto-activated when guest is from another tenant and splitting enabled |
+
+#### Log Retention Advanced System (v7.32.0)
+
+| Component | Location | Purpose |
+|-----------|----------|---------|
+| `log_reports` | Migration 010 | Generated retention/compliance reports with S3 storage |
+| `log_glacier_restore_jobs` | Migration 010 | Batch Glacier restore with progress tracking |
+| `log_export_jobs` | Migration 010 | Bulk log export jobs with download URLs |
+| `log_merkle_chain` | Migration 010 | Tamper-evident SHA-256 Merkle hash chain |
+| `log_erasure_requests` | Migration 010 | GDPR Article 17 erasure with exemption enforcement |
+| `log_search_entries` | Migration 010 | Hot-tier full-text search index (tsvector + GIN) |
+| `check_log_erasure_exemptions()` | Migration 010 | PG function: checks immutable categories against compliance licenses |
+| `LogReportService` | `lambda/shared/services/log-report.service.ts` | 5 report types: compliance_summary, retention_audit, storage_forecast, source_coverage, gdpr_data_map |
+| `LogGlacierRestoreService` | `lambda/shared/services/log-glacier-restore.service.ts` | Batch restore from Glacier/Deep Archive, 3 retrieval tiers, progress tracking |
+| `LogExportService` | `lambda/shared/services/log-export.service.ts` | Bulk export (all time / date range), JSON/CSV/JSONL formats, pre-signed downloads |
+| `LogTamperVerificationService` | `lambda/shared/services/log-tamper-verification.service.ts` | Merkle chain: add entries, verify single/segment/full chain |
+| `LogGdprErasureService` | `lambda/shared/services/log-gdpr-erasure.service.ts` | Multi-tier erasure, auto-exemption, erasure certificate hash |
+| `LogRetentionStack` | `lib/stacks/log-retention-stack.ts` | CDK: 3 S3 buckets, KMS key, 2 Lambdas, hourly EventBridge |
+| Log Retention Admin UI | `apps/admin-dashboard/app/(dashboard)/log-retention/page.tsx` | 10-tab admin page |
+
+**Admin API (16 new endpoints):**
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| `GET` | `/search` | Full-text search hot-tier logs |
+| `GET` | `/reports` | List generated reports |
+| `POST` | `/reports` | Generate a new report |
+| `GET` | `/reports/:id/download` | Pre-signed download URL |
+| `GET` | `/restore/jobs` | List Glacier restore jobs |
+| `POST` | `/restore/jobs` | Create restore job |
+| `POST` | `/restore/jobs/:id/process` | Process a restore job |
+| `GET` | `/export/jobs` | List export jobs |
+| `POST` | `/export/jobs` | Create export job |
+| `GET` | `/export/jobs/:id/download` | Export download URL |
+| `GET` | `/verification/status` | Merkle chain status |
+| `POST` | `/verification/verify-full` | Verify full Merkle chain |
+| `GET` | `/erasure/requests` | List erasure requests |
+| `POST` | `/erasure/requests` | Create erasure request |
+| `POST` | `/erasure/requests/:id/approve` | Approve erasure |
+| `POST` | `/erasure/requests/:id/execute` | Execute approved erasure |
+
+**CDK Infrastructure:**
+
+| Resource | Name | Config |
+|----------|------|--------|
+| S3 Bucket | `radiant-log-archives` | Versioned, KMS, Glacier at 90d, Deep Archive at 7yr |
+| S3 Bucket | `radiant-log-reports` | KMS, IA at 90d, Glacier at 1yr |
+| S3 Bucket | `radiant-log-exports` | KMS, 7-day auto-expiry |
+| KMS Key | `radiant-log-encryption` | Auto-rotation, RETAIN |
+| Lambda | `radiant-log-indexer` | 15 min timeout, 1 GB, hourly EventBridge |
+| Lambda | `radiant-log-retention-admin` | 5 min timeout, full S3/DB access |
+| EventBridge | Hourly indexer rule | 2 retry attempts |
+
+#### Think Tank Tenant Admin Pages (v7.26.0)
+
+| Route | Feature | Key Functionality |
+|-------|---------|-------------------|
+| `/` | Dashboard | Overview with quick action cards |
+| `/users` | Team Members | User management, invitations, role assignment, MFA status |
+| `/cartridges` | Cartridges | Tenant cartridge management (system read-only) |
+| `/reports` | Reports | Usage analytics, report generation (usage/users/billing) |
+| `/settings` | Settings | Org name, timezone, language, theme, notifications, data limits |
+| `/security` | Security | MFA enforcement, session/lockout config, password policy, event log |
+
+#### Think Tank App Navigation (v7.26.0)
+
+| Route | Nav Location | Notes |
+|-------|-------------|-------|
+| `/` (chat) | Main view | Default landing page |
+| `/rules` | Quick Links | User-defined AI rules |
+| `/history` | Quick Links | Conversation history |
+| `/artifacts` | Quick Links | Shared artifacts (newly linked v7.26.0) |
+| `/settings` | Quick Links | User preferences |
+| `/profile` | User avatar | Profile management |
+| `/simulator` | Advanced Links | Simulation tool with ADV badge (v7.26.0) |
 
 ---
 
@@ -2595,6 +2808,8 @@ example.RADz (encrypted ZIP)
 | Thermal Lambda | api-stack | State management |
 | Dreaming Lambda | scheduled-stack | Nightly training |
 | S3 Bucket | storage-stack | Model storage |
+| State Registry Lambda | state-registry-stack | Environment state capture/sync |
+| State Registry S3 | state-registry-stack | Manifests and backups storage |
 
 ## 8.6 Database Tables (v6.2.0)
 
@@ -2633,6 +2848,18 @@ example.RADz (encrypted ZIP)
 | `cartridge_operations` | Long-running operation records |
 | `cartridge_operation_steps` | Step-by-step progress |
 | `cartridge_operation_checkpoints` | Time Machine checkpoints |
+
+### Environment State Registry Tables (v7.1.0)
+
+| Table | Purpose |
+|-------|---------|
+| `env_state_manifests` | Versioned environment state snapshots |
+| `env_sync_configurations` | Per-environment sync settings |
+| `env_sync_operations` | Sync operation tracking with progress |
+| `env_backup_manifests` | Environment backup metadata |
+| `env_restore_operations` | Restore operation tracking |
+| `env_persistent_data_items` | Persistent data with sync preferences |
+| `env_state_audit_log` | Audit trail for all state operations |
 | `cartridge_operation_events` | Real-time event stream |
 
 ### LIVS Tables (v6.3.0)
@@ -2646,6 +2873,15 @@ example.RADz (encrypted ZIP)
 | `livs_orchestration_weights` | Per-pattern reliability scores |
 | `livs_pipeline_audits` | Pipeline integrity audit results (partitioned) |
 | `livs_global_model_weights` | Cross-tenant aggregated weights |
+
+### LIVS-M 2.0 Registry Tables (v7.9.0)
+
+| Table | Purpose |
+|-------|--------|
+| `livs_policy_registry` | Per-tenant JSON-based policy registry storage |
+| `livs_registry_evaluations` | Audit log of all policy evaluations |
+| `livs_registry_history` | Change history for registry modifications |
+| `livs_agent_interactions` | Supervisor governance loop audit trail |
 
 ---
 
@@ -2740,6 +2976,80 @@ System (Default) → Tenant (Override) → User (Final)
 | GET | `/api/admin/livs/models` | Model integrity |
 | GET | `/api/admin/livs/interrogations` | History |
 | GET | `/api/admin/livs/audits` | Pipeline audits |
+
+---
+
+# PART 9B: LIVS-M 2.0 REGISTRY EDITION (v7.9.0)
+
+Extension to LIVS introducing JSON-based Policy Registry for multi-agent governance. **Tier 1 Technical Moat** - sycophancy detection with chaos injection.
+
+## 9B.1 Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                     LIVS-M 2.0 REGISTRY EDITION                              │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  ┌─────────────────────────────────────────────────────────────────────┐    │
+│  │                      POLICY REGISTRY (JSON)                          │    │
+│  │  meta_config: { environment_mode, supervisor_model, escalation }    │    │
+│  │  global_directives: { max_turns, chaos_threshold, stub_tolerance }  │    │
+│  │  rules_engine: [ R_STUB_01, R_SYC_01, R_EVIDENCE_01, ... ]          │    │
+│  └─────────────────────────────────────────────────────────────────────┘    │
+│                                      │                                       │
+│                                      ▼                                       │
+│  ┌─────────────────────────────────────────────────────────────────────┐    │
+│  │                    GOVERNANCE SUPERVISOR (LLM)                       │    │
+│  │  Meta-prompt built from registry → Evaluates agent outputs          │    │
+│  │  Returns: APPROVE | REJECT | INTERVENE                              │    │
+│  └─────────────────────────────────────────────────────────────────────┘    │
+│                                      │                                       │
+│                    ┌─────────────────┼─────────────────┐                    │
+│                    ▼                 ▼                 ▼                    │
+│  ┌──────────────────────┐  ┌──────────────────┐  ┌──────────────────────┐   │
+│  │    THESIS AGENT      │  │  ANTITHESIS AGENT│  │    CHAOS AGENT       │   │
+│  │  (Lead Engineer)     │  │  (Forensic Audit)│  │  (Devil's Advocate)  │   │
+│  │  Proposes solutions  │  │  Challenges flaws│  │  Breaks consensus    │   │
+│  └──────────────────────┘  └──────────────────┘  └──────────────────────┘   │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+## 9B.2 Environment Modes
+
+| Mode | Chaos Threshold | Stub Tolerance | Use Case |
+|------|-----------------|----------------|----------|
+| `STRICT_AUDIT` | 0 | 0 | Production, compliance |
+| `BALANCED` | 2 | 0 | Default operations |
+| `RAPID_PROTO` | 5 | 3 | Development, iteration |
+| `HACKATHON` | 10 | 10 | Demos, experiments |
+
+## 9B.3 Services Architecture
+
+| Service | Purpose |
+|---------|---------|
+| `PolicyRegistryService` | Load, cache, evaluate policy registries per tenant |
+| `LIVSGovernanceSupervisorService` | Meta-prompt supervisor enforcing registry rules |
+| `AGIOrchestratorService.executeGovernedDebate()` | Multi-agent debate with governance loop |
+
+## 9B.4 Default Rules
+
+| Rule ID | Name | Severity | Action |
+|---------|------|----------|--------|
+| `R_STUB_01` | No Stubs/Placeholders | CRITICAL | REJECT_IMMEDIATE |
+| `R_SYC_01` | Anti-Sycophancy | HIGH | TRIGGER_CHAOS_AGENT |
+| `R_EVIDENCE_01` | Evidence Required | MEDIUM | REQUEST_AMENDMENT |
+| `R_SCOPE_01` | Scope Adherence | MEDIUM | REQUEST_AMENDMENT |
+
+## 9B.5 AGI Orchestrator Integration
+
+The governance loop in `AGIOrchestratorService` (Step 15):
+
+1. **Lazy Init**: Internal supervisor created on first governance request
+2. **Dual Mode**: Use external supervisor if provided, otherwise internal
+3. **Retry Loop**: Up to `maxRetriesOnRejection` attempts on REJECT
+4. **Chaos Injection**: On INTERVENE, invoke Chaos Agent to break sycophancy
+5. **Escalation**: After `max_agent_turns_before_escalation`, require human review
 
 ---
 
@@ -3031,6 +3341,230 @@ Vector-based transport for AI communication:
 
 ---
 
+# Part 12: Anticipatory Memory Architecture (v7.12.0)
+
+## 12.1 Overview
+
+5 leapfrog features that put RADIANT 3-5 years ahead of Claude's persistent memory:
+1. **Autobiographical Knowledge Graph (AKG)** — Auto-extracted entity-relationship graph from every conversation
+2. **Predictive Memory Prefetch** — ML-driven speculative memory retrieval
+3. **Memory Contradiction Detector** — Truth maintenance across conversations
+4. **Organizational Memory Mesh** — Regulatory-compliant shared knowledge (GDPR/HIPAA/SOC2/CCPA)
+5. **Dream Insight Generator** — Autonomous insight generation during Twilight Dreaming
+
+## 12.2 Services
+
+| Service | File | Purpose |
+|---------|------|---------|
+| AKG | `lambda/shared/services/akg.service.ts` | Entity extraction, graph traversal, context building |
+| Prefetch | `lambda/shared/services/predictive-prefetch.service.ts` | Access pattern learning, prediction, caching |
+| Contradictions | `lambda/shared/services/memory-contradiction-detector.service.ts` | Detection, classification, resolution |
+| Org Memory | `lambda/shared/services/org-memory-mesh.service.ts` | Consent, compliance scanning, sharing, erasure |
+| Dream Insights | `lambda/shared/services/dream-insight-generator.service.ts` | Generation, surfacing, feedback |
+
+## 12.3 Integration Points
+
+- `brain-router.service.ts` — Injects AKG context, runs async extraction, surfaces dream insights
+- `predictive-prefetch.service.ts` — Records access patterns on every AKG query
+
+## 12.4 Database Migration
+
+`V2026_02_06_001__anticipatory_memory_architecture.sql` — 16 tables, 5 enums, 4 helper functions
+
+## 12.5 Admin API
+
+`lambda/admin/anticipatory-memory.ts` — 34 endpoints under `/api/admin/anticipatory-memory/`
+
+## 12.6 Admin Dashboard
+
+`apps/admin-dashboard/app/(dashboard)/memory/anticipatory/page.tsx` — 6 tabs
+
+## 12.7 Shared Types
+
+`packages/shared/src/types/anticipatory-memory.types.ts` — All interfaces for AKG, Prefetch, Contradictions, Org Memory, Dream Insights
+
+---
+
+# Part 13: User Memory Retention & Unified Profile (v7.13.0)
+
+## 13.1 Overview
+
+Three-tier admin-configurable retention policy hierarchy with unified cross-chat, cross-model user memory profiles.
+
+**Policy Hierarchy**: Platform Default (Radiant Super-Admin) → Tenant Override (Think Tank Admin) → Tenant Admin Override (Think Tank Tenant Admin)
+
+**Constraint**: Tenant admin CANNOT exceed tenant-level limits.
+
+## 13.2 Services
+
+| Service | File | Purpose |
+|---------|------|---------|
+| Retention Policy | `lambda/shared/services/memory-retention-policy.service.ts` | Policy CRUD, hierarchy resolution, pruning, dashboard |
+| User Memory Profile | `lambda/shared/services/user-memory-profile.service.ts` | Unified profile builder, prompt injection, model tracking |
+
+## 13.3 Integration
+
+- `brain-router.service.ts` — Injects unified user memory profile into every prompt on every model; records model interactions
+
+## 13.4 Database Migration
+
+`V2026_02_06_002__user_memory_retention.sql` — 6 tables, 3 helper functions
+
+## 13.5 Admin API
+
+`lambda/admin/memory-retention.ts` — 15 endpoints under `/api/admin/memory-retention/`
+
+## 13.6 Admin Dashboards
+
+| App | Route | File |
+|-----|-------|------|
+| Radiant Admin | `/memory/retention` | `apps/admin-dashboard/app/(dashboard)/memory/retention/page.tsx` |
+| Think Tank Admin | `/thinktank-admin/memory-retention` | `apps/admin-dashboard/app/thinktank-admin/memory-retention/page.tsx` |
+| Think Tank Tenant Admin | `/thinktank-tenant-admin/memory-retention` | `apps/admin-dashboard/app/thinktank-tenant-admin/memory-retention/page.tsx` |
+
+## 13.7 Shared Types
+
+`packages/shared/src/types/user-memory-retention.types.ts` — Includes `uploaded_documents` and `downloaded_files` as `RetentionTargetType` values. `UserMemoryProfileSummary` includes `uploadedDocuments` and `downloadedFiles` arrays.
+
+## 13.8 Document & File Integration
+
+The unified user memory profile includes uploaded documents and downloaded files — **no exceptions**:
+- `uds_uploads` → fetched via `getUserUploadedDocuments()` (up to 20 recent, with extracted text summaries)
+- `uds_message_attachments` (type=file) → fetched via `getUserDownloadedFiles()` (up to 10 recent)
+- Injected into Brain Router prompt as `[Available Documents]` and `[Generated/Downloaded Files]` sections
+- Admin-controllable via `uploadedDocumentsEnabled` and `downloadedFilesEnabled` toggles at all 3 levels
+- `maxUploadSizeMb` configurable at platform and tenant levels
+
+---
+
+# Part 14: Cato Trainer — The Grounding Engine (v7.18.0)
+
+## 14.1 Overview
+
+Cato Trainer is a standalone Next.js knowledge base application (`apps/cato-trainer/`, port 3005) that delivers citation-guaranteed AI responses from document libraries using the Cato persona.
+
+## 14.2 Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    Cato Trainer (Next.js 14)                     │
+│                                                                  │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐           │
+│  │ Libraries │ │Documents │ │  Search  │ │ Ask Cato │           │
+│  │ Explorer  │ │ Viewer   │ │  Panel   │ │  Chat    │           │
+│  └─────┬─────┘ └─────┬────┘ └─────┬────┘ └─────┬────┘          │
+│        │              │            │             │               │
+│  ┌─────┴──────────────┴────────────┴─────────────┴──────┐       │
+│  │              Zustand Store (30+ fields)                │      │
+│  └──────────────────────┬───────────────────────────────┘       │
+│                         │                                        │
+│  ┌──────────────────────┴───────────────────────────────┐       │
+│  │              API Service Layer (25+ endpoints)         │      │
+│  └──────────────────────┬───────────────────────────────┘       │
+└─────────────────────────┼───────────────────────────────────────┘
+                          │ HTTP
+              ┌───────────┴───────────┐
+              │  RADIANT Admin API     │
+              │  /api/admin/cato-trainer│
+              └───────────────────────┘
+```
+
+## 14.3 File Structure
+
+```
+apps/cato-trainer/
+├── app/
+│   ├── globals.css            # Cato teal/cyan design system
+│   ├── layout.tsx             # Root layout with React Query
+│   ├── page.tsx               # 7-tab routing (library, documents, spaces, search, chat, digest, settings)
+│   └── providers.tsx          # React Query provider
+├── components/
+│   ├── CatoSidebar.tsx        # Left navigation (7 tabs)
+│   ├── ChatPanel.tsx          # Grounded Q&A with citation cards
+│   ├── SearchPanel.tsx        # Semantic/fulltext/hybrid search
+│   ├── LibraryExplorer.tsx    # Library CRUD + status cards
+│   ├── DocumentViewer.tsx     # Document list/detail/chunks/smart links
+│   └── DigestPanel.tsx        # Multi-document synthesis (6 types)
+├── lib/
+│   ├── api.ts                 # 15 types, 25+ endpoints
+│   ├── cato-trainer-store.ts  # Zustand store (30+ fields)
+│   └── utils.ts               # Confidence colors, formatting
+├── package.json               # @radiant/cato-trainer
+├── tailwind.config.ts         # Cato palette + animations
+└── tsconfig.json
+```
+
+## 14.4 Platform Integration
+
+- **Swift Deployer**: `RadiantApplication.catoTrainer` (subdomain: `cato`, path: `/cato`, icon: `shield.checkered`, color: teal, tier: Advanced)
+- **Admin Dashboard**: Settings → URLs → Cato Trainer field with Shield icon, validation, Quick Link
+- **Environment**: `CATO_TRAINER_API_URL` → defaults to `http://localhost:3001/api/admin/cato-trainer`
+
+---
+
+# Part 15: Aurelius Dojo — Backend Wiring (v7.19.0)
+
+## 15.1 Overview
+
+Aurelius Dojo backend wiring connects the existing frontend app (`apps/dojo/`, port 3004) to a dedicated Lambda handler with full database schema. The Dojo Lambda handles 35+ API endpoints across 12 route groups: Libraries, Sessions, Progress, Certifications, Mobot, Config, Decay Engine, Scenarios, Competencies, Dialectic, Multimodal, Pulse, and Archytas.
+
+## 15.2 Database Schema
+
+Migration `V2026_02_06_005__aurelius_dojo.sql` creates:
+
+| Table | Purpose |
+|-------|---------|
+| `dojo_libraries` | Document library containers per tenant |
+| `dojo_documents` | Uploaded files with S3 keys and chunk status |
+| `dojo_themes` | AI-discovered Central Themes from libraries |
+| `dojo_sessions` | Training sessions (lecture/sparring/review) |
+| `dojo_lesson_blocks` | LLM-generated lesson content with citations |
+| `dojo_sparring_questions` | Adversarial questions (MC, scenario, open, T/F) |
+| `dojo_sparring_results` | User answers with XP and reasoning analysis |
+| `dojo_user_progress` | Overall rank, XP, streaks per user |
+| `dojo_theme_progress` | Per-theme mastery, accuracy, weaknesses |
+| `dojo_certifications` | Formal certification exam results |
+| `dojo_mobot_messages` | In-session Knowledge Agent conversations |
+| `dojo_knowledge_atoms` | Per-concept units for decay tracking |
+| `dojo_decay_curves` | Ebbinghaus decay model per atom/user |
+| `dojo_scenario_sessions` | Adversarial scenario instances |
+| `dojo_scenario_branches` | Branching consequence trees |
+| `dojo_competencies` | Auto-extracted competency graphs |
+| `dojo_user_competency_scores` | Per-user competency assessments |
+| `dojo_dialectic_sessions` | Socratic dialectic sessions |
+| `dojo_dialectic_turns` | Thesis/antithesis/synthesis turns |
+| `dojo_multimodal_content` | Audio, diagrams, glossary per lesson |
+| `dojo_knowledge_pulse` | Org-wide knowledge health snapshots |
+| `dojo_archytas_tool_calls` | Tool Master execution log |
+| `dojo_config` | Per-tenant Dojo configuration |
+
+**Enums**: 13 custom PostgreSQL enums (rank_tier, library_status, document_status, session_mode, session_status, question_type, difficulty_tier, persona_archetype, dialectic_role, branch_quality, archytas_tool, archytas_sandbox)
+
+**Helper Functions**: `dojo_calculate_retention()`, `dojo_xp_to_rank()`, `dojo_update_decay_after_review()`
+
+**RLS**: All 19 tables use `app.current_tenant_id` row-level security.
+
+## 15.3 Lambda Handler
+
+```
+packages/infrastructure/lambda/admin/dojo.ts
+```
+
+Dedicated `APIGatewayProxyHandler` with path-based routing under `/api/admin/dojo/`. Uses the same `executeStatement`, `stringParam`, `longParam` DB client as other admin handlers. AI-dependent features (theme discovery, lesson generation, sparring question generation, scenario responses, dialectic responses, multimodal generation) throw descriptive errors indicating the AI pipeline is required.
+
+## 15.4 CDK Integration
+
+The Dojo Lambda is added to `admin-stack.ts` as a separate `DojoFunction` with its own `LambdaIntegration`. Routes are wired via proxy resource:
+
+```
+/admin/dojo          → GET
+/admin/dojo/{proxy+} → GET, POST, PUT, DELETE
+```
+
+This avoids defining 50+ individual API Gateway resources and routes all Dojo sub-paths to the dedicated Lambda.
+
+---
+
 # APPENDIX B: FILE STRUCTURE
 
 ```
@@ -3040,7 +3574,8 @@ packages/
 │   │   └── stacks/               # CDK stacks
 │   ├── lambda/
 │   │   ├── admin/
-│   │   │   └── sovereign-mesh.ts # Admin API
+│   │   │   ├── sovereign-mesh.ts # Admin API
+│   │   │   └── dojo.ts           # Aurelius Dojo API (35+ endpoints)
 │   │   ├── scheduled/
 │   │   │   ├── app-registry-sync.ts
 │   │   │   └── hitl-sla-monitor.ts
@@ -3062,7 +3597,8 @@ packages/
 │       ├── V2026_01_20_007__sovereign_mesh_transparency.sql
 │       ├── V2026_01_20_008__sovereign_mesh_hitl.sql
 │       ├── V2026_01_20_009__sovereign_mesh_replay.sql
-│       └── V2026_01_20_010__sovereign_mesh_seed.sql
+│       ├── V2026_01_20_010__sovereign_mesh_seed.sql
+│       └── V2026_02_06_005__aurelius_dojo.sql
 ├── admin-dashboard/
 │   └── app/(dashboard)/
 │       └── sovereign-mesh/
@@ -3072,6 +3608,612 @@ packages/
 
 ---
 
-*Document Version: 6.6.0*
-*Last Updated: February 4, 2026*
+---
+
+## SENTINEL — Alerting, Monitoring & Incident Response
+
+SENTINEL (Service Engineering Notification, Triage, Incident Navigation, Escalation & Lifecycle) is RADIANT's business continuity nervous system. Ratified v1.0.0 with 3 critical constraints.
+
+### Critical Implementation Constraints
+
+| # | Rule | Description |
+|---|------|-------------|
+| 1 | **Do Not Build Telephony** | SENTINEL detects; PagerDuty wakes humans. No custom on-call scheduling. |
+| 2 | **Shadow Mode First** | 14-day log-only before enabling auto-remediation. Never auto-failover stateful (RDS). |
+| 3 | **Push, Don't Poll** | CloudWatch Alarms push to SENTINEL via SNS. Polling reserved for external endpoints only. |
+
+### Architecture
+
+| Component | Technology | Purpose |
+|-----------|-----------|---------|
+| **Data Store** | DynamoDB (Global Tables) | Active alerts, health checks — independent of Aurora |
+| **History** | Aurora PostgreSQL | Incident history, postmortems, evidence metadata |
+| **Evidence** | S3 Object Lock (WORM) | Immutable forensic evidence for HIPAA/SOC2 |
+| **Compute** | AWS Lambda (6 functions) | Watchdog, alert processor, notifier, auto-healer, heartbeat, admin API |
+| **Inputs** | CloudWatch Alarms, Synthetic Canaries | Push (internal) + Poll (external) |
+| **Outputs** | PagerDuty API, Twilio (fallback), Slack, SES | Multi-path notification guarantee |
+| **Scheduling** | EventBridge | Heartbeat every 60s, synthetic checks every 60s |
+
+### Severity Classification
+
+| SEV | Name | Response | Resolution | Notification |
+|-----|------|----------|------------|-------------|
+| 1 | Critical | < 5 min | < 1 hour | PagerDuty phone + Twilio fallback |
+| 2 | Major | < 15 min | < 4 hours | PagerDuty SMS + Slack |
+| 3 | Moderate | < 1 hour | < 24 hours | Slack + auto Jira |
+| 4 | Low | < 4 hours | < 1 week | Slack + email digest |
+| 5 | Info | Next day | As needed | Email digest |
+
+### Admin API (Base: `/api/admin/sentinel`)
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/dashboard` | GET | Full SENTINEL dashboard with metrics |
+| `/health` | GET | Self-health for Pilot Light monitor |
+| `/alerts/process` | POST | Process incoming CloudWatch alarm events |
+| `/alerts` | GET | List active alerts with filters |
+| `/incidents` | GET | List incidents by status/severity |
+| `/incidents/:id` | GET | Incident detail with timeline |
+| `/incidents/:id/acknowledge` | POST | Acknowledge incident |
+| `/incidents/:id/status` | PUT | Update incident lifecycle stage |
+| `/health-map` | GET | Service health grid |
+| `/synthetic/run` | POST | Trigger synthetic health checks |
+| `/semantic/run` | POST | Trigger AI sanity probes |
+| `/remediation/rules` | GET | List remediation rules |
+| `/remediation/rules/:id/promote` | POST | Promote shadow rule to active |
+| `/shadow-mode/log` | GET | Shadow Mode "would have done" entries |
+| `/evidence` | GET | List evidence locker snapshots |
+| `/evidence/:id/verify` | POST | Verify evidence integrity |
+| `/circuit-breakers` | GET | Circuit breaker statuses |
+| `/postmortems` | GET/POST | List/create post-mortems |
+| `/playbooks` | GET | List response playbooks |
+| `/preferences` | GET/PUT | Admin alert preferences |
+| `/heartbeat/emit` | POST | Manual heartbeat trigger |
+
+### Dead Man's Switch ("Pilot Light")
+
+```
+Primary (us-east-1) ──heartbeat 60s──▶ deadmanssnitch.com
+                    ──heartbeat 60s──▶ PagerDuty heartbeat
+                    ──heartbeat 60s──▶ Pilot Light (us-west-2, separate account)
+                                              │
+                                              └── If East goes dark → direct PagerDuty alert
+```
+
+### Database Tables (Migration V2026_02_07_011)
+
+| Table | Purpose |
+|-------|---------|
+| `sentinel_incidents` | Incident lifecycle tracking |
+| `sentinel_incident_timeline` | Event timeline per incident |
+| `sentinel_evidence_locker` | WORM compliance snapshots |
+| `sentinel_remediation_rules` | Remediation rules with Shadow Mode |
+| `sentinel_remediation_log` | Auto-heal action audit trail |
+| `sentinel_shadow_mode_log` | Shadow "would have done" log |
+| `sentinel_postmortems` | Blameless post-incident reviews |
+| `sentinel_playbooks` | Pre-built response playbooks |
+| `sentinel_alert_preferences` | Per-admin notification preferences |
+| `sentinel_notifications` | Notification delivery tracking |
+
+---
+
+## UNIFIED USER PROFILE & MULTI-CONTACT SYSTEM (v7.34.0)
+
+### Architecture
+
+Every user (end-user and platform admin) has a unified profile with a multi-contact directory, verification pipeline, and SENTINEL alert routing integration.
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    User Profile API                      │
+│              /api/profile (Lambda)                        │
+├──────────┬──────────┬──────────┬────────────────────────┤
+│ Profile  │ Contacts │ Verify   │ SENTINEL Routing       │
+│ CRUD     │ CRUD     │ SMS/Email│ Category→Contact       │
+├──────────┴──────────┴──────────┴────────────────────────┤
+│          ContactVerificationService                      │
+│  ┌──────────┐  ┌──────────┐  ┌──────────────────────┐   │
+│  │Amazon SNS│  │Amazon SES│  │ resolve_sentinel_    │   │
+│  │(SMS)     │  │(Email)   │  │ contacts() DB func   │   │
+│  └──────────┘  └──────────┘  └──────────────────────┘   │
+├──────────────────────────────────────────────────────────┤
+│                    Aurora PostgreSQL                      │
+│  user_contacts │ user_profiles │ sentinel_contact_routing│
+│  contact_verification_log                                │
+└──────────────────────────────────────────────────────────┘
+```
+
+### Multi-Contact Directory
+
+| Constraint | Value |
+|-----------|-------|
+| Max emails per user | 3 |
+| Max phones per user | 3 |
+| Phone format | E.164 (+15551234567) |
+| Verification code | 6-digit, bcrypt-hashed |
+| Code expiry | 10 minutes |
+| Max attempts | 3 per code |
+| Cooldown after max | 10 minutes |
+| SMS delivery | Amazon SNS (Transactional) |
+| Email delivery | Amazon SES |
+
+### SENTINEL Alert Routing
+
+Admins map specific verified contacts to alert categories and severity levels:
+
+```
+sentinel_contact_routing
+├── admin_id → which admin
+├── alert_category → 'security' | 'infrastructure' | '*' | ...
+├── min_severity → 1-5 (1 = most severe)
+├── contact_id → FK to verified user_contacts
+└── enabled → on/off toggle
+```
+
+When SENTINEL fires an alert, the notifier calls `resolve_sentinel_contacts(tenant_id, category, severity)` to find all matching admin contacts and dispatches SMS (SNS) or email (SES) directly.
+
+### Profile Completeness Requirements
+
+All users MUST have:
+- At least 1 verified email (login email)
+- At least 1 verified phone (required for MFA)
+- Display name and timezone
+
+Incomplete profiles show a persistent banner across all apps.
+
+---
+
+## SYSTEM ADMINISTRATOR ROLE ENFORCEMENT (v7.34.0)
+
+### Role Hierarchy
+
+| Role | Level | Description |
+|------|-------|-------------|
+| `super_admin` | 4 | System administrator — full platform access |
+| `admin` | 3 | Platform administrator — tenants, billing, config |
+| `operator` | 2 | Operations — deploy, models, monitoring |
+| `auditor` | 1 | Read-only — audit logs, reports |
+
+### Permission Matrix (25 permissions)
+
+| Permission | super_admin | admin | operator | auditor |
+|------------|:-----------:|:-----:|:--------:|:-------:|
+| Create/delete admins | ✅ | ❌ | ❌ | ❌ |
+| Change admin roles | ✅ | ❌ | ❌ | ❌ |
+| Delete tenants | ✅ | ❌ | ❌ | ❌ |
+| Security policies | ✅ | ❌ | ❌ | ❌ |
+| Manage tenants | ✅ | ✅ | ❌ | ❌ |
+| Manage users | ✅ | ✅ | ❌ | ❌ |
+| System config | ✅ | ✅ | ❌ | ❌ |
+| Billing | ✅ | ✅ | ❌ | ❌ |
+| Models/providers | ✅ | ✅ | ✅ | ❌ |
+| Deploy | ✅ | ✅ | ✅ | ❌ |
+| SENTINEL access | ✅ | ✅ | ✅ | ❌ |
+| Audit logs | ✅ | ✅ | ✅ | ✅ |
+| Auto-access all apps | ✅ | ❌ | ❌ | ❌ |
+
+### Enforcement Layers
+
+1. **Next.js middleware** — extracts `adminRole` from JWT, blocks restricted routes, redirects to `/permission-denied`
+2. **Lambda admin-role-guard** — `requirePermission()` and `requireSuperAdmin()` middleware functions
+3. **Database function** — `check_admin_permission(admin_id, permission)` for DB-level checks
+
+### Bootstrap Flow
+
+- First admin created during deployment = auto `super_admin`
+- Only `super_admin` can create other `super_admin` accounts
+- Cannot revoke the last `super_admin` (enforced at service layer)
+- Full audit trail in `admin_role_audit_log`
+
+### Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `user_contacts` | Multi-contact directory (3 emails + 3 phones) |
+| `contact_verification_log` | Verification audit trail |
+| `user_profiles` | Extended profile fields (bio, timezone, locale) |
+| `sentinel_contact_routing` | Per-admin SENTINEL alert routing rules |
+| `admin_role_assignments` | Explicit role assignments with bootstrap flag |
+| `admin_role_audit_log` | Role change audit trail |
+| `admin_app_access` | Per-admin app access grants |
+
+---
+
+## ROLE DOMAIN CLARIFICATION (v7.35.0)
+
+RADIANT has **two distinct role domains** that must never be confused:
+
+### Platform Roles (RADIANT Admin Side)
+
+| Role | Level | RADIANT App Access | Description |
+|------|-------|:------------------:|-------------|
+| `super_admin` | 4 | ✅ ALL apps | System administrator — inherits admin + RADIANT Admin + all apps |
+| `admin` | 3 | ❌ None | Platform infrastructure admin — NO RADIANT app access |
+| `operator` | 2 | ❌ None | Operations — deploy, models, monitoring — NO RADIANT app access |
+| `auditor` | 1 | ❌ None | Read-only — audit logs, reports — NO RADIANT app access |
+
+**Key rule**: Admin privileges do NOT apply to RADIANT-side apps. Only `super_admin` gets app access.
+
+### Tenant Roles (Customer Side)
+
+| Role | Description |
+|------|-------------|
+| `tenant_admin` | Full tenant control — auto-assigned to first sign-up user |
+| `tenant_owner` | Ownership rights (billing, deletion) |
+| `standard_user` | Regular user |
+| `viewer` | Read-only user |
+
+---
+
+## TENANT PROVISIONING & SIGN-UP FLOW (v7.35.0)
+
+### Architecture
+
+```
+Marketing/Sales Website
+        │
+        ▼
+┌──────────────────────────────────────────────────────┐
+│            Tenant Sign-Up API (Public Lambda)         │
+│                /api/tenant-signup                      │
+├──────────┬──────────┬──────────┬─────────────────────┤
+│ Sign-Up  │ Verify   │ Verify   │ Accept              │
+│ Request  │ Email    │ Phone    │ Invitation           │
+│          │ (SES)    │ (SNS)    │                      │
+├──────────┴──────────┴──────────┴─────────────────────┤
+│          TenantProvisioningService                    │
+│  ┌──────────────────────────────────────────────┐    │
+│  │ 1. Create provisioning record                │    │
+│  │ 2. Send email code → verify                  │    │
+│  │ 3. Send phone code → verify                  │    │
+│  │ 4. Create tenant + first user (tenant_admin) │    │
+│  │ 5. Create verified contacts + profile        │    │
+│  │ 6. Send invitation email                     │    │
+│  │ 7. User accepts → tenant active              │    │
+│  └──────────────────────────────────────────────┘    │
+├──────────────────────────────────────────────────────┤
+│                  Aurora PostgreSQL                    │
+│  tenant_provisioning │ tenant_provisioning_log        │
+│  tenants │ users │ user_contacts │ user_profiles      │
+└──────────────────────────────────────────────────────┘
+```
+
+### Status Lifecycle
+
+```
+pending → email_verified → phone_verified → provisioning → provisioned → invitation_sent → active
+   │           │                │                                                             
+   └→ expired  └→ expired       └→ expired                                    failed ←────────┘
+```
+
+### Provisioning Constraints
+
+| Constraint | Value |
+|-----------|-------|
+| Sign-up expiry | 48 hours |
+| Invitation expiry | 72 hours |
+| First user role | `tenant_admin` |
+| Default apps | Think Tank, Curator, Tenant Admin |
+| Email verification | Required (6-digit code via SES) |
+| Phone verification | Required (6-digit code via SNS) |
+| Max email verify attempts | 5 |
+| Max phone verify attempts | 5 |
+| Duplicate prevention | Partial unique index on pending email + slug |
+
+### Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `tenant_provisioning` | Full lifecycle tracking for each sign-up |
+| `tenant_provisioning_log` | Audit trail for provisioning events |
+
+---
+
+## Unified Drift-Aware Weighting System (v7.36.0)
+
+Centralizes AI drift control and model weighting across all RADIANT components.
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                  DriftAwareWeightingService                      │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────┐  │
+│  │ Drift        │  │ Drift        │  │ App Weight           │  │
+│  │ Detection    │──│ Correction   │──│ Profiles             │  │
+│  │ (KS,PSI,χ²) │  │ (quarantine, │  │ (Genesis,Cato,       │  │
+│  │              │  │  penalties)  │  │  Cortex,Omega,...)   │  │
+│  └──────────────┘  └──────────────┘  └──────────────────────┘  │
+└────────┬──────────────┬──────────────┬──────────────┬──────────┘
+         │              │              │              │
+    ┌────▼────┐   ┌────▼────┐   ┌────▼────┐   ┌────▼────┐
+    │ AGI     │   │ Cato    │   │ Cortex  │   │ Omega   │
+    │ Orch.   │   │ Pipeline│   │ Intel.  │   │ Shadow  │
+    └─────────┘   └─────────┘   └─────────┘   └─────────┘
+                        │
+                   ┌────▼────┐
+                   │ Genesis │
+                   │ Gates   │
+                   └─────────┘
+```
+
+### Composite Score Formula
+
+```
+compositeScore = Σ(normalizedWeight[i] × factorScore[i])
+  where factors = [drift, quality, latency, cost, availability]
+  weights normalized per-app to sum to 1.0
+  stability penalty applied if preferStableModels && driftScore < 0.7
+  manual override replaces composite if set by admin
+```
+
+### Integration Points
+
+| Component | Integration Type | What It Does |
+|-----------|-----------------|--------------|
+| **AGI Orchestrator** | Primary model selection | Drift-aware models selected first, domain/specialty fallback |
+| **Cato Pipeline** | Method-level model selection | Replaces hardcoded model with drift-aware best model |
+| **Cortex Intelligence** | Insight enrichment | Drift recommendations included in CortexInsights |
+| **Omega Shadow** | Comparison tracking | Drift health recorded alongside each shadow comparison |
+| **Genesis Gates** | Stage advancement guard | Blocks unsafe stage advancement when models are drifting |
+
+### Drift Detection Methods
+
+| Method | Statistic | Threshold | Purpose |
+|--------|-----------|-----------|---------|
+| **Kolmogorov-Smirnov** | Max CDF distance | configurable | Continuous distribution shift |
+| **Population Stability Index** | Bin-based divergence | configurable | Binned distribution stability |
+| **Chi-Squared** | Category frequency | configurable | Categorical data shifts |
+| **Embedding Distance** | Cosine distance | configurable | Semantic representation drift |
+
+### Correction Actions
+
+| Action | Trigger | Effect |
+|--------|---------|--------|
+| **No action** | driftScore ≥ penaltyThreshold | Model continues normally |
+| **Weight penalty** | driftScore < penaltyThreshold | Composite weight reduced, temperature/prompt corrections applied |
+| **Quarantine** | driftScore < quarantineThreshold | Model excluded from selection, fallback activated |
+| **Auto-release** | Drift score recovers | Quarantine lifted after configured period |
+
+### Files
+
+| File | Purpose |
+|------|---------|
+| `drift-aware-weighting.service.ts` | Unified facade — single API for all apps |
+| `drift-detection.service.ts` | Statistical drift detection (KS, PSI, χ², embedding) |
+| `drift-correction.service.ts` | Quarantine, fallback, weight penalties, composite weights |
+
+---
+
+## Universal Drift Enforcement & Genesis Feedback Loop (v7.37.0)
+
+Extends the drift-aware weighting system to cover **ALL 52+ services** that invoke AI models, and adds a real-time telemetry feedback loop into Genesis gate decisions.
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    52+ AI Services                          │
+│  causal-reasoning, dream-insight, skill-execution,          │
+│  agi-complete, consciousness, hallucination-detection, ...  │
+└────────────────────────┬────────────────────────────────────┘
+                         │ modelRouterService.invoke()
+                         ▼
+┌─────────────────────────────────────────────────────────────┐
+│              ModelRouterService (v7.37.0)                    │
+│  ┌──────────────────┐  ┌──────────────────────────────┐     │
+│  │ Phase 1: Proactive│  │ Phase 2: Legacy Fallback     │     │
+│  │ isModelSafe()     │  │ getBestModel() correction    │     │
+│  │ getBestModel()    │  │ quarantine/fallback/temp     │     │
+│  └────────┬─────────┘  └──────────────┬───────────────┘     │
+│           │                            │                     │
+│           ▼                            ▼                     │
+│  ┌──────────────────────────────────────────────────────┐   │
+│  │         Model Invocation (Bedrock/LiteLLM/Direct)    │   │
+│  └──────────────────────┬───────────────────────────────┘   │
+│                         │                                    │
+│  ┌──────────────────────▼───────────────────────────────┐   │
+│  │  Telemetry: recordInvocationTelemetry()              │   │
+│  │  → In-memory ring buffer (10K/tenant, 1hr window)    │   │
+│  │  → drift_invocation_telemetry table (partitioned)    │   │
+│  └──────────────────────┬───────────────────────────────┘   │
+└─────────────────────────┼───────────────────────────────────┘
+                          │
+                          ▼
+┌─────────────────────────────────────────────────────────────┐
+│           Genesis Gate Assessment (v7.37.0)                  │
+│  isDriftHealthyForStage() checks:                            │
+│  ├── Static: avg drift score, quarantined count              │
+│  ├── Real-time: overallHealthScore (drift+reroute+failure)   │
+│  ├── Real-time: failure rate per stage threshold             │
+│  └── Real-time: reroute rate per stage threshold             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Database
+
+| Table | Purpose |
+|-------|---------|
+| `drift_invocation_telemetry` | Partitioned (monthly) telemetry for all model invocations. RLS per tenant. 7-day retention. |
+
+| Function | Purpose |
+|----------|---------|
+| `get_genesis_drift_feedback()` | SQL aggregation: total/rerouted/failed invocations, rates, health score |
+| `cleanup_drift_telemetry()` | Delete records older than retention period |
+
+### Enforcement Policy
+
+`.windsurf/workflows/drift-detection-enforcement.md` — mandatory for all new services:
+- All `modelRouterService.invoke()` calls MUST include `tenantId`
+- No hardcoded model selection without drift fallback
+- No direct LLM API calls bypassing the model router
+- New app components MUST have weight profiles
+
+---
+
+## Enforced Logging Policy (v7.37.2)
+
+Establishes mandatory structured logging for all Lambda services via the **Logging Registry** (`logging-registry.service.ts`).
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                  All Lambda Services                         │
+│  security-alert, sentinel-processor, sentinel-notifier,      │
+│  billing, admin, ai, cato, workflow, ...                     │
+└────────────────────────┬────────────────────────────────────┘
+                         │ createRegisteredLogger() / withEnforcedLogging()
+                         ▼
+┌─────────────────────────────────────────────────────────────┐
+│           Logging Registry Service (v7.37.2)                 │
+│  ┌──────────────────────────────────────────────────────┐   │
+│  │  RegisteredLogger                                     │   │
+│  │  → Structured JSON to stdout (CloudWatch)             │   │
+│  │  → Auto-registers in log_source_registry              │   │
+│  │  → Categorized: security, audit, billing, access, ... │   │
+│  └──────────────────────┬───────────────────────────────┘   │
+└─────────────────────────┼───────────────────────────────────┘
+                          │
+                          ▼
+┌─────────────────────────────────────────────────────────────┐
+│           Log Retention Policy Service                       │
+│  detectComplianceIssues() flags:                             │
+│  ├── Unenforced sources → CRITICAL compliance issue          │
+│  ├── Stale sources (7d+) → WARNING                           │
+│  └── Immutability gaps → WARNING                             │
+│                                                              │
+│  getLoggingCoverageReport() reports:                         │
+│  ├── Total/enforced/unenforced source counts                 │
+│  ├── Per-category breakdown                                  │
+│  └── Stale source identification                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Database
+
+| Table | Purpose |
+|-------|---------|
+| `log_source_registry` | Tracks all registered logging sources: service name, category, source type, enforcement status, last seen timestamp |
+
+### Log Storage Pipeline
+
+```
+Services → stdout (structured JSON) → CloudWatch Log Groups
+                                           ↓
+                              LogIndexerService (hourly, EventBridge)
+                                           ↓
+                              S3 (gzip, KMS encrypted, warm tier)
+                                           ↓ (90 days)
+                              Glacier (cold tier)
+                                           ↓ (~7 years)
+                              Glacier Deep Archive
+```
+
+- **Index pointers**: `log_index` table — SHA-256 hash, byte size, retention expiry per archived batch
+- **Tamper evidence**: `log_merkle_chain` table — Merkle hash chain for immutable categories
+- **Auto-discovery**: `LogIndexerService.autoDiscoverSources()` finds new CloudWatch log groups matching `radiant-*`
+
+### Redaction Policy
+
+Redaction is **disabled by default** in the legacy `enhancedLogger` (opt-in via `LOG_REDACT_SENSITIVE=true`). The new `RegisteredLogger` has no redaction. Regulatory compliance is enforced at dedicated layers:
+
+| Compliance | Enforcement Layer |
+|------------|------------------|
+| HIPAA PHI | `hipaa-phi-sanitization` middleware |
+| GDPR erasure | `erasure.service.ts` + data retention policies |
+| SOC2 audit | `log-tamper-verification.service.ts` + immutable archives |
+| Log retention | `log-retention-policy.service.ts` (per-tenant, per-category) |
+
+### Enforcement Policy
+
+`.windsurf/workflows/enforced-logging-policy.md` — mandatory for all services:
+- All services MUST use `createRegisteredLogger()` or `withEnforcedLogging()`
+- No `console.log`, `console.error`, `console.warn` allowed
+- No legacy `enhancedLogger` imports allowed
+- Service names must follow `domain/service-name` convention
+- Log categories must match `LogCategory` enum for retention compliance
+
+---
+
+## System Administrator Separation — Dual Identity Plane (v7.38.0)
+
+Separates system administrators from tenant users into isolated identity domains with a service layer firewall enforced at the API Gateway level.
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                      RADIANT PLATFORM                                │
+│                                                                      │
+│  ┌────────────────────────────┐   ┌────────────────────────────────┐│
+│  │  SYSTEM ADMIN PLANE        │   │  TENANT PLANE                  ││
+│  │                            │   │                                ││
+│  │  Cognito Pool B            │   │  Cognito Pool A                ││
+│  │  (system-admins)           │   │  (end-users + tenant-admins)   ││
+│  │                            │   │                                ││
+│  │  system_admins table       │   │  users + administrators        ││
+│  │  (NO tenant_id, NO RLS)    │   │  (tenant-scoped, RLS)          ││
+│  │                            │   │                                ││
+│  │  Apps: Radiant Admin ONLY  │   │  Apps: Think Tank, Curator,    ││
+│  │  ❌ Think Tank             │   │  Genesis, Dojo, Cato, TT Admin ││
+│  │  ❌ Curator                │   │  ❌ Radiant Admin              ││
+│  │  ❌ Genesis                │   │                                ││
+│  └──────────┬─────────────────┘   └──────────┬─────────────────────┘│
+│             │                                 │                      │
+│             ▼                                 ▼                      │
+│  ┌──────────────────┐              ┌─────────────────────┐          │
+│  │ Admin API GW     │              │ Tenant API GW       │          │
+│  │ Auth: Pool B     │              │ Auth: Pool A         │          │
+│  │ REJECTS Pool A   │              │ REJECTS Pool B       │          │
+│  └──────────────────┘              └─────────────────────┘          │
+│                                                                      │
+│  SENTINEL Dual-Resolution:                                           │
+│  ┌──────────────────────────────────────────────────────────────┐   │
+│  │ resolve_system_admin_contacts() → system_admin_alert_routing │   │
+│  │ resolve_sentinel_contacts()     → sentinel_contact_routing   │   │
+│  └──────────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### Database (No RLS)
+
+| Table | Purpose |
+|-------|---------|
+| `system_admins` | Global admin accounts (no tenant scope) |
+| `system_admin_contacts` | Verified email/phone for alert routing |
+| `system_admin_alert_routing` | SENTINEL alert → contact mapping |
+| `system_admin_audit_log` | Admin lifecycle events |
+| `system_admin_contact_verification_log` | Verification audit trail |
+
+### Auth Middleware
+
+| Middleware | Pool | Scope | Used By |
+|-----------|------|-------|---------|
+| `system-admin-auth.ts` → `extractSystemAdminContext()` | Pool B | Global | Radiant Admin API |
+| `shared/auth.ts` → `extractAuthContext()` | Pool A | Tenant-scoped | All consumer apps |
+| `admin-role-guard.ts` | Legacy | Re-exports system admin utilities | Backwards compat |
+
+### Bootstrap Flow
+
+```
+Deployment (Swift Deployer / CLI)
+    → Cognito Pool B: AdminCreateUser (email, temp password, MFA required)
+    → SQL: bootstrap_system_admin() → system_admins (status: pending_setup)
+    → First login: password change → MFA enroll → phone verify → active
+```
+
+### Enforcement Policy
+
+`.windsurf/workflows/admin-access-control.md` — updated for v7.38.0:
+- Admin API handlers MUST use `extractSystemAdminContext()` from Pool B
+- Tenant API handlers MUST use `extractAuthContext()` from Pool A
+- System admin data MUST NOT have tenant_id
+- Pool A tokens MUST be rejected by admin API Gateway
+- Pool B tokens MUST be rejected by tenant API Gateway
+
+---
+
+*Document Version: 7.4.0*
+*Last Updated: February 7, 2026*
 *Platform: RADIANT - The Autonomous Organism*

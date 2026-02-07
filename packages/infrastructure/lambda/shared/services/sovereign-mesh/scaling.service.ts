@@ -6,7 +6,13 @@
  */
 
 import { executeStatement, stringParam, longParam, doubleParam, boolParam } from '../../db/client';
-import { enhancedLogger } from '../../logging/enhanced-logger';
+import { createRegisteredLogger } from '../logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'sovereign-mesh/scaling',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import type {
   ScalingTier,
   ScalingProfile,
@@ -37,8 +43,6 @@ import {
   getDefaultScalingProfile,
   calculateMaxSessions,
 } from '@radiant/shared';
-
-const logger = enhancedLogger;
 
 // ============================================================================
 // AWS PRICING CONSTANTS (as of Jan 2026)

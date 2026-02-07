@@ -30,7 +30,13 @@
 import { SageMakerRuntimeClient, InvokeEndpointCommand } from '@aws-sdk/client-sagemaker-runtime';
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
 import { executeStatement, stringParam, doubleParam } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'axiom/neural-cortex',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import type {
   AxiomScorerId,
 } from '@radiant/shared';

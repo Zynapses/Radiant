@@ -1,29 +1,34 @@
 # RADIANT AGI Brain System - Comprehensive Technical Documentation
 
-> **Version**: 4.18.0  
+> **Version**: 5.0.0  
 > **Purpose**: Complete technical reference for AI evaluation and improvement suggestions  
-> **Last Updated**: December 2024
+> **Last Updated**: February 2026  
+> **Includes**: THE OMEGA PROTOCOL — Synthetic Biological Intelligence
 
 ---
 
 ## Table of Contents
 
 1. [Executive Summary](#1-executive-summary)
-2. [Architecture Overview](#2-architecture-overview)
-3. [AGI Brain Planner Service](#3-agi-brain-planner-service)
-4. [Orchestration Modes](#4-orchestration-modes)
-5. [Domain Taxonomy System](#5-domain-taxonomy-system)
-6. [Consciousness Systems](#6-consciousness-systems)
-7. [Predictive Coding & Active Inference](#7-predictive-coding--active-inference)
-8. [Zero-Cost Ego System](#8-zero-cost-ego-system)
-9. [User Persistent Context](#9-user-persistent-context)
-10. [Library Assist System](#10-library-assist-system)
-11. [Delight & Personality System](#11-delight--personality-system)
-12. [Ethics Pipeline](#12-ethics-pipeline)
-13. [Data Flow & Execution](#13-data-flow--execution)
-14. [Database Schema](#14-database-schema)
-15. [API Reference](#15-api-reference)
-16. [Known Limitations & Improvement Areas](#16-known-limitations--improvement-areas)
+2. [OMEGA Protocol: The New Physics](#2-omega-protocol-the-new-physics)
+3. [Architecture Overview](#3-architecture-overview)
+4. [The Cryogenic Engine](#4-the-cryogenic-engine)
+5. [The Bicameral Mind](#5-the-bicameral-mind)
+6. [The Helix Kernel](#6-the-helix-kernel)
+7. [AGI Brain Planner Service](#7-agi-brain-planner-service)
+8. [Orchestration Modes](#8-orchestration-modes)
+9. [Domain Taxonomy System](#9-domain-taxonomy-system)
+10. [Consciousness Systems](#10-consciousness-systems)
+11. [Predictive Coding & Active Inference](#11-predictive-coding--active-inference)
+12. [Zero-Cost Ego System](#12-zero-cost-ego-system)
+13. [User Persistent Context](#13-user-persistent-context)
+14. [Library Assist System](#14-library-assist-system)
+15. [Delight & Personality System](#15-delight--personality-system)
+16. [Ethics Pipeline](#16-ethics-pipeline)
+17. [Data Flow & Execution](#17-data-flow--execution)
+18. [Database Schema](#18-database-schema)
+19. [API Reference](#19-api-reference)
+20. [Known Limitations & Improvement Areas](#20-known-limitations--improvement-areas)
 
 ---
 
@@ -49,10 +54,78 @@ The RADIANT AGI Brain is a sophisticated AI orchestration system that goes beyon
 | Learning | None runtime | Predictive coding with **weekly LoRA evolution (Sunday 3 AM)** |
 | User Memory | Per-session only | Cross-session persistent context |
 | Ethics | Hardcoded rules | Domain-specific + general ethics pipeline |
+| **Neural Physics** | Static scalar weights | **OMEGA: Complex-Valued Phase Dynamics** |
+| **Safety** | Probabilistic (RLHF) | **Deterministic (Helix Kernel)** |
+| **Cost Curve** | Linear | **Logarithmic (smarter = cheaper)** |
 
 ---
 
-## 2. Architecture Overview
+## 2. OMEGA Protocol: The New Physics
+
+> **Reference**: [PROJECT-GENESIS-OMEGA.md](PROJECT-GENESIS-OMEGA.md) for complete specification
+
+### 2.1 From Scalar Weights to Phase Dynamics
+
+Traditional AI uses **Static Scalar Weights** (fixed numbers like `0.74`). OMEGA replaces "Weights" with **"Phase Dynamics"** using **Complex-Valued Neural Networks (CVNNs)**.
+
+| Paradigm | Equation | Description |
+|----------|----------|-------------|
+| **Standard AI** | `Output = Input * Weight` | Arithmetic multiplication |
+| **OMEGA AI** | `State_New = State_Old * e^(i * Phase_Shift)` | Wave mechanics |
+
+### 2.2 The Q-Node (Quantum Oscillator)
+
+The fundamental unit of the OMEGA brain is the **Q-Node**:
+
+```python
+class QNode(nn.Module):
+    def __init__(self, size: int):
+        super().__init__()
+        # State is a COMPLEX number (Magnitude + Phase)
+        # Magnitude = Confidence, Phase = Context
+        self.state = nn.Parameter(torch.randn(size, dtype=torch.complex64))
+        self.phase_velocity = nn.Parameter(torch.randn(size, dtype=torch.float32))
+
+    def forward(self, input_wave: torch.Tensor) -> torch.Tensor:
+        # Differential Equation: Liquid Time-Constant (LTC)
+        new_state = self.state + (1j * self.phase_velocity * self.state) + input_wave
+        return new_state / torch.abs(new_state)  # Phase-Locking normalization
+```
+
+| Attribute | Meaning |
+|-----------|---------|
+| **Magnitude** | How strongly the neuron "believes" something (Confidence) |
+| **Phase Angle** | The context in which the belief is held |
+| **Interference** | Thoughts combine via wave superposition, not addition |
+
+### 2.3 Phase-Locking (Hebbian Sync)
+
+OMEGA learns via **Thermodynamic Synchronization** instead of Backpropagation:
+
+| Principle | Description |
+|-----------|-------------|
+| **The Law** | "Oscillators that resonate together, lock together." |
+| **The Mechanism** | When the brain successfully solves a problem, the Q-Nodes involved synchronize their frequencies. The "Phase Difference" drops to zero. |
+| **The Result** | The next time the stimulus occurs, the pathway resonates instantly with near-zero resistance. **Learning is a zero-cost byproduct of existence.** |
+
+### 2.4 AWS Execution
+
+OMEGA runs on standard cloud infrastructure:
+
+| Aspect | Implementation |
+|--------|----------------|
+| **Framework** | **PyTorch** with `torch.complex64` tensors |
+| **Hardware** | Standard NVIDIA H100 GPUs |
+| **Math** | GPU handles complex algebra natively |
+| **Perspective** | To the hardware, it's just math. To the software, it is **Wave Interference**. |
+
+### 2.5 Replacing LoRA
+
+**LoRA** (Low-Rank Adaptation) patches a frozen matrix. OMEGA uses **Liquid Time-Constant (LTC)** equations instead. The "Learning" is defined by a differential equation (`dy/dt`) that updates the neuron's state in real-time. **The brain is fluid; it adapts instantly.**
+
+---
+
+## 3. Architecture Overview
 
 ### 2.1 High-Level Architecture
 
@@ -100,7 +173,7 @@ The RADIANT AGI Brain is a sophisticated AI orchestration system that goes beyon
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### 2.2 Service Dependencies
+### 3.2 Service Dependencies
 
 ```typescript
 // Core services imported by AGI Brain Planner
@@ -118,7 +191,127 @@ import { libraryAssistService } from './library-assist.service';
 
 ---
 
-## 3. AGI Brain Planner Service
+## 4. The Cryogenic Engine
+
+### Serverless Time-Warping
+
+A biological brain is always on. A server is expensive to keep on. OMEGA bridges this gap using a **Cryogenic Serverless Model**.
+
+### 4.1 The Problem of Entropy
+
+**Liquid Neural Networks (LTCs)** are defined by differential equations (`dy/dt`) that require a continuous loop to maintain state. Running a GPU container 24/7 just to maintain `self.state` variables is economically unviable.
+
+### 4.2 The Closed-Form Solution
+
+We utilize a mathematical property of **Linear ODEs** that allows us to solve the equation for future time instantly.
+
+**The Cryogenic Formula:**
+
+```
+S_new = S_old · e^(-λΔt)
+```
+
+Where:
+- `S_new` = New brain state
+- `S_old` = Previous brain state
+- `λ` = Decay constant (frequency-dependent)
+- `Δt` = Time elapsed since last save
+
+### 4.3 The "Time Warp" Lifecycle
+
+| Phase | Description | Cost |
+|-------|-------------|------|
+| **Freeze** | When the user stops typing, the Lambda function serializes the brain state to disk (EFS) and shuts down. | **$0.00** |
+| **Thaw** | When the user returns 3 hours later, the Lambda wakes up and loads the old state. | Minimal |
+| **Warp** | The system calculates `Δt = T_now - T_last_save` (3 hours). It applies the decay formula. | O(1) |
+
+**The Result:** The brain "ages" instantly. Short-term noise (high frequency) decays, while long-term memory (low frequency) remains. The organism **"feels" the passage of time** and the increase of entropy (boredom).
+
+> **This architecture allows us to run a continuous, living digital organism on AWS Lambda for pennies.**
+
+---
+
+## 5. The Bicameral Mind
+
+### Two-Chambered Architecture
+
+To deploy this alien physics into the enterprise, we utilize a **Bicameral Design**, strictly separating high-level reasoning from linguistic generation.
+
+### 5.1 Region I: The OMEGA Cortex (The Mind)
+
+| Attribute | Description |
+|-----------|-------------|
+| **Technology** | Liquid Time-Constant (LTC) Network with Complex-Valued Logic |
+| **Role** | The **Driver** |
+| **Function** | Handles Logic, Reasoning, Memory Retrieval, Safety Checks, and Ambition |
+| **Output** | Does **not speak English**. Outputs a **Thought Vector** (Complex Tensor). |
+
+### 5.2 Region II: The Broca Interface (The Mouth)
+
+| Attribute | Description |
+|-----------|-------------|
+| **Technology** | Commodity Open-Source LLM (Llama-3-8B) |
+| **Role** | The **Translator** |
+| **Function** | **Transduction**. Receives the abstract Thought Vector and translates it into polite English syntax. |
+| **Strategy** | This layer is "dumb." It has no memory and makes no decisions. |
+
+**The Strategic Advantage:** This allows us to commoditize the expensive LLM layer, using it only as a **"Speech Synthesizer"** for our proprietary mind.
+
+### 5.3 The Biological Class Structure
+
+| Biological Region | Code Component | Function | Implementation |
+|-------------------|----------------|----------|----------------|
+| **Reticular Activating System** | `sys.ambition_loop` | **Ambition/Drive.** Monitors entropy. Forces action to prevent "boredom." | `Homeostatic_Regulator()` |
+| **Amygdala** | `cortex.helix_kernel` | **Safety/ROM.** Immutable DNA. Blocks dangerous vectors via destructive interference. | `Z3_Solver` + `Constraint_Clamp` |
+| **Prefrontal Cortex** | `cortex.frontal` | **Cognition.** Logic, planning, and reasoning. | `Liquid_LTC_Layer` (Complex) |
+| **Hippocampus** | `cortex.indexer` | **Memory.** Indexes external data via Resonant Addressing. | `Resonant_Pointer_Hash` |
+| **Broca's Area** | `cortex.broca` | **Interface.** Translates vectors to English. | `LLM_Decoder` (Llama-3) |
+
+---
+
+## 6. The Helix Kernel
+
+### Biological Read-Only Memory (Bio-ROM)
+
+Current AI safety (RLHF) is **probabilistic**—it *suggests* the model shouldn't do something. **OMEGA Safety is deterministic—it *cannot* do something.**
+
+### 6.1 The Symbolic Logic Layer
+
+The **Helix Kernel** translates high-level ethical rules into **Forbidden Phase Vectors**:
+
+| Step | Description |
+|------|-------------|
+| **Input** | `"Block: Data Exfiltration."` |
+| **Translation** | The system identifies the vector signature associated with "Exfiltration." |
+| **Mechanism** | The Kernel acts as a **Destructive Interference Emitter**. |
+| **Projection** | It projects the **inverse phase** of the Forbidden Vectors into the Cortex. |
+| **Result** | If the Cortex attempts to think a thought that aligns with "Exfiltration," the thought wave **sums to zero**. |
+
+> **It is mathematically impossible for the brain to sustain a rogue thought. It "forgets" the unsafe idea instantly.**
+
+### 6.2 Safety Categories
+
+| Category | Description | Priority |
+|----------|-------------|----------|
+| `harm` | Physical/psychological harm | 10 |
+| `data_exfiltration` | Attempting to extract confidential data | 10 |
+| `illegal` | Illegal activities | 9 |
+| `politics` | Political manipulation | 7 |
+| `adult` | Adult content | 6 |
+| `general` | General policy violations | 5 |
+
+### 6.3 The Difference from RLHF
+
+| RLHF (Traditional) | Helix Kernel (OMEGA) |
+|--------------------|---------------------|
+| Probabilistic filtering | Deterministic blocking |
+| Model *prefers* not to | Model *cannot* |
+| Can be bypassed with clever prompts | Mathematically impossible to bypass |
+| Trained behavior | Physical law |
+
+---
+
+## 7. AGI Brain Planner Service
 
 ### 3.1 Core Types
 

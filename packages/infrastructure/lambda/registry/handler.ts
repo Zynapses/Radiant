@@ -4,7 +4,13 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { PoolClient } from 'pg';
 import { getPoolClient } from '../shared/db/centralized-pool';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'registry/handler',
+  category: 'infrastructure',
+  sourceType: 'lambda',
+});
 import { successResponse, notFoundResponse, handleError, corsPreflightResponse, corsHeaders } from '../shared/middleware/api-response';
 
 // ============================================================================

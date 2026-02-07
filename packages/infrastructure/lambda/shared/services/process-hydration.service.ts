@@ -17,7 +17,13 @@ import { v4 as uuidv4 } from 'uuid';
 import * as crypto from 'crypto';
 import * as zlib from 'zlib';
 import { promisify } from 'util';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'process/hydration',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 const gzip = promisify(zlib.gzip);
 const gunzip = promisify(zlib.gunzip);

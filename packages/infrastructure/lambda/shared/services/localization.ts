@@ -1,6 +1,12 @@
 import { SageMakerRuntimeClient, InvokeEndpointCommand } from '@aws-sdk/client-sagemaker-runtime';
 import { executeStatement } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'localization/main',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 type TranslationStatus = 'pending' | 'ai_translated' | 'needs_review' | 'approved' | 'rejected';
 

@@ -1,4 +1,4 @@
-// RADIANT v5.52.17 - Domain URL Configuration
+// RADIANT v6.6.0 - Domain URL Configuration
 // Configures domain routing for all RADIANT applications
 
 import Foundation

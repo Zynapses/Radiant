@@ -5,7 +5,13 @@
  */
 
 import type { StudentVersion, StudentInferenceRequest, StudentInferenceResponse } from '@radiant/shared';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'inference/student',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { STUDENT_TRAINING_CONFIG, STUDENT_INFERENCE_DEFAULTS } from '@radiant/shared/constants';
 import { getDbPool } from './database';
 import { SageMakerRuntimeClient, InvokeEndpointCommand } from '@aws-sdk/client-sagemaker-runtime';

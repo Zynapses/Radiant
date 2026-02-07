@@ -2,7 +2,13 @@
 // Integrates 56 self-hosted models with AGI Brain orchestration
 
 import { executeStatement } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'self/hosted-model-selector',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import {
   SELF_HOSTED_MODEL_REGISTRY,
   SelfHostedModelDefinition,

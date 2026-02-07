@@ -3,7 +3,13 @@
 // Includes timed sync, auto-discovery, and endpoint management
 
 import { executeStatement, stringParam, longParam } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'model/coordination',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import type {
   ModelEndpoint,
   ModelRegistryEntry,

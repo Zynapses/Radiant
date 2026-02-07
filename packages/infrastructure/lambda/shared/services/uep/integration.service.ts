@@ -15,7 +15,13 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import * as crypto from 'crypto';
-import { enhancedLogger as logger } from '../../logging/enhanced-logger';
+import { createRegisteredLogger } from '../logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'uep/integration',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { uepStorageAdapter } from './uds-storage-adapter.service';
 import type { StoredEnvelope, UEPStorageOptions } from './uds-storage-adapter.service';
 

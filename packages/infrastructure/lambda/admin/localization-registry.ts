@@ -10,7 +10,13 @@
 
 import { APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda';
 import { executeStatement, stringParam, boolParam } from '../shared/db/client';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'admin/localization-registry',
+  category: 'audit',
+  sourceType: 'lambda',
+});
 
 // ============================================================================
 // Types

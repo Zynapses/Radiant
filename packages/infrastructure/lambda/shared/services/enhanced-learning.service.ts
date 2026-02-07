@@ -4,7 +4,13 @@
 
 import { executeStatement, stringParam, longParam, doubleParam, boolParam } from '../db/client';
 import type { SqlParameter } from '@aws-sdk/client-rds-data';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'enhanced/learning',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import crypto from 'crypto';
 
 // ============================================================================

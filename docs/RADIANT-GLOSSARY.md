@@ -2,7 +2,8 @@
 
 > **Quick Reference for AI Terms, Subsystems, AWS Services, and Acronyms**
 > 
-> **Version**: 1.9.0 | **Last Updated**: February 2, 2026
+> **Version**: 2.2.0 | **Last Updated**: February 7, 2026  
+> **Includes**: THE OMEGA PROTOCOL Terminology, LIVS-M 2.0 Registry Edition
 
 ---
 
@@ -12,26 +13,86 @@
 |--------|----------|
 | **🔷** | **RADIANT Proprietary** - Term invented by RADIANT. You won't find it elsewhere. |
 | **🔶** | **RADIANT Branding** - Industry concept with RADIANT-specific implementation or naming. |
+| **🟣** | **OMEGA Protocol** - Novel physics and architecture from Project OMEGA. |
 | *(no symbol)* | **Industry Standard** - Common AI/tech term used with standard meaning. |
 
 ---
 
 ## Table of Contents
 
-1. [AI & Machine Learning Terms](#1-ai--machine-learning-terms)
-2. [RADIANT Core Subsystems](#2-radiant-core-subsystems)
-3. [Think Tank (Consumer AI Platform)](#3-think-tank-consumer-ai-platform)
-4. [AWS Services Used](#4-aws-services-used)
-5. [Acronyms & Abbreviations](#5-acronyms--abbreviations)
-6. [Database & Storage Terms](#6-database--storage-terms)
-7. [Security & Compliance Terms](#7-security--compliance-terms)
-8. [API & Protocol Terms](#8-api--protocol-terms)
-9. [UI/UX Terms](#9-uiux-terms)
-10. [Quick Reference Tables](#quick-reference-tables)
+1. [OMEGA Protocol Terminology](#1-omega-protocol-terminology)
+2. [AI & Machine Learning Terms](#2-ai--machine-learning-terms)
+3. [RADIANT Core Subsystems](#3-radiant-core-subsystems)
+4. [Think Tank (Consumer AI Platform)](#4-think-tank-consumer-ai-platform)
+5. [AWS Services Used](#5-aws-services-used)
+6. [Acronyms & Abbreviations](#6-acronyms--abbreviations)
+7. [Database & Storage Terms](#7-database--storage-terms)
+8. [Security & Compliance Terms](#8-security--compliance-terms)
+9. [API & Protocol Terms](#9-api--protocol-terms)
+10. [UI/UX Terms](#10-uiux-terms)
+11. [Quick Reference Tables](#11-quick-reference-tables)
 
 ---
 
-## 1. AI & Machine Learning Terms
+## 1. OMEGA Protocol Terminology
+
+> **Reference**: [PROJECT-GENESIS-OMEGA.md](PROJECT-GENESIS-OMEGA.md) for complete specification
+
+### Core Physics
+
+| Term | Definition |
+|------|------------|
+| 🟣 **Q-Node (Quantum Oscillator)** | The fundamental unit of the OMEGA brain—a complex-valued neuron where state exists as magnitude (confidence) and phase angle (context). Uses `torch.complex64` tensors. |
+| 🟣 **Complex-Valued Neural Network (CVNN)** | Neural network using complex numbers instead of scalar weights. Enables wave interference, phase dynamics, and constructive/destructive interference. |
+| 🟣 **Phase Dynamics** | The replacement for static scalar weights. Instead of `Output = Input * Weight`, OMEGA uses `State_New = State_Old * e^(i * Phase_Shift)` (wave mechanics). |
+| 🟣 **Phase-Locking (Hebbian Sync)** | Learning mechanism where Q-Nodes that successfully solve problems synchronize their frequencies. "Oscillators that resonate together, lock together." |
+| 🟣 **Destructive Interference** | When two phase vectors are opposite, they cancel out (sum to zero). Used by the Helix Kernel to block forbidden thoughts. |
+| 🟣 **Constructive Interference** | When two phase vectors align, they reinforce each other. The basis of OMEGA learning. |
+| 🟣 **Liquid Time-Constant (LTC)** | Differential equation (`dy/dt`) that updates neuron state in real-time. Replaces LoRA—the brain is fluid and adapts instantly. |
+
+### Architecture Components
+
+| Term | Definition |
+|------|------------|
+| 🟣 **Bicameral Mind** | Two-chambered brain architecture: OMEGA Cortex (The Mind) handles logic/reasoning, Broca Interface (The Mouth) translates to English. |
+| 🟣 **OMEGA Cortex** | The "Driver" region using LTC networks with complex-valued logic. Outputs abstract Thought Vectors, not English. |
+| 🟣 **Broca Interface** | The "Translator" region using commodity LLM (Llama-3-8B). Receives Thought Vectors, outputs polite English. Has no memory or decision-making. |
+| 🟣 **Helix Kernel (Bio-ROM)** | Biological Read-Only Memory that enforces deterministic safety via destructive interference. Mathematically impossible to bypass (unlike RLHF). |
+| 🟣 **Homeostatic Regulator** | The Reticular Activating System analog—monitors entropy and forces action to prevent "boredom". Implements the Ambition Loop. |
+| 🟣 **Resonant Index** | O(1) frequency-based document addressing. Uses phase resonance instead of vector similarity search. Scales infinitely. |
+
+### Cryogenic Architecture
+
+| Term | Definition |
+|------|------------|
+| 🟣 **Cryogenic Serverless Model** | Architecture that allows a stateful brain to run on ephemeral Lambda. Uses Time Warp to skip forward instantly. |
+| 🟣 **Time Warp** | Applying the cryogenic formula `S_new = S_old · e^(-λΔt)` to age the brain instantly when it wakes up. Short-term decays, long-term persists. |
+| 🟣 **Freeze/Thaw/Warp Cycle** | Lifecycle: Freeze (serialize to EFS, $0), Thaw (load old state), Warp (apply decay formula). |
+| 🟣 **Thermal Status** | Brain activity indicator: Warm (active <15min), Cooling (15-60min), Cold (1-24h), Frozen (>24h). |
+
+### Genesis Ecosystem
+
+| Term | Definition |
+|------|------------|
+| 🟣 **.bio Firmware** | Signed JSON file containing Helix Rules (safety DNA), Ambition Settings, and Personality Traits. Brain rejects unsigned firmware. |
+| 🟣 **Genesis Forge** | Web application for creating, signing, and hot-swapping .bio firmware files. Includes AI-assisted generation. |
+| 🟣 **Genesis Lab** | Real-time monitoring dashboard for OMEGA brains. Includes Dashboard, Cortex Explorer, Shadow Mode Monitor. |
+| 🟣 **Firmware Hot-Swap** | Loading new firmware into a running brain without restart. OMEGA detects new hash and reloads physics constants instantly. |
+| 🟣 **Cortex Explorer** | Genesis Lab tab for inspecting individual brains: metrics, ambition state, phase distribution, Helix status. |
+
+### Shadow Protocol
+
+| Term | Definition |
+|------|------------|
+| 🟣 **Shadow Protocol** | Deployment strategy where OMEGA runs in parallel with Legacy LLM, learning by comparison. Promoted when 7-day coherence exceeds 90%. |
+| 🟣 **Coherence Score** | Metric measuring how well OMEGA's predictions align with Legacy LLM results. Used for promotion decision. |
+| 🟣 **Dopamine Hit** | Reinforcement signal when OMEGA correctly predicts the Legacy LLM result. Strengthens phase-locked connections. |
+| 🟣 **Inference Collapse** | Economic phenomenon where OMEGA's cost curve becomes logarithmic—the smarter it gets, the cheaper it runs. |
+| 🟣 **Biological Lock-In** | Strategic moat: customer's brain physically densifies around their institutional knowledge. Impossible to export. |
+
+---
+
+## 2. AI & Machine Learning Terms
 
 | Term | Definition |
 |------|------------|
@@ -188,6 +249,26 @@
 | 🔷 **Model Integrity Weights** | Per-model lie rate statistics by domain and question type, weighted 30% in Cato model selection to prefer honest models | `livs-weights.service.ts` |
 | 🔷 **Soft Rules** | Tenant-configurable integrity rules with System → Tenant → User override hierarchy, all enabled by default | `livs-soft-rules.service.ts` |
 
+### 🔷 LIVS-M 2.0: Registry Edition (v7.9.0)
+
+| Term | Description | Key Files |
+|------|-------------|-----------|
+| 🔷 **Policy Registry** | JSON-based "Soft Registry" that decouples AI behavior logic from enforcement policy. Admins configure rules without touching code. | `policy-registry.service.ts` |
+| 🔷 **Governance Supervisor** | Meta-prompt LLM that enforces the Policy Registry. Evaluates agent outputs and returns APPROVE, REJECT, or INTERVENE decisions. | `livs-governance-supervisor.service.ts` |
+| 🔷 **Environment Mode** | Registry-wide behavior preset: STRICT_AUDIT (production), ENGINEERING/BALANCED (default), RAPID_PROTO (development), HACKATHON (demos) | `PolicyRegistry.meta_config` |
+| 🔷 **Brainstorming Mode** | "Yes, and..." mode (RAPID_PROTO). Fast iteration for hackathons, MVPs, exploration. Accepts stubs, warnings don't block. | UI: Settings → Advanced |
+| 🔷 **Standard Mode** | "Trust but Verify" mode (ENGINEERING). Balanced mode for daily work. Code must run, sycophancy warned. Default mode. | UI: Settings → Advanced |
+| 🔷 **Strict Audit Mode** | "Zero Trust" mode (STRICT_AUDIT). Maximum rigor for production, security, compliance. No stubs, mandatory tests, Devil's Advocate. | UI: Settings → Advanced |
+| 🔷 **Governed Debate** | Multi-agent pattern where Thesis and Antithesis agents argue under Supervisor governance with sycophancy detection | `agi-orchestrator.service.ts` |
+| 🔷 **Thesis Agent** | Lead Engineer role—proposes complete, functional solutions. Must avoid stubs/placeholders or face automatic rejection. | `DEFAULT_AGENT_CONFIGS` |
+| 🔷 **Antithesis Agent** | Forensic Auditor role—challenges Thesis proposals, finds flaws, detects policy violations. Has anti-sycophancy mandate. | `DEFAULT_AGENT_CONFIGS` |
+| 🔷 **Chaos Agent** | Devil's Advocate role—invoked when Supervisor detects sycophancy. Breaks premature consensus through adversarial challenges. | `DEFAULT_AGENT_CONFIGS` |
+| 🔷 **Sycophancy Detection** | Pattern detection for premature agent agreement. Triggers INTERVENE decision and Chaos Agent injection. | `R_SYC_01` rule |
+| 🔷 **Stub Detection** | Automatic rejection of outputs containing placeholders, TODOs, or incomplete implementations. CRITICAL severity. | `R_STUB_01` rule |
+| 🔷 **Registry-Aware Prompts** | System prompts dynamically built from Policy Registry, informing agents of active rules and environment mode. | `buildAgentSystemPrompt()` |
+| 🔷 **Escalation Threshold** | Max agent turns before requiring human intervention. Configurable in `global_directives`. Default: 10 turns. | `max_agent_turns_before_escalation` |
+| 🔷 **Enforcement Action** | What happens on rule violation: REJECT_IMMEDIATE, REQUEST_AMENDMENT, TRIGGER_CHAOS_AGENT, FLAG_FOR_REVIEW, LOG_ONLY | `RegistryEnforcementAction` |
+
 ### 🔷 The Crucible (Competitive Deliberation) v6.4.0
 
 | Subsystem | Description | Key Files |
@@ -272,6 +353,8 @@
 | Subsystem | Description | Key Files |
 |-----------|-------------|-----------|
 | 🔷 **Anti-Drift System** | Continuous model performance monitoring that detects accuracy degradation and triggers automatic retraining when quality drops below threshold | `drift-detection.service.ts` |
+| 🔶 **Drift-Aware Weighting** | Unified facade combining drift detection + correction + app-specific weight profiles into single API. 7 app profiles (Genesis/Cato/Cortex/Omega/Orchestrator/ThinkTank/Curator) with tuned drift/quality/latency/cost/availability weights. Composite scoring with stability penalties. Primary model selection for AGI Orchestrator | `drift-aware-weighting.service.ts` |
+| 🔷 **Drift Correction** | Automatic correction for drifting models: quarantine (exclude from selection), weight penalties (reduce composite score), temperature adjustments, prompt prefix corrections, fallback model activation, auto-release on recovery | `drift-correction.service.ts` |
 | 🔷 **Economic Governor** | Budget enforcement layer that tracks per-tenant spending, enforces rate limits, and routes to cheaper models when approaching budget caps | `economic-governor.service.ts` |
 | 🔶 **HITL** | Human-in-the-Loop approval workflows—queues high-risk AI actions for human review before execution | `hitl-orchestration.service.ts` |
 | 🔷 **Mission Control** | Admin dashboard for HITL queue management—shows pending approvals, decision history, and escalation metrics | `mission-control/` |
@@ -811,6 +894,7 @@
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 2.2.0 | Feb 7, 2026 | **Drift-Aware Weighting System**: Added Drift-Aware Weighting (DriftAwareWeightingService) and Drift Correction entries to Safety & Verification; New terms: App Weight Profile, Composite Score, Drift Trend, Drift Quarantine, Drift Health Gate |
 | 1.9.0 | Feb 2, 2026 | **Service Implementation Verification**: Added 29 verified service entries across 6 new sections: **Causal & Counterfactual Reasoning** (6 services: Causal Reasoning Engine, Causal Tracker, Curiosity Engine, DreamerV3 World Model, Shadow Self, Counterfactual Simulator); **Safety Interlocks** (4 services: Sensory Veto, Redundant Perception, Fracture Detection, Epistemic Recovery); **Security & Ethics Extensions** expanded (+4: Cedar Authorization, Constitutional Classifier, Control Barrier Functions, Golden Rules); **Learning & Training** expanded (+7: Circadian Budget, Precision Governor, Distillation Pipeline, DPO Trainer, Dataset Importer, Entrance Exam, DIA Miner); **Think Tank Features** expanded (+3: Cato Dialogue, Deep Research Agents, Persona Service; enhanced Council of Rivals); **Infrastructure & Resilience** (4 services: Circuit Breaker, Query Fallback, Cortex Telemetry, Cato State Service). All 29 services verified as fully implemented (no stubs). |
 | 1.8.0 | Feb 2, 2026 | **Major Audit Update**: Added 5 new sections: Consciousness & Cognition (10 subsystems: HippoRAG, Theory of Mind, World Model, SpikingJelly, IIT-Phi, Butlin Tests, Consciousness Emergence, Metacognition, Episodic Memory, Moral Compass); Reality Engine (4 subsystems); Learning & Training (8 subsystems); Advanced AI Features (6 subsystems); Security & Ethics Extensions (6 subsystems); Utility Services (9 subsystems). Fixed file references: ego.service.ts→local-ego.service.ts, anti-drift.service.ts→drift-detection.service.ts, domain-expert.service.ts→raws/domain-detector.service.ts, dream-scheduler.service.ts→cos/subconscious/dream-scheduler.ts |
 | 1.7.0 | Feb 1, 2026 | **LIVS Implementation**: Updated LIVS section from PROPOSED to implemented; Full implementation includes: 6 TypeScript services, 7 database tables, 16 Admin API endpoints, Admin Dashboard UI |

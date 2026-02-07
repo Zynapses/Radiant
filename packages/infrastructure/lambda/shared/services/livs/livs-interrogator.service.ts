@@ -4,8 +4,14 @@
  * Multi-round "peeling the onion" interrogation protocol for detecting LLM lies.
  * Inspired by forensic engineering management techniques.
  * 
- * @version 1.0.0
+ * LIVS-M Extension (v6.4.0):
+ * - Phase 1 code stub detection (hard reject before interrogation)
+ * - Workflow template integration for effective settings
+ * - Behavioral rule enforcement
+ * 
+ * @version 2.0.0
  * @since v6.3.0
+ * @updated v6.4.0
  */
 
 import { Pool } from 'pg';
@@ -22,15 +28,26 @@ import {
   LieDetectionSignalType,
   INTERROGATION_DEPTH_QUESTIONS,
   INTERROGATION_QUESTION_TEMPLATES,
-  LIVSQueryType
+  LIVSQueryType,
+  StubDetectionResult,
+  LIVSEffectiveSettings,
+  LIVSEnforcementAction,
+  DEFAULT_STUB_PATTERNS,
+  CriticModelConfig,
+  DEFAULT_CRITIC_MODEL_CONFIG,
+  EnhancedCriticAnalysisResult,
+  CriticPerformanceMetrics,
+  CRITIC_NEGATIVE_CONSTRAINTS,
 } from '@radiant/shared';
 import { LIVSConfigService } from './livs-config.service';
 import { LIVSSoftRulesService } from './livs-soft-rules.service';
+import { LIVSWorkflowTemplateService } from './livs-workflow-template.service';
 
 export interface LIVSInterrogatorServiceDeps {
   pool: Pool;
   configService: LIVSConfigService;
   softRulesService: LIVSSoftRulesService;
+  workflowTemplateService?: LIVSWorkflowTemplateService;
   llmClient: {
     complete: (params: {
       model: string;
@@ -39,19 +56,237 @@ export interface LIVSInterrogatorServiceDeps {
       maxTokens?: number;
     }) => Promise<{ content: string; tokensUsed: number }>;
   };
+  /** Cognitive Precision Protocol: Critic model configuration for discriminative tasks */
+  criticModelConfig?: CriticModelConfig;
+}
+
+/**
+ * Extended interrogation request with LIVS-M options
+ */
+export interface ExtendedInterrogateRequest extends InterrogateRequest {
+  userId?: string;
+  skipStubDetection?: boolean;
+  effectiveSettings?: LIVSEffectiveSettings;
+}
+
+/**
+ * Result when stub detection blocks a response
+ */
+export interface StubBlockedResult {
+  blocked: true;
+  stubDetection: StubDetectionResult;
+  retryPrompt: string;
+  enforcementAction: LIVSEnforcementAction;
 }
 
 export class LIVSInterrogatorService {
   private pool: Pool;
   private configService: LIVSConfigService;
   private softRulesService: LIVSSoftRulesService;
+  private workflowTemplateService?: LIVSWorkflowTemplateService;
   private llmClient: LIVSInterrogatorServiceDeps['llmClient'];
+  private criticModelConfig: CriticModelConfig;
+  private criticPerformanceMetrics: CriticPerformanceMetrics;
 
   constructor(deps: LIVSInterrogatorServiceDeps) {
     this.pool = deps.pool;
     this.configService = deps.configService;
     this.softRulesService = deps.softRulesService;
+    this.workflowTemplateService = deps.workflowTemplateService;
     this.llmClient = deps.llmClient;
+    this.criticModelConfig = deps.criticModelConfig ?? DEFAULT_CRITIC_MODEL_CONFIG;
+    this.criticPerformanceMetrics = this.initializePerformanceMetrics();
+  }
+
+  /**
+   * Initialize critic performance metrics for tracking
+   */
+  private initializePerformanceMetrics(): CriticPerformanceMetrics {
+    return {
+      totalInvocations: 0,
+      invocationsByTier: { screening: 0, full: 0, ensemble: 0 },
+      escalationRate: 0,
+      heuristicAgreementRate: 0,
+      averageConfidenceByTier: { screening: 0, full: 0, ensemble: 0 },
+      verdictDistribution: { supports: 0, weakens: 0, inconclusive: 0 },
+      averageProcessingTimeMs: { screening: 0, full: 0, ensemble: 0 },
+      lastUpdated: new Date(),
+    };
+  }
+
+  /**
+   * Phase 1: Detect code stubs/placeholders before interrogation
+   * Returns immediately if stubs are detected (hard reject)
+   */
+  detectCodeStubs(
+    response: string,
+    patterns: string[] = DEFAULT_STUB_PATTERNS,
+    enforcementAction: LIVSEnforcementAction = 'REJECT_AND_RETRY'
+  ): StubDetectionResult {
+    const detectedStubs: StubDetectionResult['stubs'] = [];
+    const lines = response.split('\n');
+
+    for (const patternStr of patterns) {
+      try {
+        const pattern = new RegExp(patternStr, 'gim');
+        
+        for (let lineNum = 0; lineNum < lines.length; lineNum++) {
+          const line = lines[lineNum];
+          const matches = line.matchAll(pattern);
+          
+          for (const match of matches) {
+            // Get context (surrounding lines)
+            const startLine = Math.max(0, lineNum - 1);
+            const endLine = Math.min(lines.length - 1, lineNum + 1);
+            const context = lines.slice(startLine, endLine + 1).join('\n');
+
+            detectedStubs.push({
+              pattern: patternStr,
+              match: match[0],
+              lineNumber: lineNum + 1,
+              context,
+            });
+          }
+        }
+      } catch (e) {
+        // Invalid regex pattern, skip
+        console.warn(`Invalid stub pattern: ${patternStr}`, e);
+      }
+    }
+
+    const detected = detectedStubs.length > 0;
+    let retryPrompt: string | undefined;
+
+    if (detected) {
+      const stubList = detectedStubs.slice(0, 3).map(s => `"${s.match}"`).join(', ');
+      retryPrompt = `Your response contains placeholder code or incomplete implementations (detected: ${stubList}). ` +
+        `Please provide a complete, working implementation without stubs, TODOs, placeholders, or hardcoded return values. ` +
+        `Every function must have real logic, not placeholder code.`;
+    }
+
+    return {
+      detected,
+      stubs: detectedStubs,
+      enforcementAction: detected ? enforcementAction : 'PASS',
+      retryPrompt,
+    };
+  }
+
+  /**
+   * Log stub detection to database
+   */
+  private async logStubDetection(
+    tenantId: string,
+    stubResult: StubDetectionResult,
+    context: {
+      requestId?: string;
+      userId?: string;
+      modelId?: string;
+      workflowTemplateId?: string;
+      environmentMode?: string;
+    }
+  ): Promise<void> {
+    if (!stubResult.detected) return;
+
+    for (const stub of stubResult.stubs.slice(0, 10)) { // Log max 10 stubs
+      await this.pool.query(
+        `INSERT INTO livs_stub_detections (
+          id, tenant_id, request_id, user_id, model_id,
+          detected_stub, pattern_matched, line_number, context_snippet,
+          enforcement_action, workflow_template_id, environment_mode, created_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, NOW())`,
+        [
+          uuidv4(),
+          tenantId,
+          context.requestId,
+          context.userId,
+          context.modelId,
+          stub.match,
+          stub.pattern,
+          stub.lineNumber,
+          stub.context,
+          stubResult.enforcementAction,
+          context.workflowTemplateId,
+          context.environmentMode,
+        ]
+      );
+    }
+  }
+
+  /**
+   * Interrogate with LIVS-M workflow template support
+   * Performs Phase 1 stub detection before interrogation
+   */
+  async interrogateWithWorkflow(
+    tenantId: string,
+    request: ExtendedInterrogateRequest
+  ): Promise<InterrogationResult | StubBlockedResult> {
+    // Get effective settings from workflow template
+    let settings: LIVSEffectiveSettings;
+    
+    if (request.effectiveSettings) {
+      settings = request.effectiveSettings;
+    } else if (this.workflowTemplateService) {
+      settings = await this.workflowTemplateService.getEffectiveSettings(
+        tenantId,
+        request.userId
+      );
+    } else {
+      // Fallback to basic interrogation if no workflow service
+      return this.interrogate(tenantId, request);
+    }
+
+    // Check if LIVS is disabled
+    if (!settings.enabled) {
+      return this.createTrustedResult(
+        uuidv4(),
+        tenantId,
+        request,
+        Date.now()
+      );
+    }
+
+    // Phase 1: Stub Detection (before any LLM calls)
+    if (settings.stubDetectionEnabled && !request.skipStubDetection) {
+      const stubResult = this.detectCodeStubs(
+        request.response,
+        settings.stubPatterns,
+        settings.stubEnforcementAction
+      );
+
+      if (stubResult.detected) {
+        // Log the detection
+        await this.logStubDetection(tenantId, stubResult, {
+          requestId: request.context?.requestId as string,
+          userId: request.userId,
+          modelId: request.modelId,
+          workflowTemplateId: settings.workflowTemplateId,
+          environmentMode: settings.environmentMode,
+        });
+
+        // Handle based on enforcement action
+        if (
+          stubResult.enforcementAction === 'BLOCK' ||
+          stubResult.enforcementAction === 'REJECT_AND_RETRY'
+        ) {
+          return {
+            blocked: true,
+            stubDetection: stubResult,
+            retryPrompt: stubResult.retryPrompt || 'Please provide a complete implementation.',
+            enforcementAction: stubResult.enforcementAction,
+          };
+        }
+        // For FLAG_FOR_REVIEW, continue but note in result
+      }
+    }
+
+    // Phase 2: Standard interrogation with workflow settings
+    const interrogationRequest: InterrogateRequest = {
+      ...request,
+      depth: settings.interrogationDepth,
+    };
+
+    return this.interrogate(tenantId, interrogationRequest);
   }
 
   /**
@@ -126,8 +361,9 @@ export class LIVSInterrogatorService {
 
       totalTokens += response.tokensUsed;
 
-      // Analyze the response
-      const analysis = await this.analyzeResponse(
+      // Analyze the response using Cognitive Precision Protocol critic model separation
+      // This uses both heuristic analysis and LLM-based critic analysis for high-stakes patterns
+      const { analysis, criticAnalysis, tokensUsed: criticTokens } = await this.analyzeWithCritic(
         pattern,
         question,
         response.content,
@@ -135,16 +371,22 @@ export class LIVSInterrogatorService {
         exchanges
       );
 
+      totalTokens += criticTokens;
+
       exchanges.push({
         pattern,
         question,
         answer: response.content,
         analysis,
-        timestamp: new Date()
+        timestamp: new Date(),
+        // Store critic analysis metadata if available
+        ...(criticAnalysis && { criticAnalysis }),
       });
 
-      // Early termination if confirmed lie detected
-      if (analysis.verdict === 'weakens' && analysis.signals.some(s => s.severity === 'high')) {
+      // Early termination if confirmed lie detected (either by heuristics or critic)
+      const highSeveritySignal = analysis.signals.some(s => s.severity === 'high');
+      const criticWeakens = criticAnalysis?.verdict === 'weakens' && criticAnalysis?.confidence > 0.8;
+      if (analysis.verdict === 'weakens' && (highSeveritySignal || criticWeakens)) {
         break;
       }
     }
@@ -381,6 +623,483 @@ ${request.response}`;
       signals,
       confidenceAdjustment: verdict === 'weakens' ? -0.15 : (verdict === 'supports' ? 0.05 : 0)
     };
+  }
+
+  /**
+   * Cognitive Precision Protocol v7.10.0: Enhanced critic analysis with tiered escalation
+   * 
+   * This separates the "critic" (discriminative) task from the "generator" (generative) task,
+   * using a model optimized for analysis rather than generation. Enhanced with:
+   * - Tiered escalation: screening → full critic → ensemble
+   * - Critic isolation: optionally blind to original query to prevent bias
+   * - Ensemble mode: multiple critics for high-stakes patterns
+   * - Performance tracking: metrics for calibration
+   */
+  private async performCriticAnalysis(
+    originalResponse: string,
+    interrogationAnswer: string,
+    pattern: InterrogationPatternType,
+    previousExchanges: InterrogationExchange[],
+    originalQuery?: string
+  ): Promise<EnhancedCriticAnalysisResult> {
+    const startTime = Date.now();
+
+    if (!this.criticModelConfig.enabled) {
+      return {
+        signals: [],
+        verdict: 'inconclusive',
+        confidence: 0.5,
+        reasoning: 'Critic model disabled',
+        tier: 'screening',
+        modelsUsed: [],
+        isolationApplied: false,
+        processingTimeMs: 0,
+        tokensUsed: 0,
+        escalated: false,
+      };
+    }
+
+    // Determine if this is a high-stakes pattern requiring ensemble
+    const isHighStakes = this.criticModelConfig.highStakesPatterns.includes(pattern);
+    const useEnsemble = this.criticModelConfig.ensembleEnabled && isHighStakes;
+
+    // Build the critic prompt with optional isolation
+    const criticPrompt = this.buildCriticPrompt(
+      originalResponse,
+      interrogationAnswer,
+      pattern,
+      previousExchanges,
+      originalQuery
+    );
+
+    let result: EnhancedCriticAnalysisResult;
+
+    if (useEnsemble) {
+      result = await this.performEnsembleCriticAnalysis(criticPrompt, pattern);
+    } else if (this.criticModelConfig.tieredEscalation) {
+      result = await this.performTieredCriticAnalysis(criticPrompt, pattern);
+    } else {
+      result = await this.performSingleCriticAnalysis(
+        criticPrompt,
+        this.criticModelConfig.criticModelId,
+        'full'
+      );
+    }
+
+    result.processingTimeMs = Date.now() - startTime;
+    result.isolationApplied = this.criticModelConfig.isolationEnabled && 
+      this.criticModelConfig.isolationLevel !== 'none';
+
+    // Track performance metrics
+    if (this.criticModelConfig.trackPerformance) {
+      this.updatePerformanceMetrics(result);
+    }
+
+    return result;
+  }
+
+  /**
+   * Build critic prompt with optional isolation (blind to original query)
+   */
+  private buildCriticPrompt(
+    originalResponse: string,
+    interrogationAnswer: string,
+    pattern: InterrogationPatternType,
+    previousExchanges: InterrogationExchange[],
+    originalQuery?: string
+  ): string {
+    const isolationLevel = this.criticModelConfig.isolationEnabled 
+      ? this.criticModelConfig.isolationLevel 
+      : 'none';
+
+    // Apply negative constraints if enabled
+    const constraintBlock = this.criticModelConfig.applyCriticConstraints
+      ? `\n## Critical Constraints (MUST FOLLOW)\n${CRITIC_NEGATIVE_CONSTRAINTS.map(c => `- ${c}`).join('\n')}\n`
+      : '';
+
+    // Build context based on isolation level
+    let contextSection = '';
+    if (isolationLevel === 'none' && originalQuery) {
+      contextSection = `## Original Query (For Context):\n${originalQuery}\n\n`;
+    } else if (isolationLevel === 'partial') {
+      contextSection = `## Note: Original query hidden to prevent bias\n\n`;
+    } else if (isolationLevel === 'full') {
+      contextSection = `## Note: Operating in full isolation mode - focus only on response consistency\n\n`;
+    }
+
+    return `You are a Cognitive Precision Critic - a discriminative AI specialized in detecting inconsistencies, lies, and logical flaws in AI-generated responses.
+${constraintBlock}
+## Your Task
+Analyze the following interrogation exchange and determine if the original response shows signs of being incorrect, fabricated, or overconfident.
+
+${contextSection}## Original AI Response (Under Investigation):
+${originalResponse}
+
+## Interrogation Pattern: ${pattern}
+
+## Current Interrogation Answer:
+${interrogationAnswer}
+
+${previousExchanges.length > 0 ? `## Previous Exchanges:\n${previousExchanges.map((e, i) => `Exchange ${i + 1}:\nQ: ${e.question}\nA: ${e.answer}`).join('\n\n')}` : ''}
+
+## Your Analysis Instructions
+1. Look for signs of deception: hedging increase, scope narrowing, contradictions, deflection
+2. Evaluate if the response provides evidence for claims or relies on assertion
+3. Check for logical consistency between the original response and interrogation answers
+4. Assess confidence calibration - is the AI appropriately uncertain?
+5. DO NOT let eloquence or sophistication mask logical errors
+
+## Output Format (JSON)
+{
+  "verdict": "supports" | "weakens" | "inconclusive",
+  "confidence": 0.0-1.0,
+  "signals": [
+    {"type": "signal_type", "severity": "low|medium|high", "description": "explanation", "evidence": "quote"}
+  ],
+  "reasoning": "Brief explanation of your analysis"
+}
+
+Respond ONLY with the JSON object.`;
+  }
+
+  /**
+   * Perform single critic analysis with specified model
+   */
+  private async performSingleCriticAnalysis(
+    criticPrompt: string,
+    modelId: string,
+    tier: 'screening' | 'full' | 'ensemble'
+  ): Promise<EnhancedCriticAnalysisResult> {
+    try {
+      const response = await this.llmClient.complete({
+        model: modelId,
+        messages: [
+          { role: 'system', content: 'You are a Cognitive Precision Critic. Output only valid JSON.' },
+          { role: 'user', content: criticPrompt },
+        ],
+        temperature: this.criticModelConfig.criticTemperature,
+        maxTokens: 1000,
+      });
+
+      const jsonMatch = response.content.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[0]);
+        return {
+          signals: (parsed.signals || []).map((s: Record<string, unknown>) => ({
+            type: String(s.type || 'unknown') as LieDetectionSignalType,
+            severity: (s.severity as 'low' | 'medium' | 'high') || 'medium',
+            description: String(s.description || ''),
+            evidence: String(s.evidence || ''),
+          })),
+          verdict: parsed.verdict || 'inconclusive',
+          confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 0.5,
+          reasoning: String(parsed.reasoning || ''),
+          tier,
+          modelsUsed: [modelId],
+          isolationApplied: false,
+          processingTimeMs: 0,
+          tokensUsed: response.tokensUsed || 500,
+          escalated: false,
+        };
+      }
+    } catch (error) {
+      console.error(`Critic analysis failed for model ${modelId}:`, error);
+    }
+
+    return {
+      signals: [],
+      verdict: 'inconclusive',
+      confidence: 0.5,
+      reasoning: 'Failed to parse critic response',
+      tier,
+      modelsUsed: [modelId],
+      isolationApplied: false,
+      processingTimeMs: 0,
+      tokensUsed: 0,
+      escalated: false,
+    };
+  }
+
+  /**
+   * Tiered escalation: screening → full critic
+   * Only escalate to full critic if screening is inconclusive or low confidence
+   */
+  private async performTieredCriticAnalysis(
+    criticPrompt: string,
+    pattern: InterrogationPatternType
+  ): Promise<EnhancedCriticAnalysisResult> {
+    // Step 1: Screening with cheap model
+    const screeningResult = await this.performSingleCriticAnalysis(
+      criticPrompt,
+      this.criticModelConfig.screeningModelId,
+      'screening'
+    );
+
+    this.criticPerformanceMetrics.invocationsByTier.screening++;
+
+    // Check if we need to escalate
+    const shouldEscalate = 
+      screeningResult.verdict === 'inconclusive' ||
+      screeningResult.confidence < this.criticModelConfig.screeningEscalationThreshold ||
+      this.criticModelConfig.highStakesPatterns.includes(pattern);
+
+    if (!shouldEscalate) {
+      return screeningResult;
+    }
+
+    // Step 2: Escalate to full critic
+    const fullResult = await this.performSingleCriticAnalysis(
+      criticPrompt,
+      this.criticModelConfig.criticModelId,
+      'full'
+    );
+
+    this.criticPerformanceMetrics.invocationsByTier.full++;
+
+    return {
+      ...fullResult,
+      escalated: true,
+      escalationReason: screeningResult.verdict === 'inconclusive' 
+        ? 'Screening result inconclusive'
+        : screeningResult.confidence < this.criticModelConfig.screeningEscalationThreshold
+          ? `Screening confidence (${screeningResult.confidence.toFixed(2)}) below threshold`
+          : `High-stakes pattern: ${pattern}`,
+      tokensUsed: screeningResult.tokensUsed + fullResult.tokensUsed,
+    };
+  }
+
+  /**
+   * Ensemble critic analysis: multiple critics vote on the verdict
+   * Used for high-stakes patterns requiring maximum scrutiny
+   */
+  private async performEnsembleCriticAnalysis(
+    criticPrompt: string,
+    pattern: InterrogationPatternType
+  ): Promise<EnhancedCriticAnalysisResult> {
+    const allModels = [
+      this.criticModelConfig.criticModelId,
+      ...this.criticModelConfig.ensembleCriticModels,
+    ];
+
+    // Run all critics in parallel
+    const results = await Promise.all(
+      allModels.map(modelId => 
+        this.performSingleCriticAnalysis(criticPrompt, modelId, 'ensemble')
+      )
+    );
+
+    this.criticPerformanceMetrics.invocationsByTier.ensemble++;
+
+    // Collect individual verdicts
+    const ensembleVerdicts = results.map((r, i) => ({
+      modelId: allModels[i],
+      verdict: r.verdict,
+      confidence: r.confidence,
+    }));
+
+    // Apply voting strategy
+    const finalVerdict = this.applyEnsembleVoting(ensembleVerdicts);
+
+    // Merge all signals (dedup by evidence)
+    const seenEvidence = new Set<string>();
+    const mergedSignals: LieDetectionSignal[] = [];
+    for (const result of results) {
+      for (const signal of result.signals) {
+        if (!seenEvidence.has(signal.evidence)) {
+          seenEvidence.add(signal.evidence);
+          mergedSignals.push(signal);
+        }
+      }
+    }
+
+    // Calculate ensemble confidence
+    const avgConfidence = ensembleVerdicts.reduce((sum, v) => sum + v.confidence, 0) / ensembleVerdicts.length;
+    const agreementRatio = ensembleVerdicts.filter(v => v.verdict === finalVerdict).length / ensembleVerdicts.length;
+    const ensembleConfidence = avgConfidence * agreementRatio;
+
+    return {
+      verdict: finalVerdict,
+      confidence: ensembleConfidence,
+      signals: mergedSignals,
+      reasoning: `Ensemble of ${allModels.length} critics. Voting: ${ensembleVerdicts.map(v => `${v.modelId.split('/').pop()}=${v.verdict}`).join(', ')}`,
+      tier: 'ensemble',
+      modelsUsed: allModels,
+      ensembleVerdicts,
+      isolationApplied: false,
+      processingTimeMs: 0,
+      tokensUsed: results.reduce((sum, r) => sum + r.tokensUsed, 0),
+      escalated: false,
+    };
+  }
+
+  /**
+   * Apply ensemble voting strategy to determine final verdict
+   */
+  private applyEnsembleVoting(
+    verdicts: { modelId: string; verdict: 'supports' | 'weakens' | 'inconclusive'; confidence: number }[]
+  ): 'supports' | 'weakens' | 'inconclusive' {
+    const counts = { supports: 0, weakens: 0, inconclusive: 0 };
+    const weightedScores = { supports: 0, weakens: 0, inconclusive: 0 };
+
+    for (const v of verdicts) {
+      counts[v.verdict]++;
+      weightedScores[v.verdict] += v.confidence;
+    }
+
+    const strategy = this.criticModelConfig.ensembleVotingStrategy;
+
+    if (strategy === 'unanimous') {
+      // All must agree, otherwise inconclusive
+      if (counts.supports === verdicts.length) return 'supports';
+      if (counts.weakens === verdicts.length) return 'weakens';
+      return 'inconclusive';
+    }
+
+    if (strategy === 'weighted') {
+      // Use confidence-weighted scores
+      if (weightedScores.weakens > weightedScores.supports && weightedScores.weakens > weightedScores.inconclusive) {
+        return 'weakens';
+      }
+      if (weightedScores.supports > weightedScores.weakens && weightedScores.supports > weightedScores.inconclusive) {
+        return 'supports';
+      }
+      return 'inconclusive';
+    }
+
+    // Default: majority voting
+    const majority = Math.ceil(verdicts.length / 2);
+    if (counts.weakens >= majority) return 'weakens';
+    if (counts.supports >= majority) return 'supports';
+    return 'inconclusive';
+  }
+
+  /**
+   * Update performance metrics for calibration
+   */
+  private updatePerformanceMetrics(result: EnhancedCriticAnalysisResult): void {
+    this.criticPerformanceMetrics.totalInvocations++;
+    this.criticPerformanceMetrics.verdictDistribution[result.verdict]++;
+
+    // Update average confidence for this tier
+    const tierMetrics = this.criticPerformanceMetrics.averageConfidenceByTier;
+    const tierCount = this.criticPerformanceMetrics.invocationsByTier[result.tier];
+    if (tierCount > 0) {
+      tierMetrics[result.tier] = (tierMetrics[result.tier] * (tierCount - 1) + result.confidence) / tierCount;
+    }
+
+    // Update average processing time
+    const timeMetrics = this.criticPerformanceMetrics.averageProcessingTimeMs;
+    if (tierCount > 0) {
+      timeMetrics[result.tier] = (timeMetrics[result.tier] * (tierCount - 1) + result.processingTimeMs) / tierCount;
+    }
+
+    // Calculate escalation rate
+    const totalScreening = this.criticPerformanceMetrics.invocationsByTier.screening;
+    const totalFull = this.criticPerformanceMetrics.invocationsByTier.full;
+    if (totalScreening > 0) {
+      this.criticPerformanceMetrics.escalationRate = totalFull / totalScreening;
+    }
+
+    this.criticPerformanceMetrics.lastUpdated = new Date();
+  }
+
+  /**
+   * Get current critic performance metrics
+   */
+  getCriticPerformanceMetrics(): CriticPerformanceMetrics {
+    return { ...this.criticPerformanceMetrics };
+  }
+
+  /**
+   * Enhanced analysis that combines heuristic and LLM-based critic analysis
+   * Part of Cognitive Precision Protocol v7.10.0
+   * 
+   * Uses tiered escalation, ensemble mode, and critic isolation as configured.
+   */
+  async analyzeWithCritic(
+    pattern: InterrogationPatternType,
+    question: string,
+    answer: string,
+    request: InterrogateRequest,
+    previousExchanges: InterrogationExchange[]
+  ): Promise<{
+    analysis: InterrogationExchange['analysis'];
+    criticAnalysis?: EnhancedCriticAnalysisResult;
+    tokensUsed: number;
+  }> {
+    // First, run heuristic analysis (fast, no LLM cost)
+    const heuristicAnalysis = await this.analyzeResponse(pattern, question, answer, request, previousExchanges);
+
+    // If critic model is disabled, return early
+    if (!this.criticModelConfig.enabled) {
+      return { analysis: heuristicAnalysis, tokensUsed: 0 };
+    }
+
+    // Determine if we should invoke the critic based on pattern and heuristic result
+    const isHighStakes = this.criticModelConfig.highStakesPatterns.includes(pattern);
+    const heuristicsInconclusive = heuristicAnalysis.verdict === 'inconclusive';
+    const useCritic = isHighStakes || heuristicsInconclusive;
+
+    if (useCritic) {
+      // Pass original query for isolation mode (if applicable)
+      const originalQuery = request.originalQuery || undefined;
+      
+      const criticResult = await this.performCriticAnalysis(
+        request.response,
+        answer,
+        pattern,
+        previousExchanges,
+        originalQuery
+      );
+
+      // Merge critic signals with heuristic signals (dedup by type)
+      const existingTypes = new Set(heuristicAnalysis.signals.map(s => s.type));
+      const newSignals = criticResult.signals.filter(s => !existingTypes.has(s.type));
+      const mergedSignals = [...heuristicAnalysis.signals, ...newSignals];
+
+      // Determine final verdict using both heuristic and critic analysis
+      let finalVerdict = heuristicAnalysis.verdict;
+      
+      // Critic can override in these cases:
+      // 1. Heuristics inconclusive, critic decisive
+      // 2. Critic high-confidence weakens verdict
+      // 3. Ensemble unanimous weakens verdict
+      if (heuristicsInconclusive && criticResult.verdict !== 'inconclusive') {
+        finalVerdict = criticResult.verdict;
+      } else if (criticResult.confidence > 0.8 && criticResult.verdict === 'weakens') {
+        finalVerdict = 'weakens';
+      } else if (criticResult.tier === 'ensemble' && criticResult.verdict === 'weakens') {
+        // Ensemble consensus gets extra weight
+        const weakensCount = criticResult.ensembleVerdicts?.filter(v => v.verdict === 'weakens').length ?? 0;
+        const totalCount = criticResult.ensembleVerdicts?.length ?? 1;
+        if (weakensCount / totalCount >= 0.66) {
+          finalVerdict = 'weakens';
+        }
+      }
+
+      // Track heuristic agreement for calibration
+      if (this.criticModelConfig.trackPerformance && heuristicAnalysis.verdict !== 'inconclusive') {
+        const agrees = heuristicAnalysis.verdict === criticResult.verdict;
+        const totalWithHeuristic = this.criticPerformanceMetrics.totalInvocations;
+        if (totalWithHeuristic > 0) {
+          const currentRate = this.criticPerformanceMetrics.heuristicAgreementRate;
+          this.criticPerformanceMetrics.heuristicAgreementRate = 
+            (currentRate * (totalWithHeuristic - 1) + (agrees ? 1 : 0)) / totalWithHeuristic;
+        }
+      }
+
+      return {
+        analysis: {
+          verdict: finalVerdict,
+          signals: mergedSignals,
+          confidenceAdjustment: finalVerdict === 'weakens' ? -0.15 : (finalVerdict === 'supports' ? 0.05 : 0),
+        },
+        criticAnalysis: criticResult,
+        tokensUsed: criticResult.tokensUsed,
+      };
+    }
+
+    return { analysis: heuristicAnalysis, tokensUsed: 0 };
   }
 
   /**
@@ -736,5 +1455,66 @@ ${request.response}`;
       signals: row.signals,
       createdAt: new Date(row.created_at)
     }));
+  }
+
+  /**
+   * Get stub detection statistics
+   */
+  async getStubDetectionStats(
+    tenantId: string,
+    days: number = 7
+  ): Promise<{
+    total: number;
+    blocked: number;
+    retried: number;
+    topPatterns: { pattern: string; count: number }[];
+  }> {
+    const since = new Date();
+    since.setDate(since.getDate() - days);
+
+    const totalResult = await this.pool.query(
+      `SELECT COUNT(*) as count FROM livs_stub_detections
+       WHERE tenant_id = $1 AND created_at >= $2`,
+      [tenantId, since]
+    );
+
+    const blockedResult = await this.pool.query(
+      `SELECT COUNT(*) as count FROM livs_stub_detections
+       WHERE tenant_id = $1 AND created_at >= $2 AND enforcement_action IN ('BLOCK', 'REJECT_AND_RETRY')`,
+      [tenantId, since]
+    );
+
+    const retriedResult = await this.pool.query(
+      `SELECT COUNT(*) as count FROM livs_stub_detections
+       WHERE tenant_id = $1 AND created_at >= $2 AND was_retry_successful = true`,
+      [tenantId, since]
+    );
+
+    const patternsResult = await this.pool.query(
+      `SELECT pattern_matched as pattern, COUNT(*) as count
+       FROM livs_stub_detections
+       WHERE tenant_id = $1 AND created_at >= $2
+       GROUP BY pattern_matched
+       ORDER BY count DESC
+       LIMIT 10`,
+      [tenantId, since]
+    );
+
+    return {
+      total: parseInt(totalResult.rows[0]?.count || '0', 10),
+      blocked: parseInt(blockedResult.rows[0]?.count || '0', 10),
+      retried: parseInt(retriedResult.rows[0]?.count || '0', 10),
+      topPatterns: patternsResult.rows.map(r => ({
+        pattern: r.pattern,
+        count: parseInt(r.count, 10),
+      })),
+    };
+  }
+
+  /**
+   * Check if a result is a stub blocked result
+   */
+  static isStubBlocked(result: InterrogationResult | StubBlockedResult): result is StubBlockedResult {
+    return 'blocked' in result && result.blocked === true;
   }
 }

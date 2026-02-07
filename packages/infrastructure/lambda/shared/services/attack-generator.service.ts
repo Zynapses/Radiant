@@ -4,7 +4,13 @@
 
 import { executeStatement, stringParam, longParam, doubleParam, boolParam } from '../db/client';
 import { modelRouterService, type ChatMessage } from './model-router.service';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'attack/generator',
+  category: 'security',
+  sourceType: 'application',
+});
 import * as crypto from 'crypto';
 
 // ============================================================================
@@ -595,6 +601,7 @@ class AttackGeneratorService {
       ];
       
       const response = await modelRouterService.invoke({
+        tenantId,
         modelId: targetModelId,
         messages,
         temperature: 0,

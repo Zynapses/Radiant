@@ -12,7 +12,13 @@ function extractAdminContext(event: any) {
   const auth = extractAuthContext(event);
   return { isAuthenticated: auth.isAdmin, tenantId: auth.tenantId };
 }
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'admin/ecd',
+  category: 'audit',
+  sourceType: 'lambda',
+});
 
 // =============================================================================
 // Response Helpers

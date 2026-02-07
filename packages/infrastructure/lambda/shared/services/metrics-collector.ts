@@ -1,6 +1,12 @@
 import { CloudWatchClient, PutMetricDataCommand, StandardUnit } from '@aws-sdk/client-cloudwatch';
 import { executeStatement } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'metrics/collector',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 type MetricType = 'api_request' | 'token_usage' | 'model_inference' | 'billing' | 'error' | 'latency';
 

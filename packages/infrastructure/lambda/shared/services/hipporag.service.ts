@@ -281,6 +281,7 @@ ANSWER: [your final answer]
 CONFIDENCE: [0-1 score]`;
 
     const response = await modelRouterService.invoke({
+      tenantId,
       modelId: this.config.entityExtractionModel,
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.3,
@@ -367,6 +368,7 @@ Only return the JSON, no other text.`;
 
     try {
       const response = await modelRouterService.invoke({
+        tenantId,
         modelId: this.config.entityExtractionModel,
         messages: [{ role: 'user', content: prompt }],
         temperature: 0,
@@ -478,6 +480,7 @@ Return as JSON array of strings: ["entity1", "entity2", ...]`;
 
     try {
       const response = await modelRouterService.invoke({
+        tenantId,
         modelId: this.config.entityExtractionModel,
         messages: [{ role: 'user', content: prompt }],
         temperature: 0,

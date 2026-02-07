@@ -5,7 +5,13 @@
 import { APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda';
 import { userPersistentContextService, type UserContextType } from '../shared/services/user-persistent-context.service';
 import { executeStatement } from '../shared/db/client';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'thinktank/user-context',
+  category: 'application',
+  sourceType: 'lambda',
+});
 
 const headers = {
   'Content-Type': 'application/json',

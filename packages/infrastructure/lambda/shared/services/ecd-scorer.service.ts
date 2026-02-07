@@ -17,7 +17,13 @@ import {
   ENTITY_SEVERITY_MAP,
   ECD_SEVERITY_ORDER,
 } from '@radiant/shared';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'ecd/scorer',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 // =============================================================================
 // ECD Scorer Service

@@ -3,7 +3,13 @@
 // ============================================================================
 
 import { APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'admin/security-schedules',
+  category: 'audit',
+  sourceType: 'lambda',
+});
 import {
   securityScheduleService,
   ScheduleType,

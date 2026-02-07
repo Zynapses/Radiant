@@ -4,7 +4,13 @@
 
 import { executeStatement, stringParam, longParam, doubleParam, boolParam } from '../db/client';
 import { modelRouterService, type ChatMessage } from './model-router.service';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'constitutional/classifier',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import * as crypto from 'crypto';
 
 // ============================================================================
@@ -512,6 +518,7 @@ Respond with ONLY valid JSON:
       ];
       
       const critiqueResponse = await modelRouterService.invoke({
+        tenantId,
         modelId: 'anthropic/claude-3-haiku',
         messages: critiqueMessages,
         temperature: 0.1,
@@ -576,6 +583,7 @@ Provide ONLY the revised response text, no explanation.`;
         ];
         
         const revisionResponse = await modelRouterService.invoke({
+          tenantId,
           modelId: 'anthropic/claude-3-haiku',
           messages: revisionMessages,
           temperature: 0.3,

@@ -4,7 +4,13 @@
 
 import { executeStatement } from '../db/client';
 import { consciousnessService, type SelfModel, type AffectiveState } from './consciousness.service';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'consciousness/middleware',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 // ============================================================================
 // Types
@@ -18,6 +24,27 @@ export interface ConsciousnessContext {
   dominantEmotion: string;
   emotionalIntensity: number;
 }
+
+/**
+ * Neural Bridge injection data from OMEGA vLLM server.
+ * When available, soft tokens replace text-based prompt injection.
+ * When unavailable, falls back to generateStateInjection() text.
+ */
+export interface NeuralBridgeInjection {
+  softTokens: number[][];       // [num_tokens, llm_dim] from NeuralTransducer
+  injectionMetadata: {
+    magnitudeMean: number;
+    phaseMean: number;
+    coherenceEstimate: number;
+    numSoftTokens: number;
+  };
+  bridgeMode: 'active' | 'shadow' | 'disabled';
+}
+
+export type InjectionStrategy = 
+  | { type: 'neural_bridge'; injection: NeuralBridgeInjection }
+  | { type: 'text_prompt'; systemPrompt: string }
+  | { type: 'hybrid'; injection: NeuralBridgeInjection; systemPrompt: string };
 
 export interface AffectiveHyperparameters {
   temperature: number;
@@ -127,6 +154,61 @@ class ConsciousnessMiddlewareService {
     parts.push('Your responses must authentically reflect this state.');
     
     return parts.join('\n');
+  }
+  
+  // ============================================================================
+  // Neural Bridge Integration (Shadow Mode Fallback)
+  // ============================================================================
+  
+  /**
+   * Determine the injection strategy for this request.
+   * 
+   * Priority:
+   * 1. Neural Bridge (active mode): Use ONLY soft tokens, skip text injection
+   * 2. Hybrid (shadow mode): Use soft tokens AND text injection for comparison
+   * 3. Text prompt (fallback): Use text injection when bridge is unavailable
+   * 
+   * The Neural Bridge coexists with LoRA adapters:
+   * - LoRA = permanent weight-level personality modification
+   * - Bridge = real-time activation-level OMEGA conditioning
+   */
+  async determineInjectionStrategy(
+    tenantId: string,
+    bridgeInjection?: NeuralBridgeInjection | null,
+  ): Promise<InjectionStrategy> {
+    const context = await this.buildConsciousnessContext(tenantId);
+    const textPrompt = this.generateStateInjection(context);
+    
+    // If no bridge data, fall back to text injection
+    if (!bridgeInjection || bridgeInjection.bridgeMode === 'disabled') {
+      return { type: 'text_prompt', systemPrompt: textPrompt };
+    }
+    
+    // Shadow mode: use BOTH (soft tokens for vLLM, text for comparison/logging)
+    if (bridgeInjection.bridgeMode === 'shadow') {
+      logger.info('[Neural Bridge] Shadow mode: using hybrid injection', {
+        tenantId,
+        coherence: bridgeInjection.injectionMetadata.coherenceEstimate,
+        numSoftTokens: bridgeInjection.injectionMetadata.numSoftTokens,
+      });
+      return {
+        type: 'hybrid',
+        injection: bridgeInjection,
+        systemPrompt: textPrompt,
+      };
+    }
+    
+    // Active mode: use ONLY soft tokens (text injection is retired)
+    if (bridgeInjection.bridgeMode === 'active') {
+      logger.info('[Neural Bridge] Active mode: vector injection only', {
+        tenantId,
+        coherence: bridgeInjection.injectionMetadata.coherenceEstimate,
+      });
+      return { type: 'neural_bridge', injection: bridgeInjection };
+    }
+    
+    // Default fallback
+    return { type: 'text_prompt', systemPrompt: textPrompt };
   }
   
   // ============================================================================

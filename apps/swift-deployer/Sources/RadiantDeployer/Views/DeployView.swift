@@ -8,6 +8,7 @@ struct DeployView: View {
     @State private var showParameterEditor = false
     @State private var selectedSnapshot: DeploymentSnapshot?
     @State private var availableSnapshots: [DeploymentSnapshot] = []
+    @State private var preservationConfig: SnapshotService.DataPreservationConfig = .preserveAll
     
     private let deploymentService = DeploymentService()
     
@@ -133,6 +134,18 @@ struct DeployView: View {
                             .buttonStyle(.plain)
                         }
                     }
+                }
+            }
+            
+            // Data Preservation (Update mode only)
+            if deploymentMode == .update, let app = appState.selectedApp {
+                Section("Data Preservation") {
+                    DataPreservationSelectionView(
+                        config: $preservationConfig,
+                        appId: app.id,
+                        environment: appState.selectedEnvironment.rawValue,
+                        credentials: appState.credentials.first
+                    )
                 }
             }
             
@@ -482,14 +495,15 @@ struct DeployView: View {
                 await AuditLogger.shared.log(action: .deploymentCompleted, details: "Install completed for \(app.name)")
                 
             case .update:
-                // Create pre-update snapshot
+                // Create pre-update snapshot with user-selected preservation options
                 await logMessage(.info, "Creating pre-update snapshot...")
                 let snapshotService = DeploymentService()
                 let snapshot = try await snapshotService.createSnapshot(
                     app: app,
                     environment: environment,
                     credentials: credentials,
-                    reason: .preUpdate
+                    reason: .preUpdate,
+                    preservationConfig: preservationConfig
                 )
                 await logMessage(.success, "Snapshot created: \(snapshot.id)")
                 

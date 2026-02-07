@@ -3,7 +3,13 @@
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { z, ZodError, ZodSchema } from 'zod';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from '../services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'shared/validation-middleware',
+  category: 'infrastructure',
+  sourceType: 'lambda',
+});
 
 // ============================================================================
 // Types

@@ -18,6 +18,7 @@ import { Badge } from '@/components/ui/badge';
 import { GlassPanel } from '@/components/ui/glass-card';
 import { cn } from '@/lib/utils';
 import type { LiquidSchema, LiquidIntent } from '@/lib/api/liquid-interface';
+import { useRadiantDelightOptional, getMotionTransition, getAnimationConfig, getMorphNarration, getMorphSubtitle } from '@radiant/delight-ui';
 import { DataGridView, ChartView, KanbanView, CalculatorView, CodeEditorView, DocumentView } from './morphed-views';
 
 export type MorphedViewType = 
@@ -133,13 +134,17 @@ export function LiquidMorphPanel({
 }: LiquidMorphPanelProps) {
   const config = VIEW_CONFIG[viewType];
   const Icon = config.icon;
+  const delight = useRadiantDelightOptional();
+  const personalityMode = delight?.personalityMode ?? 'auto';
+  const animConfig = getAnimationConfig(personalityMode);
+  const transition = getMotionTransition(personalityMode);
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
+      initial={{ opacity: 0, scale: animConfig.scaleEnter }}
       animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.95 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+      exit={{ opacity: 0, scale: animConfig.scaleExit }}
+      transition={transition}
       className={cn(
         'flex flex-col',
         isFullscreen ? 'fixed inset-0 z-50 bg-[#0a0a0f]' : 'h-full'
@@ -277,8 +282,15 @@ export function MorphTransitionEffect({
 }) {
   const config = VIEW_CONFIG[toType];
   const Icon = config.icon;
+  const delight = useRadiantDelightOptional();
+  const personalityMode = delight?.personalityMode ?? 'auto';
+  const animConfig = getAnimationConfig(personalityMode);
 
   if (!isActive) return null;
+  if (!animConfig.showMorphOverlay) return null;
+
+  const narration = getMorphNarration(personalityMode, toType);
+  const subtitle = getMorphSubtitle(personalityMode);
 
   return (
     <motion.div
@@ -290,22 +302,24 @@ export function MorphTransitionEffect({
       <motion.div
         initial={{ scale: 0.5, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+        transition={getMotionTransition(personalityMode)}
         className="text-center"
       >
         <motion.div
           animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+          transition={{ duration: personalityMode === 'playful' ? 0.8 : 1.2, repeat: Infinity, ease: 'linear' }}
           className={cn('p-4 rounded-full bg-white/[0.1] mx-auto mb-4', config.color)}
         >
           <Icon className="h-8 w-8" />
         </motion.div>
         <h3 className="text-xl font-semibold text-white mb-2">
-          Morphing to {config.label}
+          {narration}
         </h3>
-        <p className="text-sm text-slate-400">
-          Chat becomes app. App becomes whatever you need.
-        </p>
+        {subtitle && (
+          <p className="text-sm text-slate-400">
+            {subtitle}
+          </p>
+        )}
       </motion.div>
     </motion.div>
   );

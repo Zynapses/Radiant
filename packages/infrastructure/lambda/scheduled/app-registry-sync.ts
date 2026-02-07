@@ -7,11 +7,13 @@
 
 import { ScheduledEvent, Context } from 'aws-lambda';
 import { executeStatement, stringParam, longParam } from '../shared/db/client';
-import { enhancedLogger } from '../shared/logging/enhanced-logger';
-import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
-import * as crypto from 'crypto';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
 
-const logger = enhancedLogger;
+const logger = createRegisteredLogger({
+  serviceName: 'scheduled/app-registry-sync',
+  category: 'infrastructure',
+  sourceType: 'lambda',
+});
 const s3 = new S3Client({ region: process.env.AWS_REGION || 'us-east-1' });
 const SYNC_BUCKET = process.env.APP_SYNC_BUCKET || 'radiant-app-definitions';
 

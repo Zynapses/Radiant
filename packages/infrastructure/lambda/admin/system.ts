@@ -5,7 +5,13 @@
  */
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'admin/system',
+  category: 'audit',
+  sourceType: 'lambda',
+});
 
 interface SystemConfig {
   version: string;

@@ -4,7 +4,13 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { agiBrainPlannerService } from '../shared/services';
 import { corsHeaders } from '../shared/middleware/api-response';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'thinktank/brain-plan',
+  category: 'application',
+  sourceType: 'lambda',
+});
 
 interface User {
   id: string;

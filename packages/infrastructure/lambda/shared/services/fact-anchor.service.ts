@@ -11,7 +11,13 @@ import {
   ECDEntityType,
   HighRiskDomain,
 } from '@radiant/shared';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'fact/anchor',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 // =============================================================================
 // Types

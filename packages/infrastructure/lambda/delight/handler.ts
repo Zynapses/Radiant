@@ -7,7 +7,13 @@ import { APIGatewayProxyHandler, APIGatewayProxyResult, APIGatewayProxyEvent } f
 import { delightService } from '../shared/services/delight.service';
 import { successResponse, errorResponse, noContentResponse, createdResponse, DEFAULT_CORS_HEADERS } from '../shared/middleware/api-response';
 import { toRadiantError } from '../shared/errors/radiant-error';
-import { enhancedLogger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'delight/handler',
+  category: 'infrastructure',
+  sourceType: 'lambda',
+});
 
 // Helper to extract auth context from event headers
 function extractAuthContext(event: APIGatewayProxyEvent): { userId?: string; tenantId?: string; isAdmin?: boolean } {
@@ -31,8 +37,6 @@ function handleError(error: unknown): APIGatewayProxyResult {
   const radiantError = toRadiantError(error);
   return errorResponse(radiantError);
 }
-
-const logger = enhancedLogger;
 
 // ============================================================================
 // User-Facing Endpoints

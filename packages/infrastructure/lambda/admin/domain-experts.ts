@@ -5,7 +5,13 @@
 
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import { domainExpertService } from '../shared/services/domain-expert.service';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'admin/domain-experts',
+  category: 'audit',
+  sourceType: 'lambda',
+});
 import type { DomainExpertNetworkType } from '@radiant/shared';
 
 const corsHeaders = {

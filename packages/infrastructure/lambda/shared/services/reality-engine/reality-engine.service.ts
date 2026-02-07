@@ -13,7 +13,13 @@
 import { v4 as uuidv4 } from 'uuid';
 import { executeStatement } from '../../db/client';
 import { modelRouterService } from '../model-router.service';
-import { enhancedLogger as logger } from '../../logging/enhanced-logger';
+import { createRegisteredLogger } from '../logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'reality-engine/reality-engine',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import {
   RealityEngineSession,
   RealityEngineConfig,

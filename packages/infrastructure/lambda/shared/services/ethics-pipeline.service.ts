@@ -3,7 +3,13 @@
 // Works with both general ethics (moral compass) and domain-specific ethics
 
 import { domainEthicsService } from './domain-ethics.service';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'ethics/pipeline',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { moralCompassService } from './moral-compass.service';
 import { executeStatement } from '../db/client';
 import type {

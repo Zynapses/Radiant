@@ -3,7 +3,13 @@
 // ============================================================================
 
 import { APIGatewayProxyHandler, APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'admin/security',
+  category: 'audit',
+  sourceType: 'lambda',
+});
 import { constitutionalClassifierService } from '../shared/services/constitutional-classifier.service';
 import { behavioralAnomalyService } from '../shared/services/behavioral-anomaly.service';
 import { driftDetectionService } from '../shared/services/drift-detection.service';

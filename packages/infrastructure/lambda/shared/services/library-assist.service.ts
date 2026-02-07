@@ -3,7 +3,13 @@
 // AI models/modes use this to decide if libraries are helpful in solving problems
 
 import { libraryRegistryService, LibraryMatchResult, Library } from './library-registry.service';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'library/assist',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 // Proficiency scores matching the library registry schema
 interface ProficiencyScores {

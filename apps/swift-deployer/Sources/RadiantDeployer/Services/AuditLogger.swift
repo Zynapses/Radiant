@@ -171,7 +171,7 @@ actor AuditLogger {
                 }
             }
         } catch {
-            print("Failed to load audit log: \(error)")
+            RadiantLogger.error("Failed to load audit log: \(error.localizedDescription)", category: RadiantLogger.general)
         }
     }
     
@@ -194,7 +194,7 @@ actor AuditLogger {
                 }
             }
         } catch {
-            print("Failed to persist audit entry: \(error)")
+            RadiantLogger.error("Failed to persist audit entry: \(error.localizedDescription)", category: RadiantLogger.general)
         }
     }
     
@@ -213,7 +213,7 @@ actor AuditLogger {
             
             try content.write(to: logFileURL, atomically: true, encoding: .utf8)
         } catch {
-            print("Failed to persist audit log: \(error)")
+            RadiantLogger.error("Failed to persist audit log: \(error.localizedDescription)", category: RadiantLogger.general)
         }
     }
     

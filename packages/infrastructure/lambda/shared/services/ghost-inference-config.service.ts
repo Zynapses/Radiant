@@ -6,7 +6,13 @@
  */
 
 import { executeStatement, stringParam, longParam, boolParam, doubleParam } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'ghost/inference-config',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { SageMakerClient, DescribeEndpointCommand, UpdateEndpointCommand } from '@aws-sdk/client-sagemaker';
 import { v4 as uuidv4 } from 'uuid';
 

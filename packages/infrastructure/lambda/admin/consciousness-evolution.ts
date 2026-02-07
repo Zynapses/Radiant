@@ -6,7 +6,13 @@ import { predictiveCodingService } from '../shared/services/prediction-engine.se
 import { learningCandidateService } from '../shared/services/distillation-pipeline.service';
 import { localEgoService } from '../shared/services/local-ego.service';
 import { executeStatement } from '../shared/db/client';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'admin/consciousness-evolution',
+  category: 'audit',
+  sourceType: 'lambda',
+});
 
 const headers = {
   'Content-Type': 'application/json',

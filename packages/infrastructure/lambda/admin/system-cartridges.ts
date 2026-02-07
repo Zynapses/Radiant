@@ -22,7 +22,13 @@
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { systemCartridgeRegistryService } from '../shared/services/system-cartridge-registry.service';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'admin/system-cartridges',
+  category: 'audit',
+  sourceType: 'lambda',
+});
 import type {
   RegisterSystemCartridgeRequest,
   UpdateTenantVisibilityRequest,

@@ -3,7 +3,13 @@
 // ============================================================================
 
 import { executeStatement, stringParam, longParam, doubleParam, boolParam } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'behavioral/anomaly',
+  category: 'security',
+  sourceType: 'application',
+});
 
 // ============================================================================
 // Types

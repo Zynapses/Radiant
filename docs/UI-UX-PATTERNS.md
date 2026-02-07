@@ -1386,6 +1386,278 @@ When adding a new UI/UX pattern:
 
 ---
 
+## Category 11: Genesis Forge — Glass Foundry Patterns (v7.15.0)
+
+**Source**: Custom RADIANT "Bioluminescent Industrial" design system for the Behavioral ROM Forge
+
+### Glass Foundry Design Tokens
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| **Background** | `#050505` | Glass Foundry base (near-black) |
+| **Glass Panel** | `bg-[#050505]/90 backdrop-blur-[20px]` | Frosted glass side panels |
+| **Border** | `border-white/[0.06]` | Ultra-subtle white borders |
+| **Accent (Safe)** | `hsl(190, 80%, 60%)` / Cyan | Stability > 70% |
+| **Accent (Warning)** | `hsl(30, 80%, 60%)` / Orange | Stability 50-70% |
+| **Accent (Emergency)** | `hsl(0, 80%, 60%)` / Red | Stability < 50% |
+| **Font** | `JetBrains Mono` | Monospaced — "Dangerous" aesthetic |
+
+**Files**: `apps/genesis/tailwind.config.ts`, `apps/genesis/app/globals.css`
+
+### Shard Node Pattern (React Flow Custom Nodes)
+
+| Shard Type | Color | Animation | Component |
+|------------|-------|-----------|-----------|
+| **Input** | Green (`#22c55e`) | Heartbeat pulse | `InputShard.tsx` |
+| **Logic** | Violet (`#a78bfa`) | Spinning gear when processing | `LogicShard.tsx` |
+| **Output** | Amber/Red (power-based) | Power glow pulsation | `OutputShard.tsx` |
+| **Safety** | Red (`#ef4444`) | Same as Logic with red accent | `LogicShard.tsx` (category=safety) |
+
+**Shape**: Hexagonal glass prism (`clipPath: polygon(8% 0%, 92% 0%, 100% 15%, 100% 85%, 92% 100%, 8% 100%, 0% 85%, 0% 15%)`)
+
+**Files**: `apps/genesis/components/forge/nodes/`
+
+### Catenary Wire Edge Pattern
+
+| Property | Behavior |
+|----------|----------|
+| **Shape** | Quadratic bezier approximating catenary (`y = a·cosh(x/a)`) |
+| **Sag** | `sagDepth = dist * 0.15 * dataWeight + dataWeight * 60` |
+| **Thickness** | `1.5 + dataWeight * 3` px |
+| **Particles** | Light dots traveling along path (count = `frequency * 5`) |
+| **Rejection** | Red color, vibration animation, spark particles, reason label |
+
+**Files**: `apps/genesis/components/forge/edges/CatenaryEdge.tsx`
+
+### Retractable Panel Pattern
+
+| Panel | Position | Width | Trigger |
+|-------|----------|-------|---------|
+| **The Armory** | Left | 288px (`w-72`) | Chevron toggle + spring animation |
+| **The Oracle** | Right | 288px (`w-72`) | Chevron toggle + spring animation |
+
+**Animation**: Framer Motion spring (`damping: 20, stiffness: 200`)
+
+**Files**: `apps/genesis/components/forge/TheArmory.tsx`, `TheOracle.tsx`
+
+### Reactor Core Button Pattern
+
+| State | Visual |
+|-------|--------|
+| **Idle** | Dark circle with subtle cyan glow |
+| **Charging** | White plasma fills from bottom (clip-path inset) |
+| **Release (≥80%)** | Shockwave ripple: expanding circle `60px → 3000px`, fading opacity |
+| **Forging** | Spinning loader icon + progress bar |
+| **Disabled** | 30% opacity when no shards placed |
+
+**Files**: `apps/genesis/components/forge/ReactorCore.tsx`
+
+### Global Stability → UI Hue Shift
+
+The entire Glass Foundry UI shifts color based on `stability_score` from Shadow Omega:
+
+| Score | Hue | Background Gradient |
+|-------|-----|-------------------|
+| > 0.7 | Cyan (190°) | `hsl(190, 15%, 4%)` → `#050505` |
+| 0.5–0.7 | Orange (30°) | `hsl(30, 15%, 4%)` → `#050505` |
+| < 0.5 | Red (0°) | `hsl(0, 15%, 4%)` + red overlay at `0.15 * (1 - score)` opacity |
+
+**Files**: `apps/genesis/components/forge/GlassFoundry.tsx`
+
+### Void Mode Pattern — 9-Layer 3D PCB (Full Implementation)
+
+| Property | Effect |
+|----------|--------|
+| **Background** | `#000000` (pitch black) |
+| **Chrome** | All panels (Armory, Oracle, HUD) hidden |
+| **Canvas** | **9-layer 3D PCB board** via Three.js replaces React Flow canvas |
+| **Exit** | Floating button top-right |
+| **Telemetry HUD** | Top-left overlay: components, traces, power, temp, stability, CPU, RAM |
+
+**9 PCB Layers** (bottom to top):
+
+| # | Layer | Material |
+|---|-------|----------|
+| 1 | Ground Plane | Copper pour (`#8b5e3c`, metalness 0.85) |
+| 2 | FR-4 Substrate | Dark green (`#0b3b0b`, 0.12 thick) |
+| 3 | Solder Mask | Translucent green (0.7 opacity) |
+| 4 | Etch Trace Grid | `BufferGeometry` line grid, 0.6 spacing |
+| 5 | Silkscreen | Board border, `OMEGA-PCB-XX REV.A`, ref designators |
+| 6 | IC Chips | SOIC-14: `RoundedBox` body, 7 gull-wing pins/side, pin-1 dot |
+| 7 | Solder Pads | Exposed copper `planeGeometry` under each pin |
+| 8 | Via Holes | `ringGeometry` + `circleGeometry` at trace bends |
+| 9 | Mounting Holes | 4 corner holes with copper annular rings |
+
+**Data-Driven (zero mock data)**:
+
+| Visual | Real Data Source |
+|--------|-----------------|
+| Chip positions | `rfTo3D(node.position.x, node.position.y)` — actual React Flow coords |
+| Pin activity | `sin(t * edge.data.frequency * 6 + phase)` — deterministic, per-edge |
+| Trace thickness | `0.015 + edge.data.dataWeight * 0.06` |
+| Thermal LED | Continuous HSL: `hue = (1 - tempNorm) * 120` from `node.data.temperature` |
+| Ambient light | `stabilityScore` → hue 210°/30°/0° |
+
+**Files**: `apps/genesis/components/forge/VoidModePCB.tsx` (800 LOC), `GlassFoundry.tsx`
+
+### Firmware ROM Forge Pattern — Behavioral Directives
+
+Firmware = immutable behavioral software (not hardware). Burned once, never edited.
+
+| Property | Implementation |
+|----------|---------------|
+| **Draft state** | Green pulsing dot + "New Draft" header, all fields editable |
+| **Read-only state** | Amber banner "Viewing burned ROM — Immutable", all fields disabled, 70% opacity sliders |
+| **Burn button** | `bg-gradient-to-r from-orange-600 via-red-600 to-orange-600`, disabled at 30% opacity when no directives |
+| **Burn confirmation** | Full-screen modal with 3 states: confirm (red icon) → burning (orange pulse) → success (green check) |
+| **ROM timeline** | Right sidebar, vertical timeline line (`w-px bg-omega-700/50`), dot per version |
+| **Active version** | Green dot with `shadow-lg shadow-green-500/30`, green border on card |
+| **Timestamp primary** | Mono font date + time as primary identifier; optional label below |
+
+**Directive Kinds** (color-coded):
+
+| Kind | Icon | Color | Background |
+|------|------|-------|------------|
+| Instinct | `Zap` | `text-amber-400` | `bg-amber-500/10` |
+| Fear | `Skull` | `text-red-400` | `bg-red-500/10` |
+| Moral | `Scale` | `text-emerald-400` | `bg-emerald-500/10` |
+| Ambition | `Target` | `text-omega-400` | `bg-omega-500/10` |
+| Boundary | `Ban` | `text-orange-400` | `bg-orange-500/10` |
+
+**Weight bar**: 10 clickable segments, color transitions: omega-500 (1-4) → amber-500 (5-7) → red-500 (8-10)
+
+**Files**: `apps/genesis/components/GenesisForge.tsx` (1054 LOC), `apps/genesis/lib/api.ts`
+
+---
+
+## Category 12: Aurelius Dojo — Thematic Mastery Patterns (v7.16.0)
+
+**Source**: Custom RADIANT "Warm Discipline" design system for the Dojo training platform
+
+### Dojo Design Tokens
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| **Background** | `rgb(15, 12, 8)` | Warm near-black base |
+| **Glass Panel** | `bg-[#0a0806]/85 backdrop-blur-md` | Frosted glass panels |
+| **Border** | `border-dojo-900/20` | Warm amber borders |
+| **Primary** | `dojo-500` (#f59e0b) | Amber — discipline glow |
+| **Accent** | `omega-500` (#0ea5e9) | Cyan — platform continuity |
+| **Pattern** | `tatami-pattern` | 40px grid at 2% amber opacity |
+| **Font** | Inter (display) + JetBrains Mono (mono) | Dual-font system |
+
+**Files**: `apps/dojo/tailwind.config.ts`, `apps/dojo/app/globals.css`
+
+### Theme Card Pattern
+
+| Property | Implementation |
+|----------|---------------|
+| **Idle** | `bg-white/[0.02] border-white/[0.06]` with hover lift |
+| **Selected** | `bg-dojo-500/10 border-dojo-500/40 discipline-glow` |
+| **Locked** | 50% opacity, `cursor-not-allowed`, Lock icon |
+| **Disabled** | 40% opacity (max 3 selected) |
+| **Reveal** | `card-reveal` animation: translateY(12px) → 0, staggered 60ms |
+
+**Files**: `apps/dojo/components/ThemeSelector.tsx`
+
+### Sparring Answer Feedback Pattern
+
+| State | Visual |
+|-------|--------|
+| **Correct** | Green border flash (`sparring-correct`), CheckCircle2 icon, +XP badge |
+| **Incorrect** | Red border flash (`sparring-incorrect`), XCircle icon, correct answer shown |
+| **Partial** | Yellow percentage badge alongside result |
+
+**Files**: `apps/dojo/components/TrainingArena.tsx`
+
+### Rank Badge Pattern
+
+| Rank | Color Token | Background |
+|------|-------------|------------|
+| Novice | `text-slate-400` | `bg-slate-500/10` |
+| Initiate | `text-green-400` | `bg-green-500/10` |
+| Adept | `text-blue-400` | `bg-blue-500/10` |
+| Master | `text-purple-400` | `bg-purple-500/10` |
+| Radiant | `text-dojo-400` | `bg-dojo-500/10` |
+
+**XP Bar**: `bg-gradient-to-r from-dojo-600 to-dojo-400` with `progress-shimmer` overlay
+
+**Files**: `apps/dojo/components/ProgressDashboard.tsx`, `apps/dojo/lib/utils.ts`
+
+### Mobot Chat Pattern
+
+| Element | Style |
+|---------|-------|
+| **Mobot bubble** | `mobot-bubble` — amber-tinted glass, rounded-bl-sm |
+| **User bubble** | `user-bubble` — cyan-tinted glass, rounded-br-sm, right-aligned |
+| **Citations** | Inline below message, FileText icon + document name + excerpt |
+| **Loading** | Loader2 spin + "Mobot is thinking..." |
+
+**Files**: `apps/dojo/components/MobotPanel.tsx`
+
+### Decay Engine Pattern (v7.17.0)
+
+| Element | Style |
+|---------|-------|
+| **Retention bar** | Color gradient based on retention %: green (≥80%), yellow (50-79%), red (<50%) |
+| **At-risk badge** | `text-[10px] text-red-400 bg-red-500/10 px-2 py-0.5 rounded-full` |
+| **Summary cards** | 4-column grid with icon, value, label; highlight border on at-risk card |
+| **Reinforcement quiz** | Same question UI as sparring, with decay context header showing retention % and half-life |
+| **Result feedback** | Green: "memory reinforced, half-life increased"; Red: "decay curve reset, half-life shortened" |
+
+**Files**: `apps/dojo/components/DecayEngine.tsx`
+
+### Scenario Arena Pattern (v7.17.0)
+
+| Element | Style |
+|---------|-------|
+| **Persona picker** | 3-column grid of glass cards, each with icon + archetype label + description |
+| **Conversation** | Chat-style layout; persona messages left-aligned with archetype icon; learner right-aligned |
+| **Emotional shift** | Italic text `(emotional_shift)` next to persona name |
+| **Branch quality** | Inline badge after response: green (optimal), blue (acceptable), yellow (suboptimal), red (critical) |
+| **Debrief scores** | 3-column grid: Emotional Intelligence (pink), Policy Adherence (cyan), Resolution (green) |
+| **Response timeline** | Numbered list of learner responses with quality icons (CheckCircle2 or XCircle) |
+
+**Files**: `apps/dojo/components/ScenarioArena.tsx`
+
+### Dialectic Arena Pattern (v7.17.0)
+
+| Element | Style |
+|---------|-------|
+| **Agent colors** | Thesis: green-400, Antithesis: red-400, Synthesis: purple-400, Moderator: dojo-400 |
+| **Turn bubbles** | Background matches agent role bg (e.g., `bg-green-500/10` for thesis) |
+| **Reasoning type selector** | Horizontal button row: Claim, Evidence, Rebuttal, Concession, Synthesis |
+| **Quality score** | Inline percentage after turn header |
+| **Citation** | Same FileText + document name pattern as Mobot |
+| **Fallacy badges** | Yellow rounded-full pills with fallacy names |
+
+**Files**: `apps/dojo/components/DialecticArena.tsx`
+
+### Competency Mesh Pattern (v7.17.0)
+
+| Element | Style |
+|---------|-------|
+| **Role readiness** | 2-column cards with score bar, missing competencies, time-to-ready |
+| **Competency row** | Level bar (`L{n}/{max}`), trend icon (TrendingUp/Down/Minus), confidence %, gap-to-target |
+| **Priority badges** | Critical (red), High (orange), Medium (yellow), Low (green) |
+| **Learning path** | Numbered list with priority badges and estimated session count |
+
+**Files**: `apps/dojo/components/CompetencyMesh.tsx`
+
+### Knowledge Pulse Pattern (v7.17.0)
+
+| Element | Style |
+|---------|-------|
+| **Health hero** | Large centered score with glow shadow matching health color (green/yellow/red) |
+| **Metric cards** | 5-column grid: Active Users, New Certs, Cost Savings, Time-to-Competency, Retention Rate |
+| **Decay alerts** | Severity-colored cards (critical=red, warning=yellow, info=blue) with icon + message + affected count |
+| **Department bars** | Health % bar with at-risk badge, accuracy, training hours, avg rank |
+| **Theme coverage** | 2-column grid with trained count, mastery %, decay risk, compliance badge (Compliant/Non-Compliant) |
+
+**Files**: `apps/dojo/components/KnowledgePulse.tsx`
+
+---
+
 ## Modifying a Pattern
 
 When modifying an existing pattern:

@@ -2,7 +2,13 @@
 // Real-time planning system that generates execution plans for prompts
 
 import { executeStatement } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'agi/brain-planner',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { domainTaxonomyService } from './domain-taxonomy.service';
 import { agiOrchestrationSettingsService } from './agi-orchestration-settings.service';
 import { modelRouterService } from './model-router.service';

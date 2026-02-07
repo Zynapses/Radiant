@@ -1,8 +1,8 @@
-# Code-Validated Architecture Overview: Brain, Genesis, Cortex, and Cato
+# Code-Validated Architecture Overview: Brain, Genesis, Cortex, Cato & OMEGA
 
-**RADIANT v4.18.0** | **Document Version: 1.0.0**
+**RADIANT v5.0.0** | **Document Version: 2.0.0** | **February 2026**
 
-This document provides a comprehensive, code-validated overview of RADIANT's four core AGI subsystems. Every claim is backed by direct code inspection from the repository.
+This document provides a comprehensive, code-validated overview of RADIANT's five core AGI subsystems, including the new **OMEGA Protocol** for Synthetic Biological Intelligence. Every claim is backed by direct code inspection from the repository.
 
 ---
 
@@ -14,8 +14,9 @@ This document provides a comprehensive, code-validated overview of RADIANT's fou
 4. [Genesis](#2-genesis)
 5. [Cortex](#3-cortex)
 6. [Cato](#4-cato)
-7. [Database Tables](#database-tables)
-8. [Service Dependency Graph](#service-dependency-graph)
+7. [OMEGA Protocol](#5-omega-protocol)
+8. [Database Tables](#database-tables)
+9. [Service Dependency Graph](#service-dependency-graph)
 
 ---
 
@@ -27,6 +28,22 @@ This document provides a comprehensive, code-validated overview of RADIANT's fou
 | **Genesis** | Developmental gates, capability unlocking, maturity stages | `cato/genesis.service.ts` |
 | **Cortex** | Tiered memory architecture, knowledge graph, Graph-RAG | `cortex/tier-coordinator.service.ts`, `cortex/*.ts` |
 | **Cato** | Safety pipeline, governance, human-in-the-loop checkpoints | `cato/safety-pipeline.service.ts`, `cato-methods/*.ts` |
+| 🟣 **OMEGA** | Wave-based cognition, Bicameral Mind, deterministic safety | `omega_core/physics.py`, `omega_core/storage.py`, `omega_inference.py` |
+
+### OMEGA Protocol Summary
+
+The OMEGA Protocol introduces **Synthetic Biological Intelligence** using wave mechanics instead of scalar weights:
+
+| Component | Technology | Purpose |
+|-----------|------------|---------|
+| **Q-Nodes** | Complex-Valued Neural Networks | Neurons as oscillators (magnitude + phase) |
+| **OMEGA Cortex** | LTC Networks | Logic, reasoning, memory (outputs Thought Vectors) |
+| **Broca Interface** | Llama-3-8B | Translates Thought Vectors to English |
+| **Helix Kernel** | Destructive Interference | Deterministic safety (impossible to bypass) |
+| **Resonant Index** | Frequency Addressing | O(1) document lookup (infinite scaling) |
+| **Cryogenic Engine** | Time Warp | Serverless persistence ($0 idle cost) |
+
+> **Reference**: [PROJECT-GENESIS-OMEGA.md](PROJECT-GENESIS-OMEGA.md) for complete specification
 
 ---
 

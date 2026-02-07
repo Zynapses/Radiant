@@ -20,7 +20,13 @@ import { KinesisClient, PutRecordCommand, PutRecordsCommand } from '@aws-sdk/cli
 import Redis from 'ioredis';
 import * as crypto from 'crypto';
 import { executeStatement, stringParam } from '../../db/client';
-import { enhancedLogger as logger } from '../../logging/enhanced-logger';
+import { createRegisteredLogger } from '../logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'uep/uds-storage-adapter',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { udsAuditService } from '../uds/audit.service';
 import { udsTierCoordinatorService } from '../uds/tier-coordinator.service';
 

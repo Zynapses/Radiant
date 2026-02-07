@@ -2,7 +2,13 @@ import { Handler } from 'aws-lambda';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, QueryCommand, DeleteCommand } from '@aws-sdk/lib-dynamodb';
 import { ApiGatewayManagementApiClient, PostToConnectionCommand } from '@aws-sdk/client-apigatewaymanagementapi';
-import { enhancedLogger as logger } from '../../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'collaboration/broadcast-index',
+  category: 'infrastructure',
+  sourceType: 'lambda',
+});
 import { requireEnv } from '../../shared/config/env';
 
 const ddbClient = new DynamoDBClient({});

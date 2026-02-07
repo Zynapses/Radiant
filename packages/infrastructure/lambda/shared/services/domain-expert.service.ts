@@ -6,7 +6,13 @@
 import { S3Client, GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { executeStatement, stringParam, doubleParam, boolParam } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'domain/expert',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import type {
   DomainExpertConfig,
   DomainExpertNetwork,

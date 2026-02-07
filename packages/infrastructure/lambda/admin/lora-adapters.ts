@@ -4,7 +4,13 @@
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { executeStatement, stringParam, doubleParam, boolParam, longParam } from '../shared/db/client';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'admin/lora-adapters',
+  category: 'audit',
+  sourceType: 'lambda',
+});
 
 // ============================================================================
 // Types

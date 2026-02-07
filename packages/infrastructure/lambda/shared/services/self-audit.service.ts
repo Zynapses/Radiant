@@ -7,7 +7,13 @@
 
 import { PoolClient } from 'pg';
 import { getPoolClient } from '../db/centralized-pool';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'self/audit',
+  category: 'audit',
+  sourceType: 'application',
+});
 
 export type AuditFramework = 'soc2' | 'hipaa' | 'gdpr' | 'iso27001' | 'pci-dss' | 'all';
 export type AuditRunType = 'manual' | 'scheduled' | 'triggered';

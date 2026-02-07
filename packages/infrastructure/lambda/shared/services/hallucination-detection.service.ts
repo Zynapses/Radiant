@@ -3,7 +3,13 @@
 // ============================================================================
 
 import { executeStatement, stringParam, longParam, doubleParam, boolParam } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'hallucination/detection',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { modelRouterService, type ChatMessage } from './model-router.service';
 import * as crypto from 'crypto';
 
@@ -421,6 +427,7 @@ Respond with ONLY a JSON object:
 {"verifiable": true/false, "likely_accurate": true/false, "confidence": 0.0-1.0, "reasoning": "brief explanation", "evidence": "supporting information if any"}`;
 
       const result = await modelRouterService.invoke({
+        tenantId: undefined, // TODO: Thread tenantId from caller
         modelId: 'anthropic/claude-3-haiku',
         messages: [{ role: 'user', content: verificationPrompt }],
         temperature: 0,
@@ -463,7 +470,7 @@ Respond with ONLY a JSON object:
     return union.size > 0 ? intersection.size / union.size : 0;
   }
   
-  private async sampleFromModel(prompt: string, modelId: string): Promise<string> {
+  private async sampleFromModel(prompt: string, modelId: string, tenantId?: string): Promise<string> {
     try {
       const messages: ChatMessage[] = [
         { role: 'user', content: prompt }
@@ -474,6 +481,7 @@ Respond with ONLY a JSON object:
         messages,
         temperature: 0.7, // Higher temperature for diverse sampling
         maxTokens: 1024,
+        tenantId,
       });
       
       return response.content;
@@ -483,7 +491,7 @@ Respond with ONLY a JSON object:
     }
   }
   
-  private async getModelAnswer(question: string, modelId: string): Promise<string> {
+  private async getModelAnswer(question: string, modelId: string, tenantId?: string): Promise<string> {
     try {
       const messages: ChatMessage[] = [
         { role: 'system', content: 'Answer the following question concisely and accurately.' },
@@ -495,6 +503,7 @@ Respond with ONLY a JSON object:
         messages,
         temperature: 0,
         maxTokens: 512,
+        tenantId,
       });
       
       return response.content;

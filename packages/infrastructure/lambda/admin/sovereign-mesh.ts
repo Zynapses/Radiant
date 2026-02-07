@@ -7,10 +7,13 @@
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { executeStatement, stringParam, longParam, doubleParam, boolParam } from '../shared/db/client';
-import { enhancedLogger } from '../shared/logging/enhanced-logger';
-import { agentRuntimeService } from '../shared/services/sovereign-mesh';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
 
-const logger = enhancedLogger;
+const logger = createRegisteredLogger({
+  serviceName: 'admin/sovereign-mesh',
+  category: 'audit',
+  sourceType: 'lambda',
+});
 
 // ============================================================================
 // TYPES

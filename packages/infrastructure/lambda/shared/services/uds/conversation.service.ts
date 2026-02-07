@@ -10,7 +10,13 @@
  */
 
 import { executeStatement, stringParam, boolParam } from '../../db/client';
-import { enhancedLogger as logger } from '../../logging/enhanced-logger';
+import { createRegisteredLogger } from '../logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'uds/conversation',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { udsEncryptionService } from './encryption.service';
 import { udsAuditService } from './audit.service';
 import { modelRouterService } from '../model-router.service';

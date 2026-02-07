@@ -2,7 +2,13 @@
 // AGI Enhancement Phase 4: Model user cognitive state, predict needs, anticipatory assistance
 
 import { executeStatement } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'theory/of-mind',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { callLiteLLMEmbedding } from './litellm.service';
 import { modelRouterService } from './model-router.service';
 import { episodicMemoryService } from './episodic-memory.service';
@@ -877,6 +883,7 @@ Return null if expertise cannot be determined.`;
 
   private async invokeModel(prompt: string): Promise<string> {
     const response = await modelRouterService.invoke({
+      tenantId,
       modelId: 'anthropic/claude-3-haiku',
       messages: [{ role: 'user', content: prompt }],
       maxTokens: 2048,

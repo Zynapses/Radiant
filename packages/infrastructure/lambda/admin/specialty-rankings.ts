@@ -7,7 +7,13 @@ import {
   type OrchestrationMode,
   type ScoringWeights,
 } from '../shared/services/specialty-ranking.service';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'admin/specialty-rankings',
+  category: 'audit',
+  sourceType: 'lambda',
+});
 
 const headers = {
   'Content-Type': 'application/json',

@@ -16,7 +16,13 @@
  */
 
 import { executeStatement, stringParam, doubleParam, boolParam } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'empiricism/loop',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { modelRouterService, type ChatMessage } from './model-router.service';
 import { v4 as uuidv4 } from 'uuid';
 

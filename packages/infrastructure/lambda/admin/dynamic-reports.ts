@@ -4,7 +4,13 @@ import {
   schemaAdaptiveReportsService,
   DynamicReportDefinition,
 } from '../shared/services/schema-adaptive-reports.service';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'admin/dynamic-reports',
+  category: 'audit',
+  sourceType: 'lambda',
+});
 
 const success = (body: unknown): APIGatewayProxyResult => ({
   statusCode: 200,

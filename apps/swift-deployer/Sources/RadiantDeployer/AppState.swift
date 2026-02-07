@@ -37,7 +37,12 @@ final class AppState: ObservableObject {
     @Published var radiantAuthToken: String?
     @Published var isConnectedToRadiant = false
     
-    // MARK: - 1Password Status
+    // MARK: - Credential Storage
+    @Published var credentialStorageMode: CredentialStorageMode = .local
+    @Published var isCredentialStorageUnlocked = false
+    @Published var needsCredentialSetup = true
+    
+    // MARK: - 1Password Status (legacy)
     @Published var onePasswordConfigured = false
     @Published var onePasswordStatus: CredentialService.OnePasswordStatus?
     
@@ -45,6 +50,11 @@ final class AppState: ObservableObject {
     /// Set to true ONLY for local development without 1Password installed
     /// WARNING: When true, uses default placeholder credentials - never deploy with this enabled
     @Published var bypassOnePassword = false
+    
+    enum CredentialStorageMode: String, CaseIterable, Sendable {
+        case local = "Local Encrypted"
+        case onePassword = "1Password"
+    }
     
     // MARK: - Initialization
     init() {
@@ -60,24 +70,92 @@ final class AppState: ObservableObject {
         // Allow bypass for testing
         if bypassOnePassword {
             onePasswordConfigured = true
+            isCredentialStorageUnlocked = true
+            needsCredentialSetup = false
             apps = ManagedApp.defaults
             return
         }
         
-        // Check 1Password status first
+        // Check local encrypted storage first (preferred)
+        let secureStorage = SecureCredentialStorage.shared
+        let localConfigured = await secureStorage.isConfigured()
+        let localUnlocked = await secureStorage.isStorageUnlocked()
+        
+        if localConfigured {
+            credentialStorageMode = .local
+            needsCredentialSetup = false
+            isCredentialStorageUnlocked = localUnlocked
+            
+            if localUnlocked {
+                do {
+                    credentials = try await secureStorage.getAllCredentials()
+                } catch {
+                    self.error = AppError(message: "Failed to load credentials", underlying: error)
+                }
+            }
+            apps = ManagedApp.defaults
+            return
+        }
+        
+        // Fall back to 1Password check
         onePasswordStatus = await credentialService.checkOnePasswordStatus()
         onePasswordConfigured = onePasswordStatus?.installed == true && onePasswordStatus?.signedIn == true
         
-        guard onePasswordConfigured else {
-            apps = ManagedApp.defaults
+        if onePasswordConfigured {
+            credentialStorageMode = .onePassword
+            needsCredentialSetup = false
+            isCredentialStorageUnlocked = true
+            
+            do {
+                credentials = try await credentialService.loadCredentials()
+                apps = try await loadApps()
+            } catch {
+                self.error = AppError(message: "Failed to load data", underlying: error)
+            }
             return
         }
         
+        // Neither configured - needs setup
+        needsCredentialSetup = true
+        apps = ManagedApp.defaults
+    }
+    
+    /// Unlock local credential storage with passphrase
+    func unlockCredentialStorage(passphrase: String) async throws {
+        let secureStorage = SecureCredentialStorage.shared
+        try await secureStorage.unlock(passphrase: passphrase)
+        isCredentialStorageUnlocked = true
+        credentials = try await secureStorage.getAllCredentials()
+    }
+    
+    /// Lock credential storage
+    func lockCredentialStorage() async {
+        let secureStorage = SecureCredentialStorage.shared
+        await secureStorage.lock()
+        isCredentialStorageUnlocked = false
+        credentials = []
+    }
+    
+    /// Initialize local credential storage
+    func initializeCredentialStorage(passphrase: String) async throws {
+        let secureStorage = SecureCredentialStorage.shared
+        try await secureStorage.initialize(passphrase: passphrase)
+        credentialStorageMode = .local
+        needsCredentialSetup = false
+        isCredentialStorageUnlocked = true
+    }
+    
+    /// Reload credentials from current storage
+    func reloadCredentials() async {
         do {
-            credentials = try await credentialService.loadCredentials()
-            apps = try await loadApps()
+            if credentialStorageMode == .local {
+                let secureStorage = SecureCredentialStorage.shared
+                credentials = try await secureStorage.getAllCredentials()
+            } else {
+                credentials = try await credentialService.loadCredentials()
+            }
         } catch {
-            self.error = AppError(message: "Failed to load data", underlying: error)
+            self.error = AppError(message: "Failed to reload credentials", underlying: error)
         }
     }
     
@@ -137,41 +215,29 @@ final class AppState: ObservableObject {
     }
 }
 
-// MARK: - Navigation (v5.52.17)
+// MARK: - Navigation (v7.5.0 - Added Bi-directional Sync)
 enum NavigationTab: String, CaseIterable, Identifiable, Sendable {
-    // Main
+    // Core Operations
     case dashboard = "Dashboard"
-    case apps = "Apps"
     case deploy = "Deploy"
-    
-    // Operations
+    case bidirectionalSync = "Sync from Instance"
+    case scripts = "Scripts"
+    case codeSync = "Code Sync"
+    case dependencies = "Dependencies"
+    case credentials = "Credentials"
     case instances = "Instances"
-    case snapshots = "Snapshots"
     case packages = "Packages"
+    case migrations = "Migrations"
+    case snapshots = "Snapshots"
     case history = "History"
+    case driftMonitor = "Drift Monitor"
+    case spendGovernor = "Spend Governor"
     
-    // AI Registry
-    case providers = "Providers"
-    case models = "Models"
-    case selfHosted = "Self-Hosted"
-    
-    // Configuration (v5.52.17 - renamed and added)
-    case domainUrls = "Domain URLs"
-    case email = "Email"
+    // Configuration (v7.4.0)
+    case domainURLs = "Domain URLs"
     case curator = "Curator"
+    case cortexMemory = "Cortex Memory"
     
-    // Advanced (v5.52.17 - added Cortex)
-    case multiRegion = "Multi-Region"
-    case abTesting = "A/B Testing"
-    case cortex = "Cortex Memory"
-    
-    // Security & Compliance
-    case security = "Security"
-    case compliance = "Compliance"
-    
-    // System
-    case costs = "Costs"
-    case monitoring = "Monitoring"
     case settings = "Settings"
     
     var id: String { rawValue }
@@ -179,25 +245,22 @@ enum NavigationTab: String, CaseIterable, Identifiable, Sendable {
     var icon: String {
         switch self {
         case .dashboard: return "square.grid.2x2"
-        case .apps: return "app.badge"
         case .deploy: return "arrow.up.circle"
+        case .bidirectionalSync: return "arrow.triangle.2.circlepath.circle"
+        case .scripts: return "doc.text"
+        case .codeSync: return "arrow.triangle.2.circlepath"
+        case .dependencies: return "wrench.and.screwdriver"
+        case .credentials: return "key.horizontal"
         case .instances: return "server.rack"
-        case .snapshots: return "clock.arrow.circlepath"
         case .packages: return "shippingbox"
+        case .migrations: return "arrow.right.arrow.left"
+        case .snapshots: return "clock.arrow.circlepath"
         case .history: return "clock"
-        case .providers: return "building.2"
-        case .models: return "cpu"
-        case .selfHosted: return "memorychip"
-        case .domainUrls: return "globe.americas"
-        case .email: return "envelope"
+        case .driftMonitor: return "exclamationmark.triangle"
+        case .spendGovernor: return "gauge.with.dots.needle.33percent"
+        case .domainURLs: return "globe"
         case .curator: return "book.pages"
-        case .multiRegion: return "globe"
-        case .abTesting: return "flask"
-        case .cortex: return "brain"
-        case .security: return "shield.lefthalf.filled"
-        case .compliance: return "checkmark.shield"
-        case .costs: return "dollarsign.circle"
-        case .monitoring: return "waveform.path.ecg.rectangle"
+        case .cortexMemory: return "brain.head.profile"
         case .settings: return "gearshape"
         }
     }
@@ -205,55 +268,67 @@ enum NavigationTab: String, CaseIterable, Identifiable, Sendable {
     var color: Color {
         switch self {
         case .dashboard: return .blue
-        case .apps: return .purple
         case .deploy: return .green
-        case .instances: return .orange
-        case .snapshots: return .cyan
+        case .bidirectionalSync: return .purple
+        case .scripts: return .teal
+        case .codeSync: return .mint
+        case .dependencies: return .pink
+        case .credentials: return .orange
+        case .instances: return .purple
         case .packages: return .indigo
+        case .migrations: return .orange
+        case .snapshots: return .cyan
         case .history: return .brown
-        case .providers: return .teal
-        case .models: return .pink
-        case .selfHosted: return .mint
-        case .domainUrls: return .cyan
-        case .email: return .orange
-        case .curator: return .orange
-        case .multiRegion: return .blue
-        case .abTesting: return .purple
-        case .cortex: return .purple
-        case .security: return .red
-        case .compliance: return .green
-        case .costs: return .yellow
-        case .monitoring: return .teal
+        case .driftMonitor: return .red
+        case .spendGovernor: return .orange
+        case .domainURLs: return .blue
+        case .curator: return .teal
+        case .cortexMemory: return .purple
         case .settings: return .gray
         }
     }
     
-    static var mainTabs: [NavigationTab] {
-        [.dashboard, .apps, .deploy]
+    var description: String {
+        switch self {
+        case .dashboard: return "Overview of all environments and status"
+        case .deploy: return "One-click automated deployment"
+        case .bidirectionalSync: return "Extract instance state and generate new package"
+        case .scripts: return "Run deployment bash scripts"
+        case .codeSync: return "Sync local changes to AWS"
+        case .dependencies: return "Manage CLI tools (AWS CLI, Node.js, CDK)"
+        case .credentials: return "AWS key management and rotation"
+        case .instances: return "Start, stop, or wipe environment instances"
+        case .packages: return "Version and package management"
+        case .migrations: return "Promote through dev → staging → prod"
+        case .snapshots: return "Backup and restore points"
+        case .history: return "Deployment history and logs"
+        case .driftMonitor: return "Detect and reconcile infrastructure drift"
+        case .spendGovernor: return "Budget limits, freeze/thaw AWS services"
+        case .domainURLs: return "Configure domain URLs and routing"
+        case .curator: return "Knowledge graph curation settings"
+        case .cortexMemory: return "Three-tier memory system configuration"
+        case .settings: return "Preferences"
+        }
     }
     
-    static var operationTabs: [NavigationTab] {
-        [.instances, .snapshots, .packages, .history]
+    /// Primary tabs shown in sidebar
+    static var primaryTabs: [NavigationTab] {
+        [.dashboard, .deploy, .bidirectionalSync, .instances, .snapshots, .history, .driftMonitor, .spendGovernor]
     }
     
-    static var aiTabs: [NavigationTab] {
-        [.providers, .models, .selfHosted]
-    }
-    
+    /// Configuration tabs
     static var configTabs: [NavigationTab] {
-        [.domainUrls, .email, .curator]
+        [.domainURLs, .curator, .cortexMemory]
     }
     
-    static var advancedTabs: [NavigationTab] {
-        [.multiRegion, .abTesting, .cortex]
+    /// Tools tabs
+    static var toolsTabs: [NavigationTab] {
+        [.scripts, .codeSync, .dependencies, .credentials, .packages, .migrations]
     }
     
-    static var securityTabs: [NavigationTab] {
-        [.security, .compliance]
-    }
-    
-    static var systemTabs: [NavigationTab] {
-        [.costs, .monitoring, .settings]
+    /// All tabs in order
+    static var allTabs: [NavigationTab] {
+        primaryTabs + configTabs + toolsTabs + [.settings]
     }
 }
 

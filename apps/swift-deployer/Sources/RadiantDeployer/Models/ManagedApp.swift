@@ -1,4 +1,4 @@
-// RADIANT v5.52.17 - Managed App Models
+// RADIANT v6.6.0 - Managed App Models
 // Defines tenant applications and their deployment status
 
 import Foundation
@@ -66,7 +66,7 @@ struct EnvironmentStatus: Codable, Hashable, Sendable {
     var apiUrl: String?
     var dashboardUrl: String?
     
-    // v5.52.17 - Application-specific URLs
+    // v6.6.0 - Application-specific URLs
     var radiantAdminUrl: String?
     var thinktankAdminUrl: String?
     var curatorUrl: String?

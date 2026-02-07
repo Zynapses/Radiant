@@ -23,6 +23,7 @@ import {
 import { cn, formatBytes } from '@/lib/utils';
 import { GlassCard } from '@/components/ui/glass-card';
 import { toast } from 'sonner';
+import { useRadiantDelightOptional } from '@radiant/delight-ui';
 
 type ConnectorType = 's3' | 'azure_blob' | 'sharepoint' | 'google_drive' | 'snowflake' | 'confluence';
 
@@ -70,6 +71,7 @@ const domains = [
 ];
 
 export default function IngestPage() {
+  const delight = useRadiantDelightOptional();
   const [files, setFiles] = useState<UploadedFile[]>([]);
   const [selectedDomain, setSelectedDomain] = useState<string>('');
   const [expandedDomains, setExpandedDomains] = useState<string[]>(['engineering']);
@@ -122,11 +124,13 @@ export default function IngestPage() {
           description: 'Zero-copy connector is now indexing metadata.',
         });
         resetWizard();
+        delight?.triggerDelight('action_complete');
       } else {
         throw new Error('Failed to create');
       }
     } catch (error) {
       toast.error('Error', { description: 'Failed to create connector. Please try again.' });
+      delight?.triggerDelight('error_recovery');
     } finally {
       setConnectingLoader(false);
     }
@@ -140,9 +144,11 @@ export default function IngestPage() {
           prev.map((c) => (c.id === connectorId ? { ...c, status: 'syncing' } : c))
         );
         toast.success('Sync Started', { description: 'Connector is now syncing metadata.' });
+        delight?.triggerDelight('pre_execution');
       }
     } catch (error) {
       toast.error('Error', { description: 'Failed to start sync.' });
+      delight?.triggerDelight('error_recovery');
     }
   };
 

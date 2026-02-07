@@ -13,7 +13,13 @@
 import { executeStatement, stringParam, boolParam } from '../../db/client';
 // @ts-ignore - redis module may not exist in all environments
 import { getRedisClient } from '../../db/redis';
-import { enhancedLogger as logger } from '../../logging/enhanced-logger';
+import { createRegisteredLogger } from '../logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'uds/message',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { udsEncryptionService } from './encryption.service';
 import { udsAuditService } from './audit.service';
 import { udsConversationService } from './conversation.service';

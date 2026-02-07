@@ -6,7 +6,13 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { awsMonitoringService } from '../shared/services/aws-monitoring.service';
 import { monitoringNotificationsService } from '../shared/services/aws-monitoring-notifications.service';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'admin/aws-monitoring',
+  category: 'audit',
+  sourceType: 'lambda',
+});
 
 // Response helpers
 const createResponse = (statusCode: number, data: unknown): APIGatewayProxyResult => ({

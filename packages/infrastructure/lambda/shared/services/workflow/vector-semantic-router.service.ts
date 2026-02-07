@@ -15,7 +15,13 @@
  */
 
 import { v4 as uuidv4 } from 'uuid';
-import { enhancedLogger as logger } from '../../logging/enhanced-logger';
+import { createRegisteredLogger } from '../logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'workflow/vector-semantic-router',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { modelRouterService } from '../model-router.service';
 
 // =============================================================================
@@ -115,7 +121,7 @@ class VectorSemanticRouterService {
   /**
    * Generate embedding for text using fast embedding model
    */
-  async generateEmbedding(text: string): Promise<SemanticVector> {
+  async generateEmbedding(text: string, tenantId?: string): Promise<SemanticVector> {
     const cacheKey = this.hashText(text);
     
     // Check cache
@@ -128,6 +134,7 @@ class VectorSemanticRouterService {
         modelId: 'openai/text-embedding-3-small',
         messages: [{ role: 'user', content: text.substring(0, 8000) }],
         maxTokens: 1,
+        tenantId,
       });
       
       const embedding = (result as { embedding?: number[] }).embedding;

@@ -8,7 +8,13 @@ import { consciousnessService, type WorkspaceContent } from './consciousness.ser
 import { agiLearningPersistenceService } from './agi-learning-persistence.service';
 import { loraInferenceService } from './lora-inference.service';
 import { adapterManagementService } from './adapter-management.service';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'cognitive/brain',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 // ============================================================================
 // Types
@@ -500,6 +506,7 @@ export class CognitiveBrainService {
     
     // Use hybrid model router: Bedrock (primary) -> LiteLLM (fallback) -> Direct (specialized)
     return modelRouterService.invoke({
+      tenantId: options.tenantId,
       modelId,
       messages: [{ role: 'user', content: input }],
       systemPrompt,

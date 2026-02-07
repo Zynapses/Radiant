@@ -3,7 +3,13 @@
 
 import { executeStatement, stringParam } from '../db/client';
 import { modelRouterService, type ChatMessage } from './model-router.service';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'graph/rag',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import type {
   KnowledgeEntity,
   KnowledgeRelationship,
@@ -135,6 +141,7 @@ Rules:
       ];
       
       const response = await modelRouterService.invoke({
+        tenantId,
         modelId: config.extractionModel || 'anthropic/claude-3-haiku',
         messages,
         temperature: 0,

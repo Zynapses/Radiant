@@ -6,7 +6,13 @@
  */
 
 import { executeStatement } from './client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from '../services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'shared/db-transaction',
+  category: 'infrastructure',
+  sourceType: 'lambda',
+});
 
 export interface TransactionContext {
   transactionId: string;

@@ -4,7 +4,13 @@
  */
 
 import { executeStatement, stringParam, longParam } from '../db/client';
-import { enhancedLogger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'preprompt/learning',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { userRulesService } from './user-rules.service';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -22,8 +28,6 @@ import type {
   IssueAttribution,
   AttributionWeights,
 } from '@radiant/shared';
-
-const logger = enhancedLogger;
 
 // ============================================================================
 // Pre-Prompt Learning Service

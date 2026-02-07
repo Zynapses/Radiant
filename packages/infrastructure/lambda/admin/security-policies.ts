@@ -18,7 +18,13 @@ import {
   SecurityPolicyAction,
   SecurityDetectionMethod,
 } from '../shared/services/security-policy.service';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'admin/security-policies',
+  category: 'audit',
+  sourceType: 'lambda',
+});
 
 // ============================================================================
 // Types

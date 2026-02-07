@@ -3,7 +3,13 @@
 // ============================================================================
 
 import { executeStatement, stringParam, longParam, boolParam } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'security/schedule',
+  category: 'security',
+  sourceType: 'application',
+});
 import {
   EventBridgeClient,
   PutRuleCommand,

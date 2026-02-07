@@ -18,7 +18,13 @@ import { ecdScorerService } from './ecd-scorer.service';
 import { factAnchorService } from './fact-anchor.service';
 import { brainConfigService } from './brain-config.service';
 import { executeStatement } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'ecd/verification',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 // =============================================================================
 // ECD Verification Service

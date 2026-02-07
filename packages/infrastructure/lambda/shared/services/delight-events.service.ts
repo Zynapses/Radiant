@@ -4,11 +4,13 @@
  */
 
 import { EventEmitter } from 'events';
-import { enhancedLogger } from '../logging/enhanced-logger';
-import type { DelightMessageResponse } from './delight.service';
-import type { WorkflowDelightResponse } from './delight-orchestration.service';
+import { createRegisteredLogger } from './logging-registry.service';
 
-const logger = enhancedLogger;
+const logger = createRegisteredLogger({
+  serviceName: 'delight/events',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 // ============================================================================
 // Types

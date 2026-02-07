@@ -11,7 +11,13 @@
 import { KMSClient, GenerateDataKeyCommand, DecryptCommand, EncryptCommand } from '@aws-sdk/client-kms';
 import { createCipheriv, createDecipheriv, randomBytes, createHash } from 'crypto';
 import { executeStatement, stringParam } from '../../db/client';
-import { enhancedLogger as logger } from '../../logging/enhanced-logger';
+import { createRegisteredLogger } from '../logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'uds/encryption',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import type { UDSEncryptionKey } from '@radiant/shared';
 
 // =============================================================================

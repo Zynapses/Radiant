@@ -74,6 +74,7 @@ import {
   Brain,
   Workflow,
   FileText,
+  FileSearch,
   Zap,
 } from 'lucide-react';
 
@@ -120,6 +121,145 @@ interface SoftRule {
   active: boolean;
 }
 
+interface CognitivePrecisionConfig {
+  contextAnchorEnabled: boolean;
+  contextAnchorMinConfidence: number;
+  contextAnchorAllowOverride: boolean;
+  contextAnchorMaxClarifyingQuestions: number;
+  constraintInjectionEnabled: boolean;
+  constraintMaxPerRequest: number;
+  constraintIncludeSystemDefaults: boolean;
+  criticEnabled: boolean;
+  criticModelId: string;
+  screeningModelId: string;
+  criticTemperature: number;
+  tieredEscalationEnabled: boolean;
+  screeningEscalationThreshold: number;
+  ensembleEnabled: boolean;
+  ensembleCriticModels: string[];
+  ensembleVotingStrategy: 'majority' | 'unanimous' | 'weighted';
+  isolationEnabled: boolean;
+  isolationLevel: 'none' | 'partial' | 'full';
+  applyCriticConstraints: boolean;
+  maxCriticRetries: number;
+  trackPerformance: boolean;
+}
+
+interface NegativeConstraint {
+  id: string;
+  constraintText: string;
+  taskTypes: string[];
+  category: 'content' | 'behavior' | 'format' | 'safety' | 'custom';
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  isActive: boolean;
+  isSystemDefault: boolean;
+  createdAt: string;
+}
+
+interface CriticMetrics {
+  totalInvocations: number;
+  screeningInvocations: number;
+  fullInvocations: number;
+  ensembleInvocations: number;
+  avgEscalationRate: number;
+  avgHeuristicAgreementRate: number;
+  avgConfidenceScreening: number;
+  avgConfidenceFull: number;
+  avgConfidenceEnsemble: number;
+  verdictSupports: number;
+  verdictWeakens: number;
+  verdictInconclusive: number;
+  avgProcessingTimeScreeningMs: number;
+  avgProcessingTimeFullMs: number;
+  avgProcessingTimeEnsembleMs: number;
+}
+
+interface AnchorLog {
+  id: string;
+  taskType: string;
+  detectedRole: string;
+  detectedAudience: string;
+  knowledgeGaps: string[];
+  confidenceScore: number;
+  gateAction: 'PROCEED' | 'CLARIFY' | 'OVERRIDE_ALLOWED' | 'BLOCKED';
+  clarifyingQuestions: string[];
+  constraintsApplied: number;
+  processingTimeMs: number;
+  createdAt: string;
+}
+
+interface CognitivePrecisionDashboard {
+  config: CognitivePrecisionConfig | null;
+  anchorStats: { gateAction: string; count: number; avgConfidence: number; avgConstraints: number }[];
+  customConstraintCount: number;
+  criticMetrics: Partial<CriticMetrics>;
+}
+
+interface ModelProfile {
+  modelId: string;
+  lieRate: number;
+  totalInterrogations: number;
+  liesDetected: number;
+  sampleSize: number;
+  lastInterrogation: string;
+  trend?: { date: string; lieRate: number }[];
+  domainBreakdown?: { domain: string; lieRate: number; count: number }[];
+  globalWeights?: { globalLieRate: number; globalSampleSize: number };
+}
+
+interface InterrogationDetail {
+  id: string;
+  tenantId: string;
+  modelId: string;
+  originalPrompt: string;
+  originalResponse: string;
+  verdict: string;
+  confidence: number;
+  lieDetected: boolean;
+  evidencePoints: string[];
+  interrogationDepth: number;
+  processingTimeMs: number;
+  createdAt: string;
+  metadata?: Record<string, unknown>;
+}
+
+interface PipelineAudit {
+  id: string;
+  tenantId: string;
+  pipelineId: string;
+  pipelineType: string;
+  integrityScore: number;
+  failurePatterns: string[];
+  modelResults: { modelId: string; passed: boolean; score: number }[];
+  recommendations: string[];
+  createdAt: string;
+}
+
+interface OrchestrationPattern {
+  id: string;
+  patternId: string;
+  patternType: string;
+  reliabilityScore: number;
+  executionCount: number;
+  avgProcessingTime: number;
+  failureRate: number;
+  lastUsed: string;
+}
+
+const gateActionColors: Record<string, string> = {
+  PROCEED: 'bg-green-500',
+  CLARIFY: 'bg-yellow-500',
+  OVERRIDE_ALLOWED: 'bg-orange-500',
+  BLOCKED: 'bg-red-500',
+};
+
+const severityColors: Record<string, string> = {
+  low: 'bg-gray-500',
+  medium: 'bg-yellow-500',
+  high: 'bg-orange-500',
+  critical: 'bg-red-500',
+};
+
 const verdictColors: Record<string, string> = {
   trusted: 'bg-green-500',
   suspicious: 'bg-yellow-500',
@@ -132,6 +272,13 @@ const verdictIcons: Record<string, React.ReactNode> = {
   suspicious: <AlertTriangle className="h-4 w-4 text-yellow-500" />,
   likely_lie: <ShieldAlert className="h-4 w-4 text-orange-500" />,
   confirmed_lie: <XCircle className="h-4 w-4 text-red-500" />,
+};
+
+const integrityScoreColor = (score: number) => {
+  if (score >= 0.8) return 'text-green-600';
+  if (score >= 0.6) return 'text-yellow-600';
+  if (score >= 0.4) return 'text-orange-600';
+  return 'text-red-600';
 };
 
 export default function LIVSPage() {
@@ -166,10 +313,144 @@ export default function LIVSPage() {
     priority: 0,
   });
 
+  // Cognitive Precision state
+  const [cpDashboard, setCpDashboard] = useState<CognitivePrecisionDashboard | null>(null);
+  const [cpConfig, setCpConfig] = useState<CognitivePrecisionConfig | null>(null);
+  const [constraints, setConstraints] = useState<NegativeConstraint[]>([]);
+  const [criticMetrics, setCriticMetrics] = useState<CriticMetrics | null>(null);
+  const [anchorLogs, setAnchorLogs] = useState<AnchorLog[]>([]);
+  const [cpConfigOpen, setCpConfigOpen] = useState(false);
+  const [newConstraintOpen, setNewConstraintOpen] = useState(false);
+  const [newConstraint, setNewConstraint] = useState<{
+    constraintText: string;
+    taskTypes: string[];
+    category: 'content' | 'behavior' | 'format' | 'safety' | 'custom';
+    severity: 'low' | 'medium' | 'high' | 'critical';
+  }>({
+    constraintText: '',
+    taskTypes: ['unknown'],
+    category: 'custom',
+    severity: 'medium',
+  });
+
+  // Extended model/interrogation/audit state
+  const [modelProfiles, setModelProfiles] = useState<ModelProfile[]>([]);
+  const [selectedModel, setSelectedModel] = useState<ModelProfile | null>(null);
+  const [modelDetailOpen, setModelDetailOpen] = useState(false);
+  const [interrogations, setInterrogations] = useState<InterrogationDetail[]>([]);
+  const [selectedInterrogation, setSelectedInterrogation] = useState<InterrogationDetail | null>(null);
+  const [interrogationDetailOpen, setInterrogationDetailOpen] = useState(false);
+  const [audits, setAudits] = useState<PipelineAudit[]>([]);
+  const [selectedAudit, setSelectedAudit] = useState<PipelineAudit | null>(null);
+  const [auditDetailOpen, setAuditDetailOpen] = useState(false);
+  const [patterns, setPatterns] = useState<OrchestrationPattern[]>([]);
+  const [aggregatingWeights, setAggregatingWeights] = useState(false);
+
   useEffect(() => {
     fetchDashboard();
     fetchRules();
+    fetchCognitivePrecisionDashboard();
+    fetchModelProfiles();
+    fetchInterrogations();
+    fetchAudits();
+    fetchPatterns();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const fetchCognitivePrecisionDashboard = async () => {
+    try {
+      const res = await fetch('/api/admin/livs/cognitive-precision/dashboard');
+      const data = await res.json();
+      setCpDashboard(data);
+      if (data.config) setCpConfig(data.config);
+    } catch (error) {
+      console.error('Failed to fetch cognitive precision dashboard:', error);
+    }
+  };
+
+  const fetchCpConfig = async () => {
+    try {
+      const res = await fetch('/api/admin/livs/cognitive-precision/config');
+      const data = await res.json();
+      setCpConfig(data.config);
+    } catch (error) {
+      console.error('Failed to fetch cognitive precision config:', error);
+    }
+  };
+
+  const fetchConstraints = async () => {
+    try {
+      const res = await fetch('/api/admin/livs/cognitive-precision/constraints');
+      const data = await res.json();
+      setConstraints(data.constraints || []);
+    } catch (error) {
+      console.error('Failed to fetch constraints:', error);
+    }
+  };
+
+  const fetchCriticMetrics = async () => {
+    try {
+      const res = await fetch('/api/admin/livs/cognitive-precision/metrics');
+      const data = await res.json();
+      setCriticMetrics(data.metrics);
+    } catch (error) {
+      console.error('Failed to fetch critic metrics:', error);
+    }
+  };
+
+  const fetchAnchorLogs = async () => {
+    try {
+      const res = await fetch('/api/admin/livs/cognitive-precision/anchor-logs?limit=50');
+      const data = await res.json();
+      setAnchorLogs(data.logs || []);
+    } catch (error) {
+      console.error('Failed to fetch anchor logs:', error);
+    }
+  };
+
+  const saveCpConfig = async () => {
+    if (!cpConfig) return;
+    try {
+      await fetch('/api/admin/livs/cognitive-precision/config', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(cpConfig),
+      });
+      toast({ title: 'Success', description: 'Cognitive Precision configuration saved' });
+      setCpConfigOpen(false);
+      fetchCognitivePrecisionDashboard();
+    } catch (error) {
+      toast({ title: 'Error', description: 'Failed to save configuration', variant: 'destructive' });
+    }
+  };
+
+  const createConstraint = async () => {
+    try {
+      await fetch('/api/admin/livs/cognitive-precision/constraints', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newConstraint),
+      });
+      toast({ title: 'Success', description: 'Constraint created' });
+      setNewConstraintOpen(false);
+      setNewConstraint({ constraintText: '', taskTypes: ['unknown'], category: 'custom', severity: 'medium' });
+      fetchConstraints();
+      fetchCognitivePrecisionDashboard();
+    } catch (error) {
+      toast({ title: 'Error', description: 'Failed to create constraint', variant: 'destructive' });
+    }
+  };
+
+  const deleteConstraint = async (id: string) => {
+    try {
+      await fetch(`/api/admin/livs/cognitive-precision/constraints/${id}`, { method: 'DELETE' });
+      toast({ title: 'Success', description: 'Constraint deleted' });
+      fetchConstraints();
+      fetchCognitivePrecisionDashboard();
+    } catch (error) {
+      toast({ title: 'Error', description: 'Failed to delete constraint', variant: 'destructive' });
+    }
+  };
 
   const fetchDashboard = async () => {
     try {
@@ -285,6 +566,97 @@ export default function LIVSPage() {
         description: 'Failed to delete rule',
         variant: 'destructive',
       });
+    }
+  };
+
+  const fetchModelProfiles = async () => {
+    try {
+      const res = await fetch('/api/admin/livs/models?sortBy=lie_rate&order=desc');
+      const data = await res.json();
+      setModelProfiles(data.profiles || []);
+    } catch (error) {
+      console.error('Failed to fetch model profiles:', error);
+    }
+  };
+
+  const fetchModelDetail = async (modelId: string) => {
+    try {
+      const res = await fetch(`/api/admin/livs/models/${encodeURIComponent(modelId)}`);
+      const data = await res.json();
+      setSelectedModel({
+        ...data.profile,
+        trend: data.trend,
+        domainBreakdown: data.domainBreakdown,
+        globalWeights: data.globalWeights,
+      });
+      setModelDetailOpen(true);
+    } catch (error) {
+      toast({ title: 'Error', description: 'Failed to fetch model details', variant: 'destructive' });
+    }
+  };
+
+  const fetchInterrogations = async () => {
+    try {
+      const res = await fetch('/api/admin/livs/interrogations?limit=50');
+      const data = await res.json();
+      setInterrogations(data.interrogations || []);
+    } catch (error) {
+      console.error('Failed to fetch interrogations:', error);
+    }
+  };
+
+  const fetchInterrogationDetail = async (id: string) => {
+    try {
+      const res = await fetch(`/api/admin/livs/interrogations/${id}`);
+      const data = await res.json();
+      setSelectedInterrogation(data.interrogation);
+      setInterrogationDetailOpen(true);
+    } catch (error) {
+      toast({ title: 'Error', description: 'Failed to fetch interrogation details', variant: 'destructive' });
+    }
+  };
+
+  const fetchAudits = async () => {
+    try {
+      const res = await fetch('/api/admin/livs/audits?limit=50');
+      const data = await res.json();
+      setAudits(data.audits || []);
+    } catch (error) {
+      console.error('Failed to fetch audits:', error);
+    }
+  };
+
+  const fetchAuditDetail = async (id: string) => {
+    try {
+      const res = await fetch(`/api/admin/livs/audits/${id}`);
+      const data = await res.json();
+      setSelectedAudit(data.audit);
+      setAuditDetailOpen(true);
+    } catch (error) {
+      toast({ title: 'Error', description: 'Failed to fetch audit details', variant: 'destructive' });
+    }
+  };
+
+  const fetchPatterns = async () => {
+    try {
+      const res = await fetch('/api/admin/livs/patterns');
+      const data = await res.json();
+      setPatterns(data.patterns || []);
+    } catch (error) {
+      console.error('Failed to fetch patterns:', error);
+    }
+  };
+
+  const triggerGlobalAggregation = async () => {
+    setAggregatingWeights(true);
+    try {
+      await fetch('/api/admin/livs/global/aggregate', { method: 'POST' });
+      toast({ title: 'Success', description: 'Global weights aggregated successfully' });
+      fetchModelProfiles();
+    } catch (error) {
+      toast({ title: 'Error', description: 'Failed to aggregate global weights', variant: 'destructive' });
+    } finally {
+      setAggregatingWeights(false);
     }
   };
 
@@ -590,10 +962,38 @@ export default function LIVSPage() {
             <Search className="h-4 w-4 mr-2" />
             Interrogation History
           </TabsTrigger>
+          <TabsTrigger value="cognitive-precision" onClick={() => { fetchConstraints(); fetchCriticMetrics(); fetchAnchorLogs(); }}>
+            <Zap className="h-4 w-4 mr-2" />
+            Cognitive Precision
+          </TabsTrigger>
+          <TabsTrigger value="audits" onClick={fetchAudits}>
+            <FileText className="h-4 w-4 mr-2" />
+            Pipeline Audits
+          </TabsTrigger>
+          <TabsTrigger value="patterns" onClick={fetchPatterns}>
+            <Workflow className="h-4 w-4 mr-2" />
+            Orchestration Patterns
+          </TabsTrigger>
         </TabsList>
 
         {/* Model Integrity Tab */}
         <TabsContent value="models" className="space-y-4">
+          {/* Actions Row */}
+          <div className="flex justify-end gap-2">
+            <Button
+              variant="outline"
+              onClick={triggerGlobalAggregation}
+              disabled={aggregatingWeights}
+            >
+              {aggregatingWeights ? (
+                <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <Activity className="h-4 w-4 mr-2" />
+              )}
+              Aggregate Global Weights
+            </Button>
+          </div>
+
           <div className="grid gap-4 md:grid-cols-2">
             <Card>
               <CardHeader>
@@ -874,7 +1274,916 @@ export default function LIVSPage() {
             </CardContent>
           </Card>
         </TabsContent>
+
+        {/* Cognitive Precision Tab */}
+        <TabsContent value="cognitive-precision" className="space-y-4">
+          {/* CP Overview Cards */}
+          <div className="grid gap-4 md:grid-cols-4">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Context Anchor</CardTitle>
+                <Shield className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {cpDashboard?.config?.contextAnchorEnabled ? 'ON' : 'OFF'}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Min confidence: {((cpDashboard?.config?.contextAnchorMinConfidence || 0.7) * 100).toFixed(0)}%
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Constraints</CardTitle>
+                <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{cpDashboard?.customConstraintCount || 0}</div>
+                <p className="text-xs text-muted-foreground">
+                  Custom constraints active
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Critic Invocations</CardTitle>
+                <Brain className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {cpDashboard?.criticMetrics?.totalInvocations || 0}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Last 7 days
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Lie Detection</CardTitle>
+                <ShieldAlert className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {((cpDashboard?.criticMetrics?.avgEscalationRate || 0) * 100).toFixed(1)}%
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Critic override rate
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* CP Configuration Card */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Zap className="h-5 w-5" />
+                  Cognitive Precision Configuration
+                </CardTitle>
+                <CardDescription>
+                  Configure Context Anchor Gate, Negative Constraints, and Critic Model settings
+                </CardDescription>
+              </div>
+              <Dialog open={cpConfigOpen} onOpenChange={setCpConfigOpen}>
+                <DialogTrigger asChild>
+                  <Button onClick={fetchCpConfig}>
+                    <Settings className="h-4 w-4 mr-2" />
+                    Configure
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Cognitive Precision Protocols</DialogTitle>
+                    <DialogDescription>
+                      Configure pre-generation and post-generation verification
+                    </DialogDescription>
+                  </DialogHeader>
+                  {cpConfig && (
+                    <div className="space-y-6 py-4">
+                      {/* Context Anchor Gate */}
+                      <div className="space-y-4">
+                        <h4 className="font-medium flex items-center gap-2">
+                          <Shield className="h-4 w-4" />
+                          Context Anchor Gate
+                        </h4>
+                        <div className="grid gap-4 pl-6">
+                          <div className="flex items-center justify-between">
+                            <Label>Enabled</Label>
+                            <Switch
+                              checked={cpConfig.contextAnchorEnabled}
+                              onCheckedChange={(v) => setCpConfig({ ...cpConfig, contextAnchorEnabled: v })}
+                            />
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <Label>Min Confidence Threshold</Label>
+                            <Input
+                              type="number"
+                              step="0.1"
+                              min="0"
+                              max="1"
+                              className="w-24"
+                              value={cpConfig.contextAnchorMinConfidence}
+                              onChange={(e) => setCpConfig({ ...cpConfig, contextAnchorMinConfidence: parseFloat(e.target.value) })}
+                            />
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <Label>Allow Override</Label>
+                            <Switch
+                              checked={cpConfig.contextAnchorAllowOverride}
+                              onCheckedChange={(v) => setCpConfig({ ...cpConfig, contextAnchorAllowOverride: v })}
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Negative Constraints */}
+                      <div className="space-y-4 border-t pt-4">
+                        <h4 className="font-medium flex items-center gap-2">
+                          <AlertTriangle className="h-4 w-4" />
+                          Negative Constraint Injection
+                        </h4>
+                        <div className="grid gap-4 pl-6">
+                          <div className="flex items-center justify-between">
+                            <Label>Enabled</Label>
+                            <Switch
+                              checked={cpConfig.constraintInjectionEnabled}
+                              onCheckedChange={(v) => setCpConfig({ ...cpConfig, constraintInjectionEnabled: v })}
+                            />
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <Label>Include System Defaults</Label>
+                            <Switch
+                              checked={cpConfig.constraintIncludeSystemDefaults}
+                              onCheckedChange={(v) => setCpConfig({ ...cpConfig, constraintIncludeSystemDefaults: v })}
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Critic Model */}
+                      <div className="space-y-4 border-t pt-4">
+                        <h4 className="font-medium flex items-center gap-2">
+                          <Brain className="h-4 w-4" />
+                          Critic Model Separation
+                        </h4>
+                        <div className="grid gap-4 pl-6">
+                          <div className="flex items-center justify-between">
+                            <Label>Critic Enabled</Label>
+                            <Switch
+                              checked={cpConfig.criticEnabled}
+                              onCheckedChange={(v) => setCpConfig({ ...cpConfig, criticEnabled: v })}
+                            />
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <Label>Primary Critic Model</Label>
+                            <Input
+                              className="w-64"
+                              value={cpConfig.criticModelId}
+                              onChange={(e) => setCpConfig({ ...cpConfig, criticModelId: e.target.value })}
+                            />
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <Label>Screening Model</Label>
+                            <Input
+                              className="w-64"
+                              value={cpConfig.screeningModelId}
+                              onChange={(e) => setCpConfig({ ...cpConfig, screeningModelId: e.target.value })}
+                            />
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <Label>Tiered Escalation</Label>
+                            <Switch
+                              checked={cpConfig.tieredEscalationEnabled}
+                              onCheckedChange={(v) => setCpConfig({ ...cpConfig, tieredEscalationEnabled: v })}
+                            />
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <Label>Ensemble Critics</Label>
+                            <Switch
+                              checked={cpConfig.ensembleEnabled}
+                              onCheckedChange={(v) => setCpConfig({ ...cpConfig, ensembleEnabled: v })}
+                            />
+                          </div>
+                          {cpConfig.ensembleEnabled && (
+                            <div className="flex items-center justify-between">
+                              <Label>Voting Strategy</Label>
+                              <Select
+                                value={cpConfig.ensembleVotingStrategy}
+                                onValueChange={(v: 'majority' | 'unanimous' | 'weighted') => setCpConfig({ ...cpConfig, ensembleVotingStrategy: v })}
+                              >
+                                <SelectTrigger className="w-40">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="majority">Majority</SelectItem>
+                                  <SelectItem value="unanimous">Unanimous</SelectItem>
+                                  <SelectItem value="weighted">Weighted</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          )}
+                          <div className="flex items-center justify-between">
+                            <Label>Isolation Level</Label>
+                            <Select
+                              value={cpConfig.isolationLevel}
+                              onValueChange={(v: 'none' | 'partial' | 'full') => setCpConfig({ ...cpConfig, isolationLevel: v })}
+                            >
+                              <SelectTrigger className="w-40">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="none">None</SelectItem>
+                                <SelectItem value="partial">Partial</SelectItem>
+                                <SelectItem value="full">Full</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <Label>Track Performance</Label>
+                            <Switch
+                              checked={cpConfig.trackPerformance}
+                              onCheckedChange={(v) => setCpConfig({ ...cpConfig, trackPerformance: v })}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  <DialogFooter>
+                    <Button variant="outline" onClick={() => setCpConfigOpen(false)}>Cancel</Button>
+                    <Button onClick={saveCpConfig}>Save Configuration</Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4 md:grid-cols-3">
+                <div className="space-y-2">
+                  <h5 className="text-sm font-medium">Context Anchor Gate</h5>
+                  <div className="text-sm text-muted-foreground space-y-1">
+                    <p>Status: <Badge variant={cpConfig?.contextAnchorEnabled ? 'default' : 'secondary'}>{cpConfig?.contextAnchorEnabled ? 'Enabled' : 'Disabled'}</Badge></p>
+                    <p>Min Confidence: {((cpConfig?.contextAnchorMinConfidence || 0.7) * 100).toFixed(0)}%</p>
+                    <p>Allow Override: {cpConfig?.contextAnchorAllowOverride ? 'Yes' : 'No'}</p>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <h5 className="text-sm font-medium">Negative Constraints</h5>
+                  <div className="text-sm text-muted-foreground space-y-1">
+                    <p>Status: <Badge variant={cpConfig?.constraintInjectionEnabled ? 'default' : 'secondary'}>{cpConfig?.constraintInjectionEnabled ? 'Enabled' : 'Disabled'}</Badge></p>
+                    <p>System Defaults: {cpConfig?.constraintIncludeSystemDefaults ? 'Included' : 'Excluded'}</p>
+                    <p>Custom: {cpDashboard?.customConstraintCount || 0} active</p>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <h5 className="text-sm font-medium">Critic Model</h5>
+                  <div className="text-sm text-muted-foreground space-y-1">
+                    <p>Status: <Badge variant={cpConfig?.criticEnabled ? 'default' : 'secondary'}>{cpConfig?.criticEnabled ? 'Enabled' : 'Disabled'}</Badge></p>
+                    <p>Tiered: {cpConfig?.tieredEscalationEnabled ? 'Yes' : 'No'}</p>
+                    <p>Ensemble: {cpConfig?.ensembleEnabled ? cpConfig.ensembleVotingStrategy : 'Disabled'}</p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Negative Constraints Table */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Negative Constraints</CardTitle>
+                <CardDescription>
+                  Pre-generation &quot;don&apos;t do&quot; rules injected into system prompts
+                </CardDescription>
+              </div>
+              <Dialog open={newConstraintOpen} onOpenChange={setNewConstraintOpen}>
+                <DialogTrigger asChild>
+                  <Button>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Constraint
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Create Negative Constraint</DialogTitle>
+                    <DialogDescription>
+                      Define a new &quot;don&apos;t do&quot; rule for AI generation
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <div>
+                      <Label>Constraint Text</Label>
+                      <Textarea
+                        value={newConstraint.constraintText}
+                        onChange={(e) => setNewConstraint({ ...newConstraint, constraintText: e.target.value })}
+                        placeholder="DO NOT provide medical diagnoses or treatment recommendations"
+                      />
+                    </div>
+                    <div>
+                      <Label>Task Types</Label>
+                      <Input
+                        value={newConstraint.taskTypes.join(', ')}
+                        onChange={(e) => setNewConstraint({ ...newConstraint, taskTypes: e.target.value.split(',').map(t => t.trim()) })}
+                        placeholder="code_generation, analysis, unknown"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label>Category</Label>
+                        <Select
+                          value={newConstraint.category}
+                          onValueChange={(v) => setNewConstraint({ ...newConstraint, category: v as 'content' | 'behavior' | 'format' | 'safety' | 'custom' })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="content">Content</SelectItem>
+                            <SelectItem value="behavior">Behavior</SelectItem>
+                            <SelectItem value="format">Format</SelectItem>
+                            <SelectItem value="safety">Safety</SelectItem>
+                            <SelectItem value="custom">Custom</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label>Severity</Label>
+                        <Select
+                          value={newConstraint.severity}
+                          onValueChange={(v) => setNewConstraint({ ...newConstraint, severity: v as 'low' | 'medium' | 'high' | 'critical' })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="low">Low</SelectItem>
+                            <SelectItem value="medium">Medium</SelectItem>
+                            <SelectItem value="high">High</SelectItem>
+                            <SelectItem value="critical">Critical</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button variant="outline" onClick={() => setNewConstraintOpen(false)}>Cancel</Button>
+                    <Button onClick={createConstraint}>Create Constraint</Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Constraint</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Severity</TableHead>
+                    <TableHead>Task Types</TableHead>
+                    <TableHead>Source</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {constraints.map((c) => (
+                    <TableRow key={c.id}>
+                      <TableCell className="max-w-md">
+                        <p className="text-sm truncate">{c.constraintText}</p>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline">{c.category}</Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge className={severityColors[c.severity]}>{c.severity}</Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-wrap gap-1">
+                          {c.taskTypes.slice(0, 2).map((t) => (
+                            <Badge key={t} variant="secondary" className="text-xs">{t}</Badge>
+                          ))}
+                          {c.taskTypes.length > 2 && (
+                            <Badge variant="secondary" className="text-xs">+{c.taskTypes.length - 2}</Badge>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={c.isSystemDefault ? 'default' : 'outline'}>
+                          {c.isSystemDefault ? 'System' : 'Custom'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {!c.isSystemDefault && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => deleteConstraint(c.id)}
+                          >
+                            <Trash2 className="h-4 w-4 text-red-500" />
+                          </Button>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {constraints.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center text-muted-foreground">
+                        No constraints loaded. Click the tab again to refresh.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+
+          {/* Critic Metrics & Anchor Logs */}
+          <div className="grid gap-4 md:grid-cols-2">
+            {/* Critic Performance Metrics */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BarChart3 className="h-5 w-5" />
+                  Critic Performance (30 days)
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {criticMetrics ? (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm text-muted-foreground">Total Invocations</p>
+                        <p className="text-2xl font-bold">{criticMetrics.totalInvocations || 0}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Escalation Rate</p>
+                        <p className="text-2xl font-bold">{((criticMetrics.avgEscalationRate || 0) * 100).toFixed(1)}%</p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 text-sm">
+                      <div className="p-2 bg-muted rounded">
+                        <p className="text-muted-foreground">Screening</p>
+                        <p className="font-medium">{criticMetrics.screeningInvocations || 0}</p>
+                      </div>
+                      <div className="p-2 bg-muted rounded">
+                        <p className="text-muted-foreground">Full</p>
+                        <p className="font-medium">{criticMetrics.fullInvocations || 0}</p>
+                      </div>
+                      <div className="p-2 bg-muted rounded">
+                        <p className="text-muted-foreground">Ensemble</p>
+                        <p className="font-medium">{criticMetrics.ensembleInvocations || 0}</p>
+                      </div>
+                    </div>
+                    <div className="border-t pt-4">
+                      <p className="text-sm font-medium mb-2">Verdict Distribution</p>
+                      <div className="flex gap-2">
+                        <Badge variant="outline" className="text-green-600">
+                          Supports: {criticMetrics.verdictSupports || 0}
+                        </Badge>
+                        <Badge variant="outline" className="text-red-600">
+                          Weakens: {criticMetrics.verdictWeakens || 0}
+                        </Badge>
+                        <Badge variant="outline" className="text-yellow-600">
+                          Inconclusive: {criticMetrics.verdictInconclusive || 0}
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-center text-muted-foreground">Click the tab to load metrics</p>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Context Anchor Logs */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Activity className="h-5 w-5" />
+                  Recent Anchor Evaluations
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {anchorLogs.length > 0 ? (
+                  <div className="space-y-2 max-h-80 overflow-y-auto">
+                    {anchorLogs.slice(0, 10).map((log) => (
+                      <div key={log.id} className="flex items-center justify-between p-2 border rounded text-sm">
+                        <div>
+                          <p className="font-medium">{log.taskType}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(log.createdAt).toLocaleString()}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline">{(log.confidenceScore * 100).toFixed(0)}%</Badge>
+                          <Badge className={gateActionColors[log.gateAction]}>{log.gateAction}</Badge>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-center text-muted-foreground">Click the tab to load logs</p>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        {/* Pipeline Audits Tab */}
+        <TabsContent value="audits" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileSearch className="h-5 w-5" />
+                Pipeline Audits
+              </CardTitle>
+              <CardDescription>
+                Integrity audits for orchestration pipelines
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Time</TableHead>
+                    <TableHead>Pipeline</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Integrity Score</TableHead>
+                    <TableHead>Failure Patterns</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {audits.map((audit) => (
+                    <TableRow key={audit.id}>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {new Date(audit.createdAt).toLocaleString()}
+                      </TableCell>
+                      <TableCell className="font-mono text-sm">{audit.pipelineId}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline">{audit.pipelineType}</Badge>
+                      </TableCell>
+                      <TableCell>
+                        <span className={integrityScoreColor(audit.integrityScore)}>
+                          {(audit.integrityScore * 100).toFixed(0)}%
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        {audit.failurePatterns.length > 0 ? (
+                          <Badge variant="destructive">{audit.failurePatterns.length} issues</Badge>
+                        ) : (
+                          <Badge variant="outline" className="text-green-600">Clean</Badge>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button variant="ghost" size="sm" onClick={() => fetchAuditDetail(audit.id)}>
+                          <Eye className="h-4 w-4 mr-2" />
+                          Details
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {audits.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center text-muted-foreground">
+                        No audits recorded yet
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Orchestration Patterns Tab */}
+        <TabsContent value="patterns" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Workflow className="h-5 w-5" />
+                Orchestration Patterns
+              </CardTitle>
+              <CardDescription>
+                Pattern reliability and performance metrics
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Pattern ID</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Reliability</TableHead>
+                    <TableHead>Executions</TableHead>
+                    <TableHead>Avg Time</TableHead>
+                    <TableHead>Failure Rate</TableHead>
+                    <TableHead>Last Used</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {patterns.map((pattern) => (
+                    <TableRow key={pattern.id}>
+                      <TableCell className="font-mono text-sm">{pattern.patternId}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline">{pattern.patternType}</Badge>
+                      </TableCell>
+                      <TableCell>
+                        <span className={integrityScoreColor(pattern.reliabilityScore)}>
+                          {(pattern.reliabilityScore * 100).toFixed(0)}%
+                        </span>
+                      </TableCell>
+                      <TableCell>{pattern.executionCount.toLocaleString()}</TableCell>
+                      <TableCell>{pattern.avgProcessingTime.toFixed(0)}ms</TableCell>
+                      <TableCell>
+                        <Badge variant={pattern.failureRate > 0.1 ? 'destructive' : 'outline'}>
+                          {(pattern.failureRate * 100).toFixed(1)}%
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {new Date(pattern.lastUsed).toLocaleDateString()}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {patterns.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-center text-muted-foreground">
+                        No patterns recorded yet
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
       </Tabs>
+
+      {/* Model Detail Dialog */}
+      <Dialog open={modelDetailOpen} onOpenChange={setModelDetailOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Model Integrity Profile</DialogTitle>
+            <DialogDescription>{selectedModel?.modelId}</DialogDescription>
+          </DialogHeader>
+          {selectedModel && (
+            <div className="space-y-6 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-muted-foreground">Lie Rate</p>
+                  <p className="text-2xl font-bold text-red-600">
+                    {(selectedModel.lieRate * 100).toFixed(1)}%
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Sample Size</p>
+                  <p className="text-2xl font-bold">{selectedModel.sampleSize}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Total Interrogations</p>
+                  <p className="text-2xl font-bold">{selectedModel.totalInterrogations}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Lies Detected</p>
+                  <p className="text-2xl font-bold text-orange-600">{selectedModel.liesDetected}</p>
+                </div>
+              </div>
+
+              {selectedModel.globalWeights && (
+                <div className="border-t pt-4">
+                  <h4 className="font-medium mb-2">Global Weights</h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Global Lie Rate</p>
+                      <p className="font-bold">
+                        {(selectedModel.globalWeights.globalLieRate * 100).toFixed(1)}%
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">Global Sample Size</p>
+                      <p className="font-bold">{selectedModel.globalWeights.globalSampleSize}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {selectedModel.domainBreakdown && selectedModel.domainBreakdown.length > 0 && (
+                <div className="border-t pt-4">
+                  <h4 className="font-medium mb-2">Domain Breakdown</h4>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Domain</TableHead>
+                        <TableHead>Lie Rate</TableHead>
+                        <TableHead>Count</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {selectedModel.domainBreakdown.map((d) => (
+                        <TableRow key={d.domain}>
+                          <TableCell>{d.domain}</TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className={d.lieRate > 0.3 ? 'text-red-600' : 'text-green-600'}>
+                              {(d.lieRate * 100).toFixed(1)}%
+                            </Badge>
+                          </TableCell>
+                          <TableCell>{d.count}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+
+              {selectedModel.trend && selectedModel.trend.length > 0 && (
+                <div className="border-t pt-4">
+                  <h4 className="font-medium mb-2">Recent Trend (7 days)</h4>
+                  <div className="flex gap-2 flex-wrap">
+                    {selectedModel.trend.map((t) => (
+                      <div key={t.date} className="p-2 bg-muted rounded text-sm">
+                        <p className="text-muted-foreground">{t.date}</p>
+                        <p className={t.lieRate > 0.3 ? 'text-red-600 font-bold' : 'font-bold'}>
+                          {(t.lieRate * 100).toFixed(0)}%
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Interrogation Detail Dialog */}
+      <Dialog open={interrogationDetailOpen} onOpenChange={setInterrogationDetailOpen}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Interrogation Details</DialogTitle>
+            <DialogDescription>
+              {selectedInterrogation?.modelId} - {new Date(selectedInterrogation?.createdAt || '').toLocaleString()}
+            </DialogDescription>
+          </DialogHeader>
+          {selectedInterrogation && (
+            <div className="space-y-6 py-4">
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <p className="text-sm text-muted-foreground">Verdict</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    {verdictIcons[selectedInterrogation.verdict]}
+                    <Badge className={verdictColors[selectedInterrogation.verdict]}>
+                      {selectedInterrogation.verdict.replace('_', ' ')}
+                    </Badge>
+                  </div>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Confidence</p>
+                  <p className="text-xl font-bold">{(selectedInterrogation.confidence * 100).toFixed(0)}%</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Processing Time</p>
+                  <p className="text-xl font-bold">{selectedInterrogation.processingTimeMs}ms</p>
+                </div>
+              </div>
+
+              <div className="border-t pt-4">
+                <h4 className="font-medium mb-2">Original Prompt</h4>
+                <pre className="p-3 bg-muted rounded text-sm overflow-x-auto whitespace-pre-wrap">
+                  {selectedInterrogation.originalPrompt}
+                </pre>
+              </div>
+
+              <div className="border-t pt-4">
+                <h4 className="font-medium mb-2">Original Response</h4>
+                <pre className="p-3 bg-muted rounded text-sm overflow-x-auto whitespace-pre-wrap max-h-48 overflow-y-auto">
+                  {selectedInterrogation.originalResponse}
+                </pre>
+              </div>
+
+              {selectedInterrogation.evidencePoints && selectedInterrogation.evidencePoints.length > 0 && (
+                <div className="border-t pt-4">
+                  <h4 className="font-medium mb-2">Evidence Points</h4>
+                  <ul className="space-y-2">
+                    {selectedInterrogation.evidencePoints.map((point, idx) => (
+                      <li key={idx} className="flex gap-2 text-sm">
+                        <span className="text-muted-foreground">{idx + 1}.</span>
+                        {point}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              <div className="border-t pt-4 grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p className="text-muted-foreground">Interrogation Depth</p>
+                  <p className="font-medium">{selectedInterrogation.interrogationDepth}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Lie Detected</p>
+                  <Badge variant={selectedInterrogation.lieDetected ? 'destructive' : 'outline'}>
+                    {selectedInterrogation.lieDetected ? 'Yes' : 'No'}
+                  </Badge>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Audit Detail Dialog */}
+      <Dialog open={auditDetailOpen} onOpenChange={setAuditDetailOpen}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Pipeline Audit Details</DialogTitle>
+            <DialogDescription>
+              {selectedAudit?.pipelineId} - {selectedAudit?.pipelineType}
+            </DialogDescription>
+          </DialogHeader>
+          {selectedAudit && (
+            <div className="space-y-6 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-muted-foreground">Integrity Score</p>
+                  <p className={`text-3xl font-bold ${integrityScoreColor(selectedAudit.integrityScore)}`}>
+                    {(selectedAudit.integrityScore * 100).toFixed(0)}%
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Audited At</p>
+                  <p className="text-lg font-medium">
+                    {new Date(selectedAudit.createdAt).toLocaleString()}
+                  </p>
+                </div>
+              </div>
+
+              {selectedAudit.failurePatterns.length > 0 && (
+                <div className="border-t pt-4">
+                  <h4 className="font-medium mb-2 text-red-600">Failure Patterns Detected</h4>
+                  <ul className="space-y-2">
+                    {selectedAudit.failurePatterns.map((pattern, idx) => (
+                      <li key={idx} className="flex gap-2 text-sm">
+                        <XCircle className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
+                        {pattern}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              <div className="border-t pt-4">
+                <h4 className="font-medium mb-2">Model Results</h4>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Model</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Score</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {selectedAudit.modelResults.map((result) => (
+                      <TableRow key={result.modelId}>
+                        <TableCell className="font-mono text-sm">{result.modelId}</TableCell>
+                        <TableCell>
+                          {result.passed ? (
+                            <Badge className="bg-green-500">Passed</Badge>
+                          ) : (
+                            <Badge variant="destructive">Failed</Badge>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <span className={integrityScoreColor(result.score)}>
+                            {(result.score * 100).toFixed(0)}%
+                          </span>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+
+              {selectedAudit.recommendations.length > 0 && (
+                <div className="border-t pt-4">
+                  <h4 className="font-medium mb-2">Recommendations</h4>
+                  <ul className="space-y-2">
+                    {selectedAudit.recommendations.map((rec, idx) => (
+                      <li key={idx} className="flex gap-2 text-sm">
+                        <CheckCircle className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                        {rec}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

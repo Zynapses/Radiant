@@ -75,9 +75,7 @@ Before completing any architectural work, verify:
 
 ## Related Policies
 
-- `/documentation-required` - General documentation requirements
-- `/documentation-standards` - Documentation format standards
-- `/update-strategic-vision` - Marketing document updates
+- `/docs-update-all` - Master documentation policy (triggers, formats, checklist)
 
 ## Example
 

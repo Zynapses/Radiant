@@ -3,7 +3,13 @@
 // Novel UI: "Timeline Scrubber" - horizontal timeline with playhead
 
 import { executeStatement, stringParam, longParam, boolParam } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'time/travel',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 // ============================================================================
 // Types

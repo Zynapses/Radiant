@@ -19,7 +19,13 @@
  */
 
 import { v4 as uuidv4 } from 'uuid';
-import { enhancedLogger as logger } from '../../logging/enhanced-logger';
+import { createRegisteredLogger } from '../logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'workflow/multimedia-sidecar',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { modelRouterService } from '../model-router.service';
 
 // =============================================================================
@@ -363,7 +369,7 @@ class MultimediaSidecarService {
   /**
    * Transcribe using OpenAI Whisper API
    */
-  private async transcribeWithWhisper(sourceUri: string): Promise<CognitiveSidecar['transcription']> {
+  private async transcribeWithWhisper(sourceUri: string, tenantId?: string): Promise<CognitiveSidecar['transcription']> {
     const result = await modelRouterService.invoke({
       modelId: 'openai/whisper-1',
       messages: [{ 
@@ -371,6 +377,7 @@ class MultimediaSidecarService {
         content: `Transcribe the audio from: ${sourceUri}` 
       }],
       maxTokens: 4096,
+      tenantId,
     });
     
     return {
@@ -538,6 +545,7 @@ class MultimediaSidecarService {
         modelId: 'openai/text-embedding-3-small',
         messages: [{ role: 'user', content: textToEmbed.substring(0, 8000) }],
         maxTokens: 1,
+        tenantId: undefined, // TODO: Thread tenantId from caller
       });
       
       // Extract embedding from result
@@ -573,6 +581,7 @@ class MultimediaSidecarService {
       // Use vision model to describe the content
       const result = await modelRouterService.invoke({
         modelId: 'openai/gpt-4o',
+        tenantId: undefined, // TODO: Thread tenantId from caller
         messages: [{
           role: 'user',
           content: `Describe this ${mediaType} in three levels:
@@ -917,6 +926,7 @@ ${mediaType === 'image' ? `Image URL: ${sourceUri}` : `First frame of video: ${s
     
     const result = await modelRouterService.invoke({
       modelId: 'anthropic/claude-3-5-sonnet-20241022',
+      tenantId: undefined, // TODO: Thread tenantId from caller
       messages: [{
         role: 'user',
         content: `${prompt}

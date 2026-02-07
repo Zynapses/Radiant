@@ -4,7 +4,13 @@
 
 import { Handler, ScheduledEvent } from 'aws-lambda';
 import { executeStatement, stringParam, longParam, doubleParam } from '../shared/db/client';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'security/benchmark',
+  category: 'security',
+  sourceType: 'lambda',
+});
 import { hallucinationDetectionService } from '../shared/services/hallucination-detection.service';
 import { driftDetectionService } from '../shared/services/drift-detection.service';
 import { securityAlertService } from '../shared/services/security-alert.service';

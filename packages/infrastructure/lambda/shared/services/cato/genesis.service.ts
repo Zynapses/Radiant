@@ -9,6 +9,7 @@
 
 import { executeStatement } from '../../db/client';
 import { logger } from '../../logging/enhanced-logger';
+import { driftAwareWeightingService, type DriftSummary, type GenesisDriftFeedback } from '../drift-aware-weighting.service';
 
 export type GenesisStage = 'EMBRYONIC' | 'NASCENT' | 'DEVELOPING' | 'MATURING' | 'MATURE';
 
@@ -225,6 +226,130 @@ class GenesisService {
 
   async advanceStage(tenantId = 'default', targetStage?: GenesisStage): Promise<GenesisState> {
     return this.updateStage(tenantId, targetStage || 'EMBRYONIC');
+  }
+
+  /**
+   * v7.37.0: Check if model drift health allows gate advancement.
+   * Uses BOTH static drift scores AND real-time invocation telemetry from
+   * ALL 52+ services that call modelRouterService.invoke().
+   * Genesis should not advance stages if underlying models are drifting
+   * or if real-time failure/reroute rates are too high.
+   */
+  async isDriftHealthyForStage(tenantId: string, targetStage: GenesisStage): Promise<{
+    healthy: boolean;
+    driftSummary: DriftSummary;
+    genesisFeedback?: GenesisDriftFeedback;
+    reason?: string;
+  }> {
+    const summary = await driftAwareWeightingService.getDriftSummary(tenantId);
+
+    // Stricter drift requirements for higher stages
+    const stageMinAvgDrift: Record<GenesisStage, number> = {
+      'EMBRYONIC': 0.3,
+      'NASCENT': 0.4,
+      'DEVELOPING': 0.5,
+      'MATURING': 0.6,
+      'MATURE': 0.7,
+    };
+
+    const stageMaxQuarantined: Record<GenesisStage, number> = {
+      'EMBRYONIC': 5,
+      'NASCENT': 3,
+      'DEVELOPING': 2,
+      'MATURING': 1,
+      'MATURE': 0,
+    };
+
+    // v7.37.0: Real-time health thresholds per stage
+    const stageMinHealthScore: Record<GenesisStage, number> = {
+      'EMBRYONIC': 0.2,
+      'NASCENT': 0.35,
+      'DEVELOPING': 0.5,
+      'MATURING': 0.65,
+      'MATURE': 0.8,
+    };
+
+    const stageMaxFailureRate: Record<GenesisStage, number> = {
+      'EMBRYONIC': 0.30,
+      'NASCENT': 0.20,
+      'DEVELOPING': 0.15,
+      'MATURING': 0.10,
+      'MATURE': 0.05,
+    };
+
+    const stageMaxRerouteRate: Record<GenesisStage, number> = {
+      'EMBRYONIC': 0.50,
+      'NASCENT': 0.40,
+      'DEVELOPING': 0.30,
+      'MATURING': 0.20,
+      'MATURE': 0.10,
+    };
+
+    const minDrift = stageMinAvgDrift[targetStage];
+    const maxQuarantined = stageMaxQuarantined[targetStage];
+
+    // Check 1: Static drift scores
+    if (summary.avgDriftScore < minDrift) {
+      return {
+        healthy: false,
+        driftSummary: summary,
+        reason: `Average drift score ${summary.avgDriftScore.toFixed(3)} below ${targetStage} minimum ${minDrift}`,
+      };
+    }
+
+    if (summary.quarantinedModels > maxQuarantined) {
+      return {
+        healthy: false,
+        driftSummary: summary,
+        reason: `${summary.quarantinedModels} quarantined models exceeds ${targetStage} maximum ${maxQuarantined}`,
+      };
+    }
+
+    // Check 2: Real-time telemetry from all services (v7.37.0)
+    let genesisFeedback: GenesisDriftFeedback | undefined;
+    try {
+      genesisFeedback = await driftAwareWeightingService.getGenesisDriftFeedback(tenantId);
+
+      // Only apply telemetry checks if we have meaningful data (>10 invocations)
+      if (genesisFeedback.totalInvocations >= 10) {
+        const minHealth = stageMinHealthScore[targetStage];
+        const maxFailure = stageMaxFailureRate[targetStage];
+        const maxReroute = stageMaxRerouteRate[targetStage];
+
+        if (genesisFeedback.overallHealthScore < minHealth) {
+          return {
+            healthy: false,
+            driftSummary: summary,
+            genesisFeedback,
+            reason: `Overall health score ${genesisFeedback.overallHealthScore.toFixed(3)} below ${targetStage} minimum ${minHealth} (based on ${genesisFeedback.totalInvocations} invocations in last hour)`,
+          };
+        }
+
+        if (genesisFeedback.failureRate > maxFailure) {
+          return {
+            healthy: false,
+            driftSummary: summary,
+            genesisFeedback,
+            reason: `Failure rate ${(genesisFeedback.failureRate * 100).toFixed(1)}% exceeds ${targetStage} maximum ${(maxFailure * 100).toFixed(0)}% (${genesisFeedback.failedInvocations}/${genesisFeedback.totalInvocations} failed)`,
+          };
+        }
+
+        if (genesisFeedback.rerouteRate > maxReroute) {
+          return {
+            healthy: false,
+            driftSummary: summary,
+            genesisFeedback,
+            reason: `Reroute rate ${(genesisFeedback.rerouteRate * 100).toFixed(1)}% exceeds ${targetStage} maximum ${(maxReroute * 100).toFixed(0)}% (${genesisFeedback.reroutedInvocations}/${genesisFeedback.totalInvocations} rerouted)`,
+          };
+        }
+      }
+    } catch (feedbackError) {
+      logger.debug('Genesis drift feedback unavailable, using static scores only', {
+        tenantId, error: String(feedbackError),
+      });
+    }
+
+    return { healthy: true, driftSummary: summary, genesisFeedback };
   }
 }
 

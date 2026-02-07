@@ -33,7 +33,12 @@ const recordUsageSchema = z.object({
   phiDetected: z.boolean().default(false),
   phiSanitized: z.boolean().default(false),
   userId: z.string().optional(),
+  guestId: z.string().optional(),
+  attributedToUserId: z.string().optional(),
+  sessionId: z.string().optional(),
 });
+
+const USER_ROLLUP_TABLE = process.env.USER_ROLLUP_TABLE || 'radiant-user-usage-rollups';
 
 export async function handler(event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> {
   const requestLogger = logger.child({ requestId: context.awsRequestId, path: event.path });
@@ -50,6 +55,8 @@ export async function handler(event: APIGatewayProxyEvent, context: Context): Pr
       case 'GET':
         if (action === 'summary') return await handleGetSummary(event, auth, requestLogger);
         if (action === 'rollups') return await handleGetRollups(event, auth, requestLogger);
+        if (action === 'user-rollups') return await handleGetUserRollups(event, auth, requestLogger);
+        if (action === 'guest-usage') return await handleGetGuestUsage(event, auth, requestLogger);
         break;
     }
     throw new ValidationError(`Unknown action: ${action}`);
@@ -73,11 +80,14 @@ async function handleRecordUsage(event: APIGatewayProxyEvent, auth: AuthContext,
   const marginPercent = await getTenantMargin(auth.tenantId, logger);
   const billedCost = providerCost * (1 + marginPercent / 100);
 
+  // For guest-originated usage, attribute cost to the internal user
+  const effectiveUserId = data.attributedToUserId || data.userId || auth.userId;
+
   const usageEvent = {
     id: uuidv4(),
     timestamp: new Date().toISOString(),
     tenantId: auth.tenantId,
-    userId: data.userId || auth.userId,
+    userId: effectiveUserId,
     adminId: auth.isAdmin ? auth.userId : undefined,
     appId: auth.appId,
     environment: auth.environment,
@@ -96,6 +106,10 @@ async function handleRecordUsage(event: APIGatewayProxyEvent, auth: AuthContext,
     cached: data.cached,
     phiDetected: data.phiDetected,
     phiSanitized: data.phiSanitized,
+    guestId: data.guestId || undefined,
+    guestOriginated: !!data.guestId,
+    attributedToUserId: effectiveUserId,
+    sessionId: data.sessionId || undefined,
   };
 
   await ddbClient.send(new PutCommand({
@@ -104,9 +118,10 @@ async function handleRecordUsage(event: APIGatewayProxyEvent, auth: AuthContext,
   }));
 
   await updateDailyRollup(usageEvent, logger);
+  await updateUserDailyRollup(usageEvent, logger);
 
-  logger.info('Usage recorded', { eventId: usageEvent.id, modelId: data.modelId, tokens: usageEvent.totalTokens, cost: billedCost });
-  return created({ event: { id: usageEvent.id, billedCost, providerCost } });
+  logger.info('Usage recorded', { eventId: usageEvent.id, modelId: data.modelId, tokens: usageEvent.totalTokens, cost: billedCost, guestOriginated: usageEvent.guestOriginated });
+  return created({ event: { id: usageEvent.id, billedCost, providerCost, attributedToUserId: effectiveUserId } });
 }
 
 async function handleBatchRecord(event: APIGatewayProxyEvent, auth: AuthContext, logger: Logger): Promise<APIGatewayProxyResult> {
@@ -232,6 +247,118 @@ async function getTenantMargin(tenantId: string, logger: Logger): Promise<number
     toSqlParams({ tenantId })
   );
   return result.rowCount > 0 ? parseFloat(result.rows[0].margin_percent) : 20;
+}
+
+async function updateUserDailyRollup(event: Record<string, unknown>, logger: Logger): Promise<void> {
+  const date = (event.timestamp as string).split('T')[0];
+  const userId = event.attributedToUserId as string || event.userId as string;
+  try {
+    await ddbClient.send(new UpdateCommand({
+      TableName: USER_ROLLUP_TABLE,
+      Key: { pk: `TENANT#${event.tenantId}#USER#${userId}`, sk: `DATE#${date}#MODEL#${event.modelId}` },
+      UpdateExpression: `SET #date = :date, modelId = :modelId, userId = :userId, tenantId = :tenantId,
+        requestCount = if_not_exists(requestCount, :zero) + :one,
+        inputTokens = if_not_exists(inputTokens, :zero) + :inputTokens,
+        outputTokens = if_not_exists(outputTokens, :zero) + :outputTokens,
+        totalTokens = if_not_exists(totalTokens, :zero) + :totalTokens,
+        providerCost = if_not_exists(providerCost, :zero) + :providerCost,
+        billedCost = if_not_exists(billedCost, :zero) + :billedCost,
+        guestOriginatedCount = if_not_exists(guestOriginatedCount, :zero) + :guestOriginated,
+        guestOriginatedCost = if_not_exists(guestOriginatedCost, :zero) + :guestCost,
+        updatedAt = :updatedAt`,
+      ExpressionAttributeNames: { '#date': 'date' },
+      ExpressionAttributeValues: {
+        ':date': date, ':modelId': event.modelId, ':userId': userId, ':tenantId': event.tenantId,
+        ':zero': 0, ':one': 1, ':inputTokens': event.inputTokens, ':outputTokens': event.outputTokens,
+        ':totalTokens': event.totalTokens, ':providerCost': event.providerCost, ':billedCost': event.billedCost,
+        ':guestOriginated': event.guestOriginated ? 1 : 0,
+        ':guestCost': event.guestOriginated ? event.billedCost : 0,
+        ':updatedAt': new Date().toISOString(),
+      },
+    }));
+  } catch (error) {
+    logger.error('Failed to update user rollup', error as Error, { tenantId: event.tenantId as string, userId, date });
+  }
+}
+
+async function handleGetUserRollups(event: APIGatewayProxyEvent, auth: AuthContext, logger: Logger): Promise<APIGatewayProxyResult> {
+  const startDate = event.queryStringParameters?.startDate || getDefaultStartDate();
+  const endDate = event.queryStringParameters?.endDate || getTodayDate();
+  const userId = event.queryStringParameters?.userId;
+
+  if (!userId) throw new ValidationError('userId query parameter is required');
+
+  const response = await ddbClient.send(new QueryCommand({
+    TableName: USER_ROLLUP_TABLE,
+    KeyConditionExpression: 'pk = :pk AND sk BETWEEN :start AND :end',
+    ExpressionAttributeValues: {
+      ':pk': `TENANT#${auth.tenantId}#USER#${userId}`,
+      ':start': `DATE#${startDate}`,
+      ':end': `DATE#${endDate}#~`,
+    },
+  }));
+
+  const rollups = (response.Items || []).map(item => ({
+    date: item.date, modelId: item.modelId, userId: item.userId,
+    requestCount: item.requestCount, inputTokens: item.inputTokens,
+    outputTokens: item.outputTokens, totalTokens: item.totalTokens,
+    providerCost: item.providerCost, billedCost: item.billedCost,
+    guestOriginatedCount: item.guestOriginatedCount || 0,
+    guestOriginatedCost: item.guestOriginatedCost || 0,
+  }));
+
+  const totals = rollups.reduce((acc, r) => ({
+    requests: acc.requests + ((r.requestCount as number) || 0),
+    inputTokens: acc.inputTokens + ((r.inputTokens as number) || 0),
+    outputTokens: acc.outputTokens + ((r.outputTokens as number) || 0),
+    billedCost: acc.billedCost + ((r.billedCost as number) || 0),
+    guestOriginatedCount: acc.guestOriginatedCount + ((r.guestOriginatedCount as number) || 0),
+    guestOriginatedCost: acc.guestOriginatedCost + ((r.guestOriginatedCost as number) || 0),
+  }), { requests: 0, inputTokens: 0, outputTokens: 0, billedCost: 0, guestOriginatedCount: 0, guestOriginatedCost: 0 });
+
+  return success({ period: { startDate, endDate }, userId, totals, rollups });
+}
+
+async function handleGetGuestUsage(event: APIGatewayProxyEvent, auth: AuthContext, logger: Logger): Promise<APIGatewayProxyResult> {
+  const startDate = event.queryStringParameters?.startDate || getDefaultStartDate();
+  const endDate = event.queryStringParameters?.endDate || getTodayDate();
+
+  const result = await executeStatement<{
+    attributed_to_user_id: string; attribution_type: string;
+    total_requests: string; total_input_tokens: string; total_output_tokens: string;
+    total_billed_cost: string; total_provider_cost: string;
+  }>(
+    `SELECT attributed_to_user_id, attribution_type,
+            COUNT(*) as total_requests,
+            SUM(input_tokens) as total_input_tokens,
+            SUM(output_tokens) as total_output_tokens,
+            SUM(billed_cost) as total_billed_cost,
+            SUM(provider_cost) as total_provider_cost
+     FROM guest_cost_attribution_log
+     WHERE tenant_id = :tenantId
+       AND created_at BETWEEN :startDate::timestamptz AND :endDate::timestamptz
+     GROUP BY attributed_to_user_id, attribution_type
+     ORDER BY total_billed_cost DESC`,
+    toSqlParams({ tenantId: auth.tenantId, startDate: startDate + 'T00:00:00Z', endDate: endDate + 'T23:59:59Z' })
+  );
+
+  const byUser = result.rows.map(r => ({
+    attributedToUserId: r.attributed_to_user_id,
+    attributionType: r.attribution_type,
+    totalRequests: parseInt(r.total_requests) || 0,
+    totalInputTokens: parseInt(r.total_input_tokens) || 0,
+    totalOutputTokens: parseInt(r.total_output_tokens) || 0,
+    totalBilledCost: parseFloat(r.total_billed_cost) || 0,
+    totalProviderCost: parseFloat(r.total_provider_cost) || 0,
+  }));
+
+  const totals = byUser.reduce((acc, r) => ({
+    requests: acc.requests + r.totalRequests,
+    tokens: acc.tokens + r.totalInputTokens + r.totalOutputTokens,
+    billedCost: acc.billedCost + r.totalBilledCost,
+  }), { requests: 0, tokens: 0, billedCost: 0 });
+
+  return success({ period: { startDate, endDate }, totals, byUser });
 }
 
 function getDefaultStartDate(): string { const d = new Date(); d.setDate(d.getDate() - 30); return d.toISOString().split('T')[0]; }

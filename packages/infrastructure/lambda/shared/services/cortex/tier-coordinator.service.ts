@@ -6,7 +6,13 @@
  */
 
 import { executeStatement, stringParam } from '../../db/client';
-import { enhancedLogger as logger } from '../../logging/enhanced-logger';
+import { createRegisteredLogger } from '../logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'cortex/tier-coordinator',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import type {
   CortexTierConfig,
   MemoryTier,

@@ -6,7 +6,13 @@
 
 import { DynamoDBClient, PutItemCommand, QueryCommand, UpdateItemCommand, AttributeValue } from '@aws-sdk/client-dynamodb';
 import { sendTemplateEmail, EmailTemplates } from './email';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'notifications/main',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 const dynamodb = new DynamoDBClient({});
 const NOTIFICATIONS_TABLE = process.env.NOTIFICATIONS_TABLE || 'radiant-notifications';

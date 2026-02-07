@@ -21,7 +21,13 @@ import {
   GetServiceGraphCommand,
 } from '@aws-sdk/client-xray';
 import { executeStatement, stringParam, doubleParam, longParam, boolParam } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'aws/monitoring',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 // Local type definitions (also exported from @radiant/shared after build)
 type CloudWatchServiceType = 'lambda' | 'aurora' | 'ecs' | 'apigateway' | 'sqs' | 's3';

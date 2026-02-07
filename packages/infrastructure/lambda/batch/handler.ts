@@ -7,7 +7,13 @@
 import { SQSEvent, SQSRecord } from 'aws-lambda';
 import { DynamoDBClient, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
 import { S3Client, GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'batch/handler',
+  category: 'infrastructure',
+  sourceType: 'lambda',
+});
 import { requireEnv } from '../shared/config/env';
 
 const dynamodb = new DynamoDBClient({});

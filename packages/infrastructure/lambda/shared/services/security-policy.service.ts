@@ -13,7 +13,13 @@
  */
 
 import { executeStatement, stringParam, boolParam } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'security/policy',
+  category: 'security',
+  sourceType: 'application',
+});
 import Redis from 'ioredis';
 
 // Redis client for caching policies

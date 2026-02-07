@@ -10,6 +10,10 @@
 
 import { Logger } from '../logger';
 import { executeStatement, stringParam, longParam } from '../db';
+import { akgService } from './akg.service';
+import { predictivePrefetchService } from './predictive-prefetch.service';
+import { dreamInsightGeneratorService } from './dream-insight-generator.service';
+import { userMemoryProfileService } from './user-memory-profile.service';
 
 const logger = new Logger({ service: 'brain-router-service' });
 
@@ -92,19 +96,68 @@ class BrainRouterService {
       promptLength: request.prompt.length,
     });
 
+    // Inject unified user memory profile into prompt (facts, prefs, instructions, AKG entities)
+    // This ensures the SAME user profile is used across every chat on every model
+    const profileSummary = await userMemoryProfileService.getProfileSummary(
+      request.tenantId, request.userId, 600
+    ).catch(err => { logger.warn('Failed to get user memory profile', { error: String(err) }); return null; });
+
+    // Inject AKG context into prompt (if available)
+    const akgContext = await this.getAKGContext(request.tenantId, request.userId);
+
+    // Build enriched prompt: [User Memory Profile] + [AKG Context] + [User Prompt]
+    let enrichedPrompt = request.prompt;
+    if (profileSummary?.systemPromptInjection) {
+      enrichedPrompt = `${profileSummary.systemPromptInjection}\n\n${enrichedPrompt}`;
+    }
+    if (akgContext) {
+      enrichedPrompt = `${akgContext}\n\n${enrichedPrompt}`;
+    }
+    const enrichedRequest = { ...request, prompt: enrichedPrompt };
+
+    // Check for proactive Dream Insight to surface
+    const insight = await dreamInsightGeneratorService.getNextInsightToSurface(
+      request.tenantId, request.userId
+    ).catch(() => null);
+
     // Get model selection for task type
-    const selectedModel = await this.selectModel(request);
+    const selectedModel = await this.selectModel(enrichedRequest);
     
     // Execute the request through the AI gateway
-    const result = await this.executeRequest(request, selectedModel);
+    const result = await this.executeRequest(enrichedRequest, selectedModel);
     
     const latencyMs = Date.now() - startTime;
     
     // Log usage for billing
     await this.logUsage(request, result, latencyMs);
+
+    // ASYNC: Extract entities/relationships from this conversation turn
+    // Fire-and-forget so it doesn't block the user response
+    this.runPostResponseTasks(
+      request.tenantId,
+      request.userId,
+      request.prompt,
+      result.response,
+    ).catch(err => logger.warn('Post-response tasks failed', { error: String(err) }));
+
+    // ASYNC: Record model interaction for user profile tracking
+    userMemoryProfileService.recordInteraction(
+      request.tenantId, request.userId, selectedModel
+    ).catch(() => {});
     
+    // Append proactive insight if available
+    let finalResponse = result.response;
+    if (insight) {
+      finalResponse += `\n\n💡 **Insight**: ${insight.title}\n${insight.description}`;
+      if (insight.recommendation) {
+        finalResponse += `\n*Recommendation*: ${insight.recommendation}`;
+      }
+      dreamInsightGeneratorService.markSurfaced(insight.insightId, request.tenantId).catch(() => {});
+    }
+
     return {
       ...result,
+      response: finalResponse,
       selectedModel,
       latencyMs,
     };
@@ -287,6 +340,65 @@ class BrainRouterService {
     } catch (error) {
       logger.warn('Failed to log AI usage', { error });
     }
+  }
+
+  /**
+   * Get AKG context for prompt enrichment.
+   * Returns a natural language summary of what we know about this user.
+   */
+  private async getAKGContext(tenantId: string, userId: string): Promise<string | null> {
+    try {
+      const context = await akgService.getUserContext(tenantId, userId, 300);
+      return context || null;
+    } catch (error) {
+      logger.warn('Failed to get AKG context', { tenantId, userId, error });
+      return null;
+    }
+  }
+
+  /**
+   * Post-response tasks that run asynchronously after delivering the response.
+   * - AKG entity extraction
+   * - Prefetch prediction update
+   * - Access pattern recording
+   */
+  private async runPostResponseTasks(
+    tenantId: string,
+    userId: string,
+    userMessage: string,
+    aiResponse: string,
+  ): Promise<void> {
+    const conversationId = `conv_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+    // 1. Extract entities and relationships into AKG
+    const extraction = await akgService.extractFromConversation(
+      tenantId, userId, conversationId, userMessage, aiResponse
+    );
+
+    // 2. Record access patterns for prefetch training
+    const accessedNodeIds = [
+      ...extraction.newNodes.map(n => n.nodeId),
+      ...extraction.updatedNodes.map(n => n.nodeId),
+    ];
+    if (accessedNodeIds.length > 0) {
+      const promptHash = await this.hashString(userMessage.substring(0, 200));
+      await predictivePrefetchService.recordAccessPattern(
+        tenantId, userId, accessedNodeIds, promptHash, [], 0
+      );
+    }
+
+    // 3. Update prefetch predictions for next turn
+    await predictivePrefetchService.predict(
+      tenantId, userId, [], accessedNodeIds
+    );
+  }
+
+  private async hashString(input: string): Promise<string> {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(input);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
   }
 }
 

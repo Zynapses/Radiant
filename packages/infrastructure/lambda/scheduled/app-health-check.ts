@@ -7,9 +7,13 @@
 
 import { ScheduledHandler } from 'aws-lambda';
 import { executeStatement, stringParam, longParam } from '../shared/db/client';
-import { enhancedLogger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
 
-const logger = enhancedLogger;
+const logger = createRegisteredLogger({
+  serviceName: 'scheduled/app-health-check',
+  category: 'infrastructure',
+  sourceType: 'lambda',
+});
 
 interface HealthCheckResult {
   appId: string;

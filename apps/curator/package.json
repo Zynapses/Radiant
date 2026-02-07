@@ -50,7 +50,8 @@
     "framer-motion": "^11.0.0",
     "date-fns": "^3.0.0",
     "d3": "^7.8.5",
-    "@types/d3": "^7.4.3"
+    "@types/d3": "^7.4.3",
+    "@radiant/delight-ui": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",

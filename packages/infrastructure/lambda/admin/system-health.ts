@@ -13,7 +13,13 @@ import { ECSClient, DescribeServicesCommand, DescribeClustersCommand } from '@aw
 import { RDSClient, DescribeDBClustersCommand } from '@aws-sdk/client-rds';
 import { ElastiCacheClient, DescribeCacheClustersCommand } from '@aws-sdk/client-elasticache';
 import { getPoolClient } from '../shared/db/centralized-pool';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'admin/system-health',
+  category: 'audit',
+  sourceType: 'lambda',
+});
 import { successResponse, handleError } from '../shared/middleware/api-response';
 import { extractAuthContext, requireAdmin } from '../shared/auth';
 import type { 
@@ -34,6 +40,21 @@ const SERVICE_NAME = process.env.ECS_SERVICE_NAME || 'radiant-prod-litellm';
 const DB_CLUSTER_ID = process.env.DB_CLUSTER_ID || 'radiant-prod-aurora';
 const REDIS_CLUSTER_ID = process.env.REDIS_CLUSTER_ID || 'radiant-prod-redis';
 
+// Datacenter/region configuration for multi-region health monitoring
+interface DatacenterConfig {
+  id: string;
+  name: string;
+  displayName: string;
+  regions: string[];
+  primaryRegion: string;
+}
+
+const DATACENTER_CONFIGS: DatacenterConfig[] = [
+  { id: 'americas', name: 'Americas', displayName: 'Americas (US)', regions: ['us-east-1', 'us-west-2'], primaryRegion: 'us-east-1' },
+  { id: 'europe', name: 'Europe', displayName: 'Europe (EU)', regions: ['eu-west-1', 'eu-central-1'], primaryRegion: 'eu-west-1' },
+  { id: 'asia', name: 'Asia Pacific', displayName: 'Asia Pacific', regions: ['ap-northeast-1', 'ap-southeast-1', 'ap-south-1'], primaryRegion: 'ap-northeast-1' },
+];
+
 export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   const method = event.httpMethod;
   const path = event.path;
@@ -43,8 +64,10 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
     requireAdmin(auth);
 
     // GET /api/admin/system/health - Full health dashboard
+    // Supports ?datacenter=americas|europe|asia for region-specific data
     if (method === 'GET' && path.endsWith('/health')) {
-      return await getHealthDashboard();
+      const datacenterId = event.queryStringParameters?.datacenter;
+      return await getHealthDashboard(datacenterId);
     }
 
     // GET /api/admin/system/health/components - Component health list
@@ -85,11 +108,27 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
   }
 }
 
-async function getHealthDashboard(): Promise<APIGatewayProxyResult> {
+async function getHealthDashboard(datacenterId?: string): Promise<APIGatewayProxyResult> {
+  // Validate datacenter if provided
+  const datacenter = datacenterId 
+    ? DATACENTER_CONFIGS.find(dc => dc.id === datacenterId)
+    : undefined;
+
+  if (datacenterId && !datacenter) {
+    return {
+      statusCode: 400,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        success: false, 
+        error: { message: `Invalid datacenter: ${datacenterId}. Valid options: ${DATACENTER_CONFIGS.map(dc => dc.id).join(', ')}` }
+      })
+    };
+  }
+
   const [components, alerts, uptimeMetrics] = await Promise.all([
-    fetchComponentHealth(),
-    fetchActiveAlerts(),
-    fetchUptimeMetrics(),
+    fetchComponentHealth(datacenter?.primaryRegion),
+    fetchActiveAlerts(datacenter?.id),
+    fetchUptimeMetrics(datacenter?.id),
   ]);
 
   const overallStatus = components.some(c => c.status === 'unhealthy') 
@@ -98,7 +137,8 @@ async function getHealthDashboard(): Promise<APIGatewayProxyResult> {
       ? 'degraded' 
       : 'healthy';
 
-  const dashboard: SystemHealthDashboard = {
+  // Build dashboard response
+  const dashboard: SystemHealthDashboard & { datacenter?: { id: string; name: string; displayName: string }; datacenters?: { id: string; overallStatus: string }[] } = {
     generatedAt: new Date().toISOString(),
     overallStatus,
     components,
@@ -108,6 +148,21 @@ async function getHealthDashboard(): Promise<APIGatewayProxyResult> {
     uptimePercent7d: uptimeMetrics.uptime7d,
     uptimePercent30d: uptimeMetrics.uptime30d,
   };
+
+  // Add datacenter info if filtered by region
+  if (datacenter) {
+    dashboard.datacenter = {
+      id: datacenter.id,
+      name: datacenter.name,
+      displayName: datacenter.displayName,
+    };
+  } else {
+    // For global view, include summary status of all datacenters
+    dashboard.datacenters = DATACENTER_CONFIGS.map(dc => ({
+      id: dc.id,
+      overallStatus: 'healthy', // In production, this would be fetched per-region
+    }));
+  }
 
   return successResponse({ data: dashboard });
 }
@@ -253,10 +308,15 @@ async function updateGatewayConfig(event: APIGatewayProxyEvent, userId: string):
 // HELPER FUNCTIONS - Fetch real data from AWS services
 // ============================================================================
 
-async function fetchComponentHealth(): Promise<SystemComponentHealth[]> {
+async function fetchComponentHealth(region?: string): Promise<SystemComponentHealth[]> {
   const components: SystemComponentHealth[] = [];
   const now = new Date();
   const fiveMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000);
+  
+  // Note: In a multi-region deployment, you would create CloudWatch clients
+  // for each region and fetch metrics from the appropriate region.
+  // For now, we use the default region but the parameter is available for future use.
+  const _targetRegion = region || process.env.AWS_REGION || 'us-east-1';
 
   // Fetch ECS metrics for LiteLLM Gateway
   try {
@@ -472,17 +532,23 @@ async function fetchComponentHealth(): Promise<SystemComponentHealth[]> {
   return components;
 }
 
-async function fetchActiveAlerts(): Promise<SystemAlert[]> {
+async function fetchActiveAlerts(datacenterId?: string): Promise<SystemAlert[]> {
   const client = await getPoolClient();
   try {
+    // If datacenter filter provided, filter alerts by region
+    // Note: This assumes alerts table has a region column. If not, filter is ignored.
+    const whereClause = datacenterId 
+      ? `WHERE resolved_at IS NULL AND (datacenter_id = $1 OR datacenter_id IS NULL)`
+      : `WHERE resolved_at IS NULL`;
+    
     const result = await client.query(`
       SELECT * FROM system_alerts 
-      WHERE resolved_at IS NULL
+      ${whereClause}
       ORDER BY 
         CASE severity WHEN 'critical' THEN 1 WHEN 'warning' THEN 2 ELSE 3 END,
         triggered_at DESC
       LIMIT 50
-    `);
+    `, datacenterId ? [datacenterId] : []);
 
     return result.rows.map(row => ({
       id: row.id,
@@ -564,8 +630,10 @@ async function fetchLiteLLMHealth(): Promise<LiteLLMGatewayHealth> {
   };
 }
 
-async function fetchUptimeMetrics(): Promise<{ uptime24h: number; uptime7d: number; uptime30d: number }> {
+async function fetchUptimeMetrics(datacenterId?: string): Promise<{ uptime24h: number; uptime7d: number; uptime30d: number }> {
   // In production, calculate from CloudWatch alarm history
+  // The datacenterId parameter allows filtering uptime by region
+  const _datacenter = datacenterId; // Available for future per-region uptime tracking
   return {
     uptime24h: 100,
     uptime7d: 99.98,

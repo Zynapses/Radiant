@@ -5,7 +5,13 @@
  * Uses Cedar policy language for fine-grained access control.
  */
 
-import { enhancedLogger as logger } from '../../logging/enhanced-logger';
+import { createRegisteredLogger } from '../logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'cedar/cedar-authorization',
+  category: 'access',
+  sourceType: 'application',
+});
 
 // Using shared logger
 

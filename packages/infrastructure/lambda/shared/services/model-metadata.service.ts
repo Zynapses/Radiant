@@ -333,7 +333,8 @@ export class ModelMetadataService {
 
   async researchModel(
     modelId: string,
-    researchDepth: 'quick' | 'standard' | 'deep' = 'standard'
+    researchDepth: 'quick' | 'standard' | 'deep' = 'standard',
+    tenantId?: string
   ): Promise<MetadataResearchResult> {
     const startTime = Date.now();
     
@@ -358,6 +359,7 @@ export class ModelMetadataService {
         modelId: 'anthropic/claude-3-5-sonnet-20241022',
         messages: [{ role: 'user', content: researchPrompt }],
         maxTokens: 4096,
+        tenantId,
       });
 
       // Parse AI response
@@ -507,7 +509,8 @@ Return JSON:
 
   async researchNewModel(
     provider: string,
-    modelName: string
+    modelName: string,
+    tenantId?: string
   ): Promise<{ modelId: string; metadata: ModelMetadata; validation: ValidationResult }> {
     const modelId = `${provider}/${modelName.toLowerCase().replace(/\s+/g, '-')}`;
 
@@ -545,6 +548,7 @@ Return JSON:
       modelId: 'anthropic/claude-3-5-sonnet-20241022',
       messages: [{ role: 'user', content: prompt }],
       maxTokens: 2048,
+      tenantId,
     });
 
     const jsonMatch = response.content.match(/\{[\s\S]*\}/);

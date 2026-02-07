@@ -58,7 +58,13 @@
 import { v4 as uuidv4 } from 'uuid';
 import * as crypto from 'crypto';
 import { executeStatement } from '../../db/client';
-import { enhancedLogger as logger } from '../../logging/enhanced-logger';
+import { createRegisteredLogger } from '../logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'workflow/uep-node',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { modelRouterService } from '../model-router.service';
 
 // =============================================================================

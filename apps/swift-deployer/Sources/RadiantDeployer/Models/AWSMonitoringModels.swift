@@ -1,4 +1,4 @@
-// RADIANT v4.18.0 - AWS Free Tier Monitoring Models
+// RADIANT v6.6.0 - AWS Free Tier Monitoring Models
 // CloudWatch, X-Ray, and Cost Explorer data structures
 
 import Foundation

@@ -7,7 +7,13 @@
 
 import { modelRouterService } from './model-router.service';
 import { learningService } from './learning.service';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'response/synthesis',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 // ============================================================================
 // Types
@@ -199,6 +205,7 @@ export class ResponseSynthesisService {
     const synthesisPrompt = this.buildSynthesisPrompt(request.prompt, responses);
     
     const synthesisResponse = await modelRouterService.invoke({
+      tenantId: request.tenantId,
       modelId: judgeModel,
       messages: [{ role: 'user', content: synthesisPrompt }],
     });
@@ -288,6 +295,7 @@ Provide an improved answer that incorporates the best of both perspectives.
 If you believe your original answer was correct and complete, explain why and restate it.`;
         
         const result = await modelRouterService.invoke({
+          tenantId: request.tenantId,
           modelId: resp.modelId,
           messages: [{ role: 'user', content: critiquePrompt }],
         });
@@ -371,6 +379,7 @@ If you believe your original answer was correct and complete, explain why and re
     
     // Initial response
     const initialResult = await modelRouterService.invoke({
+      tenantId: request.tenantId,
       modelId: primaryModel,
       messages: [{ role: 'user', content: request.prompt }],
     });
@@ -398,6 +407,7 @@ Please improve your answer based on this feedback. Focus on:
 ${initialAssessment.improvements?.join('\n') || '- Being more accurate\n- Being more complete\n- Being clearer'}`;
       
       const refinedResult = await modelRouterService.invoke({
+        tenantId: request.tenantId,
         modelId: primaryModel,
         messages: [{ role: 'user', content: refinementPrompt }],
       });
@@ -574,6 +584,7 @@ ${initialAssessment.improvements?.join('\n') || '- Being more accurate\n- Being 
     const startTime = Date.now();
     
     const result = await modelRouterService.invoke({
+      tenantId: request.tenantId,
       modelId,
       messages: [
         ...(request.context ? [{ role: 'system' as const, content: request.context }] : []),
@@ -616,6 +627,7 @@ SCORE: [0.0-1.0 quality score]
 REASONING: [Brief explanation of why this response is best]`;
 
     const result = await modelRouterService.invoke({
+      tenantId: request.tenantId,
       modelId: judgeModel,
       messages: [{ role: 'user', content: judgePrompt }],
     });
@@ -680,6 +692,7 @@ FEEDBACK: [Brief feedback]
 IMPROVEMENTS: [Comma-separated list of specific improvements needed]`;
 
     const result = await modelRouterService.invoke({
+      tenantId: request.tenantId,
       modelId: judgeModel,
       messages: [{ role: 'user', content: assessPrompt }],
     });

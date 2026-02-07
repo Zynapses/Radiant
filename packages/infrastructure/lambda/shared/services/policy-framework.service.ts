@@ -3,7 +3,13 @@
 // Novel UI: "Stance Compass" - radial selector for policy positions
 
 import { executeStatement, stringParam, longParam, boolParam } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'policy/framework',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 // ============================================================================
 // Types

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import { api } from '@/lib/api/client';
+import { useRadiantDelightOptional } from '@radiant/delight-ui';
 import {
   Card,
   CardContent,
@@ -174,6 +175,7 @@ export default function DelightDashboardPage() {
   const [editingMessage, setEditingMessage] = useState<DelightMessage | null>(null);
   
   const queryClient = useQueryClient();
+  const delight = useRadiantDelightOptional();
 
   const { data: dashboard, isLoading, error, refetch } = useQuery({
     queryKey: ['delight-dashboard'],
@@ -184,7 +186,8 @@ export default function DelightDashboardPage() {
   const toggleCategoryMutation = useMutation({
     mutationFn: ({ id, isEnabled }: { id: string; isEnabled: boolean }) =>
       api.patch(`/api/admin/delight/categories/${id}`, { isEnabled }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['delight-dashboard'] }),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['delight-dashboard'] }); delight?.triggerDelight('action_complete'); },
+    onError: () => { delight?.triggerDelight('error_recovery'); },
   });
 
   const createMessageMutation = useMutation({
@@ -193,7 +196,9 @@ export default function DelightDashboardPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['delight-dashboard'] });
       setIsCreateDialogOpen(false);
+      delight?.triggerDelight('action_complete');
     },
+    onError: () => { delight?.triggerDelight('error_recovery'); },
   });
 
   const updateMessageMutation = useMutation({
@@ -202,12 +207,15 @@ export default function DelightDashboardPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['delight-dashboard'] });
       setEditingMessage(null);
+      delight?.triggerDelight('action_complete');
     },
+    onError: () => { delight?.triggerDelight('error_recovery'); },
   });
 
   const deleteMessageMutation = useMutation({
     mutationFn: (id: number) => api.delete(`/api/admin/delight/messages/${id}`),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['delight-dashboard'] }),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['delight-dashboard'] }); delight?.triggerDelight('action_complete'); },
+    onError: () => { delight?.triggerDelight('error_recovery'); },
   });
 
   if (isLoading) {

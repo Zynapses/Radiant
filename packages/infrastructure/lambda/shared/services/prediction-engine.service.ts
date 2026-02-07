@@ -6,7 +6,13 @@
 import { executeStatement } from '../db/client';
 import { consciousnessService } from './consciousness.service';
 import { modelRouterService } from './model-router.service';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'prediction/engine',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 // ============================================================================
 // Types

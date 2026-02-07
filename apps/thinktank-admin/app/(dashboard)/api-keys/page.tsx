@@ -10,6 +10,8 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { api } from '@/lib/api/client';
+import { useRadiantDelightOptional } from '@radiant/delight-ui';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -130,6 +132,8 @@ export default function ApiKeysPage() {
     },
   });
 
+  const delight = useRadiantDelightOptional();
+
   // Create key mutation
   const createKeyMutation = useMutation({
     mutationFn: (data: any) => fetch(`${API_BASE}/api/admin/api-keys`, {
@@ -144,9 +148,11 @@ export default function ApiKeysPage() {
       }
       queryClient.invalidateQueries({ queryKey: ['api-keys'] });
       queryClient.invalidateQueries({ queryKey: ['api-keys-dashboard'] });
+      delight?.triggerDelight('action_complete');
     },
     onError: (error: any) => {
       toast({ title: 'Error', description: error.message, variant: 'destructive' });
+      delight?.triggerDelight('error_recovery');
     },
   });
 
@@ -159,7 +165,9 @@ export default function ApiKeysPage() {
     onSuccess: () => {
       toast({ title: 'API Key Revoked' });
       queryClient.invalidateQueries({ queryKey: ['api-keys'] });
+      delight?.triggerDelight('action_complete');
     },
+    onError: () => { delight?.triggerDelight('error_recovery'); },
   });
 
   // Restore key mutation
@@ -170,7 +178,9 @@ export default function ApiKeysPage() {
     onSuccess: () => {
       toast({ title: 'API Key Restored' });
       queryClient.invalidateQueries({ queryKey: ['api-keys'] });
+      delight?.triggerDelight('action_complete');
     },
+    onError: () => { delight?.triggerDelight('error_recovery'); },
   });
 
   const copyToClipboard = (text: string) => {

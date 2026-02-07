@@ -1106,5 +1106,28 @@ aws dynamodb list-tables
 
 ---
 
-*Document Version: 4.18.49*
-*Last Updated: January 2025*
+### Drift-Aware Model Selection (v7.36.0)
+
+Cato's pipeline method execution now uses **drift-aware model selection** instead of hardcoded models.
+
+**Previous behavior**: `selectModelForMethod()` always returned `anthropic/claude-3-5-sonnet-20241022`.
+
+**New behavior**:
+1. `invokeModel()` calls `selectModelForMethodAsync()` to pre-populate a cache with the drift-aware best model
+2. `selectModelForMethod()` checks the cache first, falls back to Claude 3.5 Sonnet if cache miss
+3. Model selection uses the **Cato app weight profile**: drift 0.30, quality 0.25, latency 0.15, cost 0.15, availability 0.15
+4. Min acceptable drift score: 0.40 — models below this threshold are excluded
+
+**Genesis integration**: `isDriftHealthyForStage()` in Genesis service blocks developmental stage advancement when underlying models are drifting beyond acceptable thresholds. MATURE stage requires ≥70% average drift score and zero quarantined models.
+
+**Admin UI**: Orchestration → Drift Control (app weight profiles, drift health, Genesis gates)
+
+**Files modified**:
+- `lambda/shared/services/cato-method-executor.service.ts` — drift-aware selection
+- `lambda/shared/services/cato/genesis.service.ts` — drift health gate check
+- `lambda/shared/services/drift-aware-weighting.service.ts` — unified service
+
+---
+
+*Document Version: 4.19.0*
+*Last Updated: February 2026*

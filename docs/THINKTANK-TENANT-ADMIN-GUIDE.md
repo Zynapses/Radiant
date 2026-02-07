@@ -2,8 +2,8 @@
 
 > **Company/Team Level Administration for Think Tank**
 > 
-> Version: 1.0.0 | Platform: RADIANT 6.4.3
-> Last Updated: February 3, 2026
+> Version: 1.1.0 | Platform: RADIANT 7.9.0
+> Last Updated: February 5, 2026
 
 ---
 
@@ -38,11 +38,12 @@ The Tenant Admin app sits **BEHIND the service layer**. All requests are automat
 5. [Report Writer](#5-report-writer)
 6. [Usage & Billing](#6-usage--billing)
 7. [AI Configuration](#7-ai-configuration)
-8. [Integrations](#8-integrations)
-9. [Security Settings](#9-security-settings)
-10. [Audit Log](#10-audit-log)
-11. [API Reference](#11-api-reference)
-12. [Implementation Files](#12-implementation-files)
+8. [LIVS-M Policy](#8-livs-m-policy)
+9. [Integrations](#9-integrations)
+10. [Security Settings](#10-security-settings)
+11. [Audit Log](#11-audit-log)
+12. [API Reference](#12-api-reference)
+13. [Implementation Files](#13-implementation-files)
 
 ---
 
@@ -123,11 +124,13 @@ The dashboard provides an at-a-glance view of tenant health and usage.
 
 ---
 
-## 2. User Management
+## 2. User Management (v1.1.0)
 
 **Location**: Tenant Admin → Users
 
-Manage users within your organization.
+Manage users within your organization. All user provisioning is **invitation-only** — there is no self-registration. Each user belongs to exactly ONE tenant.
+
+> **Licensing**: User invitations are subject to per-app seat licensing. If your tenant has no available seats for an app, the invite will be blocked for that app. See [Section 2A: Licensing & Seats](#2a-licensing--seats) for details.
 
 ### 2.1 User List
 
@@ -135,8 +138,9 @@ Manage users within your organization.
 |--------|-------------|
 | **Name** | User display name |
 | **Email** | Login email |
-| **Role** | tenant_admin, member, viewer |
-| **Status** | active, invited, suspended |
+| **Role** | tenant_owner, tenant_admin, standard_user, viewer |
+| **Status** | active, invited, deactivated |
+| **Apps** | Which apps the user has access to (Think Tank, Curator, etc.) |
 | **Last Active** | Last login timestamp |
 | **MFA** | MFA enrollment status |
 
@@ -144,23 +148,111 @@ Manage users within your organization.
 
 | Role | Permissions |
 |------|-------------|
-| **tenant_admin** | Full tenant admin access, user management |
-| **member** | Use Think Tank, view reports |
-| **viewer** | View-only access to dashboards |
+| **tenant_owner** | Full tenant control — billing, user management, delete tenant, all permissions |
+| **tenant_admin** | Invite/manage users, configure settings, manage roles |
+| **standard_user** | Use licensed apps, own data only |
+| **viewer** | View-only access to dashboards, no create/edit |
+
+Roles are **soft permissions** — admin-configurable with a UI for toggling individual permissions on/off. The role provides defaults, but admins can customize per-user.
 
 ### 2.3 User Actions
 
-- **Invite User**: Send email invitation
-- **Edit Role**: Change user permissions
-- **Suspend**: Temporarily disable access
-- **Remove**: Remove from tenant (data retained)
+- **Invite User**: Send email invitation (requires seat availability for selected apps)
+- **Edit Role**: Change user role and permissions
+- **Toggle App Access**: Enable/disable access to specific apps (subject to seat licensing)
+- **Deactivate**: Disable access, **free up the seat license** (data retained for regulatory compliance)
+- **Reactivate**: Restore access (consumes a seat again)
+- **Delete**: Schedule data deletion (subject to retention requirements)
 - **Reset MFA**: Clear MFA for re-enrollment
 
-### 2.4 Bulk Actions
+### 2.4 Invitation Flow
 
-- Import users from CSV
+```
+1. Admin clicks "Invite User"
+2. Enter email address
+3. Select role: tenant_admin, standard_user, or viewer
+4. Select app access (checkboxes — disabled if no seats available):
+   [✓] Think Tank (42/50 seats)
+   [✓] Curator (15/25 seats)
+   [✗] Dojo — 0 seats available
+       "No Dojo seats available. Buy more seats or deactivate a user."
+   [✗] Genesis — Not licensed
+       "Genesis requires a license. Contact support@thinktank.app"
+5. System checks permissions and seat availability
+6. Invitation sent (expires in 7 days, or tenant-configured)
+```
+
+**Think Tank access is granted by default.** Other apps must be explicitly selected (subject to licensing).
+
+### 2.5 Deactivation vs Deletion
+
+| Action | Seat Impact | Data Impact | When To Use |
+|--------|-------------|-------------|-------------|
+| **Deactivate** | Seat FREED | Data retained | Employee leaves, temporary suspension |
+| **Delete** | Seat FREED | Data retained per retention license, then purged | GDPR erasure, permanent removal |
+
+**Important**: If your tenant has a regulatory retention license (e.g., HIPAA 7-year retention), user data CANNOT be deleted until the retention period expires. The system will show the earliest deletion date.
+
+### 2.6 Bulk Actions
+
+- Import users from CSV (subject to seat availability)
 - Export user list
 - Bulk role assignment
+- Bulk app access toggle
+
+### 2.7 Same Email in Multiple Tenants
+
+A person can have accounts in multiple organizations (e.g., john@gmail.com in Acme Corp AND Contoso). These are **completely separate user records**. When they log in, they select which organization to enter. Users have **zero visibility** into other tenants.
+
+---
+
+## 2A. Licensing & Seats (v1.0.0)
+
+**Location**: Tenant Admin → Licenses
+
+> **Full Reference**: [Think Tank Licensing Model](./THINKTANK-LICENSING-MODEL.md)
+
+### 2A.1 License Dashboard
+
+View all licenses, usage, and availability for your tenant:
+
+- **App Seats**: How many seats are used/available per app (Think Tank, Curator, Dojo, etc.)
+- **Storage**: Storage quota usage
+- **Retention**: Data retention period
+- **Compliance**: Which regulatory features are active
+
+### 2A.2 Seat Licensing
+
+Each app has its own seat count. Seats are consumed when a user is active with that app's access enabled.
+
+| State | Seat Status |
+|-------|-------------|
+| **Active user with app access** | Seat consumed |
+| **Invited user** | Seat reserved |
+| **Deactivated user** | Seat freed |
+| **User without app access** | No seat consumed |
+
+### 2A.3 Purchasing Additional Seats
+
+If you need more seats or licenses:
+- Click **"+ Buy Seats"** next to the app
+- Or contact Think Tank support at **support@thinktank.app**
+- Additional seats are billed per-seat per-month on your existing billing method
+
+### 2A.4 Compliance Licenses
+
+Regulatory features (HIPAA, GDPR, SOC 2, etc.) are optional licensed features. If your tenant does not have the license, the feature is disabled with a message:
+
+```
+⚠ This feature requires a [HIPAA/GDPR/SOC2] compliance license.
+  Contact Think Tank support at support@thinktank.app to add this to your plan.
+```
+
+Contact **support@thinktank.app** to add compliance licenses.
+
+### 2A.5 Tier Defaults
+
+Your subscription tier includes a base allocation of seats and features. See [Think Tank Licensing Model § Section 4](./THINKTANK-LICENSING-MODEL.md#4-tier-defaults) for the full tier breakdown.
 
 ---
 
@@ -499,13 +591,115 @@ Mid-Level Services settings (if tier allows):
 
 ---
 
-## 8. Integrations
+## 8. LIVS-M Policy (v7.9.0)
+
+**Location**: Tenant Admin → LIVS-M Policy
+
+Configure the AI governance "Defcon" level for your organization. LIVS-M (LLM Interrogation & Verification System - Modular) provides policy-driven forensic verification of AI outputs.
+
+### 8.1 Overview
+
+LIVS-M 2.0 allows tenant admins to configure how strictly the platform verifies AI-generated content before it's delivered to users.
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  LIVS-M Policy Settings                    v2.0.0 [UPDATE]     │
+├─────────────────────────────────────────────────────────────────┤
+│  ┌─────────────┬─────────────┬─────────────┐                    │
+│  │ Modes       │ Settings    │ Updates  •  │  ← Tab navigation  │
+│  └─────────────┴─────────────┴─────────────┘                    │
+│                                                                  │
+│  ┌──────────────────┐ ┌──────────────────┐ ┌──────────────────┐ │
+│  │  Brainstorming   │ │    Standard      │ │   Strict Audit   │ │
+│  │  ⚡ Creative     │ │  ⚖️ Default      │ │  🛡️ Secure       │ │
+│  │                  │ │  [Selected]      │ │                  │ │
+│  │  "Yes, and..."   │ │ "Trust but       │ │ "Zero Trust"     │ │
+│  │                  │ │  Verify"         │ │                  │ │
+│  └──────────────────┘ └──────────────────┘ └──────────────────┘ │
+│                                                                  │
+│  Current Mode: Standard                                          │
+│  • Sycophancy Detection: ON                                     │
+│  • Stub Rejection: ON                                           │
+│  • Chaos Injection: OFF                                         │
+│  • Max Consensus Velocity: 2                                    │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 8.2 Policy Modes
+
+| Mode | Alias | Description | Best For |
+|------|-------|-------------|----------|
+| **Brainstorming** | RAPID_PROTO | Accepts partial code, stubs, rough ideas. Focuses on speed and creativity. | Hackathons, MVP planning, early drafting |
+| **Standard** | ENGINEERING | Code must run. Stubs rejected if breaking functionality. Tests encouraged. | Daily development, sprint work |
+| **Strict Audit** | STRICT_AUDIT | No stubs. No mock data. Mandatory tests. Sycophancy triggers Devil's Advocate. | Production releases, medical/legal, security |
+
+### 8.3 Configuration Options
+
+| Setting | Description | Default |
+|---------|-------------|----------|
+| **Sycophancy Detection** | Detect when agents agree too quickly without critical analysis | ON |
+| **Stub Rejection** | Reject outputs containing TODO, placeholder, or incomplete code | ON |
+| **Chaos Injection** | Inject Devil's Advocate agent when sycophancy detected | OFF |
+| **Max Consensus Velocity** | Maximum agreement rate before triggering verification | 2 |
+
+### 8.4 Version Management (v7.9.0+)
+
+Tenant admins can check for LIVS-M policy registry updates and upgrade:
+
+| Feature | Description |
+|---------|-------------|
+| **Version Badge** | Shows current version (e.g., v2.0.0) |
+| **Update Indicator** | Animated badge when new version available |
+| **Changelog** | List of improvements in new version |
+| **Breaking Changes Alert** | Warning if update has breaking changes |
+| **Migration Notice** | Notification if database migration required |
+| **One-Click Upgrade** | Button to upgrade to latest version |
+
+### 8.5 What LIVS-M Catches
+
+| Issue | Description | Action |
+|-------|-------------|--------|
+| **Code Stubs** | `// TODO`, `throw new Error('not implemented')`, empty functions | Rejected with retry prompt |
+| **Mock Data** | Hardcoded return values, fake data | Rejected in Standard/Strict modes |
+| **Sycophancy** | AI agreeing without verification | Triggers Devil's Advocate |
+| **Incomplete Tests** | Missing test coverage | Warning in Standard, rejected in Strict |
+
+### 8.6 Tenant-Level Overrides
+
+Tenant admins can override the platform default for their organization:
+
+- **Inherit Platform Default**: Use whatever the platform admin sets
+- **Force Brainstorming**: Always use creative mode
+- **Force Standard**: Always use balanced verification
+- **Force Strict**: Always use maximum verification
+
+### 8.7 API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/tenant/livs-policy` | Get current policy settings |
+| PUT | `/api/v1/tenant/livs-policy` | Update policy settings |
+| GET | `/api/v1/tenant/livs-policy/version` | Check for updates |
+| POST | `/api/v1/tenant/livs-policy/upgrade` | Upgrade to latest version |
+
+### 8.8 Implementation
+
+**Files**:
+- UI: `apps/admin-dashboard/app/thinktank-admin/simulator/page.tsx` (LIVS-M Policy view)
+- Types: `packages/shared/src/types/livs.types.ts`
+- Service: `packages/infrastructure/lambda/shared/services/livs/livs-version.service.ts`
+
+**Status**: ✅ Implemented
+
+---
+
+## 9. Integrations
 
 **Location**: Tenant Admin → Integrations
 
 Connect Think Tank to your organization's tools.
 
-### 8.1 Available Integrations
+### 9.1 Available Integrations
 
 | Integration | Type | Description |
 |-------------|------|-------------|
@@ -515,7 +709,7 @@ Connect Think Tank to your organization's tools.
 | **Webhook** | Custom | HTTP callbacks |
 | **API Keys** | Programmatic | Service integration |
 
-### 8.2 API Key Management
+### 9.2 API Key Management
 
 Tenant admins can create API keys for programmatic access:
 
@@ -528,13 +722,13 @@ Tenant admins can create API keys for programmatic access:
 
 ---
 
-## 9. Security Settings
+## 10. Security Settings
 
 **Location**: Tenant Admin → Security
 
 Configure security policies for your organization.
 
-### 9.1 Authentication
+### 10.1 Authentication
 
 | Setting | Description | Default |
 |---------|-------------|---------|
@@ -542,7 +736,7 @@ Configure security policies for your organization.
 | **Session Timeout** | Auto-logout duration | 24h |
 | **Password Policy** | Complexity requirements | standard |
 
-### 9.2 Data Retention
+### 10.2 Data Retention
 
 | Setting | Description | Default |
 |---------|-------------|---------|
@@ -550,7 +744,7 @@ Configure security policies for your organization.
 | **Audit Log Retention** | How long to keep audit | 1 year |
 | **Export Retention** | How long to keep exports | 30 days |
 
-### 9.3 Compliance Settings
+### 10.3 Compliance Settings
 
 | Setting | Description |
 |---------|-------------|
@@ -560,13 +754,13 @@ Configure security policies for your organization.
 
 ---
 
-## 10. Audit Log
+## 11. Audit Log
 
 **Location**: Tenant Admin → Audit
 
 View all administrative actions within your tenant.
 
-### 10.1 Audited Events
+### 11.1 Audited Events
 
 | Event | Description |
 |-------|-------------|
@@ -579,7 +773,7 @@ View all administrative actions within your tenant.
 | **settings.changed** | Tenant settings modified |
 | **integration.added** | New integration configured |
 
-### 10.2 Audit Log Fields
+### 11.2 Audit Log Fields
 
 | Field | Description |
 |-------|-------------|
@@ -590,7 +784,7 @@ View all administrative actions within your tenant.
 | **Details** | Additional context |
 | **IP Address** | Source IP |
 
-### 10.3 Export
+### 11.3 Export
 
 Export audit logs for compliance:
 - Date range filter
@@ -599,7 +793,7 @@ Export audit logs for compliance:
 
 ---
 
-## 11. API Reference
+## 12. API Reference
 
 ### Base URL
 
@@ -630,7 +824,7 @@ Use Bearer token from Think Tank session or API key with `tenant:admin` scope.
 
 ---
 
-## 12. Implementation Files
+## 13. Implementation Files
 
 ### Current Implementation
 
@@ -639,6 +833,7 @@ Use Bearer token from Think Tank session or API key with `tenant:admin` scope.
 | **App Directory** | `apps/thinktank-tenant-admin/` | ✅ Created |
 | **Cartridge Manager** | `app/(dashboard)/cartridges/page.tsx` | ✅ Implemented |
 | **Dashboard** | `app/(dashboard)/page.tsx` | ✅ Implemented |
+| **LIVS-M Policy** | `apps/admin-dashboard/app/thinktank-admin/simulator/page.tsx` | ✅ Implemented |
 | **Users** | `app/(dashboard)/users/page.tsx` | 🔲 Pending |
 | **Settings** | `app/(dashboard)/settings/page.tsx` | 🔲 Pending |
 | **Reports** | `app/(dashboard)/reports/page.tsx` | 🔲 Pending |
@@ -669,6 +864,51 @@ Use Bearer token from Think Tank session or API key with `tenant:admin` scope.
 
 ---
 
+## Memory Retention Settings (v7.13.0)
+
+### Overview
+
+Tenant Admins can customize memory retention for their organization within the bounds set by the Think Tank administrator. This controls session-to-session memory, storage limits, and which memory features are available to your users.
+
+**Dashboard Location**: Tenant Admin → Memory Retention (`/thinktank-tenant-admin/memory-retention`)
+
+### What You Can Control
+
+| Setting | Type | Description |
+|---------|------|-------------|
+| **Session-to-Session Memory** | Toggle | Enable/disable persistent memory for your users |
+| **Conversation History** | Toggle | Store full conversation transcripts |
+| **Auto-Extract Facts** | Toggle | Automatically extract facts from conversations |
+| **User Can Delete Own Memory** | Toggle | Allow users to manage their own memory |
+| **Uploaded Documents in Memory** | Toggle | Include uploaded documents (PDFs, images, code) in user memory across all chats |
+| **Downloaded Files in Memory** | Toggle | Include AI-generated/retrieved files in user memory across all chats |
+| **Retention Days** | Number | How many days to retain memories (0 = unlimited) |
+| **Max Storage Per User** | Number (MB) | Maximum storage per user |
+| **Hot Tier Days** | Number | Days in fast-access storage |
+| **Warm Tier Days** | Number | Days in warm storage |
+
+### Constraints
+
+Your overrides **CANNOT exceed** limits set by the Think Tank Admin:
+- If the Think Tank Admin sets retention to 90 days, you cannot set it to 180
+- If the Think Tank Admin disables session memory, you cannot re-enable it
+- If the Think Tank Admin sets max storage to 500MB, you cannot set it to 1000MB
+- If the Think Tank Admin disables uploaded documents or downloaded files, you cannot re-enable them
+
+The dashboard will display tenant-level constraints when they exist, and the API will reject requests that exceed them.
+
+### Admin API
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/admin/memory-retention/tenant-admin/override` | Get current override |
+| PUT | `/api/admin/memory-retention/tenant-admin/override` | Set/update override |
+| DELETE | `/api/admin/memory-retention/tenant-admin/override` | Remove (restore tenant defaults) |
+| GET | `/api/admin/memory-retention/effective` | Get resolved effective policy |
+| GET | `/api/admin/memory-retention/dashboard` | Usage dashboard |
+
+---
+
 ## Related Documentation
 
 - [RADIANT Admin Guide](./RADIANT-ADMIN-GUIDE.md) - Platform administration
@@ -682,5 +922,6 @@ Use Bearer token from Think Tank session or API key with `tenant:admin` scope.
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.2.0 | 2026-02-06 | Added Memory Retention Settings section (v7.13.0) — configurable retention with constraint enforcement |
+| 1.1.0 | 2026-02-05 | Added LIVS-M Policy section (v7.9.0) with policy modes, settings, and version management |
 | 1.0.0 | 2026-02-03 | Initial documentation |
-

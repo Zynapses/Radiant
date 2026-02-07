@@ -146,7 +146,13 @@ export function isRetryableError(error: unknown): boolean {
 // Service Error Handling Utilities
 // ============================================================================
 
-import { enhancedLogger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from '../services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'shared/errors-index',
+  category: 'infrastructure',
+  sourceType: 'lambda',
+});
 
 /**
  * Standardized error handler for service methods.
@@ -172,7 +178,7 @@ export async function handleServiceError<T>(
     return await fn();
   } catch (error) {
     const logLevel = options?.logLevel ?? 'error';
-    enhancedLogger[logLevel](`${context} failed`, { 
+    logger[logLevel](`${context} failed`, { 
       error: error instanceof Error ? { message: error.message, stack: error.stack } : error 
     });
     
@@ -204,7 +210,7 @@ export function handleServiceErrorSync<T>(
     return fn();
   } catch (error) {
     const logLevel = options?.logLevel ?? 'error';
-    enhancedLogger[logLevel](`${context} failed`, { 
+    logger[logLevel](`${context} failed`, { 
       error: error instanceof Error ? { message: error.message, stack: error.stack } : error 
     });
     

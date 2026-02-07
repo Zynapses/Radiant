@@ -473,6 +473,7 @@ Return JSON:
 
     try {
       const response = await modelRouterService.invoke({
+        tenantId,
         modelId: 'anthropic/claude-3-haiku',
         messages: [{ role: 'user', content: prompt }],
         maxTokens: 1500,

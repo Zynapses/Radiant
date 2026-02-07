@@ -1,7 +1,13 @@
 import { executeStatement } from '../db/client';
 import { SNSClient, PublishCommand } from '@aws-sdk/client-sns';
 import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'billing/main',
+  category: 'billing',
+  sourceType: 'application',
+});
 
 const sns = new SNSClient({});
 const ses = new SESClient({});

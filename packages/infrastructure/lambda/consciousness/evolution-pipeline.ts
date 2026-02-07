@@ -13,7 +13,13 @@ import { executeStatement } from '../shared/db/client';
 import { learningCandidateService, type TrainingDataset } from '../shared/services/distillation-pipeline.service';
 import { enhancedLearningService } from '../shared/services/enhanced-learning.service';
 import { enhancedLearningIntegrationService } from '../shared/services/enhanced-learning-integration.service';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'consciousness/evolution-pipeline',
+  category: 'infrastructure',
+  sourceType: 'lambda',
+});
 import { v4 as uuidv4 } from 'uuid';
 
 // ============================================================================

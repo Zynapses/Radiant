@@ -2,7 +2,13 @@
 // Handles soft deletes with usage tracking and queue management
 
 import { executeStatement } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'model/deletion-queue',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { modelVersionManagerService } from './model-version-manager.service';
 import type {
   ModelDeletionQueueItem,

@@ -34,3 +34,31 @@ export type {
   ModelCandidate,
   SelectionContext 
 } from './livs-cato-integration.service';
+
+export { PolicyRegistryService } from './policy-registry.service';
+export type { 
+  PolicyRegistryServiceDeps,
+  RuleViolation,
+  RegistryEvaluationContext 
+} from './policy-registry.service';
+
+export { LIVSGovernanceSupervisorService } from './livs-governance-supervisor.service';
+export type { 
+  GovernanceSupervisorDeps,
+  ModelInvocationParams,
+  SupervisorEvaluationRequest,
+  GovernanceLoopState 
+} from './livs-governance-supervisor.service';
+
+export { LIVSWorkerPromptsService } from './livs-worker-prompts.service';
+export type { 
+  WorkerPromptsServiceDeps,
+  WorkerPromptContext 
+} from './livs-worker-prompts.service';
+
+export { LIVSVersionService } from './livs-version.service';
+export type { LIVSVersionServiceDeps } from './livs-version.service';
+
+export { ContextAnchorService, contextAnchorService } from './context-anchor.service';
+export type { ContextAnchorServiceDeps } from './context-anchor.service';
+

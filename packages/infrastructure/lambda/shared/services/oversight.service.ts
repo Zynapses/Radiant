@@ -10,7 +10,13 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import { executeStatement } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'oversight/main',
+  category: 'audit',
+  sourceType: 'application',
+});
 import { brainConfigService } from './brain-config.service';
 import {
   type OversightQueueItem,

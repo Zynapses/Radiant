@@ -10,7 +10,13 @@
  */
 
 import { executeStatement } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'sofai/router',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { brainConfigService } from './brain-config.service';
 import { ecdVerificationService } from './ecd-verification.service';
 import {

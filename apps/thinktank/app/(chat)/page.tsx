@@ -14,6 +14,7 @@ import { ViewRouter } from '@/components/polymorphic';
 import { LiquidMorphPanel, type MorphedViewType } from '@/components/liquid';
 import { useUIStore } from '@/lib/stores/ui-store';
 import { useTranslation, T } from '@/lib/i18n';
+import { useRadiantDelight, playSynthSound } from '@radiant/delight-ui';
 import type { BrainPlan } from '@/lib/api/types';
 
 interface LocalMessage {
@@ -41,6 +42,7 @@ export default function ThinkTankChat() {
   const { t } = useTranslation();
   const { user, isAuthenticated } = useAuth();
   const { sidebarOpen, setSidebarOpen, advancedMode } = useUIStore();
+  const { triggerDelight, personalityMode } = useRadiantDelight();
   
   const [messages, setMessages] = useState<LocalMessage[]>(() => [getWelcomeMessage(t)]);
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -116,10 +118,12 @@ export default function ThinkTankChat() {
       setMessages([getWelcomeMessage(t)]);
       setCurrentPlan(null);
       await loadConversations();
+      triggerDelight('session_start');
     } catch (error) {
       console.error('Failed to create conversation:', error);
       setCurrentConversationId(null);
       setMessages([getWelcomeMessage(t)]);
+      triggerDelight('error_recovery');
     }
   };
 
@@ -131,8 +135,10 @@ export default function ThinkTankChat() {
         setMessages([getWelcomeMessage(t)]);
       }
       await loadConversations();
+      triggerDelight('action_complete');
     } catch (error) {
       console.error('Failed to delete conversation:', error);
+      triggerDelight('error_recovery');
     }
   };
 
@@ -142,17 +148,18 @@ export default function ThinkTankChat() {
       
       if (result.success) {
         if (result.downloadUrl) {
-          // Open download URL in new tab
           window.open(result.downloadUrl, '_blank');
         } else if (result.artifactId) {
-          // Navigate to decision record view
           alert(`Decision Record created: ${result.artifactId}`);
         }
+        triggerDelight('action_complete');
       } else {
+        triggerDelight('error_recovery');
         alert(`Export failed: ${result.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Failed to export conversation:', error);
+      triggerDelight('error_recovery');
       alert('Failed to export conversation');
     }
   };
@@ -169,6 +176,7 @@ export default function ThinkTankChat() {
 
     setMessages((prev) => [...prev, userMessage]);
     setIsTyping(true);
+    triggerDelight('pre_execution');
 
     const assistantMessageId = (Date.now() + 1).toString();
     const assistantMessage: LocalMessage = {
@@ -216,6 +224,7 @@ export default function ThinkTankChat() {
                 )
               );
               setIsTyping(false);
+              triggerDelight('post_execution');
             } else if (chunk.type === 'error') {
               throw new Error(chunk.error);
             }
@@ -226,6 +235,7 @@ export default function ThinkTankChat() {
       }
     } catch (error) {
       console.error('Failed to send message:', error);
+      triggerDelight('error_recovery');
       await simulateResponse(assistantMessageId);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -351,7 +361,7 @@ export default function ThinkTankChat() {
                 <Button
                   variant="ghost"
                   size="icon-sm"
-                  onClick={() => setMorphedView('datagrid')}
+                  onClick={() => { setMorphedView('datagrid'); triggerDelight('action_complete'); playSynthSound(personalityMode, 'morph', 0.2); }}
                   className="text-slate-400 hover:text-green-400"
                   title="Open Data Grid"
                 >
@@ -360,7 +370,7 @@ export default function ThinkTankChat() {
                 <Button
                   variant="ghost"
                   size="icon-sm"
-                  onClick={() => setMorphedView('chart')}
+                  onClick={() => { setMorphedView('chart'); triggerDelight('action_complete'); playSynthSound(personalityMode, 'morph', 0.2); }}
                   className="text-slate-400 hover:text-blue-400"
                   title="Open Chart"
                 >
@@ -369,7 +379,7 @@ export default function ThinkTankChat() {
                 <Button
                   variant="ghost"
                   size="icon-sm"
-                  onClick={() => setMorphedView('kanban')}
+                  onClick={() => { setMorphedView('kanban'); triggerDelight('action_complete'); playSynthSound(personalityMode, 'morph', 0.2); }}
                   className="text-slate-400 hover:text-purple-400"
                   title="Open Kanban"
                 >
@@ -378,7 +388,7 @@ export default function ThinkTankChat() {
                 <Button
                   variant="ghost"
                   size="icon-sm"
-                  onClick={() => setMorphedView('calculator')}
+                  onClick={() => { setMorphedView('calculator'); triggerDelight('action_complete'); playSynthSound(personalityMode, 'morph', 0.2); }}
                   className="text-slate-400 hover:text-orange-400"
                   title="Open Calculator"
                 >
@@ -387,7 +397,7 @@ export default function ThinkTankChat() {
                 <Button
                   variant="ghost"
                   size="icon-sm"
-                  onClick={() => setMorphedView('code_editor')}
+                  onClick={() => { setMorphedView('code_editor'); triggerDelight('action_complete'); playSynthSound(personalityMode, 'morph', 0.2); }}
                   className="text-slate-400 hover:text-cyan-400"
                   title="Open Code Editor"
                 >
@@ -396,7 +406,7 @@ export default function ThinkTankChat() {
                 <Button
                   variant="ghost"
                   size="icon-sm"
-                  onClick={() => setMorphedView('document')}
+                  onClick={() => { setMorphedView('document'); triggerDelight('action_complete'); playSynthSound(personalityMode, 'morph', 0.2); }}
                   className="text-slate-400 hover:text-amber-400"
                   title="Open Document"
                 >

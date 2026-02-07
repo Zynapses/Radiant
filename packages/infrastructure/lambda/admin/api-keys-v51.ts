@@ -11,7 +11,13 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { randomBytes, createHash } from 'crypto';
 import { getPoolClient } from '../shared/db/centralized-pool';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'admin/api-keys-v51',
+  category: 'audit',
+  sourceType: 'lambda',
+});
 import { successResponse, handleError, notFoundResponse, validationErrorResponse } from '../shared/middleware/api-response';
 import { extractAuthContext, requireAdmin } from '../shared/auth';
 import type { ServiceApiKey, ApiKeyScope, CreateApiKeyRequest, CreateApiKeyResponse, ApiKeyAuditEntry } from '@radiant/shared';

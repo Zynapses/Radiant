@@ -8,7 +8,13 @@ import { consciousnessGraphService } from '../shared/services/consciousness-grap
 import { consciousnessMiddlewareService } from '../shared/services/consciousness-middleware.service';
 import { consciousnessEmergenceService } from '../shared/services/consciousness-emergence.service';
 import { executeStatement } from '../shared/db/client';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'admin/consciousness',
+  category: 'audit',
+  sourceType: 'lambda',
+});
 
 const headers = {
   'Content-Type': 'application/json',

@@ -1,8 +1,10 @@
 # Cognitive Architecture
 
-> **Beyond Orchestration: Structuring Thought**
+> **Beyond Orchestration: Structuring Thought**  
+> **Version**: 2.1.0 | **Last Updated**: February 2026  
+> **Includes**: THE OMEGA PROTOCOL Integration
 
-RADIANT's Cognitive Architecture moves beyond simple model orchestration into true cognitive structuring. These five capabilities enable results that are categorically superior to single-model approaches.
+RADIANT's Cognitive Architecture moves beyond simple model orchestration into true cognitive structuring. With the introduction of **THE OMEGA PROTOCOL**, the architecture now includes wave-based cognition using Complex-Valued Neural Networks (CVNNs) and the Bicameral Mind design.
 
 ## Overview
 
@@ -13,6 +15,41 @@ RADIANT's Cognitive Architecture moves beyond simple model orchestration into tr
 | **Deep Research** | Background agents | 50+ source analysis in 30 minutes |
 | **Dynamic LoRA** | Hot-swap expertise | Specialist-level domain performance |
 | **Generative UI** | App factory | AI becomes the interface |
+| 🟣 **OMEGA Cortex** | Wave-based cognition | Phase dynamics replace scalar weights |
+| 🟣 **Resonant Index** | O(1) document lookup | Infinite scaling via frequency addressing |
+| 🟣 **Helix Kernel** | Deterministic safety | Mathematically impossible to bypass |
+| 🔵 **Cognitive Precision** | Pre/post-gen safeguards | Context anchoring + critic separation |
+
+---
+
+## OMEGA Protocol: The New Cognitive Layer
+
+> **Reference**: [PROJECT-GENESIS-OMEGA.md](PROJECT-GENESIS-OMEGA.md) for complete specification
+
+The OMEGA Protocol introduces a fundamentally new cognitive layer that operates on **wave mechanics** instead of scalar arithmetic:
+
+### Bicameral Mind Integration
+
+| Region | Technology | Function |
+|--------|------------|----------|
+| **OMEGA Cortex** | LTC Network + CVNNs | Logic, Reasoning, Memory, Safety, Ambition |
+| **Broca Interface** | Llama-3-8B | Translation of Thought Vectors to English |
+
+### Phase Dynamics vs Traditional Weights
+
+| Paradigm | Equation | Description |
+|----------|----------|-------------|
+| **Standard AI** | `Output = Input * Weight` | Arithmetic multiplication |
+| **OMEGA AI** | `State_New = State_Old * e^(i * Phase_Shift)` | Wave mechanics |
+
+### Integration with Existing Architecture
+
+The OMEGA Protocol integrates with existing cognitive capabilities:
+
+- **Tree of Thoughts** → Uses OMEGA Cortex for branch evaluation
+- **GraphRAG** → Replaced by Resonant Index for O(1) lookup
+- **Dynamic LoRA** → Replaced by Liquid Time-Constants (real-time adaptation)
+- **Safety Pipeline** → Augmented by Helix Kernel deterministic blocking
 
 ---
 
@@ -440,6 +477,106 @@ async generatePlan(prompt: string): Promise<BrainPlan> {
 
 ---
 
+## 7. Cognitive Precision Protocols (v7.10.0)
+
+### The Problem
+LLMs commonly fail through three modes:
+1. **Context drift** - Generating without sufficient understanding of the task
+2. **Constraint violation** - Ignoring explicit "don't do" rules
+3. **Generator bias** - Self-evaluation corrupted by generation confirmation bias
+
+### The Solution
+Implement three pre/post-generation safeguards integrated into the AGI Orchestrator.
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                    Cognitive Precision Protocol                      │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                       │
+│   ┌─────────────────┐   ┌─────────────────┐   ┌─────────────────┐   │
+│   │  Context Anchor │   │   Constraint    │   │  Critic Model   │   │
+│   │      Gate       │──►│   Injection     │──►│   Separation    │   │
+│   │  (Pre-Generate) │   │ (Pre-Generate)  │   │ (Post-Generate) │   │
+│   └─────────────────┘   └─────────────────┘   └─────────────────┘   │
+│          │                     │                      │              │
+│          ▼                     ▼                      ▼              │
+│   ┌─────────────┐       ┌─────────────┐       ┌─────────────┐       │
+│   │  PROCEED /  │       │  System     │       │  Tiered     │       │
+│   │  CLARIFY /  │       │  Prompt     │       │  Escalation │       │
+│   │  BLOCK      │       │  Augmented  │       │  + Ensemble │       │
+│   └─────────────┘       └─────────────┘       └─────────────┘       │
+│                                                                       │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### 7.1 Context Anchor Gate
+
+Ensures sufficient context before generation proceeds.
+
+| Feature | Description |
+|---------|-------------|
+| **Role Detection** | Developer, analyst, manager, etc. |
+| **Audience Detection** | Technical, executive, mixed |
+| **Knowledge Gap Analysis** | What's missing for a quality response |
+| **Confidence Scoring** | Pattern + LLM extraction combined |
+| **Gate Blocking** | Optional hard block until context met |
+
+**Gate Actions**:
+- `PROCEED` - Sufficient context, generate immediately
+- `CLARIFY` - Request more information from user
+- `OVERRIDE_ALLOWED` - Below threshold but can proceed with warning
+
+### 7.2 Negative Constraint Injection
+
+Pre-generation injection of "don't do" rules into system prompts.
+
+| Category | Example Constraints |
+|----------|-------------------|
+| **Content** | "Don't hallucinate citations" |
+| **Behavior** | "Don't be sycophantic" |
+| **Format** | "Don't exceed 500 words unless asked" |
+
+Constraints are task-type aware and stored in database for admin customization.
+
+### 7.3 Critic Model Separation
+
+Uses a separate discriminative model for analysis tasks.
+
+| Tier | Model | Triggers |
+|------|-------|----------|
+| **Screening** | Claude Haiku | First pass, cheap |
+| **Full Critic** | Claude Sonnet | Low confidence or inconclusive |
+| **Ensemble** | Sonnet + GPT-4o + Gemini | High-stakes patterns |
+
+**Voting Strategies**: Majority, Unanimous, Weighted
+
+**Critic Constraints** (8 self-regulation rules):
+- Don't agree simply because response appears confident
+- Don't dismiss weak signals - investigate all anomalies
+- Don't let eloquence mask logical errors
+- Don't accept circular reasoning without verification
+
+### Configuration
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `contextAnchor.enabled` | true | Enable Context Anchor Gate |
+| `contextAnchor.minConfidence` | 0.6 | Minimum to proceed |
+| `constraintInjection.enabled` | true | Enable constraint injection |
+| `criticModel.tieredEscalation` | true | Enable screening → full |
+| `criticModel.ensembleEnabled` | false | Enable multi-critic voting |
+| `criticModel.isolationEnabled` | false | Blind critic to original query |
+
+### Key Files
+- Types: `packages/shared/src/types/livs.types.ts`
+- Context Anchor: `packages/infrastructure/lambda/shared/services/livs/context-anchor.service.ts`
+- LIVS Interrogator: `packages/infrastructure/lambda/shared/services/livs/livs-interrogator.service.ts`
+- AGI Orchestrator: `packages/infrastructure/lambda/shared/services/agi-orchestrator.service.ts`
+
+---
+
 ## Database Tables
 
 | Table | Purpose |
@@ -452,6 +589,8 @@ async generatePlan(prompt: string): Promise<BrainPlan> {
 | `lora_adapters` | LoRA adapter registry |
 | `generated_ui` | Generated UI components |
 | `cognitive_architecture_config` | Per-tenant configuration |
+| `livs_negative_constraints` | Negative constraints per tenant |
+| `livs_context_anchor_logs` | Context Anchor Gate audit logs |
 
 ---
 

@@ -127,6 +127,7 @@ export class AGIResponsePipelineService {
 
     // Invoke the model
     const modelResult = await modelRouterService.invoke({
+      tenantId: context.tenantId,
       modelId: config.modelId,
       messages: [{ role: 'user', content: fullPrompt }],
       systemPrompt: config.systemPrompt,
@@ -675,6 +676,7 @@ Where winner is 1-indexed and scores are 0-1 for each response.`;
     try {
       // Use a capable model for judging
       const judgeResult = await modelRouterService.invoke({
+        tenantId: context.tenantId,
         modelId: 'anthropic/claude-3-haiku',
         messages: [{ role: 'user', content: judgePrompt }],
         temperature: 0,
@@ -734,6 +736,7 @@ Your consensus response:`;
 
     // Use primary model for consensus
     const result = await modelRouterService.invoke({
+      tenantId: context.tenantId,
       modelId: responses[0].model.modelId,
       messages: [{ role: 'user', content: consensusPrompt }],
     });

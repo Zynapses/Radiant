@@ -5,7 +5,13 @@
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 import { Middleware, MiddlewareHandler } from './index';
-import { enhancedLogger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from '../services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'shared/middleware-logging',
+  category: 'infrastructure',
+  sourceType: 'lambda',
+});
 import { createRequestContext, runWithContextAsync } from '../utils/request-context';
 
 interface AuthenticatedEvent extends APIGatewayProxyEvent {
@@ -68,7 +74,7 @@ export function loggingMiddleware(options: {
         requestLog.body = truncateBody(event.body);
       }
 
-      enhancedLogger.debug('Incoming request', requestLog);
+      logger.debug('Incoming request', requestLog);
 
       let response: APIGatewayProxyResult;
       let error: Error | undefined;
@@ -104,7 +110,7 @@ export function loggingMiddleware(options: {
         responseLog.error = error.message;
       }
 
-      enhancedLogger.info('Request completed', responseLog as unknown as Record<string, unknown>);
+      logger.info('Request completed', responseLog as unknown as Record<string, unknown>);
 
       // Add request ID to response headers
       response.headers = {

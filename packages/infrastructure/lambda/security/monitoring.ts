@@ -4,8 +4,15 @@
 
 import { Handler, ScheduledEvent } from 'aws-lambda';
 import { executeStatement, stringParam, longParam } from '../shared/db/client';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'security/monitoring',
+  category: 'security',
+  sourceType: 'lambda',
+});
 import { driftDetectionService } from '../shared/services/drift-detection.service';
+import { driftCorrectionService } from '../shared/services/drift-correction.service';
 import { behavioralAnomalyService } from '../shared/services/behavioral-anomaly.service';
 import { constitutionalClassifierService } from '../shared/services/constitutional-classifier.service';
 import { securityAlertService } from '../shared/services/security-alert.service';
@@ -108,6 +115,21 @@ async function runTenantMonitoring(
   // 1. Run drift detection for all active models
   if (config.driftDetectionEnabled) {
     result.driftResults = await runDriftDetection(tenantId, config);
+
+    // 1b. Apply drift corrections (v7.24.0) — quarantine, weight penalties, fallbacks
+    try {
+      const corrections = await driftCorrectionService.checkAndCorrectAllModels(tenantId);
+      const applied = corrections.filter(c => c.actionTaken !== 'none' && c.actionTaken !== 'error');
+      if (applied.length > 0) {
+        logger.info('Drift corrections applied during monitoring', {
+          tenantId,
+          correctionsApplied: applied.length,
+          actions: applied.map(c => ({ model: c.modelId, action: c.actionTaken })),
+        });
+      }
+    } catch (correctionError) {
+      logger.error('Drift correction failed during monitoring', { tenantId, error: String(correctionError) });
+    }
   }
   
   // 2. Check for behavioral anomalies across users

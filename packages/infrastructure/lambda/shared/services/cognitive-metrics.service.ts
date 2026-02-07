@@ -21,7 +21,13 @@ import {
   PutMetricDataCommand,
   StandardUnit,
 } from '@aws-sdk/client-cloudwatch';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'cognitive/metrics',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 export type RouteType = 'sniper' | 'war_room' | 'hitl';
 

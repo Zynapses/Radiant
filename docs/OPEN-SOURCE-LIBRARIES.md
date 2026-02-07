@@ -186,6 +186,10 @@ Libraries used internally by Think Tank applications.
 | `d3-geo` | Geographic projections | ISC | 2024-01-01 | ✅ |
 | `react-simple-maps` | Map components | MIT | 2024-01-01 | ✅ |
 | `topojson-client` | TopoJSON parsing | ISC | 2024-01-01 | ✅ |
+| `reactflow` | Node-based graph canvas (Genesis Forge Glass Foundry) | MIT | 2026-02-06 | ✅ |
+| `three` | 3D rendering engine (Void Mode PCB visualization) | MIT | 2026-02-06 | ✅ |
+| `@react-three/fiber` | React renderer for Three.js | MIT | 2026-02-06 | ✅ |
+| `@react-three/drei` | Useful helpers for react-three-fiber | MIT | 2026-02-06 | ✅ |
 
 ### Content Rendering
 

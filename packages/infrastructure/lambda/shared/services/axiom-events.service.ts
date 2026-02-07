@@ -10,14 +10,18 @@
 
 import { EventEmitter } from 'events';
 import { randomUUID } from 'crypto';
-import { enhancedLogger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'axiom/events',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import type {
   UEPEnvelope,
   UEPSourceCard,
   UEPEnvelopeType,
 } from '@radiant/shared';
-
-const logger = enhancedLogger;
 
 // =============================================================================
 // Types

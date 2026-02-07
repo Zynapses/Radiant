@@ -2,7 +2,13 @@
 // "Don't Build the Tool. BE the Tool."
 
 import { APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'thinktank/liquid-interface',
+  category: 'application',
+  sourceType: 'lambda',
+});
 import { 
   liquidInterfaceService, 
   ghostStateService, 

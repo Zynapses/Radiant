@@ -1,6 +1,12 @@
 import { SageMakerClient, DescribeEndpointCommand } from '@aws-sdk/client-sagemaker';
 import { executeStatement } from '../db/client';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'thermal/state',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 export type ThermalState = 'off' | 'cold' | 'warm' | 'hot' | 'automatic';
 export type ModelHostingTier = 'hot' | 'warm' | 'cold' | 'off';

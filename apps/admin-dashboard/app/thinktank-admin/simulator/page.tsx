@@ -15,7 +15,8 @@
  * - User analytics
  */
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   Layers,
   Gauge,
@@ -35,6 +36,11 @@ import {
   Save,
   AlertTriangle,
   Heart,
+  Scale,
+  ArrowUpCircle,
+  CheckCircle2,
+  Clock,
+  FileText,
 } from 'lucide-react';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -46,6 +52,8 @@ import { Slider } from '@/components/ui/slider';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import {
   Select,
@@ -83,9 +91,10 @@ import {
   GOVERNOR_MODES,
 } from './mock-data';
 
-// Navigation items
-const NAV_ITEMS: { id: AdminViewType; icon: React.ElementType; label: string; badge?: string }[] = [
+// Base navigation items - badge will be computed dynamically
+const BASE_NAV_ITEMS: { id: AdminViewType; icon: React.ElementType; label: string; badge?: string; badgeVariant?: 'default' | 'update' }[] = [
   { id: 'overview', icon: Activity, label: 'Overview' },
+  { id: 'livs-policy', icon: Scale, label: 'LIVS-M Policy' },
   { id: 'polymorphic', icon: Layers, label: 'Polymorphic UI' },
   { id: 'governor', icon: Gauge, label: 'Governor' },
   { id: 'ego', icon: Brain, label: 'Ego System' },
@@ -96,6 +105,45 @@ const NAV_ITEMS: { id: AdminViewType; icon: React.ElementType; label: string; ba
   { id: 'users', icon: Users, label: 'Users' },
   { id: 'analytics', icon: BarChart3, label: 'Analytics' },
 ];
+
+// LIVS-M Version Check Types (mirrors @radiant/shared types)
+interface LIVSVersionCheckResult {
+  currentVersion: string;
+  latestVersion: string;
+  updateAvailable: boolean;
+  changelog: string[];
+  breakingChanges: boolean;
+  migrationRequired: boolean;
+  releaseDate: string;
+}
+
+// Mock API function - in production, this calls the actual LIVS version service
+async function checkLIVSVersion(): Promise<LIVSVersionCheckResult> {
+  // Simulate API call delay
+  await new Promise(resolve => setTimeout(resolve, 500));
+  
+  // Return mock version data - in production this comes from LIVSVersionService
+  return {
+    currentVersion: '2.0.0',
+    latestVersion: '2.1.0',
+    updateAvailable: true,
+    changelog: [
+      'Enhanced sycophancy detection with configurable thresholds',
+      'New consensus velocity limits for multi-agent verification',
+      'Improved stub detection patterns for modern frameworks',
+      'Policy registry now supports custom rule definitions',
+    ],
+    breakingChanges: false,
+    migrationRequired: false,
+    releaseDate: '2025-01-15',
+  };
+}
+
+async function upgradeLIVSVersion(): Promise<{ success: boolean; newVersion: string }> {
+  // Simulate upgrade process
+  await new Promise(resolve => setTimeout(resolve, 1500));
+  return { success: true, newVersion: '2.1.0' };
+}
 
 export default function AdminSimulatorPage() {
   // State
@@ -108,6 +156,33 @@ export default function AdminSimulatorPage() {
   const [domains, setDomains] = useState<DomainConfig[]>(MOCK_DOMAINS);
   const [modelPricing, setModelPricing] = useState<ModelPricing[]>(MOCK_MODEL_PRICING);
   const [isSimulating, setIsSimulating] = useState(false);
+  const [livsActiveTab, setLivsActiveTab] = useState('modes');
+
+  // React Query for LIVS version checking
+  const queryClient = useQueryClient();
+  
+  const { data: livsVersionInfo, isLoading: isLoadingVersion } = useQuery({
+    queryKey: ['livs-version-thinktank'],
+    queryFn: checkLIVSVersion,
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+  });
+
+  const upgradeMutation = useMutation({
+    mutationFn: upgradeLIVSVersion,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['livs-version-thinktank'] });
+    },
+  });
+
+  // Compute dynamic navigation items based on version status
+  const navItems = useMemo(() => {
+    return BASE_NAV_ITEMS.map(item => {
+      if (item.id === 'livs-policy' && livsVersionInfo?.updateAvailable) {
+        return { ...item, badge: 'UPDATE', badgeVariant: 'update' as const };
+      }
+      return item;
+    });
+  }, [livsVersionInfo?.updateAvailable]);
 
   // ============================================================================
   // Overview View
@@ -1070,11 +1145,299 @@ export default function AdminSimulatorPage() {
   );
 
   // ============================================================================
+  // LIVS-M Policy View (NEW v7.9.0) - Updated with Version Management
+  // ============================================================================
+  const renderLIVSPolicyView = () => (
+    <div className="space-y-6">
+      {/* Header with Version Badge */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight">LIVS-M 2.0 Policy Settings</h2>
+          <p className="text-muted-foreground">
+            Configure the AI governance &quot;Defcon&quot; level for forensic verification
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Badge variant="outline" className="gap-1">
+            <Scale className="h-3 w-3" />
+            v{livsVersionInfo?.currentVersion || '2.0.0'}
+          </Badge>
+          {livsVersionInfo?.updateAvailable && (
+            <Badge className="gap-1 bg-green-500 hover:bg-green-600 animate-pulse">
+              <ArrowUpCircle className="h-3 w-3" />
+              v{livsVersionInfo.latestVersion} Available
+            </Badge>
+          )}
+        </div>
+      </div>
+
+      {/* Tabs for Modes, Settings, and Updates */}
+      <Tabs value={livsActiveTab} onValueChange={setLivsActiveTab}>
+        <TabsList>
+          <TabsTrigger value="modes">Policy Modes</TabsTrigger>
+          <TabsTrigger value="settings">Settings</TabsTrigger>
+          <TabsTrigger value="updates" className="relative">
+            Updates
+            {livsVersionInfo?.updateAvailable && (
+              <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+            )}
+          </TabsTrigger>
+        </TabsList>
+
+        {/* Modes Tab */}
+        <TabsContent value="modes" className="space-y-6 mt-6">
+          {/* Mode Selection */}
+          <div className="grid gap-4 md:grid-cols-3">
+            {/* Brainstorming Mode */}
+            <Card 
+              className="cursor-pointer transition-all hover:shadow-md border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950"
+              onClick={() => console.log('Set RAPID_PROTO')}
+            >
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <Zap className="h-6 w-6 text-amber-600" />
+                  <Badge variant="outline">Creative</Badge>
+                </div>
+                <CardTitle className="text-lg">Brainstorming</CardTitle>
+                <p className="text-sm font-medium text-muted-foreground">&quot;Yes, and...&quot; mode</p>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm">Accepts partial code, stubs, and rough ideas. Focuses on speed and creativity.</p>
+                <p className="text-xs text-muted-foreground mt-2"><strong>Best for:</strong> Hackathons, MVP planning, early drafting</p>
+              </CardContent>
+            </Card>
+
+            {/* Standard Mode */}
+            <Card 
+              className="cursor-pointer transition-all hover:shadow-md ring-2 ring-primary border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950"
+              onClick={() => console.log('Set ENGINEERING')}
+            >
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <Scale className="h-6 w-6 text-blue-600" />
+                  <Badge variant="default">Default</Badge>
+                </div>
+                <CardTitle className="text-lg">Standard</CardTitle>
+                <p className="text-sm font-medium text-muted-foreground">&quot;Trust but Verify&quot; mode</p>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm">Code must run. Stubs rejected if breaking functionality. Tests encouraged.</p>
+                <p className="text-xs text-muted-foreground mt-2"><strong>Best for:</strong> Daily development, Sprint work</p>
+              </CardContent>
+            </Card>
+
+            {/* Strict Audit Mode */}
+            <Card 
+              className="cursor-pointer transition-all hover:shadow-md border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950"
+              onClick={() => console.log('Set STRICT_AUDIT')}
+            >
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <Shield className="h-6 w-6 text-red-600" />
+                  <Badge variant="outline">Secure</Badge>
+                </div>
+                <CardTitle className="text-lg">Strict Audit</CardTitle>
+                <p className="text-sm font-medium text-muted-foreground">&quot;Zero Trust&quot; mode</p>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm">No stubs. No mock data. Mandatory tests. Sycophancy triggers Devil&apos;s Advocate.</p>
+                <p className="text-xs text-muted-foreground mt-2"><strong>Best for:</strong> Production releases, medical/legal, security</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Current Settings Summary */}
+          <Card className="bg-blue-50 dark:bg-blue-950">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <Scale className="h-4 w-4 text-blue-600" />
+                Current Mode: Standard
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4 md:grid-cols-4 text-sm">
+                <div className="flex items-center gap-2">
+                  <Zap className="h-4 w-4 text-green-500" />
+                  <span>Sycophancy Detection: ON</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Shield className="h-4 w-4 text-green-500" />
+                  <span>Stub Rejection: ON</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4 text-gray-400" />
+                  <span>Chaos Injection: OFF</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Scale className="h-4 w-4 text-blue-500" />
+                  <span>Max Consensus Velocity: 2</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Settings Tab */}
+        <TabsContent value="settings" className="space-y-6 mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-sm">Advanced Options</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label>Sycophancy Detection</Label>
+                  <p className="text-xs text-muted-foreground">Detect when agents agree too quickly</p>
+                </div>
+                <Switch checked={true} />
+              </div>
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label>Stub Rejection</Label>
+                  <p className="text-xs text-muted-foreground">Reject outputs with TODO or placeholder code</p>
+                </div>
+                <Switch checked={true} />
+              </div>
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label>Chaos Injection</Label>
+                  <p className="text-xs text-muted-foreground">Inject Devil&apos;s Advocate when sycophancy detected</p>
+                </div>
+                <Switch checked={false} />
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Updates Tab */}
+        <TabsContent value="updates" className="space-y-6 mt-6">
+          {isLoadingVersion ? (
+            <Card>
+              <CardContent className="py-8 text-center">
+                <RefreshCw className="h-8 w-8 animate-spin mx-auto text-muted-foreground" />
+                <p className="mt-2 text-muted-foreground">Checking for updates...</p>
+              </CardContent>
+            </Card>
+          ) : livsVersionInfo?.updateAvailable ? (
+            <>
+              {/* Update Available Alert */}
+              <Alert className="border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950">
+                <ArrowUpCircle className="h-4 w-4 text-green-600" />
+                <AlertTitle className="text-green-800 dark:text-green-200">
+                  LIVS-M v{livsVersionInfo.latestVersion} Available
+                </AlertTitle>
+                <AlertDescription className="text-green-700 dark:text-green-300">
+                  Released on {new Date(livsVersionInfo.releaseDate).toLocaleDateString()}
+                </AlertDescription>
+              </Alert>
+
+              {/* Breaking Changes Warning */}
+              {livsVersionInfo.breakingChanges && (
+                <Alert variant="destructive">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertTitle>Breaking Changes</AlertTitle>
+                  <AlertDescription>
+                    This update contains breaking changes. Review the changelog carefully before upgrading.
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              {/* Migration Required Warning */}
+              {livsVersionInfo.migrationRequired && (
+                <Alert className="border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950">
+                  <Clock className="h-4 w-4 text-amber-600" />
+                  <AlertTitle className="text-amber-800 dark:text-amber-200">Migration Required</AlertTitle>
+                  <AlertDescription className="text-amber-700 dark:text-amber-300">
+                    This update requires a database migration. The upgrade process will handle this automatically.
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              {/* Version Info Card */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="h-5 w-5" />
+                    Version Details
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Current Version</p>
+                      <p className="font-mono font-medium">v{livsVersionInfo.currentVersion}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">Latest Version</p>
+                      <p className="font-mono font-medium text-green-600">v{livsVersionInfo.latestVersion}</p>
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  {/* Changelog */}
+                  <div>
+                    <h4 className="font-medium mb-2">What&apos;s New</h4>
+                    <ul className="space-y-2">
+                      {livsVersionInfo.changelog.map((item, index) => (
+                        <li key={index} className="flex items-start gap-2 text-sm">
+                          <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <Separator />
+
+                  {/* Upgrade Button */}
+                  <Button 
+                    className="w-full"
+                    onClick={() => upgradeMutation.mutate()}
+                    disabled={upgradeMutation.isPending}
+                  >
+                    {upgradeMutation.isPending ? (
+                      <>
+                        <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                        Upgrading...
+                      </>
+                    ) : (
+                      <>
+                        <ArrowUpCircle className="h-4 w-4 mr-2" />
+                        Upgrade to v{livsVersionInfo.latestVersion}
+                      </>
+                    )}
+                  </Button>
+                </CardContent>
+              </Card>
+            </>
+          ) : (
+            <Card>
+              <CardContent className="py-8 text-center">
+                <CheckCircle2 className="h-12 w-12 text-green-500 mx-auto" />
+                <h3 className="mt-4 font-semibold">You&apos;re Up to Date!</h3>
+                <p className="text-muted-foreground mt-1">
+                  LIVS-M v{livsVersionInfo?.currentVersion || '2.0.0'} is the latest version.
+                </p>
+                <Button variant="outline" className="mt-4" onClick={() => queryClient.invalidateQueries({ queryKey: ['livs-version-thinktank'] })}>
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Check Again
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+
+  // ============================================================================
   // Render Content
   // ============================================================================
   const renderContent = () => {
     switch (currentView) {
       case 'overview': return renderOverview();
+      case 'livs-policy': return renderLIVSPolicyView();
       case 'polymorphic': return renderPolymorphicView();
       case 'governor': return renderGovernorView();
       case 'ego': return renderEgoView();
@@ -1100,7 +1463,7 @@ export default function AdminSimulatorPage() {
           <p className="text-xs text-muted-foreground">Think Tank Configuration</p>
         </div>
         
-        {NAV_ITEMS.map((item) => (
+        {navItems.map((item) => (
           <button
             key={item.id}
             onClick={() => setCurrentView(item.id)}
@@ -1115,7 +1478,14 @@ export default function AdminSimulatorPage() {
               {item.label}
             </div>
             {item.badge && (
-              <Badge variant="secondary" className="text-xs">
+              <Badge 
+                variant="secondary" 
+                className={`text-xs ${
+                  item.badgeVariant === 'update' 
+                    ? 'bg-green-500 text-white hover:bg-green-600 animate-pulse' 
+                    : ''
+                }`}
+              >
                 {item.badge}
               </Badge>
             )}

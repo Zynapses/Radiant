@@ -5,7 +5,13 @@
  */
 
 import type { CounterfactualResult } from '@radiant/shared';
-import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'counterfactual/simulator',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 import { COUNTERFACTUAL_SAMPLING_STRATEGIES, COUNTERFACTUAL_MAX_DAILY_SIMULATIONS } from '@radiant/shared/constants';
 import { getDbPool } from './database';
 import { callLiteLLM } from './litellm.service';

@@ -6,7 +6,13 @@ import { PoolClient } from 'pg';
 import { SNSClient, PublishCommand } from '@aws-sdk/client-sns';
 import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
 import { getPoolClient } from '../shared/db/centralized-pool';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'cost/logger',
+  category: 'infrastructure',
+  sourceType: 'lambda',
+});
 import { corsHeaders } from '../shared/middleware/api-response';
 
 const sns = new SNSClient({});

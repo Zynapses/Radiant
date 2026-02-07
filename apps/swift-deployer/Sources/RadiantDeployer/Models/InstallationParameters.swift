@@ -1,4 +1,4 @@
-// RADIANT v5.52.17 - Installation Parameters
+// RADIANT v6.6.0 - Installation Parameters
 // Defines deployment parameters with tier-based defaults
 
 import Foundation
@@ -170,7 +170,7 @@ struct InstallationParameters: Codable, Sendable {
     var enableGuardDuty: Bool
     var enableHIPAACompliance: Bool
     
-    // v5.52.17 - Application Features
+    // v6.6.0 - Application Features
     var enableCurator: Bool             // Knowledge graph curation app
     var enableCortexMemory: Bool        // Three-tier memory system
     var enableTimeMachine: Bool         // Conversation forking/checkpoints
@@ -178,7 +178,12 @@ struct InstallationParameters: Codable, Sendable {
     var enableComplianceExport: Bool    // HIPAA/SOC2/GDPR exports
     var enableEgoSystem: Bool           // Zero-cost persistent identity
     
-    // Domain Configuration (v5.52.17)
+    // v7.0.0 - OMEGA Bio-Mimetic AI (Project Genesis)
+    var enableOmegaBrain: Bool          // Bio-mimetic AI organism with CVNN
+    var omegaShadowMode: Bool           // Shadow mode for parallel inference
+    var omegaApiUrl: String?            // OMEGA API endpoint URL
+    
+    // Domain Configuration (v6.6.0)
     var domainConfig: DomainURLConfiguration?
     
     // Billing
@@ -217,6 +222,9 @@ struct InstallationParameters: Codable, Sendable {
             enableCollaboration: tier >= .starter,
             enableComplianceExport: true,
             enableEgoSystem: true,
+            enableOmegaBrain: tier >= .scale,
+            omegaShadowMode: false,
+            omegaApiUrl: nil,
             domainConfig: baseDomain.isEmpty ? nil : .defaults(baseDomain: baseDomain),
             externalProviderMarkup: 1.40,
             selfHostedMarkup: 1.75,
@@ -240,6 +248,8 @@ struct InstallationParameters: Codable, Sendable {
         if enableCollaboration { features.append("Collaboration") }
         if enableComplianceExport { features.append("Compliance Export") }
         if enableEgoSystem { features.append("Ego System") }
+        if enableOmegaBrain { features.append("OMEGA Brain") }
+        if omegaShadowMode { features.append("OMEGA Shadow Mode") }
         return features
     }
 }
@@ -261,7 +271,7 @@ struct InstanceParameters: Codable, Sendable {
     var enableGuardDuty: Bool
     var enableHIPAACompliance: Bool
     
-    // v5.52.17 - Application Features
+    // v6.6.0 - Application Features
     var enableCurator: Bool
     var enableCortexMemory: Bool
     var enableTimeMachine: Bool
@@ -269,7 +279,12 @@ struct InstanceParameters: Codable, Sendable {
     var enableComplianceExport: Bool
     var enableEgoSystem: Bool
     
-    // Domain Configuration (v5.52.17)
+    // v7.0.0 - OMEGA Bio-Mimetic AI
+    var enableOmegaBrain: Bool
+    var omegaShadowMode: Bool
+    var omegaApiUrl: String?
+    
+    // Domain Configuration (v6.6.0)
     var domainConfig: DomainURLConfiguration?
     
     var externalProviderMarkup: Double
@@ -303,6 +318,9 @@ struct InstanceParameters: Codable, Sendable {
             enableCollaboration: enableCollaboration,
             enableComplianceExport: enableComplianceExport,
             enableEgoSystem: enableEgoSystem,
+            enableOmegaBrain: enableOmegaBrain,
+            omegaShadowMode: omegaShadowMode,
+            omegaApiUrl: omegaApiUrl,
             domainConfig: domainConfig,
             externalProviderMarkup: externalProviderMarkup,
             selfHostedMarkup: selfHostedMarkup,
@@ -332,6 +350,9 @@ struct InstanceParameters: Codable, Sendable {
             enableCollaboration: tier >= .starter,
             enableComplianceExport: true,
             enableEgoSystem: true,
+            enableOmegaBrain: tier >= .scale,
+            omegaShadowMode: false,
+            omegaApiUrl: nil,
             domainConfig: nil,
             externalProviderMarkup: 1.40,
             selfHostedMarkup: 1.75,
@@ -363,6 +384,9 @@ struct ParameterChanges: Codable, Sendable {
     var enableCollaboration: Bool?
     var enableComplianceExport: Bool?
     var enableEgoSystem: Bool?
+    var enableOmegaBrain: Bool?
+    var omegaShadowMode: Bool?
+    var omegaApiUrl: String?
     var domainConfig: DomainURLConfiguration?
     var externalProviderMarkup: Double?
     var selfHostedMarkup: Double?
@@ -384,6 +408,9 @@ struct ParameterChanges: Codable, Sendable {
         enableCollaboration == nil &&
         enableComplianceExport == nil &&
         enableEgoSystem == nil &&
+        enableOmegaBrain == nil &&
+        omegaShadowMode == nil &&
+        omegaApiUrl == nil &&
         domainConfig == nil &&
         externalProviderMarkup == nil &&
         selfHostedMarkup == nil

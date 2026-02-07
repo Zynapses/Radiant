@@ -4,7 +4,13 @@
  */
 
 import { executeStatement, stringParam, longParam } from '../db/client';
-import { enhancedLogger } from '../logging/enhanced-logger';
+import { createRegisteredLogger } from './logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'delight/main',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 // Import types from @radiant/shared - single source of truth
 import type {
@@ -47,8 +53,6 @@ export type {
   DelightEasterEgg,
   DelightSound,
 };
-
-const logger = enhancedLogger;
 
 // ============================================================================
 // Service-specific Types (not in @radiant/shared)

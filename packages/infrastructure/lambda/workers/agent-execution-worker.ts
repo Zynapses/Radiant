@@ -7,7 +7,13 @@
 
 import { SQSHandler, SQSRecord } from 'aws-lambda';
 import { executeStatement, stringParam, longParam, doubleParam } from '../shared/db/client';
-import { enhancedLogger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'workers/agent-execution-worker',
+  category: 'application',
+  sourceType: 'lambda',
+});
 import { agentRuntimeService, snapshotCaptureService } from '../shared/services/sovereign-mesh';
 import { sqsDispatcherService } from '../shared/services/sovereign-mesh/sqs-dispatcher.service';
 import { redisCacheService } from '../shared/services/sovereign-mesh/redis-cache.service';
@@ -27,8 +33,6 @@ interface IterationResult {
   approvalReason?: string;
   summary?: string;
 }
-
-const logger = enhancedLogger;
 
 interface ExecutionMessage {
   type: 'start' | 'iterate' | 'resume' | 'cancel';

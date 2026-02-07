@@ -810,7 +810,9 @@ export interface CatoPipelineEvent {
     | 'CHECKPOINT_DECIDED'
     | 'RISK_VETO'
     | 'COMPENSATION_STARTED'
-    | 'COMPENSATION_COMPLETED';
+    | 'COMPENSATION_COMPLETED'
+    | 'CHAOS_INJECTED'        // LIVS-M: Sycophancy breaker triggered
+    | 'STUB_DETECTED';        // LIVS-M: Code stub detected
   pipelineId: string;
   tenantId: string;
   methodId?: string;

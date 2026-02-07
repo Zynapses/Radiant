@@ -1129,6 +1129,7 @@ Identity Anchor: ${this.selfModel.identityAnchor}`;
       for (const log of logsToProcess) {
         try {
           const response = await modelRouterService.invoke({
+            tenantId,
             modelId: 'anthropic/claude-3-haiku',
             messages: [
               { 

@@ -20,6 +20,7 @@ import {
 import { cn } from '@/lib/utils';
 import { GlassCard } from '@/components/ui/glass-card';
 import { toast } from 'sonner';
+import { useRadiantDelightOptional } from '@radiant/delight-ui';
 
 type QuizCardType = 'fact_check' | 'logic_check' | 'ambiguity';
 
@@ -60,6 +61,7 @@ function getCardTypeConfig(cardType: QuizCardType) {
 }
 
 export default function VerifyPage() {
+  const delight = useRadiantDelightOptional();
   const [items, setItems] = useState<VerificationItem[]>(defaultVerifications);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -108,6 +110,7 @@ export default function VerifyPage() {
           description: 'The knowledge has been verified and will be deployed.',
         });
         setSelectedItem(null);
+        delight?.triggerDelight('action_complete');
       } else {
         throw new Error('Failed to verify');
       }
@@ -115,6 +118,7 @@ export default function VerifyPage() {
       toast.error('Error', {
         description: 'Failed to verify the fact. Please try again.',
       });
+      delight?.triggerDelight('error_recovery');
     } finally {
       setActionLoading(null);
     }
@@ -136,6 +140,7 @@ export default function VerifyPage() {
           description: 'The knowledge has been rejected and will not be deployed.',
         });
         setSelectedItem(null);
+        delight?.triggerDelight('action_complete');
       } else {
         throw new Error('Failed to reject');
       }
@@ -143,6 +148,7 @@ export default function VerifyPage() {
       toast.error('Error', {
         description: 'Failed to reject the fact. Please try again.',
       });
+      delight?.triggerDelight('error_recovery');
     } finally {
       setActionLoading(null);
     }
@@ -173,6 +179,7 @@ export default function VerifyPage() {
         setShowCorrectDialog(false);
         setCorrection('');
         setCorrectionReason('');
+        delight?.triggerDelight('action_complete');
       } else {
         throw new Error('Failed to correct');
       }
@@ -180,6 +187,7 @@ export default function VerifyPage() {
       toast.error('Error', {
         description: 'Failed to save correction. Please try again.',
       });
+      delight?.triggerDelight('error_recovery');
     } finally {
       setActionLoading(null);
     }
@@ -203,6 +211,7 @@ export default function VerifyPage() {
           description: `Option ${choice.toUpperCase()} has been selected as correct.`,
         });
         setSelectedItem(null);
+        delight?.triggerDelight('action_complete');
       } else {
         throw new Error('Failed to resolve');
       }
@@ -210,6 +219,7 @@ export default function VerifyPage() {
       toast.error('Error', {
         description: 'Failed to resolve ambiguity. Please try again.',
       });
+      delight?.triggerDelight('error_recovery');
     } finally {
       setActionLoading(null);
     }

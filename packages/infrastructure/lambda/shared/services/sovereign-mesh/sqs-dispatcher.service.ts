@@ -6,10 +6,13 @@
  */
 
 import { SQSClient, SendMessageCommand, SendMessageBatchCommand, GetQueueAttributesCommand } from '@aws-sdk/client-sqs';
-import { enhancedLogger } from '../../logging/enhanced-logger';
-import { executeStatement, stringParam } from '../../db/client';
+import { createRegisteredLogger } from '../logging-registry.service';
 
-const logger = enhancedLogger;
+const logger = createRegisteredLogger({
+  serviceName: 'sovereign-mesh/sqs-dispatcher',
+  category: 'infrastructure',
+  sourceType: 'application',
+});
 
 // ============================================================================
 // TYPES

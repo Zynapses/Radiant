@@ -9,7 +9,13 @@
 
 import { Handler, APIGatewayProxyHandler, APIGatewayProxyEvent, Context } from 'aws-lambda';
 import { executeStatement } from '../shared/db/client';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+
+const logger = createRegisteredLogger({
+  serviceName: 'consciousness/initializer',
+  category: 'infrastructure',
+  sourceType: 'lambda',
+});
 import { modelRouterService } from '../shared/services/model-router.service';
 
 // ============================================================================
