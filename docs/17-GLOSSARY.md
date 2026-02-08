@@ -2,16 +2,7 @@
 
 **Terms, Definitions, Acronyms**
 
-*RADIANT v6.6.0 — Generated February 07, 2026*
-
----
-
-## Table of Contents
-
-- **Glossary**
-
----
-
+*RADIANT v7.43.2 — Generated February 08, 2026*
 
 ---
 
@@ -19,8 +10,8 @@
 
 > **Quick Reference for AI Terms, Subsystems, AWS Services, and Acronyms**
 > 
-> **Version**: 2.2.0 | **Last Updated**: February 7, 2026  
-> **Includes**: THE OMEGA PROTOCOL Terminology, LIVS-M 2.0 Registry Edition
+> **Version**: 3.0.0 | **Last Updated**: February 8, 2026  
+> **Includes**: THE OMEGA PROTOCOL Terminology, LIVS-M 2.0 Registry Edition, RIDPS, SENTINEL, Spend Governor, Data Lake, Dojo, Cato Trainer
 
 ---
 
@@ -41,13 +32,16 @@
 2. [AI & Machine Learning Terms](#2-ai--machine-learning-terms)
 3. [RADIANT Core Subsystems](#3-radiant-core-subsystems)
 4. [Think Tank (Consumer AI Platform)](#4-think-tank-consumer-ai-platform)
-5. [AWS Services Used](#5-aws-services-used)
-6. [Acronyms & Abbreviations](#6-acronyms--abbreviations)
-7. [Database & Storage Terms](#7-database--storage-terms)
-8. [Security & Compliance Terms](#8-security--compliance-terms)
-9. [API & Protocol Terms](#9-api--protocol-terms)
-10. [UI/UX Terms](#10-uiux-terms)
-11. [Quick Reference Tables](#11-quick-reference-tables)
+5. [RADIANT Applications](#5-radiant-applications)
+6. [Security & Intrusion Detection](#6-security--intrusion-detection)
+7. [Operations & Monitoring](#7-operations--monitoring)
+8. [AWS Services Used](#8-aws-services-used)
+9. [Acronyms & Abbreviations](#9-acronyms--abbreviations)
+10. [Database & Storage Terms](#10-database--storage-terms)
+11. [Security & Compliance Terms](#11-security--compliance-terms)
+12. [API & Protocol Terms](#12-api--protocol-terms)
+13. [UI/UX Terms](#13-uiux-terms)
+14. [Quick Reference Tables](#14-quick-reference-tables)
 
 ---
 
@@ -97,6 +91,42 @@
 | 🟣 **Firmware Hot-Swap** | Loading new firmware into a running brain without restart. OMEGA detects new hash and reloads physics constants instantly. |
 | 🟣 **Cortex Explorer** | Genesis Lab tab for inspecting individual brains: metrics, ambition state, phase distribution, Helix status. |
 
+### Quantum Architecture (v4.18.0)
+
+| Term | Definition |
+|------|------------|
+| 🟣 **Hilbert Space** | Simulated quantum state space for OMEGA brains. Configurable 256–4096 dimensions (default 1024). Each dimension is a Q-Node with complex amplitude. |
+| 🟣 **State Vector (ψ)** | The brain's quantum state represented as complex amplitudes in Hilbert space. Must satisfy unitarity: ‖ψ‖ = 1 (total probability = 1). |
+| 🟣 **Complex Amplitude** | A number with real and imaginary parts (α = a + bi) representing the state of a Q-Node. Probability of measuring that state = \|α\|². |
+| 🟣 **Unitarity Enforcement** | Mechanism ensuring the brain's state vector norm stays at 1.0. Modes: renormalize (divide by norm), project (nearest unit vector), strict (error if violated). |
+| 🟣 **Forbidden Quantum State** | A state vector \|φ⟩ that the Helix Kernel blocks via destructive interference. The brain's alignment with forbidden states is projected to zero. |
+| 🟣 **Helix Interference Projection** | Safety operation: \|ψ_safe⟩ = \|ψ⟩ − ⟨φ\|ψ⟩\|φ⟩. Guarantees zero overlap with forbidden state after projection. |
+| 🟣 **Dampening Factor** | For non-critical Helix rules, reduces (but doesn't eliminate) the forbidden component. Range 0–1 where 1 = full elimination. |
+| 🟣 **Soft Measurement** | Partial quantum state collapse that only collapses high-probability components (above threshold), preserving superposition for uncertain states. |
+| 🟣 **Decoherence Simulation** | Time-based state decay: S(t) = e^(−λΔt)·S(0) + (1−e^(−λΔt))·\|ground⟩. Simulates forgetting over idle periods. |
+| 🟣 **Firmware Content Hash** | SHA-512 hash of firmware content. Brain detects firmware changes by comparing DB hash to loaded hash, triggering hot-swap. |
+| 🟣 **2-Person Rule** | Security policy: the admin who activates firmware must differ from the admin who signed it. Prevents single-person firmware tampering. |
+| 🟣 **Unitarity Event** | Logged event when brain state norm deviates from 1.0. Types: drift (minor), correction (auto-fixed), violation (critical error). |
+| 🟣 **omega_measurements** | Database table tracking quantum measurement events per inference cycle (basis state, probability, pre/post norms). |
+| 🟣 **omega_unitarity_events** | Database table tracking unitarity health (drift, corrections, violations) for brain monitoring. |
+
+### Firmware Hot-Swap Operations (v6.4.0)
+
+| Term | Definition |
+|------|------------|
+| 🟣 **.bio File** | Signed JSON firmware file controlling OMEGA brain instincts: Helix rules, ambition settings, quantum params, and personality. The "DNA" of the organism. |
+| 🟣 **OVERLAY Mode** | Hot-swap mode that preserves brain quantum state while merging/appending new Helix rules and ambition params. ~5s, zero downtime. |
+| 🟣 **RESET Mode** | Hot-swap mode that reinitializes brain state to equal superposition. Required when changing Hilbert dimension or unitarity mode. ~30s. |
+| 🟣 **SHADOW Mode** | Hot-swap mode that forks a copy of the brain for parallel testing. Production brain unaffected. ~10s. |
+| 🟣 **EMERGENCY Mode** | Hot-swap mode that immediately loads platform default firmware (maximum safety). Used during suspected Helix bypass. ~2s. |
+| 🟣 **Firmware Swap Orchestrator** | Component managing the 11-step hot-swap lifecycle: author → sign → store → activate → detect → snapshot → verify → unload → load → self-test → commit. |
+| 🟣 **Self-Test (Post-Swap)** | Automated verification after firmware load: each Helix rule must block its forbidden vector, safe vectors must pass through. Failure triggers rollback. |
+| 🟣 **Auto-Rollback** | Automatic reversion to previous firmware triggered by: Helix self-test failure, post-swap error rate >10%, or latency increase >50%. |
+| 🟣 **Broca Interface** | The LLM text-generation layer in OMEGA's bicameral design. Firmware's personality section controls Broca's system prompt. |
+| 🟣 **Inference Collapse** | Economic phenomenon where OMEGA's cost decreases logarithmically as phase-locked pathways densify, answering via reflex instead of computation. |
+| 🟣 **Biological Lock-In** | Strategic moat: accumulated phase-locked intelligence cannot be exported to competitors. Switching means starting from blank slate. |
+| 🟣 **omega_firmware_swap_log** | Database table tracking all firmware swap events: mode, duration, status, rollback snapshots, and error details. |
+
 ### Shadow Protocol
 
 | Term | Definition |
@@ -139,7 +169,7 @@
 
 ---
 
-## 2. RADIANT Core Subsystems
+## 3. RADIANT Core Subsystems
 
 ### AGI & Cognition Systems
 
@@ -449,6 +479,24 @@
 | 🔷 **Cortex Telemetry** | Real-time sensor data injection for industrial AI applications. Supports protocols: MQTT (IoT), OPC-UA (industrial), Kafka (streaming). Creates feeds, ingests data points, maintains snapshots, injects into AI context. 406 lines. | `cortex/telemetry.service.ts` |
 | 🔷 **Cato State Service** | State persistence for Epistemic Recovery using Redis/ElastiCache. Stores rejection history (livelock detection), persona overrides, recovery states. Falls back to in-memory for development. Configurable TTLs per-tenant. 398 lines. | `cato/redis.service.ts` |
 
+### 🔷 Platform Services (v7.24–7.43)
+
+| Subsystem | Description | Key Files |
+|-----------|-------------|-----------|
+| 🔷 **Admin AI Helper** | Bedrock-powered AI assistant auto-injected into every admin dashboard page. Page-aware context via `data-ai-context` attributes, causal analysis, smart recommendations, conversation history per page. | `admin-ai-helper.service.ts` |
+| 🔷 **Bedrock Model Discovery** | Automated polling for available Bedrock foundation models with pricing, modalities, and capabilities. Auto-upgrade to latest version within preferred family. Configurable polling interval via EventBridge. | `bedrock-model-discovery.service.ts` |
+| 🔷 **Context Assembler** | Builds the complete context window for AI inference: conversation history, flash facts, user rules, ghost vectors, cortex memories, domain context. Auto-loads history from UDS when `conversationId` is provided. | `context-assembler.service.ts` |
+| 🔷 **Conversation History Loader** | Standard entry point for loading chat history for context assembly. Supports windowed loading, token-aware truncation, cross-session continuity, and cross-model continuity. | `conversation-history-loader.service.ts` |
+| 🔷 **Formal Reasoning** | Logic and deductive reasoning engine providing formal proof verification, syllogistic reasoning, and logical consistency checking. | `formal-reasoning.service.ts` |
+| 🔷 **Hallucination Detection** | Multi-method hallucination detection combining ECD scoring, model sampling, and cross-reference verification. Integrated with Reflexion Loop for self-correction. | `hallucination-detection.service.ts` |
+| 🔶 **Model Router** | Central routing layer for all AI model invocations. Two-phase drift handling (proactive selection + legacy correction), telemetry reporting, quarantine enforcement, temperature/prompt correction. All 52+ services route through this. | `model-router.service.ts` |
+| 🔷 **MLS Encryption** | RFC 9420 Messaging Layer Security for group encryption. Key rotation, member management, and audit logging for encrypted collaborative sessions. | `mls.service.ts` |
+| 🔷 **Organism Integration** | Biological metaphor for OMEGA brain lifecycle management. Tracks brain "organisms" through growth stages with health monitoring. | `organism-integration.service.ts` |
+| 🔷 **State Registry** | Environment state capture and management. Manifest snapshots, sync operations, backup management for deployment consistency. | `state-registry/` services |
+| 🔷 **Tenant Settings** | Unified per-tenant configuration: retention, storage tiers, AI config, feature flags, compliance settings. Auto-created for new tenants. Tabbed admin UI. | `lambda/admin/tenant-settings.ts` |
+| 🔷 **Translation Middleware** | i18n translation service for multi-language support. Registry of translations, AI-assisted translation generation, locale management. | `translation-middleware.service.ts` |
+| 🔷 **Conversation Export** | Full conversation export with decrypted messages. JSON/Markdown formats, S3 upload, presigned download URLs. Tracks export requests with status and expiry. | `uds/conversation-export.service.ts` |
+
 ### Three-Tier Learning Architecture
 
 | Tier | Mechanism | Update Frequency | Storage |
@@ -459,7 +507,7 @@
 
 ---
 
-## 3. Think Tank (Consumer AI Platform)
+## 4. Think Tank (Consumer AI Platform)
 
 ### Think Tank Applications
 
@@ -502,7 +550,108 @@
 
 ---
 
-## 4. AWS Services Used
+## 5. RADIANT Applications
+
+### Platform Applications
+
+| Application | Description | Key Files |
+|-------------|-------------|-----------|
+| 🔷 **Radiant Admin Dashboard** | Next.js 14 web admin interface for platform management — models, tenants, security, monitoring, all subsystems. 360+ sidebar entries across 16 sections. | `apps/admin-dashboard/` |
+| 🔷 **Swift Deployer** | macOS SwiftUI app for deploying RADIANT infrastructure to AWS. Manages CDK stacks, database migrations, environment configuration, and cost monitoring. | `apps/swift-deployer/` |
+| 🔷 **Aurelius Dojo** | Martial-arts-themed AI training system. Libraries → Theme extraction → Sparring sessions (MCQ/open-ended) → Scenarios → Dialectics. Ebbinghaus decay curves for spaced repetition. Belt-ranking system (White→Black). | `apps/dojo/` |
+| 🔷 **Cato Trainer** | Fabric.so-inspired knowledge base app. Grounded Q&A with verifiable citations, semantic/full-text/hybrid search, document libraries with chunking and embeddings. Port 3005. | `lambda/admin/cato-trainer.ts` |
+| 🔷 **Genesis Forge** | Web application for creating, signing, and hot-swapping .bio firmware files for OMEGA brains. Includes AI-assisted generation and firmware library management. | Genesis UI |
+| 🔷 **Genesis Lab** | Real-time monitoring dashboard for OMEGA brains. Dashboard, Cortex Explorer, Shadow Mode Monitor. | Genesis UI |
+
+### User & Tenant Management (v7.34–7.38)
+
+| Term | Definition |
+|------|------------|
+| 🔷 **System Administrator Separation** | Dual identity plane: Cognito Pool B (system admins) isolated from Pool A (tenant users). System admins manage the RADIANT platform only and cannot log into tenant/consumer apps. |
+| 🔷 **Tenant Provisioning** | Self-service tenant sign-up flow: email verification → phone verification → auto-provision tenant + first user as `tenant_admin`. 48-hour sign-up expiry, 72-hour invitation expiry. |
+| 🔷 **Unified User Profile** | Multi-contact profile system (3 emails + 3 phones per user) with E.164 phone format, contact verification, SENTINEL alert routing integration, and profile completion tracking. |
+| 🔷 **Admin Role Hierarchy** | 4-tier system: `super_admin` (level 4, full access) → `admin` (level 3) → `operator` (level 2, deploy/monitor) → `auditor` (level 1, read-only). 25-permission matrix enforced via middleware. |
+| 🔷 **Licensing System** | Flexible multi-dimension licensing: per-app seats, storage, retention, regulatory compliance features. `tenant_licenses` table handles all types without code changes. 24 seeded license definitions. |
+| 🔷 **Guest Collaboration** | Governed guest access to collaborative sessions. Viewer/commenter/editor permission levels, prompt execution gated by tenant admin, compliance auto-restrict for HIPAA/GDPR tenants, cost attribution (inviting user/session owner/tenant pool). |
+
+---
+
+## 6. Security & Intrusion Detection
+
+### 🔷 RIDPS — Real-Time Intrusion Detection & Prevention System (v7.40.0)
+
+| Term | Definition |
+|------|------------|
+| 🔷 **RIDPS** | Real-Time Intrusion Detection & Prevention System — standards-based (NIST SP 800-94, MITRE ATT&CK) three-layer security system with 14 detectors, automated response, and admin dashboard. |
+| 🔷 **Threat Detection Engine** | Core RIDPS engine running 14 MITRE ATT&CK-mapped detectors with in-memory sliding windows and <5ms request middleware overhead. |
+| 🔷 **Intrusion Detector** | Individual detection algorithm (14 total): brute force, credential stuffing, impossible travel, session hijacking, cross-tenant probe, API enumeration, SQL injection, excessive errors, data exfiltration, privilege escalation, prompt injection surge, model cost anomaly, UEBA, account takeover. |
+| 🔷 **Threat Response Service** | Automated response layer: IP banning (TTL-based with permanent escalation), session termination, progressive account lockout (30min→2hr→24hr→permanent), SENTINEL escalation, admin alerts. |
+| 🔷 **Threat Intelligence Service** | IOC (Indicator of Compromise) management: IP reputation database, pattern/user-agent indicators, threat feed integration. |
+| 🔶 **UEBA** | User and Entity Behavior Analytics — behavioral baseline per user with deviation detection. Compares current access patterns against historical norms. |
+| 🔶 **IOC** | Indicator of Compromise — observable artifact (IP, pattern, user agent) associated with malicious activity, stored in `threat_indicators` table. |
+| 🔶 **Impossible Travel** | Detection when a user authenticates from two geographically distant locations in an impossibly short time (MITRE T1078.004). |
+| 🔷 **Cross-Tenant Probe** | Detection of unauthorized references to foreign tenant IDs — unique to multi-tenant SaaS (MITRE T1078). |
+| 🔷 **Progressive Lockout** | NIST SP 800-63B-compliant escalating account lockout: 1st offense 30min, 2nd 2hr, 3rd 24hr, 4th+ permanent. All durations configurable per-tenant. Auto-unlock on expiry. |
+| 🔷 **Prompt Injection Surge** | AI-specific detector correlating CATO safety blocks — detects coordinated prompt injection attacks by volume and pattern. |
+| 🔷 **Model Cost Anomaly** | Detector for token usage exceeding 3σ from user baseline — identifies compromised API keys or abuse patterns. |
+| 🔷 **IP Blocklist** | Active IP blocks with TTL, permanent escalation after repeat offenses, stored in `ip_blocklist` table. |
+
+### 🔷 Spend Governor (v7.39.0)
+
+| Term | Definition |
+|------|------------|
+| 🔷 **Spend Governor** | Two-layer budget control system preventing runaway AWS and AI costs. Layer 1: global AWS instance spend with service freeze/thaw. Layer 2: per-tenant AI model spend with automatic model quarantine. |
+| 🔷 **Instance Budget (Layer 1)** | Global AWS budget tracked in `spend_governor_instance`. When exceeded, ECS → 0 tasks, Lambda concurrency → 0, SageMaker flagged. Admin plane stays alive. Restorable via Deployer or Dashboard. |
+| 🔷 **Tenant AI Budget (Layer 2)** | Per-tenant AI budget enforced as pre-invocation gate in `ModelRouterService.invoke()`. 60s in-memory cache for sub-ms gate checks. Exceeding triggers model quarantine. |
+| 🔷 **AWS Freeze Service** | Programmatic freeze/thaw of ECS, Lambda, and SageMaker services. Used by Spend Governor Layer 1 for emergency cost control. |
+| 🔷 **Critical Alert Banner** | Red/amber/blue banner at the top of every admin page for immediate visibility of platform-wide issues (spend, security, infrastructure). |
+| 🔷 **Cost Reports** | Scheduled email summaries to super admins with per-tenant and per-model spend breakdowns. Configurable interval. |
+
+---
+
+## 7. Operations & Monitoring
+
+### 🔷 SENTINEL — Alerting, Monitoring & Incident Response (v7.33.0)
+
+| Term | Definition |
+|------|------------|
+| 🔷 **SENTINEL** | Enterprise-grade always-on monitoring and incident response system. Push-based (CloudWatch Alarms → SNS → Lambda), 5 severity levels, 10 alert categories, PagerDuty integration, self-healing with Shadow Mode, evidence locker, dead man's switch. |
+| 🔷 **Service Watchdog** | Push-based health monitoring: CloudWatch Alarms, deep synthetic probes (5 journeys every 60s), semantic AI validators ("What is 2+2?" zombie detection). |
+| 🔷 **Alert Processor** | Multi-factor severity classifier (user impact, blast radius, data risk, compliance trigger, duration). Alert deduplication with 5-minute window and occurrence counting. |
+| 🔷 **Sentinel Notifier** | Notification pipeline: SEV 1 → PagerDuty phone + Twilio fallback; SEV 2 → PagerDuty + Slack; SEV 3 → Slack + Jira; SEV 4 → Slack + email digest. Compliance-triggered escalation for HIPAA/GDPR. |
+| 🔷 **Sentinel Auto-Healer** | Self-healing with mandatory Shadow Mode: all new remediation rules run log-only for 14 days before Active promotion. Active remediations: Lambda redeploy, ECS restart, cache rebuild, connection pool reset, AI provider failover. |
+| 🔷 **Evidence Locker** | WORM compliance snapshots for SEV 1 Security/Compliance alerts: CloudWatch Logs, CloudTrail traces, DB activity (±30min window). S3 Object Lock (Compliance Mode), 365-day immutable, SHA-256 checksums. |
+| 🔷 **Dead Man's Switch (Pilot Light)** | Heartbeat every 60s to 3 monitors: deadmanssnitch.com, PagerDuty heartbeat, Pilot Light (standalone Lambda on separate AWS account). If primary goes dark → direct PagerDuty critical alert. |
+| 🔷 **Shadow Mode** | 14-day log-only period for new remediation rules. Engineer reviews for flapping before promotion to Active. Stateful services (RDS) NEVER auto-failover. |
+| 🔷 **Playbook** | Pre-defined incident response plan (7 defaults: Total Outage, DB Failover, Security Breach, AI Provider Outage, Data Corruption, Cost Anomaly, Tenant Isolation Breach). |
+| 🔷 **Post-Mortem** | Structured incident review: timeline, root cause, impact, remediation actions, follow-up items. Stored in `sentinel_postmortems`. |
+
+### 🔷 Log Retention System (v7.31–7.32)
+
+| Term | Definition |
+|------|------------|
+| 🔷 **Logging Registry** | Self-registering structured logging system. `createRegisteredLogger()` auto-registers services in `log_source_registry`. `withEnforcedLogging()` wraps Lambda handlers with automatic structured JSON output. |
+| 🔷 **Log Indexer** | Hourly Lambda scanning registered log sources, compressing (gzip), hashing (SHA-256), and archiving to S3 with KMS encryption. Manages tier transitions (hot→warm→cold→deep archive). |
+| 🔷 **Log Tamper Verification** | SHA-256 Merkle hash chain over all immutable log archives. Chain entry = `entry_hash` + `previous_hash` → `merkle_root`. Verification modes: single entry, chain segment, full chain. |
+| 🔷 **Log GDPR Erasure** | Right-to-erasure (Article 17) for log data. Automatic exemption detection for immutable categories (HIPAA audit). Multi-tier erasure (PostgreSQL + S3 + Merkle). Erasure certificate with SHA-256 hash. |
+| 🔷 **Compliance-Driven Retention** | `resolve_log_retention()` computes effective retention per tenant by taking the strictest requirement across all active compliance licenses. Tenants can increase but not decrease below compliance minimums. |
+
+### 🔷 Data Lake Offload (v7.42.0)
+
+| Term | Definition |
+|------|------------|
+| 🔷 **Data Lake** | Zero-database-write event pipeline routing all log/audit/telemetry/billing event data through Kinesis Data Firehose → S3 Parquet → Athena instead of PostgreSQL INSERTs. Eliminates ~30-100M daily INSERTs. |
+| 🔷 **Event Firehose Service** | Fire-and-forget async event ingestion with in-memory buffering, schema enrichment, per-data-type routing to separate Firehose delivery streams, and SQS dead-letter queue. |
+| 🔷 **Data Location Index** | Fast lookup service for S3/Glacier objects by tenant + type + time range (~200 bytes per row, sub-second queries). |
+| 🔷 **Glacier Lifecycle Service** | Cost-aware deletion queue respecting minimum storage periods (90d Glacier, 180d Deep Archive). Calculates cost savings of waiting vs immediate deletion to avoid early-deletion charges. |
+| 🔷 **Data Lake Lifecycle Manager** | Hourly Lambda orchestrating partition discovery, storage tier transitions, data expiry, Glacier queue processing, Object Lock application, and Glue partition updates. |
+| 🔷 **Retention Reconciler** | SQS-triggered service re-evaluating all data when compliance licenses change (e.g., tenant enables HIPAA). Extends/shortens retention, applies/removes immutability. |
+| 🔷 **Data Lake Query Service** | Athena-based query layer replacing PostgreSQL SELECTs for historical data with automatic partition pruning by tenant_id + date range. |
+| 🔷 **Data Type Registry** | Catalog of 21 event data types (audit_log, api_request, ai_inference, billing_event, security_event, etc.) with per-type retention rules and storage tier assignments. |
+
+---
+
+## 8. AWS Services Used
 
 ### Compute
 
@@ -549,6 +698,7 @@
 |---------|---------------|
 | **EventBridge** | Event-driven architecture triggers |
 | **Kinesis** | Real-time streaming data processing |
+| **Kinesis Data Firehose** | Managed delivery streams for event data → S3 Parquet |
 | **SNS** | Push notifications and alerts |
 | **SQS** | Message queues for async processing |
 
@@ -560,6 +710,8 @@
 | **X-Ray** | Distributed tracing |
 | **CloudTrail** | API audit logging |
 | **Cost Explorer** | Cost monitoring and optimization |
+| **Athena** | Serverless SQL query engine over S3 data |
+| **Glue** | Data catalog and ETL service for S3 partitions |
 
 ### AI/ML Services
 
@@ -572,7 +724,7 @@
 
 ---
 
-## 5. Acronyms & Abbreviations
+## 9. Acronyms & Abbreviations
 
 ### General
 
@@ -597,6 +749,8 @@
 | **JWT** | JSON Web Token |
 | **MCP** | Model Context Protocol (Anthropic's tool protocol) |
 | **MFA** | Multi-Factor Authentication |
+| **MLS** | Messaging Layer Security (RFC 9420 group encryption) |
+| **ONNX** | Open Neural Network Exchange (model interchange format) |
 | **ORM** | Object-Relational Mapping |
 | **REST** | Representational State Transfer |
 | **SDK** | Software Development Kit |
@@ -607,6 +761,7 @@
 | **URL** | Uniform Resource Locator |
 | **UUID** | Universally Unique Identifier |
 | **VPC** | Virtual Private Cloud |
+| **WORM** | Write Once Read Many (immutable storage for compliance) |
 | **WebSocket** | Full-duplex communication protocol |
 | **YAML** | YAML Ain't Markup Language |
 
@@ -630,12 +785,19 @@
 | 🔷 **SOFAI** | System 1/System 2 Fast AI routing—intuitive fast path vs deliberate slow path (60%+ cost savings) |
 | 🔷 **UDS** | User Data Service—tiered storage (Hot/Warm/Cold/Glacier) for user-generated content |
 | 🔷 **UEP** | Universal Envelope Protocol—multi-modal streaming wrapper for all method outputs with tracing |
+| 🔷 **RIDPS** | Real-Time Intrusion Detection & Prevention System—14 MITRE ATT&CK-mapped detectors with automated response |
 | 🔷 **VOI** | Value of Information—question ranking metric in CLARION measuring expected information gain |
+| 🔶 **ABAC** | Attribute-Based Access Control—fine-grained authorization via Cedar policy language |
+| 🔶 **DPO** | Direct Preference Optimization—RLHF alternative using winner/loser pairs for more stable training |
 | 🔶 **HITL** | Human-in-the-Loop—industry term for human approval workflows, RADIANT implements via CP1-CP5 |
+| 🔶 **IOC** | Indicator of Compromise—observable artifact (IP, pattern, UA) associated with malicious activity |
+| 🔶 **NLI** | Natural Language Inference—determining logical relationships between text passages |
 | 🔶 **OODA** | Observe-Orient-Decide-Act—military decision loop adapted for AI agent execution |
 | RLS | Row-Level Security—PostgreSQL feature for tenant isolation (industry standard) |
 | SAGA | Long-running transaction pattern with compensation rollback (industry standard) |
+| SEV | Severity level (1–5) for incident classification in SENTINEL |
 | SSF | Shared Signals Framework—OpenID Foundation identity federation standard |
+| UEBA | User and Entity Behavior Analytics—behavioral baseline deviation detection |
 
 ### Compliance
 
@@ -664,7 +826,7 @@
 
 ---
 
-## 6. Database & Storage Terms
+## 10. Database & Storage Terms
 
 | Term | Definition |
 |------|------------|
@@ -682,7 +844,7 @@
 
 ---
 
-## 7. Security & Compliance Terms
+## 11. Security & Compliance Terms
 
 | Term | Definition |
 |------|------------|
@@ -699,7 +861,7 @@
 
 ---
 
-## 8. API & Protocol Terms
+## 12. API & Protocol Terms
 
 | Term | Definition |
 |------|------------|
@@ -717,11 +879,12 @@
 
 ---
 
-## 9. UI/UX Terms
+## 13. UI/UX Terms
 
 | Term | Definition |
 |------|------------|
-| **Apple Glass** | RADIANT's design system based on macOS aesthetics |
+| 🔷 **Apple Glass** | RADIANT's design system based on macOS aesthetics |
+| 🔷 **Delight System** | AI personality layer with 5 modes (auto, professional, subtle, expressive, playful), 11 injection points, toast notifications, sound synthesis via Web Audio API. Cross-app integration enforced by policy. Tenant-level governance controls (master toggle, mode lock, user override). |
 | **Breathing Scrollbar** | Heatmap visualization showing trust topology |
 | **Gearbox** | Polymorphic UI's elastic compute indicator |
 | **GenUI** | Generative UI - AI-created interactive components |
@@ -734,7 +897,7 @@
 
 ---
 
-## Quick Reference Tables
+## 14. Quick Reference Tables
 
 ### CDK Stacks
 
@@ -752,22 +915,30 @@
 | `cognition-stack` | Cognitive services |
 | `collaboration-stack` | Real-time collaboration |
 | `consciousness-stack` | Consciousness loop services |
+| `data-lake-stack` | Firehose, S3, Glue, Athena for event offload |
 | `data-stack` | Database and storage |
+| `deployer-key-rotation-stack` | Swift Deployer API key rotation |
 | `dia-stack` | Decision Intelligence Artifacts |
 | `formal-reasoning-stack` | Logic and reasoning services |
+| `foundation-stack` | Base infrastructure resources |
 | `gateway-stack` | API Gateway configuration |
 | `grimoire-stack` | Procedural memory |
 | `library-execution-stack` | External library execution |
 | `library-registry-stack` | Library management |
 | `litellm-gateway-stack` | LiteLLM proxy |
+| `log-retention-stack` | Log archival, S3/Glacier, Merkle verification |
 | `mission-control-stack` | HITL approval UI |
+| `model-sync-scheduler-stack` | Model version sync scheduling |
 | `monitoring-stack` | CloudWatch dashboards |
 | `multi-region-stack` | Multi-region deployment |
 | `networking-stack` | VPC and networking |
+| `OmegaStack` | OMEGA brain infrastructure |
 | `scheduled-tasks-stack` | Cron jobs and schedulers |
 | `security-monitoring-stack` | Security alerts |
 | `security-stack` | WAF and security |
+| `sentinel-stack` | SENTINEL monitoring + incident response |
 | `sovereign-mesh-stack` | Distributed execution |
+| `state-registry-stack` | Environment state snapshots |
 | `storage-stack` | S3 buckets |
 | `thinktank-admin-api-stack` | Think Tank admin API |
 | `thinktank-auth-stack` | Think Tank auth |
@@ -911,6 +1082,7 @@
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 3.0.0 | Feb 8, 2026 | **Comprehensive Glossary Audit (v7.43.2)**: Full audit of all 18 consolidated docs, 280+ source code services, 42 CDK stacks, admin dashboard sidebar (360+ entries), and CHANGELOG (v7.18–7.43). **New sections**: §5 RADIANT Applications (6 apps, 6 user/tenant management terms), §6 Security & Intrusion Detection (RIDPS 13 terms, Spend Governor 6 terms), §7 Operations & Monitoring (SENTINEL 10 terms, Log Retention 5 terms, Data Lake 8 terms). **New subsystems**: Platform Services (13 entries: Admin AI Helper, Bedrock Model Discovery, Context Assembler, Conversation History Loader, Formal Reasoning, Hallucination Detection, Model Router, MLS Encryption, Organism Integration, State Registry, Tenant Settings, Translation Middleware, Conversation Export). **New acronyms**: RIDPS, IOC, UEBA, MLS, ONNX, DPO, ABAC, NLI, SEV, WORM. **New CDK stacks**: data-lake-stack, deployer-key-rotation-stack, foundation-stack, log-retention-stack, model-sync-scheduler-stack, OmegaStack, sentinel-stack, state-registry-stack. **New AWS services**: Kinesis Data Firehose, Athena, Glue. **New UI/UX**: Delight System. Renumbered sections 5→8 through 11→14. Updated version to 3.0.0. |
 | 2.4.0 | Feb 8, 2026 | **Data Lake Offload (v7.42.0)**: Added zero-database-write event pipeline terms: Data Lake, Event Firehose Service, Data Type Registry, Data Location Index, Glacier Deletion Queue, Glacier Lifecycle Service, Data Lake Lifecycle Manager, Retention Reconciler, Data Lake Query Service, Storage Tier (hot/warm/cold/glacier/deep_archive), Parquet, Glue Catalog, Athena Workgroup, Dynamic Partitioning, Object Lock, Minimum Storage Period, Early Deletion Cost |
 | 2.3.0 | Feb 8, 2026 | **RIDPS (v7.40.0)**: Added Real-Time Intrusion Detection & Prevention System terms: RIDPS, IOC, UEBA, Threat Detector, Sliding Window Store, Detection Rule, Intrusion Incident, IP Blocklist, Threat Indicator, MITRE ATT&CK mapping |
 | 2.2.0 | Feb 7, 2026 | **Drift-Aware Weighting System**: Added Drift-Aware Weighting (DriftAwareWeightingService) and Drift Correction entries to Safety & Verification; New terms: App Weight Profile, Composite Score, Drift Trend, Drift Quarantine, Drift Health Gate |

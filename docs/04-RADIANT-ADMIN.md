@@ -15,6 +15,7 @@
 - **Part V: System Health & Monitoring**
 - **Part VI: SaaS Metrics**
 - **Part VII: Seed Data & Configuration**
+- **Part VIII: OMEGA Firmware Administration (v6.4.0)**
 
 ---
 
@@ -31694,6 +31695,137 @@ func executeInstall(...) async throws -> DeploymentExecutionResult {
 - [API Reference](API_REFERENCE.md) - Provider and model API endpoints
 
 
+
+---
+
+## Part VIII: OMEGA Firmware Administration (v6.4.0)
+
+> **Version**: 6.4.0 | **Date**: February 8, 2026
+> **Audience**: Platform Administrators
+
+### Overview
+
+OMEGA Firmware Administration allows platform administrators to manage the behavior, safety rules, and cognitive parameters of OMEGA AI brains in real-time through the Genesis Forge interface. All firmware operations are cryptographically signed, auditable, and support automatic rollback.
+
+### Accessing Firmware Management
+
+Navigate to **OMEGA → Firmware** in the admin sidebar, or directly visit `/omega/firmware`.
+
+**Required permissions:** `omega:firmware:read` for viewing, `omega:firmware:write` for authoring/activating, `omega:firmware:sign` for KMS signing.
+
+### Firmware Lifecycle
+
+| Status | Description | Next Action |
+|--------|-------------|-------------|
+| **Draft** | Being authored in Genesis Forge editor | Validate → Sign |
+| **Signed** | Cryptographically signed via KMS | Activate |
+| **Active** | Currently loaded on the target brain | (Running) |
+| **Superseded** | Replaced by newer firmware | Rollback (if needed) |
+| **Revoked** | Manually revoked by admin | Cannot reactivate |
+
+### Creating New Firmware
+
+1. Open **Genesis Forge → Firmware Library**
+2. Click **"New Firmware"** or clone an existing profile
+3. Configure sections:
+   - **Helix Rules** — Safety guardrails (forbidden behaviors). Each rule defines a forbidden vector signature, severity (CRITICAL/HIGH/MEDIUM/LOW), and interference mode (DESTRUCTIVE or DAMPENING)
+   - **Ambition Settings** — Learning speed (plasticity rate 0–0.1), entropy threshold (0–1), dopamine decay rate (0.9–1.0), boredom trigger behavior
+   - **Quantum Parameters** — Hilbert dimension (256–4096), unitarity mode (STRICT/RELAXED), decoherence rate. **Note:** Changing Hilbert dimension or unitarity mode requires RESET swap mode
+   - **Personality** — Broca Interface system prompt, tone (formal/casual/technical), domain focus areas
+4. Click **"Validate"** — all checks must pass (green checkmarks)
+5. Click **"Sign"** — authenticates with your admin credentials and signs via AWS KMS
+
+### Deploying Firmware (Swap Modes)
+
+After signing, click **"Activate"** and select a swap mode:
+
+| Mode | When to Use | Impact |
+|------|-------------|--------|
+| **OVERLAY** | Adding/updating safety rules, tuning parameters | Zero downtime, brain state preserved |
+| **RESET** | Changing Hilbert dimension or unitarity mode | ~30s queued, brain state reinitialized |
+| **SHADOW** | Testing new firmware against live traffic | Zero downtime, parallel brain copy |
+| **EMERGENCY** | Safety incident or suspected Helix bypass | Immediate platform defaults |
+
+**Production deployments** require:
+
+- Two-person approval (signer ≠ activator)
+- Re-authentication at activation (FDA 21 CFR Part 11)
+- Pre-flight validation pass
+
+### Monitoring Active Firmware
+
+The **OMEGA Dashboard** (`/omega/firmware`) displays:
+
+- **Brain Status** — Active firmware hash, version, activation time
+- **Swap Timeline** — Real-time visualization of swap progress
+- **Helix Activity** — Rule activation counts, blocked vectors, severity breakdown
+- **Ambition Metrics** — Entropy level, dopamine level, learning rate, dream cycle triggers
+- **Coherence Score** — Shadow mode alignment metric (target: >90% over 7 days)
+
+### Rollback
+
+**Manual rollback:** Firmware Library → click superseded firmware → **"Rollback to This Version"**
+
+**API rollback:**
+```bash
+curl -X POST https://api.radiant.example/api/v2/firmware/{firmware-id}/rollback \
+  -H "Authorization: Bearer $ADMIN_TOKEN"
+```
+
+**Automatic rollback** triggers:
+
+- Helix self-test failure during swap
+- Post-swap error rate > 10% within 5 minutes
+- Post-swap latency increase > 50%
+
+### Emergency Lockdown
+
+Any admin can trigger emergency lockdown from the dashboard or via API:
+
+```bash
+curl -X POST https://api.radiant.example/api/v2/firmware/emergency \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"brain_id": "uuid-here", "reason": "Suspected Helix bypass"}'
+```
+
+This immediately loads **platform default firmware** (maximum safety, minimal capabilities). Post-incident review required within 24 hours.
+
+### Audit Trail
+
+All firmware operations are logged in `pki_audit_log` and `omega_firmware_swap_log`:
+
+| Event | Logged Data |
+|-------|-------------|
+| Firmware created | Author, timestamp, content hash |
+| Firmware signed | Signer key ID, signature algorithm, timestamp |
+| Firmware activated | Activator (must differ from signer in prod), swap mode, target brain |
+| Swap completed | Duration, from/to firmware IDs, status |
+| Rollback triggered | Trigger reason (manual/auto), rollback snapshot key |
+| Emergency lockdown | Admin, reason, affected brain(s) |
+
+### Cartridge Management (.RADz)
+
+Cartridges are portable AI intelligence packages that bundle firmware + trained models:
+
+| Action | Path |
+|--------|------|
+| Import cartridge | **OMEGA → Cartridges → Import** |
+| Validate signature | Automatic on import (KMS verification) |
+| Install to brain | Select target brain → **"Install"** |
+| Update cartridge | Hot-swap via OVERLAY (zero downtime) |
+
+### API Endpoints
+
+| Method | Endpoint | Purpose |
+|--------|----------|---------|
+| POST | `/api/v2/firmware/upload` | Upload and validate .bio file |
+| POST | `/api/v2/firmware/{id}/sign` | Sign via KMS |
+| POST | `/api/v2/firmware/{id}/activate` | Trigger hot-swap |
+| POST | `/api/v2/firmware/{id}/rollback` | Revert to previous firmware |
+| GET | `/api/v2/firmware/{id}/preflight` | Validate all prerequisites |
+| POST | `/api/v2/firmware/emergency` | Immediate safety lockdown |
+| GET | `/api/v2/omega/status` | Brain status including firmware hash |
 
 ---
 

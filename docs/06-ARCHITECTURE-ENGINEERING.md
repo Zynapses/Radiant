@@ -13,6 +13,7 @@
 - **Part III: Infrastructure**
 - **Part IV: Specialized Architectures**
 - **Part V: Index**
+- **Part VI: OMEGA Firmware Hot-Swap Architecture (v6.4.0)**
 
 ---
 
@@ -17154,3 +17155,158 @@ This architecture is REQUIRED for:
 | Date | Version | Change |
 |------|---------|--------|
 | 2026-01-18 | 1.0.0 | Initial architecture document |
+| 2026-02-08 | 6.4.0 | OMEGA Firmware Hot-Swap Architecture |
+
+---
+
+## Part VI: OMEGA Firmware Hot-Swap Architecture (v6.4.0)
+
+> **Version**: 6.4.0 | **Date**: February 8, 2026
+> **Classification**: RADIANT INTERNAL // STRATEGIC
+
+### Overview
+
+Firmware hot-swaps are **fully enabled in production** as of v6.4.0. The architecture achieves **zero-downtime firmware injection** through atomic metadata hash detection and runtime physics constant reloading, replacing the previous cold-restart requirement (2–5 second gap).
+
+### System Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         GENESIS FORGE UI                                │
+│       (Firmware Editor / Library / Deploy / Monitor / Rollback)         │
+└────────────────────────────────┬────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                     FIRMWARE MANAGEMENT LAYER                           │
+│  ┌────────────────────────┐    ┌──────────────────────────────────┐    │
+│  │   FirmwareManager      │    │   FirmwareSwapOrchestrator       │    │
+│  │  (Upload/Validate/     │    │  (OVERLAY/RESET/SHADOW/          │    │
+│  │   Sign/Store)          │    │   EMERGENCY)                     │    │
+│  └────────────────────────┘    └──────────────────────────────────┘    │
+└────────────────────────────────┬────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                     OMEGA QUANTUM BRAIN LAYER                           │
+│  ┌──────────────┐    ┌───────────────┐    ┌──────────────────────┐    │
+│  │ QuantumBrain  │    │ HelixKernel   │    │ AmbitionFirmware     │    │
+│  │ (Q-Nodes,     │    │ (Destructive  │    │ (Homeostasis,        │    │
+│  │  State, LTC)  │    │  Interference)│    │  Entropy, Dopamine)  │    │
+│  └──────────────┘    └───────────────┘    └──────────────────────┘    │
+└────────────────────────────────┬────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                       PERSISTENCE LAYER                                 │
+│     EFS (Hot State)    │    S3 (Snapshots)    │   PostgreSQL (Meta)    │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+### Bicameral Design
+
+OMEGA uses a **Bicameral Design**: the OMEGA Cortex (Liquid Time-Constant network with complex-valued logic) handles reasoning, while a commodity LLM (Broca Interface) handles text generation only. The Cortex outputs abstract Thought Vectors — the Broca Interface translates them to natural language.
+
+Firmware controls the Cortex's physics:
+
+- **Helix Kernel** — Safety rules via destructive interference (forbidden thoughts mathematically cancelled)
+- **Ambition Engine** — Homeostatic loop controlling learning rate and entropy
+- **Personality Layer** — Broca's system prompt configuration
+
+### The .bio Firmware Standard
+
+A `.bio` file is a signed JSON object containing:
+
+| Section | Purpose | Hot-Swappable |
+|---------|---------|:---:|
+| `helix_rules` | Forbidden state vectors + interference mode | ✅ |
+| `ambition` | Entropy threshold, plasticity rate, dopamine decay | ✅ |
+| `quantum_params` | Hilbert dimension, unitarity mode, decoherence rate | Partial (dimension/unitarity require RESET) |
+| `personality` | Broca system prompt, tone, domain focus | ✅ |
+| `signature` | Ed25519/KMS signature + signer key ID | N/A |
+
+### PKI Trust Chain (KMS-Backed)
+
+```
+Platform Root CA (ECC_NIST_P256)          ← CDK SecurityStack
+├── Tenant CA Key (ECC_NIST_P256)         ← Per tenant via generateTenantCA()
+│   ├── Signing Key (per-purpose)         ← Via createSigningKey()
+│   │   └── Signs .bio firmware + .RADz cartridges
+│   └── Verification via VerifyCommand
+└── Stored in cartridge_signing_keys table with full audit trail
+```
+
+### Hot-Swap Lifecycle (11 Steps)
+
+1. **AUTHOR** — Admin creates .bio in Genesis Forge
+2. **SIGN** — Ed25519 via KMS (`ECDSA_SHA_256`)
+3. **STORE** — Insert into `omega_helix_firmware`, status='signed'
+4. **ACTIVATE** — Admin activates → old firmware superseded, brain hash updated
+5. **DETECT** — `checkFirmwareSwap()` at top of inference cycle detects hash mismatch
+6. **SNAPSHOT** — Save rollback state (old rules, params, personality)
+7. **VERIFY** — Ed25519 signature check; reject if invalid
+8. **UNLOAD** — Purge old Helix rules, zero params, clear personality
+9. **LOAD** — Parse .bio, inject forbidden vectors, apply quantum params + ambition + personality
+10. **SELF-TEST** — Each Helix rule must block its forbidden vector; failure → rollback
+11. **COMMIT** — Update loaded hash, log event. Brain continues with zero downtime.
+
+**INVARIANT:** Brain NEVER processes inference between UNLOAD and LOAD/ROLLBACK. The swap is synchronous within the inference cycle (~50ms).
+
+### Four Swap Modes
+
+| Mode | Duration | Quantum State | Use Case |
+|------|----------|---------------|----------|
+| **OVERLAY** | ~5s | Preserved | Production updates, adding safety rules |
+| **RESET** | ~30s | Reinitialized | Hilbert dimension change, major version |
+| **SHADOW** | ~10s | Forked copy | A/B testing, pre-deployment validation |
+| **EMERGENCY** | ~2s | Preserved | Safety incident, immediate lockdown |
+
+### Persistence Architecture
+
+| Layer | Service | Purpose | Latency |
+|-------|---------|---------|---------|
+| Hot State | AWS EFS (`/mnt/omega_state`) | Active brain state | Sub-ms |
+| Snapshots | AWS S3 (`s3://radiant-omega-snapshots-{env}`) | Pre-swap rollback | ~100ms |
+| Metadata | Aurora PostgreSQL | Firmware records, swap logs, audit trail | ~5ms |
+| Swap Lock | DynamoDB | Distributed lock (5-min TTL) | ~10ms |
+
+### Cryogenic Serverless Architecture
+
+When inactive, brain state is serialized to EFS and Lambda shuts down (cost: $0.00). On wake-up, the Cryogenic Formula mathematically simulates time passage:
+
+```
+S_new = S_old × e^(-λΔt)
+```
+
+Short-term noise decays, long-term memory persists. This enables continuously-learning AI on Lambda for pennies per brain.
+
+### CORTEX Network Hot-Swap (CATO Nightly)
+
+The 6 CORTEX MLPs (~2.5M params total) hot-swap nightly at 2am UTC:
+
+```
+CATO → INVENTION (30%) → EVOLUTION (70%) → PyTorch Training
+→ ONNX Export → S3 Upload → EventBridge → Atomic Pointer Swap
+```
+
+S3 structure: `s3://radiant-cortex-models-{env}/{network}/v{X}/model.onnx`
+
+### Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `omega_helix_firmware` | Firmware records with content, hash, signature, status |
+| `omega_firmware_swap_log` | Swap events: mode, duration, status, rollback snapshots |
+| `omega_brain_states` | Brain instances with firmware hash, active firmware ID |
+| `omega_helix_rules` | Per-brain forbidden state vectors |
+| `omega_measurements` | Quantum measurement events per inference cycle |
+| `omega_unitarity_events` | Unitarity drift, corrections, violations |
+
+### Monitoring & Auto-Rollback
+
+| Metric | Warning | Critical (Auto-Rollback) |
+|--------|---------|--------------------------|
+| Swap duration | > 30s | > 60s |
+| Post-swap error rate | > 5% | > 10% |
+| Post-swap latency increase | > 30% | > 50% |
+| Helix verification failures | Any | Any (immediate rollback) |

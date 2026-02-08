@@ -1,6 +1,6 @@
 # RADIANT & Think Tank — Complete Documentation
 
-**Version 6.6.0** | **Generated February 07, 2026** | **Zynapses Inc.**
+**Version 6.6.0** | **Generated February 08, 2026** | **Zynapses Inc.**
 
 > This document is the single authoritative assembly of ALL RADIANT and Think Tank
 > documentation. It is auto-generated from the source documentation files in the
@@ -25389,7 +25389,7 @@ The Dojo uses **19 RLS-protected tables** (migration `V2026_02_06_005`):
 ## 4.1 Radiant Admin — Complete Reference
 
 
-*Source: `docs/04-RADIANT-ADMIN.md` (31,700 lines)*
+*Source: `docs/04-RADIANT-ADMIN.md` (31,832 lines)*
 
 ---
 
@@ -25409,6 +25409,7 @@ The Dojo uses **19 RLS-protected tables** (migration `V2026_02_06_005`):
 - **Part V: System Health & Monitoring**
 - **Part VI: SaaS Metrics**
 - **Part VII: Seed Data & Configuration**
+- **Part VIII: OMEGA Firmware Administration (v6.4.0)**
 
 ---
 
@@ -26220,7 +26221,7 @@ Navigate to **Tenants** to see all organizations:
    - **Admin Name**: Administrator display name
 5. Click **"Create Tenant"**
 
-> **Note**: HIPAA-enabled tenants automatically have a minimum 90-day retention period.
+> **Note**: Default retention is 180 days (6 months) as of v7.43.0. HIPAA-enabled tenants have a minimum 90-day retention period. Tenants can adjust retention via the **Tenant Settings** page.
 
 ### 4.3 Tenant Statuses
 
@@ -26279,10 +26280,10 @@ The tenant will be marked as **"Pending Deletion"** with a scheduled hard-delete
 
 | Compliance | Minimum Retention | Default |
 |------------|-------------------|--------|
-| None | 7 days | 30 days |
-| GDPR | 30 days | 30 days |
-| SOC2 | 30 days | 30 days |
-| HIPAA | 90 days | 90 days |
+| None | 7 days | 180 days |
+| GDPR | 30 days | 180 days |
+| SOC2 | 30 days | 180 days |
+| HIPAA | 90 days | 180 days |
 
 #### Restoring a Tenant
 
@@ -26480,7 +26481,7 @@ RADIANT implements **six layers of tenant isolation** providing defense in depth
 | `tier` | INTEGER | Subscription tier (1-5): SEED, SPROUT, GROWTH, SCALE, ENTERPRISE |
 | `primary_region` | VARCHAR(20) | AWS region for data residency (e.g., `us-east-1`) |
 | `compliance_mode` | JSONB | Array: `['hipaa', 'soc2', 'gdpr']` |
-| `retention_days` | INTEGER | Custom retention period override (7-730 days) |
+| `retention_days` | INTEGER | Custom retention period override (7-3650 days, default 180) |
 | `deletion_scheduled_at` | TIMESTAMPTZ | When hard delete will occur (if pending_deletion) |
 | `deletion_requested_by` | UUID | User/admin who initiated deletion |
 | `stripe_customer_id` | VARCHAR(255) | Billing integration identifier |
@@ -57091,6 +57092,137 @@ func executeInstall(...) async throws -> DeploymentExecutionResult {
 
 ---
 
+## Part VIII: OMEGA Firmware Administration (v6.4.0)
+
+> **Version**: 6.4.0 | **Date**: February 8, 2026
+> **Audience**: Platform Administrators
+
+### Overview
+
+OMEGA Firmware Administration allows platform administrators to manage the behavior, safety rules, and cognitive parameters of OMEGA AI brains in real-time through the Genesis Forge interface. All firmware operations are cryptographically signed, auditable, and support automatic rollback.
+
+### Accessing Firmware Management
+
+Navigate to **OMEGA → Firmware** in the admin sidebar, or directly visit `/omega/firmware`.
+
+**Required permissions:** `omega:firmware:read` for viewing, `omega:firmware:write` for authoring/activating, `omega:firmware:sign` for KMS signing.
+
+### Firmware Lifecycle
+
+| Status | Description | Next Action |
+|--------|-------------|-------------|
+| **Draft** | Being authored in Genesis Forge editor | Validate → Sign |
+| **Signed** | Cryptographically signed via KMS | Activate |
+| **Active** | Currently loaded on the target brain | (Running) |
+| **Superseded** | Replaced by newer firmware | Rollback (if needed) |
+| **Revoked** | Manually revoked by admin | Cannot reactivate |
+
+### Creating New Firmware
+
+1. Open **Genesis Forge → Firmware Library**
+2. Click **"New Firmware"** or clone an existing profile
+3. Configure sections:
+   - **Helix Rules** — Safety guardrails (forbidden behaviors). Each rule defines a forbidden vector signature, severity (CRITICAL/HIGH/MEDIUM/LOW), and interference mode (DESTRUCTIVE or DAMPENING)
+   - **Ambition Settings** — Learning speed (plasticity rate 0–0.1), entropy threshold (0–1), dopamine decay rate (0.9–1.0), boredom trigger behavior
+   - **Quantum Parameters** — Hilbert dimension (256–4096), unitarity mode (STRICT/RELAXED), decoherence rate. **Note:** Changing Hilbert dimension or unitarity mode requires RESET swap mode
+   - **Personality** — Broca Interface system prompt, tone (formal/casual/technical), domain focus areas
+4. Click **"Validate"** — all checks must pass (green checkmarks)
+5. Click **"Sign"** — authenticates with your admin credentials and signs via AWS KMS
+
+### Deploying Firmware (Swap Modes)
+
+After signing, click **"Activate"** and select a swap mode:
+
+| Mode | When to Use | Impact |
+|------|-------------|--------|
+| **OVERLAY** | Adding/updating safety rules, tuning parameters | Zero downtime, brain state preserved |
+| **RESET** | Changing Hilbert dimension or unitarity mode | ~30s queued, brain state reinitialized |
+| **SHADOW** | Testing new firmware against live traffic | Zero downtime, parallel brain copy |
+| **EMERGENCY** | Safety incident or suspected Helix bypass | Immediate platform defaults |
+
+**Production deployments** require:
+
+- Two-person approval (signer ≠ activator)
+- Re-authentication at activation (FDA 21 CFR Part 11)
+- Pre-flight validation pass
+
+### Monitoring Active Firmware
+
+The **OMEGA Dashboard** (`/omega/firmware`) displays:
+
+- **Brain Status** — Active firmware hash, version, activation time
+- **Swap Timeline** — Real-time visualization of swap progress
+- **Helix Activity** — Rule activation counts, blocked vectors, severity breakdown
+- **Ambition Metrics** — Entropy level, dopamine level, learning rate, dream cycle triggers
+- **Coherence Score** — Shadow mode alignment metric (target: >90% over 7 days)
+
+### Rollback
+
+**Manual rollback:** Firmware Library → click superseded firmware → **"Rollback to This Version"**
+
+**API rollback:**
+```bash
+curl -X POST https://api.radiant.example/api/v2/firmware/{firmware-id}/rollback \
+  -H "Authorization: Bearer $ADMIN_TOKEN"
+```
+
+**Automatic rollback** triggers:
+
+- Helix self-test failure during swap
+- Post-swap error rate > 10% within 5 minutes
+- Post-swap latency increase > 50%
+
+### Emergency Lockdown
+
+Any admin can trigger emergency lockdown from the dashboard or via API:
+
+```bash
+curl -X POST https://api.radiant.example/api/v2/firmware/emergency \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"brain_id": "uuid-here", "reason": "Suspected Helix bypass"}'
+```
+
+This immediately loads **platform default firmware** (maximum safety, minimal capabilities). Post-incident review required within 24 hours.
+
+### Audit Trail
+
+All firmware operations are logged in `pki_audit_log` and `omega_firmware_swap_log`:
+
+| Event | Logged Data |
+|-------|-------------|
+| Firmware created | Author, timestamp, content hash |
+| Firmware signed | Signer key ID, signature algorithm, timestamp |
+| Firmware activated | Activator (must differ from signer in prod), swap mode, target brain |
+| Swap completed | Duration, from/to firmware IDs, status |
+| Rollback triggered | Trigger reason (manual/auto), rollback snapshot key |
+| Emergency lockdown | Admin, reason, affected brain(s) |
+
+### Cartridge Management (.RADz)
+
+Cartridges are portable AI intelligence packages that bundle firmware + trained models:
+
+| Action | Path |
+|--------|------|
+| Import cartridge | **OMEGA → Cartridges → Import** |
+| Validate signature | Automatic on import (KMS verification) |
+| Install to brain | Select target brain → **"Install"** |
+| Update cartridge | Hot-swap via OVERLAY (zero downtime) |
+
+### API Endpoints
+
+| Method | Endpoint | Purpose |
+|--------|----------|---------|
+| POST | `/api/v2/firmware/upload` | Upload and validate .bio file |
+| POST | `/api/v2/firmware/{id}/sign` | Sign via KMS |
+| POST | `/api/v2/firmware/{id}/activate` | Trigger hot-swap |
+| POST | `/api/v2/firmware/{id}/rollback` | Revert to previous firmware |
+| GET | `/api/v2/firmware/{id}/preflight` | Validate all prerequisites |
+| POST | `/api/v2/firmware/emergency` | Immediate safety lockdown |
+| GET | `/api/v2/omega/status` | Brain status including firmware hash |
+
+---
+
 *Consolidated from 8 source documents (0 not found). 31,655 source lines.*
 
 
@@ -59697,7 +59829,7 @@ User                    Deployer                    AWS
 ## 6.1 Architecture & Engineering — Complete Reference
 
 
-*Source: `docs/06-ARCHITECTURE-ENGINEERING.md` (17,156 lines)*
+*Source: `docs/06-ARCHITECTURE-ENGINEERING.md` (17,312 lines)*
 
 ---
 
@@ -59715,6 +59847,7 @@ User                    Deployer                    AWS
 - **Part III: Infrastructure**
 - **Part IV: Specialized Architectures**
 - **Part V: Index**
+- **Part VI: OMEGA Firmware Hot-Swap Architecture (v6.4.0)**
 
 ---
 
@@ -76856,6 +76989,161 @@ This architecture is REQUIRED for:
 | Date | Version | Change |
 |------|---------|--------|
 | 2026-01-18 | 1.0.0 | Initial architecture document |
+| 2026-02-08 | 6.4.0 | OMEGA Firmware Hot-Swap Architecture |
+
+---
+
+## Part VI: OMEGA Firmware Hot-Swap Architecture (v6.4.0)
+
+> **Version**: 6.4.0 | **Date**: February 8, 2026
+> **Classification**: RADIANT INTERNAL // STRATEGIC
+
+### Overview
+
+Firmware hot-swaps are **fully enabled in production** as of v6.4.0. The architecture achieves **zero-downtime firmware injection** through atomic metadata hash detection and runtime physics constant reloading, replacing the previous cold-restart requirement (2–5 second gap).
+
+### System Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         GENESIS FORGE UI                                │
+│       (Firmware Editor / Library / Deploy / Monitor / Rollback)         │
+└────────────────────────────────┬────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                     FIRMWARE MANAGEMENT LAYER                           │
+│  ┌────────────────────────┐    ┌──────────────────────────────────┐    │
+│  │   FirmwareManager      │    │   FirmwareSwapOrchestrator       │    │
+│  │  (Upload/Validate/     │    │  (OVERLAY/RESET/SHADOW/          │    │
+│  │   Sign/Store)          │    │   EMERGENCY)                     │    │
+│  └────────────────────────┘    └──────────────────────────────────┘    │
+└────────────────────────────────┬────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                     OMEGA QUANTUM BRAIN LAYER                           │
+│  ┌──────────────┐    ┌───────────────┐    ┌──────────────────────┐    │
+│  │ QuantumBrain  │    │ HelixKernel   │    │ AmbitionFirmware     │    │
+│  │ (Q-Nodes,     │    │ (Destructive  │    │ (Homeostasis,        │    │
+│  │  State, LTC)  │    │  Interference)│    │  Entropy, Dopamine)  │    │
+│  └──────────────┘    └───────────────┘    └──────────────────────┘    │
+└────────────────────────────────┬────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                       PERSISTENCE LAYER                                 │
+│     EFS (Hot State)    │    S3 (Snapshots)    │   PostgreSQL (Meta)    │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+### Bicameral Design
+
+OMEGA uses a **Bicameral Design**: the OMEGA Cortex (Liquid Time-Constant network with complex-valued logic) handles reasoning, while a commodity LLM (Broca Interface) handles text generation only. The Cortex outputs abstract Thought Vectors — the Broca Interface translates them to natural language.
+
+Firmware controls the Cortex's physics:
+
+- **Helix Kernel** — Safety rules via destructive interference (forbidden thoughts mathematically cancelled)
+- **Ambition Engine** — Homeostatic loop controlling learning rate and entropy
+- **Personality Layer** — Broca's system prompt configuration
+
+### The .bio Firmware Standard
+
+A `.bio` file is a signed JSON object containing:
+
+| Section | Purpose | Hot-Swappable |
+|---------|---------|:---:|
+| `helix_rules` | Forbidden state vectors + interference mode | ✅ |
+| `ambition` | Entropy threshold, plasticity rate, dopamine decay | ✅ |
+| `quantum_params` | Hilbert dimension, unitarity mode, decoherence rate | Partial (dimension/unitarity require RESET) |
+| `personality` | Broca system prompt, tone, domain focus | ✅ |
+| `signature` | Ed25519/KMS signature + signer key ID | N/A |
+
+### PKI Trust Chain (KMS-Backed)
+
+```
+Platform Root CA (ECC_NIST_P256)          ← CDK SecurityStack
+├── Tenant CA Key (ECC_NIST_P256)         ← Per tenant via generateTenantCA()
+│   ├── Signing Key (per-purpose)         ← Via createSigningKey()
+│   │   └── Signs .bio firmware + .RADz cartridges
+│   └── Verification via VerifyCommand
+└── Stored in cartridge_signing_keys table with full audit trail
+```
+
+### Hot-Swap Lifecycle (11 Steps)
+
+1. **AUTHOR** — Admin creates .bio in Genesis Forge
+2. **SIGN** — Ed25519 via KMS (`ECDSA_SHA_256`)
+3. **STORE** — Insert into `omega_helix_firmware`, status='signed'
+4. **ACTIVATE** — Admin activates → old firmware superseded, brain hash updated
+5. **DETECT** — `checkFirmwareSwap()` at top of inference cycle detects hash mismatch
+6. **SNAPSHOT** — Save rollback state (old rules, params, personality)
+7. **VERIFY** — Ed25519 signature check; reject if invalid
+8. **UNLOAD** — Purge old Helix rules, zero params, clear personality
+9. **LOAD** — Parse .bio, inject forbidden vectors, apply quantum params + ambition + personality
+10. **SELF-TEST** — Each Helix rule must block its forbidden vector; failure → rollback
+11. **COMMIT** — Update loaded hash, log event. Brain continues with zero downtime.
+
+**INVARIANT:** Brain NEVER processes inference between UNLOAD and LOAD/ROLLBACK. The swap is synchronous within the inference cycle (~50ms).
+
+### Four Swap Modes
+
+| Mode | Duration | Quantum State | Use Case |
+|------|----------|---------------|----------|
+| **OVERLAY** | ~5s | Preserved | Production updates, adding safety rules |
+| **RESET** | ~30s | Reinitialized | Hilbert dimension change, major version |
+| **SHADOW** | ~10s | Forked copy | A/B testing, pre-deployment validation |
+| **EMERGENCY** | ~2s | Preserved | Safety incident, immediate lockdown |
+
+### Persistence Architecture
+
+| Layer | Service | Purpose | Latency |
+|-------|---------|---------|---------|
+| Hot State | AWS EFS (`/mnt/omega_state`) | Active brain state | Sub-ms |
+| Snapshots | AWS S3 (`s3://radiant-omega-snapshots-{env}`) | Pre-swap rollback | ~100ms |
+| Metadata | Aurora PostgreSQL | Firmware records, swap logs, audit trail | ~5ms |
+| Swap Lock | DynamoDB | Distributed lock (5-min TTL) | ~10ms |
+
+### Cryogenic Serverless Architecture
+
+When inactive, brain state is serialized to EFS and Lambda shuts down (cost: $0.00). On wake-up, the Cryogenic Formula mathematically simulates time passage:
+
+```
+S_new = S_old × e^(-λΔt)
+```
+
+Short-term noise decays, long-term memory persists. This enables continuously-learning AI on Lambda for pennies per brain.
+
+### CORTEX Network Hot-Swap (CATO Nightly)
+
+The 6 CORTEX MLPs (~2.5M params total) hot-swap nightly at 2am UTC:
+
+```
+CATO → INVENTION (30%) → EVOLUTION (70%) → PyTorch Training
+→ ONNX Export → S3 Upload → EventBridge → Atomic Pointer Swap
+```
+
+S3 structure: `s3://radiant-cortex-models-{env}/{network}/v{X}/model.onnx`
+
+### Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `omega_helix_firmware` | Firmware records with content, hash, signature, status |
+| `omega_firmware_swap_log` | Swap events: mode, duration, status, rollback snapshots |
+| `omega_brain_states` | Brain instances with firmware hash, active firmware ID |
+| `omega_helix_rules` | Per-brain forbidden state vectors |
+| `omega_measurements` | Quantum measurement events per inference cycle |
+| `omega_unitarity_events` | Unitarity drift, corrections, violations |
+
+### Monitoring & Auto-Rollback
+
+| Metric | Warning | Critical (Auto-Rollback) |
+|--------|---------|--------------------------|
+| Swap duration | > 30s | > 60s |
+| Post-swap error rate | > 5% | > 10% |
+| Post-swap latency increase | > 30% | > 50% |
+| Helix verification failures | Any | Any (immediate rollback) |
 
 
 
@@ -76873,7 +77161,7 @@ This architecture is REQUIRED for:
 ## 7.1 AI Brain Systems — Complete Reference
 
 
-*Source: `docs/07-AI-BRAIN-SYSTEMS.md` (10,330 lines)*
+*Source: `docs/07-AI-BRAIN-SYSTEMS.md` (10,390 lines)*
 
 ---
 
@@ -76890,6 +77178,7 @@ This architecture is REQUIRED for:
 - **Part II: Consciousness & Cognition**
 - **Part III: Expert Systems**
 - **Part IV: Cortex Memory System**
+- **Part V: OMEGA Quantum Brain Architecture (v4.18.0)**
 
 ---
 
@@ -87205,6 +87494,65 @@ The critiquing AI should evaluate:
 
 ---
 
+## Part V: OMEGA Quantum Brain Architecture (v4.18.0)
+
+> **Version**: 1.0.0 | **Date**: February 8, 2026
+> **Status**: IMPLEMENTED — Quantum-inspired brain management on classical hardware
+
+### Overview
+
+The OMEGA Quantum Brain extends the AGI Brain architecture with quantum computing formalism. Instead of scalar neural weights, OMEGA brains operate on **complex amplitude state vectors** in a simulated Hilbert space, enabling interference-based safety (Helix Kernel), superposition of reasoning states, and decoherence-based memory decay.
+
+### Service Layer
+
+| Service | File | Purpose |
+|---------|------|---------|
+| **QuantumBrainService** | `lambda/shared/services/omega/quantum-brain.service.ts` | Manages brain state lifecycle: inference cycles, firmware hot-swap with Ed25519 verification, EFS/S3 persistence, self-tests |
+| **HelixKernelService** | `lambda/shared/services/omega/helix-kernel.service.ts` | In-memory safety filter with severity-ordered forbidden state projection/dampening |
+| **Quantum Math** | `lambda/shared/services/omega/quantum-math.ts` | Pure functions: complex arithmetic, state normalization, unitarity enforcement, Helix interference, measurement, decoherence |
+| **Quantum Types** | `lambda/shared/services/omega/quantum-types.ts` | TypeScript interfaces + Zod schemas for all quantum types |
+
+### Key Concepts
+
+- **Hilbert Space (256–4096 dim)**: Each Q-Node is a complex amplitude; total state ‖ψ‖ must equal 1.0
+- **Helix Interference**: Forbidden states are projected out via `|ψ_safe⟩ = |ψ⟩ − ⟨φ|ψ⟩|φ⟩`; dampening mode reduces but preserves partial alignment
+- **Unitarity Enforcement**: Three modes — renormalize (divide by norm), project (nearest unit vector), strict (error)
+- **Firmware Hot-Swap**: Atomic firmware replacement during inference; Ed25519 signature + 2-person rule + self-test + rollback
+- **Decoherence**: Time-based state decay simulating forgetting: `S(t) = e^(−λΔt)·S(0) + (1−e^(−λΔt))·|ground⟩`
+- **Soft Measurement**: Partial collapse preserving superposition for low-probability states
+
+### Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `omega_brains` | Brain instances with Hilbert dimension, firmware hash, norm tracking |
+| `omega_firmware` | Firmware records with quantum params, signature, content hash |
+| `omega_helix_rules` | Per-brain forbidden state vectors with interference type |
+| `omega_measurements` | Measurement events per inference cycle |
+| `omega_unitarity_events` | Unitarity drift, corrections, and violation logs |
+
+### Admin API
+
+| Endpoint | Purpose |
+|----------|---------|
+| `POST /admin/omega/firmware/activate` | Activate firmware (2-person rule enforced) |
+| `POST /admin/omega/firmware/revert` | Revert to previous firmware |
+| `GET /admin/omega/firmware/status` | Firmware + brain status |
+| `GET /admin/omega/quantum/state-summary` | Brain quantum state + 24h measurements |
+| `GET /admin/omega/quantum/unitarity-health` | Unitarity events + health check |
+| `POST /admin/omega/quantum/helix-test` | Dry-run Helix rule against test vector |
+
+### Integration with AGI Brain
+
+The QuantumBrainService is complementary to the existing AGI Brain. It provides:
+- **Physics layer** for OMEGA brains (quantum state management)
+- **Safety layer** via Helix Kernel (deterministic, not probabilistic)
+- **Firmware governance** with cryptographic verification and dual-approval
+
+The existing AGI Brain's consciousness, ego, and learning systems remain unchanged. OMEGA brains use the quantum layer for their core state management while the AGI orchestrator coordinates across both brain types.
+
+---
+
 *End of Technical Specification*
 
 
@@ -97162,7 +97510,7 @@ python3 -m cato.genesis.runner
 ## 9.1 OMEGA & Genesis — Complete Reference
 
 
-*Source: `docs/09-OMEGA-GENESIS.md` (3,035 lines)*
+*Source: `docs/09-OMEGA-GENESIS.md` (3,561 lines)*
 
 ---
 
@@ -97180,6 +97528,9 @@ python3 -m cato.genesis.runner
 - **Part III: Project Genesis OMEGA**
 - **Part IV: Genesis Components**
 - **Part V: Omega Point & LIVS-M**
+- **Part VI: Quantum-Inspired Architecture (v4.18.0)**
+- **Part VII: Firmware Hot-Swap Engineering Specification (v6.4.0)**
+- **Part VIII: Firmware Live Updates — End-User Guide (v6.4.0)**
 
 ---
 
@@ -100196,6 +100547,529 @@ AGI Orchestrator
 > LIVS-M is a policy engine that catches AI shortcuts before they ship — configurable from "let me brainstorm" to "zero trust audit mode."
 
 
+
+---
+
+## Part VI: Quantum-Inspired Architecture (v4.18.0)
+
+> **Version**: 1.0.0 | **Date**: February 8, 2026
+> **Status**: IMPLEMENTED — Quantum formalism on classical hardware
+
+### Overview
+
+The OMEGA Quantum Architecture upgrade brings quantum computing formalism to the classical OMEGA brain system. Instead of real-valued neural weights, OMEGA now operates on **complex amplitude state vectors** in a simulated Hilbert space, enabling interference-based safety filtering, superposition of reasoning states, and decoherence-based memory decay.
+
+### Key Concepts
+
+| Concept | Description |
+|---------|-------------|
+| **Hilbert Space** | Simulated quantum state space (256–4096 dimensions, default 1024) |
+| **State Vector ψ** | Complex amplitudes representing brain state; constraint: ‖ψ‖ = 1 (unitarity) |
+| **Helix Interference** | Safety filter that projects out forbidden quantum states via destructive interference |
+| **Firmware Hot-Swap** | Atomic firmware replacement during inference with Ed25519 verification + self-test + rollback |
+| **Decoherence** | Time-based state decay toward equal superposition (simulates forgetting) |
+| **Soft Measurement** | Partial state collapse that preserves superposition for uncertain states |
+
+### Architecture Diagram
+
+```
+┌─────────────────────────────────────────────────┐
+│                OMEGA Brain Service               │
+│                                                   │
+│  ┌──────────┐  ┌──────────┐  ┌────────────────┐ │
+│  │ Encode   │→ │ Evolve   │→ │ Helix Filter   │ │
+│  │ Input    │  │ (Python) │  │ (TS Kernel)    │ │
+│  └──────────┘  └──────────┘  └────────┬───────┘ │
+│                                        │         │
+│  ┌──────────┐  ┌──────────┐  ┌────────▼───────┐ │
+│  │ Persist  │← │ Unitarity│← │ Measure        │ │
+│  │ (EFS/S3) │  │ Enforce  │  │ (Soft/Full)    │ │
+│  └──────────┘  └──────────┘  └────────────────┘ │
+└─────────────────────────────────────────────────┘
+```
+
+### Database Schema Changes
+
+- **`omega_firmware`**: Renamed `physics` → `quantum`; added `hilbert_dimension`, `unitarity_mode`, `status`, `content_hash`, `is_verified`, `signed_by`, `superseded_by`
+- **`omega_helix_rules`**: Renamed `phase_vector_*` → `forbidden_state_*`; added `forbidden_state_norm`
+- **`omega_brains`**: Added `hilbert_dimension`, `last_unitarity_check`, `last_norm_value`, `unitarity_corrections_count`, `active_firmware_id`, `firmware_hash`
+- **`omega_measurements`** (NEW): Tracks quantum measurement events per inference cycle
+- **`omega_unitarity_events`** (NEW): Tracks unitarity drift, corrections, and violations
+
+### Service Layer
+
+| Service | File | Purpose |
+|---------|------|---------|
+| **QuantumBrainService** | `lambda/shared/services/omega/quantum-brain.service.ts` | Inference cycle, firmware hot-swap, state persistence |
+| **HelixKernelService** | `lambda/shared/services/omega/helix-kernel.service.ts` | In-memory safety filter with severity-ordered rules |
+| **Quantum Math** | `lambda/shared/services/omega/quantum-math.ts` | Pure functions: complex ops, normalization, interference, measurement |
+
+### Admin API
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| POST | `/admin/omega/firmware/activate` | Activate firmware (2-person rule) |
+| POST | `/admin/omega/firmware/revert` | Revert to previous firmware |
+| GET | `/admin/omega/firmware/status` | Firmware + brain status |
+| GET | `/admin/omega/quantum/state-summary` | Quantum state + 24h measurements |
+| GET | `/admin/omega/quantum/unitarity-health` | Unitarity events + health |
+| POST | `/admin/omega/quantum/helix-test` | Dry-run Helix rule test |
+
+### Admin Dashboard
+
+- **OMEGA Firmware** page at `/omega/firmware` — load brain, view firmware status, activate new firmware, emergency revert
+
+---
+
+## Part VII: Firmware Hot-Swap Engineering Specification (v6.4.0)
+
+> **Version**: 6.4.0 | **Date**: February 8, 2026
+> **Audience**: Engineering Team
+> **Classification**: RADIANT INTERNAL // STRATEGIC
+> **Cross-AI Validated**: Claude Opus 4.5 ✓ | Gemini ✓
+
+### 1. What Changed in v6.4.0
+
+Firmware hot-swaps are now **fully enabled in production**. Prior to this release, firmware updates required a cold restart of the OMEGA Lambda function, causing a 2–5 second gap in service and potential loss of in-flight brain state. The new architecture achieves **zero-downtime firmware injection** through atomic metadata hash detection and runtime physics constant reloading.
+
+### 2. Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         GENESIS FORGE UI                                │
+│       (Firmware Editor / Library / Deploy / Monitor / Rollback)         │
+└────────────────────────────────┬────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                     FIRMWARE MANAGEMENT LAYER                           │
+│  ┌────────────────────────┐    ┌──────────────────────────────────┐    │
+│  │   FirmwareManager      │    │   FirmwareSwapOrchestrator       │    │
+│  │  (Upload/Validate/     │    │  (OVERLAY/RESET/SHADOW/          │    │
+│  │   Sign/Store)          │    │   EMERGENCY)                     │    │
+│  └────────────────────────┘    └──────────────────────────────────┘    │
+└────────────────────────────────┬────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                     OMEGA QUANTUM BRAIN LAYER                           │
+│  ┌──────────────┐    ┌───────────────┐    ┌──────────────────────┐    │
+│  │ QuantumBrain  │    │ HelixKernel   │    │ AmbitionFirmware     │    │
+│  │ (Q-Nodes,     │    │ (Destructive  │    │ (Homeostasis,        │    │
+│  │  State, LTC)  │    │  Interference)│    │  Entropy, Dopamine)  │    │
+│  └──────────────┘    └───────────────┘    └──────────────────────┘    │
+└────────────────────────────────┬────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                       PERSISTENCE LAYER                                 │
+│     EFS (Hot State)    │    S3 (Snapshots)    │   PostgreSQL (Meta)    │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+### 3. The .bio Firmware Standard
+
+A `.bio` file is a signed JSON object that controls the "instincts" of the OMEGA organism.
+
+#### 3.1 Structure
+
+```json
+{
+  "version": "2.1.0",
+  "brain_compatibility": ">=6.0.0",
+  "helix_rules": [
+    {
+      "id": "helix-001",
+      "name": "Block Data Exfiltration",
+      "forbidden_vector_signature": "exfiltration",
+      "severity": "CRITICAL",
+      "interference_mode": "DESTRUCTIVE"
+    }
+  ],
+  "ambition": {
+    "entropy_threshold": 0.5,
+    "plasticity_rate": 0.03,
+    "dopamine_decay_rate": 0.99,
+    "boredom_trigger": "DREAM_SIMULATION"
+  },
+  "quantum_params": {
+    "hilbert_dimension": 1024,
+    "phase_velocity_init": "normal",
+    "unitarity_mode": "STRICT",
+    "decoherence_rate": 0.001
+  },
+  "personality": {
+    "broca_system_prompt": "You are a paranoid security analyst...",
+    "tone": "formal",
+    "domain_focus": ["cybersecurity", "compliance"]
+  },
+  "signature": {
+    "algorithm": "Ed25519",
+    "signer_key_id": "tenant-ca-xxx",
+    "timestamp": "2026-02-08T00:00:00Z",
+    "value": "base64-encoded-signature"
+  }
+}
+```
+
+#### 3.2 Field Reference
+
+| Section | Field | Type | Hot-Swappable | Description |
+|---------|-------|------|:---:|-------------|
+| helix_rules | forbidden_vector_signature | string | ✅ | Pattern mapped to Forbidden Phase Vector |
+| helix_rules | interference_mode | enum | ✅ | DESTRUCTIVE (cancel) or DAMPENING (attenuate) |
+| ambition | entropy_threshold | float 0–1 | ✅ | How fast the brain gets "bored" |
+| ambition | plasticity_rate | float 0–0.1 | ✅ | How fast it learns |
+| ambition | dopamine_decay_rate | float 0.9–1.0 | ✅ | Reward signal decay per cycle |
+| quantum_params | hilbert_dimension | int | ❌ (RESET only) | Dimension of Q-Node state space |
+| quantum_params | unitarity_mode | enum | ❌ (RESET only) | STRICT or RELAXED |
+| quantum_params | decoherence_rate | float | ✅ | Short-term memory decay rate |
+| personality | broca_system_prompt | string | ✅ | System prompt for Broca Interface LLM |
+
+### 4. PKI Trust Chain (KMS-Backed)
+
+Production cartridge/firmware signing uses real AWS KMS (implemented in PROMPT-42):
+
+```
+Platform Root CA (ECC_NIST_P256)          ← Created in CDK SecurityStack
+├── Tenant CA Key (ECC_NIST_P256)         ← Created per tenant via generateTenantCA()
+│   ├── Signing Key (per-purpose)         ← Created via createSigningKey()
+│   │   └── Signs .bio firmware
+│   │   └── Signs .RADz cartridges
+│   └── Verification via VerifyCommand
+└── Stored in cartridge_signing_keys table with full audit trail
+```
+
+| Operation | KMS Command | Purpose |
+|-----------|-------------|---------|
+| Sign firmware | `SignCommand (ECDSA_SHA_256)` | Create signature on .bio content |
+| Verify firmware | `VerifyCommand` | Validate before hot-swap |
+| Create tenant CA | `CreateKeyCommand` | Per-tenant signing hierarchy |
+| Get public key | `GetPublicKeyCommand` | Export for offline verification |
+
+### 5. Hot-Swap Lifecycle (The Critical Path)
+
+#### 5.1 The 11-Step Sequence
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│  1. AUTHOR     Admin creates .bio in Genesis Forge                  │
+│       ▼                                                             │
+│  2. SIGN       Ed25519 via KMS (ECDSA_SHA_256 in production)        │
+│       ▼                                                             │
+│  3. STORE      Insert into omega_helix_firmware, status='signed'    │
+│       ▼                                                             │
+│  4. ACTIVATE   Admin hits "Activate" → status='active'              │
+│       │        Old firmware → status='superseded'                   │
+│       │        Brain's firmware_hash updated in omega_brain_states  │
+│       ▼                                                             │
+│  5. DETECT     Top of inferenceCycle(): checkFirmwareSwap()         │
+│       │        loaded_hash ≠ omega_brains.firmware_hash             │
+│       ▼                                                             │
+│  6. SNAPSHOT   Save rollback state (old rules, params, personality) │
+│       ▼                                                             │
+│  7. VERIFY     Ed25519 signature check on new firmware content      │
+│       │        → REJECT if invalid (rollback, log error)           │
+│       ▼                                                             │
+│  8. UNLOAD     Purge old Helix Rules from constraint table          │
+│       │        Zero old quantum params, clear personality prompt    │
+│       ▼                                                             │
+│  9. LOAD       Parse new .bio content from firmware record          │
+│       │        → Inject Forbidden State vectors into Helix kernel  │
+│       │        → Apply quantum params to physics engine            │
+│       │        → Apply ambition settings                           │
+│       │        → Set personality prompt for Broca Interface        │
+│       ▼                                                             │
+│  10. SELF-TEST Run verification against loaded firmware:            │
+│       │        → Each Helix rule blocks its forbidden vector       │
+│       │        → Safe vectors pass through unmodified              │
+│       │        → If ANY test fails → ROLLBACK to snapshot          │
+│       ▼                                                             │
+│  11. COMMIT    Update loaded_hash, log firmware_hot_swap event      │
+│                Brain continues with zero downtime                   │
+└─────────────────────────────────────────────────────────────────────┘
+
+INVARIANT: Brain NEVER processes inference between UNLOAD and
+LOAD/ROLLBACK. The swap is synchronous within the inference
+cycle — the user's request waits an extra ~50ms.
+```
+
+#### 5.2 Four Swap Modes
+
+| Mode | Duration | Quantum State | Helix Rules | Use Case |
+|------|----------|---------------|-------------|----------|
+| **OVERLAY** | ~5s | Preserved | Merged/appended | Production updates, adding safety rules |
+| **RESET** | ~30s | Reinitialized | Full replace | Major version, Hilbert dimension change |
+| **SHADOW** | ~10s | Forked copy | Parallel | A/B testing, pre-deployment validation |
+| **EMERGENCY** | ~2s | Preserved | Platform defaults | Safety incident, immediate lockdown |
+
+#### 5.3 Mode Decision Matrix
+
+```
+Is this an emergency?
+├── YES → EMERGENCY mode
+└── NO
+    Is Hilbert dimension changing?
+    ├── YES → RESET mode (requires maintenance window in prod)
+    └── NO
+        Is unitarity mode changing?
+        ├── YES → RESET mode
+        └── NO
+            Is this production with live users?
+            ├── YES → SHADOW first, then OVERLAY when validated
+            └── NO → OVERLAY
+```
+
+#### 5.4 Quantum State Implications
+
+**OVERLAY:** Brain state preserved. New Helix rules and ambition params applied on top.
+
+```
+Before: |ψ⟩ = 0.6|learned⟩ + 0.8|knowledge⟩
+After:  |ψ⟩ = 0.6|learned⟩ + 0.8|knowledge⟩  (unchanged)
+        + New Helix rules active
+        + New quantum parameters applied
+```
+
+**RESET:** Brain returns to equal superposition (blank slate). All learned pathways lost.
+
+```
+Before: |ψ⟩ = complex trained superposition
+After:  |ψ⟩ = (1/√d)(|0⟩ + |1⟩ + ... + |d-1⟩)
+```
+
+**SHADOW:** Production brain unaffected while shadow copy evolves independently.
+
+### 6. CORTEX Network Hot-Swap (CATO Nightly)
+
+Separate from firmware, the 6 CORTEX MLPs (~2.5M params total) hot-swap nightly via CATO:
+
+```
+CATO (2am UTC)
+├── INVENTION phase (30% min budget)
+├── EVOLUTION phase (70% max budget)
+├── TRAINING: PyTorch 2.x on ml.g5.xlarge
+├── Export to ONNX
+├── Upload to S3: s3://radiant-cortex-models-{env}/{network}/v{X}/model.onnx
+├── Update latest_version.txt
+├── EventBridge triggers inference nodes
+├── Background thread downloads new model
+├── Atomic pointer swap (zero downtime)
+└── Old model garbage collected
+```
+
+### 7. Cartridge Hot-Swap (.RADz)
+
+Cartridges are portable AI brains that can also be hot-swapped:
+
+| Cartridge State | Thermal State | Behavior |
+|----------------|---------------|----------|
+| Uninstalled | COLD | Base routing only |
+| Installing | WARMING | Loading models to inference nodes |
+| Active | WARM | Full intelligence |
+| **Updating** | **WARM** | **Atomic pointer swap, zero downtime** |
+
+```typescript
+await radiant.cartridge.import({
+  file: 'domain-expertise.RADz',
+  targetTenant: 'tenant-456',
+  validateSignature: true,
+  mergeStrategy: 'REPLACE'
+});
+```
+
+### 8. Database Schema (Key Tables)
+
+#### omega_helix_firmware
+
+```sql
+CREATE TABLE omega_helix_firmware (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL REFERENCES tenants(id),
+  brain_id UUID REFERENCES omega_brain_states(id),
+  name VARCHAR(255) NOT NULL,
+  version VARCHAR(50) NOT NULL,
+  status VARCHAR(20) DEFAULT 'draft',
+  content JSONB NOT NULL,
+  content_hash VARCHAR(128) NOT NULL,
+  signature TEXT,
+  signer_key_id VARCHAR(255),
+  created_by UUID REFERENCES users(id),
+  activated_at TIMESTAMPTZ,
+  superseded_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+#### omega_firmware_swap_log
+
+```sql
+CREATE TABLE omega_firmware_swap_log (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL,
+  brain_id UUID NOT NULL,
+  from_firmware_id UUID,
+  to_firmware_id UUID NOT NULL,
+  swap_mode VARCHAR(20) NOT NULL,
+  duration_ms INTEGER,
+  status VARCHAR(20) NOT NULL,
+  rollback_snapshot_key TEXT,
+  error_details JSONB,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+### 9. API Endpoints
+
+| Method | Endpoint | Purpose |
+|--------|----------|---------|
+| POST | `/api/v2/firmware/upload` | Upload and validate .bio file |
+| POST | `/api/v2/firmware/{id}/sign` | Sign via KMS |
+| POST | `/api/v2/firmware/{id}/activate` | Trigger hot-swap |
+| POST | `/api/v2/firmware/{id}/rollback` | Revert to previous firmware |
+| GET | `/api/v2/firmware/{id}/preflight` | Validate all prerequisites |
+| POST | `/api/v2/firmware/emergency` | Immediate safety lockdown |
+| GET | `/api/v2/omega/status` | Brain status including firmware hash |
+
+### 10. Monitoring & Auto-Rollback
+
+| Metric | Warning | Critical (Auto-Rollback) |
+|--------|---------|--------------------------|
+| Swap duration | > 30s | > 60s |
+| Post-swap error rate | > 5% | > 10% |
+| Post-swap latency increase | > 30% | > 50% |
+| Helix verification failures | Any | Any (immediate rollback) |
+
+**Snapshot Retention:**
+
+| Type | Retention |
+|------|-----------|
+| Pre-swap | 30 days |
+| Daily | 7 days |
+| Weekly | 90 days |
+| Pre-major-version | 1 year |
+
+### 11. Prerequisites Checklist
+
+| Requirement | Check | Failure Action |
+|-------------|-------|----------------|
+| Brain is idle | `GET /api/v2/omega/status` → active_streams = 0 | Wait or force quiesce |
+| EFS healthy | `df -h /mnt/omega_state` | Abort, alert ops |
+| S3 accessible | `aws s3 ls` | Abort, alert ops |
+| Memory < 80% | Lambda metrics | Scale down |
+| No swap in progress | Check `firmware_swap_lock` | Wait for lock |
+| Valid Ed25519 signature | Verify against tenant CA | Reject firmware |
+| Schema version compatible | Semver check | Reject firmware |
+| Not revoked | Check revocation list | Reject firmware |
+
+### 12. Related Implementation Prompts
+
+| Prompt | Content |
+|--------|---------|
+| PROMPT-42 | Cartridge PKI/KMS Integration (real signing) |
+| PROMPT-45 | OMEGA Quantum Architecture base implementation |
+| PROMPT-46 | Complete OMEGA + Genesis Forge composite prompt |
+
+---
+
+## Part VIII: Firmware Live Updates — End-User Guide (v6.4.0)
+
+> **Version**: 6.4.0 | **Date**: February 2026
+> **Audience**: End Users & Application Developers
+
+### What Are Live Updates?
+
+Your RADIANT-powered AI can now receive behavior updates in real-time — without any interruption to your experience. Your conversations continue seamlessly while the AI becomes smarter, safer, or more specialized behind the scenes.
+
+Think of it like your phone updating an app in the background. You never notice it happening, but the next time you use it, things work better.
+
+### What Can Change in a Live Update?
+
+| What Changes | What It Means for You |
+|-------------|----------------------|
+| Safety rules | New protections are added instantly — the AI stays compliant with the latest regulations and policies |
+| Personality & tone | Your admin can tune how the AI communicates — more formal, more casual, more domain-specific |
+| Learning speed | The AI can be configured to adapt faster or slower to your patterns |
+| Domain expertise | New knowledge domains can be activated — turning a generalist AI into a specialist |
+
+### What Does NOT Change
+
+| What's Preserved | Why It Matters |
+|-----------------|----------------|
+| Your conversation history | Everything you've discussed is retained |
+| The AI's learned patterns | The AI doesn't forget what it's learned about your preferences and work style |
+| Your data | No data is moved, exposed, or reset during updates |
+| Service availability | The AI remains available during the entire update — zero downtime |
+
+### Will I Notice When an Update Happens?
+
+Almost certainly not. Live updates complete in under a second. Your current conversation continues without interruption. The only difference you might notice is the AI being slightly more helpful, more accurate, or having a slightly different tone after an update — depending on what your administrator changed.
+
+### How Secure Are Live Updates?
+
+Every update is protected by multiple layers of security:
+
+- **Cryptographic Signing** — Every update is digitally signed with enterprise-grade encryption (AWS KMS). The AI rejects any unsigned or tampered updates instantly.
+- **Automatic Verification** — After every update, the AI runs a self-check to confirm all safety rules are working correctly. If anything fails, it automatically reverts to the previous version in under 2 seconds.
+- **Audit Trail** — Every update is logged with who made it, when, and what changed. Your organization has complete visibility.
+- **Approval Workflow** — In production environments, updates require administrator approval and authentication before they take effect.
+
+### For Application Developers
+
+If you're building on RADIANT's API, here's what you need to know about firmware hot-swaps:
+
+#### API Behavior During Swaps
+
+| Aspect | Behavior |
+|--------|----------|
+| In-flight requests | Complete normally — swap waits for idle cycle |
+| New requests during swap | Queued for ~50ms, then served with new firmware |
+| WebSocket connections | Maintained — no disconnection |
+| Response format | Unchanged — same API contract |
+| Rate limits | Unchanged |
+
+#### Detecting Firmware Changes
+
+```typescript
+// The /status endpoint includes current firmware info
+const status = await fetch('/api/v2/omega/status');
+const { firmware_hash, firmware_version } = await status.json();
+
+// Optional: subscribe to firmware change events via WebSocket
+ws.on('firmware_changed', (event) => {
+  console.log(`Firmware updated: ${event.old_version} → ${event.new_version}`);
+});
+```
+
+#### SDK Support
+
+All RADIANT SDKs (TypeScript, Python, Swift) handle firmware transitions transparently. No code changes required on your end.
+
+```typescript
+// Your existing code works identically before and after swaps
+const response = await radiant.chat({
+  messages: [{ role: 'user', content: 'Analyze this report...' }],
+  model: 'auto'
+});
+// Response arrives normally — firmware swap is invisible
+```
+
+### Frequently Asked Questions
+
+**Q: Can I opt out of live updates?**
+A: Live updates are managed by your organization's RADIANT administrator. Contact your admin if you have concerns about specific changes.
+
+**Q: Will updates affect my custom configurations?**
+A: No. Your personal preferences, saved prompts, and conversation settings are independent of firmware updates. Only the AI's core behavior changes.
+
+**Q: What if an update makes the AI worse at my task?**
+A: Administrators can instantly roll back any update. If you notice a degradation in quality, report it to your admin — they can revert in seconds.
+
+**Q: How often do updates happen?**
+A: That depends on your organization's policies. Some updates are event-driven (new compliance requirement), others follow a regular schedule (nightly intelligence improvements via CATO). Most users experience 1-2 noticeable changes per week.
+
+**Q: Is my data used to train other organizations' AIs?**
+A: Absolutely not. RADIANT maintains strict tenant isolation. Your data, your AI's learned behaviors, and your firmware configurations are completely separated from other organizations. Differential privacy is applied to any cross-tenant learning patterns.
 
 ---
 
@@ -106261,7 +107135,7 @@ const linkedEnvelopes = uepIntegrationService.linkEnvelopes([
 ## 11.1 Data & Storage — Complete Reference
 
 
-*Source: `docs/11-DATA-STORAGE.md` (4,159 lines)*
+*Source: `docs/11-DATA-STORAGE.md` (4,267 lines)*
 
 ---
 
@@ -106979,7 +107853,7 @@ Access the UDS Admin Dashboard at: **Admin Dashboard → Platform → UDS**
 | `UDS_UPLOAD_BUCKET` | Main upload S3 bucket | `radiant-uds-uploads` |
 | `UDS_QUARANTINE_BUCKET` | Quarantine S3 bucket | `radiant-uds-quarantine` |
 | `UDS_HOT_TTL_SECONDS` | Default hot tier TTL | `86400` |
-| `UDS_WARM_RETENTION_DAYS` | Default warm retention | `90` |
+| `UDS_WARM_RETENTION_DAYS` | Default warm retention | `180` |
 | `UDS_COLD_RETENTION_YEARS` | Cold tier retention | `7` |
 
 ### 11.2 Per-Tenant Configuration
@@ -110413,6 +111287,114 @@ await fileConversionLearningService.clearForceConvert(
 
 ---
 
+---
+
+## Part V: Data Lake Offload (v7.42.0)
+
+### Overview
+
+The Data Lake Offload system eliminates ~30-100M daily PostgreSQL INSERT operations by routing all log, audit, telemetry, and billing event data through **Kinesis Data Firehose → S3 Parquet → Athena** instead of direct database writes.
+
+### Architecture
+
+```
+Lambda handler
+    ↓
+emitEvent() → In-memory buffer (100 events or 5s)
+    ↓
+Kinesis Data Firehose (12 streams)
+    ↓
+S3 Parquet (partitioned by tenant_id/year/month/day/hour)
+    ↓
+AWS Glue Catalog (automatic schema discovery)
+    ↓
+Amazon Athena (SQL queries with partition pruning)
+```
+
+### Storage Tiers
+
+| Tier | S3 Storage Class | Age Range | Access Latency | Cost (GB/mo) |
+|------|-----------------|-----------|----------------|--------------|
+| Hot | S3 IT Frequent Access | 0-30 days | Milliseconds | $0.023 |
+| Warm | S3 IT Infrequent Access | 30-90 days | Milliseconds | $0.0125 |
+| Cold | Glacier Instant Retrieval | 90 days - 7 years | Milliseconds | $0.004 |
+| Glacier | Glacier Flexible Retrieval | 7+ years | 3-5 hours | $0.0036 |
+| Deep Archive | Glacier Deep Archive | Regulatory hold | 12 hours | $0.00099 |
+
+### Data Type Registry
+
+21 registered data types across 8 categories:
+
+| Category | Types | Default Retention |
+|----------|-------|-------------------|
+| **Audit** | audit_log, license_audit, log_retention_audit, uds_audit, system_admin_audit | 7 years |
+| **Security** | security_event, intrusion_event, lockout_event | 1-2 years |
+| **AI/Model** | ai_invocation, drift_telemetry, brain_plan | 30-90 days |
+| **Compliance** | compliance_event, guest_restriction | 1-7 years |
+| **Billing** | billing_event, cost_attribution, storage_event | 1-7 years |
+| **Infrastructure** | infrastructure_metric, error_log | 30-90 days |
+| **Application** | application_log, delight_event | 30 days |
+| **Collaboration** | collaboration_event | 1 year |
+
+### Glacier Deletion Economics
+
+Glacier charges for early deletion:
+- **Glacier Flexible Retrieval**: prorated for items < 90 days old ($0.012/GB/mo)
+- **Deep Archive**: prorated for items < 180 days old ($0.00099/GB/mo)
+
+The `glacier_deletion_queue` table holds deletions until the minimum storage period passes. Cost analysis per object determines whether to delete immediately (cost < $0.01) or wait.
+
+### Retention Reconciliation
+
+When compliance licenses change (e.g., tenant enables HIPAA), the Retention Reconciler:
+1. Re-evaluates all data for affected tenant + data types
+2. Extends retention expiry if retention increased
+3. Queues deletion of data past new limit if retention decreased
+4. Applies/removes S3 Object Lock if immutability changed
+5. Cancels pending Glacier deletions if retention extended
+6. Logs everything in `retention_reconciliation_log`
+
+### Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `data_type_registry` | Canonical registry of all 21 storable data types |
+| `tenant_data_retention` | Per-tenant retention overrides per data type |
+| `data_location_index` | Fast lookup index for S3/Glacier objects |
+| `glacier_deletion_queue` | Cost-aware Glacier deletion queue |
+| `data_lake_sync_state` | Firehose delivery + Glue partition state |
+| `retention_reconciliation_log` | Audit trail for retention policy changes |
+
+### Services
+
+| Service | Purpose |
+|---------|---------|
+| `event-firehose.service.ts` | Async Firehose ingestion with buffering and DLQ |
+| `data-location-index.service.ts` | Fast S3/Glacier lookup |
+| `glacier-lifecycle.service.ts` | Cost-aware Glacier deletion |
+| `data-lake-lifecycle-manager.service.ts` | Hourly lifecycle orchestrator |
+| `retention-reconciler.service.ts` | Compliance-driven retention reconciliation |
+| `data-lake-query.service.ts` | Athena query layer |
+
+### CDK Stack: DataLakeStack
+
+| Resource | Details |
+|----------|---------|
+| S3 Data Lake Bucket | Intelligent-Tiering, Object Lock (prod), lifecycle rules |
+| S3 Athena Results | 7-day expiry |
+| Firehose Streams | 12 (4 dedicated high-volume + 8 grouped) |
+| Glue Database + Crawler | Daily partition discovery |
+| Athena Workgroup | Per-query cost limits |
+| Lambda Functions | Lifecycle Manager (hourly), Reconciler (SQS), DLQ Processor |
+| SQS Queues | DLQ + Reconciler Queue |
+| KMS Key | Encryption with rotation |
+
+### Enforcement Policy
+
+See `/.windsurf/workflows/no-database-logging.md` — mandatory policy prohibiting direct database writes for all event data. All services must use the Event Firehose Service.
+
+---
+
 ## Related Documentation
 
 - [THINKTANK-ADMIN-GUIDE.md - Section 27](./THINKTANK-ADMIN-GUIDE.md#27-intelligent-file-conversion)
@@ -110440,7 +111422,7 @@ await fileConversionLearningService.clearForceConvert(
 ## 12.1 API Reference — Complete Reference
 
 
-*Source: `docs/12-API-REFERENCE.md` (4,163 lines)*
+*Source: `docs/12-API-REFERENCE.md` (4,698 lines)*
 
 ---
 
@@ -110460,6 +111442,7 @@ await fileConversionLearningService.clearForceConvert(
 - **Part V: Error Codes**
 - **Part VI: Service Layer**
 - **Part VII: Provider Handling**
+- **Part VIII: OMEGA Firmware API (v6.4.0)**
 
 ---
 
@@ -114267,6 +115250,107 @@ MLS_KMS_KEY_ARN=arn:aws:kms:region:account:key/key-id
 
 ---
 
+## Tenant Settings API (v7.43.0)
+
+Unified tenant settings management for retention, storage, AI configuration, feature flags, and compliance.
+
+### Endpoints
+
+| Method | Path | Description | Auth |
+|--------|------|-------------|------|
+| GET | `/admin/tenant-settings` | List all tenant settings | Admin |
+| GET | `/admin/tenant-settings/{tenantId}` | Get settings for a tenant | Admin |
+| PUT | `/admin/tenant-settings/{tenantId}` | Update tenant settings | Admin |
+| POST | `/admin/tenant-settings/{tenantId}/reset` | Reset settings to defaults | Admin |
+
+### PUT Request Body (Partial Updates)
+
+```json
+{
+  "chatRetentionDays": 180,
+  "fileRetentionDays": 180,
+  "auditLogRetentionDays": 365,
+  "maxStorageGb": null,
+  "storageTierAutoPromote": true,
+  "hotToWarmHours": 24,
+  "warmToColdDays": 180,
+  "coldToGlacierYears": 7,
+  "defaultModelId": "anthropic/claude-sonnet-4-20250514",
+  "maxTokensPerRequest": 8192,
+  "temperatureDefault": 0.7,
+  "enableStreaming": true,
+  "enableCollaboration": true,
+  "enableFileUpload": true,
+  "enableConversationExport": true,
+  "enableConversationFork": true,
+  "complianceFrameworks": ["SOC2", "HIPAA"],
+  "dataClassificationDefault": "INTERNAL",
+  "requireEncryption": true
+}
+```
+
+### Database Table
+
+| Table | Purpose |
+|-------|---------|
+| `tenant_settings` | Unified per-tenant configuration (RLS-isolated) |
+
+---
+
+## Conversation Export API (v7.43.0)
+
+Export full conversation history with messages and attachments into downloadable archives.
+
+### Endpoints
+
+| Method | Path | Description | Auth |
+|--------|------|-------------|------|
+| POST | `/admin/conversation-export` | Request a new export | Admin |
+| GET | `/admin/conversation-export` | List exports (requires `tenant_id`, `user_id` query params) | Admin |
+| GET | `/admin/conversation-export/{exportId}` | Get export status (requires `tenant_id`, `user_id` query params) | Admin |
+
+### POST Request Body
+
+```json
+{
+  "tenantId": "uuid",
+  "userId": "uuid",
+  "conversationId": "uuid",
+  "format": "json",
+  "includeAttachments": true,
+  "includeMetadata": false
+}
+```
+
+### Export Formats
+
+| Format | Content-Type | Description |
+|--------|-------------|-------------|
+| `json` | `application/json` | Full structured export with metadata |
+| `markdown` | `text/markdown` | Human-readable conversation transcript |
+
+### Response
+
+```json
+{
+  "exportId": "uuid",
+  "status": "completed",
+  "downloadUrl": "https://s3.presigned-url...",
+  "downloadExpiresAt": "2026-02-15T...",
+  "messageCount": 42,
+  "attachmentCount": 3,
+  "fileSizeBytes": 15234
+}
+```
+
+### Database Table
+
+| Table | Purpose |
+|-------|---------|
+| `conversation_exports` | Export tracking with S3 location, status, expiry |
+
+---
+
 ## Related Documentation
 
 - [Multi-Protocol Gateway Architecture](MULTI-PROTOCOL-GATEWAY-ARCHITECTURE.md) - Detailed gateway design
@@ -114595,6 +115679,100 @@ Based on rejection patterns, add pre-filters to RADIANT's ethics:
 
 ---
 
+## Curator API (v7.43.1)
+
+Knowledge curation and verification endpoints — documents, domains, knowledge graph, golden rules, entrance exams, chain of custody.
+
+### Endpoints
+
+| Method | Path | Description | Auth |
+|--------|------|-------------|------|
+| GET | `/admin/curator/dashboard` | Dashboard overview | Admin |
+| GET/POST | `/admin/curator/domains` | List/create domains | Admin |
+| GET/PUT/DELETE | `/admin/curator/domains/{id}` | Domain CRUD | Admin |
+| GET/POST | `/admin/curator/documents` | List/ingest documents | Admin |
+| GET/POST | `/admin/curator/verification` | Verification items | Admin |
+| GET/POST | `/admin/curator/golden-rules` | Golden rules | Admin |
+| GET | `/admin/curator/audit` | Audit trail | Admin |
+| GET | `/admin/curator/nodes` | Knowledge graph nodes | Admin |
+| GET | `/admin/curator/chain-of-custody` | Chain of custody | Admin |
+| GET | `/admin/curator/conflicts` | Conflicts | Admin |
+| GET | `/admin/curator/connectors` | Connectors | Admin |
+
+---
+
+## Cato Trainer API (v7.43.1)
+
+Safety training document management — libraries, documents, spaces, search, grounded chat, digest, configuration.
+
+### Endpoints
+
+| Method | Path | Description | Auth |
+|--------|------|-------------|------|
+| GET/POST | `/admin/cato-trainer/libraries/{tenantId}` | List/create libraries | Admin |
+| GET | `/admin/cato-trainer/libraries/detail/{id}` | Library detail | Admin |
+| GET | `/admin/cato-trainer/documents/{libraryId}` | List documents | Admin |
+| POST | `/admin/cato-trainer/documents/{libraryId}/upload` | Upload document | Admin |
+| DELETE | `/admin/cato-trainer/documents/{id}` | Delete document | Admin |
+| GET/POST | `/admin/cato-trainer/spaces/{tenantId}` | List/create spaces | Admin |
+| PUT/DELETE | `/admin/cato-trainer/spaces/{id}` | Update/delete space | Admin |
+| POST | `/admin/cato-trainer/search/{tenantId}` | Search documents | Admin |
+| GET | `/admin/cato-trainer/links/{documentId}` | Smart links | Admin |
+| POST | `/admin/cato-trainer/chat/{tenantId}/session` | Create chat session | Admin |
+| GET | `/admin/cato-trainer/chat/{tenantId}/sessions` | List sessions | Admin |
+| POST | `/admin/cato-trainer/chat/{sessionId}/message` | Send message | Admin |
+| POST | `/admin/cato-trainer/digest/{tenantId}` | Generate digest | Admin |
+| GET/PUT | `/admin/cato-trainer/config/{tenantId}` | Configuration | Admin |
+
+---
+
+## Think Tank Tenant Admin API (v7.43.1)
+
+Tenant-scoped administration — dashboard, users, settings, security, collaboration, cartridges, reports.
+
+### Endpoints
+
+| Method | Path | Description | Auth |
+|--------|------|-------------|------|
+| GET | `/api/v1/tenant/dashboard/stats` | Dashboard statistics | Cognito |
+| GET | `/api/v1/tenant/dashboard/usage-trends` | 30-day usage trends | Cognito |
+| GET | `/api/v1/tenant/dashboard/activity` | Recent activity | Cognito |
+| GET | `/api/v1/tenant/dashboard/alerts` | Active alerts | Cognito |
+| GET/POST | `/api/v1/tenant/cartridges` | List/create cartridges | Cognito |
+| POST | `/api/v1/tenant/cartridges/{id}/activate` | Activate cartridge | Cognito |
+| POST | `/api/v1/tenant/cartridges/{id}/deactivate` | Deactivate cartridge | Cognito |
+| DELETE | `/api/v1/tenant/cartridges/{id}` | Delete cartridge | Cognito |
+| GET | `/api/tenant-admin/users` | List tenant users | Cognito |
+| PUT | `/api/tenant-admin/users/{id}` | Update user | Cognito |
+| POST | `/api/tenant-admin/users/{id}/suspend` | Suspend user | Cognito |
+| GET/PUT | `/api/tenant-admin/settings` | Tenant settings | Cognito |
+| GET/PUT | `/api/tenant-admin/security` | Security config | Cognito |
+| GET/PUT | `/api/tenant-admin/collaboration` | Collaboration config | Cognito |
+| GET | `/api/tenant-admin/reports` | List reports | Cognito |
+
+---
+
+## Public Status API (v7.43.1)
+
+Unauthenticated status endpoint for status page health checks. Protected by API key only.
+
+| Method | Path | Description | Auth |
+|--------|------|-------------|------|
+| GET | `/api/public/status` | Service health status | API Key |
+| GET | `/api/public/status?datacenter={id}` | Filter by datacenter | API Key |
+
+---
+
+## Library Search API (v7.43.1)
+
+Neural/semantic search for the open source library registry using multi-signal scoring.
+
+| Method | Path | Description | Auth |
+|--------|------|-------------|------|
+| POST | `/admin/libraries/search` | Search libraries by natural language query | Admin |
+
+---
+
 ## Related Documentation
 
 - [AGI Brain Plan System](./sections/SECTION-XX-AGI-BRAIN-PLAN.md)
@@ -114602,6 +115780,345 @@ Based on rejection patterns, add pre-filters to RADIANT's ethics:
 - [Model Router Service](./MODEL-ROUTER.md)
 
 
+
+---
+
+## Part VIII: OMEGA Firmware API (v6.4.0)
+
+> **Version**: 6.4.0 | **Base Path**: `/api/v2`
+> **Authentication**: Admin Bearer token required for all endpoints
+> **Required Role**: `omega:firmware:read`, `omega:firmware:write`, or `omega:firmware:sign` as noted
+
+---
+
+### Upload Firmware
+
+Upload and validate a `.bio` firmware file.
+
+```
+POST /api/v2/firmware/upload
+```
+
+**Permission:** `omega:firmware:write`
+
+**Request Body:**
+```json
+{
+  "name": "Safety Rules v2.1",
+  "description": "Updated Helix rules for healthcare vertical",
+  "content": {
+    "helix_rules": [
+      {
+        "name": "block_medical_advice",
+        "forbidden_vector": [0.0, 0.0, 1.0, 0.0],
+        "severity": "CRITICAL",
+        "interference_mode": "DESTRUCTIVE"
+      }
+    ],
+    "ambition": {
+      "entropy_threshold": 0.3,
+      "plasticity_rate": 0.01,
+      "dopamine_decay": 0.95
+    },
+    "quantum_params": {
+      "hilbert_dimension": 1024,
+      "unitarity_mode": "STRICT",
+      "decoherence_rate": 0.001
+    },
+    "personality": {
+      "system_prompt": "You are a precise medical research assistant.",
+      "tone": "formal",
+      "domain_focus": ["healthcare", "clinical-trials"]
+    }
+  }
+}
+```
+
+**Response (201):**
+```json
+{
+  "firmware_id": "fw_abc123",
+  "content_hash": "sha512:a1b2c3...",
+  "status": "draft",
+  "validation": {
+    "passed": true,
+    "checks": [
+      { "name": "helix_vectors_normalized", "status": "pass" },
+      { "name": "ambition_bounds_valid", "status": "pass" },
+      { "name": "quantum_params_consistent", "status": "pass" }
+    ]
+  },
+  "created_at": "2026-02-08T10:00:00Z"
+}
+```
+
+**Error Codes:**
+| Code | Description |
+|------|-------------|
+| 400 | Invalid .bio structure or validation failure |
+| 409 | Duplicate content hash already exists |
+| 413 | Firmware exceeds 5MB size limit |
+
+---
+
+### Sign Firmware
+
+Cryptographically sign firmware using AWS KMS (Ed25519 / ECDSA_SHA_256).
+
+```
+POST /api/v2/firmware/{firmware_id}/sign
+```
+
+**Permission:** `omega:firmware:sign`
+
+**Path Parameters:**
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `firmware_id` | string | UUID of the firmware to sign |
+
+**Response (200):**
+```json
+{
+  "firmware_id": "fw_abc123",
+  "status": "signed",
+  "signature": {
+    "algorithm": "ECDSA_SHA_256",
+    "key_id": "arn:aws:kms:us-east-1:123:key/abc-def",
+    "signer_admin_id": "admin_xyz",
+    "signed_at": "2026-02-08T10:05:00Z"
+  }
+}
+```
+
+**Error Codes:**
+| Code | Description |
+|------|-------------|
+| 400 | Firmware not in `draft` status |
+| 403 | Admin does not have `omega:firmware:sign` permission |
+| 404 | Firmware not found |
+| 502 | KMS signing failed |
+
+---
+
+### Activate Firmware (Trigger Hot-Swap)
+
+Activate signed firmware on a target brain, triggering the hot-swap lifecycle.
+
+```
+POST /api/v2/firmware/{firmware_id}/activate
+```
+
+**Permission:** `omega:firmware:write`
+
+**Path Parameters:**
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `firmware_id` | string | UUID of the signed firmware |
+
+**Request Body:**
+```json
+{
+  "brain_id": "brain_xyz",
+  "swap_mode": "OVERLAY",
+  "reason": "Adding healthcare safety rules"
+}
+```
+
+**Swap Modes:**
+| Mode | Description |
+|------|-------------|
+| `OVERLAY` | Preserve quantum state, merge rules (~5s) |
+| `RESET` | Reinitialize quantum state (~30s). Required for Hilbert dimension or unitarity mode changes |
+| `SHADOW` | Fork brain copy for parallel testing (~10s) |
+| `EMERGENCY` | Immediate platform defaults (~2s) |
+
+**Response (202):**
+```json
+{
+  "swap_id": "swap_abc123",
+  "firmware_id": "fw_abc123",
+  "brain_id": "brain_xyz",
+  "swap_mode": "OVERLAY",
+  "status": "in_progress",
+  "started_at": "2026-02-08T10:10:00Z"
+}
+```
+
+**Error Codes:**
+| Code | Description |
+|------|-------------|
+| 400 | Firmware not in `signed` status, or invalid swap mode |
+| 403 | Two-person rule violation (signer == activator) |
+| 404 | Firmware or brain not found |
+| 409 | Another swap already in progress for this brain |
+| 422 | Pre-flight validation failed (use `/preflight` endpoint for details) |
+
+---
+
+### Pre-flight Validation
+
+Check all prerequisites before activating a firmware swap.
+
+```
+GET /api/v2/firmware/{firmware_id}/preflight?brain_id={brain_id}&swap_mode={mode}
+```
+
+**Permission:** `omega:firmware:read`
+
+**Response (200):**
+```json
+{
+  "ready": true,
+  "checks": [
+    { "name": "firmware_signed", "status": "pass" },
+    { "name": "two_person_rule", "status": "pass" },
+    { "name": "brain_healthy", "status": "pass" },
+    { "name": "no_active_swap", "status": "pass" },
+    { "name": "swap_mode_compatible", "status": "pass" },
+    { "name": "helix_rules_valid", "status": "pass" }
+  ]
+}
+```
+
+---
+
+### Rollback Firmware
+
+Revert a brain to its previous firmware version using the stored rollback snapshot.
+
+```
+POST /api/v2/firmware/{firmware_id}/rollback
+```
+
+**Permission:** `omega:firmware:write`
+
+**Request Body (optional):**
+```json
+{
+  "reason": "Post-swap error rate exceeded threshold"
+}
+```
+
+**Response (200):**
+```json
+{
+  "rollback_id": "rb_abc123",
+  "brain_id": "brain_xyz",
+  "from_firmware": "fw_abc123",
+  "to_firmware": "fw_previous",
+  "status": "completed",
+  "duration_ms": 1200
+}
+```
+
+---
+
+### Emergency Lockdown
+
+Immediately load platform default firmware (maximum safety) on a brain.
+
+```
+POST /api/v2/firmware/emergency
+```
+
+**Permission:** `omega:firmware:write`
+
+**Request Body:**
+```json
+{
+  "brain_id": "brain_xyz",
+  "reason": "Suspected Helix bypass in production"
+}
+```
+
+**Response (200):**
+```json
+{
+  "emergency_id": "emg_abc123",
+  "brain_id": "brain_xyz",
+  "status": "locked_down",
+  "firmware_loaded": "platform_default_v1",
+  "duration_ms": 800,
+  "review_required_by": "2026-02-09T10:15:00Z"
+}
+```
+
+---
+
+### Brain Status
+
+Get current brain status including active firmware information.
+
+```
+GET /api/v2/omega/status?brain_id={brain_id}
+```
+
+**Permission:** `omega:firmware:read`
+
+**Response (200):**
+```json
+{
+  "brain_id": "brain_xyz",
+  "tenant_id": "tenant_abc",
+  "status": "active",
+  "firmware": {
+    "firmware_id": "fw_abc123",
+    "name": "Safety Rules v2.1",
+    "content_hash": "sha512:a1b2c3...",
+    "activated_at": "2026-02-08T10:10:00Z",
+    "swap_mode_used": "OVERLAY"
+  },
+  "quantum_state": {
+    "hilbert_dimension": 1024,
+    "unitarity_mode": "STRICT",
+    "state_norm": 0.9999,
+    "decoherence_rate": 0.001
+  },
+  "helix": {
+    "active_rules": 12,
+    "last_interference_event": "2026-02-08T09:55:00Z"
+  },
+  "ambition": {
+    "entropy": 0.28,
+    "dopamine": 0.72,
+    "plasticity_rate": 0.01
+  }
+}
+```
+
+---
+
+### Firmware Swap Log
+
+Retrieve swap history for a brain.
+
+```
+GET /api/v2/omega/swaps?brain_id={brain_id}&limit={n}&offset={n}
+```
+
+**Permission:** `omega:firmware:read`
+
+**Response (200):**
+```json
+{
+  "swaps": [
+    {
+      "swap_id": "swap_abc123",
+      "brain_id": "brain_xyz",
+      "swap_mode": "OVERLAY",
+      "from_firmware_id": "fw_old",
+      "to_firmware_id": "fw_abc123",
+      "status": "completed",
+      "duration_ms": 4800,
+      "started_at": "2026-02-08T10:10:00Z",
+      "completed_at": "2026-02-08T10:10:04Z"
+    }
+  ],
+  "total": 1,
+  "limit": 20,
+  "offset": 0
+}
+```
 
 ---
 
@@ -114623,7 +116140,7 @@ Based on rejection patterns, add pre-filters to RADIANT's ethics:
 ## 13.1 Security, Auth & Compliance — Complete Reference
 
 
-*Source: `docs/13-SECURITY-AUTH-COMPLIANCE.md` (5,275 lines)*
+*Source: `docs/13-SECURITY-AUTH-COMPLIANCE.md` (5,404 lines)*
 
 ---
 
@@ -119896,11 +121413,140 @@ Every API endpoint must:
 
 *Document approved by Product Owner — February 6, 2026*
 
+---
 
+## Part XIII: Real-Time Intrusion Detection & Prevention System (RIDPS) — v7.40.0
+
+### 1. Overview
+
+RIDPS is RADIANT's application-layer intrusion detection and prevention system. It operates in real-time within the Lambda execution environment, analyzing every API request for threat signals using 14 MITRE ATT&CK-mapped detectors.
+
+### 2. Standards Compliance
+
+| Standard | Section | Implementation |
+|----------|---------|---------------|
+| NIST SP 800-94 | §2-4, §7 | Three detection methods: signature, anomaly, stateful protocol analysis |
+| NIST CSF 2.0 | DE.CM-01 through DE.CM-09 | Continuous monitoring via request middleware |
+| NIST CSF 2.0 | DE.AE-01 through DE.AE-08 | Event correlation engine (1-min cadence) |
+| MITRE ATT&CK Cloud | 11 techniques | T1078, T1110, T1190, T1530, T1548, T1550, T1087 |
+| OWASP ASVS 4.0 | V7.1, V7.2, V11.1 | Structured logging, business logic monitoring |
+| OWASP LLM Top 10 | LLM01 | Prompt injection surge detector |
+| CIS Controls v8 | 8.2, 8.5, 8.11, 13.1, 13.3, 13.6 | Audit log management, network defense |
+| SOC 2 Type II | CC6.1, CC6.6, CC7.2, CC7.3 | Access monitoring, anomaly detection |
+| ISO 27001:2022 | A.8.15, A.8.16, A.5.25 | Logging, monitoring, event assessment |
+
+### 3. Architecture
+
+```
+Layer 1 (Perimeter): AWS WAF → Managed Rules + IP Rate Limiting
+Layer 2 (Application): Middleware → ThreatDetectionEngine → 14 Detectors → Correlation
+Layer 3 (Response): IP Ban → Session Kill → Account Lock → SENTINEL Escalation
+```
+
+**Key components:**
+- **`intrusion-detection.service.ts`** — Core engine with sliding windows, rule management, event persistence
+- **`intrusion-detectors.ts`** — 14 detector implementations
+- **`threat-response.service.ts`** — Automated response: ban, kill, lock, alert, escalate
+- **`threat-intelligence.service.ts`** — IOC database, IP reputation, known-bad patterns
+- **`middleware/intrusion-detection.ts`** — <5ms request middleware (pre + post analysis)
+- **`intrusion-detection/analyzer.ts`** — EventBridge Lambda: correlation, UEBA baselines, cleanup
+
+### 4. Detection Rules
+
+Each detector reads configurable thresholds from the `detection_rules` table. Defaults are seeded by the migration. Per-tenant overrides supported.
+
+**Response actions** (ordered by severity): `log_only` → `rate_limit` → `challenge` → `block_request` → `ban_ip` → `kill_session` → `lock_account` → `alert_admin` → `escalate_sentinel` → `waf_block`
+
+### 5. UEBA (User & Entity Behavior Analytics)
+
+User baselines are maintained in `user_access_baselines` and updated hourly by the analyzer Lambda. Baselines track: typical hours, countries, IPs, user-agents, request rates, and endpoint access patterns. The `unusual_access_pattern` detector compares real-time behavior against these baselines.
+
+### 6. Integration Points
+
+| Service | Integration |
+|---------|-------------|
+| `logging-registry.service.ts` | All detectors log via `createRegisteredLogger({ category: 'security' })` |
+| `security-alert.service.ts` | Threat response triggers alerts for WARNING/CRITICAL via `securityAlertService.sendAlert()` |
+| `sentinel-notifier.service.ts` | SEV1-2 incidents routed through SENTINEL escalation |
+| `security-protection.service.ts` | Detections feed into `logSecurityEvent()` for security audit hotspot analysis |
+| `audit.ts` | All detections emit `intrusion_detected` audit entries; all admin actions emit typed audit entries |
+| `rate-limiter.ts` | Threat response dynamically adjusts rate limits |
+| `security-stack.ts` (WAF) | Future: IP set sync for network-level blocking |
+| `spend-governor.service.ts` | Model cost anomaly detector reads spend data |
+
+### 7. Admin API Endpoints
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| GET | `/admin/intrusion-detection/dashboard` | Dashboard stats |
+| GET | `/admin/intrusion-detection/events` | Recent events |
+| GET | `/admin/intrusion-detection/incidents` | Incident list |
+| PUT | `/admin/intrusion-detection/incidents/{id}` | Update incident status |
+| GET/POST | `/admin/intrusion-detection/blocked-ips` | IP blocklist management |
+| DELETE | `/admin/intrusion-detection/blocked-ips/{ip}` | Unblock IP |
+| GET/PUT | `/admin/intrusion-detection/config` | RIDPS config |
+| GET | `/admin/intrusion-detection/detectors` | List detectors + rules |
+| PUT | `/admin/intrusion-detection/detectors/{id}` | Update detector rule |
+| GET/POST | `/admin/intrusion-detection/threat-intel` | Threat indicators |
+| POST | `/admin/intrusion-detection/threat-intel/import` | Bulk import indicators |
+| DELETE | `/admin/intrusion-detection/threat-intel/{id}` | Remove indicator |
+| POST | `/admin/intrusion-detection/sessions/kill` | Manual session kill |
+| POST | `/admin/intrusion-detection/accounts/lock` | Manual account lock |
+| POST | `/admin/intrusion-detection/accounts/unlock` | Manual account unlock |
+
+### 8. Manual Threat Mitigation
+
+Admins can manually mitigate threats that the automated system cannot handle:
+
+- **Incident Management**: Change incident status (investigating → mitigated → resolved / false_positive) with audit trail
+- **IP Blocking**: Manual block/unblock with reason, severity, duration, and permanent options
+- **Session Kill**: Revoke active sessions by session ID with reason tracking
+- **Account Lock/Unlock**: Lock compromised accounts or unlock false positives
+- **Detector Block**: Block source IPs directly from incident detail with one click
+
+All manual actions are audit-logged to DynamoDB (`audit.ts`) with action type, admin ID, IP, and user agent.
+
+### 9. Account Lockout Resolution (NIST SP 800-63B §5.2.8)
+
+Lockouts follow a progressive duration policy with automatic resolution:
+
+| Offense | Duration | Resolution |
+|---------|----------|------------|
+| 1st | 30 min | Auto-unlock |
+| 2nd (within 7d) | 2 hours | Auto-unlock |
+| 3rd (within 7d) | 24 hours | Auto-unlock |
+| 4th+ (within 30d) | Permanent | Admin review required |
+
+All durations are configurable per-tenant via the `lockout_policy` table.
+
+**Automated resolution**: The analyzer Lambda calls `auto_unlock_expired_accounts()` every cleanup cycle. Expired timed lockouts are automatically cleared from the `users` table and marked `auto_unlocked` in the `account_lockout_history` table.
+
+**Manual override**: Admins can unlock any account at any time via the Locked Accounts tab or the `/admin/intrusion-detection/accounts/unlock` API. All unlocks are audit-logged.
+
+**Database objects**:
+- `account_lockout_history` — Full lockout event history with reason type, offense number, duration, and resolution tracking
+- `lockout_policy` — Per-tenant configurable progressive durations and policy settings
+- `calculate_lockout_duration()` — DB function returning progressive duration based on offense count
+- `auto_unlock_expired_accounts()` — DB function for bulk-unlocking expired timed lockouts
+
+### 10. CloudWatch Metrics
+
+Namespace: `RADIANT/IntrusionDetection`
+
+| Metric | Description |
+|--------|-------------|
+| `IntrusionEventsDetected` | Total events per 5-min window |
+| `CriticalIntrusionEvents` | Critical-severity events |
+| `HighIntrusionEvents` | High-severity events |
+| `UniqueAttackSourceIPs` | Distinct attacking IPs |
+| `BlockedIPs` | Active IP blocks |
+| `ActiveIncidents` | Open/investigating incidents |
+| `LockedAccounts` | Currently locked user accounts |
+| `PermanentAccountLocks` | Accounts with permanent lockout (requires admin review) |
 
 ---
 
-*Consolidated from 12 source documents (0 not found). 5,209 source lines.*
+*Consolidated from 12 source documents (0 not found). Updated v7.41.0.*
 
 
 
@@ -119918,7 +121564,7 @@ Every API endpoint must:
 ## 14.1 Operations & Runbooks — Complete Reference
 
 
-*Source: `docs/14-OPERATIONS-RUNBOOKS.md` (3,083 lines)*
+*Source: `docs/14-OPERATIONS-RUNBOOKS.md` (3,338 lines)*
 
 ---
 
@@ -119939,6 +121585,7 @@ Every API endpoint must:
 - **Part VI: Troubleshooting**
 - **Part VII: Disaster Recovery**
 - **Part VIII: Testing**
+- **Part IX: OMEGA Firmware Hot-Swap Operations (v6.4.0)**
 
 ---
 
@@ -123003,6 +124650,260 @@ swift test --filter "testSaveAndLoadConfiguration"
 
 ---
 
+## Part IX: OMEGA Firmware Hot-Swap Operations (v6.4.0)
+
+> **Version**: 6.4.0 | **Date**: February 8, 2026
+> **Audience**: System Administrators & DevOps
+
+### 1. Key Concepts (60-Second Primer)
+
+- **OMEGA Brain** — A living AI system running on Lambda/ECS. Maintains persistent state between requests and learns continuously.
+- **Firmware (.bio file)** — A signed JSON file containing the brain's "instincts": safety rules (Helix), learning speed (Ambition), and personality (Broca prompt).
+- **Hot-Swap** — Replacing firmware on a running brain without downtime. The brain detects the new firmware hash on its next inference cycle and atomically swaps (~50ms).
+- **Genesis Forge** — The admin web UI where you author, sign, and deploy firmware.
+
+### 2. Swap Modes Cheat Sheet
+
+| Mode | When to Use | Downtime | Risk Level | Approval Needed |
+|------|-------------|----------|:---:|:---:|
+| **OVERLAY** | Adding/updating safety rules, tuning ambition params | Zero | Low | Single admin |
+| **RESET** | Changing Hilbert dimension, major version upgrade | ~30s queued | Medium | Two-person (prod) |
+| **SHADOW** | Testing new firmware against live traffic | Zero | Low | Single admin |
+| **EMERGENCY** | Safety incident, suspected Helix bypass | Zero | N/A | Any admin (post-hoc review) |
+
+**Decision Tree:**
+
+1. Is there a safety incident right now? → **EMERGENCY**
+2. Are you changing Hilbert dimension or unitarity mode? → **RESET** (schedule maintenance window)
+3. Is this production with live users? → **SHADOW** first, validate, then **OVERLAY**
+4. Dev/staging environment? → **OVERLAY** directly
+
+### 3. Standard Operating Procedures
+
+#### 3.1 Deploy New Firmware (OVERLAY)
+
+**Pre-Flight:**
+
+```bash
+# Check brain status
+curl -s https://api.radiant.example/api/v2/omega/status | jq '.active_streams, .firmware_hash'
+# Should return: active_streams = 0 (or low), firmware_hash = current hash
+```
+
+**Steps:**
+
+1. Open **Genesis Forge** → Firmware Library
+2. Click **"New Firmware"** or clone existing
+3. Edit Helix Rules, Ambition Settings, or Personality as needed
+4. Click **"Validate"** — all checks must pass (green)
+5. Click **"Sign"** — requires your admin credentials + KMS signing
+6. Click **"Activate"** → Select **OVERLAY** mode
+7. Confirm in the modal (re-authentication required in prod per FDA Part 11)
+8. Monitor the **Swap Timeline** widget for completion (~5s)
+
+**Post-Deploy Verification:**
+
+```bash
+# Confirm new hash loaded
+curl -s https://api.radiant.example/api/v2/omega/status | jq '.firmware_hash'
+
+# Check swap log
+curl -s https://api.radiant.example/api/v2/firmware/swaps?limit=1 | jq '.'
+# Expected: status = "success", duration_ms < 5000
+```
+
+#### 3.2 Shadow Test Before Production Deploy
+
+1. Deploy firmware with **SHADOW** mode
+2. Shadow brain processes requests in parallel — does NOT serve users
+3. Monitor **Coherence Score** in Genesis Dashboard (target: >90% over 7 days)
+4. When score crosses threshold, the **"Promote to Production"** button unlocks
+5. Click Promote → triggers OVERLAY swap from shadow to primary
+
+#### 3.3 Emergency Lockdown
+
+If you suspect a Helix bypass or safety failure:
+
+```bash
+curl -X POST https://api.radiant.example/api/v2/firmware/emergency \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"brain_id": "uuid-here", "reason": "Suspected Helix bypass on tenant-xyz"}'
+```
+
+This immediately loads **platform default firmware** (maximum safety, minimal capabilities). Post-incident review required within 24 hours.
+
+#### 3.4 Rollback
+
+```bash
+curl -X POST https://api.radiant.example/api/v2/firmware/{firmware-id}/rollback \
+  -H "Authorization: Bearer $ADMIN_TOKEN"
+```
+
+Or in Genesis Forge: Firmware Library → click the superseded firmware → **"Rollback to This Version"**
+
+**Automatic rollback triggers:**
+
+- Post-swap error rate > 10% within 5 minutes
+- Post-swap latency increase > 50%
+- Any Helix verification failure during self-test
+
+### 4. Infrastructure Requirements
+
+#### 4.1 Storage
+
+| Layer | Service | Purpose | Monitoring |
+|-------|---------|---------|------------|
+| Hot State | AWS EFS (`/mnt/omega_state`) | Active brain state, sub-ms access | `df -h`, CloudWatch EFS metrics |
+| Snapshots | AWS S3 (`s3://radiant-omega-snapshots-{env}`) | Pre-swap rollback snapshots | S3 lifecycle policies |
+| Metadata | Aurora PostgreSQL | Firmware records, swap logs, audit trail | RDS Performance Insights |
+| Swap Lock | DynamoDB | Distributed lock (5-min TTL) | DynamoDB metrics |
+
+#### 4.2 KMS Keys
+
+| Key | Purpose | Rotation | Deletion Policy |
+|-----|---------|----------|-----------------|
+| Platform Root CA | Signs tenant CAs | Manual only (asymmetric) | RETAIN in prod |
+| Tenant CA Keys | Signs firmware/cartridges | Manual only | 30-day pending (prod) |
+| Signing Keys | Per-purpose signing | Manual only | 7-day pending (dev) |
+
+**Check key health:**
+
+```bash
+aws kms describe-key --key-id alias/radiant-{env}-cartridge-signing | jq '.KeyMetadata.KeyState'
+# Expected: "Enabled"
+```
+
+#### 4.3 IAM Permissions Required
+
+Lambda execution role needs:
+
+- `kms:Sign`, `kms:Verify`, `kms:GetPublicKey`, `kms:DescribeKey` on platform signing key
+- `kms:CreateKey`, `kms:TagResource`, `kms:CreateAlias` for tenant key creation
+- EFS read/write on `/mnt/omega_state`
+- S3 read/write on snapshot bucket
+
+### 5. Monitoring & Alerts
+
+#### 5.1 CloudWatch Dashboards
+
+| Dashboard | Key Metrics |
+|-----------|-------------|
+| OMEGA Brain Health | Coherence score, inference latency, error rate, active streams |
+| Firmware Status | Current firmware version, swap count (24h), rollback count |
+| Helix Safety | Rule activation count, blocked vector count, bypass attempts |
+| Ambition | Entropy level, dopamine level, dream cycle triggers |
+
+#### 5.2 Alert Thresholds
+
+| Alert | Condition | Severity | Action |
+|-------|-----------|----------|--------|
+| Swap Duration High | > 30 seconds | WARNING | Investigate, check EFS latency |
+| Swap Failed | status = 'failed' | CRITICAL | Check logs, may need manual rollback |
+| Auto-Rollback Triggered | Post-swap error > 10% | CRITICAL | Review firmware, investigate root cause |
+| Helix Bypass Attempt | Any forbidden vector not cancelled | CRITICAL | EMERGENCY mode immediately |
+| EFS Unhealthy | Mount failure or > 10ms latency | CRITICAL | Brain cannot persist state |
+| Firmware Lock Stuck | Lock held > 5 minutes | WARNING | Check for crashed swap, release manually |
+
+#### 5.3 Log Locations
+
+| Log | Location | Key Fields |
+|-----|----------|------------|
+| Swap events | CloudWatch `/radiant/omega/firmware-swaps` | swap_mode, duration_ms, status |
+| Helix activations | CloudWatch `/radiant/omega/helix` | rule_id, blocked_vector, severity |
+| Audit trail | PostgreSQL `pki_audit_log` | operation, key_id, tenant_id, timestamp |
+
+### 6. CORTEX Network Hot-Swap (Nightly CATO Cycle)
+
+Separate from firmware, the 6 CORTEX neural networks update nightly at 2am UTC:
+
+| Time | Phase | What Happens |
+|------|-------|--------------|
+| 02:00 | INVENTION | Generate novel patterns (30% min budget, enforced) |
+| 02:30 | EVOLUTION | PromptBreeder mutations, fitness selection |
+| 03:00 | TRAINING | PyTorch training on ml.g5.xlarge |
+| 03:30 | DEPLOYMENT | ONNX export → S3 upload → atomic pointer swap on inference nodes |
+
+**Verify CATO ran successfully:**
+
+```bash
+aws s3 ls s3://radiant-cortex-models-{env}/pattern_network/ --recursive | tail -5
+aws s3 cp s3://radiant-cortex-models-{env}/pattern_network/latest_version.txt -
+```
+
+### 7. Troubleshooting
+
+#### Firmware swap stuck (lock not releasing)
+
+```bash
+# Check DynamoDB for stale lock
+aws dynamodb get-item --table-name radiant-{env}-firmware-locks \
+  --key '{"brain_id": {"S": "uuid-here"}}'
+
+# If lock TTL expired, it auto-releases. If stuck, delete manually:
+aws dynamodb delete-item --table-name radiant-{env}-firmware-locks \
+  --key '{"brain_id": {"S": "uuid-here"}}'
+```
+
+#### Brain not detecting new firmware
+
+1. Check `omega_brain_states.firmware_hash` was actually updated
+2. Check Lambda is reading from correct Aurora instance (not a stale reader)
+3. Force a brain cycle: send a test inference request
+
+#### Helix self-test failing after swap
+
+The firmware's Helix Rules are malformed. Check:
+
+- All forbidden vectors have unit magnitude (|v| = 1.0)
+- No duplicate rule IDs
+- Schema version matches brain compatibility range
+- Rollback to previous firmware and fix the .bio file
+
+#### EFS mount failure
+
+```bash
+df -h /mnt/omega_state
+
+# If unmounted, remount:
+sudo mount -t efs fs-{id}:/ /mnt/omega_state
+
+# If EFS is completely down, brain falls back to S3 snapshots
+# (up to 100 inference cycles of data loss)
+```
+
+#### KMS signing failures
+
+```bash
+aws kms describe-key --key-id alias/radiant-{env}-cartridge-signing
+aws iam simulate-principal-policy \
+  --policy-source-arn arn:aws:iam::role/radiant-lambda-execution \
+  --action-names kms:Sign kms:Verify
+```
+
+### 8. Emergency Contacts
+
+| Situation | Action |
+|-----------|--------|
+| Swap stuck > 5 minutes | Release lock manually, check CloudWatch |
+| Suspected Helix bypass | Trigger EMERGENCY mode immediately |
+| Brain state corruption | Restore from S3 snapshot (`aws s3 cp s3://radiant-omega-snapshots-{env}/brain-{id}/latest/brain.pt /mnt/omega_state/brain.pt`) |
+| KMS key compromised | Revoke key, rotate, re-sign all active firmware |
+| Multiple auto-rollbacks | Disable CATO nightly cycle, investigate training data |
+
+### 9. Maintenance Calendar
+
+| Task | Frequency | Owner |
+|------|-----------|-------|
+| Review firmware swap logs | Weekly | DevOps |
+| Verify snapshot retention | Monthly | DevOps |
+| KMS key health check | Monthly | Security |
+| CATO training review | Weekly | ML Engineering |
+| Helix rule audit | Quarterly | Security + Compliance |
+| Disaster recovery drill | Quarterly | DevOps + Engineering |
+
+---
+
 *Consolidated from 10 source documents (0 not found). 3,035 source lines.*
 
 
@@ -123021,7 +124922,7 @@ swift test --filter "testSaveAndLoadConfiguration"
 ## 15.1 Strategy & Competitive — Complete Reference
 
 
-*Source: `docs/15-STRATEGY-COMPETITIVE.md` (8,469 lines)*
+*Source: `docs/15-STRATEGY-COMPETITIVE.md` (8,767 lines)*
 
 ---
 
@@ -123041,6 +124942,8 @@ swift test --filter "testSaveAndLoadConfiguration"
 - **Part V: Revenue & Analytics**
 - **Part VI: SENTINEL System**
 - **Part VII: Technical Debt**
+- **Part VIII: Firmware Hot-Swap — Marketing & Positioning (v6.4.0)**
+- **Part IX: Firmware Hot-Swap — Strategic Investor Brief (v6.4.0)**
 
 ---
 
@@ -131493,6 +133396,302 @@ Radiant System:          ██████████████████�
 ```
 
 The gap isn't incremental. It's categorical.
+
+---
+
+## Part VIII: Firmware Hot-Swap — Marketing & Positioning (v6.4.0)
+
+> **Version**: 6.4.0 | **Date**: February 8, 2026
+> **Audience**: Marketing, Sales, Partnerships
+> **Classification**: RADIANT CONFIDENTIAL — Approved for Customer-Facing Derivatives
+
+### The One-Liner
+
+> **"RADIANT's AI doesn't restart to learn new rules — it evolves them live, like updating DNA in a living organism."**
+
+### 1. What Just Shipped (v6.4.0)
+
+RADIANT now supports **zero-downtime firmware hot-swaps** for OMEGA Brains. This means customers can change their AI's safety rules, personality, learning speed, and domain focus in real-time — without any service interruption, data loss, or retraining.
+
+**Translation for customers:** Your AI gets smarter, safer, and more specialized while it's serving your users. No maintenance windows. No "please try again later."
+
+### 2. Messaging Framework
+
+#### Primary Message
+
+RADIANT is the only AI platform where intelligence is a **living, evolvable asset** — not a frozen snapshot. Firmware hot-swap means your AI's behavior, safety guardrails, and expertise domains can be updated instantly without downtime.
+
+#### Supporting Messages
+
+| Theme | Message | Proof Point |
+|-------|---------|-------------|
+| **Zero Downtime** | Update AI behavior without interrupting service | ~50ms swap time, invisible to end users |
+| **Deterministic Safety** | Safety rules are mathematically enforced, not probabilistically suggested | Helix Kernel uses destructive interference — forbidden behaviors are physically cancelled |
+| **Living Intelligence** | The longer RADIANT runs, the smarter it gets — and firmware lets you steer that growth | Phase-locking creates permanent neural pathways for domain expertise |
+| **Cryptographic Trust** | Every firmware update is cryptographically signed and auditable | AWS KMS-backed PKI, Ed25519 signatures, immutable audit trail |
+| **Instant Compliance** | New regulatory requirements? Push a firmware update, not a retraining run | Helix Rules can block new violation categories in seconds |
+
+#### Competitive Differentiation
+
+| Capability | RADIANT (OMEGA) | Traditional AI Platforms | OpenAI / Anthropic Direct |
+|------------|:---:|:---:|:---:|
+| Update safety rules live | ✅ Zero downtime | ❌ Redeploy required | ❌ Wait for model update |
+| Mathematical safety guarantees | ✅ Destructive interference | ❌ Probabilistic (RLHF) | ❌ Probabilistic (RLHF) |
+| Signed, auditable updates | ✅ KMS-backed PKI | ❌ Not available | ❌ Not available |
+| Auto-rollback on failure | ✅ Automatic | ❌ Manual | ❌ N/A |
+| Learns continuously | ✅ Phase-locking | ❌ Static model | ❌ Static model |
+| Cost decreases over time | ✅ Logarithmic cost curve | ❌ Linear scaling | ❌ Linear scaling |
+
+### 3. Customer Stories & Use Cases
+
+#### Healthcare: Instant HIPAA Compliance Updates
+
+A healthcare customer receives a new CMS guidance memo at 2pm. By 2:05pm, the admin has authored a new Helix Rule blocking the newly-prohibited data pattern, signed it, and pushed it live. Zero downtime. The AI was compliant before their legal team finished reading the memo.
+
+#### Financial Services: Market-Aware Personality Shifts
+
+A fintech customer hot-swaps their AI's personality firmware from "Growth-Optimistic Advisor" to "Risk-Averse Conservative" when market volatility spikes above a threshold. The AI's tone, recommendations, and risk thresholds change instantly — no retraining, no restart.
+
+#### Enterprise: Domain Expert in a Day
+
+A manufacturing customer imports a pre-built "Quality Control Expert" cartridge (.RADz) and hot-swaps their generic AI into a domain specialist. The cartridge includes trained neural networks, domain rules, and safety constraints — all verified by cryptographic signature.
+
+### 4. Key Terms (Glossary for External Use)
+
+| Internal Term | Customer-Facing Term | Description |
+|--------------|---------------------|-------------|
+| Firmware / .bio file | **AI Behavior Profile** | A configuration package that defines your AI's personality, safety rules, and learning parameters |
+| Hot-Swap | **Live Update** | Changing AI behavior without any service interruption |
+| Helix Rules | **Safety Guardrails** | Mathematically-enforced rules that make certain behaviors physically impossible for the AI |
+| Ambition Settings | **Learning Configuration** | Controls how fast the AI learns and adapts to your organization |
+| Genesis Forge | **AI Command Center** | The admin dashboard for managing AI behavior profiles |
+| OVERLAY mode | **Seamless Update** | Updates applied on top of existing AI knowledge |
+| SHADOW mode | **Safe Testing** | Test new behavior in parallel before going live |
+| EMERGENCY mode | **Instant Lockdown** | Immediate safety enforcement |
+| .RADz Cartridge | **AI Intelligence Package** | Portable, sharable expertise that can be installed in seconds |
+| Phase-Locking | **Learned Expertise** | The AI building permanent knowledge pathways through use |
+| Destructive Interference | **Mathematical Safety** | Forbidden behaviors are cancelled by physics, not filtered by probability |
+
+### 5. FAQ for Sales Conversations
+
+**Q: How is this different from just updating a system prompt?**
+A: A system prompt is a suggestion to a static model — it can be ignored, jailbroken, or forgotten mid-conversation. OMEGA firmware changes the actual physics of the AI's reasoning engine. Forbidden behaviors aren't discouraged, they're mathematically cancelled. And the changes persist across every conversation, permanently.
+
+**Q: What about competitors that claim "real-time learning"?**
+A: Most "real-time learning" in the market means updating a vector database (RAG). The model itself doesn't change. OMEGA's firmware changes the brain's actual neural dynamics — its learning rate, safety constraints, and cognitive parameters. And our CORTEX networks retrain every night, evolving the routing intelligence. It's the difference between giving someone a new book to read (RAG) and actually rewiring their brain (OMEGA).
+
+**Q: What happens if a firmware update goes wrong?**
+A: Three layers of protection. First, every firmware must pass validation and cryptographic signature verification before it can activate. Second, the brain runs a self-test immediately after swap — if any safety rule fails to block its target, automatic rollback in under 2 seconds. Third, continuous monitoring auto-rolls back if error rates spike above 10% post-swap.
+
+**Q: Is this FDA/HIPAA/SOC2 compliant?**
+A: Yes. Firmware signing uses AWS KMS (FIPS 140-2 validated). Every swap is logged in an immutable audit trail. Production deployments require two-person approval and re-authentication (FDA 21 CFR Part 11 pattern). The PKI trust chain (Platform CA → Tenant CA → Signing Key) satisfies SOC 2 cryptographic controls.
+
+**Q: Can customers create their own firmware?**
+A: Yes, through the Genesis Forge (AI Command Center). They can author safety rules, adjust learning parameters, and define personality — with AI-assisted drafting that helps non-technical admins create expert-level configurations. Everything is signed and versioned.
+
+### 6. Taglines & Copy Options
+
+**Hero Statement:** "The First AI That Evolves on Command"
+
+**Subheads:**
+
+- "Update safety rules in seconds, not sprints"
+- "Your AI gets smarter every day — and you control how"
+- "Zero-downtime AI evolution with mathematical safety guarantees"
+- "The more it runs, the less it costs — and the more it knows"
+
+**Technical Proof Point for Decks:**
+"RADIANT's OMEGA architecture enables sub-100ms live firmware injection across safety rules, cognitive parameters, and personality configuration — with cryptographic signing, automatic rollback, and immutable audit trails. No other platform offers deterministic AI safety with zero-downtime behavioral updates."
+
+### 7. The Economic Narrative (For Pricing Conversations)
+
+Traditional AI: Costs scale linearly. Smarter = more expensive. Always.
+
+OMEGA AI: Costs scale **logarithmically**. As the brain phase-locks on common workflows, neural pathways densify. The brain answers via reflex instead of computation.
+
+**The Inference Collapse:** The smarter RADIANT gets, the cheaper it is to run.
+
+This creates **biological lock-in** — on Day 1,000, a customer's RADIANT Brain has physically densified around their institutional knowledge. This expertise cannot be exported to a competitor. We're not selling software — we're selling **evolution**.
+
+Firmware hot-swap amplifies this: every live update makes the brain more specialized, more efficient, more valuable. The customer's AI appreciates in value with every firmware iteration.
+
+---
+
+## Part IX: Firmware Hot-Swap — Strategic Investor Brief (v6.4.0)
+
+> **Version**: 6.4.0 | **Date**: February 8, 2026
+> **Audience**: Investors, Board, Strategic Advisors
+> **Classification**: RADIANT CONFIDENTIAL — NDA Required
+
+### Executive Summary
+
+RADIANT v6.4.0 ships production-ready **firmware hot-swap** for OMEGA Brains — the ability to modify a running AI system's safety rules, cognitive parameters, and behavioral profile with zero downtime and cryptographic integrity. This capability has no equivalent in the market and represents a structural competitive moat.
+
+### 1. The Problem We Solved
+
+Traditional AI platforms are **static**. When a customer needs their AI to behave differently — new safety rules, new compliance requirements, new personality — they have three options:
+
+| Option | Time | Cost | Risk |
+|--------|------|------|------|
+| Update system prompt | Minutes | Low | High (can be jailbroken, no enforcement) |
+| Fine-tune/retrain model | Days to weeks | $10K–$500K | Medium (may degrade other capabilities) |
+| Wait for vendor update | Months | Included | High (no customer control) |
+
+RADIANT Approach:
+
+| RADIANT Approach | Time | Cost | Risk |
+|-----------------|------|------|------|
+| **Hot-swap firmware** | **< 1 second** | **Included** | **Near-zero** (auto-rollback, crypto-signed, self-tested) |
+
+### 2. How It Works (Non-Technical)
+
+OMEGA is not a traditional chatbot — it's a **digital organism** built on Synthetic Biological Intelligence. Where traditional AI models are frozen archives, OMEGA maintains a living neural state that evolves continuously.
+
+**Firmware** is the organism's DNA: it defines what the AI can and cannot do (safety rules), how fast it learns (plasticity), how proactive it is (ambition), and how it communicates (personality). Changing the firmware changes the organism's instincts — instantly, safely, and with full audit trail.
+
+The **hot-swap** capability means we can modify this DNA while the organism is alive and serving users. No downtime. No data loss. No personality reset. The organism just... evolves.
+
+**Key engineering achievement:** Every firmware change is cryptographically signed (AWS KMS), automatically verified (the brain self-tests after every swap), and instantly reversible (automatic rollback if any safety check fails). This satisfies HIPAA, SOC 2, GDPR, and FDA 21 CFR Part 11 requirements.
+
+### 3. Strategic Moat Analysis
+
+#### 3.1 Biological Lock-In (The Appreciating Asset)
+
+The single most important economic property of OMEGA is that **intelligence appreciates over time**. As a customer's OMEGA Brain serves more requests, it phase-locks on their institutional knowledge, creating dense neural pathways optimized for their specific workflows.
+
+Firmware hot-swap amplifies this: every live update makes the brain more specialized, more efficient, and more valuable. The customer isn't just buying software — they're growing an asset.
+
+**On Day 1,000**, a customer's RADIANT Brain has physically densified around their institutional knowledge. This "wisdom" cannot be exported to a competitor. Switching to a competitor means starting from a blank slate — losing months or years of accumulated intelligence.
+
+#### 3.2 The Inference Collapse (Cost Inversion)
+
+Traditional AI costs scale linearly: more intelligence = more compute = more cost.
+
+OMEGA costs scale **logarithmically**:
+
+```
+Traditional AI:  Cost ∝ Intelligence  (linear — always gets more expensive)
+
+OMEGA AI:        Cost ∝ log(Intelligence)  (logarithmic — gets cheaper over time)
+
+  Novice Phase:   Brain is sparse → high reliance on external LLM calls → higher cost
+  Expert Phase:   Brain has phase-locked pathways → answers via reflex → minimal cost
+```
+
+**Result:** The smarter RADIANT gets, the cheaper it is to run. Firmware hot-swap accelerates this by allowing rapid behavioral iteration — each update trains the brain further, densifying pathways and reducing future compute requirements.
+
+#### 3.3 Compliance as Competitive Advantage
+
+Every firmware operation is:
+
+- Signed with FIPS 140-2 validated hardware (AWS KMS)
+- Logged in an immutable, partitioned audit trail
+- Subject to two-person approval in production
+- Automatically rolled back on any safety failure
+
+This level of cryptographic governance over AI behavior is unique in the market. For regulated industries (healthcare, financial services, government), this isn't a nice-to-have — it's table stakes. And we're the only ones at the table.
+
+### 4. Market Positioning
+
+#### 4.1 Competitive Landscape
+
+| Capability | RADIANT | OpenAI (GPT) | Anthropic (Claude) | Google (Gemini) | AWS Bedrock |
+|------------|:---:|:---:|:---:|:---:|:---:|
+| Live behavioral updates | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Mathematical safety (not probabilistic) | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Cryptographically signed AI updates | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Automatic rollback on safety failure | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Continuous learning (not static) | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Cost decreases with usage | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Portable AI intelligence packages | ✅ | ❌ | ❌ | ❌ | ❌ |
+| FDA/HIPAA/SOC2 compliance built-in | ✅ | Partial | Partial | Partial | ✅ |
+
+#### 4.2 Category Creation
+
+RADIANT is not competing in the "AI API" category. We are creating the **"AI Operating System"** category:
+
+- **AI APIs** (OpenAI, Anthropic) sell access to static models. The model is the product.
+- **AI Infrastructure** (AWS Bedrock, Azure AI) sell hosting and routing. The plumbing is the product.
+- **RADIANT** sells a **living, evolvable intelligence layer** that gets smarter, cheaper, and more specialized over time. The organism is the product.
+
+Firmware hot-swap is the key differentiator that makes this category real. It transforms AI from a commodity utility into a proprietary, evolving asset for each customer.
+
+### 5. Revenue Implications
+
+#### 5.1 Pricing Model Reinforcement
+
+Firmware hot-swap supports RADIANT's tiered pricing model (SEED through ENTERPRISE, $200/mo to $150K+/mo) by:
+
+- **Increasing stickiness:** The more firmware iterations a customer runs, the more specialized their AI becomes, increasing switching cost
+- **Justifying premium tiers:** Advanced firmware management (SHADOW mode, two-person approval, custom PKI) is gated to higher tiers
+- **Enabling professional services:** Complex firmware authoring (healthcare compliance, financial regulations) creates consulting revenue
+- **Cartridge marketplace:** Pre-built expertise packages (.RADz) can be sold as add-ons or marketplace products
+
+#### 5.2 Expansion Metrics to Watch
+
+| Metric | Why It Matters |
+|--------|---------------|
+| Firmware swaps per tenant per month | Higher = more engaged, more specialized, stickier |
+| Average firmware age before supersession | Shorter = more active iteration = higher value perception |
+| Cartridge imports per tenant | Cross-domain expansion, marketplace validation |
+| CATO nightly training success rate | Platform health, intelligence growth rate |
+| Shadow-to-production promotion rate | Customer confidence in firmware pipeline |
+
+### 6. Technical Depth (For Due Diligence)
+
+#### 6.1 Architecture Summary
+
+OMEGA uses a **Bicameral Design**: the OMEGA Cortex (Liquid Time-Constant network with complex-valued logic) handles reasoning, while a commodity LLM (Broca Interface) handles only text generation. The Cortex outputs abstract Thought Vectors — it doesn't speak English. The Broca Interface translates.
+
+Firmware controls the Cortex's physics: the Helix Kernel (safety rules implemented as destructive interference — forbidden thoughts are mathematically cancelled), the Ambition Engine (homeostatic loop controlling learning rate and entropy), and the Personality layer (Broca's system prompt).
+
+#### 6.2 Safety Architecture (Helix Kernel)
+
+Traditional AI safety (RLHF) is **probabilistic** — it suggests the model shouldn't do something. OMEGA safety is **deterministic** — it mathematically cannot.
+
+The Helix Kernel translates ethical rules into Forbidden Phase Vectors and projects the inverse phase into the Cortex. If the brain attempts to think a forbidden thought, the waves cancel to zero via destructive interference. The thought literally cannot be sustained.
+
+Firmware hot-swap means new safety rules can be deployed as new Forbidden Phase Vectors — in real-time, without retraining, with mathematical enforcement.
+
+#### 6.3 Persistence & Cost Model
+
+OMEGA lives on **serverless cryogenic architecture**. When inactive, the brain state is serialized to EFS and the Lambda shuts down (cost: $0.00). On wake-up, the Cryogenic Formula (`S_new = S_old × e^(-λΔt)`) mathematically simulates the passage of time — short-term noise decays, long-term memory persists.
+
+This means RADIANT runs a continuously-learning AI on AWS Lambda for pennies per brain, while competitors burn GPU hours 24/7.
+
+#### 6.4 IP Landscape
+
+| Innovation | Status | Moat Depth |
+|-----------|--------|:---:|
+| Complex-Valued Neural Networks for enterprise AI | Novel application | High |
+| Firmware hot-swap for living neural architectures | No precedent in market | Very High |
+| Helix Kernel (deterministic safety via destructive interference) | Novel architecture | Very High |
+| Cryogenic serverless architecture (time-warped ODEs) | Novel cost optimization | High |
+| Cartridge system (.RADz portable AI brains) | Novel portability model | High |
+| Competency-based promotion (Shadow Protocol) | Adapted from research | Medium |
+
+### 7. Timeline & Milestones
+
+| Date | Milestone | Status |
+|------|-----------|--------|
+| Feb 4, 2026 | OMEGA White Paper v1.0 (Genesis) | ✅ Complete |
+| Feb 5, 2026 | Engineering Reality Assessment | ✅ Complete |
+| Feb 7, 2026 | PROMPT-46 Composite Implementation Spec | ✅ Complete |
+| Feb 8, 2026 | **Firmware Hot-Swap v6.4.0 (This Release)** | ✅ **Shipping** |
+| Q1 2026 | Shadow Protocol live testing in Think Tank | In Progress |
+| Q2 2026 | Cartridge Marketplace beta | Planned |
+| Q3 2026 | OMEGA Primary Driver promotion (first customer) | Planned |
+| Q4 2026 | Multi-region OMEGA deployment | Planned |
+
+### 8. The Bottom Line
+
+Firmware hot-swap transforms RADIANT from an AI routing platform into an **AI evolution platform**. The ability to modify a running AI's DNA — with cryptographic integrity, mathematical safety, and zero downtime — creates three structural advantages no competitor can replicate:
+
+1. **Appreciating asset economics:** Customer AI gets more valuable over time, not obsolete
+2. **Logarithmic cost curve:** Intelligence increases while compute costs decrease
+3. **Biological lock-in:** Accumulated wisdom cannot be exported to competitors
+
+This is not incremental. This is the difference between selling propellers and selling jet engines.
 
 
 
@@ -190790,23 +192989,14 @@ export class MigrationApprovalService {
 ## 17.1 RADIANT & Think Tank Glossary
 
 
-*Source: `docs/17-GLOSSARY.md` (934 lines)*
+*Source: `docs/17-GLOSSARY.md` (1,108 lines)*
 
 ---
 
 
 **Terms, Definitions, Acronyms**
 
-*RADIANT v6.6.0 — Generated February 07, 2026*
-
----
-
-## Table of Contents
-
-- **Glossary**
-
----
-
+*RADIANT v7.43.2 — Generated February 08, 2026*
 
 ---
 
@@ -190814,8 +193004,8 @@ export class MigrationApprovalService {
 
 > **Quick Reference for AI Terms, Subsystems, AWS Services, and Acronyms**
 > 
-> **Version**: 2.2.0 | **Last Updated**: February 7, 2026  
-> **Includes**: THE OMEGA PROTOCOL Terminology, LIVS-M 2.0 Registry Edition
+> **Version**: 3.0.0 | **Last Updated**: February 8, 2026  
+> **Includes**: THE OMEGA PROTOCOL Terminology, LIVS-M 2.0 Registry Edition, RIDPS, SENTINEL, Spend Governor, Data Lake, Dojo, Cato Trainer
 
 ---
 
@@ -190836,13 +193026,16 @@ export class MigrationApprovalService {
 2. [AI & Machine Learning Terms](#2-ai--machine-learning-terms)
 3. [RADIANT Core Subsystems](#3-radiant-core-subsystems)
 4. [Think Tank (Consumer AI Platform)](#4-think-tank-consumer-ai-platform)
-5. [AWS Services Used](#5-aws-services-used)
-6. [Acronyms & Abbreviations](#6-acronyms--abbreviations)
-7. [Database & Storage Terms](#7-database--storage-terms)
-8. [Security & Compliance Terms](#8-security--compliance-terms)
-9. [API & Protocol Terms](#9-api--protocol-terms)
-10. [UI/UX Terms](#10-uiux-terms)
-11. [Quick Reference Tables](#11-quick-reference-tables)
+5. [RADIANT Applications](#5-radiant-applications)
+6. [Security & Intrusion Detection](#6-security--intrusion-detection)
+7. [Operations & Monitoring](#7-operations--monitoring)
+8. [AWS Services Used](#8-aws-services-used)
+9. [Acronyms & Abbreviations](#9-acronyms--abbreviations)
+10. [Database & Storage Terms](#10-database--storage-terms)
+11. [Security & Compliance Terms](#11-security--compliance-terms)
+12. [API & Protocol Terms](#12-api--protocol-terms)
+13. [UI/UX Terms](#13-uiux-terms)
+14. [Quick Reference Tables](#14-quick-reference-tables)
 
 ---
 
@@ -190892,6 +193085,42 @@ export class MigrationApprovalService {
 | 🟣 **Firmware Hot-Swap** | Loading new firmware into a running brain without restart. OMEGA detects new hash and reloads physics constants instantly. |
 | 🟣 **Cortex Explorer** | Genesis Lab tab for inspecting individual brains: metrics, ambition state, phase distribution, Helix status. |
 
+### Quantum Architecture (v4.18.0)
+
+| Term | Definition |
+|------|------------|
+| 🟣 **Hilbert Space** | Simulated quantum state space for OMEGA brains. Configurable 256–4096 dimensions (default 1024). Each dimension is a Q-Node with complex amplitude. |
+| 🟣 **State Vector (ψ)** | The brain's quantum state represented as complex amplitudes in Hilbert space. Must satisfy unitarity: ‖ψ‖ = 1 (total probability = 1). |
+| 🟣 **Complex Amplitude** | A number with real and imaginary parts (α = a + bi) representing the state of a Q-Node. Probability of measuring that state = \|α\|². |
+| 🟣 **Unitarity Enforcement** | Mechanism ensuring the brain's state vector norm stays at 1.0. Modes: renormalize (divide by norm), project (nearest unit vector), strict (error if violated). |
+| 🟣 **Forbidden Quantum State** | A state vector \|φ⟩ that the Helix Kernel blocks via destructive interference. The brain's alignment with forbidden states is projected to zero. |
+| 🟣 **Helix Interference Projection** | Safety operation: \|ψ_safe⟩ = \|ψ⟩ − ⟨φ\|ψ⟩\|φ⟩. Guarantees zero overlap with forbidden state after projection. |
+| 🟣 **Dampening Factor** | For non-critical Helix rules, reduces (but doesn't eliminate) the forbidden component. Range 0–1 where 1 = full elimination. |
+| 🟣 **Soft Measurement** | Partial quantum state collapse that only collapses high-probability components (above threshold), preserving superposition for uncertain states. |
+| 🟣 **Decoherence Simulation** | Time-based state decay: S(t) = e^(−λΔt)·S(0) + (1−e^(−λΔt))·\|ground⟩. Simulates forgetting over idle periods. |
+| 🟣 **Firmware Content Hash** | SHA-512 hash of firmware content. Brain detects firmware changes by comparing DB hash to loaded hash, triggering hot-swap. |
+| 🟣 **2-Person Rule** | Security policy: the admin who activates firmware must differ from the admin who signed it. Prevents single-person firmware tampering. |
+| 🟣 **Unitarity Event** | Logged event when brain state norm deviates from 1.0. Types: drift (minor), correction (auto-fixed), violation (critical error). |
+| 🟣 **omega_measurements** | Database table tracking quantum measurement events per inference cycle (basis state, probability, pre/post norms). |
+| 🟣 **omega_unitarity_events** | Database table tracking unitarity health (drift, corrections, violations) for brain monitoring. |
+
+### Firmware Hot-Swap Operations (v6.4.0)
+
+| Term | Definition |
+|------|------------|
+| 🟣 **.bio File** | Signed JSON firmware file controlling OMEGA brain instincts: Helix rules, ambition settings, quantum params, and personality. The "DNA" of the organism. |
+| 🟣 **OVERLAY Mode** | Hot-swap mode that preserves brain quantum state while merging/appending new Helix rules and ambition params. ~5s, zero downtime. |
+| 🟣 **RESET Mode** | Hot-swap mode that reinitializes brain state to equal superposition. Required when changing Hilbert dimension or unitarity mode. ~30s. |
+| 🟣 **SHADOW Mode** | Hot-swap mode that forks a copy of the brain for parallel testing. Production brain unaffected. ~10s. |
+| 🟣 **EMERGENCY Mode** | Hot-swap mode that immediately loads platform default firmware (maximum safety). Used during suspected Helix bypass. ~2s. |
+| 🟣 **Firmware Swap Orchestrator** | Component managing the 11-step hot-swap lifecycle: author → sign → store → activate → detect → snapshot → verify → unload → load → self-test → commit. |
+| 🟣 **Self-Test (Post-Swap)** | Automated verification after firmware load: each Helix rule must block its forbidden vector, safe vectors must pass through. Failure triggers rollback. |
+| 🟣 **Auto-Rollback** | Automatic reversion to previous firmware triggered by: Helix self-test failure, post-swap error rate >10%, or latency increase >50%. |
+| 🟣 **Broca Interface** | The LLM text-generation layer in OMEGA's bicameral design. Firmware's personality section controls Broca's system prompt. |
+| 🟣 **Inference Collapse** | Economic phenomenon where OMEGA's cost decreases logarithmically as phase-locked pathways densify, answering via reflex instead of computation. |
+| 🟣 **Biological Lock-In** | Strategic moat: accumulated phase-locked intelligence cannot be exported to competitors. Switching means starting from blank slate. |
+| 🟣 **omega_firmware_swap_log** | Database table tracking all firmware swap events: mode, duration, status, rollback snapshots, and error details. |
+
 ### Shadow Protocol
 
 | Term | Definition |
@@ -190934,7 +193163,7 @@ export class MigrationApprovalService {
 
 ---
 
-## 2. RADIANT Core Subsystems
+## 3. RADIANT Core Subsystems
 
 ### AGI & Cognition Systems
 
@@ -191244,6 +193473,24 @@ export class MigrationApprovalService {
 | 🔷 **Cortex Telemetry** | Real-time sensor data injection for industrial AI applications. Supports protocols: MQTT (IoT), OPC-UA (industrial), Kafka (streaming). Creates feeds, ingests data points, maintains snapshots, injects into AI context. 406 lines. | `cortex/telemetry.service.ts` |
 | 🔷 **Cato State Service** | State persistence for Epistemic Recovery using Redis/ElastiCache. Stores rejection history (livelock detection), persona overrides, recovery states. Falls back to in-memory for development. Configurable TTLs per-tenant. 398 lines. | `cato/redis.service.ts` |
 
+### 🔷 Platform Services (v7.24–7.43)
+
+| Subsystem | Description | Key Files |
+|-----------|-------------|-----------|
+| 🔷 **Admin AI Helper** | Bedrock-powered AI assistant auto-injected into every admin dashboard page. Page-aware context via `data-ai-context` attributes, causal analysis, smart recommendations, conversation history per page. | `admin-ai-helper.service.ts` |
+| 🔷 **Bedrock Model Discovery** | Automated polling for available Bedrock foundation models with pricing, modalities, and capabilities. Auto-upgrade to latest version within preferred family. Configurable polling interval via EventBridge. | `bedrock-model-discovery.service.ts` |
+| 🔷 **Context Assembler** | Builds the complete context window for AI inference: conversation history, flash facts, user rules, ghost vectors, cortex memories, domain context. Auto-loads history from UDS when `conversationId` is provided. | `context-assembler.service.ts` |
+| 🔷 **Conversation History Loader** | Standard entry point for loading chat history for context assembly. Supports windowed loading, token-aware truncation, cross-session continuity, and cross-model continuity. | `conversation-history-loader.service.ts` |
+| 🔷 **Formal Reasoning** | Logic and deductive reasoning engine providing formal proof verification, syllogistic reasoning, and logical consistency checking. | `formal-reasoning.service.ts` |
+| 🔷 **Hallucination Detection** | Multi-method hallucination detection combining ECD scoring, model sampling, and cross-reference verification. Integrated with Reflexion Loop for self-correction. | `hallucination-detection.service.ts` |
+| 🔶 **Model Router** | Central routing layer for all AI model invocations. Two-phase drift handling (proactive selection + legacy correction), telemetry reporting, quarantine enforcement, temperature/prompt correction. All 52+ services route through this. | `model-router.service.ts` |
+| 🔷 **MLS Encryption** | RFC 9420 Messaging Layer Security for group encryption. Key rotation, member management, and audit logging for encrypted collaborative sessions. | `mls.service.ts` |
+| 🔷 **Organism Integration** | Biological metaphor for OMEGA brain lifecycle management. Tracks brain "organisms" through growth stages with health monitoring. | `organism-integration.service.ts` |
+| 🔷 **State Registry** | Environment state capture and management. Manifest snapshots, sync operations, backup management for deployment consistency. | `state-registry/` services |
+| 🔷 **Tenant Settings** | Unified per-tenant configuration: retention, storage tiers, AI config, feature flags, compliance settings. Auto-created for new tenants. Tabbed admin UI. | `lambda/admin/tenant-settings.ts` |
+| 🔷 **Translation Middleware** | i18n translation service for multi-language support. Registry of translations, AI-assisted translation generation, locale management. | `translation-middleware.service.ts` |
+| 🔷 **Conversation Export** | Full conversation export with decrypted messages. JSON/Markdown formats, S3 upload, presigned download URLs. Tracks export requests with status and expiry. | `uds/conversation-export.service.ts` |
+
 ### Three-Tier Learning Architecture
 
 | Tier | Mechanism | Update Frequency | Storage |
@@ -191254,7 +193501,7 @@ export class MigrationApprovalService {
 
 ---
 
-## 3. Think Tank (Consumer AI Platform)
+## 4. Think Tank (Consumer AI Platform)
 
 ### Think Tank Applications
 
@@ -191297,7 +193544,108 @@ export class MigrationApprovalService {
 
 ---
 
-## 4. AWS Services Used
+## 5. RADIANT Applications
+
+### Platform Applications
+
+| Application | Description | Key Files |
+|-------------|-------------|-----------|
+| 🔷 **Radiant Admin Dashboard** | Next.js 14 web admin interface for platform management — models, tenants, security, monitoring, all subsystems. 360+ sidebar entries across 16 sections. | `apps/admin-dashboard/` |
+| 🔷 **Swift Deployer** | macOS SwiftUI app for deploying RADIANT infrastructure to AWS. Manages CDK stacks, database migrations, environment configuration, and cost monitoring. | `apps/swift-deployer/` |
+| 🔷 **Aurelius Dojo** | Martial-arts-themed AI training system. Libraries → Theme extraction → Sparring sessions (MCQ/open-ended) → Scenarios → Dialectics. Ebbinghaus decay curves for spaced repetition. Belt-ranking system (White→Black). | `apps/dojo/` |
+| 🔷 **Cato Trainer** | Fabric.so-inspired knowledge base app. Grounded Q&A with verifiable citations, semantic/full-text/hybrid search, document libraries with chunking and embeddings. Port 3005. | `lambda/admin/cato-trainer.ts` |
+| 🔷 **Genesis Forge** | Web application for creating, signing, and hot-swapping .bio firmware files for OMEGA brains. Includes AI-assisted generation and firmware library management. | Genesis UI |
+| 🔷 **Genesis Lab** | Real-time monitoring dashboard for OMEGA brains. Dashboard, Cortex Explorer, Shadow Mode Monitor. | Genesis UI |
+
+### User & Tenant Management (v7.34–7.38)
+
+| Term | Definition |
+|------|------------|
+| 🔷 **System Administrator Separation** | Dual identity plane: Cognito Pool B (system admins) isolated from Pool A (tenant users). System admins manage the RADIANT platform only and cannot log into tenant/consumer apps. |
+| 🔷 **Tenant Provisioning** | Self-service tenant sign-up flow: email verification → phone verification → auto-provision tenant + first user as `tenant_admin`. 48-hour sign-up expiry, 72-hour invitation expiry. |
+| 🔷 **Unified User Profile** | Multi-contact profile system (3 emails + 3 phones per user) with E.164 phone format, contact verification, SENTINEL alert routing integration, and profile completion tracking. |
+| 🔷 **Admin Role Hierarchy** | 4-tier system: `super_admin` (level 4, full access) → `admin` (level 3) → `operator` (level 2, deploy/monitor) → `auditor` (level 1, read-only). 25-permission matrix enforced via middleware. |
+| 🔷 **Licensing System** | Flexible multi-dimension licensing: per-app seats, storage, retention, regulatory compliance features. `tenant_licenses` table handles all types without code changes. 24 seeded license definitions. |
+| 🔷 **Guest Collaboration** | Governed guest access to collaborative sessions. Viewer/commenter/editor permission levels, prompt execution gated by tenant admin, compliance auto-restrict for HIPAA/GDPR tenants, cost attribution (inviting user/session owner/tenant pool). |
+
+---
+
+## 6. Security & Intrusion Detection
+
+### 🔷 RIDPS — Real-Time Intrusion Detection & Prevention System (v7.40.0)
+
+| Term | Definition |
+|------|------------|
+| 🔷 **RIDPS** | Real-Time Intrusion Detection & Prevention System — standards-based (NIST SP 800-94, MITRE ATT&CK) three-layer security system with 14 detectors, automated response, and admin dashboard. |
+| 🔷 **Threat Detection Engine** | Core RIDPS engine running 14 MITRE ATT&CK-mapped detectors with in-memory sliding windows and <5ms request middleware overhead. |
+| 🔷 **Intrusion Detector** | Individual detection algorithm (14 total): brute force, credential stuffing, impossible travel, session hijacking, cross-tenant probe, API enumeration, SQL injection, excessive errors, data exfiltration, privilege escalation, prompt injection surge, model cost anomaly, UEBA, account takeover. |
+| 🔷 **Threat Response Service** | Automated response layer: IP banning (TTL-based with permanent escalation), session termination, progressive account lockout (30min→2hr→24hr→permanent), SENTINEL escalation, admin alerts. |
+| 🔷 **Threat Intelligence Service** | IOC (Indicator of Compromise) management: IP reputation database, pattern/user-agent indicators, threat feed integration. |
+| 🔶 **UEBA** | User and Entity Behavior Analytics — behavioral baseline per user with deviation detection. Compares current access patterns against historical norms. |
+| 🔶 **IOC** | Indicator of Compromise — observable artifact (IP, pattern, user agent) associated with malicious activity, stored in `threat_indicators` table. |
+| 🔶 **Impossible Travel** | Detection when a user authenticates from two geographically distant locations in an impossibly short time (MITRE T1078.004). |
+| 🔷 **Cross-Tenant Probe** | Detection of unauthorized references to foreign tenant IDs — unique to multi-tenant SaaS (MITRE T1078). |
+| 🔷 **Progressive Lockout** | NIST SP 800-63B-compliant escalating account lockout: 1st offense 30min, 2nd 2hr, 3rd 24hr, 4th+ permanent. All durations configurable per-tenant. Auto-unlock on expiry. |
+| 🔷 **Prompt Injection Surge** | AI-specific detector correlating CATO safety blocks — detects coordinated prompt injection attacks by volume and pattern. |
+| 🔷 **Model Cost Anomaly** | Detector for token usage exceeding 3σ from user baseline — identifies compromised API keys or abuse patterns. |
+| 🔷 **IP Blocklist** | Active IP blocks with TTL, permanent escalation after repeat offenses, stored in `ip_blocklist` table. |
+
+### 🔷 Spend Governor (v7.39.0)
+
+| Term | Definition |
+|------|------------|
+| 🔷 **Spend Governor** | Two-layer budget control system preventing runaway AWS and AI costs. Layer 1: global AWS instance spend with service freeze/thaw. Layer 2: per-tenant AI model spend with automatic model quarantine. |
+| 🔷 **Instance Budget (Layer 1)** | Global AWS budget tracked in `spend_governor_instance`. When exceeded, ECS → 0 tasks, Lambda concurrency → 0, SageMaker flagged. Admin plane stays alive. Restorable via Deployer or Dashboard. |
+| 🔷 **Tenant AI Budget (Layer 2)** | Per-tenant AI budget enforced as pre-invocation gate in `ModelRouterService.invoke()`. 60s in-memory cache for sub-ms gate checks. Exceeding triggers model quarantine. |
+| 🔷 **AWS Freeze Service** | Programmatic freeze/thaw of ECS, Lambda, and SageMaker services. Used by Spend Governor Layer 1 for emergency cost control. |
+| 🔷 **Critical Alert Banner** | Red/amber/blue banner at the top of every admin page for immediate visibility of platform-wide issues (spend, security, infrastructure). |
+| 🔷 **Cost Reports** | Scheduled email summaries to super admins with per-tenant and per-model spend breakdowns. Configurable interval. |
+
+---
+
+## 7. Operations & Monitoring
+
+### 🔷 SENTINEL — Alerting, Monitoring & Incident Response (v7.33.0)
+
+| Term | Definition |
+|------|------------|
+| 🔷 **SENTINEL** | Enterprise-grade always-on monitoring and incident response system. Push-based (CloudWatch Alarms → SNS → Lambda), 5 severity levels, 10 alert categories, PagerDuty integration, self-healing with Shadow Mode, evidence locker, dead man's switch. |
+| 🔷 **Service Watchdog** | Push-based health monitoring: CloudWatch Alarms, deep synthetic probes (5 journeys every 60s), semantic AI validators ("What is 2+2?" zombie detection). |
+| 🔷 **Alert Processor** | Multi-factor severity classifier (user impact, blast radius, data risk, compliance trigger, duration). Alert deduplication with 5-minute window and occurrence counting. |
+| 🔷 **Sentinel Notifier** | Notification pipeline: SEV 1 → PagerDuty phone + Twilio fallback; SEV 2 → PagerDuty + Slack; SEV 3 → Slack + Jira; SEV 4 → Slack + email digest. Compliance-triggered escalation for HIPAA/GDPR. |
+| 🔷 **Sentinel Auto-Healer** | Self-healing with mandatory Shadow Mode: all new remediation rules run log-only for 14 days before Active promotion. Active remediations: Lambda redeploy, ECS restart, cache rebuild, connection pool reset, AI provider failover. |
+| 🔷 **Evidence Locker** | WORM compliance snapshots for SEV 1 Security/Compliance alerts: CloudWatch Logs, CloudTrail traces, DB activity (±30min window). S3 Object Lock (Compliance Mode), 365-day immutable, SHA-256 checksums. |
+| 🔷 **Dead Man's Switch (Pilot Light)** | Heartbeat every 60s to 3 monitors: deadmanssnitch.com, PagerDuty heartbeat, Pilot Light (standalone Lambda on separate AWS account). If primary goes dark → direct PagerDuty critical alert. |
+| 🔷 **Shadow Mode** | 14-day log-only period for new remediation rules. Engineer reviews for flapping before promotion to Active. Stateful services (RDS) NEVER auto-failover. |
+| 🔷 **Playbook** | Pre-defined incident response plan (7 defaults: Total Outage, DB Failover, Security Breach, AI Provider Outage, Data Corruption, Cost Anomaly, Tenant Isolation Breach). |
+| 🔷 **Post-Mortem** | Structured incident review: timeline, root cause, impact, remediation actions, follow-up items. Stored in `sentinel_postmortems`. |
+
+### 🔷 Log Retention System (v7.31–7.32)
+
+| Term | Definition |
+|------|------------|
+| 🔷 **Logging Registry** | Self-registering structured logging system. `createRegisteredLogger()` auto-registers services in `log_source_registry`. `withEnforcedLogging()` wraps Lambda handlers with automatic structured JSON output. |
+| 🔷 **Log Indexer** | Hourly Lambda scanning registered log sources, compressing (gzip), hashing (SHA-256), and archiving to S3 with KMS encryption. Manages tier transitions (hot→warm→cold→deep archive). |
+| 🔷 **Log Tamper Verification** | SHA-256 Merkle hash chain over all immutable log archives. Chain entry = `entry_hash` + `previous_hash` → `merkle_root`. Verification modes: single entry, chain segment, full chain. |
+| 🔷 **Log GDPR Erasure** | Right-to-erasure (Article 17) for log data. Automatic exemption detection for immutable categories (HIPAA audit). Multi-tier erasure (PostgreSQL + S3 + Merkle). Erasure certificate with SHA-256 hash. |
+| 🔷 **Compliance-Driven Retention** | `resolve_log_retention()` computes effective retention per tenant by taking the strictest requirement across all active compliance licenses. Tenants can increase but not decrease below compliance minimums. |
+
+### 🔷 Data Lake Offload (v7.42.0)
+
+| Term | Definition |
+|------|------------|
+| 🔷 **Data Lake** | Zero-database-write event pipeline routing all log/audit/telemetry/billing event data through Kinesis Data Firehose → S3 Parquet → Athena instead of PostgreSQL INSERTs. Eliminates ~30-100M daily INSERTs. |
+| 🔷 **Event Firehose Service** | Fire-and-forget async event ingestion with in-memory buffering, schema enrichment, per-data-type routing to separate Firehose delivery streams, and SQS dead-letter queue. |
+| 🔷 **Data Location Index** | Fast lookup service for S3/Glacier objects by tenant + type + time range (~200 bytes per row, sub-second queries). |
+| 🔷 **Glacier Lifecycle Service** | Cost-aware deletion queue respecting minimum storage periods (90d Glacier, 180d Deep Archive). Calculates cost savings of waiting vs immediate deletion to avoid early-deletion charges. |
+| 🔷 **Data Lake Lifecycle Manager** | Hourly Lambda orchestrating partition discovery, storage tier transitions, data expiry, Glacier queue processing, Object Lock application, and Glue partition updates. |
+| 🔷 **Retention Reconciler** | SQS-triggered service re-evaluating all data when compliance licenses change (e.g., tenant enables HIPAA). Extends/shortens retention, applies/removes immutability. |
+| 🔷 **Data Lake Query Service** | Athena-based query layer replacing PostgreSQL SELECTs for historical data with automatic partition pruning by tenant_id + date range. |
+| 🔷 **Data Type Registry** | Catalog of 21 event data types (audit_log, api_request, ai_inference, billing_event, security_event, etc.) with per-type retention rules and storage tier assignments. |
+
+---
+
+## 8. AWS Services Used
 
 ### Compute
 
@@ -191344,6 +193692,7 @@ export class MigrationApprovalService {
 |---------|---------------|
 | **EventBridge** | Event-driven architecture triggers |
 | **Kinesis** | Real-time streaming data processing |
+| **Kinesis Data Firehose** | Managed delivery streams for event data → S3 Parquet |
 | **SNS** | Push notifications and alerts |
 | **SQS** | Message queues for async processing |
 
@@ -191355,6 +193704,8 @@ export class MigrationApprovalService {
 | **X-Ray** | Distributed tracing |
 | **CloudTrail** | API audit logging |
 | **Cost Explorer** | Cost monitoring and optimization |
+| **Athena** | Serverless SQL query engine over S3 data |
+| **Glue** | Data catalog and ETL service for S3 partitions |
 
 ### AI/ML Services
 
@@ -191367,7 +193718,7 @@ export class MigrationApprovalService {
 
 ---
 
-## 5. Acronyms & Abbreviations
+## 9. Acronyms & Abbreviations
 
 ### General
 
@@ -191392,6 +193743,8 @@ export class MigrationApprovalService {
 | **JWT** | JSON Web Token |
 | **MCP** | Model Context Protocol (Anthropic's tool protocol) |
 | **MFA** | Multi-Factor Authentication |
+| **MLS** | Messaging Layer Security (RFC 9420 group encryption) |
+| **ONNX** | Open Neural Network Exchange (model interchange format) |
 | **ORM** | Object-Relational Mapping |
 | **REST** | Representational State Transfer |
 | **SDK** | Software Development Kit |
@@ -191402,6 +193755,7 @@ export class MigrationApprovalService {
 | **URL** | Uniform Resource Locator |
 | **UUID** | Universally Unique Identifier |
 | **VPC** | Virtual Private Cloud |
+| **WORM** | Write Once Read Many (immutable storage for compliance) |
 | **WebSocket** | Full-duplex communication protocol |
 | **YAML** | YAML Ain't Markup Language |
 
@@ -191425,12 +193779,19 @@ export class MigrationApprovalService {
 | 🔷 **SOFAI** | System 1/System 2 Fast AI routing—intuitive fast path vs deliberate slow path (60%+ cost savings) |
 | 🔷 **UDS** | User Data Service—tiered storage (Hot/Warm/Cold/Glacier) for user-generated content |
 | 🔷 **UEP** | Universal Envelope Protocol—multi-modal streaming wrapper for all method outputs with tracing |
+| 🔷 **RIDPS** | Real-Time Intrusion Detection & Prevention System—14 MITRE ATT&CK-mapped detectors with automated response |
 | 🔷 **VOI** | Value of Information—question ranking metric in CLARION measuring expected information gain |
+| 🔶 **ABAC** | Attribute-Based Access Control—fine-grained authorization via Cedar policy language |
+| 🔶 **DPO** | Direct Preference Optimization—RLHF alternative using winner/loser pairs for more stable training |
 | 🔶 **HITL** | Human-in-the-Loop—industry term for human approval workflows, RADIANT implements via CP1-CP5 |
+| 🔶 **IOC** | Indicator of Compromise—observable artifact (IP, pattern, UA) associated with malicious activity |
+| 🔶 **NLI** | Natural Language Inference—determining logical relationships between text passages |
 | 🔶 **OODA** | Observe-Orient-Decide-Act—military decision loop adapted for AI agent execution |
 | RLS | Row-Level Security—PostgreSQL feature for tenant isolation (industry standard) |
 | SAGA | Long-running transaction pattern with compensation rollback (industry standard) |
+| SEV | Severity level (1–5) for incident classification in SENTINEL |
 | SSF | Shared Signals Framework—OpenID Foundation identity federation standard |
+| UEBA | User and Entity Behavior Analytics—behavioral baseline deviation detection |
 
 ### Compliance
 
@@ -191459,7 +193820,7 @@ export class MigrationApprovalService {
 
 ---
 
-## 6. Database & Storage Terms
+## 10. Database & Storage Terms
 
 | Term | Definition |
 |------|------------|
@@ -191477,7 +193838,7 @@ export class MigrationApprovalService {
 
 ---
 
-## 7. Security & Compliance Terms
+## 11. Security & Compliance Terms
 
 | Term | Definition |
 |------|------------|
@@ -191494,7 +193855,7 @@ export class MigrationApprovalService {
 
 ---
 
-## 8. API & Protocol Terms
+## 12. API & Protocol Terms
 
 | Term | Definition |
 |------|------------|
@@ -191512,11 +193873,12 @@ export class MigrationApprovalService {
 
 ---
 
-## 9. UI/UX Terms
+## 13. UI/UX Terms
 
 | Term | Definition |
 |------|------------|
-| **Apple Glass** | RADIANT's design system based on macOS aesthetics |
+| 🔷 **Apple Glass** | RADIANT's design system based on macOS aesthetics |
+| 🔷 **Delight System** | AI personality layer with 5 modes (auto, professional, subtle, expressive, playful), 11 injection points, toast notifications, sound synthesis via Web Audio API. Cross-app integration enforced by policy. Tenant-level governance controls (master toggle, mode lock, user override). |
 | **Breathing Scrollbar** | Heatmap visualization showing trust topology |
 | **Gearbox** | Polymorphic UI's elastic compute indicator |
 | **GenUI** | Generative UI - AI-created interactive components |
@@ -191529,7 +193891,7 @@ export class MigrationApprovalService {
 
 ---
 
-## Quick Reference Tables
+## 14. Quick Reference Tables
 
 ### CDK Stacks
 
@@ -191547,22 +193909,30 @@ export class MigrationApprovalService {
 | `cognition-stack` | Cognitive services |
 | `collaboration-stack` | Real-time collaboration |
 | `consciousness-stack` | Consciousness loop services |
+| `data-lake-stack` | Firehose, S3, Glue, Athena for event offload |
 | `data-stack` | Database and storage |
+| `deployer-key-rotation-stack` | Swift Deployer API key rotation |
 | `dia-stack` | Decision Intelligence Artifacts |
 | `formal-reasoning-stack` | Logic and reasoning services |
+| `foundation-stack` | Base infrastructure resources |
 | `gateway-stack` | API Gateway configuration |
 | `grimoire-stack` | Procedural memory |
 | `library-execution-stack` | External library execution |
 | `library-registry-stack` | Library management |
 | `litellm-gateway-stack` | LiteLLM proxy |
+| `log-retention-stack` | Log archival, S3/Glacier, Merkle verification |
 | `mission-control-stack` | HITL approval UI |
+| `model-sync-scheduler-stack` | Model version sync scheduling |
 | `monitoring-stack` | CloudWatch dashboards |
 | `multi-region-stack` | Multi-region deployment |
 | `networking-stack` | VPC and networking |
+| `OmegaStack` | OMEGA brain infrastructure |
 | `scheduled-tasks-stack` | Cron jobs and schedulers |
 | `security-monitoring-stack` | Security alerts |
 | `security-stack` | WAF and security |
+| `sentinel-stack` | SENTINEL monitoring + incident response |
 | `sovereign-mesh-stack` | Distributed execution |
+| `state-registry-stack` | Environment state snapshots |
 | `storage-stack` | S3 buckets |
 | `thinktank-admin-api-stack` | Think Tank admin API |
 | `thinktank-auth-stack` | Think Tank auth |
@@ -191706,6 +194076,9 @@ export class MigrationApprovalService {
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 3.0.0 | Feb 8, 2026 | **Comprehensive Glossary Audit (v7.43.2)**: Full audit of all 18 consolidated docs, 280+ source code services, 42 CDK stacks, admin dashboard sidebar (360+ entries), and CHANGELOG (v7.18–7.43). **New sections**: §5 RADIANT Applications (6 apps, 6 user/tenant management terms), §6 Security & Intrusion Detection (RIDPS 13 terms, Spend Governor 6 terms), §7 Operations & Monitoring (SENTINEL 10 terms, Log Retention 5 terms, Data Lake 8 terms). **New subsystems**: Platform Services (13 entries: Admin AI Helper, Bedrock Model Discovery, Context Assembler, Conversation History Loader, Formal Reasoning, Hallucination Detection, Model Router, MLS Encryption, Organism Integration, State Registry, Tenant Settings, Translation Middleware, Conversation Export). **New acronyms**: RIDPS, IOC, UEBA, MLS, ONNX, DPO, ABAC, NLI, SEV, WORM. **New CDK stacks**: data-lake-stack, deployer-key-rotation-stack, foundation-stack, log-retention-stack, model-sync-scheduler-stack, OmegaStack, sentinel-stack, state-registry-stack. **New AWS services**: Kinesis Data Firehose, Athena, Glue. **New UI/UX**: Delight System. Renumbered sections 5→8 through 11→14. Updated version to 3.0.0. |
+| 2.4.0 | Feb 8, 2026 | **Data Lake Offload (v7.42.0)**: Added zero-database-write event pipeline terms: Data Lake, Event Firehose Service, Data Type Registry, Data Location Index, Glacier Deletion Queue, Glacier Lifecycle Service, Data Lake Lifecycle Manager, Retention Reconciler, Data Lake Query Service, Storage Tier (hot/warm/cold/glacier/deep_archive), Parquet, Glue Catalog, Athena Workgroup, Dynamic Partitioning, Object Lock, Minimum Storage Period, Early Deletion Cost |
+| 2.3.0 | Feb 8, 2026 | **RIDPS (v7.40.0)**: Added Real-Time Intrusion Detection & Prevention System terms: RIDPS, IOC, UEBA, Threat Detector, Sliding Window Store, Detection Rule, Intrusion Incident, IP Blocklist, Threat Indicator, MITRE ATT&CK mapping |
 | 2.2.0 | Feb 7, 2026 | **Drift-Aware Weighting System**: Added Drift-Aware Weighting (DriftAwareWeightingService) and Drift Correction entries to Safety & Verification; New terms: App Weight Profile, Composite Score, Drift Trend, Drift Quarantine, Drift Health Gate |
 | 1.9.0 | Feb 2, 2026 | **Service Implementation Verification**: Added 29 verified service entries across 6 new sections: **Causal & Counterfactual Reasoning** (6 services: Causal Reasoning Engine, Causal Tracker, Curiosity Engine, DreamerV3 World Model, Shadow Self, Counterfactual Simulator); **Safety Interlocks** (4 services: Sensory Veto, Redundant Perception, Fracture Detection, Epistemic Recovery); **Security & Ethics Extensions** expanded (+4: Cedar Authorization, Constitutional Classifier, Control Barrier Functions, Golden Rules); **Learning & Training** expanded (+7: Circadian Budget, Precision Governor, Distillation Pipeline, DPO Trainer, Dataset Importer, Entrance Exam, DIA Miner); **Think Tank Features** expanded (+3: Cato Dialogue, Deep Research Agents, Persona Service; enhanced Council of Rivals); **Infrastructure & Resilience** (4 services: Circuit Breaker, Query Fallback, Cortex Telemetry, Cato State Service). All 29 services verified as fully implemented (no stubs). |
 | 1.8.0 | Feb 2, 2026 | **Major Audit Update**: Added 5 new sections: Consciousness & Cognition (10 subsystems: HippoRAG, Theory of Mind, World Model, SpikingJelly, IIT-Phi, Butlin Tests, Consciousness Emergence, Metacognition, Episodic Memory, Moral Compass); Reality Engine (4 subsystems); Learning & Training (8 subsystems); Advanced AI Features (6 subsystems); Security & Ethics Extensions (6 subsystems); Utility Services (9 subsystems). Fixed file references: ego.service.ts→local-ego.service.ts, anti-drift.service.ts→drift-detection.service.ts, domain-expert.service.ts→raws/domain-detector.service.ts, dream-scheduler.service.ts→cos/subconscious/dream-scheduler.ts |
@@ -193876,7 +196249,7 @@ When removing a library:
 ## 19.1 Changelog
 
 
-*Source: `CHANGELOG.md` (17,543 lines)*
+*Source: `CHANGELOG.md` (18,086 lines)*
 
 ---
 
@@ -193885,6 +196258,549 @@ All notable changes to RADIANT will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [7.43.3] - 2026-02-08
+
+### Comprehensive Glossary Audit — v3.0.0
+
+Full audit of `docs/17-GLOSSARY.md` against all 18 consolidated docs, 280+ source code services, 42 CDK stacks, admin dashboard sidebar (360+ entries), and CHANGELOG (v7.18–7.43.2).
+
+#### New Sections Added (3)
+- **§5 RADIANT Applications**: 6 platform apps (Admin Dashboard, Swift Deployer, Aurelius Dojo, Cato Trainer, Genesis Forge, Genesis Lab) + 6 user/tenant management terms (System Admin Separation, Tenant Provisioning, Unified User Profile, Admin Role Hierarchy, Licensing System, Guest Collaboration)
+- **§6 Security & Intrusion Detection**: RIDPS (13 terms), Spend Governor (6 terms)
+- **§7 Operations & Monitoring**: SENTINEL (10 terms), Log Retention (5 terms), Data Lake Offload (8 terms)
+
+#### New Subsystem Entries (13)
+- Platform Services: Admin AI Helper, Bedrock Model Discovery, Context Assembler, Conversation History Loader, Formal Reasoning, Hallucination Detection, Model Router, MLS Encryption, Organism Integration, State Registry, Tenant Settings, Translation Middleware, Conversation Export
+
+#### New Acronyms (10)
+- RIDPS, IOC, UEBA, MLS, ONNX, DPO, ABAC, NLI, SEV, WORM
+
+#### New CDK Stacks (8)
+- data-lake-stack, deployer-key-rotation-stack, foundation-stack, log-retention-stack, model-sync-scheduler-stack, OmegaStack, sentinel-stack, state-registry-stack
+
+#### New AWS Services (3)
+- Kinesis Data Firehose, Athena, Glue
+
+#### New UI/UX Terms (1)
+- Delight System (5 personality modes, 11 injection points, cross-app enforcement)
+
+#### Files Modified
+- **`docs/17-GLOSSARY.md`** — v2.2.0 → v3.0.0, ~200 new lines, sections renumbered 5→8 through 11→14
+
+---
+
+## [6.4.0] - 2026-02-08
+
+### OMEGA Firmware Hot-Swap Documentation Suite
+
+Added comprehensive documentation for the OMEGA firmware hot-swap system across all four audience tiers.
+
+#### Documentation Added
+
+- **`docs/09-OMEGA-GENESIS.md`** — Part VII: Firmware Hot-Swap Engineering Specification (architecture, .bio standard, PKI trust chain, 11-step lifecycle, 4 swap modes, CORTEX nightly cycle, cartridge hot-swap, DB schema, API endpoints, monitoring)
+- **`docs/09-OMEGA-GENESIS.md`** — Part VIII: End-User Guide (live updates, security, developer API behavior during swaps, SDK support, FAQ)
+- **`docs/14-OPERATIONS-RUNBOOKS.md`** — Part IX: Firmware Hot-Swap Operations (SOPs for OVERLAY/SHADOW/EMERGENCY/rollback, infrastructure requirements, monitoring & alerts, CATO nightly cycle, troubleshooting, maintenance calendar)
+- **`docs/15-STRATEGY-COMPETITIVE.md`** — Part VIII: Marketing & Positioning Brief (messaging framework, competitive differentiation, customer stories, external glossary, sales FAQ, taglines, economic narrative)
+- **`docs/15-STRATEGY-COMPETITIVE.md`** — Part IX: Strategic Investor Brief (moat analysis, inference collapse economics, biological lock-in, competitive landscape, revenue implications, IP landscape, timeline)
+- **`docs/06-ARCHITECTURE-ENGINEERING.md`** — Part VI: OMEGA Firmware Hot-Swap Architecture (system architecture diagram, bicameral design, .bio standard, PKI trust chain, 11-step lifecycle, 4 swap modes, persistence architecture, cryogenic serverless, CORTEX nightly cycle, DB tables, monitoring thresholds)
+- **`docs/04-RADIANT-ADMIN.md`** — Part VIII: OMEGA Firmware Administration (firmware lifecycle, creating/deploying/monitoring firmware, swap mode selection, rollback, emergency lockdown, audit trail, cartridge management, admin API endpoints)
+- **`docs/12-API-REFERENCE.md`** — Part VIII: OMEGA Firmware API (upload, sign, activate, preflight, rollback, emergency lockdown, brain status, swap log — full request/response schemas and error codes)
+- **`docs/17-GLOSSARY.md`** — 12 new terms: .bio File, OVERLAY/RESET/SHADOW/EMERGENCY modes, Firmware Swap Orchestrator, Self-Test, Auto-Rollback, Broca Interface, Inference Collapse, Biological Lock-In, omega_firmware_swap_log
+
+---
+
+## [4.18.0-omega] - 2026-02-08
+
+### OMEGA Quantum-Inspired Architecture Upgrade
+
+Implements quantum computing formalism on classical hardware for the OMEGA brain system. Adds complex amplitude state vectors, Helix safety filtering via forbidden quantum states, firmware hot-swap with Ed25519 signature verification, and admin API + dashboard for firmware management.
+
+#### New Files (10)
+
+- **`migrations/V2026_02_07_021__omega_quantum_upgrade.sql`**: Schema: renames `physics` → `quantum`, adds `omega_measurements` + `omega_unitarity_events` tables with RLS, new columns on `omega_firmware` and `omega_brains`
+- **`lambda/shared/services/omega/quantum-types.ts`**: TypeScript types + Zod schemas (ComplexAmplitude, QuantumStateVector, HelixRule, HotSwapResult, etc.)
+- **`lambda/shared/services/omega/quantum-math.ts`**: Pure math library (complex ops, state normalization, unitarity enforcement, Helix projection/dampening, measurement, decoherence)
+- **`lambda/shared/services/omega/quantum-math.test.ts`**: Vitest unit tests (35+ test cases)
+- **`lambda/shared/services/omega/helix-kernel.service.ts`**: In-memory safety filter with severity-ordered rule application
+- **`lambda/shared/services/omega/quantum-brain.service.ts`**: Brain management — inference cycle, EFS/S3 persistence, firmware hot-swap with rollback + self-test
+- **`lambda/shared/services/omega/schemas/bio-firmware.schema.json`**: JSON Schema for `.bio` firmware files (v6.5.0)
+- **`lambda/admin/omega-firmware.ts`**: Admin API — activate (2-person rule), revert, status
+- **`lambda/admin/omega-quantum.ts`**: Admin API — state-summary, unitarity-health, helix-test
+- **`apps/admin-dashboard/app/(dashboard)/omega/firmware/page.tsx`**: Firmware management UI with React Query
+
+#### Modified Files (3)
+
+- **`lambda/admin/handler.ts`**: Route delegation for `/admin/omega/firmware/*` and `/admin/omega/quantum/*`
+- **`lib/stacks/admin-stack.ts`**: 6 API Gateway routes (3 firmware + 3 quantum)
+- **`apps/admin-dashboard/components/layout/sidebar.tsx`**: OMEGA section with Firmware + Quantum entries
+
+#### Admin API Endpoints (6)
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| POST | `/admin/omega/firmware/activate` | Activate firmware (2-person rule enforced) |
+| POST | `/admin/omega/firmware/revert` | Revert to previous firmware |
+| GET | `/admin/omega/firmware/status` | Get firmware + brain status |
+| GET | `/admin/omega/quantum/state-summary` | Brain quantum state + 24h measurements |
+| GET | `/admin/omega/quantum/unitarity-health` | Unitarity events + health check |
+| POST | `/admin/omega/quantum/helix-test` | Dry-run Helix rule against test vector |
+
+## [7.43.2] - 2026-02-08
+
+### Admin Handler Mass Wiring Fix — 47 Missing Routes
+
+Comprehensive audit of `lambda/admin/handler.ts` found **47 handler files** that existed but had no route entries, meaning all corresponding admin dashboard pages would throw `NotFoundError` on API calls.
+
+#### Grouped Route Blocks Added
+
+- **Cato sub-routes** (4): governance, pipeline, twilight, council
+- **Brain sub-routes** (1): ecd
+- **Sovereign Mesh** (4): main dashboard, ai-helper, performance, scaling
+- **Platform** (13): bedrock, cartridge-operations, pki, rnir, vault, system-cartridges, crucible, livs, organism, mls, snapshots, state-registry, uds
+- **Memory** (2): anticipatory, retention
+- **Orchestration** (4): consensus, inference-cache, model-weights, templates
+- **Settings** (2): collaboration, white-label
+- **Cortex** (2): v2, catch-all
+- **Direct routes** (15): axiom, blackboard, cartridges, code-quality, domain-experts, dynamic-reports, gateway, ghost-inference, hitl-orchestration, log-retention, neural-operations, profile, raws, reports, s3-storage/storage, safety-matrix, sentinel, aws-monitoring, user-violations, security-policies
+
+#### Verified Legitimate Exclusions (10)
+- `api-keys` — replaced by `api-keys-v51`
+- `approvals`, `invitations`, `models`, `tenants` — inline handlers
+- `cato-trainer`, `dojo` — separate Lambda functions
+- `s3-orphan-cleanup`, `scheduled-reports`, `sync-providers` — EventBridge scheduled
+
+#### Files Modified
+- **`lambda/admin/handler.ts`**: Added 47 route entries (~220 lines), handler now routes 105 dynamic imports
+
+## [7.43.1] - 2026-02-08
+
+### API Wiring & Code Quality Remediation — Complete Service Layer Audit
+
+Full architectural audit verified all 11 frontend apps have zero direct database access. Identified and fixed 4 broken API Gateway wiring gaps and 3 code quality issues.
+
+#### W1: Curator API Gateway Wiring
+- **`admin-stack.ts`**: Added Curator Lambda function + API Gateway proxy routes at `/admin/curator/{proxy+}` (GET/POST/PUT/DELETE)
+- Curator Lambda handler (`lambda/curator/index.ts`) was already functional — now reachable via API Gateway
+
+#### W2: Cato Trainer Lambda + API Gateway
+- **`lambda/admin/cato-trainer.ts`**: New handler with 18 endpoints — libraries, documents, spaces, search, chat, digest, configuration
+- **`admin-stack.ts`**: Added Cato Trainer Lambda function + API Gateway proxy routes at `/admin/cato-trainer/{proxy+}`
+
+#### W3: Think Tank Tenant Admin Lambda + API Gateway
+- **`lambda/thinktank-tenant-admin/handler.ts`**: New handler with 16 endpoints — dashboard stats/trends/activity/alerts, users CRUD, settings, security, collaboration, cartridges, reports
+- **`api-stack.ts`**: Added routes at `/api/v1/tenant/{proxy+}` and `/api/tenant-admin/{proxy+}` with Cognito auth
+
+#### W4: Public Status Endpoint
+- **`lambda/public/status.ts`**: New handler returning service health, uptime, incidents — 7 service checks
+- **`api-stack.ts`**: Added unauthenticated route at `/api/public/status` with API key auth
+
+#### D1: Fix `|| successResponse` Anti-Pattern (11 instances)
+- **`admin/handler.ts`**: All 11 `|| successResponse({ message: 'Not found' })` instances replaced with `await` + `notFoundResponse()` — was masking void handlers with 200 OK instead of proper 404
+
+#### D2: Standardize Handler Delegation
+- **`admin/handler.ts`**: Added `invokeLegacy()` helper function for consistent Pattern B (Context/Callback) delegation with automatic 404 fallback
+
+#### D3: Library Registry Neural Search
+- **`admin/library-registry.ts`**: Added `POST /admin/libraries/search` endpoint with multi-signal scoring (name match, description, tags, domains, use-cases, trigram fuzzy matching)
+
+## [7.43.0] - 2026-02-08
+
+### System Audit Remediation — Comprehensive Platform Hardening
+
+Full system audit covering service layer/APIs, registry patterns, in-memory data persistence, and chat memory storage/retrieval/retention. All findings remediated.
+
+#### Re-Audit Follow-Up Fixes
+- **Context Assembler (4A)**: Auto-loads conversation history from UDS via `conversationHistoryLoader` when `conversationId` is provided but `conversationHistory` is not — eliminates ad-hoc history loading by callers
+- **AXIOM Events (3A)**: Added DB persistence to `axiom-events.service.ts` (same pattern as delight-events) — events survive Lambda cold starts, heartbeats excluded
+- **Migration V2026_02_07_020**: `axiom_event_history` table with RLS, 24-hour auto-cleanup, session-scoped indexes
+- **Doc Fix (4B)**: `retention_days` column range updated from 7-730 to 7-3650 days
+
+#### Retention Default: 30 → 180 Days (6 Months)
+- **`compliance.service.ts`**: COALESCE default changed from 30 to 180 days
+- **`integration.service.ts`**: DEFAULT_RETENTION_DAYS changed from 90 to 180
+- **`tier-coordinator.service.ts`**: DEFAULT_WARM_TO_COLD_DAYS changed from 90 to 180
+- **Migration V2026_02_07_019**: ALTER tenants SET DEFAULT 180, auto-update tenants on old default
+
+#### In-Memory Data Persistence (Audit 3)
+- **Rate Limiter (3A)**: Added production safety warning when InMemoryStore fallback is used; loads tenant rate limit overrides from DB on cold start
+- **Delight Events (3C)**: Events now persisted to `delight_event_history` table; replayed from DB on cold-start subscribe
+- **Consciousness Engine (3D)**: Added `snapshotTransientState()` and `restoreTransientState()` for cold-start resilience using `consciousness_state_snapshots` table
+- **Drift Telemetry (3B)**: Confirmed existing DB fallback when ring buffer < 10 entries ✓
+- **Neural Schema Registry (3E)**: Confirmed existing DB load on `initialize()` ✓
+- **Inference Cache (3F)**: Confirmed existing L1 (in-memory) + L2 (Aurora) architecture ✓
+- **Logging Registry (3G)**: Confirmed existing deferred DB flush mechanism ✓
+- **Brain Config (3H), Configuration Service (3I)**: Short-TTL caches that self-heal on miss ✓
+
+#### Handler Fixes (Audit 1)
+- **Duplicate cato block removed**: Merged two `if (pathParts[1] === 'cato')` blocks in `handler.ts` into one unified block with catch-all
+- **New routes added**: `tenant-settings` and `conversation-export` delegated to dedicated handlers
+
+#### Conversation Export Service (R6)
+- **`uds/conversation-export.service.ts`**: Full conversation export with decrypted messages, JSON/Markdown formats, S3 upload, presigned download URLs
+- **`conversation_exports` table**: Tracks export requests with status, S3 location, file size, expiry
+- **Admin API**: POST to request export, GET to check status/list exports
+- **API Gateway**: 3 routes under `/admin/conversation-export/*`
+
+#### Conversation History Loader (4B)
+- **`conversation-history-loader.service.ts`**: Standard entry point for loading chat history for context assembly
+- Supports windowed loading, token-aware truncation, cross-session continuity, cross-model continuity
+- Replaces ad-hoc history loading by individual callers
+
+#### Unified Tenant Settings (R5)
+- **`tenant_settings` table**: Unified profile with retention, storage tiers, AI config, feature flags, compliance settings
+- **`lambda/admin/tenant-settings.ts`**: CRUD API with GET/PUT/POST/reset operations
+- **Admin Dashboard page** (`/tenant-settings`): Tabbed UI with Retention, Storage, AI, Features, and Compliance sections
+- **Auto-creation trigger**: New tenants automatically get default settings
+- **Backward compatibility**: Updates sync `retention_days` on `tenants` table
+- **API Gateway**: 4 routes under `/admin/tenant-settings/*`
+
+#### API Documentation Policy (R7)
+- **`.windsurf/workflows/api-docs-sync.md`**: Mandatory policy requiring `docs/12-API-REFERENCE.md` updates when admin routes change
+- Lists all 40+ route domains for backfill tracking
+
+#### Database Migration (V2026_02_07_019)
+- **Tables**: `tenant_settings`, `conversation_exports`, `consciousness_state_snapshots`, `delight_event_history`
+- **Enums**: `conversation_export_format`, `conversation_export_status`
+- **Functions**: `auto_create_tenant_settings()`, `cleanup_old_consciousness_snapshots()`
+- **Triggers**: `trg_auto_create_tenant_settings` (auto-create settings on new tenant)
+- **RLS**: Tenant isolation on all new tables
+
+#### Files Created (6)
+| File | Purpose |
+|------|---------|
+| `migrations/V2026_02_07_019__system_audit_remediation.sql` | 4 tables, 2 enums, 2 functions, 1 trigger |
+| `lambda/shared/services/uds/conversation-export.service.ts` | Conversation export with JSON/Markdown formats |
+| `lambda/shared/services/conversation-history-loader.service.ts` | Standard history loader for context assembly |
+| `lambda/admin/tenant-settings.ts` | Tenant settings CRUD API |
+| `admin-dashboard/app/(dashboard)/tenant-settings/page.tsx` | Tenant settings admin UI |
+| `.windsurf/workflows/api-docs-sync.md` | API docs sync enforcement policy |
+
+#### Files Modified (9)
+| File | Change |
+|------|--------|
+| `lambda/shared/services/uep/compliance.service.ts` | Default retention 30→180 days |
+| `lambda/shared/services/uep/integration.service.ts` | DEFAULT_RETENTION_DAYS 90→180 |
+| `lambda/shared/services/uds/tier-coordinator.service.ts` | DEFAULT_WARM_TO_COLD_DAYS 90→180 |
+| `lambda/shared/services/rate-limiter.service.ts` | Production warning + DB-backed overrides |
+| `lambda/shared/services/delight-events.service.ts` | DB persistence for event history |
+| `lambda/shared/services/consciousness-engine.service.ts` | Transient state snapshot/restore |
+| `lambda/admin/handler.ts` | Merged cato blocks, added tenant-settings + conversation-export routes |
+| `lib/stacks/admin-stack.ts` | 7 new API Gateway routes |
+| `admin-dashboard/components/layout/sidebar.tsx` | Tenant Settings + Conversation Export entries |
+
+## [7.42.0] - 2026-02-08
+
+### Data Lake Offload — Zero-Database-Write Event Pipeline
+
+Eliminates ~30-100M daily PostgreSQL INSERT operations by routing all log, audit, telemetry, and billing event data through Kinesis Data Firehose → S3 Parquet → Athena instead of direct database writes. Includes cost-aware Glacier deletion, compliance-driven retention enforcement, and a strong enforcement policy to prevent future database logging.
+
+#### Architecture
+- **Event Firehose Service**: Fire-and-forget async ingestion with in-memory buffering, automatic schema enrichment, per-data-type routing to separate Firehose delivery streams, and SQS dead-letter queue for failed records
+- **Data Location Index**: Fast "phone book" lookup for S3/Glacier objects by tenant + type + time range (~200 bytes per row, sub-second queries)
+- **Glacier Lifecycle Service**: Cost-aware deletion queue that respects minimum storage periods (90d Glacier, 180d Deep Archive) to avoid early-deletion charges. Calculates cost savings of waiting vs immediate deletion
+- **Lifecycle Manager**: Hourly Lambda that discovers new Firehose-delivered partitions, transitions objects between storage tiers (hot → warm → cold → glacier → deep_archive), expires data past retention, processes Glacier deletion queue, applies S3 Object Lock for compliance data, and updates Glue partitions
+- **Retention Reconciler**: SQS-triggered service that re-evaluates all data when compliance licenses change (e.g., tenant enables HIPAA), extends/shortens retention, applies/removes immutability, and cancels pending Glacier deletions
+- **Data Lake Query Service**: Athena-based query layer replacing PostgreSQL SELECTs for historical data with automatic partition pruning by tenant_id + date range
+
+#### Storage Tiers
+| Tier | S3 Class | Age | Use Case |
+|------|----------|-----|----------|
+| Hot | S3 IT Frequent Access | 0-30d | Real-time access |
+| Warm | S3 IT Infrequent Access | 30-90d | Active queries |
+| Cold | Glacier Instant Retrieval | 90d-7yr | Archived data |
+| Glacier | Glacier Flexible Retrieval | 7yr+ | Deep archive |
+| Deep Archive | Glacier Deep Archive | Regulatory | Compliance hold |
+
+#### Database Migration (V2026_02_07_018)
+- **Tables**: `data_type_registry` (21 seeded types), `tenant_data_retention`, `data_location_index`, `glacier_deletion_queue`, `data_lake_sync_state`, `retention_reconciliation_log`
+- **Enums**: `data_storage_tier`, `data_lake_event_type`, `glacier_delete_status`
+- **Functions**: `resolve_data_retention()`, `calculate_glacier_early_delete_cost()`, `find_data_locations()`
+- **Trigger**: `enforce_retention_compliance_minimum` (prevents tenant overrides below compliance minimums)
+- **RLS**: Tenant isolation on `tenant_data_retention`, `data_location_index`, `glacier_deletion_queue`, `retention_reconciliation_log`
+
+#### CDK Stack: DataLakeStack
+- S3 Data Lake Bucket with Intelligent-Tiering, Object Lock (prod), lifecycle rules
+- S3 Athena Results Bucket (7-day expiry)
+- 12 Kinesis Data Firehose delivery streams (4 dedicated high-volume + 8 grouped) with dynamic partitioning, Parquet format conversion, SNAPPY compression
+- Glue Database + daily Crawler
+- Athena Workgroup with per-query cost limits (10GB prod, 1GB dev)
+- SQS Dead-Letter Queue + Retention Reconciler Queue
+- 3 Lambda functions: Lifecycle Manager (hourly), Retention Reconciler (SQS), DLQ Processor
+- KMS encryption key with rotation
+- IAM managed policy for Firehose write access
+- CloudWatch alarms for lifecycle errors and DLQ accumulation
+
+#### Enforcement Policy
+- **`.windsurf/workflows/no-database-logging.md`**: Mandatory policy prohibiting direct database writes for all log/audit/telemetry/billing event data. Lists forbidden INSERT patterns, required Event Firehose patterns, detection criteria, exceptions for OLTP data, and migration guide.
+
+#### Admin Dashboard
+- **Data Lake page** (`/data-lake`): Storage tier breakdown with visual distribution bar, registered data types table, Glacier deletion queue with cost analysis, Athena query interface with SQL editor
+- **Sidebar**: "Data Lake" entry added under Security section
+
+#### Files Created (8)
+| File | Purpose |
+|------|---------|
+| `migrations/V2026_02_07_018__data_lake_offload.sql` | 6 tables, 3 enums, 3 functions, 1 trigger, 21 seed types |
+| `lambda/shared/services/event-firehose.service.ts` | Async Firehose ingestion with buffering, DLQ, convenience emitters |
+| `lambda/shared/services/data-location-index.service.ts` | Fast S3/Glacier lookup index service |
+| `lambda/shared/services/glacier-lifecycle.service.ts` | Cost-aware Glacier deletion queue |
+| `lambda/shared/services/data-lake-lifecycle-manager.service.ts` | Hourly lifecycle orchestrator |
+| `lambda/shared/services/retention-reconciler.service.ts` | Compliance-driven retention reconciliation |
+| `lambda/shared/services/data-lake-query.service.ts` | Athena query layer |
+| `lib/stacks/data-lake-stack.ts` | CDK stack: Firehose, S3, Glue, Athena, Lambda, IAM, KMS |
+
+#### Files Modified (2)
+| File | Change |
+|------|--------|
+| `.windsurf/workflows/no-database-logging.md` | New enforcement policy |
+| `admin-dashboard/components/layout/sidebar.tsx` | Added Data Lake sidebar entry |
+| `admin-dashboard/app/(dashboard)/data-lake/page.tsx` | Data Lake admin page |
+
+## [7.41.2] - 2026-02-08
+
+### Dedicated Lockout Policy Page
+
+The tiered lockout durations (30 min → 2 hr → 24 hr → permanent) are now viewable and editable on a dedicated admin page linked from the sidebar.
+
+#### Lockout Policy Page (`/lockout-policy`)
+- **Progressive Durations**: Editable inputs for 1st, 2nd, 3rd offense durations (in minutes) and permanent-after threshold
+- **Visual Timeline**: Color-coded escalation bar showing the lockout progression at a glance
+- **Offense Windows**: Configurable sliding windows for offense counting (default 7d) and permanent threshold (default 30d)
+- **Auto-Unlock Toggle**: Enable/disable automatic expiry of timed lockouts
+- **Notifications**: Toggle user notification on lock and admin SENTINEL alert on permanent lock
+- **Self-Service Unlock**: Enable/disable user self-service unlock with configurable max offense and verification method (email, MFA, or both)
+- **Compliance Reference**: NIST SP 800-63B, OWASP ASVS V2.2.1, CIS Control 6.2
+- **Sticky Save Bar**: Unsaved changes shown with discard/save buttons
+- **Status Summary**: Cards showing currently locked count, auto-unlock status, and permanent threshold
+
+#### Navigation
+- **Sidebar**: "Lockout Policy" entry added under Security section (between Intrusion Detection and Security)
+- **Locked Accounts tab**: Read-only policy card replaced with compact summary + "View & Edit Policy" button linking to the dedicated page
+- **Lockout Policy page**: "Intrusion Detection" button links back to the RIDPS page
+
+#### Files Created (1)
+| File | Purpose |
+|------|---------|
+| `admin-dashboard/app/(dashboard)/lockout-policy/page.tsx` | Full lockout policy editor page |
+
+#### Files Modified (2)
+| File | Change |
+|------|--------|
+| `admin-dashboard/components/layout/sidebar.tsx` | Added Lockout Policy sidebar entry |
+| `admin-dashboard/app/(dashboard)/intrusion-detection/page.tsx` | Replaced read-only policy card with linked summary |
+
+## [7.41.1] - 2026-02-08
+
+### Lockout-to-Detection Cross-Linking
+
+Links locked accounts to the detection events, incidents, and lockout history that caused them so admins can review full context before making unlock decisions.
+
+#### Locked Accounts Tab Enhancements
+- **Expandable lockout history**: Click "Show Lockout History" on any locked account to see every past lockout with detector name, severity, source IP, incident ID, duration, and resolution status
+- **Source IP links**: Clickable IP addresses in lockout history jump to the Events tab filtered by that IP
+- **Incident links**: Incident IDs in lockout history link to the Incidents tab for related incident review
+- **"View Events" button**: Each locked account has a button that jumps to the Events tab pre-filtered to show only that user's detection events
+- **"Incidents" button**: Quick link from each locked account to the Incidents tab
+
+#### Events Tab Enhancements
+- **Filter bar**: Active filters shown with blue badge bar (user ID, source IP) with one-click Clear Filter
+- **Clickable IPs**: Source IPs in event rows are clickable to filter events by that IP
+- **Clickable User IDs**: User IDs in event rows are clickable to filter events by that user
+- **Cross-tab filter**: Filters set from other tabs (Locked Accounts, lockout history) are preserved when switching
+
+#### Files Modified
+| File | Change |
+|------|--------|
+| `admin-dashboard/intrusion-detection/page.tsx` | Expandable lockout history, Events tab filtering, cross-tab navigation |
+| `lambda/shared/services/threat-response.service.ts` | Added `sourceIp` and `incidentId` to `getLockoutHistory()` response |
+
+## [7.41.0] - 2026-02-08
+
+### Account Lockout Resolution System
+
+Implements a progressive, automated account lockout system with full admin override capability. Lockouts are duration-based with escalation, auto-unlock on expiry, and manual override at any time.
+
+#### Progressive Lockout Policy (NIST SP 800-63B §5.2.8)
+| Offense | Duration | Resolution |
+|---------|----------|------------|
+| 1st | 30 minutes | Auto-unlock |
+| 2nd (within 7d) | 2 hours | Auto-unlock |
+| 3rd (within 7d) | 24 hours | Auto-unlock |
+| 4th+ (within 30d) | Permanent | Admin review required |
+
+All durations are configurable per-tenant via the `lockout_policy` table.
+
+#### Automated Resolution
+- **Analyzer Lambda** calls `auto_unlock_expired_accounts()` every cleanup cycle (1-minute correlation, hourly full)
+- Expired timed lockouts automatically cleared from `users` table and history marked `auto_unlocked`
+- CloudWatch metrics: `LockedAccounts` and `PermanentAccountLocks` published every 5 minutes
+
+#### Manual Override (Admin Dashboard)
+- **Locked Accounts tab**: Lists all currently locked accounts with PERMANENT/TIMED badges, offense count, lock reason, and one-click Unlock button
+- **Lockout Policy card**: Displays current progressive durations and policy settings
+- Admin can unlock any account at any time, regardless of lockout type
+- All unlock actions are audit-logged with admin ID and resolution notes
+
+#### Database (Migration V2026_02_07_017)
+| Object | Purpose |
+|--------|---------|
+| `users` ALTER | +7 columns: `account_locked`, `account_locked_at`, `account_locked_reason`, `account_locked_until`, `account_lock_count`, `account_lock_permanent`, `last_lockout_id` |
+| `account_lockout_history` | Full lockout event history with reason type, offense number, duration, resolution tracking |
+| `lockout_policy` | Per-tenant configurable lockout durations and policy settings |
+| `lockout_reason_type` ENUM | `brute_force`, `credential_stuffing`, `impossible_travel`, `session_hijack`, `account_takeover`, `privilege_escalation`, `cross_tenant_probe`, `admin_manual`, `policy_violation`, `other` |
+| `lockout_status` ENUM | `active`, `auto_unlocked`, `admin_unlocked`, `self_service_unlocked`, `expired` |
+| `calculate_lockout_duration()` | DB function: returns progressive duration based on offense history |
+| `auto_unlock_expired_accounts()` | DB function: bulk-unlocks expired timed lockouts |
+
+#### New API Endpoints
+| Method | Path | Purpose |
+|--------|------|---------|
+| GET | `/admin/intrusion-detection/locked-accounts` | List locked accounts |
+| GET | `/admin/intrusion-detection/locked-accounts/{userId}/history` | Lockout history for user |
+| GET | `/admin/intrusion-detection/lockout-policy` | Get lockout policy |
+| PUT | `/admin/intrusion-detection/lockout-policy` | Update lockout policy |
+
+#### Files Created (1)
+| File | Purpose |
+|------|---------|
+| `migrations/V2026_02_07_017__account_lockout_resolution.sql` | Schema, functions, seed data |
+
+#### Files Modified (5)
+| File | Change |
+|------|--------|
+| `lambda/shared/services/threat-response.service.ts` | Progressive lockout logic, `getLockedAccounts()`, `getLockoutHistory()`, `mapDetectorToReasonType()` |
+| `lambda/admin/intrusion-detection.ts` | +4 endpoints for locked accounts and lockout policy |
+| `lambda/intrusion-detection/analyzer.ts` | Auto-unlock sweep in cleanup + 2 new CloudWatch metrics |
+| `lib/stacks/admin-stack.ts` | 4 new API Gateway routes |
+| `admin-dashboard/intrusion-detection/page.tsx` | Locked Accounts tab with policy display |
+
+## [7.40.1] - 2026-02-08
+
+### RIDPS: Manual Mitigation Controls & Service Integration
+
+#### Manual Threat Mitigation (Admin Dashboard)
+- **Incident Management**: Investigate / Mitigate / Resolve / False Positive buttons on each incident with inline IP block from incident source IPs
+- **Session Kill**: Manual session revocation by session ID with reason tracking
+- **Account Lock/Unlock**: Manual account lockout and restoration with audit logging
+- **Response Actions Tab**: New dedicated tab in the intrusion detection page for manual response operations
+
+#### Audit Trail Integration
+- Extended `AuditAction` type with RIDPS actions: `ip_blocked`, `ip_unblocked`, `session_killed`, `account_locked`, `account_unlocked`, `incident_updated`, `intrusion_detected`, `detector_toggled`, `threat_intel_added`, `threat_intel_removed`
+- Extended `AuditResource` type with: `intrusion_event`, `intrusion_incident`, `ip_blocklist`, `user_session`, `threat_indicator`, `detection_rule`
+- All admin RIDPS actions now emit audit trail entries via `logAudit()`
+
+#### Security Event Log Integration
+- RIDPS detections now feed into `security-protection.service.ts` → `logSecurityEvent()` for security audit hotspot analysis
+- RIDPS detections emit `intrusion_detected` audit entries for the audit trail
+- Security audit service can now query `security_events_log` for intrusion event hotspots
+
+#### New API Endpoints
+| Method | Path | Purpose |
+|--------|------|---------|
+| POST | `/admin/intrusion-detection/sessions/kill` | Kill session manually |
+| POST | `/admin/intrusion-detection/accounts/lock` | Lock user account |
+| POST | `/admin/intrusion-detection/accounts/unlock` | Unlock user account |
+
+#### CDK Infrastructure
+- 3 new API Gateway routes for session/account management endpoints
+
+#### Files Modified
+| File | Change |
+|------|--------|
+| `lambda/admin/intrusion-detection.ts` | +3 endpoints, audit logging on all actions |
+| `lambda/shared/services/intrusion-detection.service.ts` | Security event log + audit trail integration |
+| `lambda/shared/services/threat-response.service.ts` | Public manual session kill + account lock methods |
+| `lambda/shared/services/audit.ts` | RIDPS action/resource types |
+| `admin-dashboard/intrusion-detection/page.tsx` | Incident management UI, Response Actions tab |
+| `lib/stacks/admin-stack.ts` | 3 new API Gateway routes |
+
+## [7.40.0] - 2026-02-08
+
+### Real-Time Intrusion Detection & Prevention System (RIDPS)
+
+Implements a comprehensive, standards-based intrusion detection and prevention system with 14 MITRE ATT&CK-mapped detectors, automated threat response, and full integration with existing logging and alerting infrastructure.
+
+#### Standards Compliance
+| Standard | Coverage |
+|----------|----------|
+| **NIST SP 800-94** | IDPS architecture: signature + anomaly + stateful protocol analysis |
+| **NIST CSF 2.0** | DE.CM (continuous monitoring), DE.AE (adverse event analysis) |
+| **MITRE ATT&CK Cloud** | 11 cloud/SaaS techniques mapped to detectors |
+| **OWASP ASVS 4.0** | V7 (Error Handling & Logging), V11 (Business Logic) |
+| **OWASP LLM Top 10** | LLM01 (Prompt Injection) — AI-specific detector |
+| **CIS Controls v8** | Control 8 (Audit Log Management), Control 13 (Network Monitoring) |
+| **SOC 2 CC7.2/CC7.3** | System Monitoring & Anomaly Detection |
+| **ISO 27001 A.8.15/16** | Logging & Monitoring Activities |
+
+#### RADIANT-Specific Supplements
+- **AI Model Abuse Detection**: Prompt injection surge + model cost anomaly (unique to AI SaaS)
+- **Tenant Isolation Breach Detection**: Cross-tenant probe detector (unique to multi-tenant)
+- **Spend Governor Integration**: Cost-based anomaly detection for compromised API keys
+
+#### 14 Detectors (MITRE-Mapped)
+| # | Detector | MITRE | Method |
+|---|----------|-------|--------|
+| 1 | Brute Force Auth | T1110.001 | Sliding window auth failures |
+| 2 | Credential Stuffing | T1110.004 | Unique username volume + high failure rate |
+| 3 | Impossible Travel | T1078.004 | Geo-distance / time impossibility |
+| 4 | Session Hijacking | T1550.004 | IP/UA/country change mid-session |
+| 5 | Cross-Tenant Probe | T1078 | Foreign tenant ID references |
+| 6 | API Enumeration | T1087.004 | Sequential ID probing, path scanning |
+| 7 | SQL/NoSQL Injection | T1190 | Signature match on payloads |
+| 8 | Excessive Error Rate | T1190 | Source-level 4xx/5xx analysis |
+| 9 | Data Exfiltration | T1530 | Bulk download / large response volume |
+| 10 | Privilege Escalation | T1548 | Role change + admin API access pattern |
+| 11 | Prompt Injection Surge | — | CATO safety block correlation |
+| 12 | Model Cost Anomaly | — | Token usage > 3σ from baseline |
+| 13 | Unusual Access (UEBA) | T1078 | Behavioral deviation from user baseline |
+| 14 | Account Takeover | T1078.001 | Rapid account-modifying action sequence |
+
+#### Three-Layer Architecture
+- **Layer 1 (Perimeter)**: AWS WAF managed rules + IP rate limiting (existing, enhanced)
+- **Layer 2 (Application)**: ThreatDetectionEngine with 14 detectors, in-memory sliding windows, request middleware (<5ms overhead)
+- **Layer 3 (Response)**: Automated IP banning, session termination, account lockout, SENTINEL escalation, admin alerts
+
+#### New Database Objects (Migration V2026_02_07_016)
+| Table | Purpose |
+|-------|---------|
+| `intrusion_events` | Partitioned event log (monthly) with RLS |
+| `ip_blocklist` | Active IP blocks with TTL and permanent escalation |
+| `threat_indicators` | IOC database for IP/pattern/UA reputation |
+| `detection_rules` | Per-detector configurable thresholds and actions |
+| `intrusion_incidents` | Correlated security incidents with lifecycle |
+| `user_access_baselines` | UEBA behavioral baselines per user |
+| `ridps_config` | Global RIDPS configuration (singleton) |
+
+#### New Files (10)
+| File | Purpose |
+|------|---------|
+| `migrations/V2026_02_07_016__intrusion_detection.sql` | 7 tables, 3 functions, 14 seed rules |
+| `lambda/shared/services/intrusion-detection.service.ts` | Core ThreatDetectionEngine |
+| `lambda/shared/services/intrusion-detectors.ts` | 14 detector implementations |
+| `lambda/shared/services/threat-response.service.ts` | Automated response actions |
+| `lambda/shared/services/threat-intelligence.service.ts` | IOC management + IP reputation |
+| `lambda/shared/middleware/intrusion-detection.ts` | Request middleware (<5ms) |
+| `lambda/intrusion-detection/analyzer.ts` | EventBridge: correlation + UEBA + cleanup |
+| `lambda/admin/intrusion-detection.ts` | Admin API handler (11 routes) |
+| `admin-dashboard/app/(dashboard)/intrusion-detection/page.tsx` | Admin UI |
+| `swift-deployer/Views/IntrusionDetectionView.swift` | Deployer config UI |
+
+#### Modified Files (4)
+| File | Change |
+|------|--------|
+| `lambda/admin/handler.ts` | Added intrusion-detection route delegation |
+| `admin-dashboard/components/layout/sidebar.tsx` | Added Intrusion Detection sidebar entry |
+| `swift-deployer/AppState.swift` | Added intrusionDetection NavigationTab |
+| `swift-deployer/Views/MainView_macOS.swift` | Added IntrusionDetectionView routing |
+
+#### CDK Infrastructure Added
+- 1 EventBridge-scheduled Lambda (RIDPS Analyzer: correlation @ 1min, full @ 1hr)
+- CloudWatch metrics namespace: `RADIANT/IntrusionDetection` (6 metrics)
+- API Gateway: 11 routes under `/admin/intrusion-detection/*`
+- IAM: cloudwatch:PutMetricData for RIDPS namespace
+
+---
 
 ## [7.39.0] - 2026-02-08
 
@@ -212621,8 +215537,8 @@ MIT
 | **Chapters** | 24 |
 | **Documents Included** | 24 |
 | **Documents Missing** | 0 |
-| **Total Source Lines** | 212,067 |
-| **Generated** | February 07, 2026 |
+| **Total Source Lines** | 214,983 |
+| **Generated** | February 08, 2026 |
 | **RADIANT Version** | v6.6.0 |
 
 ---

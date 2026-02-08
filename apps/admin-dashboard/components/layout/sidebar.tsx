@@ -220,6 +220,11 @@ const navigation: NavigationItem[] = [
   { name: 'Cato Dialogue', href: '/cato/dialogue', icon: MessageSquare },
   { name: 'Safety Matrix', href: '/safety-matrix', icon: ShieldCheck },
   
+  // OMEGA Section
+  { type: 'separator', label: 'OMEGA' },
+  { name: 'OMEGA Firmware', href: '/omega/firmware', icon: Cpu },
+  { name: 'OMEGA Quantum', href: '/omega/quantum', icon: Snowflake },
+  
   // Consciousness Section
   { type: 'separator', label: 'Consciousness' },
   { name: 'Engine', href: '/consciousness/engine', icon: Cpu },

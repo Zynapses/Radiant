@@ -12,6 +12,7 @@
 - **Part II: Consciousness & Cognition**
 - **Part III: Expert Systems**
 - **Part IV: Cortex Memory System**
+- **Part V: OMEGA Quantum Brain Architecture (v4.18.0)**
 
 ---
 
@@ -10324,6 +10325,65 @@ The critiquing AI should evaluate:
 5. **Practical Utility**: Does the consciousness service provide value beyond what could be achieved without it?
 
 6. **Improvement Priorities**: What changes would most significantly improve the implementation?
+
+---
+
+## Part V: OMEGA Quantum Brain Architecture (v4.18.0)
+
+> **Version**: 1.0.0 | **Date**: February 8, 2026
+> **Status**: IMPLEMENTED — Quantum-inspired brain management on classical hardware
+
+### Overview
+
+The OMEGA Quantum Brain extends the AGI Brain architecture with quantum computing formalism. Instead of scalar neural weights, OMEGA brains operate on **complex amplitude state vectors** in a simulated Hilbert space, enabling interference-based safety (Helix Kernel), superposition of reasoning states, and decoherence-based memory decay.
+
+### Service Layer
+
+| Service | File | Purpose |
+|---------|------|---------|
+| **QuantumBrainService** | `lambda/shared/services/omega/quantum-brain.service.ts` | Manages brain state lifecycle: inference cycles, firmware hot-swap with Ed25519 verification, EFS/S3 persistence, self-tests |
+| **HelixKernelService** | `lambda/shared/services/omega/helix-kernel.service.ts` | In-memory safety filter with severity-ordered forbidden state projection/dampening |
+| **Quantum Math** | `lambda/shared/services/omega/quantum-math.ts` | Pure functions: complex arithmetic, state normalization, unitarity enforcement, Helix interference, measurement, decoherence |
+| **Quantum Types** | `lambda/shared/services/omega/quantum-types.ts` | TypeScript interfaces + Zod schemas for all quantum types |
+
+### Key Concepts
+
+- **Hilbert Space (256–4096 dim)**: Each Q-Node is a complex amplitude; total state ‖ψ‖ must equal 1.0
+- **Helix Interference**: Forbidden states are projected out via `|ψ_safe⟩ = |ψ⟩ − ⟨φ|ψ⟩|φ⟩`; dampening mode reduces but preserves partial alignment
+- **Unitarity Enforcement**: Three modes — renormalize (divide by norm), project (nearest unit vector), strict (error)
+- **Firmware Hot-Swap**: Atomic firmware replacement during inference; Ed25519 signature + 2-person rule + self-test + rollback
+- **Decoherence**: Time-based state decay simulating forgetting: `S(t) = e^(−λΔt)·S(0) + (1−e^(−λΔt))·|ground⟩`
+- **Soft Measurement**: Partial collapse preserving superposition for low-probability states
+
+### Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `omega_brains` | Brain instances with Hilbert dimension, firmware hash, norm tracking |
+| `omega_firmware` | Firmware records with quantum params, signature, content hash |
+| `omega_helix_rules` | Per-brain forbidden state vectors with interference type |
+| `omega_measurements` | Measurement events per inference cycle |
+| `omega_unitarity_events` | Unitarity drift, corrections, and violation logs |
+
+### Admin API
+
+| Endpoint | Purpose |
+|----------|---------|
+| `POST /admin/omega/firmware/activate` | Activate firmware (2-person rule enforced) |
+| `POST /admin/omega/firmware/revert` | Revert to previous firmware |
+| `GET /admin/omega/firmware/status` | Firmware + brain status |
+| `GET /admin/omega/quantum/state-summary` | Brain quantum state + 24h measurements |
+| `GET /admin/omega/quantum/unitarity-health` | Unitarity events + health check |
+| `POST /admin/omega/quantum/helix-test` | Dry-run Helix rule against test vector |
+
+### Integration with AGI Brain
+
+The QuantumBrainService is complementary to the existing AGI Brain. It provides:
+- **Physics layer** for OMEGA brains (quantum state management)
+- **Safety layer** via Helix Kernel (deterministic, not probabilistic)
+- **Firmware governance** with cryptographic verification and dual-approval
+
+The existing AGI Brain's consciousness, ego, and learning systems remain unchanged. OMEGA brains use the quantum layer for their core state management while the AGI orchestrator coordinates across both brain types.
 
 ---
 

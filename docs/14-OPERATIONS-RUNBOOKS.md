@@ -16,6 +16,7 @@
 - **Part VI: Troubleshooting**
 - **Part VII: Disaster Recovery**
 - **Part VIII: Testing**
+- **Part IX: OMEGA Firmware Hot-Swap Operations (v6.4.0)**
 
 ---
 
@@ -3077,6 +3078,260 @@ swift test --filter "testSaveAndLoadConfiguration"
 - [API Reference](API_REFERENCE.md)
 
 
+
+---
+
+## Part IX: OMEGA Firmware Hot-Swap Operations (v6.4.0)
+
+> **Version**: 6.4.0 | **Date**: February 8, 2026
+> **Audience**: System Administrators & DevOps
+
+### 1. Key Concepts (60-Second Primer)
+
+- **OMEGA Brain** — A living AI system running on Lambda/ECS. Maintains persistent state between requests and learns continuously.
+- **Firmware (.bio file)** — A signed JSON file containing the brain's "instincts": safety rules (Helix), learning speed (Ambition), and personality (Broca prompt).
+- **Hot-Swap** — Replacing firmware on a running brain without downtime. The brain detects the new firmware hash on its next inference cycle and atomically swaps (~50ms).
+- **Genesis Forge** — The admin web UI where you author, sign, and deploy firmware.
+
+### 2. Swap Modes Cheat Sheet
+
+| Mode | When to Use | Downtime | Risk Level | Approval Needed |
+|------|-------------|----------|:---:|:---:|
+| **OVERLAY** | Adding/updating safety rules, tuning ambition params | Zero | Low | Single admin |
+| **RESET** | Changing Hilbert dimension, major version upgrade | ~30s queued | Medium | Two-person (prod) |
+| **SHADOW** | Testing new firmware against live traffic | Zero | Low | Single admin |
+| **EMERGENCY** | Safety incident, suspected Helix bypass | Zero | N/A | Any admin (post-hoc review) |
+
+**Decision Tree:**
+
+1. Is there a safety incident right now? → **EMERGENCY**
+2. Are you changing Hilbert dimension or unitarity mode? → **RESET** (schedule maintenance window)
+3. Is this production with live users? → **SHADOW** first, validate, then **OVERLAY**
+4. Dev/staging environment? → **OVERLAY** directly
+
+### 3. Standard Operating Procedures
+
+#### 3.1 Deploy New Firmware (OVERLAY)
+
+**Pre-Flight:**
+
+```bash
+# Check brain status
+curl -s https://api.radiant.example/api/v2/omega/status | jq '.active_streams, .firmware_hash'
+# Should return: active_streams = 0 (or low), firmware_hash = current hash
+```
+
+**Steps:**
+
+1. Open **Genesis Forge** → Firmware Library
+2. Click **"New Firmware"** or clone existing
+3. Edit Helix Rules, Ambition Settings, or Personality as needed
+4. Click **"Validate"** — all checks must pass (green)
+5. Click **"Sign"** — requires your admin credentials + KMS signing
+6. Click **"Activate"** → Select **OVERLAY** mode
+7. Confirm in the modal (re-authentication required in prod per FDA Part 11)
+8. Monitor the **Swap Timeline** widget for completion (~5s)
+
+**Post-Deploy Verification:**
+
+```bash
+# Confirm new hash loaded
+curl -s https://api.radiant.example/api/v2/omega/status | jq '.firmware_hash'
+
+# Check swap log
+curl -s https://api.radiant.example/api/v2/firmware/swaps?limit=1 | jq '.'
+# Expected: status = "success", duration_ms < 5000
+```
+
+#### 3.2 Shadow Test Before Production Deploy
+
+1. Deploy firmware with **SHADOW** mode
+2. Shadow brain processes requests in parallel — does NOT serve users
+3. Monitor **Coherence Score** in Genesis Dashboard (target: >90% over 7 days)
+4. When score crosses threshold, the **"Promote to Production"** button unlocks
+5. Click Promote → triggers OVERLAY swap from shadow to primary
+
+#### 3.3 Emergency Lockdown
+
+If you suspect a Helix bypass or safety failure:
+
+```bash
+curl -X POST https://api.radiant.example/api/v2/firmware/emergency \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"brain_id": "uuid-here", "reason": "Suspected Helix bypass on tenant-xyz"}'
+```
+
+This immediately loads **platform default firmware** (maximum safety, minimal capabilities). Post-incident review required within 24 hours.
+
+#### 3.4 Rollback
+
+```bash
+curl -X POST https://api.radiant.example/api/v2/firmware/{firmware-id}/rollback \
+  -H "Authorization: Bearer $ADMIN_TOKEN"
+```
+
+Or in Genesis Forge: Firmware Library → click the superseded firmware → **"Rollback to This Version"**
+
+**Automatic rollback triggers:**
+
+- Post-swap error rate > 10% within 5 minutes
+- Post-swap latency increase > 50%
+- Any Helix verification failure during self-test
+
+### 4. Infrastructure Requirements
+
+#### 4.1 Storage
+
+| Layer | Service | Purpose | Monitoring |
+|-------|---------|---------|------------|
+| Hot State | AWS EFS (`/mnt/omega_state`) | Active brain state, sub-ms access | `df -h`, CloudWatch EFS metrics |
+| Snapshots | AWS S3 (`s3://radiant-omega-snapshots-{env}`) | Pre-swap rollback snapshots | S3 lifecycle policies |
+| Metadata | Aurora PostgreSQL | Firmware records, swap logs, audit trail | RDS Performance Insights |
+| Swap Lock | DynamoDB | Distributed lock (5-min TTL) | DynamoDB metrics |
+
+#### 4.2 KMS Keys
+
+| Key | Purpose | Rotation | Deletion Policy |
+|-----|---------|----------|-----------------|
+| Platform Root CA | Signs tenant CAs | Manual only (asymmetric) | RETAIN in prod |
+| Tenant CA Keys | Signs firmware/cartridges | Manual only | 30-day pending (prod) |
+| Signing Keys | Per-purpose signing | Manual only | 7-day pending (dev) |
+
+**Check key health:**
+
+```bash
+aws kms describe-key --key-id alias/radiant-{env}-cartridge-signing | jq '.KeyMetadata.KeyState'
+# Expected: "Enabled"
+```
+
+#### 4.3 IAM Permissions Required
+
+Lambda execution role needs:
+
+- `kms:Sign`, `kms:Verify`, `kms:GetPublicKey`, `kms:DescribeKey` on platform signing key
+- `kms:CreateKey`, `kms:TagResource`, `kms:CreateAlias` for tenant key creation
+- EFS read/write on `/mnt/omega_state`
+- S3 read/write on snapshot bucket
+
+### 5. Monitoring & Alerts
+
+#### 5.1 CloudWatch Dashboards
+
+| Dashboard | Key Metrics |
+|-----------|-------------|
+| OMEGA Brain Health | Coherence score, inference latency, error rate, active streams |
+| Firmware Status | Current firmware version, swap count (24h), rollback count |
+| Helix Safety | Rule activation count, blocked vector count, bypass attempts |
+| Ambition | Entropy level, dopamine level, dream cycle triggers |
+
+#### 5.2 Alert Thresholds
+
+| Alert | Condition | Severity | Action |
+|-------|-----------|----------|--------|
+| Swap Duration High | > 30 seconds | WARNING | Investigate, check EFS latency |
+| Swap Failed | status = 'failed' | CRITICAL | Check logs, may need manual rollback |
+| Auto-Rollback Triggered | Post-swap error > 10% | CRITICAL | Review firmware, investigate root cause |
+| Helix Bypass Attempt | Any forbidden vector not cancelled | CRITICAL | EMERGENCY mode immediately |
+| EFS Unhealthy | Mount failure or > 10ms latency | CRITICAL | Brain cannot persist state |
+| Firmware Lock Stuck | Lock held > 5 minutes | WARNING | Check for crashed swap, release manually |
+
+#### 5.3 Log Locations
+
+| Log | Location | Key Fields |
+|-----|----------|------------|
+| Swap events | CloudWatch `/radiant/omega/firmware-swaps` | swap_mode, duration_ms, status |
+| Helix activations | CloudWatch `/radiant/omega/helix` | rule_id, blocked_vector, severity |
+| Audit trail | PostgreSQL `pki_audit_log` | operation, key_id, tenant_id, timestamp |
+
+### 6. CORTEX Network Hot-Swap (Nightly CATO Cycle)
+
+Separate from firmware, the 6 CORTEX neural networks update nightly at 2am UTC:
+
+| Time | Phase | What Happens |
+|------|-------|--------------|
+| 02:00 | INVENTION | Generate novel patterns (30% min budget, enforced) |
+| 02:30 | EVOLUTION | PromptBreeder mutations, fitness selection |
+| 03:00 | TRAINING | PyTorch training on ml.g5.xlarge |
+| 03:30 | DEPLOYMENT | ONNX export → S3 upload → atomic pointer swap on inference nodes |
+
+**Verify CATO ran successfully:**
+
+```bash
+aws s3 ls s3://radiant-cortex-models-{env}/pattern_network/ --recursive | tail -5
+aws s3 cp s3://radiant-cortex-models-{env}/pattern_network/latest_version.txt -
+```
+
+### 7. Troubleshooting
+
+#### Firmware swap stuck (lock not releasing)
+
+```bash
+# Check DynamoDB for stale lock
+aws dynamodb get-item --table-name radiant-{env}-firmware-locks \
+  --key '{"brain_id": {"S": "uuid-here"}}'
+
+# If lock TTL expired, it auto-releases. If stuck, delete manually:
+aws dynamodb delete-item --table-name radiant-{env}-firmware-locks \
+  --key '{"brain_id": {"S": "uuid-here"}}'
+```
+
+#### Brain not detecting new firmware
+
+1. Check `omega_brain_states.firmware_hash` was actually updated
+2. Check Lambda is reading from correct Aurora instance (not a stale reader)
+3. Force a brain cycle: send a test inference request
+
+#### Helix self-test failing after swap
+
+The firmware's Helix Rules are malformed. Check:
+
+- All forbidden vectors have unit magnitude (|v| = 1.0)
+- No duplicate rule IDs
+- Schema version matches brain compatibility range
+- Rollback to previous firmware and fix the .bio file
+
+#### EFS mount failure
+
+```bash
+df -h /mnt/omega_state
+
+# If unmounted, remount:
+sudo mount -t efs fs-{id}:/ /mnt/omega_state
+
+# If EFS is completely down, brain falls back to S3 snapshots
+# (up to 100 inference cycles of data loss)
+```
+
+#### KMS signing failures
+
+```bash
+aws kms describe-key --key-id alias/radiant-{env}-cartridge-signing
+aws iam simulate-principal-policy \
+  --policy-source-arn arn:aws:iam::role/radiant-lambda-execution \
+  --action-names kms:Sign kms:Verify
+```
+
+### 8. Emergency Contacts
+
+| Situation | Action |
+|-----------|--------|
+| Swap stuck > 5 minutes | Release lock manually, check CloudWatch |
+| Suspected Helix bypass | Trigger EMERGENCY mode immediately |
+| Brain state corruption | Restore from S3 snapshot (`aws s3 cp s3://radiant-omega-snapshots-{env}/brain-{id}/latest/brain.pt /mnt/omega_state/brain.pt`) |
+| KMS key compromised | Revoke key, rotate, re-sign all active firmware |
+| Multiple auto-rollbacks | Disable CATO nightly cycle, investigate training data |
+
+### 9. Maintenance Calendar
+
+| Task | Frequency | Owner |
+|------|-----------|-------|
+| Review firmware swap logs | Weekly | DevOps |
+| Verify snapshot retention | Monthly | DevOps |
+| KMS key health check | Monthly | Security |
+| CATO training review | Weekly | ML Engineering |
+| Helix rule audit | Quarterly | Security + Compliance |
+| Disaster recovery drill | Quarterly | DevOps + Engineering |
 
 ---
 

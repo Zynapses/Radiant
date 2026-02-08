@@ -831,6 +831,18 @@ async function routeRequest(
     return secPolHandler(event);
   }
 
+  // OMEGA Quantum Architecture (v4.18.0)
+  if (pathParts[1] === 'omega') {
+    if (pathParts[2] === 'firmware') {
+      const { handler: omegaFwHandler } = await import('./omega-firmware.js');
+      return omegaFwHandler(event);
+    }
+    if (pathParts[2] === 'quantum') {
+      const { handler: omegaQuantumHandler } = await import('./omega-quantum.js');
+      return omegaQuantumHandler(event);
+    }
+  }
+
   throw new NotFoundError(`Admin route not found: ${method} ${path}`);
 }
 

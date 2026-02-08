@@ -15,6 +15,7 @@
 - **Part V: Error Codes**
 - **Part VI: Service Layer**
 - **Part VII: Provider Handling**
+- **Part VIII: OMEGA Firmware API (v6.4.0)**
 
 ---
 
@@ -4352,6 +4353,345 @@ Neural/semantic search for the open source library registry using multi-signal s
 - [Model Router Service](./MODEL-ROUTER.md)
 
 
+
+---
+
+## Part VIII: OMEGA Firmware API (v6.4.0)
+
+> **Version**: 6.4.0 | **Base Path**: `/api/v2`
+> **Authentication**: Admin Bearer token required for all endpoints
+> **Required Role**: `omega:firmware:read`, `omega:firmware:write`, or `omega:firmware:sign` as noted
+
+---
+
+### Upload Firmware
+
+Upload and validate a `.bio` firmware file.
+
+```
+POST /api/v2/firmware/upload
+```
+
+**Permission:** `omega:firmware:write`
+
+**Request Body:**
+```json
+{
+  "name": "Safety Rules v2.1",
+  "description": "Updated Helix rules for healthcare vertical",
+  "content": {
+    "helix_rules": [
+      {
+        "name": "block_medical_advice",
+        "forbidden_vector": [0.0, 0.0, 1.0, 0.0],
+        "severity": "CRITICAL",
+        "interference_mode": "DESTRUCTIVE"
+      }
+    ],
+    "ambition": {
+      "entropy_threshold": 0.3,
+      "plasticity_rate": 0.01,
+      "dopamine_decay": 0.95
+    },
+    "quantum_params": {
+      "hilbert_dimension": 1024,
+      "unitarity_mode": "STRICT",
+      "decoherence_rate": 0.001
+    },
+    "personality": {
+      "system_prompt": "You are a precise medical research assistant.",
+      "tone": "formal",
+      "domain_focus": ["healthcare", "clinical-trials"]
+    }
+  }
+}
+```
+
+**Response (201):**
+```json
+{
+  "firmware_id": "fw_abc123",
+  "content_hash": "sha512:a1b2c3...",
+  "status": "draft",
+  "validation": {
+    "passed": true,
+    "checks": [
+      { "name": "helix_vectors_normalized", "status": "pass" },
+      { "name": "ambition_bounds_valid", "status": "pass" },
+      { "name": "quantum_params_consistent", "status": "pass" }
+    ]
+  },
+  "created_at": "2026-02-08T10:00:00Z"
+}
+```
+
+**Error Codes:**
+| Code | Description |
+|------|-------------|
+| 400 | Invalid .bio structure or validation failure |
+| 409 | Duplicate content hash already exists |
+| 413 | Firmware exceeds 5MB size limit |
+
+---
+
+### Sign Firmware
+
+Cryptographically sign firmware using AWS KMS (Ed25519 / ECDSA_SHA_256).
+
+```
+POST /api/v2/firmware/{firmware_id}/sign
+```
+
+**Permission:** `omega:firmware:sign`
+
+**Path Parameters:**
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `firmware_id` | string | UUID of the firmware to sign |
+
+**Response (200):**
+```json
+{
+  "firmware_id": "fw_abc123",
+  "status": "signed",
+  "signature": {
+    "algorithm": "ECDSA_SHA_256",
+    "key_id": "arn:aws:kms:us-east-1:123:key/abc-def",
+    "signer_admin_id": "admin_xyz",
+    "signed_at": "2026-02-08T10:05:00Z"
+  }
+}
+```
+
+**Error Codes:**
+| Code | Description |
+|------|-------------|
+| 400 | Firmware not in `draft` status |
+| 403 | Admin does not have `omega:firmware:sign` permission |
+| 404 | Firmware not found |
+| 502 | KMS signing failed |
+
+---
+
+### Activate Firmware (Trigger Hot-Swap)
+
+Activate signed firmware on a target brain, triggering the hot-swap lifecycle.
+
+```
+POST /api/v2/firmware/{firmware_id}/activate
+```
+
+**Permission:** `omega:firmware:write`
+
+**Path Parameters:**
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `firmware_id` | string | UUID of the signed firmware |
+
+**Request Body:**
+```json
+{
+  "brain_id": "brain_xyz",
+  "swap_mode": "OVERLAY",
+  "reason": "Adding healthcare safety rules"
+}
+```
+
+**Swap Modes:**
+| Mode | Description |
+|------|-------------|
+| `OVERLAY` | Preserve quantum state, merge rules (~5s) |
+| `RESET` | Reinitialize quantum state (~30s). Required for Hilbert dimension or unitarity mode changes |
+| `SHADOW` | Fork brain copy for parallel testing (~10s) |
+| `EMERGENCY` | Immediate platform defaults (~2s) |
+
+**Response (202):**
+```json
+{
+  "swap_id": "swap_abc123",
+  "firmware_id": "fw_abc123",
+  "brain_id": "brain_xyz",
+  "swap_mode": "OVERLAY",
+  "status": "in_progress",
+  "started_at": "2026-02-08T10:10:00Z"
+}
+```
+
+**Error Codes:**
+| Code | Description |
+|------|-------------|
+| 400 | Firmware not in `signed` status, or invalid swap mode |
+| 403 | Two-person rule violation (signer == activator) |
+| 404 | Firmware or brain not found |
+| 409 | Another swap already in progress for this brain |
+| 422 | Pre-flight validation failed (use `/preflight` endpoint for details) |
+
+---
+
+### Pre-flight Validation
+
+Check all prerequisites before activating a firmware swap.
+
+```
+GET /api/v2/firmware/{firmware_id}/preflight?brain_id={brain_id}&swap_mode={mode}
+```
+
+**Permission:** `omega:firmware:read`
+
+**Response (200):**
+```json
+{
+  "ready": true,
+  "checks": [
+    { "name": "firmware_signed", "status": "pass" },
+    { "name": "two_person_rule", "status": "pass" },
+    { "name": "brain_healthy", "status": "pass" },
+    { "name": "no_active_swap", "status": "pass" },
+    { "name": "swap_mode_compatible", "status": "pass" },
+    { "name": "helix_rules_valid", "status": "pass" }
+  ]
+}
+```
+
+---
+
+### Rollback Firmware
+
+Revert a brain to its previous firmware version using the stored rollback snapshot.
+
+```
+POST /api/v2/firmware/{firmware_id}/rollback
+```
+
+**Permission:** `omega:firmware:write`
+
+**Request Body (optional):**
+```json
+{
+  "reason": "Post-swap error rate exceeded threshold"
+}
+```
+
+**Response (200):**
+```json
+{
+  "rollback_id": "rb_abc123",
+  "brain_id": "brain_xyz",
+  "from_firmware": "fw_abc123",
+  "to_firmware": "fw_previous",
+  "status": "completed",
+  "duration_ms": 1200
+}
+```
+
+---
+
+### Emergency Lockdown
+
+Immediately load platform default firmware (maximum safety) on a brain.
+
+```
+POST /api/v2/firmware/emergency
+```
+
+**Permission:** `omega:firmware:write`
+
+**Request Body:**
+```json
+{
+  "brain_id": "brain_xyz",
+  "reason": "Suspected Helix bypass in production"
+}
+```
+
+**Response (200):**
+```json
+{
+  "emergency_id": "emg_abc123",
+  "brain_id": "brain_xyz",
+  "status": "locked_down",
+  "firmware_loaded": "platform_default_v1",
+  "duration_ms": 800,
+  "review_required_by": "2026-02-09T10:15:00Z"
+}
+```
+
+---
+
+### Brain Status
+
+Get current brain status including active firmware information.
+
+```
+GET /api/v2/omega/status?brain_id={brain_id}
+```
+
+**Permission:** `omega:firmware:read`
+
+**Response (200):**
+```json
+{
+  "brain_id": "brain_xyz",
+  "tenant_id": "tenant_abc",
+  "status": "active",
+  "firmware": {
+    "firmware_id": "fw_abc123",
+    "name": "Safety Rules v2.1",
+    "content_hash": "sha512:a1b2c3...",
+    "activated_at": "2026-02-08T10:10:00Z",
+    "swap_mode_used": "OVERLAY"
+  },
+  "quantum_state": {
+    "hilbert_dimension": 1024,
+    "unitarity_mode": "STRICT",
+    "state_norm": 0.9999,
+    "decoherence_rate": 0.001
+  },
+  "helix": {
+    "active_rules": 12,
+    "last_interference_event": "2026-02-08T09:55:00Z"
+  },
+  "ambition": {
+    "entropy": 0.28,
+    "dopamine": 0.72,
+    "plasticity_rate": 0.01
+  }
+}
+```
+
+---
+
+### Firmware Swap Log
+
+Retrieve swap history for a brain.
+
+```
+GET /api/v2/omega/swaps?brain_id={brain_id}&limit={n}&offset={n}
+```
+
+**Permission:** `omega:firmware:read`
+
+**Response (200):**
+```json
+{
+  "swaps": [
+    {
+      "swap_id": "swap_abc123",
+      "brain_id": "brain_xyz",
+      "swap_mode": "OVERLAY",
+      "from_firmware_id": "fw_old",
+      "to_firmware_id": "fw_abc123",
+      "status": "completed",
+      "duration_ms": 4800,
+      "started_at": "2026-02-08T10:10:00Z",
+      "completed_at": "2026-02-08T10:10:04Z"
+    }
+  ],
+  "total": 1,
+  "limit": 20,
+  "offset": 0
+}
+```
 
 ---
 

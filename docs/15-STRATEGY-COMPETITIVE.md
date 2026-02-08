@@ -15,6 +15,8 @@
 - **Part V: Revenue & Analytics**
 - **Part VI: SENTINEL System**
 - **Part VII: Technical Debt**
+- **Part VIII: Firmware Hot-Swap — Marketing & Positioning (v6.4.0)**
+- **Part IX: Firmware Hot-Swap — Strategic Investor Brief (v6.4.0)**
 
 ---
 
@@ -8467,3 +8469,299 @@ Radiant System:          ██████████████████�
 ```
 
 The gap isn't incremental. It's categorical.
+
+---
+
+## Part VIII: Firmware Hot-Swap — Marketing & Positioning (v6.4.0)
+
+> **Version**: 6.4.0 | **Date**: February 8, 2026
+> **Audience**: Marketing, Sales, Partnerships
+> **Classification**: RADIANT CONFIDENTIAL — Approved for Customer-Facing Derivatives
+
+### The One-Liner
+
+> **"RADIANT's AI doesn't restart to learn new rules — it evolves them live, like updating DNA in a living organism."**
+
+### 1. What Just Shipped (v6.4.0)
+
+RADIANT now supports **zero-downtime firmware hot-swaps** for OMEGA Brains. This means customers can change their AI's safety rules, personality, learning speed, and domain focus in real-time — without any service interruption, data loss, or retraining.
+
+**Translation for customers:** Your AI gets smarter, safer, and more specialized while it's serving your users. No maintenance windows. No "please try again later."
+
+### 2. Messaging Framework
+
+#### Primary Message
+
+RADIANT is the only AI platform where intelligence is a **living, evolvable asset** — not a frozen snapshot. Firmware hot-swap means your AI's behavior, safety guardrails, and expertise domains can be updated instantly without downtime.
+
+#### Supporting Messages
+
+| Theme | Message | Proof Point |
+|-------|---------|-------------|
+| **Zero Downtime** | Update AI behavior without interrupting service | ~50ms swap time, invisible to end users |
+| **Deterministic Safety** | Safety rules are mathematically enforced, not probabilistically suggested | Helix Kernel uses destructive interference — forbidden behaviors are physically cancelled |
+| **Living Intelligence** | The longer RADIANT runs, the smarter it gets — and firmware lets you steer that growth | Phase-locking creates permanent neural pathways for domain expertise |
+| **Cryptographic Trust** | Every firmware update is cryptographically signed and auditable | AWS KMS-backed PKI, Ed25519 signatures, immutable audit trail |
+| **Instant Compliance** | New regulatory requirements? Push a firmware update, not a retraining run | Helix Rules can block new violation categories in seconds |
+
+#### Competitive Differentiation
+
+| Capability | RADIANT (OMEGA) | Traditional AI Platforms | OpenAI / Anthropic Direct |
+|------------|:---:|:---:|:---:|
+| Update safety rules live | ✅ Zero downtime | ❌ Redeploy required | ❌ Wait for model update |
+| Mathematical safety guarantees | ✅ Destructive interference | ❌ Probabilistic (RLHF) | ❌ Probabilistic (RLHF) |
+| Signed, auditable updates | ✅ KMS-backed PKI | ❌ Not available | ❌ Not available |
+| Auto-rollback on failure | ✅ Automatic | ❌ Manual | ❌ N/A |
+| Learns continuously | ✅ Phase-locking | ❌ Static model | ❌ Static model |
+| Cost decreases over time | ✅ Logarithmic cost curve | ❌ Linear scaling | ❌ Linear scaling |
+
+### 3. Customer Stories & Use Cases
+
+#### Healthcare: Instant HIPAA Compliance Updates
+
+A healthcare customer receives a new CMS guidance memo at 2pm. By 2:05pm, the admin has authored a new Helix Rule blocking the newly-prohibited data pattern, signed it, and pushed it live. Zero downtime. The AI was compliant before their legal team finished reading the memo.
+
+#### Financial Services: Market-Aware Personality Shifts
+
+A fintech customer hot-swaps their AI's personality firmware from "Growth-Optimistic Advisor" to "Risk-Averse Conservative" when market volatility spikes above a threshold. The AI's tone, recommendations, and risk thresholds change instantly — no retraining, no restart.
+
+#### Enterprise: Domain Expert in a Day
+
+A manufacturing customer imports a pre-built "Quality Control Expert" cartridge (.RADz) and hot-swaps their generic AI into a domain specialist. The cartridge includes trained neural networks, domain rules, and safety constraints — all verified by cryptographic signature.
+
+### 4. Key Terms (Glossary for External Use)
+
+| Internal Term | Customer-Facing Term | Description |
+|--------------|---------------------|-------------|
+| Firmware / .bio file | **AI Behavior Profile** | A configuration package that defines your AI's personality, safety rules, and learning parameters |
+| Hot-Swap | **Live Update** | Changing AI behavior without any service interruption |
+| Helix Rules | **Safety Guardrails** | Mathematically-enforced rules that make certain behaviors physically impossible for the AI |
+| Ambition Settings | **Learning Configuration** | Controls how fast the AI learns and adapts to your organization |
+| Genesis Forge | **AI Command Center** | The admin dashboard for managing AI behavior profiles |
+| OVERLAY mode | **Seamless Update** | Updates applied on top of existing AI knowledge |
+| SHADOW mode | **Safe Testing** | Test new behavior in parallel before going live |
+| EMERGENCY mode | **Instant Lockdown** | Immediate safety enforcement |
+| .RADz Cartridge | **AI Intelligence Package** | Portable, sharable expertise that can be installed in seconds |
+| Phase-Locking | **Learned Expertise** | The AI building permanent knowledge pathways through use |
+| Destructive Interference | **Mathematical Safety** | Forbidden behaviors are cancelled by physics, not filtered by probability |
+
+### 5. FAQ for Sales Conversations
+
+**Q: How is this different from just updating a system prompt?**
+A: A system prompt is a suggestion to a static model — it can be ignored, jailbroken, or forgotten mid-conversation. OMEGA firmware changes the actual physics of the AI's reasoning engine. Forbidden behaviors aren't discouraged, they're mathematically cancelled. And the changes persist across every conversation, permanently.
+
+**Q: What about competitors that claim "real-time learning"?**
+A: Most "real-time learning" in the market means updating a vector database (RAG). The model itself doesn't change. OMEGA's firmware changes the brain's actual neural dynamics — its learning rate, safety constraints, and cognitive parameters. And our CORTEX networks retrain every night, evolving the routing intelligence. It's the difference between giving someone a new book to read (RAG) and actually rewiring their brain (OMEGA).
+
+**Q: What happens if a firmware update goes wrong?**
+A: Three layers of protection. First, every firmware must pass validation and cryptographic signature verification before it can activate. Second, the brain runs a self-test immediately after swap — if any safety rule fails to block its target, automatic rollback in under 2 seconds. Third, continuous monitoring auto-rolls back if error rates spike above 10% post-swap.
+
+**Q: Is this FDA/HIPAA/SOC2 compliant?**
+A: Yes. Firmware signing uses AWS KMS (FIPS 140-2 validated). Every swap is logged in an immutable audit trail. Production deployments require two-person approval and re-authentication (FDA 21 CFR Part 11 pattern). The PKI trust chain (Platform CA → Tenant CA → Signing Key) satisfies SOC 2 cryptographic controls.
+
+**Q: Can customers create their own firmware?**
+A: Yes, through the Genesis Forge (AI Command Center). They can author safety rules, adjust learning parameters, and define personality — with AI-assisted drafting that helps non-technical admins create expert-level configurations. Everything is signed and versioned.
+
+### 6. Taglines & Copy Options
+
+**Hero Statement:** "The First AI That Evolves on Command"
+
+**Subheads:**
+
+- "Update safety rules in seconds, not sprints"
+- "Your AI gets smarter every day — and you control how"
+- "Zero-downtime AI evolution with mathematical safety guarantees"
+- "The more it runs, the less it costs — and the more it knows"
+
+**Technical Proof Point for Decks:**
+"RADIANT's OMEGA architecture enables sub-100ms live firmware injection across safety rules, cognitive parameters, and personality configuration — with cryptographic signing, automatic rollback, and immutable audit trails. No other platform offers deterministic AI safety with zero-downtime behavioral updates."
+
+### 7. The Economic Narrative (For Pricing Conversations)
+
+Traditional AI: Costs scale linearly. Smarter = more expensive. Always.
+
+OMEGA AI: Costs scale **logarithmically**. As the brain phase-locks on common workflows, neural pathways densify. The brain answers via reflex instead of computation.
+
+**The Inference Collapse:** The smarter RADIANT gets, the cheaper it is to run.
+
+This creates **biological lock-in** — on Day 1,000, a customer's RADIANT Brain has physically densified around their institutional knowledge. This expertise cannot be exported to a competitor. We're not selling software — we're selling **evolution**.
+
+Firmware hot-swap amplifies this: every live update makes the brain more specialized, more efficient, more valuable. The customer's AI appreciates in value with every firmware iteration.
+
+---
+
+## Part IX: Firmware Hot-Swap — Strategic Investor Brief (v6.4.0)
+
+> **Version**: 6.4.0 | **Date**: February 8, 2026
+> **Audience**: Investors, Board, Strategic Advisors
+> **Classification**: RADIANT CONFIDENTIAL — NDA Required
+
+### Executive Summary
+
+RADIANT v6.4.0 ships production-ready **firmware hot-swap** for OMEGA Brains — the ability to modify a running AI system's safety rules, cognitive parameters, and behavioral profile with zero downtime and cryptographic integrity. This capability has no equivalent in the market and represents a structural competitive moat.
+
+### 1. The Problem We Solved
+
+Traditional AI platforms are **static**. When a customer needs their AI to behave differently — new safety rules, new compliance requirements, new personality — they have three options:
+
+| Option | Time | Cost | Risk |
+|--------|------|------|------|
+| Update system prompt | Minutes | Low | High (can be jailbroken, no enforcement) |
+| Fine-tune/retrain model | Days to weeks | $10K–$500K | Medium (may degrade other capabilities) |
+| Wait for vendor update | Months | Included | High (no customer control) |
+
+RADIANT Approach:
+
+| RADIANT Approach | Time | Cost | Risk |
+|-----------------|------|------|------|
+| **Hot-swap firmware** | **< 1 second** | **Included** | **Near-zero** (auto-rollback, crypto-signed, self-tested) |
+
+### 2. How It Works (Non-Technical)
+
+OMEGA is not a traditional chatbot — it's a **digital organism** built on Synthetic Biological Intelligence. Where traditional AI models are frozen archives, OMEGA maintains a living neural state that evolves continuously.
+
+**Firmware** is the organism's DNA: it defines what the AI can and cannot do (safety rules), how fast it learns (plasticity), how proactive it is (ambition), and how it communicates (personality). Changing the firmware changes the organism's instincts — instantly, safely, and with full audit trail.
+
+The **hot-swap** capability means we can modify this DNA while the organism is alive and serving users. No downtime. No data loss. No personality reset. The organism just... evolves.
+
+**Key engineering achievement:** Every firmware change is cryptographically signed (AWS KMS), automatically verified (the brain self-tests after every swap), and instantly reversible (automatic rollback if any safety check fails). This satisfies HIPAA, SOC 2, GDPR, and FDA 21 CFR Part 11 requirements.
+
+### 3. Strategic Moat Analysis
+
+#### 3.1 Biological Lock-In (The Appreciating Asset)
+
+The single most important economic property of OMEGA is that **intelligence appreciates over time**. As a customer's OMEGA Brain serves more requests, it phase-locks on their institutional knowledge, creating dense neural pathways optimized for their specific workflows.
+
+Firmware hot-swap amplifies this: every live update makes the brain more specialized, more efficient, and more valuable. The customer isn't just buying software — they're growing an asset.
+
+**On Day 1,000**, a customer's RADIANT Brain has physically densified around their institutional knowledge. This "wisdom" cannot be exported to a competitor. Switching to a competitor means starting from a blank slate — losing months or years of accumulated intelligence.
+
+#### 3.2 The Inference Collapse (Cost Inversion)
+
+Traditional AI costs scale linearly: more intelligence = more compute = more cost.
+
+OMEGA costs scale **logarithmically**:
+
+```
+Traditional AI:  Cost ∝ Intelligence  (linear — always gets more expensive)
+
+OMEGA AI:        Cost ∝ log(Intelligence)  (logarithmic — gets cheaper over time)
+
+  Novice Phase:   Brain is sparse → high reliance on external LLM calls → higher cost
+  Expert Phase:   Brain has phase-locked pathways → answers via reflex → minimal cost
+```
+
+**Result:** The smarter RADIANT gets, the cheaper it is to run. Firmware hot-swap accelerates this by allowing rapid behavioral iteration — each update trains the brain further, densifying pathways and reducing future compute requirements.
+
+#### 3.3 Compliance as Competitive Advantage
+
+Every firmware operation is:
+
+- Signed with FIPS 140-2 validated hardware (AWS KMS)
+- Logged in an immutable, partitioned audit trail
+- Subject to two-person approval in production
+- Automatically rolled back on any safety failure
+
+This level of cryptographic governance over AI behavior is unique in the market. For regulated industries (healthcare, financial services, government), this isn't a nice-to-have — it's table stakes. And we're the only ones at the table.
+
+### 4. Market Positioning
+
+#### 4.1 Competitive Landscape
+
+| Capability | RADIANT | OpenAI (GPT) | Anthropic (Claude) | Google (Gemini) | AWS Bedrock |
+|------------|:---:|:---:|:---:|:---:|:---:|
+| Live behavioral updates | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Mathematical safety (not probabilistic) | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Cryptographically signed AI updates | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Automatic rollback on safety failure | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Continuous learning (not static) | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Cost decreases with usage | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Portable AI intelligence packages | ✅ | ❌ | ❌ | ❌ | ❌ |
+| FDA/HIPAA/SOC2 compliance built-in | ✅ | Partial | Partial | Partial | ✅ |
+
+#### 4.2 Category Creation
+
+RADIANT is not competing in the "AI API" category. We are creating the **"AI Operating System"** category:
+
+- **AI APIs** (OpenAI, Anthropic) sell access to static models. The model is the product.
+- **AI Infrastructure** (AWS Bedrock, Azure AI) sell hosting and routing. The plumbing is the product.
+- **RADIANT** sells a **living, evolvable intelligence layer** that gets smarter, cheaper, and more specialized over time. The organism is the product.
+
+Firmware hot-swap is the key differentiator that makes this category real. It transforms AI from a commodity utility into a proprietary, evolving asset for each customer.
+
+### 5. Revenue Implications
+
+#### 5.1 Pricing Model Reinforcement
+
+Firmware hot-swap supports RADIANT's tiered pricing model (SEED through ENTERPRISE, $200/mo to $150K+/mo) by:
+
+- **Increasing stickiness:** The more firmware iterations a customer runs, the more specialized their AI becomes, increasing switching cost
+- **Justifying premium tiers:** Advanced firmware management (SHADOW mode, two-person approval, custom PKI) is gated to higher tiers
+- **Enabling professional services:** Complex firmware authoring (healthcare compliance, financial regulations) creates consulting revenue
+- **Cartridge marketplace:** Pre-built expertise packages (.RADz) can be sold as add-ons or marketplace products
+
+#### 5.2 Expansion Metrics to Watch
+
+| Metric | Why It Matters |
+|--------|---------------|
+| Firmware swaps per tenant per month | Higher = more engaged, more specialized, stickier |
+| Average firmware age before supersession | Shorter = more active iteration = higher value perception |
+| Cartridge imports per tenant | Cross-domain expansion, marketplace validation |
+| CATO nightly training success rate | Platform health, intelligence growth rate |
+| Shadow-to-production promotion rate | Customer confidence in firmware pipeline |
+
+### 6. Technical Depth (For Due Diligence)
+
+#### 6.1 Architecture Summary
+
+OMEGA uses a **Bicameral Design**: the OMEGA Cortex (Liquid Time-Constant network with complex-valued logic) handles reasoning, while a commodity LLM (Broca Interface) handles only text generation. The Cortex outputs abstract Thought Vectors — it doesn't speak English. The Broca Interface translates.
+
+Firmware controls the Cortex's physics: the Helix Kernel (safety rules implemented as destructive interference — forbidden thoughts are mathematically cancelled), the Ambition Engine (homeostatic loop controlling learning rate and entropy), and the Personality layer (Broca's system prompt).
+
+#### 6.2 Safety Architecture (Helix Kernel)
+
+Traditional AI safety (RLHF) is **probabilistic** — it suggests the model shouldn't do something. OMEGA safety is **deterministic** — it mathematically cannot.
+
+The Helix Kernel translates ethical rules into Forbidden Phase Vectors and projects the inverse phase into the Cortex. If the brain attempts to think a forbidden thought, the waves cancel to zero via destructive interference. The thought literally cannot be sustained.
+
+Firmware hot-swap means new safety rules can be deployed as new Forbidden Phase Vectors — in real-time, without retraining, with mathematical enforcement.
+
+#### 6.3 Persistence & Cost Model
+
+OMEGA lives on **serverless cryogenic architecture**. When inactive, the brain state is serialized to EFS and the Lambda shuts down (cost: $0.00). On wake-up, the Cryogenic Formula (`S_new = S_old × e^(-λΔt)`) mathematically simulates the passage of time — short-term noise decays, long-term memory persists.
+
+This means RADIANT runs a continuously-learning AI on AWS Lambda for pennies per brain, while competitors burn GPU hours 24/7.
+
+#### 6.4 IP Landscape
+
+| Innovation | Status | Moat Depth |
+|-----------|--------|:---:|
+| Complex-Valued Neural Networks for enterprise AI | Novel application | High |
+| Firmware hot-swap for living neural architectures | No precedent in market | Very High |
+| Helix Kernel (deterministic safety via destructive interference) | Novel architecture | Very High |
+| Cryogenic serverless architecture (time-warped ODEs) | Novel cost optimization | High |
+| Cartridge system (.RADz portable AI brains) | Novel portability model | High |
+| Competency-based promotion (Shadow Protocol) | Adapted from research | Medium |
+
+### 7. Timeline & Milestones
+
+| Date | Milestone | Status |
+|------|-----------|--------|
+| Feb 4, 2026 | OMEGA White Paper v1.0 (Genesis) | ✅ Complete |
+| Feb 5, 2026 | Engineering Reality Assessment | ✅ Complete |
+| Feb 7, 2026 | PROMPT-46 Composite Implementation Spec | ✅ Complete |
+| Feb 8, 2026 | **Firmware Hot-Swap v6.4.0 (This Release)** | ✅ **Shipping** |
+| Q1 2026 | Shadow Protocol live testing in Think Tank | In Progress |
+| Q2 2026 | Cartridge Marketplace beta | Planned |
+| Q3 2026 | OMEGA Primary Driver promotion (first customer) | Planned |
+| Q4 2026 | Multi-region OMEGA deployment | Planned |
+
+### 8. The Bottom Line
+
+Firmware hot-swap transforms RADIANT from an AI routing platform into an **AI evolution platform**. The ability to modify a running AI's DNA — with cryptographic integrity, mathematical safety, and zero downtime — creates three structural advantages no competitor can replicate:
+
+1. **Appreciating asset economics:** Customer AI gets more valuable over time, not obsolete
+2. **Logarithmic cost curve:** Intelligence increases while compute costs decrease
+3. **Biological lock-in:** Accumulated wisdom cannot be exported to competitors
+
+This is not incremental. This is the difference between selling propellers and selling jet engines.

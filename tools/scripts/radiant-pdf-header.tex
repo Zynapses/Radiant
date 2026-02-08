@@ -1,0 +1,52 @@
+% RADIANT PDF Styling — injected via pandoc --include-in-header
+% Works WITH pandoc's default template (no compatibility issues)
+
+% ── Colors ──
+\definecolor{radiantblue}{HTML}{1E3A5F}
+\definecolor{radiantaccent}{HTML}{2563EB}
+\definecolor{rulegray}{HTML}{D1D5DB}
+\definecolor{lightgray}{HTML}{9CA3AF}
+
+% ── Headers and footers ──
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\color{lightgray}\nouppercase{\leftmark}}
+\fancyhead[R]{\small\color{lightgray}RADIANT \& Think Tank}
+\fancyfoot[C]{\small\color{lightgray}\thepage}
+\fancyfoot[R]{\small\color{lightgray}Zynapses Inc.}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.2pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{rulegray}\leaders\hrule height \headrulewidth\hfill}}
+\renewcommand{\footrule}{\hbox to\headwidth{\color{rulegray}\leaders\hrule height \footrulewidth\hfill}}
+
+\fancypagestyle{plain}{
+  \fancyhf{}
+  \fancyfoot[C]{\small\color{lightgray}\thepage}
+  \fancyfoot[R]{\small\color{lightgray}Zynapses Inc.}
+  \renewcommand{\headrulewidth}{0pt}
+  \renewcommand{\footrulewidth}{0.2pt}
+  \renewcommand{\footrule}{\hbox to\headwidth{\color{rulegray}\leaders\hrule height \footrulewidth\hfill}}
+}
+
+% ── Section styling ──
+\usepackage{titlesec}
+\titleformat{\chapter}[display]
+  {\normalfont\huge\bfseries\color{radiantblue}}
+  {\chaptertitlename\ \thechapter}{20pt}{\Huge}
+\titleformat{\section}
+  {\normalfont\Large\bfseries\color{radiantblue}}
+  {\thesection}{1em}{}
+\titleformat{\subsection}
+  {\normalfont\large\bfseries\color{radiantblue!80!black}}
+  {\thesubsection}{1em}{}
+\titleformat{\subsubsection}
+  {\normalfont\normalsize\bfseries\color{radiantblue!60!black}}
+  {\thesubsubsection}{1em}{}
+
+% ── Spacing ──
+\setlength{\parskip}{0.4em}
+\setlength{\parindent}{0pt}
+
+% ── Table styling ──
+\renewcommand{\arraystretch}{1.3}

@@ -1797,6 +1797,54 @@ export class AdminStack extends cdk.Stack {
       authorizationType: apigateway.AuthorizationType.COGNITO,
     });
 
+    // =========================================================================
+    // OMEGA Quantum Architecture API routes (v4.18.0)
+    // =========================================================================
+
+    const omega = admin.addResource('omega');
+
+    // Firmware management
+    const omegaFirmware = omega.addResource('firmware');
+
+    // POST /admin/omega/firmware/activate
+    omegaFirmware.addResource('activate').addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // POST /admin/omega/firmware/revert
+    omegaFirmware.addResource('revert').addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // GET /admin/omega/firmware/status
+    omegaFirmware.addResource('status').addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Quantum state management
+    const omegaQuantum = omega.addResource('quantum');
+
+    // GET /admin/omega/quantum/state-summary
+    omegaQuantum.addResource('state-summary').addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // GET /admin/omega/quantum/unitarity-health
+    omegaQuantum.addResource('unitarity-health').addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // POST /admin/omega/quantum/helix-test
+    omegaQuantum.addResource('helix-test').addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
     // Outputs
     new cdk.CfnOutput(this, 'AdminDashboardUrl', {
       value: `https://${this.adminDistribution.distributionDomainName}`,

@@ -5,6 +5,93 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.43.3] - 2026-02-08
+
+### Comprehensive Glossary Audit — v3.0.0
+
+Full audit of `docs/17-GLOSSARY.md` against all 18 consolidated docs, 280+ source code services, 42 CDK stacks, admin dashboard sidebar (360+ entries), and CHANGELOG (v7.18–7.43.2).
+
+#### New Sections Added (3)
+- **§5 RADIANT Applications**: 6 platform apps (Admin Dashboard, Swift Deployer, Aurelius Dojo, Cato Trainer, Genesis Forge, Genesis Lab) + 6 user/tenant management terms (System Admin Separation, Tenant Provisioning, Unified User Profile, Admin Role Hierarchy, Licensing System, Guest Collaboration)
+- **§6 Security & Intrusion Detection**: RIDPS (13 terms), Spend Governor (6 terms)
+- **§7 Operations & Monitoring**: SENTINEL (10 terms), Log Retention (5 terms), Data Lake Offload (8 terms)
+
+#### New Subsystem Entries (13)
+- Platform Services: Admin AI Helper, Bedrock Model Discovery, Context Assembler, Conversation History Loader, Formal Reasoning, Hallucination Detection, Model Router, MLS Encryption, Organism Integration, State Registry, Tenant Settings, Translation Middleware, Conversation Export
+
+#### New Acronyms (10)
+- RIDPS, IOC, UEBA, MLS, ONNX, DPO, ABAC, NLI, SEV, WORM
+
+#### New CDK Stacks (8)
+- data-lake-stack, deployer-key-rotation-stack, foundation-stack, log-retention-stack, model-sync-scheduler-stack, OmegaStack, sentinel-stack, state-registry-stack
+
+#### New AWS Services (3)
+- Kinesis Data Firehose, Athena, Glue
+
+#### New UI/UX Terms (1)
+- Delight System (5 personality modes, 11 injection points, cross-app enforcement)
+
+#### Files Modified
+- **`docs/17-GLOSSARY.md`** — v2.2.0 → v3.0.0, ~200 new lines, sections renumbered 5→8 through 11→14
+
+---
+
+## [6.4.0] - 2026-02-08
+
+### OMEGA Firmware Hot-Swap Documentation Suite
+
+Added comprehensive documentation for the OMEGA firmware hot-swap system across all four audience tiers.
+
+#### Documentation Added
+
+- **`docs/09-OMEGA-GENESIS.md`** — Part VII: Firmware Hot-Swap Engineering Specification (architecture, .bio standard, PKI trust chain, 11-step lifecycle, 4 swap modes, CORTEX nightly cycle, cartridge hot-swap, DB schema, API endpoints, monitoring)
+- **`docs/09-OMEGA-GENESIS.md`** — Part VIII: End-User Guide (live updates, security, developer API behavior during swaps, SDK support, FAQ)
+- **`docs/14-OPERATIONS-RUNBOOKS.md`** — Part IX: Firmware Hot-Swap Operations (SOPs for OVERLAY/SHADOW/EMERGENCY/rollback, infrastructure requirements, monitoring & alerts, CATO nightly cycle, troubleshooting, maintenance calendar)
+- **`docs/15-STRATEGY-COMPETITIVE.md`** — Part VIII: Marketing & Positioning Brief (messaging framework, competitive differentiation, customer stories, external glossary, sales FAQ, taglines, economic narrative)
+- **`docs/15-STRATEGY-COMPETITIVE.md`** — Part IX: Strategic Investor Brief (moat analysis, inference collapse economics, biological lock-in, competitive landscape, revenue implications, IP landscape, timeline)
+- **`docs/06-ARCHITECTURE-ENGINEERING.md`** — Part VI: OMEGA Firmware Hot-Swap Architecture (system architecture diagram, bicameral design, .bio standard, PKI trust chain, 11-step lifecycle, 4 swap modes, persistence architecture, cryogenic serverless, CORTEX nightly cycle, DB tables, monitoring thresholds)
+- **`docs/04-RADIANT-ADMIN.md`** — Part VIII: OMEGA Firmware Administration (firmware lifecycle, creating/deploying/monitoring firmware, swap mode selection, rollback, emergency lockdown, audit trail, cartridge management, admin API endpoints)
+- **`docs/12-API-REFERENCE.md`** — Part VIII: OMEGA Firmware API (upload, sign, activate, preflight, rollback, emergency lockdown, brain status, swap log — full request/response schemas and error codes)
+- **`docs/17-GLOSSARY.md`** — 12 new terms: .bio File, OVERLAY/RESET/SHADOW/EMERGENCY modes, Firmware Swap Orchestrator, Self-Test, Auto-Rollback, Broca Interface, Inference Collapse, Biological Lock-In, omega_firmware_swap_log
+
+---
+
+## [4.18.0-omega] - 2026-02-08
+
+### OMEGA Quantum-Inspired Architecture Upgrade
+
+Implements quantum computing formalism on classical hardware for the OMEGA brain system. Adds complex amplitude state vectors, Helix safety filtering via forbidden quantum states, firmware hot-swap with Ed25519 signature verification, and admin API + dashboard for firmware management.
+
+#### New Files (10)
+
+- **`migrations/V2026_02_07_021__omega_quantum_upgrade.sql`**: Schema: renames `physics` → `quantum`, adds `omega_measurements` + `omega_unitarity_events` tables with RLS, new columns on `omega_firmware` and `omega_brains`
+- **`lambda/shared/services/omega/quantum-types.ts`**: TypeScript types + Zod schemas (ComplexAmplitude, QuantumStateVector, HelixRule, HotSwapResult, etc.)
+- **`lambda/shared/services/omega/quantum-math.ts`**: Pure math library (complex ops, state normalization, unitarity enforcement, Helix projection/dampening, measurement, decoherence)
+- **`lambda/shared/services/omega/quantum-math.test.ts`**: Vitest unit tests (35+ test cases)
+- **`lambda/shared/services/omega/helix-kernel.service.ts`**: In-memory safety filter with severity-ordered rule application
+- **`lambda/shared/services/omega/quantum-brain.service.ts`**: Brain management — inference cycle, EFS/S3 persistence, firmware hot-swap with rollback + self-test
+- **`lambda/shared/services/omega/schemas/bio-firmware.schema.json`**: JSON Schema for `.bio` firmware files (v6.5.0)
+- **`lambda/admin/omega-firmware.ts`**: Admin API — activate (2-person rule), revert, status
+- **`lambda/admin/omega-quantum.ts`**: Admin API — state-summary, unitarity-health, helix-test
+- **`apps/admin-dashboard/app/(dashboard)/omega/firmware/page.tsx`**: Firmware management UI with React Query
+
+#### Modified Files (3)
+
+- **`lambda/admin/handler.ts`**: Route delegation for `/admin/omega/firmware/*` and `/admin/omega/quantum/*`
+- **`lib/stacks/admin-stack.ts`**: 6 API Gateway routes (3 firmware + 3 quantum)
+- **`apps/admin-dashboard/components/layout/sidebar.tsx`**: OMEGA section with Firmware + Quantum entries
+
+#### Admin API Endpoints (6)
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| POST | `/admin/omega/firmware/activate` | Activate firmware (2-person rule enforced) |
+| POST | `/admin/omega/firmware/revert` | Revert to previous firmware |
+| GET | `/admin/omega/firmware/status` | Get firmware + brain status |
+| GET | `/admin/omega/quantum/state-summary` | Brain quantum state + 24h measurements |
+| GET | `/admin/omega/quantum/unitarity-health` | Unitarity events + health check |
+| POST | `/admin/omega/quantum/helix-test` | Dry-run Helix rule against test vector |
+
 ## [7.43.2] - 2026-02-08
 
 ### Admin Handler Mass Wiring Fix — 47 Missing Routes

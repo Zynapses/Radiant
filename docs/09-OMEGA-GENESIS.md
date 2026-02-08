@@ -13,6 +13,9 @@
 - **Part III: Project Genesis OMEGA**
 - **Part IV: Genesis Components**
 - **Part V: Omega Point & LIVS-M**
+- **Part VI: Quantum-Inspired Architecture (v4.18.0)**
+- **Part VII: Firmware Hot-Swap Engineering Specification (v6.4.0)**
+- **Part VIII: Firmware Live Updates — End-User Guide (v6.4.0)**
 
 ---
 
@@ -3029,6 +3032,529 @@ AGI Orchestrator
 > LIVS-M is a policy engine that catches AI shortcuts before they ship — configurable from "let me brainstorm" to "zero trust audit mode."
 
 
+
+---
+
+## Part VI: Quantum-Inspired Architecture (v4.18.0)
+
+> **Version**: 1.0.0 | **Date**: February 8, 2026
+> **Status**: IMPLEMENTED — Quantum formalism on classical hardware
+
+### Overview
+
+The OMEGA Quantum Architecture upgrade brings quantum computing formalism to the classical OMEGA brain system. Instead of real-valued neural weights, OMEGA now operates on **complex amplitude state vectors** in a simulated Hilbert space, enabling interference-based safety filtering, superposition of reasoning states, and decoherence-based memory decay.
+
+### Key Concepts
+
+| Concept | Description |
+|---------|-------------|
+| **Hilbert Space** | Simulated quantum state space (256–4096 dimensions, default 1024) |
+| **State Vector ψ** | Complex amplitudes representing brain state; constraint: ‖ψ‖ = 1 (unitarity) |
+| **Helix Interference** | Safety filter that projects out forbidden quantum states via destructive interference |
+| **Firmware Hot-Swap** | Atomic firmware replacement during inference with Ed25519 verification + self-test + rollback |
+| **Decoherence** | Time-based state decay toward equal superposition (simulates forgetting) |
+| **Soft Measurement** | Partial state collapse that preserves superposition for uncertain states |
+
+### Architecture Diagram
+
+```
+┌─────────────────────────────────────────────────┐
+│                OMEGA Brain Service               │
+│                                                   │
+│  ┌──────────┐  ┌──────────┐  ┌────────────────┐ │
+│  │ Encode   │→ │ Evolve   │→ │ Helix Filter   │ │
+│  │ Input    │  │ (Python) │  │ (TS Kernel)    │ │
+│  └──────────┘  └──────────┘  └────────┬───────┘ │
+│                                        │         │
+│  ┌──────────┐  ┌──────────┐  ┌────────▼───────┐ │
+│  │ Persist  │← │ Unitarity│← │ Measure        │ │
+│  │ (EFS/S3) │  │ Enforce  │  │ (Soft/Full)    │ │
+│  └──────────┘  └──────────┘  └────────────────┘ │
+└─────────────────────────────────────────────────┘
+```
+
+### Database Schema Changes
+
+- **`omega_firmware`**: Renamed `physics` → `quantum`; added `hilbert_dimension`, `unitarity_mode`, `status`, `content_hash`, `is_verified`, `signed_by`, `superseded_by`
+- **`omega_helix_rules`**: Renamed `phase_vector_*` → `forbidden_state_*`; added `forbidden_state_norm`
+- **`omega_brains`**: Added `hilbert_dimension`, `last_unitarity_check`, `last_norm_value`, `unitarity_corrections_count`, `active_firmware_id`, `firmware_hash`
+- **`omega_measurements`** (NEW): Tracks quantum measurement events per inference cycle
+- **`omega_unitarity_events`** (NEW): Tracks unitarity drift, corrections, and violations
+
+### Service Layer
+
+| Service | File | Purpose |
+|---------|------|---------|
+| **QuantumBrainService** | `lambda/shared/services/omega/quantum-brain.service.ts` | Inference cycle, firmware hot-swap, state persistence |
+| **HelixKernelService** | `lambda/shared/services/omega/helix-kernel.service.ts` | In-memory safety filter with severity-ordered rules |
+| **Quantum Math** | `lambda/shared/services/omega/quantum-math.ts` | Pure functions: complex ops, normalization, interference, measurement |
+
+### Admin API
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| POST | `/admin/omega/firmware/activate` | Activate firmware (2-person rule) |
+| POST | `/admin/omega/firmware/revert` | Revert to previous firmware |
+| GET | `/admin/omega/firmware/status` | Firmware + brain status |
+| GET | `/admin/omega/quantum/state-summary` | Quantum state + 24h measurements |
+| GET | `/admin/omega/quantum/unitarity-health` | Unitarity events + health |
+| POST | `/admin/omega/quantum/helix-test` | Dry-run Helix rule test |
+
+### Admin Dashboard
+
+- **OMEGA Firmware** page at `/omega/firmware` — load brain, view firmware status, activate new firmware, emergency revert
+
+---
+
+## Part VII: Firmware Hot-Swap Engineering Specification (v6.4.0)
+
+> **Version**: 6.4.0 | **Date**: February 8, 2026
+> **Audience**: Engineering Team
+> **Classification**: RADIANT INTERNAL // STRATEGIC
+> **Cross-AI Validated**: Claude Opus 4.5 ✓ | Gemini ✓
+
+### 1. What Changed in v6.4.0
+
+Firmware hot-swaps are now **fully enabled in production**. Prior to this release, firmware updates required a cold restart of the OMEGA Lambda function, causing a 2–5 second gap in service and potential loss of in-flight brain state. The new architecture achieves **zero-downtime firmware injection** through atomic metadata hash detection and runtime physics constant reloading.
+
+### 2. Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         GENESIS FORGE UI                                │
+│       (Firmware Editor / Library / Deploy / Monitor / Rollback)         │
+└────────────────────────────────┬────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                     FIRMWARE MANAGEMENT LAYER                           │
+│  ┌────────────────────────┐    ┌──────────────────────────────────┐    │
+│  │   FirmwareManager      │    │   FirmwareSwapOrchestrator       │    │
+│  │  (Upload/Validate/     │    │  (OVERLAY/RESET/SHADOW/          │    │
+│  │   Sign/Store)          │    │   EMERGENCY)                     │    │
+│  └────────────────────────┘    └──────────────────────────────────┘    │
+└────────────────────────────────┬────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                     OMEGA QUANTUM BRAIN LAYER                           │
+│  ┌──────────────┐    ┌───────────────┐    ┌──────────────────────┐    │
+│  │ QuantumBrain  │    │ HelixKernel   │    │ AmbitionFirmware     │    │
+│  │ (Q-Nodes,     │    │ (Destructive  │    │ (Homeostasis,        │    │
+│  │  State, LTC)  │    │  Interference)│    │  Entropy, Dopamine)  │    │
+│  └──────────────┘    └───────────────┘    └──────────────────────┘    │
+└────────────────────────────────┬────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                       PERSISTENCE LAYER                                 │
+│     EFS (Hot State)    │    S3 (Snapshots)    │   PostgreSQL (Meta)    │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+### 3. The .bio Firmware Standard
+
+A `.bio` file is a signed JSON object that controls the "instincts" of the OMEGA organism.
+
+#### 3.1 Structure
+
+```json
+{
+  "version": "2.1.0",
+  "brain_compatibility": ">=6.0.0",
+  "helix_rules": [
+    {
+      "id": "helix-001",
+      "name": "Block Data Exfiltration",
+      "forbidden_vector_signature": "exfiltration",
+      "severity": "CRITICAL",
+      "interference_mode": "DESTRUCTIVE"
+    }
+  ],
+  "ambition": {
+    "entropy_threshold": 0.5,
+    "plasticity_rate": 0.03,
+    "dopamine_decay_rate": 0.99,
+    "boredom_trigger": "DREAM_SIMULATION"
+  },
+  "quantum_params": {
+    "hilbert_dimension": 1024,
+    "phase_velocity_init": "normal",
+    "unitarity_mode": "STRICT",
+    "decoherence_rate": 0.001
+  },
+  "personality": {
+    "broca_system_prompt": "You are a paranoid security analyst...",
+    "tone": "formal",
+    "domain_focus": ["cybersecurity", "compliance"]
+  },
+  "signature": {
+    "algorithm": "Ed25519",
+    "signer_key_id": "tenant-ca-xxx",
+    "timestamp": "2026-02-08T00:00:00Z",
+    "value": "base64-encoded-signature"
+  }
+}
+```
+
+#### 3.2 Field Reference
+
+| Section | Field | Type | Hot-Swappable | Description |
+|---------|-------|------|:---:|-------------|
+| helix_rules | forbidden_vector_signature | string | ✅ | Pattern mapped to Forbidden Phase Vector |
+| helix_rules | interference_mode | enum | ✅ | DESTRUCTIVE (cancel) or DAMPENING (attenuate) |
+| ambition | entropy_threshold | float 0–1 | ✅ | How fast the brain gets "bored" |
+| ambition | plasticity_rate | float 0–0.1 | ✅ | How fast it learns |
+| ambition | dopamine_decay_rate | float 0.9–1.0 | ✅ | Reward signal decay per cycle |
+| quantum_params | hilbert_dimension | int | ❌ (RESET only) | Dimension of Q-Node state space |
+| quantum_params | unitarity_mode | enum | ❌ (RESET only) | STRICT or RELAXED |
+| quantum_params | decoherence_rate | float | ✅ | Short-term memory decay rate |
+| personality | broca_system_prompt | string | ✅ | System prompt for Broca Interface LLM |
+
+### 4. PKI Trust Chain (KMS-Backed)
+
+Production cartridge/firmware signing uses real AWS KMS (implemented in PROMPT-42):
+
+```
+Platform Root CA (ECC_NIST_P256)          ← Created in CDK SecurityStack
+├── Tenant CA Key (ECC_NIST_P256)         ← Created per tenant via generateTenantCA()
+│   ├── Signing Key (per-purpose)         ← Created via createSigningKey()
+│   │   └── Signs .bio firmware
+│   │   └── Signs .RADz cartridges
+│   └── Verification via VerifyCommand
+└── Stored in cartridge_signing_keys table with full audit trail
+```
+
+| Operation | KMS Command | Purpose |
+|-----------|-------------|---------|
+| Sign firmware | `SignCommand (ECDSA_SHA_256)` | Create signature on .bio content |
+| Verify firmware | `VerifyCommand` | Validate before hot-swap |
+| Create tenant CA | `CreateKeyCommand` | Per-tenant signing hierarchy |
+| Get public key | `GetPublicKeyCommand` | Export for offline verification |
+
+### 5. Hot-Swap Lifecycle (The Critical Path)
+
+#### 5.1 The 11-Step Sequence
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│  1. AUTHOR     Admin creates .bio in Genesis Forge                  │
+│       ▼                                                             │
+│  2. SIGN       Ed25519 via KMS (ECDSA_SHA_256 in production)        │
+│       ▼                                                             │
+│  3. STORE      Insert into omega_helix_firmware, status='signed'    │
+│       ▼                                                             │
+│  4. ACTIVATE   Admin hits "Activate" → status='active'              │
+│       │        Old firmware → status='superseded'                   │
+│       │        Brain's firmware_hash updated in omega_brain_states  │
+│       ▼                                                             │
+│  5. DETECT     Top of inferenceCycle(): checkFirmwareSwap()         │
+│       │        loaded_hash ≠ omega_brains.firmware_hash             │
+│       ▼                                                             │
+│  6. SNAPSHOT   Save rollback state (old rules, params, personality) │
+│       ▼                                                             │
+│  7. VERIFY     Ed25519 signature check on new firmware content      │
+│       │        → REJECT if invalid (rollback, log error)           │
+│       ▼                                                             │
+│  8. UNLOAD     Purge old Helix Rules from constraint table          │
+│       │        Zero old quantum params, clear personality prompt    │
+│       ▼                                                             │
+│  9. LOAD       Parse new .bio content from firmware record          │
+│       │        → Inject Forbidden State vectors into Helix kernel  │
+│       │        → Apply quantum params to physics engine            │
+│       │        → Apply ambition settings                           │
+│       │        → Set personality prompt for Broca Interface        │
+│       ▼                                                             │
+│  10. SELF-TEST Run verification against loaded firmware:            │
+│       │        → Each Helix rule blocks its forbidden vector       │
+│       │        → Safe vectors pass through unmodified              │
+│       │        → If ANY test fails → ROLLBACK to snapshot          │
+│       ▼                                                             │
+│  11. COMMIT    Update loaded_hash, log firmware_hot_swap event      │
+│                Brain continues with zero downtime                   │
+└─────────────────────────────────────────────────────────────────────┘
+
+INVARIANT: Brain NEVER processes inference between UNLOAD and
+LOAD/ROLLBACK. The swap is synchronous within the inference
+cycle — the user's request waits an extra ~50ms.
+```
+
+#### 5.2 Four Swap Modes
+
+| Mode | Duration | Quantum State | Helix Rules | Use Case |
+|------|----------|---------------|-------------|----------|
+| **OVERLAY** | ~5s | Preserved | Merged/appended | Production updates, adding safety rules |
+| **RESET** | ~30s | Reinitialized | Full replace | Major version, Hilbert dimension change |
+| **SHADOW** | ~10s | Forked copy | Parallel | A/B testing, pre-deployment validation |
+| **EMERGENCY** | ~2s | Preserved | Platform defaults | Safety incident, immediate lockdown |
+
+#### 5.3 Mode Decision Matrix
+
+```
+Is this an emergency?
+├── YES → EMERGENCY mode
+└── NO
+    Is Hilbert dimension changing?
+    ├── YES → RESET mode (requires maintenance window in prod)
+    └── NO
+        Is unitarity mode changing?
+        ├── YES → RESET mode
+        └── NO
+            Is this production with live users?
+            ├── YES → SHADOW first, then OVERLAY when validated
+            └── NO → OVERLAY
+```
+
+#### 5.4 Quantum State Implications
+
+**OVERLAY:** Brain state preserved. New Helix rules and ambition params applied on top.
+
+```
+Before: |ψ⟩ = 0.6|learned⟩ + 0.8|knowledge⟩
+After:  |ψ⟩ = 0.6|learned⟩ + 0.8|knowledge⟩  (unchanged)
+        + New Helix rules active
+        + New quantum parameters applied
+```
+
+**RESET:** Brain returns to equal superposition (blank slate). All learned pathways lost.
+
+```
+Before: |ψ⟩ = complex trained superposition
+After:  |ψ⟩ = (1/√d)(|0⟩ + |1⟩ + ... + |d-1⟩)
+```
+
+**SHADOW:** Production brain unaffected while shadow copy evolves independently.
+
+### 6. CORTEX Network Hot-Swap (CATO Nightly)
+
+Separate from firmware, the 6 CORTEX MLPs (~2.5M params total) hot-swap nightly via CATO:
+
+```
+CATO (2am UTC)
+├── INVENTION phase (30% min budget)
+├── EVOLUTION phase (70% max budget)
+├── TRAINING: PyTorch 2.x on ml.g5.xlarge
+├── Export to ONNX
+├── Upload to S3: s3://radiant-cortex-models-{env}/{network}/v{X}/model.onnx
+├── Update latest_version.txt
+├── EventBridge triggers inference nodes
+├── Background thread downloads new model
+├── Atomic pointer swap (zero downtime)
+└── Old model garbage collected
+```
+
+### 7. Cartridge Hot-Swap (.RADz)
+
+Cartridges are portable AI brains that can also be hot-swapped:
+
+| Cartridge State | Thermal State | Behavior |
+|----------------|---------------|----------|
+| Uninstalled | COLD | Base routing only |
+| Installing | WARMING | Loading models to inference nodes |
+| Active | WARM | Full intelligence |
+| **Updating** | **WARM** | **Atomic pointer swap, zero downtime** |
+
+```typescript
+await radiant.cartridge.import({
+  file: 'domain-expertise.RADz',
+  targetTenant: 'tenant-456',
+  validateSignature: true,
+  mergeStrategy: 'REPLACE'
+});
+```
+
+### 8. Database Schema (Key Tables)
+
+#### omega_helix_firmware
+
+```sql
+CREATE TABLE omega_helix_firmware (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL REFERENCES tenants(id),
+  brain_id UUID REFERENCES omega_brain_states(id),
+  name VARCHAR(255) NOT NULL,
+  version VARCHAR(50) NOT NULL,
+  status VARCHAR(20) DEFAULT 'draft',
+  content JSONB NOT NULL,
+  content_hash VARCHAR(128) NOT NULL,
+  signature TEXT,
+  signer_key_id VARCHAR(255),
+  created_by UUID REFERENCES users(id),
+  activated_at TIMESTAMPTZ,
+  superseded_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+#### omega_firmware_swap_log
+
+```sql
+CREATE TABLE omega_firmware_swap_log (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL,
+  brain_id UUID NOT NULL,
+  from_firmware_id UUID,
+  to_firmware_id UUID NOT NULL,
+  swap_mode VARCHAR(20) NOT NULL,
+  duration_ms INTEGER,
+  status VARCHAR(20) NOT NULL,
+  rollback_snapshot_key TEXT,
+  error_details JSONB,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+### 9. API Endpoints
+
+| Method | Endpoint | Purpose |
+|--------|----------|---------|
+| POST | `/api/v2/firmware/upload` | Upload and validate .bio file |
+| POST | `/api/v2/firmware/{id}/sign` | Sign via KMS |
+| POST | `/api/v2/firmware/{id}/activate` | Trigger hot-swap |
+| POST | `/api/v2/firmware/{id}/rollback` | Revert to previous firmware |
+| GET | `/api/v2/firmware/{id}/preflight` | Validate all prerequisites |
+| POST | `/api/v2/firmware/emergency` | Immediate safety lockdown |
+| GET | `/api/v2/omega/status` | Brain status including firmware hash |
+
+### 10. Monitoring & Auto-Rollback
+
+| Metric | Warning | Critical (Auto-Rollback) |
+|--------|---------|--------------------------|
+| Swap duration | > 30s | > 60s |
+| Post-swap error rate | > 5% | > 10% |
+| Post-swap latency increase | > 30% | > 50% |
+| Helix verification failures | Any | Any (immediate rollback) |
+
+**Snapshot Retention:**
+
+| Type | Retention |
+|------|-----------|
+| Pre-swap | 30 days |
+| Daily | 7 days |
+| Weekly | 90 days |
+| Pre-major-version | 1 year |
+
+### 11. Prerequisites Checklist
+
+| Requirement | Check | Failure Action |
+|-------------|-------|----------------|
+| Brain is idle | `GET /api/v2/omega/status` → active_streams = 0 | Wait or force quiesce |
+| EFS healthy | `df -h /mnt/omega_state` | Abort, alert ops |
+| S3 accessible | `aws s3 ls` | Abort, alert ops |
+| Memory < 80% | Lambda metrics | Scale down |
+| No swap in progress | Check `firmware_swap_lock` | Wait for lock |
+| Valid Ed25519 signature | Verify against tenant CA | Reject firmware |
+| Schema version compatible | Semver check | Reject firmware |
+| Not revoked | Check revocation list | Reject firmware |
+
+### 12. Related Implementation Prompts
+
+| Prompt | Content |
+|--------|---------|
+| PROMPT-42 | Cartridge PKI/KMS Integration (real signing) |
+| PROMPT-45 | OMEGA Quantum Architecture base implementation |
+| PROMPT-46 | Complete OMEGA + Genesis Forge composite prompt |
+
+---
+
+## Part VIII: Firmware Live Updates — End-User Guide (v6.4.0)
+
+> **Version**: 6.4.0 | **Date**: February 2026
+> **Audience**: End Users & Application Developers
+
+### What Are Live Updates?
+
+Your RADIANT-powered AI can now receive behavior updates in real-time — without any interruption to your experience. Your conversations continue seamlessly while the AI becomes smarter, safer, or more specialized behind the scenes.
+
+Think of it like your phone updating an app in the background. You never notice it happening, but the next time you use it, things work better.
+
+### What Can Change in a Live Update?
+
+| What Changes | What It Means for You |
+|-------------|----------------------|
+| Safety rules | New protections are added instantly — the AI stays compliant with the latest regulations and policies |
+| Personality & tone | Your admin can tune how the AI communicates — more formal, more casual, more domain-specific |
+| Learning speed | The AI can be configured to adapt faster or slower to your patterns |
+| Domain expertise | New knowledge domains can be activated — turning a generalist AI into a specialist |
+
+### What Does NOT Change
+
+| What's Preserved | Why It Matters |
+|-----------------|----------------|
+| Your conversation history | Everything you've discussed is retained |
+| The AI's learned patterns | The AI doesn't forget what it's learned about your preferences and work style |
+| Your data | No data is moved, exposed, or reset during updates |
+| Service availability | The AI remains available during the entire update — zero downtime |
+
+### Will I Notice When an Update Happens?
+
+Almost certainly not. Live updates complete in under a second. Your current conversation continues without interruption. The only difference you might notice is the AI being slightly more helpful, more accurate, or having a slightly different tone after an update — depending on what your administrator changed.
+
+### How Secure Are Live Updates?
+
+Every update is protected by multiple layers of security:
+
+- **Cryptographic Signing** — Every update is digitally signed with enterprise-grade encryption (AWS KMS). The AI rejects any unsigned or tampered updates instantly.
+- **Automatic Verification** — After every update, the AI runs a self-check to confirm all safety rules are working correctly. If anything fails, it automatically reverts to the previous version in under 2 seconds.
+- **Audit Trail** — Every update is logged with who made it, when, and what changed. Your organization has complete visibility.
+- **Approval Workflow** — In production environments, updates require administrator approval and authentication before they take effect.
+
+### For Application Developers
+
+If you're building on RADIANT's API, here's what you need to know about firmware hot-swaps:
+
+#### API Behavior During Swaps
+
+| Aspect | Behavior |
+|--------|----------|
+| In-flight requests | Complete normally — swap waits for idle cycle |
+| New requests during swap | Queued for ~50ms, then served with new firmware |
+| WebSocket connections | Maintained — no disconnection |
+| Response format | Unchanged — same API contract |
+| Rate limits | Unchanged |
+
+#### Detecting Firmware Changes
+
+```typescript
+// The /status endpoint includes current firmware info
+const status = await fetch('/api/v2/omega/status');
+const { firmware_hash, firmware_version } = await status.json();
+
+// Optional: subscribe to firmware change events via WebSocket
+ws.on('firmware_changed', (event) => {
+  console.log(`Firmware updated: ${event.old_version} → ${event.new_version}`);
+});
+```
+
+#### SDK Support
+
+All RADIANT SDKs (TypeScript, Python, Swift) handle firmware transitions transparently. No code changes required on your end.
+
+```typescript
+// Your existing code works identically before and after swaps
+const response = await radiant.chat({
+  messages: [{ role: 'user', content: 'Analyze this report...' }],
+  model: 'auto'
+});
+// Response arrives normally — firmware swap is invisible
+```
+
+### Frequently Asked Questions
+
+**Q: Can I opt out of live updates?**
+A: Live updates are managed by your organization's RADIANT administrator. Contact your admin if you have concerns about specific changes.
+
+**Q: Will updates affect my custom configurations?**
+A: No. Your personal preferences, saved prompts, and conversation settings are independent of firmware updates. Only the AI's core behavior changes.
+
+**Q: What if an update makes the AI worse at my task?**
+A: Administrators can instantly roll back any update. If you notice a degradation in quality, report it to your admin — they can revert in seconds.
+
+**Q: How often do updates happen?**
+A: That depends on your organization's policies. Some updates are event-driven (new compliance requirement), others follow a regular schedule (nightly intelligence improvements via CATO). Most users experience 1-2 noticeable changes per week.
+
+**Q: Is my data used to train other organizations' AIs?**
+A: Absolutely not. RADIANT maintains strict tenant isolation. Your data, your AI's learned behaviors, and your firmware configurations are completely separated from other organizations. Differential privacy is applied to any cross-tenant learning patterns.
 
 ---
 
