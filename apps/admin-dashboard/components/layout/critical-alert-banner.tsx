@@ -29,7 +29,7 @@ export function CriticalAlertBanner() {
   const visibleAlerts = alerts.filter(a => !dismissedIds.has(a.id));
 
   const handleDismiss = useCallback(async (alertId: string) => {
-    setDismissedIds(prev => new Set([...prev, alertId]));
+    setDismissedIds(prev => new Set([...Array.from(prev), alertId]));
     try {
       await api.post(`/api/admin/critical-alerts/${alertId}/dismiss`);
     } catch {

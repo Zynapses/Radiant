@@ -364,7 +364,7 @@ export default function MemoryRetentionPage() {
                     <div className="flex items-center gap-2">
                       <span className={`px-2 py-0.5 rounded text-xs font-medium ${scopeColor}`}>{String(e.scope)}</span>
                       <span className="text-sm text-gray-700">{String(e.action).replace(/_/g, ' ')}</span>
-                      {e.target_type && <span className="text-xs text-gray-400">({String(e.target_type)})</span>}
+                      {e.target_type ? <span className="text-xs text-gray-400">({String(e.target_type)})</span> : null}
                     </div>
                     <span className="text-xs text-gray-400">{new Date(String(e.created_at)).toLocaleString()}</span>
                   </div>

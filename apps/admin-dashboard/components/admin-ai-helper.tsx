@@ -94,8 +94,7 @@ function renderInline(text: string): React.ReactNode {
     let firstMatch: { index: number; length: number; node: React.ReactNode } | null = null;
 
     if (boldMatch && boldMatch.index !== undefined) {
-      const candidate = { index: boldMatch.index, length: boldMatch[0].length, node: <strong key={key++} className="font-semibold text-white">{boldMatch[1]}</strong> };
-      if (!firstMatch || candidate.index < firstMatch.index) firstMatch = candidate;
+      firstMatch = { index: boldMatch.index, length: boldMatch[0].length, node: <strong key={key++} className="font-semibold text-white">{boldMatch[1]}</strong> };
     }
     if (codeMatch && codeMatch.index !== undefined) {
       const candidate = { index: codeMatch.index, length: codeMatch[0].length, node: <code key={key++} className="bg-slate-700 px-1 py-0.5 rounded text-xs font-mono text-emerald-300">{codeMatch[1]}</code> };

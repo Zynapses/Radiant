@@ -227,7 +227,7 @@ export class SentinelStack extends cdk.Stack {
       NODE_OPTIONS: '--enable-source-maps',
     };
 
-    const lambdaDefaults: Partial<lambda.FunctionProps> = {
+    const lambdaDefaults = {
       runtime: lambda.Runtime.NODEJS_20_X,
       memorySize: 1024,
       timeout: cdk.Duration.seconds(30),
