@@ -198,7 +198,7 @@ export function AxiomForge({ query, onCompiled, onCancel, className }: AxiomForg
                 Ready to compile your optimized prompt
               </h4>
               <p className="text-sm text-white/60 mb-6">
-                We've gathered enough context. Click below to generate your optimized prompt.
+                We&apos;ve gathered enough context. Click below to generate your optimized prompt.
               </p>
               <button
                 onClick={() => compile()}

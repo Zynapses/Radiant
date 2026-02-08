@@ -349,7 +349,7 @@ export function LIVSMPolicySettings({
                 LIVS-M Policy Mode
               </CardTitle>
               <CardDescription>
-                Select the governance "Defcon" level for AI agent behavior
+                Select the governance &quot;Defcon&quot; level for AI agent behavior
               </CardDescription>
             </div>
             {loading && <RefreshCw className="h-4 w-4 animate-spin text-muted-foreground" />}

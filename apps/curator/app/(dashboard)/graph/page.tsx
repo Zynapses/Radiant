@@ -498,7 +498,7 @@ export default function GraphPage() {
                 </div>
                 <div>
                   <h2 className="text-lg font-semibold">Force Override</h2>
-                  <p className="text-sm text-muted-foreground">"God Mode" - Supersedes AI</p>
+                  <p className="text-sm text-muted-foreground">&quot;God Mode&quot; - Supersedes AI</p>
                 </div>
               </div>
               <button onClick={() => setShowOverrideDialog(false)} className="p-1 hover:bg-accent rounded">

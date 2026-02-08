@@ -45,7 +45,7 @@ const STEP_COLORS: Record<StepStatus, string> = {
 };
 
 export function WorkflowProgress({
-  currentStep,
+  currentStep: _currentStep,
   steps,
   progress,
   className,

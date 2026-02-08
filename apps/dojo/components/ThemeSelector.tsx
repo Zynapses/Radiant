@@ -115,7 +115,7 @@ export function ThemeSelector() {
           <Sparkles className="w-12 h-12 text-white/10 mb-4" />
           <h3 className="text-lg font-medium text-white/40">No Themes Discovered</h3>
           <p className="text-sm text-white/25 mt-1">
-            Go to the Library tab and click "Discover Themes" to analyze your documents
+            Go to the Library tab and click &quot;Discover Themes&quot; to analyze your documents
           </p>
         </div>
       ) : (

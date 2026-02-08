@@ -239,7 +239,7 @@ export default function VerifyPage() {
         <div>
           <h1 className="text-2xl font-bold">Verify Knowledge</h1>
           <p className="text-muted-foreground mt-1">
-            Review AI understanding and confirm accuracy. The "Entrance Exam" ensures quality.
+            Review AI understanding and confirm accuracy. The &quot;Entrance Exam&quot; ensures quality.
           </p>
         </div>
         <div className="flex items-center gap-2 bg-curator-gold/10 text-curator-gold px-4 py-2 rounded-lg">
@@ -354,7 +354,7 @@ export default function VerifyPage() {
               {selectedItem.cardType === 'fact_check' && (
                 <div className="bg-muted/50 rounded-lg p-4 mb-6">
                   <p className="text-sm text-muted-foreground mb-2">I extracted:</p>
-                  <p className="text-lg font-medium">"{selectedItem.statement}"</p>
+                  <p className="text-lg font-medium">&quot;{selectedItem.statement}&quot;</p>
                   <p className="text-sm text-muted-foreground mt-2">Is this correct?</p>
                 </div>
               )}
@@ -362,7 +362,7 @@ export default function VerifyPage() {
               {selectedItem.cardType === 'logic_check' && (
                 <div className="bg-muted/50 rounded-lg p-4 mb-6">
                   <p className="text-sm text-muted-foreground mb-2">I inferred:</p>
-                  <p className="text-lg font-medium">"{selectedItem.inferredRelationship || selectedItem.statement}"</p>
+                  <p className="text-lg font-medium">&quot;{selectedItem.inferredRelationship || selectedItem.statement}&quot;</p>
                   <p className="text-sm text-muted-foreground mt-2">Is this relationship correct?</p>
                 </div>
               )}
@@ -546,7 +546,7 @@ export default function VerifyPage() {
                 />
               </div>
               <p className="text-xs text-muted-foreground">
-                This will create a Golden Rule override that supersedes the AI's extraction.
+                This will create a Golden Rule override that supersedes the AI&apos;s extraction.
               </p>
               <div className="flex gap-3 pt-2">
                 <button

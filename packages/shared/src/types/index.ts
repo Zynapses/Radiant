@@ -195,4 +195,31 @@ export * from './anticipatory-memory.types';
 export * from './user-memory-retention.types';
 
 // User Identity & Multi-Tenant Membership (v7.22.0)
-export * from './user-identity.types';
+// Selective export to avoid conflicts with auth-v51.types (TenantUser),
+// curator.types (TenantRole), and user-registry.types (UserStatus)
+export type {
+  LicenseType,
+  AppId,
+  LicenseUnit,
+  ComplianceFeatureCode,
+  AddonFeatureCode,
+  FeatureCode,
+  TenantLicense,
+  LicenseCatalogCategory,
+  LicenseCatalogEntry,
+  LicenseAuditAction,
+  LicenseAuditRecord,
+  LicenseRequirement,
+  LicenseCheckResult,
+  TenantAuthConfig,
+  UserAdminAction,
+  AdminApp,
+  UserAdminActionRecord,
+  DeactivateUserResult,
+  RequestDeletionResult,
+  InviteUserRequest,
+  UpdateUserRequest,
+  DeactivateUserRequest,
+  RequestUserDeletionRequest,
+  UpdateTenantAuthConfigRequest,
+} from './user-identity.types';

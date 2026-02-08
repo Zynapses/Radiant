@@ -399,7 +399,7 @@ export default function OverridesPage() {
                 </div>
                 <div>
                   <h2 className="text-lg font-semibold">Create Golden Rule Override</h2>
-                  <p className="text-sm text-muted-foreground">"God Mode" - Supersedes all AI learning</p>
+                  <p className="text-sm text-muted-foreground">&quot;God Mode&quot; - Supersedes all AI learning</p>
                 </div>
               </div>
               <button onClick={() => { setShowCreateDialog(false); resetCreateForm(); }} className="p-1 hover:bg-accent rounded">

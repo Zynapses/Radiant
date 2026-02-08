@@ -21,7 +21,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useUIStore } from '@/lib/stores/ui-store';
-import { useRadiantDelightOptional, getMotionTransition, getMorphAnimationStates, playSynthSound } from '@radiant/delight-ui';
+import { useRadiantDelightOptional, getMorphAnimationStates, playSynthSound } from '@radiant/delight-ui';
 
 export type ViewType = 
   | 'chat'

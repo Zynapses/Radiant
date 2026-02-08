@@ -36,7 +36,7 @@ interface CompiledPromptPreviewProps {
 export function CompiledPromptPreview({
   systemPrompt,
   userPrompt,
-  modelId,
+  modelId: _modelId,
   modelName,
   tokenCount,
   onEdit,

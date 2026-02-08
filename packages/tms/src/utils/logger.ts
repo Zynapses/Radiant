@@ -10,7 +10,7 @@ const isTest = process.env.NODE_ENV === 'test' || process.env.VITEST;
 
 // In Lambda or test environments, use plain JSON logging
 // In development, try to use pino-pretty if available
-let loggerOptions: pino.LoggerOptions = {
+const loggerOptions: pino.LoggerOptions = {
   name: 'radiant-tms',
   level: process.env.LOG_LEVEL || (isTest ? 'silent' : 'info'),
 };
