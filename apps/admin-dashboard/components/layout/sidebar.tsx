@@ -77,6 +77,7 @@ import {
   BookOpen,
   Swords,
   Snowflake,
+  ShieldAlert,
 } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -283,6 +284,8 @@ const navigation: NavigationItem[] = [
   
   // Security & Compliance Section
   { type: 'separator', label: 'Security' },
+  { name: 'Intrusion Detection', href: '/intrusion-detection', icon: ShieldAlert },
+  { name: 'Lockout Policy', href: '/lockout-policy', icon: Lock },
   { name: 'Security', href: '/security', icon: Shield },
   { name: 'Sec Alerts', href: '/security/alerts', icon: AlertTriangle },
   { name: 'Protection', href: '/security/protection', icon: ShieldCheck },
@@ -293,6 +296,7 @@ const navigation: NavigationItem[] = [
   { name: 'Sec Policies', href: '/security/policies', icon: FileText },
   { name: 'Compliance', href: '/compliance', icon: ShieldCheck },
   { name: 'Log Retention', href: '/log-retention', icon: Archive },
+  { name: 'Data Lake', href: '/data-lake', icon: Database },
   { name: 'Violations', href: '/compliance/violations', icon: AlertTriangle },
   { name: 'Checklists', href: '/compliance/checklists', icon: ListChecks },
   { name: 'Self-Audit', href: '/compliance/self-audit', icon: Activity },
@@ -319,6 +323,8 @@ const navigation: NavigationItem[] = [
   
   // Settings Section
   { type: 'separator', label: 'Settings' },
+  { name: 'Tenant Settings', href: '/tenant-settings', icon: Sliders },
+  { name: 'Conversation Export', href: '/conversation-export', icon: Archive },
   { name: 'Settings', href: '/settings', icon: Settings },
   { name: 'URLs', href: '/settings/urls', icon: Link2 },
   { name: 'Security Settings', href: '/settings/security', icon: Lock },

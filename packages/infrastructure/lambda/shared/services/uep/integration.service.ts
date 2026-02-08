@@ -143,7 +143,7 @@ export interface CatoMethodEnvelopeV1 {
 // =============================================================================
 
 const RADIANT_VERSION = process.env.RADIANT_VERSION || '5.52.58';
-const DEFAULT_RETENTION_DAYS = 90;
+const DEFAULT_RETENTION_DAYS = 180; // 6 months
 const PHI_RETENTION_DAYS = 2190; // 6 years for HIPAA
 
 // =============================================================================

@@ -6,6 +6,7 @@ import type { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-l
 import { Logger } from '../shared/logger';
 import { successResponse, errorResponse } from '../shared/response';
 import { UnauthorizedError, NotFoundError, ValidationError, ForbiddenError } from '../shared/errors';
+import { notFoundResponse } from '../shared/utils/response';
 import { extractAuthContext, requireAdmin } from '../shared/auth';
 import { MINIMAL_CONTEXT, NOOP_CALLBACK } from '../shared/lambda-context';
 import {
@@ -80,6 +81,19 @@ export async function handler(
   }
 }
 
+/**
+ * Helper: invoke a legacy callback-style handler consistently.
+ * Awaits the result and falls back to 404 if the handler returns void/undefined.
+ */
+async function invokeLegacy(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  fn: (...args: any[]) => any,
+  event: APIGatewayProxyEvent,
+): Promise<APIGatewayProxyResult> {
+  const result = await fn(event, MINIMAL_CONTEXT, NOOP_CALLBACK);
+  return (result || notFoundResponse()) as APIGatewayProxyResult;
+}
+
 async function routeRequest(
   event: APIGatewayProxyEvent,
   auth: { userId: string; isSuperAdmin: boolean },
@@ -145,7 +159,8 @@ async function routeRequest(
     }
     if (pathParts[2] === 'self-audit') {
       const mod = await import('./self-audit.js');
-      return (mod.getDashboard(event, MINIMAL_CONTEXT, NOOP_CALLBACK) || successResponse({ message: 'Not found' })) as APIGatewayProxyResult;
+      const result = await mod.getDashboard(event, MINIMAL_CONTEXT, NOOP_CALLBACK);
+      return (result || notFoundResponse()) as APIGatewayProxyResult;
     }
   }
 
@@ -227,6 +242,29 @@ async function routeRequest(
     return spendGovernorHandler(event);
   }
 
+  // Intrusion Detection (v7.40.0 — RIDPS)
+  if (pathParts[1] === 'intrusion-detection') {
+    const { handleIntrusionDetection } = await import('./intrusion-detection.js');
+    return handleIntrusionDetection(event);
+  }
+
+  // Data Lake (v7.42.0)
+  if (pathParts[1] === 'data-lake') {
+    const { handleDataLake } = await import('./data-lake.js');
+    return handleDataLake(event);
+  }
+
+  // Tenant Settings (v7.43.0 — Unified tenant profile/settings)
+  if (pathParts[1] === 'tenant-settings') {
+    const { handler: tenantSettingsHandler } = await import('./tenant-settings.js');
+    return tenantSettingsHandler(event);
+  }
+
+  // Conversation Export (v7.43.0 — Export chat history)
+  if (pathParts[1] === 'conversation-export') {
+    return await handleConversationExport(event);
+  }
+
   // Ethics
   if (pathParts[1] === 'ethics') {
     const { handler: ethicsHandler } = await import('./ethics.js');
@@ -254,7 +292,8 @@ async function routeRequest(
   // Enhanced learning
   if (pathParts[1] === 'enhanced-learning') {
     const mod = await import('./enhanced-learning.js');
-    return (mod.getConfig(event, MINIMAL_CONTEXT, NOOP_CALLBACK) || successResponse({ message: 'Not found' })) as APIGatewayProxyResult;
+    const result = await mod.getConfig(event, MINIMAL_CONTEXT, NOOP_CALLBACK);
+    return (result || notFoundResponse()) as APIGatewayProxyResult;
   }
 
   // Logs (AWS logs)
@@ -267,20 +306,24 @@ async function routeRequest(
   if (pathParts[1] === 'consciousness') {
     if (pathParts[2] === 'engine') {
       const mod = await import('./consciousness-engine.js');
-      return (mod.getDashboard(event, MINIMAL_CONTEXT, NOOP_CALLBACK) || successResponse({ message: 'Not found' })) as APIGatewayProxyResult;
+      const result = await mod.getDashboard(event, MINIMAL_CONTEXT, NOOP_CALLBACK);
+      return (result || notFoundResponse()) as APIGatewayProxyResult;
     }
     if (pathParts[2] === 'evolution') {
       const mod = await import('./consciousness-evolution.js');
-      return (mod.getPredictionMetrics(event, MINIMAL_CONTEXT, NOOP_CALLBACK) || successResponse({ message: 'Not found' })) as APIGatewayProxyResult;
+      const result = await mod.getPredictionMetrics(event, MINIMAL_CONTEXT, NOOP_CALLBACK);
+      return (result || notFoundResponse()) as APIGatewayProxyResult;
     }
     const mod = await import('./consciousness.js');
-    return (mod.getConsciousnessMetrics(event, MINIMAL_CONTEXT, NOOP_CALLBACK) || successResponse({ message: 'Not found' })) as APIGatewayProxyResult;
+    const result = await mod.getConsciousnessMetrics(event, MINIMAL_CONTEXT, NOOP_CALLBACK);
+    return (result || notFoundResponse()) as APIGatewayProxyResult;
   }
 
   // Ego system
   if (pathParts[1] === 'ego') {
     const mod = await import('./ego.js');
-    return (mod.getEgoDashboard(event, MINIMAL_CONTEXT, NOOP_CALLBACK) || successResponse({ message: 'Not found' })) as APIGatewayProxyResult;
+    const result = await mod.getEgoDashboard(event, MINIMAL_CONTEXT, NOOP_CALLBACK);
+    return (result || notFoundResponse()) as APIGatewayProxyResult;
   }
 
   // Formal reasoning
@@ -292,7 +335,8 @@ async function routeRequest(
   // Domain ethics
   if (pathParts[1] === 'domain-ethics') {
     const mod = await import('./domain-ethics.js');
-    return (mod.listFrameworks(event, MINIMAL_CONTEXT, NOOP_CALLBACK) || successResponse({ message: 'Not found' })) as APIGatewayProxyResult;
+    const result = await mod.listFrameworks(event, MINIMAL_CONTEXT, NOOP_CALLBACK);
+    return (result || notFoundResponse()) as APIGatewayProxyResult;
   }
 
   // Ethics-free reasoning
@@ -301,7 +345,7 @@ async function routeRequest(
     return mod.handler(event, MINIMAL_CONTEXT, NOOP_CALLBACK) as Promise<APIGatewayProxyResult>;
   }
 
-  // Cato services
+  // Cato services (unified block — genesis, dialogue, global, and catch-all)
   if (pathParts[1] === 'cato') {
     if (pathParts[2] === 'genesis') {
       const mod = await import('./cato-genesis.js');
@@ -309,12 +353,33 @@ async function routeRequest(
     }
     if (pathParts[2] === 'dialogue') {
       const mod = await import('./cato-dialogue.js');
-      return (mod.dialogue(event, MINIMAL_CONTEXT, NOOP_CALLBACK) || successResponse({ message: 'Not found' })) as APIGatewayProxyResult;
+      const result = await mod.dialogue(event, MINIMAL_CONTEXT, NOOP_CALLBACK);
+      return (result || notFoundResponse()) as APIGatewayProxyResult;
     }
     if (pathParts[2] === 'global') {
       const mod = await import('./cato-global.js');
       return mod.handler(event, MINIMAL_CONTEXT, NOOP_CALLBACK) as Promise<APIGatewayProxyResult>;
     }
+    if (pathParts[2] === 'governance') {
+      const mod = await import('./cato-governance.js');
+      return mod.handler(event, MINIMAL_CONTEXT, NOOP_CALLBACK) as Promise<APIGatewayProxyResult>;
+    }
+    if (pathParts[2] === 'pipeline') {
+      const mod = await import('./cato-pipeline.js');
+      return mod.handler(event, MINIMAL_CONTEXT, NOOP_CALLBACK) as Promise<APIGatewayProxyResult>;
+    }
+    if (pathParts[2] === 'twilight') {
+      const mod = await import('./cato-twilight.js');
+      return invokeLegacy(mod.getDashboard, event);
+    }
+    if (pathParts[2] === 'council') {
+      const mod = await import('./council.js');
+      const result = await mod.handler(event, MINIMAL_CONTEXT, NOOP_CALLBACK);
+      return (result || notFoundResponse()) as APIGatewayProxyResult;
+    }
+    // Catch-all for other cato sub-routes
+    const mod = await import('./cato.js');
+    return mod.handler(event, context) as Promise<APIGatewayProxyResult>;
   }
 
   // Model Registry v5.52.57 - Model Version Discovery & Lifecycle
@@ -326,13 +391,15 @@ async function routeRequest(
   // Model coordination
   if (pathParts[1] === 'model-coordination') {
     const mod = await import('./model-coordination.js');
-    return (mod.getSyncConfig(event, MINIMAL_CONTEXT, NOOP_CALLBACK) || successResponse({ message: 'Not found' })) as APIGatewayProxyResult;
+    const result = await mod.getSyncConfig(event, MINIMAL_CONTEXT, NOOP_CALLBACK);
+    return (result || notFoundResponse()) as APIGatewayProxyResult;
   }
 
   // Model proficiency
   if (pathParts[1] === 'model-proficiency') {
     const mod = await import('./model-proficiency.js');
-    return (mod.getAllRankings(event, MINIMAL_CONTEXT, NOOP_CALLBACK) || successResponse({ message: 'Not found' })) as APIGatewayProxyResult;
+    const result = await mod.getAllRankings(event, MINIMAL_CONTEXT, NOOP_CALLBACK);
+    return (result || notFoundResponse()) as APIGatewayProxyResult;
   }
 
   // Infrastructure tier
@@ -350,7 +417,8 @@ async function routeRequest(
   // Inference components
   if (pathParts[1] === 'inference-components') {
     const mod = await import('./inference-components.js');
-    return (mod.getConfig(event, MINIMAL_CONTEXT, NOOP_CALLBACK) || successResponse({ message: 'Not found' })) as APIGatewayProxyResult;
+    const result = await mod.getConfig(event, MINIMAL_CONTEXT, NOOP_CALLBACK);
+    return (result || notFoundResponse()) as APIGatewayProxyResult;
   }
 
   // User Registry - assignments, consent, DSAR, break glass, legal hold
@@ -361,6 +429,10 @@ async function routeRequest(
 
   // Brain v6.0.4 - AGI Brain admin
   if (pathParts[1] === 'brain') {
+    if (pathParts[2] === 'ecd') {
+      const { handler: ecdHandler } = await import('./ecd.js');
+      return ecdHandler(event);
+    }
     const { handler: brainHandler } = await import('./brain.js');
     return brainHandler(event);
   }
@@ -439,12 +511,6 @@ async function routeRequest(
   if (pathParts[1] === 'cognition') {
     const { handler: cognitionHandler } = await import('./cognition.js');
     return cognitionHandler(event);
-  }
-
-  // Genesis Cato Safety Architecture
-  if (pathParts[1] === 'cato') {
-    const mod = await import('./cato.js');
-    return mod.handler(event, context) as Promise<APIGatewayProxyResult>;
   }
 
   // Empiricism Loop - Reality-testing circuit for consciousness
@@ -551,6 +617,218 @@ async function routeRequest(
     if (subRoute === 'rate-limits') {
       return mod.getRateLimitStatus(event, MINIMAL_CONTEXT, NOOP_CALLBACK) as Promise<APIGatewayProxyResult>;
     }
+  }
+
+  // Sovereign Mesh - multi-agent orchestration
+  if (pathParts[1] === 'sovereign-mesh') {
+    if (pathParts[2] === 'ai-helper') {
+      const { handler: aiHelperHandler } = await import('./admin-ai-helper.js');
+      return aiHelperHandler(event);
+    }
+    if (pathParts[2] === 'performance') {
+      const { handler: perfHandler } = await import('./sovereign-mesh-performance.js');
+      return perfHandler(event);
+    }
+    if (pathParts[2] === 'scaling') {
+      const { handler: scalingHandler } = await import('./sovereign-mesh-scaling.js');
+      return scalingHandler(event);
+    }
+    const { handler: meshHandler } = await import('./sovereign-mesh.js');
+    return meshHandler(event);
+  }
+
+  // Platform services
+  if (pathParts[1] === 'platform') {
+    if (pathParts[2] === 'bedrock' || pathParts[2] === 'bedrock-settings') {
+      const { handler: bedrockHandler } = await import('./bedrock-management.js');
+      return bedrockHandler(event);
+    }
+    if (pathParts[2] === 'cartridge-operations') {
+      const { handler: cartOpsHandler } = await import('./cartridge-operations.js');
+      return cartOpsHandler(event);
+    }
+    if (pathParts[2] === 'pki') {
+      const { handler: pkiHandler } = await import('./cartridge-pki.js');
+      return pkiHandler(event);
+    }
+    if (pathParts[2] === 'rnir') {
+      const { handler: rnirHandler } = await import('./cartridge-rnir.js');
+      return rnirHandler(event);
+    }
+    if (pathParts[2] === 'vault') {
+      const { handler: vaultHandler } = await import('./cartridge-vault.js');
+      return vaultHandler(event);
+    }
+    if (pathParts[2] === 'system-cartridges') {
+      const { handler: sysCartHandler } = await import('./system-cartridges.js');
+      return sysCartHandler(event);
+    }
+    if (pathParts[2] === 'crucible') {
+      const { handler: crucibleHandler } = await import('./crucible.js');
+      return crucibleHandler(event);
+    }
+    if (pathParts[2] === 'livs') {
+      const { handler: livsHandler } = await import('./livs.js');
+      return livsHandler(event);
+    }
+    if (pathParts[2] === 'organism') {
+      const { handler: organismHandler } = await import('./organism.js');
+      return organismHandler(event);
+    }
+    if (pathParts[2] === 'mls') {
+      const { handler: mlsHandler } = await import('./mls.js');
+      return mlsHandler(event);
+    }
+    if (pathParts[2] === 'snapshots') {
+      const { handler: snapHandler } = await import('./snapshot-storage.js');
+      return snapHandler(event);
+    }
+    if (pathParts[2] === 'state-registry') {
+      const { handler: stateHandler } = await import('./state-registry.js');
+      return stateHandler(event);
+    }
+    if (pathParts[2] === 'uds') {
+      const { handler: udsHandler } = await import('./uds.js');
+      return udsHandler(event);
+    }
+  }
+
+  // Memory services
+  if (pathParts[1] === 'memory') {
+    if (pathParts[2] === 'anticipatory') {
+      const { handler: anticHandler } = await import('./anticipatory-memory.js');
+      return anticHandler(event);
+    }
+    if (pathParts[2] === 'retention') {
+      const { handler: retentionHandler } = await import('./memory-retention.js');
+      return retentionHandler(event);
+    }
+  }
+
+  // Orchestration sub-routes (methods already wired above)
+  if (pathParts[1] === 'orchestration') {
+    if (pathParts[2] === 'consensus') {
+      const { handler: consensusHandler } = await import('./heterogeneous-consensus.js');
+      return consensusHandler(event);
+    }
+    if (pathParts[2] === 'inference-cache') {
+      const { handler: cacheHandler } = await import('./inference-cache.js');
+      return cacheHandler(event);
+    }
+    if (pathParts[2] === 'model-weights') {
+      const { handler: weightsHandler } = await import('./model-weights.js');
+      return weightsHandler(event);
+    }
+    if (pathParts[2] === 'templates') {
+      const { handler: templatesHandler } = await import('./orchestration-user-templates.js');
+      return templatesHandler(event);
+    }
+  }
+
+  // Settings sub-routes
+  if (pathParts[1] === 'settings') {
+    if (pathParts[2] === 'collaboration') {
+      const { handler: collabHandler } = await import('./collaboration-settings.js');
+      return collabHandler(event);
+    }
+    if (pathParts[2] === 'white-label') {
+      const { handler: wlHandler } = await import('./white-label.js');
+      return wlHandler(event);
+    }
+  }
+
+  // Cortex (catch-all after cortex-graph-rag was matched above)
+  if (pathParts[1] === 'cortex') {
+    if (pathParts[2] === 'v2') {
+      const { handler: cortexV2Handler } = await import('./cortex-v2.js');
+      return cortexV2Handler(event);
+    }
+    const { handler: cortexHandler } = await import('./cortex.js');
+    return cortexHandler(event);
+  }
+
+  // Direct route handlers
+  if (pathParts[1] === 'axiom') {
+    const { handler: axiomHandler } = await import('./axiom-admin.js');
+    return axiomHandler(event);
+  }
+  if (pathParts[1] === 'blackboard') {
+    const { handler: bbHandler } = await import('./blackboard.js');
+    return bbHandler(event);
+  }
+  if (pathParts[1] === 'cartridges') {
+    const mod = await import('./cartridges.js');
+    return invokeLegacy(mod.listCartridges, event);
+  }
+  if (pathParts[1] === 'code-quality') {
+    const { handler: cqHandler } = await import('./code-quality.js');
+    return cqHandler(event);
+  }
+  if (pathParts[1] === 'domain-experts') {
+    const mod = await import('./domain-experts.js');
+    return invokeLegacy(mod.getDashboard, event);
+  }
+  if (pathParts[1] === 'dynamic-reports') {
+    const { handler: dynReportsHandler } = await import('./dynamic-reports.js');
+    return dynReportsHandler(event);
+  }
+  if (pathParts[1] === 'gateway') {
+    const { handler: gatewayHandler } = await import('./gateway.js');
+    return gatewayHandler(event);
+  }
+  if (pathParts[1] === 'ghost-inference') {
+    const { handler: ghostHandler } = await import('./ghost-inference.js');
+    return ghostHandler(event, context) as Promise<APIGatewayProxyResult>;
+  }
+  if (pathParts[1] === 'hitl-orchestration') {
+    const mod = await import('./hitl-orchestration.js');
+    // V2 handler — cast event for compatibility
+    const result = await mod.handler(event as any, MINIMAL_CONTEXT);
+    return (result || notFoundResponse()) as APIGatewayProxyResult;
+  }
+  if (pathParts[1] === 'log-retention') {
+    const { handler: logRetHandler } = await import('./log-retention.js');
+    return logRetHandler(event, context) as Promise<APIGatewayProxyResult>;
+  }
+  if (pathParts[1] === 'neural-operations') {
+    const mod = await import('./neural-operations.js');
+    return invokeLegacy(mod.getDashboard, event);
+  }
+  if (pathParts[1] === 'profile') {
+    const { handler: profileHandler } = await import('./profile.js');
+    return profileHandler(event);
+  }
+  if (pathParts[1] === 'raws') {
+    const { handler: rawsHandler } = await import('./raws.js');
+    return rawsHandler(event);
+  }
+  if (pathParts[1] === 'reports') {
+    const { handler: reportsHandler } = await import('./reports.js');
+    return reportsHandler(event);
+  }
+  if (pathParts[1] === 's3-storage' || pathParts[1] === 'storage') {
+    const { handler: storageHandler } = await import('./s3-storage.js');
+    return storageHandler(event);
+  }
+  if (pathParts[1] === 'safety-matrix') {
+    const mod = await import('./safety-matrix.js');
+    return invokeLegacy(mod.getDashboard, event);
+  }
+  if (pathParts[1] === 'sentinel') {
+    const { handler: sentinelHandler } = await import('./sentinel.js');
+    return sentinelHandler(event);
+  }
+  if (pathParts[1] === 'aws-monitoring') {
+    const { handler: awsMonHandler } = await import('./aws-monitoring.js');
+    return awsMonHandler(event);
+  }
+  if (pathParts[1] === 'user-violations') {
+    const { handler: violationsHandler } = await import('./user-violations.js');
+    return violationsHandler(event);
+  }
+  if (pathParts[1] === 'security-policies') {
+    const { handler: secPolHandler } = await import('./security-policies.js');
+    return secPolHandler(event);
   }
 
   throw new NotFoundError(`Admin route not found: ${method} ${path}`);
@@ -751,4 +1029,64 @@ async function handleProviders(
   }
 
   throw new NotFoundError(`Provider operation not supported: ${method}`);
+}
+
+async function handleConversationExport(
+  event: APIGatewayProxyEvent
+): Promise<APIGatewayProxyResult> {
+  const method = event.httpMethod;
+  const pathParts = event.path.split('/').filter(Boolean);
+  const exportId = pathParts[2]; // /admin/conversation-export/:exportId
+
+  try {
+    const { conversationExportService } = await import('../shared/services/uds/conversation-export.service.js');
+
+    // POST /admin/conversation-export - Request new export
+    if (method === 'POST' && !exportId) {
+      const body = JSON.parse(event.body || '{}');
+      if (!body.tenantId || !body.userId || !body.conversationId) {
+        throw new ValidationError('tenantId, userId, and conversationId are required');
+      }
+      const result = await conversationExportService.requestExport({
+        tenantId: body.tenantId,
+        userId: body.userId,
+        conversationId: body.conversationId,
+        format: body.format || 'json',
+        includeAttachments: body.includeAttachments ?? true,
+        includeMetadata: body.includeMetadata ?? false,
+      });
+      return successResponse(result, 201);
+    }
+
+    // GET /admin/conversation-export/:exportId - Get export status
+    if (method === 'GET' && exportId) {
+      const tenantId = event.queryStringParameters?.tenant_id;
+      const userId = event.queryStringParameters?.user_id;
+      if (!tenantId || !userId) {
+        throw new ValidationError('tenant_id and user_id query params are required');
+      }
+      const result = await conversationExportService.getExportStatus(tenantId, userId, exportId);
+      if (!result) {
+        throw new NotFoundError(`Export not found: ${exportId}`);
+      }
+      return successResponse(result);
+    }
+
+    // GET /admin/conversation-export?tenant_id=&user_id= - List exports
+    if (method === 'GET' && !exportId) {
+      const tenantId = event.queryStringParameters?.tenant_id;
+      const userId = event.queryStringParameters?.user_id;
+      if (!tenantId || !userId) {
+        throw new ValidationError('tenant_id and user_id query params are required');
+      }
+      const limit = parseInt(event.queryStringParameters?.limit || '20', 10);
+      const results = await conversationExportService.listExports(tenantId, userId, limit);
+      return successResponse({ data: results, count: results.length });
+    }
+
+    throw new NotFoundError(`Conversation export operation not supported: ${method}`);
+  } catch (error) {
+    if (error instanceof NotFoundError || error instanceof ValidationError) throw error;
+    throw error;
+  }
 }

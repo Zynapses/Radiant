@@ -30,7 +30,7 @@ import type {
 // =============================================================================
 
 const DEFAULT_HOT_TO_WARM_HOURS = 24;
-const DEFAULT_WARM_TO_COLD_DAYS = 90;
+const DEFAULT_WARM_TO_COLD_DAYS = 180; // 6 months (v7.43.0)
 const DEFAULT_COLD_TO_GLACIER_YEARS = 7;
 
 const BATCH_SIZE = 1000;

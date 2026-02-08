@@ -236,8 +236,9 @@ export function withEnforcedLogging(
         path: event.path,
       });
 
-      // Flush deferred DB registrations
+      // Flush deferred DB registrations and event buffer
       await flushRegistrations();
+      try { const { flushEventBuffer } = await import('./event-firehose.service'); await flushEventBuffer(); } catch { /* firehose not initialized */ }
 
       return result;
     } catch (error) {
@@ -248,6 +249,7 @@ export function withEnforcedLogging(
 
       // Still try to flush
       await flushRegistrations().catch(() => {});
+      try { const { flushEventBuffer } = await import('./event-firehose.service'); await flushEventBuffer(); } catch { /* firehose not initialized */ }
 
       return {
         statusCode: 500,

@@ -385,6 +385,69 @@ export class CatoToolRegistryService {
     this.inputValidators.clear();
   }
 
+  /**
+   * Semantic tool discovery via neural embeddings (v7.43.0).
+   * Delegates to NeuralSchemaRegistry for intent-based matching,
+   * then resolves the full CatoToolDefinition for each match.
+   */
+  async findToolsByIntent(
+    intent: string,
+    options?: { maxResults?: number; category?: string; tenantId?: string }
+  ): Promise<Array<{ tool: CatoToolDefinition; relevanceScore: number }>> {
+    try {
+      const { neuralSchemaRegistry } = await import('./organism/neural-schema-registry.service.js');
+      const filters = options?.category ? { categories: [options.category] as never[] } : undefined;
+      const matches = await neuralSchemaRegistry.findToolsByQuery(intent, options?.maxResults || 5, filters);
+
+      const allTools = await this.listTools({
+        category: options?.category,
+        tenantId: options?.tenantId,
+        enabled: true,
+        limit: 200,
+      });
+
+      const results: Array<{ tool: CatoToolDefinition; relevanceScore: number }> = [];
+      for (let i = 0; i < matches.length; i++) {
+        const match = matches[i];
+        const found = allTools.find(t => t.toolName === match.name || t.toolId === match.toolId);
+        if (found) {
+          // Score by position (first match = highest relevance)
+          results.push({ tool: found, relevanceScore: 1 - (i / matches.length) });
+        }
+      }
+      return results;
+    } catch {
+      // Neural registry not available — fall back to keyword search
+      return this.fallbackKeywordSearch(intent, options);
+    }
+  }
+
+  /**
+   * Fallback keyword search when neural embeddings are unavailable.
+   */
+  private async fallbackKeywordSearch(
+    query: string,
+    options?: { maxResults?: number; category?: string; tenantId?: string }
+  ): Promise<Array<{ tool: CatoToolDefinition; relevanceScore: number }>> {
+    const terms = query.toLowerCase().split(/\s+/);
+    const tools = await this.listTools({
+      category: options?.category,
+      tenantId: options?.tenantId,
+      enabled: true,
+      limit: 100,
+    });
+
+    return tools
+      .map(tool => {
+        const searchText = `${tool.toolName} ${tool.description} ${(tool.tags || []).join(' ')}`.toLowerCase();
+        const matchCount = terms.filter(t => searchText.includes(t)).length;
+        return { tool, relevanceScore: matchCount / Math.max(terms.length, 1) };
+      })
+      .filter(r => r.relevanceScore > 0)
+      .sort((a, b) => b.relevanceScore - a.relevanceScore)
+      .slice(0, options?.maxResults || 5);
+  }
+
   private mapRowToTool(row: Record<string, unknown>): CatoToolDefinition {
     return {
       toolId: row.tool_id as string,

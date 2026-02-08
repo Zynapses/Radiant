@@ -185,12 +185,15 @@ export class RateLimiterService {
   private tenantOverrides: Map<string, TenantRateLimitOverride> = new Map();
   private readonly keyPrefix = 'rate_limit:';
   
+  private usingInMemoryFallback: boolean;
+
   constructor(
     redisClient?: RedisClient,
     config?: Partial<RateLimitConfig>
   ) {
     // Use provided Redis client or fall back to in-memory
     this.redis = redisClient || new InMemoryStore();
+    this.usingInMemoryFallback = this.redis instanceof InMemoryStore;
     
     // Load config from environment with defaults
     this.config = {
@@ -200,12 +203,62 @@ export class RateLimiterService {
       ...config,
     };
     
+    // PRODUCTION SAFETY: Warn loudly if using in-memory fallback
+    if (this.usingInMemoryFallback) {
+      const isProduction = process.env.NODE_ENV === 'production' || process.env.STAGE === 'prod';
+      if (isProduction) {
+        logger.error('CRITICAL: RateLimiterService using InMemoryStore in PRODUCTION. ' +
+          'Rate limits will reset on every Lambda cold start, enabling burst abuse. ' +
+          'Provide a Redis client via REDIS_URL or the Cato Redis Stack.', 
+          new Error('InMemoryStore in production'));
+      } else {
+        logger.warn('RateLimiterService using InMemoryStore fallback. ' +
+          'Rate limits will not persist across Lambda invocations.');
+      }
+    }
+    
     logger.info('RateLimiterService initialized', {
       enabled: this.config.enabled,
       maxRequests: this.config.maxRequests,
       windowSeconds: this.config.windowSeconds,
-      usingRedis: !(this.redis instanceof InMemoryStore),
+      usingRedis: !this.usingInMemoryFallback,
     });
+    
+    // Load tenant overrides from DB on init (non-blocking)
+    this.loadTenantOverridesFromDB().catch(err => {
+      logger.warn('Failed to load tenant rate limit overrides from DB', { error: String(err) });
+    });
+  }
+
+  /**
+   * Load tenant-specific rate limit overrides from the database
+   * so they survive Lambda cold starts.
+   */
+  private async loadTenantOverridesFromDB(): Promise<void> {
+    try {
+      const { executeStatement } = await import('../db/client');
+      const result = await executeStatement(
+        `SELECT tenant_id, max_requests_per_minute, window_seconds, reason, expires_at
+         FROM tenant_rate_limit_overrides
+         WHERE (expires_at IS NULL OR expires_at > NOW())`,
+        []
+      );
+      for (const row of result.rows || []) {
+        const override: TenantRateLimitOverride = {
+          tenantId: row.tenant_id as string,
+          maxRequests: row.max_requests_per_minute as number,
+          windowSeconds: row.window_seconds as number,
+          reason: row.reason as string | undefined,
+          expiresAt: row.expires_at ? new Date(row.expires_at as string) : undefined,
+        };
+        this.tenantOverrides.set(override.tenantId, override);
+      }
+      if (this.tenantOverrides.size > 0) {
+        logger.info(`Loaded ${this.tenantOverrides.size} tenant rate limit overrides from DB`);
+      }
+    } catch {
+      // Table may not exist yet — that's fine, overrides are optional
+    }
   }
   
   private getEnvBoolean(name: string, defaultValue: boolean): boolean {

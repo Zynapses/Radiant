@@ -232,6 +232,7 @@ enum NavigationTab: String, CaseIterable, Identifiable, Sendable {
     case history = "History"
     case driftMonitor = "Drift Monitor"
     case spendGovernor = "Spend Governor"
+    case intrusionDetection = "Intrusion Detection"
     
     // Configuration (v7.4.0)
     case domainURLs = "Domain URLs"
@@ -258,6 +259,7 @@ enum NavigationTab: String, CaseIterable, Identifiable, Sendable {
         case .history: return "clock"
         case .driftMonitor: return "exclamationmark.triangle"
         case .spendGovernor: return "gauge.with.dots.needle.33percent"
+        case .intrusionDetection: return "shield.checkered"
         case .domainURLs: return "globe"
         case .curator: return "book.pages"
         case .cortexMemory: return "brain.head.profile"
@@ -281,6 +283,7 @@ enum NavigationTab: String, CaseIterable, Identifiable, Sendable {
         case .history: return .brown
         case .driftMonitor: return .red
         case .spendGovernor: return .orange
+        case .intrusionDetection: return .blue
         case .domainURLs: return .blue
         case .curator: return .teal
         case .cortexMemory: return .purple
@@ -304,6 +307,7 @@ enum NavigationTab: String, CaseIterable, Identifiable, Sendable {
         case .history: return "Deployment history and logs"
         case .driftMonitor: return "Detect and reconcile infrastructure drift"
         case .spendGovernor: return "Budget limits, freeze/thaw AWS services"
+        case .intrusionDetection: return "Real-time threat detection & prevention"
         case .domainURLs: return "Configure domain URLs and routing"
         case .curator: return "Knowledge graph curation settings"
         case .cortexMemory: return "Three-tier memory system configuration"
@@ -313,7 +317,7 @@ enum NavigationTab: String, CaseIterable, Identifiable, Sendable {
     
     /// Primary tabs shown in sidebar
     static var primaryTabs: [NavigationTab] {
-        [.dashboard, .deploy, .bidirectionalSync, .instances, .snapshots, .history, .driftMonitor, .spendGovernor]
+        [.dashboard, .deploy, .bidirectionalSync, .instances, .snapshots, .history, .driftMonitor, .spendGovernor, .intrusionDetection]
     }
     
     /// Configuration tabs

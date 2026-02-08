@@ -187,6 +187,102 @@ export class ConsciousnessEngineService {
     return defaultSelfModel;
   }
 
+  /**
+   * Snapshot transient in-memory state to DB for cold-start resilience.
+   * Call periodically (e.g., after each inference cycle) or before Lambda shutdown.
+   */
+  async snapshotTransientState(tenantId: string): Promise<void> {
+    try {
+      const stateData = {
+        actionHistory: this.actionHistory.slice(-50), // Keep last 50
+        currentDriveState: this.currentDriveState,
+        config: this.config,
+      };
+      const stateJson = JSON.stringify(stateData);
+      const { createHash } = await import('crypto');
+      const stateHash = createHash('sha256').update(stateJson).digest('hex');
+
+      // Mark old snapshots as superseded
+      await executeStatement(
+        `UPDATE consciousness_state_snapshots 
+         SET is_current = false, superseded_at = NOW()
+         WHERE tenant_id = $1 AND state_type = $2 AND is_current = true`,
+        [
+          { name: 'tenantId', value: { stringValue: tenantId } },
+          { name: 'stateType', value: { stringValue: 'transient_runtime' } },
+        ]
+      );
+
+      // Insert new snapshot
+      await executeStatement(
+        `INSERT INTO consciousness_state_snapshots 
+         (tenant_id, state_type, state_data, state_hash, is_current)
+         VALUES ($1, $2, $3::jsonb, $4, true)`,
+        [
+          { name: 'tenantId', value: { stringValue: tenantId } },
+          { name: 'stateType', value: { stringValue: 'transient_runtime' } },
+          { name: 'stateData', value: { stringValue: stateJson } },
+          { name: 'stateHash', value: { stringValue: stateHash } },
+        ]
+      );
+    } catch (error) {
+      logger.warn('Failed to snapshot consciousness transient state', { tenantId, error });
+    }
+  }
+
+  /**
+   * Restore transient state from the latest DB snapshot (cold-start recovery).
+   */
+  async restoreTransientState(tenantId: string): Promise<boolean> {
+    try {
+      const result = await executeStatement(
+        `SELECT state_data, state_hash FROM consciousness_state_snapshots
+         WHERE tenant_id = $1 AND state_type = $2 AND is_current = true
+         LIMIT 1`,
+        [
+          { name: 'tenantId', value: { stringValue: tenantId } },
+          { name: 'stateType', value: { stringValue: 'transient_runtime' } },
+        ]
+      );
+
+      if (result.rows && result.rows.length > 0) {
+        const row = result.rows[0] as Record<string, unknown>;
+        const stateData = typeof row.state_data === 'string'
+          ? JSON.parse(row.state_data)
+          : row.state_data;
+
+        if (stateData.actionHistory) {
+          this.actionHistory = stateData.actionHistory;
+        }
+        if (stateData.currentDriveState) {
+          this.currentDriveState = stateData.currentDriveState;
+        }
+        if (stateData.config) {
+          this.config = { ...this.config, ...stateData.config };
+        }
+
+        // Mark as restored
+        await executeStatement(
+          `UPDATE consciousness_state_snapshots SET restored_at = NOW()
+           WHERE tenant_id = $1 AND state_type = $2 AND is_current = true`,
+          [
+            { name: 'tenantId', value: { stringValue: tenantId } },
+            { name: 'stateType', value: { stringValue: 'transient_runtime' } },
+          ]
+        );
+
+        logger.info('Restored consciousness transient state from snapshot', {
+          tenantId,
+          actionHistorySize: this.actionHistory.length,
+        });
+        return true;
+      }
+    } catch (error) {
+      logger.warn('Failed to restore consciousness transient state', { tenantId, error });
+    }
+    return false;
+  }
+
   async loadEgo(tenantId: string): Promise<SelfModel | null> {
     const result = await executeStatement(
       `SELECT self_model, drive_state, preferred_states, beliefs 

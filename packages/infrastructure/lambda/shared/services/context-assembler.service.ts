@@ -111,11 +111,25 @@ class ContextAssemblerService {
     userId: string;
     tenantId: string;
     prompt: string;
+    conversationId?: string;
     conversationHistory?: ConversationMessage[];
     ghostVector?: Float32Array | null;
     domain?: string;
   }): Promise<AssembledContext> {
-    const { userId, tenantId, prompt, conversationHistory, ghostVector, domain } = params;
+    const { userId, tenantId, prompt, conversationId, ghostVector, domain } = params;
+    let { conversationHistory } = params;
+
+    // Auto-load history from UDS if conversationId provided but no history passed
+    if (!conversationHistory && conversationId) {
+      try {
+        const { conversationHistoryLoader } = await import('./conversation-history-loader.service');
+        conversationHistory = await conversationHistoryLoader.loadForContextAssembly(
+          tenantId, userId, conversationId
+        );
+      } catch (error) {
+        logger.warn('Failed to auto-load conversation history', { conversationId, error: String(error) });
+      }
+    }
 
     // Check for injection attempts
     const injectionDetected = XMLEscaper.containsInjectionAttempt(prompt);

@@ -19,12 +19,18 @@ export type AuditAction =
   | 'login' | 'logout' | 'login_failed'
   | 'api_key_created' | 'api_key_revoked'
   | 'permission_granted' | 'permission_revoked'
-  | 'config_changed' | 'export' | 'import';
+  | 'config_changed' | 'export' | 'import'
+  | 'ip_blocked' | 'ip_unblocked'
+  | 'session_killed' | 'account_locked' | 'account_unlocked'
+  | 'incident_updated' | 'intrusion_detected'
+  | 'detector_toggled' | 'threat_intel_added' | 'threat_intel_removed';
 
 export type AuditResource =
   | 'user' | 'tenant' | 'api_key' | 'model'
   | 'webhook' | 'config' | 'billing' | 'subscription'
-  | 'batch_job' | 'audit_log' | 'notification';
+  | 'batch_job' | 'audit_log' | 'notification'
+  | 'intrusion_event' | 'intrusion_incident' | 'ip_blocklist'
+  | 'user_session' | 'threat_indicator' | 'detection_rule';
 
 export interface AuditEntry {
   id: string;

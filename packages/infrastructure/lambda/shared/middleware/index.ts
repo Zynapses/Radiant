@@ -44,3 +44,4 @@ export { loggingMiddleware } from './logging';
 export { corsMiddleware } from './cors';
 export { errorMiddleware } from './error';
 export { validationMiddleware } from './validation';
+export { intrusionDetectionMiddleware } from './intrusion-detection';

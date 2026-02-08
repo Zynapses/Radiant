@@ -2,11 +2,11 @@
 description: MANDATORY - Update ALL relevant documentation on ANY code change. This is the MASTER documentation policy.
 ---
 
-# Master Documentation Policy
+# Master Documentation Policy (v2.0 — Consolidated)
 
 > ⚠️ **THIS POLICY IS MANDATORY AND HAS NO EXCEPTIONS** ⚠️
 >
-> **Every code change requires documentation updates.** This policy replaces all previous fragmented documentation policies.
+> **Every code change requires documentation updates.** Documentation was consolidated from 244 files into 18 documents on 2026-02-07.
 
 ---
 
@@ -22,238 +22,192 @@ Do NOT:
 
 ---
 
+## The 18 Consolidated Documents
+
+### App Documents (one per app)
+| # | Document | What It Covers |
+|---|----------|---------------|
+| 01 | `docs/01-THINK-TANK.md` | User guide, admin guide, tenant admin, Mac, licensing, Delight, collaboration |
+| 02 | `docs/02-CURATOR.md` | User guide + engineering guide |
+| 03 | `docs/03-DOJO.md` | Aurelius Dojo training system |
+| 04 | `docs/04-RADIANT-ADMIN.md` | Platform admin, deployment, system health, spend governor, SaaS metrics |
+| 05 | `docs/05-SWIFT-DEPLOYER.md` | User guide + architecture |
+
+### System Documents
+| # | Document | What It Covers |
+|---|----------|---------------|
+| 06 | `docs/06-ARCHITECTURE-ENGINEERING.md` | Architecture, CDK, engineering vision, gateway, app isolation |
+| 07 | `docs/07-AI-BRAIN-SYSTEMS.md` | AGI brain, consciousness, cognitive, Cortex, expert adapters |
+| 08 | `docs/08-CATO-SAFETY.md` | CATO safety, ADRs, runbooks, GPU infra, trainer, ethics |
+| 09 | `docs/09-OMEGA-GENESIS.md` | OMEGA Protocol, Genesis Forge/Lab, Resonant Index |
+| 10 | `docs/10-ORCHESTRATION-WORKFLOWS.md` | Orchestration methods/patterns, UEP specification |
+| 11 | `docs/11-DATA-STORAGE.md` | UDS, RAWS, data retention, cost optimization |
+| 12 | `docs/12-API-REFERENCE.md` | APIs, versioning, error codes, MCP/A2A service layer |
+| 13 | `docs/13-SECURITY-AUTH-COMPLIANCE.md` | Auth architecture, user/admin/tenant auth, MFA, OAuth, compliance |
+| 14 | `docs/14-OPERATIONS-RUNBOOKS.md` | Runbooks, troubleshooting, performance, DR, testing |
+| 15 | `docs/15-STRATEGY-COMPETITIVE.md` | Vision, moats, capabilities, pitch, revenue, tech debt |
+| 16 | `docs/16-IMPLEMENTATION-SPECS.md` | Sections 00–46 (build specs + DB schema) |
+| 17 | `docs/17-GLOSSARY.md` | Terms, definitions, acronyms |
+| 18 | `docs/18-UI-UX-LIBRARIES.md` | Design patterns, open source libraries |
+
+---
+
 ## Step 1: Identify Change Type
 
 Before making ANY code change, identify what type of change it is:
 
-| Change Type | Keywords to Look For |
-|-------------|---------------------|
+| Change Type | Keywords |
+|-------------|----------|
+| `thinktank_feature` | Think Tank, chat, UI, morphing, liquid, delight, user rules |
+| `thinktank_admin` | admin config, tenant admin, brain plans, domains |
+| `curator` | knowledge graph, verification, cartridge |
+| `dojo` | training, spaced repetition, competency |
+| `platform_feature` | tenant, billing, models, providers, spend governor |
+| `deployer` | Swift app, deployment, domain URL, tier |
+| `architecture` | service, pattern, design, system, CDK, Lambda |
 | `database` | migration, table, column, schema, SQL |
-| `lambda` | handler, service, Lambda function |
-| `api_endpoint` | route, endpoint, API, REST |
-| `cdk` | stack, CDK, infrastructure, AWS resource |
-| `thinktank_feature` | Think Tank, chat, UI, morphing, liquid |
-| `thinktank_admin` | admin config, user rules, delight, domains |
-| `tenant_admin` | tenant settings, team config, tenant reports, org admin |
-| `tenant_settings` | company settings, tenant configuration, org preferences |
-| `team_settings` | team management, team configuration, workspace settings |
-| `org_admin` | organization admin, company admin, enterprise settings |
-| `platform_feature` | tenant, billing, models, providers |
-| `user_facing` | UI component, user interaction, visible to user |
-| `ui_component` | component, button, panel, view, design |
-| `orchestration` | workflow, method, pipeline, execution |
-| `security` | auth, permission, HIPAA, compliance, encryption |
-| `billing` | credits, subscription, pricing, invoice |
-| `models` | AI model, provider, LLM, self-hosted |
-| `dependency` | npm, package, library, import |
-| `consciousness` | ego, affect, consciousness, identity |
-| `cato` | safety, genesis, ethics, CBF |
-| `omega` | OMEGA Protocol, Genesis, Cortex, Helix Kernel, firmware, shadow mode |
-| `genesis` | Genesis Lab, Genesis Forge, firmware, brain monitoring |
-| `cortex` | memory, blackboard, context |
-| `architecture` | service, pattern, design, system |
+| `api_endpoint` | route, endpoint, API, REST, MCP, A2A |
+| `security` | auth, permission, HIPAA, compliance, MFA, OAuth |
+| `brain` | consciousness, cognitive, cortex, expert system |
+| `cato` | safety, ethics, CBF, grounding |
+| `omega` | OMEGA Protocol, Genesis, Helix Kernel, firmware |
+| `orchestration` | workflow, method, pipeline, UEP |
+| `data_storage` | UDS, RAWS, retention, file conversion |
 | `competitive_advantage` | moat, unique feature, differentiator |
-| `deployer` | Swift app, deployment, domain URL, tier, installation |
-| `curator` | knowledge graph, verification, documents, overrides, chain of custody |
-| `cartridge` | cartridge, .radz, export, import, PKI, signing, federation |
-| `mcp` | Model Context Protocol, MCP server, tools, resources |
-| `a2a` | Agent-to-Agent, A2A protocol, agent registry |
-| `api_keys` | API key, interface type, scopes, key validation |
-| `gateway` | Go gateway, NATS, WebSocket, SSE, protocol |
-| `service_layer` | MCP worker, A2A worker, Cedar policy |
-| `health` | system health, monitoring, alerts, uptime |
-| `monitoring` | CloudWatch, metrics, alerts, dashboard |
-| `litellm_gateway` | LiteLLM proxy, AI gateway, ECS tasks |
-| `delight` | Delight system, personality mode, injection point, UX touches |
-| `delight_ui` | @radiant/delight-ui package, cross-app Delight provider |
-| `delight_achievement` | achievement, easter egg, sound effect, celebration |
-| `delight_orchestration` | Delight-Brain integration, SSE events, workflow messages |
-| `new_term` | New AI term, technology concept, definition |
-| `new_subsystem` | New service, component, feature system |
-| `new_acronym` | New abbreviation introduced |
-| `aws_service` | New AWS service added to infrastructure |
+| `ui_component` | component, button, panel, design pattern |
+| `dependency` | npm, package, library |
+| `new_term` | new AI term, subsystem, acronym |
+| `operations` | deployment, incident, scaling, performance, DR |
 
 ---
 
 ## Step 2: Look Up Required Docs
-
-Use the trigger matrix to find ALL required documentation:
 
 ### ALWAYS Update (Every Change)
 ```
 ✅ CHANGELOG.md
 ```
 
-### Database Changes
+### Think Tank Changes
 ```
 ✅ CHANGELOG.md
-✅ docs/sections/SECTION-07-DATABASE-SCHEMA.md
-✅ docs/RADIANT-PLATFORM-ARCHITECTURE.md
-✅ Relevant admin guide (RADIANT or THINKTANK)
+✅ docs/01-THINK-TANK.md (user guide, admin guide, tenant admin — all in one doc)
+✅ docs/15-STRATEGY-COMPETITIVE.md (if major feature)
 ```
 
-### Lambda/Service Changes
+### Curator Changes
 ```
 ✅ CHANGELOG.md
-✅ docs/ENGINEERING-IMPLEMENTATION-VISION.md
-✅ docs/RADIANT-PLATFORM-ARCHITECTURE.md
+✅ docs/02-CURATOR.md
+✅ docs/15-STRATEGY-COMPETITIVE.md (if competitive advantage)
 ```
 
-### API Endpoint Changes
+### Dojo Changes
 ```
 ✅ CHANGELOG.md
-✅ docs/ENGINEERING-IMPLEMENTATION-VISION.md
-✅ docs/API_REFERENCE.md
-✅ docs/RADIANT-PLATFORM-ARCHITECTURE.md
-✅ Relevant admin guide
+✅ docs/03-DOJO.md
 ```
 
-### CDK/Infrastructure Changes
+### Platform / Admin Changes
 ```
 ✅ CHANGELOG.md
-✅ docs/ENGINEERING-IMPLEMENTATION-VISION.md
-✅ docs/RADIANT-PLATFORM-ARCHITECTURE.md
-```
-
-### Think Tank Features
-```
-✅ CHANGELOG.md
-✅ docs/THINKTANK-USER-GUIDE.md
-✅ docs/THINKTANK-ADMIN-GUIDE.md
-✅ docs/THINKTANK-ADMIN-GUIDE-V2.md
-✅ docs/THINKTANK-TENANT-ADMIN-GUIDE.md (if tenant-admin features)
-✅ docs/STRATEGIC-VISION-MARKETING.md (if major)
-```
-
-### Platform Features
-```
-✅ CHANGELOG.md
-✅ docs/RADIANT-ADMIN-GUIDE.md
-✅ docs/STRATEGIC-VISION-MARKETING.md
-✅ docs/ENGINEERING-IMPLEMENTATION-VISION.md (if technical)
-```
-
-### User-Facing UI Changes
-```
-✅ CHANGELOG.md
-✅ docs/THINKTANK-USER-GUIDE.md
-✅ docs/UI-UX-PATTERNS.md (if new pattern)
-```
-
-### Competitive Advantage Features
-```
-✅ CHANGELOG.md
-✅ docs/THINKTANK-MOATS.md (Think Tank advantages)
-✅ docs/RADIANT-MOATS.md (Platform advantages)
-✅ docs/STRATEGIC-VISION-MARKETING.md
-✅ docs/PITCH-DECK-POINTS.md (investor talking points)
-```
-
-### New Dependencies
-```
-✅ CHANGELOG.md
-✅ docs/OPEN-SOURCE-LIBRARIES.md
+✅ docs/04-RADIANT-ADMIN.md (admin, deployment, health, spend governor)
+✅ docs/15-STRATEGY-COMPETITIVE.md (if major)
 ```
 
 ### Swift Deployer Changes
 ```
 ✅ CHANGELOG.md
-✅ docs/SWIFT-DEPLOYER-USER-GUIDE.md
-✅ docs/RADIANT-ADMIN-GUIDE.md (if affects deployment options)
+✅ docs/05-SWIFT-DEPLOYER.md
 ```
 
-### System Health / Monitoring Changes
+### Architecture / CDK / Lambda Changes
 ```
 ✅ CHANGELOG.md
-✅ docs/SYSTEM-HEALTH-GUIDE.md
-✅ docs/RADIANT-ADMIN-GUIDE.md (if admin-configurable)
-✅ docs/RADIANT-PLATFORM-ARCHITECTURE.md (if architectural)
+✅ docs/06-ARCHITECTURE-ENGINEERING.md
+```
+
+### Database Changes
+```
+✅ CHANGELOG.md
+✅ docs/06-ARCHITECTURE-ENGINEERING.md
+✅ docs/16-IMPLEMENTATION-SPECS.md (Section 07: Database Schema)
+```
+
+### AI Brain / Consciousness Changes
+```
+✅ CHANGELOG.md
+✅ docs/07-AI-BRAIN-SYSTEMS.md
+```
+
+### CATO Safety Changes
+```
+✅ CHANGELOG.md
+✅ docs/08-CATO-SAFETY.md
 ```
 
 ### OMEGA / Genesis Changes
 ```
 ✅ CHANGELOG.md
-✅ docs/OMEGA-USER-GUIDE.md (architecture, Q-Nodes, Cortex, Resonant Index)
-✅ docs/OMEGA-ADMIN-GUIDE.md (admin API, brain management, firmware, Shadow Mode)
-✅ docs/RADIANT-PLATFORM-ARCHITECTURE.md (if architectural)
-✅ docs/RADIANT-MOATS.md (if competitive advantage)
+✅ docs/09-OMEGA-GENESIS.md
+✅ docs/06-ARCHITECTURE-ENGINEERING.md (if architectural)
 ```
 
-### Licensing / Seats / Compliance Changes
+### Orchestration / UEP Changes
 ```
 ✅ CHANGELOG.md
-✅ docs/THINKTANK-LICENSING-MODEL.md (license types, tiers, enforcement)
-✅ docs/THINKTANK-TENANT-ADMIN-GUIDE.md (tenant admin UI for licenses)
-✅ docs/RADIANT-ADMIN-GUIDE.md (if platform-level license overrides)
-✅ docs/architecture/ADR-USER-PROVISIONING-SEAT-LICENSING-AUTH.md (if policy changes)
+✅ docs/10-ORCHESTRATION-WORKFLOWS.md
 ```
 
-### Think Tank Feature Changes (Dual-Platform)
-```
-✅ CHANGELOG.md — with platform annotation: [Web], [Mac], or [Both]
-✅ docs/THINKTANK-USER-GUIDE.md (user-facing features)
-✅ docs/THINKTANK-MAC-GUIDE.md (Feature Parity Matrix update)
-✅ docs/THINKTANK-ADMIN-GUIDE.md (if admin-configurable)
-⚠️ ALSO: Run /.windsurf/workflows/thinktank-dual-platform.md sync checklist
-```
-
-### Curator / Knowledge Changes
+### Data / Storage Changes
 ```
 ✅ CHANGELOG.md
-✅ docs/CURATOR-USER-GUIDE.md
-✅ docs/CURATOR-ENGINEERING-GUIDE.md (if technical)
-✅ docs/RADIANT-ADMIN-GUIDE.md (if admin-configurable)
+✅ docs/11-DATA-STORAGE.md
 ```
 
-### Cartridge Changes
+### API / Service Layer Changes
 ```
 ✅ CHANGELOG.md
-✅ docs/CURATOR-USER-GUIDE.md (Section 11: Managing Cartridges)
-✅ docs/RADIANT-ADMIN-GUIDE.md (Section 89: Cartridge PKI)
-✅ docs/THINKTANK-TENANT-ADMIN-GUIDE.md (Section 4: Cartridge Manager)
-✅ docs/RADIANT-MOATS.md (if portable intelligence advantage)
-✅ docs/ENGINEERING-IMPLEMENTATION-VISION.md (Section 25: Neural Architecture)
+✅ docs/12-API-REFERENCE.md
+✅ docs/06-ARCHITECTURE-ENGINEERING.md (if architectural)
 ```
 
-### Tenant Admin Features (Company/Team Settings)
+### Security / Auth / Compliance Changes
 ```
 ✅ CHANGELOG.md
-✅ docs/THINKTANK-TENANT-ADMIN-GUIDE.md
-✅ docs/THINKTANK-ADMIN-GUIDE.md (if affects platform config)
-✅ docs/ENGINEERING-IMPLEMENTATION-VISION.md (if architectural)
+✅ docs/13-SECURITY-AUTH-COMPLIANCE.md
+✅ docs/04-RADIANT-ADMIN.md (if admin-configurable)
 ```
 
-### Service Layer Changes (MCP, A2A, API)
+### Operations / Runbook Changes
 ```
 ✅ CHANGELOG.md
-✅ docs/SERVICE-LAYER-GUIDE.md
-✅ docs/RADIANT-PLATFORM-ARCHITECTURE.md
-✅ docs/RADIANT-ADMIN-GUIDE.md (if admin-configurable)
-✅ docs/ENGINEERING-IMPLEMENTATION-VISION.md (if architectural)
+✅ docs/14-OPERATIONS-RUNBOOKS.md
 ```
 
-### Delight System Changes
+### Competitive Advantage Features
 ```
 ✅ CHANGELOG.md
-✅ docs/DELIGHT-SYSTEM-GUIDE.md
-✅ docs/THINKTANK-ADMIN-GUIDE.md (if admin-configurable)
-✅ docs/THINKTANK-ADMIN-GUIDE-V2.md (if admin-configurable)
-✅ docs/RADIANT-PLATFORM-ARCHITECTURE.md (if architectural)
-✅ docs/ENGINEERING-IMPLEMENTATION-VISION.md (if events/orchestration)
+✅ docs/15-STRATEGY-COMPETITIVE.md
 ```
 
-### New Terms, Subsystems, or Acronyms
+### New Dependencies
 ```
 ✅ CHANGELOG.md
-✅ docs/RADIANT-GLOSSARY.md (MANDATORY)
-✅ docs/RADIANT-PLATFORM-ARCHITECTURE.md (if new subsystem)
+✅ docs/18-UI-UX-LIBRARIES.md
+```
+
+### New Terms / Subsystems / Acronyms
+```
+✅ CHANGELOG.md
+✅ docs/17-GLOSSARY.md (MANDATORY)
 ```
 
 ---
 
 ## Step 3: Update ALL Identified Docs
 
-For each document identified in Step 2:
+For each document identified in Step 2, add content in the appropriate Part/Section within the consolidated document.
 
 ### CHANGELOG.md Format
 ```markdown
@@ -266,94 +220,15 @@ For each document identified in Step 2:
 **Description of change**
 
 - Bullet point details
-- More details
 
 **Files Modified**: `path/to/files`
-```
-
-### Admin Guide Format
-```markdown
-### Feature Name (vX.X.X)
-
-**Purpose**: What this does
-
-**Configuration**:
-| Setting | Default | Description |
-|---------|---------|-------------|
-| option | value | what it does |
-
-**Usage**:
-1. Step one
-2. Step two
-
-**API** (if applicable):
-- `GET /api/endpoint` - description
-```
-
-### User Guide Format
-```markdown
-### Feature Name
-
-**What it does**: Plain language description for end users
-
-**How to use it**:
-1. Navigate to...
-2. Click...
-3. Result...
-
-**Tips**: Helpful hints
-```
-
-### Engineering Guide Format
-```markdown
-## Section Number. Feature Name (vX.X.X)
-
-### X.1 Overview
-
-Technical description
-
-### X.2 Architecture
-
-```
-[ASCII diagram]
-```
-
-### X.3 Implementation
-
-| Component | Location | Purpose |
-|-----------|----------|---------|
-| File | path | what it does |
-
-### X.4 Code Example
-
-```typescript
-// example code
-```
 ```
 
 ---
 
 ## Step 4: Update Version Numbers
 
-When updating these documents, also update the version number in the header:
-
-- `docs/RADIANT-ADMIN-GUIDE.md`
-- `docs/THINKTANK-ADMIN-GUIDE.md`
-- `docs/THINKTANK-ADMIN-GUIDE-V2.md`
-- `docs/THINKTANK-TENANT-ADMIN-GUIDE.md`
-- `docs/THINKTANK-USER-GUIDE.md`
-- `docs/CURATOR-USER-GUIDE.md`
-- `docs/CURATOR-ENGINEERING-GUIDE.md`
-- `docs/STRATEGIC-VISION-MARKETING.md`
-- `docs/ENGINEERING-IMPLEMENTATION-VISION.md`
-- `docs/RADIANT-PLATFORM-ARCHITECTURE.md`
-- `docs/SWIFT-DEPLOYER-USER-GUIDE.md`
-- `docs/SERVICE-LAYER-GUIDE.md`
-- `docs/RADIANT-GLOSSARY.md`
-- `docs/SYSTEM-HEALTH-GUIDE.md`
-- `docs/DELIGHT-SYSTEM-GUIDE.md`
-- `docs/OMEGA-USER-GUIDE.md`
-- `docs/OMEGA-ADMIN-GUIDE.md`
+When updating any of the 18 consolidated documents, update the version number in the document header.
 
 ---
 
@@ -363,97 +238,65 @@ Before marking task complete, verify:
 
 ```
 □ CHANGELOG.md updated
-□ All admin guides updated (if admin-facing)
-□ User guide updated (if user-facing)
-□ Engineering guide updated (if technical)
-□ Strategic vision updated (if major feature)
-□ Moats updated (if competitive advantage)
-□ Database schema updated (if new tables)
-□ Platform architecture updated (if architectural change)
-□ Swift Deployer guide updated (if deployer changes)
-□ Service Layer guide updated (if MCP, A2A, API, gateway changes)
-□ Curator guide updated (if knowledge, verification, or cartridge changes)
-□ Tenant Admin guide updated (if tenant/team settings, org admin, cartridge management)
-□ **Glossary updated (if new terms, subsystems, acronyms, or AWS services)**
-□ System Health guide updated (if monitoring, alerts, or health changes)
-□ OMEGA User Guide updated (if OMEGA/Genesis architecture, features, or Q-Nodes)
-□ OMEGA Admin Guide updated (if OMEGA admin API, firmware, Shadow Mode, or brain ops)
-□ Delight System Guide updated (if personality modes, injection points, achievements, easter eggs, sounds, events, or orchestration)
+□ Relevant app doc updated (01–05) if app-facing change
+□ Architecture doc (06) updated if architectural change
+□ Relevant system doc updated (07–18) if system-level change
+□ Glossary (17) updated if new terms/acronyms
+□ Strategy (15) updated if competitive advantage
 □ Version numbers updated in all touched docs
 ```
 
 ---
 
-## The Documentation Manifest
+## Step 6: Reassemble Complete Documentation
 
-A machine-readable manifest exists at:
+After updating ANY documentation files, regenerate the complete assembled documentation:
+
+```bash
+python3 tools/scripts/assemble-complete-documentation.py
 ```
-docs/DOCUMENTATION-MANIFEST.json
-```
 
-This file contains:
-- All primary and secondary documentation files
-- Trigger keywords for each document
-- The complete trigger matrix
+This produces:
+- `docs/publications/RADIANT-THINKTANK-COMPLETE-DOCUMENTATION.md`
+- `docs/publications/RADIANT-THINKTANK-COMPLETE-DOCUMENTATION.pdf`
 
-Use this manifest to programmatically determine which docs need updating.
+See policy: `/.windsurf/workflows/docs-assemble-complete.md`
 
 ---
 
 ## Quick Reference Card
 
 ```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                    DOCUMENTATION UPDATE CHECKLIST                        │
-├─────────────────────────────────────────────────────────────────────────┤
-│                                                                          │
-│  FOR EVERY CHANGE:                                                       │
-│  ✅ CHANGELOG.md                                                         │
-│                                                                          │
-│  FOR THINK TANK CHANGES:                                                 │
-│  ✅ THINKTANK-USER-GUIDE.md (user-facing)                               │
-│  ✅ THINKTANK-ADMIN-GUIDE.md (admin-facing)                             │
-│  ✅ THINKTANK-ADMIN-GUIDE-V2.md (admin-facing)                          │
-│  ✅ THINKTANK-TENANT-ADMIN-GUIDE.md (tenant/team admin)                 │
-│                                                                          │
-│  FOR PLATFORM CHANGES:                                                   │
-│  ✅ RADIANT-ADMIN-GUIDE.md                                              │
-│                                                                          │
-│  FOR MAJOR FEATURES:                                                     │
-│  ✅ STRATEGIC-VISION-MARKETING.md                                       │
-│  ✅ ENGINEERING-IMPLEMENTATION-VISION.md                                │
-│                                                                          │
-│  FOR DATABASE CHANGES:                                                   │
-│  ✅ sections/SECTION-07-DATABASE-SCHEMA.md                              │
-│  ✅ RADIANT-PLATFORM-ARCHITECTURE.md                                    │
-│                                                                          │
-│  FOR COMPETITIVE ADVANTAGES:                                             │
-│  ✅ THINKTANK-MOATS.md or RADIANT-MOATS.md                              │
-│                                                                          │
-│  FOR SERVICE LAYER (MCP, A2A, API):                                      │
-│  ✅ SERVICE-LAYER-GUIDE.md                                              │
-│  ✅ RADIANT-PLATFORM-ARCHITECTURE.md                                    │
-│                                                                          │
-│  FOR OMEGA / GENESIS CHANGES:                                            │
-│  ✅ OMEGA-USER-GUIDE.md (architecture, features)                        │
-│  ✅ OMEGA-ADMIN-GUIDE.md (admin ops, API, firmware)                     │
-│                                                                          │
-│  FOR SWIFT DEPLOYER CHANGES:                                             │
-│  ✅ SWIFT-DEPLOYER-USER-GUIDE.md                                        │
-│  (credentials, instances, drift, snapshots, migrations)                  │
-│                                                                          │
-│  FOR SYSTEM HEALTH / MONITORING:                                         │
-│  ✅ SYSTEM-HEALTH-GUIDE.md                                              │
-│  (alerts, uptime, CloudWatch, LiteLLM gateway)                           │
-│                                                                          │
-│  FOR DELIGHT SYSTEM CHANGES:                                             │
-│  ✅ DELIGHT-SYSTEM-GUIDE.md                                             │
-│  (personality, injection points, achievements, easter eggs, sounds)       │
-│                                                                          │
-│  FOR NEW TERMS/SUBSYSTEMS/ACRONYMS:                                      │
-│  ✅ RADIANT-GLOSSARY.md (MANDATORY)                                     │
-│                                                                          │
-└─────────────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────┐
+│           DOCUMENTATION UPDATE CHECKLIST (v2.0)          │
+├──────────────────────────────────────────────────────────┤
+│                                                          │
+│  EVERY CHANGE:     ✅ CHANGELOG.md                       │
+│                                                          │
+│  THINK TANK:       ✅ docs/01-THINK-TANK.md              │
+│  CURATOR:          ✅ docs/02-CURATOR.md                  │
+│  DOJO:             ✅ docs/03-DOJO.md                     │
+│  RADIANT ADMIN:    ✅ docs/04-RADIANT-ADMIN.md            │
+│  SWIFT DEPLOYER:   ✅ docs/05-SWIFT-DEPLOYER.md           │
+│                                                          │
+│  ARCHITECTURE:     ✅ docs/06-ARCHITECTURE-ENGINEERING.md  │
+│  AI BRAIN:         ✅ docs/07-AI-BRAIN-SYSTEMS.md          │
+│  CATO SAFETY:      ✅ docs/08-CATO-SAFETY.md               │
+│  OMEGA/GENESIS:    ✅ docs/09-OMEGA-GENESIS.md             │
+│  ORCHESTRATION:    ✅ docs/10-ORCHESTRATION-WORKFLOWS.md   │
+│  DATA/STORAGE:     ✅ docs/11-DATA-STORAGE.md              │
+│  API REFERENCE:    ✅ docs/12-API-REFERENCE.md             │
+│  SECURITY/AUTH:    ✅ docs/13-SECURITY-AUTH-COMPLIANCE.md   │
+│  OPERATIONS:       ✅ docs/14-OPERATIONS-RUNBOOKS.md       │
+│  STRATEGY:         ✅ docs/15-STRATEGY-COMPETITIVE.md      │
+│  IMPL SPECS:       ✅ docs/16-IMPLEMENTATION-SPECS.md      │
+│  GLOSSARY:         ✅ docs/17-GLOSSARY.md                  │
+│  UI/UX:            ✅ docs/18-UI-UX-LIBRARIES.md           │
+│                                                          │
+│  THEN: python3 tools/scripts/                            │
+│        assemble-complete-documentation.py                │
+│                                                          │
+└──────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -465,21 +308,7 @@ Use this manifest to programmatically determine which docs need updating.
 ❌ Only updating one document when multiple apply
 ❌ Updating docs without updating version numbers
 ❌ Waiting for user to ask about documentation
-❌ Skipping user guide for user-facing changes
-❌ Skipping admin guide for admin-facing changes
-❌ Forgetting STRATEGIC-VISION-MARKETING.md when updating admin guides
-❌ **Introducing new terms/acronyms without updating RADIANT-GLOSSARY.md**
-❌ Changing Delight features without updating DELIGHT-SYSTEM-GUIDE.md
-
----
-
-## Why This Matters
-
-1. **User Trust**: Users rely on documentation to understand features
-2. **Maintainability**: Future developers need accurate docs
-3. **Compliance**: Some docs are legally required (HIPAA, SOC2)
-4. **Marketing**: Strategic vision is customer-facing
-5. **Competitive Advantage**: Moats docs track our differentiation
+❌ **Introducing new terms/acronyms without updating 17-GLOSSARY.md**
 
 ---
 

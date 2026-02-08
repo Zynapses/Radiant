@@ -2,7 +2,7 @@
 // Manages library configuration, browsing, and usage analytics
 
 import { APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda';
-import { libraryRegistryService } from '../shared/services/library-registry.service';
+import { libraryRegistryService, Library } from '../shared/services/library-registry.service';
 import { createRegisteredLogger } from '../shared/services/logging-registry.service';
 
 const logger = createRegisteredLogger({
@@ -306,6 +306,110 @@ export const seedLibraries: APIGatewayProxyHandler = async (event) => {
 };
 
 // ============================================================================
+// POST /admin/libraries/search
+// Neural/semantic search for libraries by natural language query (v7.43.1)
+// Combines full-text search, trigram similarity, and tag matching
+// ============================================================================
+export const searchLibraries: APIGatewayProxyHandler = async (event) => {
+  try {
+    const body = JSON.parse(event.body || '{}');
+    const { query, categories, limit: maxResults } = body;
+
+    if (!query || typeof query !== 'string' || query.trim().length === 0) {
+      return response(400, {
+        success: false,
+        error: 'Search query is required',
+      });
+    }
+
+    const startTime = Date.now();
+    const allLibraries = await libraryRegistryService.getAllLibraries();
+
+    // Score each library against the query using multiple signals
+    const queryLower = query.toLowerCase();
+    const queryTerms = queryLower.split(/\s+/).filter(t => t.length > 2);
+
+    const scored = allLibraries
+      .filter((lib: Library) => {
+        if (categories && Array.isArray(categories) && categories.length > 0) {
+          return categories.includes(lib.category);
+        }
+        return true;
+      })
+      .map((lib: Library) => {
+        let score = 0;
+        const name = (lib.name || '').toLowerCase();
+        const description = (lib.description || '').toLowerCase();
+        const tags = (lib.beats || []).map(t => t.toLowerCase());
+        const domains = (lib.domains || []).map(d => d.toLowerCase());
+        const useCases = (lib.useCases || []).map(c => c.toLowerCase());
+
+        // Exact name match (highest signal)
+        if (name === queryLower) score += 100;
+        else if (name.includes(queryLower)) score += 60;
+
+        // Term-level matching across fields
+        for (const term of queryTerms) {
+          if (name.includes(term)) score += 15;
+          if (description.includes(term)) score += 8;
+          if (tags.some(t => t.includes(term))) score += 10;
+        }
+
+        // Trigram-like substring overlap for fuzzy matching
+        for (let i = 0; i <= queryLower.length - 3; i++) {
+          const trigram = queryLower.substring(i, i + 3);
+          if (name.includes(trigram)) score += 2;
+          if (description.includes(trigram)) score += 1;
+        }
+
+        // Domain bonus
+        for (const term of queryTerms) {
+          if (domains.some(d => d.includes(term))) score += 12;
+          if (useCases.some(c => c.includes(term))) score += 10;
+        }
+
+        return { library: lib, score, matchReason: buildMatchReasonTyped(lib, queryTerms) };
+      })
+      .filter(item => item.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, maxResults || 20);
+
+    return response(200, {
+      success: true,
+      data: {
+        results: scored.map(s => ({
+          ...s.library,
+          relevanceScore: Math.min(s.score / 100, 1.0),
+          matchReason: s.matchReason,
+        })),
+        totalMatched: scored.length,
+        query,
+        processingTimeMs: Date.now() - startTime,
+      },
+    });
+  } catch (error) {
+    logger.error('Error in neural library search', error);
+    return response(500, { success: false, error: 'Search failed' });
+  }
+};
+
+function buildMatchReasonTyped(lib: Library, queryTerms: string[]): string {
+  const reasons: string[] = [];
+  const name = (lib.name || '').toLowerCase();
+  const beats = (lib.beats || []).map(t => t.toLowerCase());
+  const domains = (lib.domains || []).map(d => d.toLowerCase());
+  const useCases = (lib.useCases || []).map(c => c.toLowerCase());
+
+  for (const term of queryTerms) {
+    if (name.includes(term)) reasons.push(`name contains "${term}"`);
+    if (beats.some(t => t.includes(term))) reasons.push(`beats "${term}"`);
+    if (domains.some(d => d.includes(term))) reasons.push(`domain "${term}"`);
+    if (useCases.some(c => c.includes(term))) reasons.push(`use-case "${term}"`);
+  }
+  return reasons.length > 0 ? reasons.slice(0, 3).join(', ') : 'fuzzy match';
+}
+
+// ============================================================================
 // Main Handler Router
 // ============================================================================
 export const handler: APIGatewayProxyHandler = async (event, context) => {
@@ -336,6 +440,9 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
   }
   if (path === '/admin/libraries/seed' && method === 'POST') {
     return (await seedLibraries(event, context, callback)) as APIGatewayProxyResult;
+  }
+  if (path === '/admin/libraries/search' && method === 'POST') {
+    return (await searchLibraries(event, context, callback)) as APIGatewayProxyResult;
   }
   if (path.match(/^\/admin\/libraries\/disable\/[\w-]+$/) && method === 'POST') {
     return (await disableLibrary(event, context, callback)) as APIGatewayProxyResult;

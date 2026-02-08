@@ -533,7 +533,7 @@ export class UEPComplianceService {
         COALESCE(compliance_mode, '{}') as compliance_mode,
         COALESCE((SELECT hipaa_enabled FROM hipaa_config WHERE tenant_id = t.id), false) as phi_enabled,
         COALESCE((SELECT mode FROM hipaa_config WHERE tenant_id = t.id), 'sanitize') as phi_mode,
-        COALESCE(retention_days, 30) as retention_days
+        COALESCE(retention_days, 180) as retention_days
       FROM tenants t
       WHERE id = $1`,
       [tenantId]
@@ -551,7 +551,7 @@ export class UEPComplianceService {
         enabled: row?.phi_enabled || false,
         mode: (row?.phi_mode as 'sanitize' | 'block' | 'warn') || 'sanitize',
       },
-      retentionDays: row?.retention_days || 30,
+      retentionDays: row?.retention_days || 180,
     };
   }
 
@@ -625,7 +625,7 @@ export class UEPComplianceService {
     frameworks: RegulatoryFramework[],
     containsPhi: boolean
   ): number {
-    let maxRetention = 30; // Default
+    let maxRetention = 180; // Default: 6 months
 
     for (const framework of frameworks) {
       const reqs = FRAMEWORK_REQUIREMENTS[framework];

@@ -1225,6 +1225,120 @@ export class AdminStack extends cdk.Stack {
     });
 
     // =========================================================================
+    // Curator v7.43.1 — Knowledge Curation & Verification Routes
+    // =========================================================================
+    const curatorFunction = new lambda.Function(this, 'CuratorFunction', {
+      functionName: `${appId}-${environment}-curator`,
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: 'curator/index.handler',
+      code: lambda.Code.fromAsset('lambda/dist'),
+      memorySize: 512,
+      timeout: cdk.Duration.seconds(30),
+      environment: {
+        APP_ID: appId,
+        ENVIRONMENT: environment,
+        TIER: tier.toString(),
+        AURORA_SECRET_ARN: auroraCluster.secret?.secretArn || '',
+        AURORA_CLUSTER_ARN: auroraCluster.clusterArn,
+        LOG_LEVEL: isProd ? 'info' : 'debug',
+        RADIANT_VERSION,
+      },
+      vpc,
+      vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
+      securityGroups: [apiSecurityGroup],
+      role: adminLambdaRole,
+      tracing: tier >= 2 ? lambda.Tracing.ACTIVE : lambda.Tracing.DISABLED,
+      logRetention: logs.RetentionDays.ONE_MONTH,
+    });
+
+    const curatorIntegration = new apigateway.LambdaIntegration(curatorFunction, {
+      proxy: true,
+    });
+
+    // Curator base resource: /admin/curator
+    const curator = admin.addResource('curator');
+    curator.addMethod('GET', curatorIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Curator proxy: /admin/curator/{proxy+}
+    const curatorProxy = curator.addResource('{proxy+}');
+    curatorProxy.addMethod('GET', curatorIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    curatorProxy.addMethod('POST', curatorIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    curatorProxy.addMethod('PUT', curatorIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    curatorProxy.addMethod('DELETE', curatorIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // =========================================================================
+    // Cato Trainer v7.43.1 — Safety Training & Document Management Routes
+    // =========================================================================
+    const catoTrainerFunction = new lambda.Function(this, 'CatoTrainerFunction', {
+      functionName: `${appId}-${environment}-cato-trainer`,
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: 'admin/cato-trainer.handler',
+      code: lambda.Code.fromAsset('lambda/dist'),
+      memorySize: 512,
+      timeout: cdk.Duration.seconds(30),
+      environment: {
+        APP_ID: appId,
+        ENVIRONMENT: environment,
+        TIER: tier.toString(),
+        AURORA_SECRET_ARN: auroraCluster.secret?.secretArn || '',
+        AURORA_CLUSTER_ARN: auroraCluster.clusterArn,
+        LOG_LEVEL: isProd ? 'info' : 'debug',
+        RADIANT_VERSION,
+      },
+      vpc,
+      vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
+      securityGroups: [apiSecurityGroup],
+      role: adminLambdaRole,
+      tracing: tier >= 2 ? lambda.Tracing.ACTIVE : lambda.Tracing.DISABLED,
+      logRetention: logs.RetentionDays.ONE_MONTH,
+    });
+
+    const catoTrainerIntegration = new apigateway.LambdaIntegration(catoTrainerFunction, {
+      proxy: true,
+    });
+
+    // Cato Trainer base resource: /admin/cato-trainer
+    const catoTrainer = admin.addResource('cato-trainer');
+    catoTrainer.addMethod('GET', catoTrainerIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Cato Trainer proxy: /admin/cato-trainer/{proxy+}
+    const catoTrainerProxy = catoTrainer.addResource('{proxy+}');
+    catoTrainerProxy.addMethod('GET', catoTrainerIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    catoTrainerProxy.addMethod('POST', catoTrainerIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    catoTrainerProxy.addMethod('PUT', catoTrainerIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    catoTrainerProxy.addMethod('DELETE', catoTrainerIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // =========================================================================
     // Spend Governor v7.39.0 — Budget Control & Cost Reporting
     // =========================================================================
 
@@ -1380,6 +1494,305 @@ export class AdminStack extends cdk.Stack {
       authorizationType: apigateway.AuthorizationType.COGNITO,
     });
     criticalAlerts.addResource('{alertId}').addResource('dismiss').addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // =========================================================================
+    // Intrusion Detection v7.40.0 — RIDPS (Real-Time IDS/IPS)
+    // Standards: NIST SP 800-94, NIST CSF 2.0, MITRE ATT&CK, CIS v8
+    // =========================================================================
+
+    // CloudWatch permissions for RIDPS metrics
+    adminLambdaRole.addToPrincipalPolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: [
+        'cloudwatch:PutMetricData',
+      ],
+      resources: ['*'],
+      conditions: {
+        StringEquals: {
+          'cloudwatch:namespace': 'RADIANT/IntrusionDetection',
+        },
+      },
+    }));
+
+    // RIDPS Analyzer Lambda (EventBridge scheduled)
+    const ridpsAnalyzerFn = new lambda.Function(this, 'RIDPSAnalyzerFunction', {
+      functionName: `${appId}-${environment}-ridps-analyzer`,
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: 'intrusion-detection/analyzer.handler',
+      code: lambda.Code.fromAsset('lambda/dist'),
+      memorySize: 256,
+      timeout: cdk.Duration.seconds(60),
+      environment: {
+        APP_ID: appId,
+        ENVIRONMENT: environment,
+        TIER: tier.toString(),
+        AURORA_SECRET_ARN: auroraCluster.secret?.secretArn || '',
+        AURORA_CLUSTER_ARN: auroraCluster.clusterArn,
+        LOG_LEVEL: isProd ? 'info' : 'debug',
+        RADIANT_VERSION,
+      },
+      vpc,
+      vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
+      securityGroups: [apiSecurityGroup],
+      role: adminLambdaRole,
+      tracing: tier >= 2 ? lambda.Tracing.ACTIVE : lambda.Tracing.DISABLED,
+      logRetention: logs.RetentionDays.ONE_MONTH,
+    });
+
+    // Correlation: every 1 minute
+    new events.Rule(this, 'RIDPSCorrelationSchedule', {
+      ruleName: `${appId}-${environment}-ridps-correlate`,
+      description: 'RIDPS: correlate intrusion events into incidents (NIST CSF DE.AE-04)',
+      schedule: events.Schedule.rate(cdk.Duration.minutes(1)),
+      targets: [new targets.LambdaFunction(ridpsAnalyzerFn, {
+        event: events.RuleTargetInput.fromObject({ source: 'ridps', 'detail-type': 'scheduled', detail: { mode: 'correlate' } }),
+      })],
+      enabled: true,
+    });
+
+    // Full analysis (baselines + cleanup): every 1 hour
+    new events.Rule(this, 'RIDPSFullAnalysisSchedule', {
+      ruleName: `${appId}-${environment}-ridps-full-analysis`,
+      description: 'RIDPS: update UEBA baselines, cleanup expired data (CIS 8.11)',
+      schedule: events.Schedule.rate(cdk.Duration.hours(1)),
+      targets: [new targets.LambdaFunction(ridpsAnalyzerFn, {
+        event: events.RuleTargetInput.fromObject({ source: 'ridps', 'detail-type': 'scheduled', detail: { mode: 'full' } }),
+      })],
+      enabled: true,
+    });
+
+    // API Gateway routes for intrusion-detection
+    const intrusionDetection = admin.addResource('intrusion-detection');
+
+    // Dashboard
+    intrusionDetection.addResource('dashboard').addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Events
+    intrusionDetection.addResource('events').addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Incidents
+    const incidents = intrusionDetection.addResource('incidents');
+    incidents.addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    const incidentById = incidents.addResource('{incidentId}');
+    incidentById.addMethod('PUT', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Blocked IPs
+    const blockedIps = intrusionDetection.addResource('blocked-ips');
+    blockedIps.addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    blockedIps.addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    blockedIps.addResource('{ip}').addMethod('DELETE', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Config
+    const ridpsConfig = intrusionDetection.addResource('config');
+    ridpsConfig.addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    ridpsConfig.addMethod('PUT', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Detectors
+    const detectors = intrusionDetection.addResource('detectors');
+    detectors.addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    detectors.addResource('{detectorId}').addMethod('PUT', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Sessions (manual kill)
+    const sessions = intrusionDetection.addResource('sessions');
+    sessions.addResource('kill').addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Accounts (manual lock/unlock)
+    const accounts = intrusionDetection.addResource('accounts');
+    accounts.addResource('lock').addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    accounts.addResource('unlock').addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Locked Accounts
+    const lockedAccounts = intrusionDetection.addResource('locked-accounts');
+    lockedAccounts.addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    const lockedAccountById = lockedAccounts.addResource('{userId}');
+    lockedAccountById.addResource('history').addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Lockout Policy
+    const lockoutPolicy = intrusionDetection.addResource('lockout-policy');
+    lockoutPolicy.addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    lockoutPolicy.addMethod('PUT', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Threat Intelligence
+    const threatIntel = intrusionDetection.addResource('threat-intel');
+    threatIntel.addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    threatIntel.addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    threatIntel.addResource('import').addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    threatIntel.addResource('{indicatorId}').addMethod('DELETE', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // =========================================================================
+    // Data Lake API routes (v7.42.0)
+    // =========================================================================
+
+    const dataLake = admin.addResource('data-lake');
+
+    // GET /admin/data-lake/stats
+    dataLake.addResource('stats').addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // GET /admin/data-lake/tiers
+    dataLake.addResource('tiers').addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // GET /admin/data-lake/data-types
+    dataLake.addResource('data-types').addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // GET /admin/data-lake/glacier-queue
+    dataLake.addResource('glacier-queue').addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // GET /admin/data-lake/lifecycle-status
+    dataLake.addResource('lifecycle-status').addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // GET /admin/data-lake/tenant/{tenantId}
+    const dataLakeTenant = dataLake.addResource('tenant');
+    dataLakeTenant.addResource('{tenantId}').addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // POST /admin/data-lake/query
+    const dataLakeQuery = dataLake.addResource('query');
+    dataLakeQuery.addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // POST /admin/data-lake/reconcile
+    const dataLakeReconcile = dataLake.addResource('reconcile');
+    dataLakeReconcile.addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // =========================================================================
+    // Tenant Settings API routes (v7.43.0)
+    // =========================================================================
+
+    const tenantSettings = admin.addResource('tenant-settings');
+
+    // GET /admin/tenant-settings - List all
+    tenantSettings.addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // GET/PUT /admin/tenant-settings/{tenantId}
+    const tenantSettingsById = tenantSettings.addResource('{tenantId}');
+    tenantSettingsById.addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    tenantSettingsById.addMethod('PUT', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // POST /admin/tenant-settings/{tenantId}/reset
+    tenantSettingsById.addResource('reset').addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // =========================================================================
+    // Conversation Export API routes (v7.43.0)
+    // =========================================================================
+
+    const conversationExport = admin.addResource('conversation-export');
+
+    // GET /admin/conversation-export - List exports
+    // POST /admin/conversation-export - Request new export
+    conversationExport.addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    conversationExport.addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // GET /admin/conversation-export/{exportId} - Get export status
+    conversationExport.addResource('{exportId}').addMethod('GET', adminIntegration, {
       authorizer: adminAuthorizer,
       authorizationType: apigateway.AuthorizationType.COGNITO,
     });

@@ -1,0 +1,915 @@
+openapi: 3.1.0
+info:
+  title: RADIANT Admin API
+  description: |
+    Admin API for RADIANT multi-tenant AI platform.
+    Provides endpoints for tenant management, AI model configuration, 
+    billing, reports, and system administration.
+  version: 5.42.0
+  contact:
+    name: RADIANT Support
+  license:
+    name: Proprietary
+
+servers:
+  - url: https://api.{domain}/admin
+    description: Production
+    variables:
+      domain:
+        default: radiant.ai
+  - url: http://localhost:3001/admin
+    description: Local development
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: Tenants
+    description: Tenant management
+  - name: Models
+    description: AI model configuration
+  - name: Providers
+    description: AI provider management
+  - name: Reports
+    description: Report generation and management
+  - name: AI Reports
+    description: AI-powered report generation
+  - name: Billing
+    description: Billing and credits
+  - name: Users
+    description: User management
+  - name: Settings
+    description: System settings
+
+paths:
+  /tenants:
+    get:
+      tags: [Tenants]
+      summary: List all tenants
+      operationId: listTenants
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [active, suspended, trial]
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: List of tenants
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tenants:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Tenant'
+                  total:
+                    type: integer
+    post:
+      tags: [Tenants]
+      summary: Create a new tenant
+      operationId: createTenant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTenantRequest'
+      responses:
+        '201':
+          description: Tenant created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tenant'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /tenants/{tenantId}:
+    get:
+      tags: [Tenants]
+      summary: Get tenant by ID
+      operationId: getTenant
+      parameters:
+        - $ref: '#/components/parameters/TenantId'
+      responses:
+        '200':
+          description: Tenant details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tenant'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Tenants]
+      summary: Update tenant
+      operationId: updateTenant
+      parameters:
+        - $ref: '#/components/parameters/TenantId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTenantRequest'
+      responses:
+        '200':
+          description: Tenant updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tenant'
+    delete:
+      tags: [Tenants]
+      summary: Delete tenant
+      operationId: deleteTenant
+      parameters:
+        - $ref: '#/components/parameters/TenantId'
+      responses:
+        '200':
+          description: Tenant deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+
+  /ai-reports:
+    get:
+      tags: [AI Reports]
+      summary: List AI-generated reports
+      operationId: listAIReports
+      responses:
+        '200':
+          description: List of reports
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reports:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AIReport'
+    post:
+      tags: [AI Reports]
+      summary: Generate a new AI report
+      operationId: generateAIReport
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateReportRequest'
+      responses:
+        '201':
+          description: Report generated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  report:
+                    $ref: '#/components/schemas/AIReport'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /ai-reports/{reportId}:
+    get:
+      tags: [AI Reports]
+      summary: Get report by ID
+      operationId: getAIReport
+      parameters:
+        - $ref: '#/components/parameters/ReportId'
+      responses:
+        '200':
+          description: Report details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  report:
+                    $ref: '#/components/schemas/AIReport'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [AI Reports]
+      summary: Update report
+      operationId: updateAIReport
+      parameters:
+        - $ref: '#/components/parameters/ReportId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateReportRequest'
+      responses:
+        '200':
+          description: Report updated
+    delete:
+      tags: [AI Reports]
+      summary: Delete report
+      operationId: deleteAIReport
+      parameters:
+        - $ref: '#/components/parameters/ReportId'
+      responses:
+        '200':
+          description: Report deleted
+
+  /ai-reports/{reportId}/export:
+    post:
+      tags: [AI Reports]
+      summary: Export report to file
+      operationId: exportAIReport
+      parameters:
+        - $ref: '#/components/parameters/ReportId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [format]
+              properties:
+                format:
+                  type: string
+                  enum: [pdf, excel, html, json]
+      responses:
+        '200':
+          description: Export URL
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  downloadUrl:
+                    type: string
+                    format: uri
+                  format:
+                    type: string
+                  key:
+                    type: string
+
+  /ai-reports/{reportId}/chat:
+    post:
+      tags: [AI Reports]
+      summary: Modify report via chat
+      operationId: chatWithReport
+      parameters:
+        - $ref: '#/components/parameters/ReportId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [message]
+              properties:
+                message:
+                  type: string
+                  description: User's modification request
+      responses:
+        '200':
+          description: Report modified
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  report:
+                    $ref: '#/components/schemas/AIReport'
+                  message:
+                    type: string
+
+  /ai-reports/templates:
+    get:
+      tags: [AI Reports]
+      summary: List report templates
+      operationId: listReportTemplates
+      responses:
+        '200':
+          description: List of templates
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  templates:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ReportTemplate'
+    post:
+      tags: [AI Reports]
+      summary: Create report template
+      operationId: createReportTemplate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTemplateRequest'
+      responses:
+        '201':
+          description: Template created
+
+  /ai-reports/brand-kits:
+    get:
+      tags: [AI Reports]
+      summary: List brand kits
+      operationId: listBrandKits
+      responses:
+        '200':
+          description: List of brand kits
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  brandKits:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BrandKit'
+    post:
+      tags: [AI Reports]
+      summary: Create brand kit
+      operationId: createBrandKit
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBrandKitRequest'
+      responses:
+        '201':
+          description: Brand kit created
+
+  /ai-reports/insights/dashboard:
+    get:
+      tags: [AI Reports]
+      summary: Get insights dashboard
+      operationId: getInsightsDashboard
+      responses:
+        '200':
+          description: Dashboard data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  insights:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SmartInsight'
+                  stats:
+                    type: object
+                    properties:
+                      total_insights:
+                        type: integer
+                      anomalies:
+                        type: integer
+                      trends:
+                        type: integer
+                      recommendations:
+                        type: integer
+
+  /models:
+    get:
+      tags: [Models]
+      summary: List available AI models
+      operationId: listModels
+      parameters:
+        - name: provider
+          in: query
+          schema:
+            type: string
+        - name: capability
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of models
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  models:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Model'
+
+  /providers:
+    get:
+      tags: [Providers]
+      summary: List AI providers
+      operationId: listProviders
+      responses:
+        '200':
+          description: List of providers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  providers:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Provider'
+
+  /billing/credits:
+    get:
+      tags: [Billing]
+      summary: Get credit balance
+      operationId: getCreditBalance
+      responses:
+        '200':
+          description: Credit balance
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditBalance'
+
+  /billing/usage:
+    get:
+      tags: [Billing]
+      summary: Get usage history
+      operationId: getUsageHistory
+      parameters:
+        - name: start_date
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: end_date
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Usage history
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  usage:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UsageRecord'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    TenantId:
+      name: tenantId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Tenant identifier
+    ReportId:
+      name: reportId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Report identifier
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+
+  schemas:
+    Tenant:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        slug:
+          type: string
+        status:
+          type: string
+          enum: [active, suspended, trial]
+        tier:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    CreateTenantRequest:
+      type: object
+      required: [name, slug]
+      properties:
+        name:
+          type: string
+        slug:
+          type: string
+        tier:
+          type: integer
+          default: 1
+        settings:
+          type: object
+
+    UpdateTenantRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        status:
+          type: string
+          enum: [active, suspended]
+        tier:
+          type: integer
+        settings:
+          type: object
+
+    AIReport:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: string
+        template_id:
+          type: string
+        brand_kit_id:
+          type: string
+        content:
+          $ref: '#/components/schemas/GeneratedReport'
+        status:
+          type: string
+          enum: [draft, generating, complete, error]
+        created_by:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    GeneratedReport:
+      type: object
+      required: [title, sections, created_at]
+      properties:
+        title:
+          type: string
+        subtitle:
+          type: string
+        executive_summary:
+          type: string
+        sections:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReportSection'
+        charts:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChartConfig'
+        tables:
+          type: array
+          items:
+            $ref: '#/components/schemas/TableConfig'
+        smart_insights:
+          type: array
+          items:
+            $ref: '#/components/schemas/SmartInsight'
+        created_at:
+          type: string
+          format: date-time
+        confidence_score:
+          type: number
+          minimum: 0
+          maximum: 1
+
+    ReportSection:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum: [heading, paragraph, metrics, chart, table, quote, list]
+        content:
+          type: string
+        level:
+          type: integer
+          enum: [1, 2, 3]
+        items:
+          type: array
+          items:
+            type: string
+        metrics:
+          type: array
+          items:
+            type: object
+            properties:
+              label:
+                type: string
+              value:
+                type: string
+              change:
+                type: string
+              trend:
+                type: string
+                enum: [up, down, neutral]
+
+    ChartConfig:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [bar, line, pie, area]
+        title:
+          type: string
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              label:
+                type: string
+              value:
+                type: number
+
+    TableConfig:
+      type: object
+      properties:
+        title:
+          type: string
+        headers:
+          type: array
+          items:
+            type: string
+        rows:
+          type: array
+          items:
+            type: array
+            items:
+              type: string
+
+    SmartInsight:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [anomaly, trend, recommendation, warning, achievement]
+        title:
+          type: string
+        description:
+          type: string
+        metric:
+          type: string
+        value:
+          type: string
+        change:
+          type: string
+        severity:
+          type: string
+          enum: [low, medium, high]
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+
+    GenerateReportRequest:
+      type: object
+      required: [title, prompt]
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        template_id:
+          type: string
+        brand_kit_id:
+          type: string
+        prompt:
+          type: string
+          description: AI prompt for report generation
+        parameters:
+          type: object
+          description: Additional parameters for generation
+
+    UpdateReportRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        content:
+          $ref: '#/components/schemas/GeneratedReport'
+
+    ReportTemplate:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+        prompt_template:
+          type: string
+        default_parameters:
+          type: object
+        is_system:
+          type: boolean
+
+    CreateTemplateRequest:
+      type: object
+      required: [name, prompt_template]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+        prompt_template:
+          type: string
+        default_parameters:
+          type: object
+
+    BrandKit:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        logo_url:
+          type: string
+          format: uri
+        primary_color:
+          type: string
+          pattern: '^#[0-9A-Fa-f]{6}$'
+        secondary_color:
+          type: string
+        accent_color:
+          type: string
+        font_family:
+          type: string
+        header_font:
+          type: string
+        company_name:
+          type: string
+        tagline:
+          type: string
+        is_default:
+          type: boolean
+
+    CreateBrandKitRequest:
+      type: object
+      required: [name, company_name]
+      properties:
+        name:
+          type: string
+        logo_url:
+          type: string
+        primary_color:
+          type: string
+          default: '#3b82f6'
+        secondary_color:
+          type: string
+        accent_color:
+          type: string
+        font_family:
+          type: string
+        header_font:
+          type: string
+        company_name:
+          type: string
+        tagline:
+          type: string
+        is_default:
+          type: boolean
+
+    Model:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        provider:
+          type: string
+        capabilities:
+          type: array
+          items:
+            type: string
+        context_window:
+          type: integer
+        cost_per_1k_input:
+          type: number
+        cost_per_1k_output:
+          type: number
+        is_enabled:
+          type: boolean
+
+    Provider:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+          enum: [external, self_hosted]
+        status:
+          type: string
+          enum: [active, inactive, error]
+        models_count:
+          type: integer
+
+    CreditBalance:
+      type: object
+      properties:
+        available:
+          type: number
+        used:
+          type: number
+        total:
+          type: number
+        expires_at:
+          type: string
+          format: date-time
+
+    UsageRecord:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        model:
+          type: string
+        requests:
+          type: integer
+        input_tokens:
+          type: integer
+        output_tokens:
+          type: integer
+        cost:
+          type: number

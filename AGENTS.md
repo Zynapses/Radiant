@@ -80,23 +80,29 @@ DYNAMIC: New policies in /.windsurf/workflows/ are AUTOMATICALLY enforced.
 **Master Policy**: `/.windsurf/workflows/docs-update-all.md`
 **Documentation Manifest**: `/docs/DOCUMENTATION-MANIFEST.json`
 
-### Quick Reference - Always Update These:
+### Quick Reference - Always Update These (18 Consolidated Docs):
 
 | Change Type | Required Documentation |
 |-------------|----------------------|
 | **ANY change** | `CHANGELOG.md` |
-| **Think Tank feature** | `THINKTANK-USER-GUIDE.md` + `THINKTANK-ADMIN-GUIDE.md` + `THINKTANK-ADMIN-GUIDE-V2.md` + `THINKTANK-MAC-GUIDE.md` (dual-platform sync) |
-| **Tenant/Team admin** | `THINKTANK-TENANT-ADMIN-GUIDE.md` |
-| **Licensing/Seats/Compliance** | `THINKTANK-LICENSING-MODEL.md` + `THINKTANK-TENANT-ADMIN-GUIDE.md` |
-| **Platform feature** | `RADIANT-ADMIN-GUIDE.md` |
-| **Admin guide update** | `STRATEGIC-VISION-MARKETING.md` (auto-trigger) |
-| **Technical/Architecture** | `ENGINEERING-IMPLEMENTATION-VISION.md` |
-| **Database change** | `sections/SECTION-07-DATABASE-SCHEMA.md` + `RADIANT-PLATFORM-ARCHITECTURE.md` |
-| **Competitive advantage** | `THINKTANK-MOATS.md` or `RADIANT-MOATS.md` |
-| **Swift Deployer change** | `SWIFT-DEPLOYER-USER-GUIDE.md` |
-| **Service layer (MCP/A2A/API)** | `SERVICE-LAYER-GUIDE.md` + `RADIANT-PLATFORM-ARCHITECTURE.md` |
-| **Delight system change** | `DELIGHT-SYSTEM-GUIDE.md` + `THINKTANK-ADMIN-GUIDE.md` + `RADIANT-PLATFORM-ARCHITECTURE.md` |
-| **OMEGA/Genesis change** | `OMEGA-USER-GUIDE.md` + `OMEGA-ADMIN-GUIDE.md` |
+| **Think Tank feature** | `docs/01-THINK-TANK.md` (user, admin, tenant, Mac, Delight — all in one) |
+| **Curator change** | `docs/02-CURATOR.md` |
+| **Dojo change** | `docs/03-DOJO.md` |
+| **Platform/Admin feature** | `docs/04-RADIANT-ADMIN.md` (admin, deploy, health, spend governor) |
+| **Swift Deployer change** | `docs/05-SWIFT-DEPLOYER.md` |
+| **Architecture/CDK/Lambda** | `docs/06-ARCHITECTURE-ENGINEERING.md` |
+| **AI Brain/Consciousness** | `docs/07-AI-BRAIN-SYSTEMS.md` |
+| **CATO Safety** | `docs/08-CATO-SAFETY.md` |
+| **OMEGA/Genesis change** | `docs/09-OMEGA-GENESIS.md` |
+| **Orchestration/UEP** | `docs/10-ORCHESTRATION-WORKFLOWS.md` |
+| **Data/Storage** | `docs/11-DATA-STORAGE.md` |
+| **API/Service layer** | `docs/12-API-REFERENCE.md` |
+| **Security/Auth** | `docs/13-SECURITY-AUTH-COMPLIANCE.md` |
+| **Operations** | `docs/14-OPERATIONS-RUNBOOKS.md` |
+| **Competitive advantage** | `docs/15-STRATEGY-COMPETITIVE.md` |
+| **Database schema** | `docs/16-IMPLEMENTATION-SPECS.md` |
+| **New terms/acronyms** | `docs/17-GLOSSARY.md` |
+| **UI/UX/Dependencies** | `docs/18-UI-UX-LIBRARIES.md` |
 
 ### The Golden Rule
 
@@ -107,14 +113,14 @@ IF you change code → THEN you MUST update ALL applicable documentation
 **NEVER**:
 - ❌ Say "I'll update docs later"
 - ❌ Update only CHANGELOG.md
-- ❌ Skip user guide for user-facing changes
-- ❌ Skip admin guide for admin-facing changes
-- ❌ Forget STRATEGIC-VISION-MARKETING.md when updating admin guides
+- ❌ Skip the relevant app doc (01–05) for app-facing changes
+- ❌ Skip glossary (17) when introducing new terms
 
 **ALWAYS**:
 - ✅ Update documentation IN THE SAME TASK as code changes
 - ✅ Update version numbers in all touched documents
 - ✅ Check the trigger matrix in `/docs/DOCUMENTATION-MANIFEST.json`
+- ✅ Run `python3 tools/scripts/assemble-complete-documentation.py` after doc changes
 
 ## ⚠️ Implementation Rules
 
@@ -210,9 +216,12 @@ Extension specs in: `radiant-cascade-extension-v4.18.0/docs/phases/`
 
 ## 📖 Documentation References
 
-- Full specs: `docs/sections/` (split by section number)
-- Phase summaries: `docs/phases/`
-- Original prompt: `docs/RADIANT-PROMPT-32-FULL.md`
+- **18 consolidated docs**: `docs/01-THINK-TANK.md` through `docs/18-UI-UX-LIBRARIES.md`
+- **Complete assembled doc**: `docs/publications/RADIANT-THINKTANK-COMPLETE-DOCUMENTATION.md` (.pdf)
+- **Documentation manifest**: `docs/DOCUMENTATION-MANIFEST.json`
+- **Archive of originals**: `docs/archive/pre-consolidation/`
+- **Assembly script**: `tools/scripts/assemble-complete-documentation.py`
+- **Consolidation script**: `tools/scripts/consolidate-documentation.py`
 
 ## ✅ Verification Checklist
 

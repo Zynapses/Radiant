@@ -11,6 +11,7 @@
 import { EventEmitter } from 'events';
 import { randomUUID } from 'crypto';
 import { createRegisteredLogger } from './logging-registry.service';
+import { executeStatement, stringParam } from '../db/client';
 
 const logger = createRegisteredLogger({
   serviceName: 'axiom/events',
@@ -131,7 +132,7 @@ class AxiomEventsService extends EventEmitter {
    * Subscribe to events for a session
    */
   subscribe(subscription: AxiomEventSubscription): () => void {
-    const { sessionId } = subscription;
+    const { sessionId, tenantId } = subscription;
 
     if (!this.subscriptions.has(sessionId)) {
       this.subscriptions.set(sessionId, new Set());
@@ -139,13 +140,24 @@ class AxiomEventsService extends EventEmitter {
 
     this.subscriptions.get(sessionId)!.add(subscription);
 
-    // Send recent events to catch up
-    const history = this.eventHistory.get(sessionId) || [];
-    for (const event of history) {
-      try {
-        subscription.callback(event);
-      } catch (error) {
-        logger.error('[AXIOM:Events] Error sending history event', { error, sessionId });
+    // Send recent events to catch up — load from DB on cold start
+    let history = this.eventHistory.get(sessionId) || [];
+    if (history.length === 0 && tenantId) {
+      this.loadHistoryFromDB(sessionId, tenantId).then((dbHistory) => {
+        if (dbHistory.length > 0) {
+          this.eventHistory.set(sessionId, dbHistory);
+          for (const event of dbHistory) {
+            try { subscription.callback(event); } catch { /* swallow */ }
+          }
+        }
+      }).catch(() => { /* DB unavailable, proceed without history */ });
+    } else {
+      for (const event of history) {
+        try {
+          subscription.callback(event);
+        } catch (error) {
+          logger.error('[AXIOM:Events] Error sending history event', { error, sessionId });
+        }
       }
     }
 
@@ -356,6 +368,9 @@ class AxiomEventsService extends EventEmitter {
       history.shift();
     }
 
+    // Persist to DB (fire-and-forget)
+    this.persistEventToDB(event).catch(() => { /* swallow */ });
+
     // Notify subscribers
     const subs = this.subscriptions.get(event.sessionId);
     if (subs) {
@@ -409,6 +424,69 @@ class AxiomEventsService extends EventEmitter {
     if (interval) {
       clearInterval(interval);
       this.heartbeatIntervals.delete(sessionId);
+    }
+  }
+
+  /**
+   * Persist event to DB for cold-start resilience (v7.43.0)
+   */
+  private async persistEventToDB(event: AxiomEvent): Promise<void> {
+    // Skip heartbeats — they're ephemeral by definition
+    if (event.type === 'heartbeat') return;
+
+    // Resolve tenantId from active subscriptions
+    const subs = this.subscriptions.get(event.sessionId);
+    const tenantId = subs ? Array.from(subs)[0]?.tenantId : undefined;
+    if (!tenantId) return;
+
+    try {
+      await executeStatement(
+        `INSERT INTO axiom_event_history (tenant_id, session_id, event_type, event_data)
+         VALUES ($1, $2, $3, $4::jsonb)`,
+        [
+          stringParam('tenantId', tenantId),
+          stringParam('sessionId', event.sessionId),
+          stringParam('eventType', event.type),
+          stringParam('eventData', JSON.stringify({ data: event.data, timestamp: event.timestamp })),
+        ]
+      );
+    } catch (error) {
+      logger.debug('[AXIOM:Events] Failed to persist event to DB', { error: String(error) });
+    }
+  }
+
+  /**
+   * Load event history from DB on cold start (v7.43.0)
+   */
+  private async loadHistoryFromDB(sessionId: string, tenantId: string): Promise<AxiomEvent[]> {
+    try {
+      const result = await executeStatement(
+        `SELECT event_type, event_data, created_at
+         FROM axiom_event_history
+         WHERE session_id = $1 AND tenant_id = $2
+           AND created_at > NOW() - INTERVAL '1 hour'
+         ORDER BY created_at ASC
+         LIMIT 100`,
+        [
+          stringParam('sessionId', sessionId),
+          stringParam('tenantId', tenantId),
+        ]
+      );
+
+      return (result.rows || []).map((row: Record<string, unknown>) => {
+        const eventData = typeof row.event_data === 'string'
+          ? JSON.parse(row.event_data as string)
+          : row.event_data as Record<string, unknown>;
+        return {
+          type: row.event_type as AxiomEventType,
+          sessionId,
+          timestamp: eventData.timestamp || new Date(row.created_at as string).toISOString(),
+          data: eventData.data || {},
+        };
+      });
+    } catch (error) {
+      logger.debug('[AXIOM:Events] Failed to load history from DB', { error: String(error) });
+      return [];
     }
   }
 }

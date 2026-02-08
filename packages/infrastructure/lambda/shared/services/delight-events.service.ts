@@ -54,10 +54,65 @@ class DelightEventsService extends EventEmitter {
   }
 
   /**
+   * Load event history from DB for a plan (cold-start resilience).
+   * Called when subscribing to a plan that has no in-memory history.
+   */
+  private async loadHistoryFromDB(planId: string, tenantId: string): Promise<DelightEvent[]> {
+    try {
+      const { executeStatement, stringParam } = await import('../db/client');
+      const result = await executeStatement(
+        `SELECT event_type, event_data, created_at
+         FROM delight_event_history
+         WHERE plan_id = $1 AND tenant_id = $2
+         ORDER BY created_at ASC
+         LIMIT $3`,
+        [
+          stringParam('planId', planId),
+          stringParam('tenantId', tenantId),
+          stringParam('limit', String(this.MAX_HISTORY_SIZE)),
+        ]
+      );
+      return (result.rows || []).map((row: Record<string, unknown>) => ({
+        type: row.event_type as DelightEvent['type'],
+        planId,
+        timestamp: String(row.created_at),
+        data: row.event_data as DelightEventData,
+      }));
+    } catch {
+      // Table may not exist yet — return empty
+      return [];
+    }
+  }
+
+  /**
+   * Persist an event to DB (fire-and-forget)
+   */
+  private persistEventToDB(event: DelightEvent, tenantId?: string): void {
+    if (!tenantId) return;
+    (async () => {
+      try {
+        const { executeStatement, stringParam } = await import('../db/client');
+        await executeStatement(
+          `INSERT INTO delight_event_history (tenant_id, plan_id, event_type, event_data)
+           VALUES ($1, $2, $3, $4::jsonb)`,
+          [
+            stringParam('tenantId', tenantId),
+            stringParam('planId', event.planId),
+            stringParam('eventType', event.type),
+            stringParam('eventData', JSON.stringify(event.data)),
+          ]
+        );
+      } catch {
+        // Non-critical — best-effort persistence
+      }
+    })();
+  }
+
+  /**
    * Subscribe to delight events for a plan
    */
   subscribe(subscription: DelightEventSubscription): () => void {
-    const { planId } = subscription;
+    const { planId, tenantId } = subscription;
     
     if (!this.subscriptions.has(planId)) {
       this.subscriptions.set(planId, new Set());
@@ -67,8 +122,20 @@ class DelightEventsService extends EventEmitter {
 
     // Send any recent events for this plan
     const history = this.eventHistory.get(planId) || [];
-    for (const event of history) {
-      subscription.callback(event);
+    if (history.length > 0) {
+      for (const event of history) {
+        subscription.callback(event);
+      }
+    } else {
+      // Cold start: load from DB and replay
+      this.loadHistoryFromDB(planId, tenantId).then(dbHistory => {
+        if (dbHistory.length > 0) {
+          this.eventHistory.set(planId, dbHistory);
+          for (const event of dbHistory) {
+            subscription.callback(event);
+          }
+        }
+      }).catch(() => { /* best-effort */ });
     }
 
     // Return unsubscribe function
@@ -238,6 +305,10 @@ class DelightEventsService extends EventEmitter {
       history.shift();
     }
 
+    // Persist to DB (fire-and-forget) for cold-start resilience
+    const tenantId = this.getActiveTenantForPlan(event.planId);
+    this.persistEventToDB(event, tenantId);
+
     // Notify subscribers
     const subs = this.subscriptions.get(event.planId);
     if (subs) {
@@ -254,6 +325,18 @@ class DelightEventsService extends EventEmitter {
     this.emit('delight', event);
     this.emit(`delight:${event.type}`, event);
     this.emit(`plan:${event.planId}`, event);
+  }
+
+  /**
+   * Get the tenant ID from the first subscriber for a plan.
+   * Used to persist events with the correct tenant context.
+   */
+  private getActiveTenantForPlan(planId: string): string | undefined {
+    const subs = this.subscriptions.get(planId);
+    if (subs && subs.size > 0) {
+      return Array.from(subs)[0].tenantId;
+    }
+    return undefined;
   }
 }
 

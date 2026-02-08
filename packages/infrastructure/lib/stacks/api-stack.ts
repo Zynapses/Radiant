@@ -1912,6 +1912,60 @@ export class ApiStack extends cdk.Stack {
     // to avoid CloudFormation 500 resource limit
     // =========================================================================
 
+    // =========================================================================
+    // Think Tank Tenant Admin API (v7.43.1) — Tenant-scoped administration
+    // =========================================================================
+    const tenantAdminLambda = this.createLambda(
+      'ThinktankTenantAdmin',
+      'thinktank-tenant-admin/handler.handler',
+      commonEnv,
+      vpc,
+      apiSecurityGroup,
+      lambdaRole
+    );
+    const tenantAdminIntegration = new apigateway.LambdaIntegration(tenantAdminLambda);
+
+    // /api/v1/tenant/{proxy+} — dashboard, cartridges
+    const v1 = this.api.root.addResource('api').addResource('v1');
+    const tenant = v1.addResource('tenant');
+    tenant.addProxy({
+      defaultIntegration: tenantAdminIntegration,
+      defaultMethodOptions: {
+        authorizer: cognitoAuthorizer,
+        authorizationType: apigateway.AuthorizationType.COGNITO,
+      },
+    });
+
+    // /api/tenant-admin/{proxy+} — users, settings, security, collaboration, reports
+    const tenantAdmin = this.api.root.addResource('tenant-admin');
+    tenantAdmin.addProxy({
+      defaultIntegration: tenantAdminIntegration,
+      defaultMethodOptions: {
+        authorizer: cognitoAuthorizer,
+        authorizationType: apigateway.AuthorizationType.COGNITO,
+      },
+    });
+
+    // =========================================================================
+    // Public Status API (v7.43.1) — Unauthenticated status endpoint
+    // =========================================================================
+    const statusLambda = this.createLambda(
+      'PublicStatus',
+      'public/status.handler',
+      commonEnv,
+      vpc,
+      apiSecurityGroup,
+      lambdaRole
+    );
+    const statusIntegration = new apigateway.LambdaIntegration(statusLambda);
+
+    // /api/public/status — no auth required
+    const publicApi = this.api.root.addResource('public');
+    const statusResource = publicApi.addResource('status');
+    statusResource.addMethod('GET', statusIntegration, {
+      apiKeyRequired: true,
+    });
+
     // Outputs
     new cdk.CfnOutput(this, 'ApiUrl', {
       value: this.api.url,

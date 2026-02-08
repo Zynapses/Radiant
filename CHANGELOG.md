@@ -5,6 +5,462 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.43.2] - 2026-02-08
+
+### Admin Handler Mass Wiring Fix — 47 Missing Routes
+
+Comprehensive audit of `lambda/admin/handler.ts` found **47 handler files** that existed but had no route entries, meaning all corresponding admin dashboard pages would throw `NotFoundError` on API calls.
+
+#### Grouped Route Blocks Added
+
+- **Cato sub-routes** (4): governance, pipeline, twilight, council
+- **Brain sub-routes** (1): ecd
+- **Sovereign Mesh** (4): main dashboard, ai-helper, performance, scaling
+- **Platform** (13): bedrock, cartridge-operations, pki, rnir, vault, system-cartridges, crucible, livs, organism, mls, snapshots, state-registry, uds
+- **Memory** (2): anticipatory, retention
+- **Orchestration** (4): consensus, inference-cache, model-weights, templates
+- **Settings** (2): collaboration, white-label
+- **Cortex** (2): v2, catch-all
+- **Direct routes** (15): axiom, blackboard, cartridges, code-quality, domain-experts, dynamic-reports, gateway, ghost-inference, hitl-orchestration, log-retention, neural-operations, profile, raws, reports, s3-storage/storage, safety-matrix, sentinel, aws-monitoring, user-violations, security-policies
+
+#### Verified Legitimate Exclusions (10)
+- `api-keys` — replaced by `api-keys-v51`
+- `approvals`, `invitations`, `models`, `tenants` — inline handlers
+- `cato-trainer`, `dojo` — separate Lambda functions
+- `s3-orphan-cleanup`, `scheduled-reports`, `sync-providers` — EventBridge scheduled
+
+#### Files Modified
+- **`lambda/admin/handler.ts`**: Added 47 route entries (~220 lines), handler now routes 105 dynamic imports
+
+## [7.43.1] - 2026-02-08
+
+### API Wiring & Code Quality Remediation — Complete Service Layer Audit
+
+Full architectural audit verified all 11 frontend apps have zero direct database access. Identified and fixed 4 broken API Gateway wiring gaps and 3 code quality issues.
+
+#### W1: Curator API Gateway Wiring
+- **`admin-stack.ts`**: Added Curator Lambda function + API Gateway proxy routes at `/admin/curator/{proxy+}` (GET/POST/PUT/DELETE)
+- Curator Lambda handler (`lambda/curator/index.ts`) was already functional — now reachable via API Gateway
+
+#### W2: Cato Trainer Lambda + API Gateway
+- **`lambda/admin/cato-trainer.ts`**: New handler with 18 endpoints — libraries, documents, spaces, search, chat, digest, configuration
+- **`admin-stack.ts`**: Added Cato Trainer Lambda function + API Gateway proxy routes at `/admin/cato-trainer/{proxy+}`
+
+#### W3: Think Tank Tenant Admin Lambda + API Gateway
+- **`lambda/thinktank-tenant-admin/handler.ts`**: New handler with 16 endpoints — dashboard stats/trends/activity/alerts, users CRUD, settings, security, collaboration, cartridges, reports
+- **`api-stack.ts`**: Added routes at `/api/v1/tenant/{proxy+}` and `/api/tenant-admin/{proxy+}` with Cognito auth
+
+#### W4: Public Status Endpoint
+- **`lambda/public/status.ts`**: New handler returning service health, uptime, incidents — 7 service checks
+- **`api-stack.ts`**: Added unauthenticated route at `/api/public/status` with API key auth
+
+#### D1: Fix `|| successResponse` Anti-Pattern (11 instances)
+- **`admin/handler.ts`**: All 11 `|| successResponse({ message: 'Not found' })` instances replaced with `await` + `notFoundResponse()` — was masking void handlers with 200 OK instead of proper 404
+
+#### D2: Standardize Handler Delegation
+- **`admin/handler.ts`**: Added `invokeLegacy()` helper function for consistent Pattern B (Context/Callback) delegation with automatic 404 fallback
+
+#### D3: Library Registry Neural Search
+- **`admin/library-registry.ts`**: Added `POST /admin/libraries/search` endpoint with multi-signal scoring (name match, description, tags, domains, use-cases, trigram fuzzy matching)
+
+## [7.43.0] - 2026-02-08
+
+### System Audit Remediation — Comprehensive Platform Hardening
+
+Full system audit covering service layer/APIs, registry patterns, in-memory data persistence, and chat memory storage/retrieval/retention. All findings remediated.
+
+#### Re-Audit Follow-Up Fixes
+- **Context Assembler (4A)**: Auto-loads conversation history from UDS via `conversationHistoryLoader` when `conversationId` is provided but `conversationHistory` is not — eliminates ad-hoc history loading by callers
+- **AXIOM Events (3A)**: Added DB persistence to `axiom-events.service.ts` (same pattern as delight-events) — events survive Lambda cold starts, heartbeats excluded
+- **Migration V2026_02_07_020**: `axiom_event_history` table with RLS, 24-hour auto-cleanup, session-scoped indexes
+- **Doc Fix (4B)**: `retention_days` column range updated from 7-730 to 7-3650 days
+
+#### Retention Default: 30 → 180 Days (6 Months)
+- **`compliance.service.ts`**: COALESCE default changed from 30 to 180 days
+- **`integration.service.ts`**: DEFAULT_RETENTION_DAYS changed from 90 to 180
+- **`tier-coordinator.service.ts`**: DEFAULT_WARM_TO_COLD_DAYS changed from 90 to 180
+- **Migration V2026_02_07_019**: ALTER tenants SET DEFAULT 180, auto-update tenants on old default
+
+#### In-Memory Data Persistence (Audit 3)
+- **Rate Limiter (3A)**: Added production safety warning when InMemoryStore fallback is used; loads tenant rate limit overrides from DB on cold start
+- **Delight Events (3C)**: Events now persisted to `delight_event_history` table; replayed from DB on cold-start subscribe
+- **Consciousness Engine (3D)**: Added `snapshotTransientState()` and `restoreTransientState()` for cold-start resilience using `consciousness_state_snapshots` table
+- **Drift Telemetry (3B)**: Confirmed existing DB fallback when ring buffer < 10 entries ✓
+- **Neural Schema Registry (3E)**: Confirmed existing DB load on `initialize()` ✓
+- **Inference Cache (3F)**: Confirmed existing L1 (in-memory) + L2 (Aurora) architecture ✓
+- **Logging Registry (3G)**: Confirmed existing deferred DB flush mechanism ✓
+- **Brain Config (3H), Configuration Service (3I)**: Short-TTL caches that self-heal on miss ✓
+
+#### Handler Fixes (Audit 1)
+- **Duplicate cato block removed**: Merged two `if (pathParts[1] === 'cato')` blocks in `handler.ts` into one unified block with catch-all
+- **New routes added**: `tenant-settings` and `conversation-export` delegated to dedicated handlers
+
+#### Conversation Export Service (R6)
+- **`uds/conversation-export.service.ts`**: Full conversation export with decrypted messages, JSON/Markdown formats, S3 upload, presigned download URLs
+- **`conversation_exports` table**: Tracks export requests with status, S3 location, file size, expiry
+- **Admin API**: POST to request export, GET to check status/list exports
+- **API Gateway**: 3 routes under `/admin/conversation-export/*`
+
+#### Conversation History Loader (4B)
+- **`conversation-history-loader.service.ts`**: Standard entry point for loading chat history for context assembly
+- Supports windowed loading, token-aware truncation, cross-session continuity, cross-model continuity
+- Replaces ad-hoc history loading by individual callers
+
+#### Unified Tenant Settings (R5)
+- **`tenant_settings` table**: Unified profile with retention, storage tiers, AI config, feature flags, compliance settings
+- **`lambda/admin/tenant-settings.ts`**: CRUD API with GET/PUT/POST/reset operations
+- **Admin Dashboard page** (`/tenant-settings`): Tabbed UI with Retention, Storage, AI, Features, and Compliance sections
+- **Auto-creation trigger**: New tenants automatically get default settings
+- **Backward compatibility**: Updates sync `retention_days` on `tenants` table
+- **API Gateway**: 4 routes under `/admin/tenant-settings/*`
+
+#### API Documentation Policy (R7)
+- **`.windsurf/workflows/api-docs-sync.md`**: Mandatory policy requiring `docs/12-API-REFERENCE.md` updates when admin routes change
+- Lists all 40+ route domains for backfill tracking
+
+#### Database Migration (V2026_02_07_019)
+- **Tables**: `tenant_settings`, `conversation_exports`, `consciousness_state_snapshots`, `delight_event_history`
+- **Enums**: `conversation_export_format`, `conversation_export_status`
+- **Functions**: `auto_create_tenant_settings()`, `cleanup_old_consciousness_snapshots()`
+- **Triggers**: `trg_auto_create_tenant_settings` (auto-create settings on new tenant)
+- **RLS**: Tenant isolation on all new tables
+
+#### Files Created (6)
+| File | Purpose |
+|------|---------|
+| `migrations/V2026_02_07_019__system_audit_remediation.sql` | 4 tables, 2 enums, 2 functions, 1 trigger |
+| `lambda/shared/services/uds/conversation-export.service.ts` | Conversation export with JSON/Markdown formats |
+| `lambda/shared/services/conversation-history-loader.service.ts` | Standard history loader for context assembly |
+| `lambda/admin/tenant-settings.ts` | Tenant settings CRUD API |
+| `admin-dashboard/app/(dashboard)/tenant-settings/page.tsx` | Tenant settings admin UI |
+| `.windsurf/workflows/api-docs-sync.md` | API docs sync enforcement policy |
+
+#### Files Modified (9)
+| File | Change |
+|------|--------|
+| `lambda/shared/services/uep/compliance.service.ts` | Default retention 30→180 days |
+| `lambda/shared/services/uep/integration.service.ts` | DEFAULT_RETENTION_DAYS 90→180 |
+| `lambda/shared/services/uds/tier-coordinator.service.ts` | DEFAULT_WARM_TO_COLD_DAYS 90→180 |
+| `lambda/shared/services/rate-limiter.service.ts` | Production warning + DB-backed overrides |
+| `lambda/shared/services/delight-events.service.ts` | DB persistence for event history |
+| `lambda/shared/services/consciousness-engine.service.ts` | Transient state snapshot/restore |
+| `lambda/admin/handler.ts` | Merged cato blocks, added tenant-settings + conversation-export routes |
+| `lib/stacks/admin-stack.ts` | 7 new API Gateway routes |
+| `admin-dashboard/components/layout/sidebar.tsx` | Tenant Settings + Conversation Export entries |
+
+## [7.42.0] - 2026-02-08
+
+### Data Lake Offload — Zero-Database-Write Event Pipeline
+
+Eliminates ~30-100M daily PostgreSQL INSERT operations by routing all log, audit, telemetry, and billing event data through Kinesis Data Firehose → S3 Parquet → Athena instead of direct database writes. Includes cost-aware Glacier deletion, compliance-driven retention enforcement, and a strong enforcement policy to prevent future database logging.
+
+#### Architecture
+- **Event Firehose Service**: Fire-and-forget async ingestion with in-memory buffering, automatic schema enrichment, per-data-type routing to separate Firehose delivery streams, and SQS dead-letter queue for failed records
+- **Data Location Index**: Fast "phone book" lookup for S3/Glacier objects by tenant + type + time range (~200 bytes per row, sub-second queries)
+- **Glacier Lifecycle Service**: Cost-aware deletion queue that respects minimum storage periods (90d Glacier, 180d Deep Archive) to avoid early-deletion charges. Calculates cost savings of waiting vs immediate deletion
+- **Lifecycle Manager**: Hourly Lambda that discovers new Firehose-delivered partitions, transitions objects between storage tiers (hot → warm → cold → glacier → deep_archive), expires data past retention, processes Glacier deletion queue, applies S3 Object Lock for compliance data, and updates Glue partitions
+- **Retention Reconciler**: SQS-triggered service that re-evaluates all data when compliance licenses change (e.g., tenant enables HIPAA), extends/shortens retention, applies/removes immutability, and cancels pending Glacier deletions
+- **Data Lake Query Service**: Athena-based query layer replacing PostgreSQL SELECTs for historical data with automatic partition pruning by tenant_id + date range
+
+#### Storage Tiers
+| Tier | S3 Class | Age | Use Case |
+|------|----------|-----|----------|
+| Hot | S3 IT Frequent Access | 0-30d | Real-time access |
+| Warm | S3 IT Infrequent Access | 30-90d | Active queries |
+| Cold | Glacier Instant Retrieval | 90d-7yr | Archived data |
+| Glacier | Glacier Flexible Retrieval | 7yr+ | Deep archive |
+| Deep Archive | Glacier Deep Archive | Regulatory | Compliance hold |
+
+#### Database Migration (V2026_02_07_018)
+- **Tables**: `data_type_registry` (21 seeded types), `tenant_data_retention`, `data_location_index`, `glacier_deletion_queue`, `data_lake_sync_state`, `retention_reconciliation_log`
+- **Enums**: `data_storage_tier`, `data_lake_event_type`, `glacier_delete_status`
+- **Functions**: `resolve_data_retention()`, `calculate_glacier_early_delete_cost()`, `find_data_locations()`
+- **Trigger**: `enforce_retention_compliance_minimum` (prevents tenant overrides below compliance minimums)
+- **RLS**: Tenant isolation on `tenant_data_retention`, `data_location_index`, `glacier_deletion_queue`, `retention_reconciliation_log`
+
+#### CDK Stack: DataLakeStack
+- S3 Data Lake Bucket with Intelligent-Tiering, Object Lock (prod), lifecycle rules
+- S3 Athena Results Bucket (7-day expiry)
+- 12 Kinesis Data Firehose delivery streams (4 dedicated high-volume + 8 grouped) with dynamic partitioning, Parquet format conversion, SNAPPY compression
+- Glue Database + daily Crawler
+- Athena Workgroup with per-query cost limits (10GB prod, 1GB dev)
+- SQS Dead-Letter Queue + Retention Reconciler Queue
+- 3 Lambda functions: Lifecycle Manager (hourly), Retention Reconciler (SQS), DLQ Processor
+- KMS encryption key with rotation
+- IAM managed policy for Firehose write access
+- CloudWatch alarms for lifecycle errors and DLQ accumulation
+
+#### Enforcement Policy
+- **`.windsurf/workflows/no-database-logging.md`**: Mandatory policy prohibiting direct database writes for all log/audit/telemetry/billing event data. Lists forbidden INSERT patterns, required Event Firehose patterns, detection criteria, exceptions for OLTP data, and migration guide.
+
+#### Admin Dashboard
+- **Data Lake page** (`/data-lake`): Storage tier breakdown with visual distribution bar, registered data types table, Glacier deletion queue with cost analysis, Athena query interface with SQL editor
+- **Sidebar**: "Data Lake" entry added under Security section
+
+#### Files Created (8)
+| File | Purpose |
+|------|---------|
+| `migrations/V2026_02_07_018__data_lake_offload.sql` | 6 tables, 3 enums, 3 functions, 1 trigger, 21 seed types |
+| `lambda/shared/services/event-firehose.service.ts` | Async Firehose ingestion with buffering, DLQ, convenience emitters |
+| `lambda/shared/services/data-location-index.service.ts` | Fast S3/Glacier lookup index service |
+| `lambda/shared/services/glacier-lifecycle.service.ts` | Cost-aware Glacier deletion queue |
+| `lambda/shared/services/data-lake-lifecycle-manager.service.ts` | Hourly lifecycle orchestrator |
+| `lambda/shared/services/retention-reconciler.service.ts` | Compliance-driven retention reconciliation |
+| `lambda/shared/services/data-lake-query.service.ts` | Athena query layer |
+| `lib/stacks/data-lake-stack.ts` | CDK stack: Firehose, S3, Glue, Athena, Lambda, IAM, KMS |
+
+#### Files Modified (2)
+| File | Change |
+|------|--------|
+| `.windsurf/workflows/no-database-logging.md` | New enforcement policy |
+| `admin-dashboard/components/layout/sidebar.tsx` | Added Data Lake sidebar entry |
+| `admin-dashboard/app/(dashboard)/data-lake/page.tsx` | Data Lake admin page |
+
+## [7.41.2] - 2026-02-08
+
+### Dedicated Lockout Policy Page
+
+The tiered lockout durations (30 min → 2 hr → 24 hr → permanent) are now viewable and editable on a dedicated admin page linked from the sidebar.
+
+#### Lockout Policy Page (`/lockout-policy`)
+- **Progressive Durations**: Editable inputs for 1st, 2nd, 3rd offense durations (in minutes) and permanent-after threshold
+- **Visual Timeline**: Color-coded escalation bar showing the lockout progression at a glance
+- **Offense Windows**: Configurable sliding windows for offense counting (default 7d) and permanent threshold (default 30d)
+- **Auto-Unlock Toggle**: Enable/disable automatic expiry of timed lockouts
+- **Notifications**: Toggle user notification on lock and admin SENTINEL alert on permanent lock
+- **Self-Service Unlock**: Enable/disable user self-service unlock with configurable max offense and verification method (email, MFA, or both)
+- **Compliance Reference**: NIST SP 800-63B, OWASP ASVS V2.2.1, CIS Control 6.2
+- **Sticky Save Bar**: Unsaved changes shown with discard/save buttons
+- **Status Summary**: Cards showing currently locked count, auto-unlock status, and permanent threshold
+
+#### Navigation
+- **Sidebar**: "Lockout Policy" entry added under Security section (between Intrusion Detection and Security)
+- **Locked Accounts tab**: Read-only policy card replaced with compact summary + "View & Edit Policy" button linking to the dedicated page
+- **Lockout Policy page**: "Intrusion Detection" button links back to the RIDPS page
+
+#### Files Created (1)
+| File | Purpose |
+|------|---------|
+| `admin-dashboard/app/(dashboard)/lockout-policy/page.tsx` | Full lockout policy editor page |
+
+#### Files Modified (2)
+| File | Change |
+|------|--------|
+| `admin-dashboard/components/layout/sidebar.tsx` | Added Lockout Policy sidebar entry |
+| `admin-dashboard/app/(dashboard)/intrusion-detection/page.tsx` | Replaced read-only policy card with linked summary |
+
+## [7.41.1] - 2026-02-08
+
+### Lockout-to-Detection Cross-Linking
+
+Links locked accounts to the detection events, incidents, and lockout history that caused them so admins can review full context before making unlock decisions.
+
+#### Locked Accounts Tab Enhancements
+- **Expandable lockout history**: Click "Show Lockout History" on any locked account to see every past lockout with detector name, severity, source IP, incident ID, duration, and resolution status
+- **Source IP links**: Clickable IP addresses in lockout history jump to the Events tab filtered by that IP
+- **Incident links**: Incident IDs in lockout history link to the Incidents tab for related incident review
+- **"View Events" button**: Each locked account has a button that jumps to the Events tab pre-filtered to show only that user's detection events
+- **"Incidents" button**: Quick link from each locked account to the Incidents tab
+
+#### Events Tab Enhancements
+- **Filter bar**: Active filters shown with blue badge bar (user ID, source IP) with one-click Clear Filter
+- **Clickable IPs**: Source IPs in event rows are clickable to filter events by that IP
+- **Clickable User IDs**: User IDs in event rows are clickable to filter events by that user
+- **Cross-tab filter**: Filters set from other tabs (Locked Accounts, lockout history) are preserved when switching
+
+#### Files Modified
+| File | Change |
+|------|--------|
+| `admin-dashboard/intrusion-detection/page.tsx` | Expandable lockout history, Events tab filtering, cross-tab navigation |
+| `lambda/shared/services/threat-response.service.ts` | Added `sourceIp` and `incidentId` to `getLockoutHistory()` response |
+
+## [7.41.0] - 2026-02-08
+
+### Account Lockout Resolution System
+
+Implements a progressive, automated account lockout system with full admin override capability. Lockouts are duration-based with escalation, auto-unlock on expiry, and manual override at any time.
+
+#### Progressive Lockout Policy (NIST SP 800-63B §5.2.8)
+| Offense | Duration | Resolution |
+|---------|----------|------------|
+| 1st | 30 minutes | Auto-unlock |
+| 2nd (within 7d) | 2 hours | Auto-unlock |
+| 3rd (within 7d) | 24 hours | Auto-unlock |
+| 4th+ (within 30d) | Permanent | Admin review required |
+
+All durations are configurable per-tenant via the `lockout_policy` table.
+
+#### Automated Resolution
+- **Analyzer Lambda** calls `auto_unlock_expired_accounts()` every cleanup cycle (1-minute correlation, hourly full)
+- Expired timed lockouts automatically cleared from `users` table and history marked `auto_unlocked`
+- CloudWatch metrics: `LockedAccounts` and `PermanentAccountLocks` published every 5 minutes
+
+#### Manual Override (Admin Dashboard)
+- **Locked Accounts tab**: Lists all currently locked accounts with PERMANENT/TIMED badges, offense count, lock reason, and one-click Unlock button
+- **Lockout Policy card**: Displays current progressive durations and policy settings
+- Admin can unlock any account at any time, regardless of lockout type
+- All unlock actions are audit-logged with admin ID and resolution notes
+
+#### Database (Migration V2026_02_07_017)
+| Object | Purpose |
+|--------|---------|
+| `users` ALTER | +7 columns: `account_locked`, `account_locked_at`, `account_locked_reason`, `account_locked_until`, `account_lock_count`, `account_lock_permanent`, `last_lockout_id` |
+| `account_lockout_history` | Full lockout event history with reason type, offense number, duration, resolution tracking |
+| `lockout_policy` | Per-tenant configurable lockout durations and policy settings |
+| `lockout_reason_type` ENUM | `brute_force`, `credential_stuffing`, `impossible_travel`, `session_hijack`, `account_takeover`, `privilege_escalation`, `cross_tenant_probe`, `admin_manual`, `policy_violation`, `other` |
+| `lockout_status` ENUM | `active`, `auto_unlocked`, `admin_unlocked`, `self_service_unlocked`, `expired` |
+| `calculate_lockout_duration()` | DB function: returns progressive duration based on offense history |
+| `auto_unlock_expired_accounts()` | DB function: bulk-unlocks expired timed lockouts |
+
+#### New API Endpoints
+| Method | Path | Purpose |
+|--------|------|---------|
+| GET | `/admin/intrusion-detection/locked-accounts` | List locked accounts |
+| GET | `/admin/intrusion-detection/locked-accounts/{userId}/history` | Lockout history for user |
+| GET | `/admin/intrusion-detection/lockout-policy` | Get lockout policy |
+| PUT | `/admin/intrusion-detection/lockout-policy` | Update lockout policy |
+
+#### Files Created (1)
+| File | Purpose |
+|------|---------|
+| `migrations/V2026_02_07_017__account_lockout_resolution.sql` | Schema, functions, seed data |
+
+#### Files Modified (5)
+| File | Change |
+|------|--------|
+| `lambda/shared/services/threat-response.service.ts` | Progressive lockout logic, `getLockedAccounts()`, `getLockoutHistory()`, `mapDetectorToReasonType()` |
+| `lambda/admin/intrusion-detection.ts` | +4 endpoints for locked accounts and lockout policy |
+| `lambda/intrusion-detection/analyzer.ts` | Auto-unlock sweep in cleanup + 2 new CloudWatch metrics |
+| `lib/stacks/admin-stack.ts` | 4 new API Gateway routes |
+| `admin-dashboard/intrusion-detection/page.tsx` | Locked Accounts tab with policy display |
+
+## [7.40.1] - 2026-02-08
+
+### RIDPS: Manual Mitigation Controls & Service Integration
+
+#### Manual Threat Mitigation (Admin Dashboard)
+- **Incident Management**: Investigate / Mitigate / Resolve / False Positive buttons on each incident with inline IP block from incident source IPs
+- **Session Kill**: Manual session revocation by session ID with reason tracking
+- **Account Lock/Unlock**: Manual account lockout and restoration with audit logging
+- **Response Actions Tab**: New dedicated tab in the intrusion detection page for manual response operations
+
+#### Audit Trail Integration
+- Extended `AuditAction` type with RIDPS actions: `ip_blocked`, `ip_unblocked`, `session_killed`, `account_locked`, `account_unlocked`, `incident_updated`, `intrusion_detected`, `detector_toggled`, `threat_intel_added`, `threat_intel_removed`
+- Extended `AuditResource` type with: `intrusion_event`, `intrusion_incident`, `ip_blocklist`, `user_session`, `threat_indicator`, `detection_rule`
+- All admin RIDPS actions now emit audit trail entries via `logAudit()`
+
+#### Security Event Log Integration
+- RIDPS detections now feed into `security-protection.service.ts` → `logSecurityEvent()` for security audit hotspot analysis
+- RIDPS detections emit `intrusion_detected` audit entries for the audit trail
+- Security audit service can now query `security_events_log` for intrusion event hotspots
+
+#### New API Endpoints
+| Method | Path | Purpose |
+|--------|------|---------|
+| POST | `/admin/intrusion-detection/sessions/kill` | Kill session manually |
+| POST | `/admin/intrusion-detection/accounts/lock` | Lock user account |
+| POST | `/admin/intrusion-detection/accounts/unlock` | Unlock user account |
+
+#### CDK Infrastructure
+- 3 new API Gateway routes for session/account management endpoints
+
+#### Files Modified
+| File | Change |
+|------|--------|
+| `lambda/admin/intrusion-detection.ts` | +3 endpoints, audit logging on all actions |
+| `lambda/shared/services/intrusion-detection.service.ts` | Security event log + audit trail integration |
+| `lambda/shared/services/threat-response.service.ts` | Public manual session kill + account lock methods |
+| `lambda/shared/services/audit.ts` | RIDPS action/resource types |
+| `admin-dashboard/intrusion-detection/page.tsx` | Incident management UI, Response Actions tab |
+| `lib/stacks/admin-stack.ts` | 3 new API Gateway routes |
+
+## [7.40.0] - 2026-02-08
+
+### Real-Time Intrusion Detection & Prevention System (RIDPS)
+
+Implements a comprehensive, standards-based intrusion detection and prevention system with 14 MITRE ATT&CK-mapped detectors, automated threat response, and full integration with existing logging and alerting infrastructure.
+
+#### Standards Compliance
+| Standard | Coverage |
+|----------|----------|
+| **NIST SP 800-94** | IDPS architecture: signature + anomaly + stateful protocol analysis |
+| **NIST CSF 2.0** | DE.CM (continuous monitoring), DE.AE (adverse event analysis) |
+| **MITRE ATT&CK Cloud** | 11 cloud/SaaS techniques mapped to detectors |
+| **OWASP ASVS 4.0** | V7 (Error Handling & Logging), V11 (Business Logic) |
+| **OWASP LLM Top 10** | LLM01 (Prompt Injection) — AI-specific detector |
+| **CIS Controls v8** | Control 8 (Audit Log Management), Control 13 (Network Monitoring) |
+| **SOC 2 CC7.2/CC7.3** | System Monitoring & Anomaly Detection |
+| **ISO 27001 A.8.15/16** | Logging & Monitoring Activities |
+
+#### RADIANT-Specific Supplements
+- **AI Model Abuse Detection**: Prompt injection surge + model cost anomaly (unique to AI SaaS)
+- **Tenant Isolation Breach Detection**: Cross-tenant probe detector (unique to multi-tenant)
+- **Spend Governor Integration**: Cost-based anomaly detection for compromised API keys
+
+#### 14 Detectors (MITRE-Mapped)
+| # | Detector | MITRE | Method |
+|---|----------|-------|--------|
+| 1 | Brute Force Auth | T1110.001 | Sliding window auth failures |
+| 2 | Credential Stuffing | T1110.004 | Unique username volume + high failure rate |
+| 3 | Impossible Travel | T1078.004 | Geo-distance / time impossibility |
+| 4 | Session Hijacking | T1550.004 | IP/UA/country change mid-session |
+| 5 | Cross-Tenant Probe | T1078 | Foreign tenant ID references |
+| 6 | API Enumeration | T1087.004 | Sequential ID probing, path scanning |
+| 7 | SQL/NoSQL Injection | T1190 | Signature match on payloads |
+| 8 | Excessive Error Rate | T1190 | Source-level 4xx/5xx analysis |
+| 9 | Data Exfiltration | T1530 | Bulk download / large response volume |
+| 10 | Privilege Escalation | T1548 | Role change + admin API access pattern |
+| 11 | Prompt Injection Surge | — | CATO safety block correlation |
+| 12 | Model Cost Anomaly | — | Token usage > 3σ from baseline |
+| 13 | Unusual Access (UEBA) | T1078 | Behavioral deviation from user baseline |
+| 14 | Account Takeover | T1078.001 | Rapid account-modifying action sequence |
+
+#### Three-Layer Architecture
+- **Layer 1 (Perimeter)**: AWS WAF managed rules + IP rate limiting (existing, enhanced)
+- **Layer 2 (Application)**: ThreatDetectionEngine with 14 detectors, in-memory sliding windows, request middleware (<5ms overhead)
+- **Layer 3 (Response)**: Automated IP banning, session termination, account lockout, SENTINEL escalation, admin alerts
+
+#### New Database Objects (Migration V2026_02_07_016)
+| Table | Purpose |
+|-------|---------|
+| `intrusion_events` | Partitioned event log (monthly) with RLS |
+| `ip_blocklist` | Active IP blocks with TTL and permanent escalation |
+| `threat_indicators` | IOC database for IP/pattern/UA reputation |
+| `detection_rules` | Per-detector configurable thresholds and actions |
+| `intrusion_incidents` | Correlated security incidents with lifecycle |
+| `user_access_baselines` | UEBA behavioral baselines per user |
+| `ridps_config` | Global RIDPS configuration (singleton) |
+
+#### New Files (10)
+| File | Purpose |
+|------|---------|
+| `migrations/V2026_02_07_016__intrusion_detection.sql` | 7 tables, 3 functions, 14 seed rules |
+| `lambda/shared/services/intrusion-detection.service.ts` | Core ThreatDetectionEngine |
+| `lambda/shared/services/intrusion-detectors.ts` | 14 detector implementations |
+| `lambda/shared/services/threat-response.service.ts` | Automated response actions |
+| `lambda/shared/services/threat-intelligence.service.ts` | IOC management + IP reputation |
+| `lambda/shared/middleware/intrusion-detection.ts` | Request middleware (<5ms) |
+| `lambda/intrusion-detection/analyzer.ts` | EventBridge: correlation + UEBA + cleanup |
+| `lambda/admin/intrusion-detection.ts` | Admin API handler (11 routes) |
+| `admin-dashboard/app/(dashboard)/intrusion-detection/page.tsx` | Admin UI |
+| `swift-deployer/Views/IntrusionDetectionView.swift` | Deployer config UI |
+
+#### Modified Files (4)
+| File | Change |
+|------|--------|
+| `lambda/admin/handler.ts` | Added intrusion-detection route delegation |
+| `admin-dashboard/components/layout/sidebar.tsx` | Added Intrusion Detection sidebar entry |
+| `swift-deployer/AppState.swift` | Added intrusionDetection NavigationTab |
+| `swift-deployer/Views/MainView_macOS.swift` | Added IntrusionDetectionView routing |
+
+#### CDK Infrastructure Added
+- 1 EventBridge-scheduled Lambda (RIDPS Analyzer: correlation @ 1min, full @ 1hr)
+- CloudWatch metrics namespace: `RADIANT/IntrusionDetection` (6 metrics)
+- API Gateway: 11 routes under `/admin/intrusion-detection/*`
+- IAM: cloudwatch:PutMetricData for RIDPS namespace
+
+---
+
 ## [7.39.0] - 2026-02-08
 
 ### Spend Governor — Two-Layer Budget Control System

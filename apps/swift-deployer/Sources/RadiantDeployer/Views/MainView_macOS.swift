@@ -518,6 +518,8 @@ struct DetailContentView: View {
             DriftMonitorView()
         case .spendGovernor:
             SpendGovernorView()
+        case .intrusionDetection:
+            IntrusionDetectionView()
         case .domainURLs:
             SettingsView() // Domain URLs configured in Settings
         case .curator:

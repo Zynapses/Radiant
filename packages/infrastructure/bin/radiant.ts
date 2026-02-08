@@ -17,6 +17,7 @@ import { BrainStack } from '../lib/stacks/brain-stack';
 import { ThinkTankAuthStack } from '../lib/stacks/thinktank-auth-stack';
 import { ThinkTankAdminApiStack } from '../lib/stacks/thinktank-admin-api-stack';
 import { LiteLLMGatewayStack } from '../lib/stacks/litellm-gateway-stack';
+import { DataLakeStack } from '../lib/stacks/data-lake-stack';
 import { 
   RADIANT_VERSION, 
   getTierConfig,
@@ -403,6 +404,23 @@ const catoGenesisStack = new CatoGenesisStack(app, `${stackPrefix}-cato-genesis`
   description: `RADIANT Cato Genesis Monitoring - ${appId} ${environment}`,
 });
 catoGenesisStack.addDependency(foundationStack);
+
+// ============================================================================
+// DATA LAKE STACK (Phase 3 - Zero-DB-Write Event Pipeline v7.42.0)
+// ============================================================================
+
+// 14. Data Lake Stack (Firehose, S3, Glue, Athena, Lifecycle Lambdas)
+const dataLakeStack = new DataLakeStack(app, `${stackPrefix}-data-lake`, {
+  env,
+  environment,
+  databaseSecretArn: dataStack.cluster.secret?.secretArn || '',
+  databaseClusterArn: dataStack.cluster.clusterArn,
+  alarmTopicArn: app.node.tryGetContext('alertTopicArn'),
+  tags,
+  description: `RADIANT Data Lake - ${appId} ${environment}`,
+});
+dataLakeStack.addDependency(dataStack);
+dataLakeStack.addDependency(securityStack);
 
 // ============================================================================
 // CATO INFRASTRUCTURE TIER TRANSITION (Phase 3)
