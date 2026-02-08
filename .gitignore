@@ -64,6 +64,41 @@ temp/
 *.tmp
 
 # Large zip archives
+*.zip
 radiant-source-bundle.zip
 radiant-source-code.zip
 radiant-source-docs.zip
+
+# ═══════════════════════════════════════════════════════════════════════════
+# LARGE / BINARY FILES - NEVER COMMIT
+# ═══════════════════════════════════════════════════════════════════════════
+
+# Compiled macOS app bundles
+*.app/
+*.app
+
+# PDF files (generated — use scripts to rebuild)
+*.pdf
+
+# Generated HTML docs
+docs/html/
+docs/**/*.html
+*.html
+!apps/**/*.html
+
+# Generated complete documentation (rebuild with assemble-complete-documentation.py)
+docs/publications/
+
+# Documentation archives (keep locally, not in git)
+docs/archive/
+
+# PDF directories
+docs/pdf/
+docs/pdf-essential/
+docs/pdf-latest/
+
+# Doc exports
+docs/exports/
+
+# Exported bundles
+radiant-gemini-export.zip
