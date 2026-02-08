@@ -162,7 +162,8 @@ export class ApiStack extends cdk.Stack {
     });
 
     // API Resources
-    const v2 = this.api.root.addResource('api').addResource('v2');
+    const apiResource = this.api.root.addResource('api');
+    const v2 = apiResource.addResource('v2');
 
     // Health check (no auth)
     const health = v2.addResource('health');
@@ -1926,7 +1927,7 @@ export class ApiStack extends cdk.Stack {
     const tenantAdminIntegration = new apigateway.LambdaIntegration(tenantAdminLambda);
 
     // /api/v1/tenant/{proxy+} — dashboard, cartridges
-    const v1 = this.api.root.addResource('api').addResource('v1');
+    const v1 = apiResource.addResource('v1');
     const tenant = v1.addResource('tenant');
     tenant.addProxy({
       defaultIntegration: tenantAdminIntegration,

@@ -643,7 +643,7 @@ export class DataLakeStack extends cdk.Stack {
     for (const [key, stream] of firehoseStreams) {
       new cdk.CfnOutput(this, `FirehoseArn-${key}`, {
         value: stream.attrArn,
-        exportName: `radiant-firehose-${key}-arn-${env}`,
+        exportName: `radiant-firehose-${key.replace(/_/g, '-')}-arn-${env}`,
       });
     }
   }
