@@ -170,9 +170,9 @@ async function getDashboardStats(tenantId: string): Promise<APIGatewayProxyResul
   ]);
 
   return createResponse({
-    total_users: parseInt(userCount.rows[0]?.count || '0'),
-    active_conversations: parseInt(conversationCount.rows[0]?.count || '0'),
-    total_messages: parseInt(messageCount.rows[0]?.count || '0'),
+    total_users: parseInt(String(userCount.rows[0]?.count ?? '0')),
+    active_conversations: parseInt(String(conversationCount.rows[0]?.count ?? '0')),
+    total_messages: parseInt(String(messageCount.rows[0]?.count ?? '0')),
     ai_requests_today: 0,
     storage_used_mb: 0,
     monthly_cost_usd: 0,
@@ -216,7 +216,7 @@ async function getAlerts(tenantId: string): Promise<APIGatewayProxyResult> {
      WHERE c.tenant_id = $1 AND m.created_at > NOW() - INTERVAL '1 hour'`,
     [tenantId]
   );
-  const hourlyMessages = parseInt(usageResult.rows[0]?.count || '0');
+  const hourlyMessages = parseInt(String(usageResult.rows[0]?.count ?? '0'));
   if (hourlyMessages > 1000) {
     alerts.push({
       id: randomUUID(),

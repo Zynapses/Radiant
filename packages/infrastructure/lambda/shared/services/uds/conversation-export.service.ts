@@ -23,7 +23,7 @@ import { udsUploadService } from './upload.service';
 
 const logger = createRegisteredLogger({
   serviceName: 'uds/conversation-export',
-  category: 'platform',
+  category: 'application',
   sourceType: 'application',
 });
 

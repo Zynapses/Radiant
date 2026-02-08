@@ -881,9 +881,9 @@ Return null if expertise cannot be determined.`;
     }
   }
 
-  private async invokeModel(prompt: string): Promise<string> {
+  private async invokeModel(prompt: string, tenantId?: string): Promise<string> {
     const response = await modelRouterService.invoke({
-      tenantId,
+      tenantId: tenantId || 'system',
       modelId: 'anthropic/claude-3-haiku',
       messages: [{ role: 'user', content: prompt }],
       maxTokens: 2048,

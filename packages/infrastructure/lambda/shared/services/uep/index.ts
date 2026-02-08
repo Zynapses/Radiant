@@ -69,7 +69,6 @@ export type {
   SignatureResult,
   VerificationResult,
   EncryptedPayload,
-  MLSGroupConfig,
   MLSGroupMember,
 } from './security.service';
 

@@ -297,9 +297,10 @@ async function sendSentinelAlert(
 ): Promise<void> {
   try {
     // Use SENTINEL notifier if available
-    const { sentinelNotifierService } = await import('../shared/services/sentinel-notifier.service');
+    const { SentinelNotifierService } = await import('../shared/services/sentinel-notifier.service');
+    const notifier = new SentinelNotifierService();
 
-    await sentinelNotifierService.notify({
+    await notifier.notify({
       id: `spend-${alertType}-${tenantId}-${Date.now()}`,
       title: alertType === 'spend_suspended'
         ? 'AI Models Suspended — Budget Exceeded'
@@ -316,7 +317,7 @@ async function sendSentinelAlert(
         percentUsed: check.percentUsed,
       },
       timestamp: new Date().toISOString(),
-    } as Parameters<typeof sentinelNotifierService.notify>[0]);
+    } as any);
   } catch (error) {
     logger.warn('Failed to send SENTINEL alert, falling back to audit log', {
       tenantId,
@@ -328,9 +329,10 @@ async function sendSentinelAlert(
 
 async function sendInstanceSentinelAlert(alertType: string, message: string): Promise<void> {
   try {
-    const { sentinelNotifierService } = await import('../shared/services/sentinel-notifier.service');
+    const { SentinelNotifierService } = await import('../shared/services/sentinel-notifier.service');
+    const notifier = new SentinelNotifierService();
 
-    await sentinelNotifierService.notify({
+    await notifier.notify({
       id: `spend-${alertType}-instance-${Date.now()}`,
       title: 'AWS Services FROZEN — Instance Budget Exceeded',
       description: message,
@@ -340,7 +342,7 @@ async function sendInstanceSentinelAlert(alertType: string, message: string): Pr
       tags: ['spend-governor', 'instance-freeze', alertType],
       metadata: {},
       timestamp: new Date().toISOString(),
-    } as Parameters<typeof sentinelNotifierService.notify>[0]);
+    } as any);
   } catch (error) {
     logger.error('Failed to send instance SENTINEL alert', {
       alertType,

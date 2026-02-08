@@ -182,8 +182,11 @@ This is for compliance purposes.`,
     warRoomDeliberations: event.warRoomDeliberations,
   };
 
-  // Use AI Helper for explanation generation
+  // Use AI Helper for explanation generation (dynamically imported)
   try {
+    const aiHelperModule = await import('../shared/services/sovereign-mesh/ai-helper.service').catch(() => null);
+    if (!aiHelperModule) return generateTemplateExplanation(event, tier);
+    const aiHelperService = (aiHelperModule as any).default || (aiHelperModule as any).aiHelperService || aiHelperModule;
     const result = await (aiHelperService as any).explain(
       {
         action: 'model_selection',

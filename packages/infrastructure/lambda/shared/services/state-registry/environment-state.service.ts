@@ -78,8 +78,8 @@ import type {
   CreateBackupRequest,
   CreateBackupResponse,
   ResourceHealth,
-  DEFAULT_PERSISTENT_DATA_ITEMS,
 } from '@radiant/shared';
+import { DEFAULT_PERSISTENT_DATA_ITEMS } from '@radiant/shared';
 
 // ============================================================================
 // Configuration

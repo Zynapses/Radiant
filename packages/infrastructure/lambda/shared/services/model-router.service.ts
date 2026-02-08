@@ -663,6 +663,7 @@ export class ModelRouterService {
       const errorMsg = primaryError instanceof Error ? primaryError.message : 'Unknown error';
       logger.warn(`Primary provider ${config.provider} failed for ${request.modelId}`, { error: primaryError });
       this.recordFailure(config.provider, errorMsg);
+    }
 
     // Try fallback providers
     const fallbackOrder = this.getFallbackOrder(config);
