@@ -880,9 +880,8 @@ class HeterogeneousConsensusService {
 
       logger.info('Consensus result persisted', { consensusId: result.consensusId });
     } catch (error) {
-      logger.error('Failed to persist consensus result', {
+      logger.error('Failed to persist consensus result', error, {
         consensusId: result.consensusId,
-        error: error instanceof Error ? error.message : 'unknown',
       });
     }
   }

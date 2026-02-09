@@ -8,6 +8,7 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { executeStatement, stringParam, longParam, doubleParam, boolParam } from '../shared/db/client';
 import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+import { agentRuntimeService } from '../shared/services/sovereign-mesh/agent-runtime.service';
 
 const logger = createRegisteredLogger({
   serviceName: 'admin/sovereign-mesh',

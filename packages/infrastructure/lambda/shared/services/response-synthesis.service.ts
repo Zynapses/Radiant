@@ -605,7 +605,8 @@ ${initialAssessment.improvements?.join('\n') || '- Being more accurate\n- Being 
   private async judgeResponses(
     prompt: string,
     responses: SynthesisModelResponse[],
-    judgeModel: string
+    judgeModel: string,
+    tenantId?: string
   ): Promise<{ bestResponse: SynthesisModelResponse; qualityScore: number; reasoning: string }> {
     const judgePrompt = `You are a judge evaluating AI responses. Pick the BEST response.
 
@@ -627,7 +628,7 @@ SCORE: [0.0-1.0 quality score]
 REASONING: [Brief explanation of why this response is best]`;
 
     const result = await modelRouterService.invoke({
-      tenantId: request.tenantId,
+      tenantId,
       modelId: judgeModel,
       messages: [{ role: 'user', content: judgePrompt }],
     });
@@ -671,7 +672,8 @@ Your synthesized response:`;
   private async assessQuality(
     prompt: string,
     response: string,
-    judgeModel: string
+    judgeModel: string,
+    tenantId?: string
   ): Promise<{ qualityScore: number; confidence: number; feedback: string; improvements?: string[] }> {
     const assessPrompt = `Assess the quality of this AI response.
 
@@ -692,7 +694,7 @@ FEEDBACK: [Brief feedback]
 IMPROVEMENTS: [Comma-separated list of specific improvements needed]`;
 
     const result = await modelRouterService.invoke({
-      tenantId: request.tenantId,
+      tenantId,
       modelId: judgeModel,
       messages: [{ role: 'user', content: assessPrompt }],
     });

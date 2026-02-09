@@ -407,7 +407,8 @@ class SpikingJellyService {
    */
   private async describeUnifiedPercept(
     streams: SpikeStream[],
-    synchrony: SynchronyAnalysis
+    synchrony: SynchronyAnalysis,
+    tenantId?: string
   ): Promise<string | null> {
     const streamDescriptions = streams
       .map(s => `- ${s.name} (${s.modality}): ${s.spikeTimes.length} spikes`)

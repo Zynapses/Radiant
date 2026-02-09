@@ -2,7 +2,7 @@
 
 **Training • Spaced Repetition • Adversarial Scenarios • Competency Mesh**
 
-*RADIANT v6.6.0 — Generated February 07, 2026*
+*RADIANT v7.46.0 — Updated February 08, 2026*
 
 ---
 
@@ -158,7 +158,7 @@ Click the **Mobot** button in the top bar to open the Knowledge Agent:
 | **Database Migration** | `packages/infrastructure/migrations/V2026_02_06_005__aurelius_dojo.sql` | 19 tables, 13 enums, 3 functions |
 | **CDK Stack** | `packages/infrastructure/lib/stacks/admin-stack.ts` | DojoFunction + proxy resource |
 
-**Note**: AI-dependent features (theme discovery, lesson generation, sparring question generation, scenario responses, dialectic responses, multimodal generation) require the Dojo AI pipeline Lambda to be deployed. Non-AI endpoints (CRUD, config, progress tracking) work immediately.
+**Note**: All AI-dependent features (theme discovery, lesson generation, sparring questions, scenario responses, dialectic responses, multimodal generation, mobot, competency extraction, Archytas suggestions) are implemented inline via `modelRouterService` using the tenant-configured AI model. The `invokeDojoLLM()` helper routes all calls through drift enforcement and spend governance.
 
 ---
 

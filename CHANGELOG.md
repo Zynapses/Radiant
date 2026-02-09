@@ -5,6 +5,166 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.46.0] - 2026-02-08
+
+### Core Service Gap Closure — tenantId Threading, Dojo AI Pipeline, Video Converter
+
+#### Bug Fix: tenantId Threading (5 Services, 10 Call Sites)
+- **agi-complete.service.ts**: Thread `tenantId` through `findAnalogies`, `generateAnalogy`, `applyAnalogy`, `applyAdaptations`
+- **multi-agent.service.ts**: Thread `tenantId` through `agentThink` and `agentRespond` context objects + 13 internal call sites in `runDebate`, `runConsensus`, `runDivideAndConquer`, `runCriticalReview`
+- **multimedia-sidecar.service.ts**: Thread `tenantId` through `generateSidecar`, `generateEmbedding`, `generateDescription`, `synthesizeStreams`
+- **hallucination-detection.service.ts**: Thread `tenantId` through `extractAndVerifyClaims` → `verifyClaim`
+- **agi-extensions.service.ts**: Thread `tenantId` through `analyzeDialogueTurn`
+- **Impact**: Enables drift enforcement (v7.37.0) and spend governor (v7.39.0) on all model invocations
+
+#### Dojo AI Pipeline — 9 Endpoints Fully Implemented
+- **Theme Discovery**: LLM analyzes document chunks to extract 10-15 Central Themes with difficulty tiers
+- **Lesson Generation**: Sensei agent synthesizes lesson blocks with source citations from theme chunks
+- **Sparring Questions**: Adversarial agent generates difficulty-scaled questions grounded in source material
+- **Mobot Knowledge Agent**: Citation-grounded conversational responses from library content
+- **Scenario Response**: Persona-based role-play with emotional shifts and consequence scoring
+- **Competency Extraction**: LLM-powered competency graph extraction from library themes
+- **Dialectic Response**: Multi-agent Socratic system (thesis/antithesis/moderator) with fallacy detection
+- **Multimodal Generation**: Mermaid diagrams, glossary, key takeaways, learning style adaptations
+- **Archytas Suggestions**: Context-aware tool suggestions based on session history
+- **Helper**: `invokeDojoLLM()` utility uses tenant-configured AI model with proper tenantId threading
+
+#### Video Converter — ffmpeg Fallback
+- **New Strategy 2**: Local ffmpeg frame extraction before falling back to placeholder frames
+- Checks `FFMPEG_PATH`, `/opt/bin/ffmpeg` (Lambda layer), `/usr/bin/ffmpeg`, `/usr/local/bin/ffmpeg`
+- Per-frame extraction with 30s timeout and temp file cleanup
+- Placeholder frames preserved as Strategy 3 (last resort)
+
+### Files Modified
+| File | Changes |
+|------|---------|
+| `lambda/shared/services/agi-complete.service.ts` | +tenantId param to 4 methods |
+| `lambda/shared/services/multi-agent.service.ts` | +tenantId in context objects, 15 call sites |
+| `lambda/shared/services/workflow/multimedia-sidecar.service.ts` | +tenantId to 3 public + 2 private methods |
+| `lambda/shared/services/hallucination-detection.service.ts` | +tenantId threading through claim verification chain |
+| `lambda/shared/services/agi-extensions.service.ts` | +tenantId to analyzeDialogueTurn |
+| `lambda/admin/dojo.ts` | +modelRouterService import, invokeDojoLLM helper, 9 endpoint implementations |
+| `lambda/shared/services/converters/video-converter.ts` | +extractFramesWithFfmpeg, 3-strategy extraction |
+
+## [7.45.0] - 2026-02-08
+
+### Think Tank (Mac) — Full Feature Parity Gap Closure [Mac]
+
+Comprehensive gap closure bringing the Mac app to full feature parity with the web app (minus Polymorphic Interface).
+
+#### New Types (CoreTypes.swift — 1,406 lines, +800 lines)
+- **Governor Dashboard**: GovernorDashboard, GovernorConfig, CostMetrics, FuelGauge, ModeIndicator, SavingsSparkline, SavingsBreakdown, GovernorModelTier, ArbitrageRule, RuleCondition, RuleAction, ModelRecommendation, BudgetStatus, SavingsHistoryEntry
+- **Derivation History**: DerivationNode, DerivationChain, ProvenanceReport, DerivationNodeType
+- **Flash Facts**: FlashFact, FlashFactCategory, VerificationMethod, FlashFactExtraction, FlashFactCollection
+- **Grimoire**: Spell, SpellCategory, SpellVariable, SpellVariableType, SpellExecution, SpellResult
+- **Ideas**: Idea, IdeaStatus, IdeaPriority, IdeaAttachment, IdeaAttachmentType, IdeaBoard, IdeaBoardColumn
+- **Cartridges**: ActiveCartridge, CartridgeScope
+- **Cato Mood**: CatoMood (balanced/scout/sage/spark/guide)
+- **AXIOM Extended**: ClarificationMode, ClarionPreferences, AxiomWorkflowStep, AxiomWorkflowProgress, AxiomDomainFull, ClarionQuestionFull, QuestionType, ModelScoreFull, AxiomFeedbackData, AxiomChemistryMoment
+- **Collaboration Full**: CollaborationSession, Participant, ParticipantRole, CursorPosition, SessionSettings, CollaborationInvite, CollaborationMessage
+- **i18n**: SupportedLocale (10 languages)
+
+#### New Services (PlatformServices.swift — 860 lines, +500 lines)
+- **DerivationHistoryService**: 6 endpoints — chains, provenance reports, challenge nodes, evidence sources
+- **FlashFactsService**: 9 endpoints — extract, list, verify, confirm, delete, collections, search
+- **GrimoireService**: 8 endpoints — spell CRUD, execute, featured, rate
+- **IdeasService**: 10 endpoints — idea CRUD, capture from message, boards, develop with AI, link
+- **CartridgeService**: Active cartridges, toggle
+- **FullCollaborationService**: Session CRUD, join, leave, invite, end
+- **DelightPreferencesService**: Fetch/update backend personality preferences
+- **GovernorService expanded**: 14 endpoints (was 2) — dashboard, config, mode, recommend, metrics, budget, tiers, arbitrage rules, decisions, savings history
+
+#### New Services (Standalone)
+- **AxiomSessionService**: Full AXIOM session lifecycle with SSE streaming, feedback (rate session/prompt/correction), question tree caching, observable state machine (AxiomSessionState)
+- **AuthService**: Keychain-based token storage, login/logout, automatic token refresh with scheduling, session persistence
+- **LocalizationService**: i18n with 5 languages (EN/ES/FR/DE/JA), 100+ translation keys, locale persistence
+
+#### New Views (8 feature views)
+- **FlashFactsView**: Category filtering, search, fact cards with verify/copy/delete, collection management
+- **GrimoireView**: Spell grid with category filter, featured/my spells tabs, spell detail sheet with variable input and execution
+- **IdeasView**: Status-based filtering, idea cards with priority/tags, create sheet, AI-powered idea development
+- **DerivationHistoryView**: HSplitView chain browser, node cards with type icons, challenge mechanism, provenance reports
+- **GovernorDashboardView**: Fuel gauge (circular), mode selector, savings breakdown, 4-tab detail (metrics/tiers/rules/decisions)
+- **CartridgeIndicatorView**: Active .RADz bundle indicator with scope icons, popover detail, compact variant
+- **CatoMoodSelectorView**: 5 moods with dropdown/inline/compact variants, color-coded
+- **LoginView**: Full auth UI with email/password, show/hide password, remember me, error display
+
+#### New Views (AXIOM sub-views)
+- **AxiomWorkflowProgressView**: Step-by-step progress with icons and connecting lines
+- **ConfidenceMeterView**: Circular confidence indicator
+- **AxiomDomainDisplayView**: Domain path breadcrumbs with confidence
+- **ModelScoreBarsView**: Animated model comparison bars with delta indicators
+- **ClarificationCardView**: Type-specific question input (choice/multi/text/scale/boolean)
+- **CompiledPromptPreviewView**: System/user prompt toggle with copy and rating
+- **AxiomFeedbackCaptureView**: 5-star session rating
+- **ClarionPreferencesPanelView**: AXIOM preferences form (mode, max questions, display, learning)
+
+#### Other Changes
+- **ActivityHeatmapView**: GitHub-style contribution heatmap for profile
+- **SettingsStore**: Added catoMood, selectedLocale, clarionPreferences, soundEnabled, Delight sync (debounced push to backend)
+- **SettingsView**: 8 tabs (was 5) — added Personality (mood selector), Language (10 locales), AXIOM (Clarion preferences)
+- **AppState/Navigation**: 10 sections (was 6) — added Grimoire, Ideas, Flash Facts, Governor
+- **MainView**: Wired all new views into routing
+- **ChatView**: Integrated CartridgeIndicatorView and CatoMoodSelectorView into header
+- **ThinkTankApp**: Auth gate (LoginView when unauthenticated), LocalizationService environment object
+- **APIClient**: Added setToken(), buildURL() methods for auth and SSE support
+
+## [7.44.0] - 2026-02-08
+
+### Think Tank (Mac) — Native macOS Client [Mac]
+
+Full native macOS SwiftUI application replicating the Think Tank web experience (minus the Polymorphic Interface).
+
+#### Swift App (`apps/thinktank-mac/`)
+- **Package.swift**: Swift 5.9+, macOS 14+, dependencies: swift-markdown, Highlightr, SwiftyJSON
+- **Core Types**: All TypeScript types ported to Swift Codable structs (CoreTypes.swift — 400+ lines)
+- **API Client**: Actor-based URLSession client with SSE streaming, auth, JSON coding
+- **Services**: ChatService, ModelService, RulesService, SettingsService, AnalyticsService, ArtifactService, BrainPlanService, GovernorService, TimeTravelService, AxiomService, CrucibleService, CollaborationService, ComplianceExportService, DomainModeService, VoiceService
+- **Stores**: AppState, ChatStore, SettingsStore — all @MainActor @ObservableObject
+- **Design System**: GlassCard (glassmorphism), AuroraBackground, GradientButton, BadgeView, TypingIndicator, EmptyStateView, ShimmerView
+- **Chat Views**: ChatView, ChatInputView, MessageBubbleView, ModelSelectorView, DomainSelectorView
+- **Sidebar**: NavigationSplitView with grouped conversations, search, nav sections
+- **Settings**: Native macOS Settings window with 5 tabs (General, Display, Voice, Shortcuts, Privacy)
+- **My Rules**: Full CRUD + preset browser + rule card UI
+- **History**: Sortable/searchable conversation history
+- **Artifacts**: Split-view browser with type filtering + detail preview + save/copy
+- **Profile**: Analytics dashboard with stats, achievements, usage charts
+- **Time Machine**: Timeline + playback + bookmarks + branches + restore
+- **AXIOM Forge**: 4-step prompt optimization (Classify → Clarify → Compile → Route)
+- **Brain Plan Viewer**: Orchestration mode, domain, steps, governor status
+- **Crucible Deliberation**: Event timeline with expandable Q&A cards
+- **Voice Input**: AVAudioEngine recording with level visualization + Whisper transcription
+- **File Attachments**: NSOpenPanel + drag-and-drop with type validation (25MB limit)
+- **Keyboard Shortcuts**: ⌘N (new chat), ⇧⌘D (advanced), ⇧⌘F (focus), ⌘\\ (sidebar)
+
+#### Policies & Documentation
+- **Bidirectional Sync Policy v2.0**: Rewrote `/.windsurf/workflows/thinktank-dual-platform.md` with 7 hard rules, blocking gate, anti-patterns — changes to Web MUST mirror to Mac and vice versa
+- **Portability Manifest**: Created `docs/THINKTANK-MAC-PORTABILITY-MANIFEST.md` — 33 features tracked across 3 tiers, technology adaptation map, known gaps
+- **Mac User Guide**: Created `docs/THINKTANK-MAC-GUIDE.md` — 20-section user documentation
+- **docs-update-all v2.1**: Added bidirectional Think Tank requirements + Mac-specific entries
+- **docs-assemble-complete**: Added Mac Guide + Portability Manifest to assembly structure
+- **Assembly script**: Added Mac docs to DOCUMENT_STRUCTURE in assemble-complete-documentation.py
+
+#### Excluded from Mac (by design)
+- **Polymorphic Interface** (LiquidMorphPanel) — excluded per scope
+- **Admin features** — remain web-only
+
+**Files Created**: 27 Swift source files, 2 documentation files, 1 Package.swift
+**Files Modified**: 4 policy/workflow files, 1 assembly script, CHANGELOG.md
+
+## [7.43.4] - 2026-02-08
+
+### Application Hub & URL Configuration
+
+#### Admin Dashboard
+- **New `/apps` page**: Platform Applications hub showing all 9 RADIANT apps (Think Tank, Curator, Dojo, Cato Trainer, Genesis Lab, Genesis Forge, OMEGA API, Admin, API) with descriptions, tier badges, tech stack info, configured URL launch links, and health check buttons
+- **New "Applications" sidebar section**: Added at top of navigation with "All Apps" and "URL Configuration" entries for discoverability
+
+#### Swift Deployer
+- **URLConfigurationView**: Added missing URL fields for Cato Trainer, Curator, Genesis Lab, Genesis Forge, and OMEGA API to the form, ViewModel, and URLConfiguration model
+- **URLConfiguration model**: Added `catoTrainerUrl`, `curatorUrl`, `genesisLabUrl`, `genesisForgeUrl`, `omegaApiUrl` with default subdomain-based URLs
+- **Validation**: All new URL fields included in validation pass
+
 ## [7.43.3] - 2026-02-08
 
 ### Comprehensive Glossary Audit — v3.0.0

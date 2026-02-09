@@ -145,7 +145,8 @@ export type VerificationError =
   | 'COOLDOWN_ACTIVE'
   | 'RATE_LIMITED'
   | 'DELIVERY_FAILED'
-  | 'INVALID_CONTACT';
+  | 'INVALID_CONTACT'
+  | 'NO_PENDING_CODE';
 
 export interface VerifyCodeRequest {
   contactId: string;
@@ -156,7 +157,7 @@ export interface VerifyCodeResponse {
   success: boolean;
   contactId: string;
   verified: boolean;
-  attemptsRemaining: number;
+  attemptsRemaining?: number;
   error?: VerificationError | 'INVALID_CODE' | 'CODE_EXPIRED';
 }
 

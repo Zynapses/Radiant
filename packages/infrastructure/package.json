@@ -18,6 +18,9 @@
     "bootstrap": "cdk bootstrap"
   },
   "dependencies": {
+    "@aws-sdk/client-bedrock": "^3.985.0",
+    "@aws-sdk/client-glacier": "^3.985.0",
+    "@aws-sdk/client-iam": "^3.985.0",
     "@radiant/shared": "workspace:*",
     "aws-cdk-lib": "^2.120.0",
     "constructs": "^10.3.0",

@@ -297,26 +297,34 @@ async function sendSentinelAlert(
 ): Promise<void> {
   try {
     // Use SENTINEL notifier if available
-    const { SentinelNotifierService } = await import('../shared/services/sentinel-notifier.service');
-    const notifier = new SentinelNotifierService();
+    const mod = await import('../shared/services/sentinel-notifier.service.js') as any;
+    const notifier = new mod.SentinelNotifierService(null, {});
 
-    await notifier.notify({
-      id: `spend-${alertType}-${tenantId}-${Date.now()}`,
+    await notifier.notifyForAlert({
+      alertId: `spend-${alertType}-${tenantId}-${Date.now()}`,
       title: alertType === 'spend_suspended'
         ? 'AI Models Suspended — Budget Exceeded'
         : 'Approaching AI Budget Limit',
-      description: message,
+      message,
       severity: alertType === 'spend_suspended' ? 2 : 3,
       source: 'spend-governor',
-      component: 'model-router',
-      tenantScope: tenantId,
-      tags: ['spend-governor', alertType],
-      metadata: {
+      service: 'model-router',
+      tenantScope: tenantId as any,
+      category: 'spend',
+      status: 'firing',
+      region: 'us-east-1',
+      environment: 'production',
+      details: {
         budgetUsd: check.budgetUsd,
         spentUsd: check.spentUsd,
         percentUsed: check.percentUsed,
       },
-      timestamp: new Date().toISOString(),
+      deduplicationKey: `spend-${alertType}-${tenantId}`,
+      occurrenceCount: 1,
+      firstOccurrenceAt: new Date().toISOString(),
+      lastOccurrenceAt: new Date().toISOString(),
+      autoRemediationStatus: 'not_applicable',
+      createdAt: new Date().toISOString(),
     } as any);
   } catch (error) {
     logger.warn('Failed to send SENTINEL alert, falling back to audit log', {
@@ -329,19 +337,28 @@ async function sendSentinelAlert(
 
 async function sendInstanceSentinelAlert(alertType: string, message: string): Promise<void> {
   try {
-    const { SentinelNotifierService } = await import('../shared/services/sentinel-notifier.service');
-    const notifier = new SentinelNotifierService();
+    const mod = await import('../shared/services/sentinel-notifier.service.js') as any;
+    const notifier = new mod.SentinelNotifierService(null, {});
 
-    await notifier.notify({
-      id: `spend-${alertType}-instance-${Date.now()}`,
+    await notifier.notifyForAlert({
+      alertId: `spend-${alertType}-instance-${Date.now()}`,
       title: 'AWS Services FROZEN — Instance Budget Exceeded',
-      description: message,
-      severity: 1, // SEV 1 — phone/SMS via PagerDuty
+      message,
+      severity: 1,
       source: 'spend-governor',
-      component: 'aws-services',
-      tags: ['spend-governor', 'instance-freeze', alertType],
-      metadata: {},
-      timestamp: new Date().toISOString(),
+      service: 'aws-services',
+      category: 'spend',
+      status: 'firing',
+      region: 'us-east-1',
+      environment: 'production',
+      tenantScope: 'all' as any,
+      details: {},
+      deduplicationKey: `spend-${alertType}-instance`,
+      occurrenceCount: 1,
+      firstOccurrenceAt: new Date().toISOString(),
+      lastOccurrenceAt: new Date().toISOString(),
+      autoRemediationStatus: 'not_applicable',
+      createdAt: new Date().toISOString(),
     } as any);
   } catch (error) {
     logger.error('Failed to send instance SENTINEL alert', {

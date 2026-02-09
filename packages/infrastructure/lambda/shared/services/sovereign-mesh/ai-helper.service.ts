@@ -10,6 +10,7 @@
  * - Explanation: Human-readable summaries
  */
 
+import * as crypto from 'crypto';
 import { executeStatement, stringParam, longParam, doubleParam, boolParam, param } from '../../db/client';
 import { createRegisteredLogger } from '../logging-registry.service';
 

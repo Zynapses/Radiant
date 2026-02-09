@@ -1192,7 +1192,7 @@ Return JSON:
   // Helper Methods
   // ============================================================================
 
-  private async generateEmbedding(text: string): Promise<number[]> {
+  private async generateEmbedding(text: string, tenantId?: string): Promise<number[]> {
     try {
       await modelRouterService.invoke({
         tenantId,

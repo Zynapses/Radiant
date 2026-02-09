@@ -16,6 +16,21 @@ const logger = createRegisteredLogger({
 // Types
 // ============================================================================
 
+export interface DelightMessageResponse {
+  message?: string;
+  selectedText?: string;
+  tone?: string;
+  personality?: string;
+}
+
+export interface WorkflowDelightResponse {
+  messages: DelightMessageResponse[];
+  achievements?: Array<{ id: string; name: string; celebrationMessage: string }>;
+  easterEggs?: Array<{ easterEggId: string; name: string; activationMessage: string }>;
+  sounds?: Array<{ soundId: string }>;
+  soundEffect?: string;
+}
+
 export interface DelightEvent {
   type: 'message' | 'achievement' | 'easter_egg' | 'sound' | 'step_update' | 'plan_update';
   planId: string;
@@ -59,7 +74,7 @@ class DelightEventsService extends EventEmitter {
    */
   private async loadHistoryFromDB(planId: string, tenantId: string): Promise<DelightEvent[]> {
     try {
-      const { executeStatement, stringParam } = await import('../db/client');
+      const { executeStatement, stringParam } = await import('../db/client.js');
       const result = await executeStatement(
         `SELECT event_type, event_data, created_at
          FROM delight_event_history
@@ -91,7 +106,7 @@ class DelightEventsService extends EventEmitter {
     if (!tenantId) return;
     (async () => {
       try {
-        const { executeStatement, stringParam } = await import('../db/client');
+        const { executeStatement, stringParam } = await import('../db/client.js');
         await executeStatement(
           `INSERT INTO delight_event_history (tenant_id, plan_id, event_type, event_data)
            VALUES ($1, $2, $3, $4::jsonb)`,

@@ -1642,7 +1642,7 @@ Your task is to:
     switch (method) {
       case 'invoke':
         const response = await modelRouterService.invoke({
-          tenantId: input.tenantId,
+          tenantId: String(input.tenantId || ''),
           modelId: String(parameters.modelId || input.modelId || 'anthropic/claude-3-5-sonnet'),
           messages: (input.messages as Array<{ role: 'user' | 'system' | 'assistant'; content: string }>) || [],
           maxTokens: Number(parameters.maxTokens || 4096),
@@ -1704,7 +1704,7 @@ Your task is to:
     switch (method) {
       case 'summarize':
         const summaryResponse = await modelRouterService.invoke({
-          tenantId: input.tenantId,
+          tenantId: String(input.tenantId || ''),
           modelId: 'anthropic/claude-3-5-sonnet',
           messages: [{ role: 'user', content: `Summarize this content concisely:\n\n${String(input.content || '')}` }],
           maxTokens: Number(parameters.maxTokens || 500),
@@ -1712,7 +1712,7 @@ Your task is to:
         return { summary: summaryResponse.content };
       case 'extractEntities':
         const entityResponse = await modelRouterService.invoke({
-          tenantId: input.tenantId,
+          tenantId: String(input.tenantId || ''),
           modelId: 'anthropic/claude-3-5-sonnet',
           messages: [{ 
             role: 'user', 
@@ -1723,7 +1723,7 @@ Your task is to:
         return { entities: entityResponse.content };
       case 'classify':
         const classifyResponse = await modelRouterService.invoke({
-          tenantId: input.tenantId,
+          tenantId: String(input.tenantId || ''),
           modelId: 'anthropic/claude-3-5-sonnet',
           messages: [{ 
             role: 'user', 

@@ -257,6 +257,10 @@ export interface StatusPageAuditEntry {
   // Rate limiting
   rateLimitRemaining: number;
   wasRateLimited: boolean;
+  
+  // Error info (when applicable)
+  errorCode?: string;
+  errorMessage?: string;
 }
 
 // =============================================================================

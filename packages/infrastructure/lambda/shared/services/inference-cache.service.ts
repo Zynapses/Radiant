@@ -520,7 +520,7 @@ class InferenceCacheService {
       this.logEvent(tenantId, cacheKey, 'invalidate', '', '', 0, 0).catch(() => {});
       return (result.numberOfRecordsUpdated ?? 0) > 0;
     } catch (error) {
-      logger.error('Failed to invalidate cache entry', { tenantId, cacheKey, error });
+      logger.error('Failed to invalidate cache entry', error, { tenantId, cacheKey });
       return false;
     }
   }
@@ -550,7 +550,7 @@ class InferenceCacheService {
 
       return result.numberOfRecordsUpdated ?? 0;
     } catch (error) {
-      logger.error('Failed to invalidate by model', { tenantId, modelId, error });
+      logger.error('Failed to invalidate by model', error, { tenantId, modelId });
       return 0;
     }
   }
@@ -576,7 +576,7 @@ class InferenceCacheService {
       this.logEvent(tenantId, 'ALL', 'purge', '', '', 0, 0).catch(() => {});
       return result.numberOfRecordsUpdated ?? 0;
     } catch (error) {
-      logger.error('Failed to purge tenant cache', { tenantId, error });
+      logger.error('Failed to purge tenant cache', error, { tenantId });
       return 0;
     }
   }
@@ -597,7 +597,7 @@ class InferenceCacheService {
         freedBytes: parseInt(row?.freed_bytes ?? '0', 10),
       };
     } catch (error) {
-      logger.error('Failed to expire stale entries', { error });
+      logger.error('Failed to expire stale entries', error);
       return { expiredCount: 0, freedBytes: 0 };
     }
   }
@@ -786,7 +786,7 @@ class InferenceCacheService {
           activeEntries: Number(row.active_entries),
           expiredEntries: Number(row.expired_entries),
           totalStorageSizeBytes: Number(row.total_storage_bytes),
-          topCachedModels: (row.top_cached_models as Array<{ model_id: string; hit_count: number; cost_saved_usd: number }>) || [],
+          topCachedModels: ((row.top_cached_models as Array<{ model_id: string; hit_count: number; cost_saved_usd: number }>) || []).map((m: any) => ({ modelId: m.model_id, hitCount: m.hit_count, costSavedUsd: m.cost_saved_usd })),
           evictionsInPeriod: Number(row.evictions),
           invalidationsInPeriod: Number(row.invalidations),
         };

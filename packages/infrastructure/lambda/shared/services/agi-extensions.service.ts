@@ -741,7 +741,7 @@ Query: ${query}`,
     return result.rows.map(row => this.mapDialogueTurn(row as Record<string, unknown>));
   }
 
-  async analyzeDialogueTurn(content: string): Promise<{ intent: string; sentiment: number; dialogueAct: string }> {
+  async analyzeDialogueTurn(tenantId: string, content: string): Promise<{ intent: string; sentiment: number; dialogueAct: string }> {
     const prompt = `Analyze this dialogue turn:
 
 "${content.substring(0, 500)}"
@@ -755,7 +755,7 @@ Return JSON:
 
     try {
       const response = await modelRouterService.invoke({
-        tenantId: undefined, // TODO: Thread tenantId from caller
+        tenantId,
         modelId: 'anthropic/claude-3-haiku',
         messages: [{ role: 'user', content: prompt }],
         maxTokens: 200,

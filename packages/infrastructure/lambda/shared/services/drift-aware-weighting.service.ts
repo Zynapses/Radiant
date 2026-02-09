@@ -713,7 +713,8 @@ class DriftAwareWeightingService {
   // ===========================================================================
 
   getAppProfile(app: RadiantApp): AppWeightProfile {
-    return { ...APP_WEIGHT_PROFILES[app] } || { ...APP_WEIGHT_PROFILES.orchestrator };
+    const profile = APP_WEIGHT_PROFILES[app];
+    return profile ? { ...profile } : { ...APP_WEIGHT_PROFILES.orchestrator };
   }
 
   getAllAppProfiles(): Record<RadiantApp, AppWeightProfile> {

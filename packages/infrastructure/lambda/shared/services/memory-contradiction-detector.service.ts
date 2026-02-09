@@ -311,6 +311,7 @@ class MemoryContradictionDetectorService {
     model: string,
     newFact: string,
     existingFact: string,
+    tenantId?: string,
   ): Promise<{ is_contradiction: boolean; type: string; severity: number; explanation: string; resolution_suggestion: string } | null> {
     try {
       const result = await modelRouterService.invoke({

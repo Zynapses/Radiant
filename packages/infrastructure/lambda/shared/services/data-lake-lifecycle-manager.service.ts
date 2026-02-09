@@ -150,6 +150,7 @@ export class DataLakeLifecycleManagerService {
       objectLocksApplied: 0,
       gluePartitionsAdded: 0,
       errors: [],
+      durationMs: 0,
     };
 
     try {

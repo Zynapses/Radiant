@@ -29,6 +29,7 @@
 import { APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda';
 import { executeStatement, stringParam, longParam } from '../shared/db/client';
 import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+import { modelRouterService } from '../shared/services/model-router.service';
 
 const logger = createRegisteredLogger({
   serviceName: 'admin/dojo',
@@ -88,6 +89,30 @@ const extractPathParam = (path: string, pattern: RegExp): string | null => {
   const match = path.match(pattern);
   return match ? match[1] : null;
 };
+
+async function getDojoAiModel(tenantId: string): Promise<string> {
+  const result = await executeStatement(
+    `SELECT ai_model FROM dojo_config WHERE tenant_id = :tenantId`,
+    [stringParam('tenantId', tenantId)]
+  );
+  return (result as any).rows?.[0]?.ai_model || 'claude-sonnet-4-20250514';
+}
+
+async function invokeDojoLLM(
+  tenantId: string,
+  prompt: string,
+  options?: { maxTokens?: number; temperature?: number }
+): Promise<string> {
+  const modelId = await getDojoAiModel(tenantId);
+  const response = await modelRouterService.invoke({
+    tenantId,
+    modelId: `anthropic/${modelId}`,
+    messages: [{ role: 'user', content: prompt }],
+    maxTokens: options?.maxTokens || 2000,
+    temperature: options?.temperature || 0.3,
+  });
+  return response.content;
+}
 
 // =============================================================================
 // Handler
@@ -354,7 +379,7 @@ async function handleGetLibraries(ctx: RequestContext, tenantId: string) {
     `SELECT * FROM dojo_libraries WHERE tenant_id = :tenantId ORDER BY created_at DESC`,
     [stringParam('tenantId', tenantId)]
   );
-  return success({ libraries: result.records || [] });
+  return success({ libraries: result.rows || [] });
 }
 
 async function handleCreateLibrary(ctx: RequestContext, tenantId: string, body: { name: string; description: string }) {
@@ -364,7 +389,7 @@ async function handleCreateLibrary(ctx: RequestContext, tenantId: string, body: 
      RETURNING *`,
     [stringParam('tenantId', tenantId), stringParam('name', body.name), stringParam('description', body.description || '')]
   );
-  return created({ library: result.records?.[0] });
+  return created({ library: result.rows?.[0] });
 }
 
 async function handleGetDocuments(ctx: RequestContext, libraryId: string) {
@@ -372,7 +397,7 @@ async function handleGetDocuments(ctx: RequestContext, libraryId: string) {
     `SELECT * FROM dojo_documents WHERE library_id = :libraryId ORDER BY uploaded_at DESC`,
     [stringParam('libraryId', libraryId)]
   );
-  return success({ documents: result.records || [] });
+  return success({ documents: result.rows || [] });
 }
 
 async function handleUploadDocument(ctx: RequestContext, libraryId: string, event: any) {
@@ -402,7 +427,7 @@ async function handleUploadDocument(ctx: RequestContext, libraryId: string, even
     [stringParam('libraryId', libraryId)]
   );
 
-  return created({ document: result.records?.[0] });
+  return created({ document: result.rows?.[0] });
 }
 
 async function handleDeleteDocument(ctx: RequestContext, libraryId: string, documentId: string) {
@@ -426,10 +451,10 @@ async function handleDiscoverThemes(ctx: RequestContext, libraryId: string) {
     [stringParam('libraryId', libraryId)]
   );
 
-  if (existing.records && existing.records.length > 0) {
+  if (existing.rows && existing.rows.length > 0) {
     return success({
       library_id: libraryId,
-      themes: existing.records,
+      themes: existing.rows,
       discovery_model: 'claude-sonnet-4-20250514',
       analyzed_chunks: 0,
     });
@@ -441,15 +466,101 @@ async function handleDiscoverThemes(ctx: RequestContext, libraryId: string) {
     [stringParam('libraryId', libraryId)]
   );
 
-  // TODO: Invoke LLM discovery pipeline asynchronously via SQS/Step Functions.
-  // The pipeline: 1) fetch all chunks for library 2) cluster by embedding similarity 
-  // 3) LLM names and describes each cluster as a Central Theme 4) store themes in dojo_themes
-  // 5) update library status to 'ready'
-  throw new Error(
-    'Theme discovery requires the AI pipeline to be running. ' +
-    'Ensure the Dojo discovery Lambda is deployed and the library has documents with embeddings. ' +
-    'Trigger discovery via: POST /api/admin/dojo/libraries/:libraryId/discover-themes'
+  // Fetch all document chunks for this library
+  const chunksResult = await executeStatement(
+    `SELECT dc.id, dc.content, dc.chunk_index, dd.title as doc_title
+     FROM dojo_document_chunks dc
+     JOIN dojo_documents dd ON dd.id = dc.document_id
+     WHERE dd.library_id = :libraryId
+     ORDER BY dd.title, dc.chunk_index
+     LIMIT 200`,
+    [stringParam('libraryId', libraryId)]
   );
+
+  const chunks = (chunksResult as any).rows || [];
+  if (chunks.length === 0) {
+    await executeStatement(
+      `UPDATE dojo_libraries SET status = 'ready', updated_at = NOW() WHERE id = :libraryId`,
+      [stringParam('libraryId', libraryId)]
+    );
+    return success({ library_id: libraryId, themes: [], discovery_model: 'none', analyzed_chunks: 0, message: 'No document chunks found to analyze' });
+  }
+
+  // Build content summary for LLM (cap at ~50k chars)
+  const contentSummary = chunks.map((c: any, i: number) =>
+    `[Chunk ${i + 1} from "${c.doc_title}"]: ${(c.content || '').substring(0, 500)}`
+  ).join('\n\n').substring(0, 50000);
+
+  const prompt = `You are an expert curriculum designer. Analyze the following document chunks from a training library and identify 10-15 Central Themes (core topics that the material covers).
+
+DOCUMENT CHUNKS:
+${contentSummary}
+
+For each theme, provide:
+1. A clear, concise name (2-5 words)
+2. A description (1-2 sentences explaining what this theme covers)
+3. A difficulty tier: "beginner", "intermediate", or "advanced"
+4. Estimated number of lessons needed (1-10)
+
+Return ONLY a JSON array:
+[
+  {
+    "name": "Theme Name",
+    "description": "What this theme covers",
+    "difficulty_tier": "beginner|intermediate|advanced",
+    "estimated_lessons": 3
+  }
+]`;
+
+  try {
+    const llmResponse = await invokeDojoLLM(ctx.tenantId, prompt, { maxTokens: 3000 });
+    const jsonMatch = llmResponse.match(/\[[\s\S]*\]/);
+    if (!jsonMatch) {
+      throw new Error('LLM did not return valid JSON array');
+    }
+
+    const themes = JSON.parse(jsonMatch[0]);
+    const storedThemes: any[] = [];
+
+    for (const theme of themes.slice(0, 15)) {
+      const insertResult = await executeStatement(
+        `INSERT INTO dojo_themes (library_id, name, description, difficulty_tier, estimated_lessons, source_chunk_ids)
+         VALUES (:libraryId, :name, :description, :tier::dojo_difficulty_tier, :lessons, '{}')
+         RETURNING *`,
+        [
+          stringParam('libraryId', libraryId),
+          stringParam('name', theme.name || 'Unnamed Theme'),
+          stringParam('description', theme.description || ''),
+          stringParam('tier', theme.difficulty_tier || 'intermediate'),
+          longParam('lessons', theme.estimated_lessons || 3),
+        ]
+      );
+      if ((insertResult as any).rows?.[0]) {
+        storedThemes.push((insertResult as any).rows[0]);
+      }
+    }
+
+    // Mark library as ready
+    await executeStatement(
+      `UPDATE dojo_libraries SET status = 'ready', updated_at = NOW() WHERE id = :libraryId`,
+      [stringParam('libraryId', libraryId)]
+    );
+
+    return success({
+      library_id: libraryId,
+      themes: storedThemes,
+      discovery_model: await getDojoAiModel(ctx.tenantId),
+      analyzed_chunks: chunks.length,
+    });
+  } catch (error) {
+    // Revert library status on failure
+    await executeStatement(
+      `UPDATE dojo_libraries SET status = 'error', updated_at = NOW() WHERE id = :libraryId`,
+      [stringParam('libraryId', libraryId)]
+    );
+    logger.error('Theme discovery failed', { libraryId, error: String(error) });
+    return serverError(`Theme discovery failed: ${error instanceof Error ? error.message : String(error)}`);
+  }
 }
 
 async function handleGetThemes(ctx: RequestContext, libraryId: string) {
@@ -457,7 +568,7 @@ async function handleGetThemes(ctx: RequestContext, libraryId: string) {
     `SELECT * FROM dojo_themes WHERE library_id = :libraryId ORDER BY difficulty_tier, name`,
     [stringParam('libraryId', libraryId)]
   );
-  return success({ themes: result.records || [] });
+  return success({ themes: result.rows || [] });
 }
 
 // =============================================================================
@@ -478,7 +589,7 @@ async function handleStartSession(ctx: RequestContext, tenantId: string, body: {
       stringParam('mode', body.mode),
     ]
   );
-  return created({ session: result.records?.[0] });
+  return created({ session: result.rows?.[0] });
 }
 
 async function handleGetSession(ctx: RequestContext, sessionId: string) {
@@ -486,8 +597,8 @@ async function handleGetSession(ctx: RequestContext, sessionId: string) {
     `SELECT * FROM dojo_sessions WHERE id = :sessionId`,
     [stringParam('sessionId', sessionId)]
   );
-  if (!result.records?.length) return notFound('Session not found');
-  return success({ session: result.records[0] });
+  if (!result.rows?.length) return notFound('Session not found');
+  return success({ session: result.rows[0] });
 }
 
 async function handleGetLessonBlocks(ctx: RequestContext, sessionId: string) {
@@ -495,7 +606,7 @@ async function handleGetLessonBlocks(ctx: RequestContext, sessionId: string) {
     `SELECT * FROM dojo_lesson_blocks WHERE session_id = :sessionId ORDER BY sequence`,
     [stringParam('sessionId', sessionId)]
   );
-  return success({ blocks: result.records || [] });
+  return success({ blocks: result.rows || [] });
 }
 
 async function handleNextLesson(ctx: RequestContext, sessionId: string) {
@@ -506,13 +617,84 @@ async function handleNextLesson(ctx: RequestContext, sessionId: string) {
     `SELECT COUNT(*) as count FROM dojo_lesson_blocks WHERE session_id = :sessionId`,
     [stringParam('sessionId', sessionId)]
   );
-  const seq = parseInt(existing.records?.[0]?.count || '0', 10);
+  const seq = parseInt(String(existing.rows?.[0]?.count || '0'), 10);
 
-  throw new Error(
-    'Lesson generation requires the AI pipeline. The Sensei agent analyzes ' +
-    `theme chunks and synthesizes lesson #${seq + 1} with source citations. ` +
-    'Deploy the Dojo AI Lambda to enable this feature.'
+  // Get session details including themes
+  const sessionResult = await executeStatement(
+    `SELECT s.*, array_to_json(s.theme_ids) as theme_id_list
+     FROM dojo_sessions s WHERE s.id = :sessionId`,
+    [stringParam('sessionId', sessionId)]
   );
+  const session = (sessionResult as any).rows?.[0];
+  if (!session) return notFound('Session not found');
+
+  // Get theme details
+  const themeIds = JSON.parse(session.theme_id_list || '[]');
+  const themeResult = await executeStatement(
+    `SELECT * FROM dojo_themes WHERE id = ANY(:themeIds::UUID[])`,
+    [stringParam('themeIds', `{${themeIds.join(',')}}`)]
+  );
+  const themes = (themeResult as any).rows || [];
+
+  // Get relevant chunks for these themes
+  const chunkResult = await executeStatement(
+    `SELECT dc.content, dc.chunk_index, dd.title as doc_title
+     FROM dojo_document_chunks dc
+     JOIN dojo_documents dd ON dd.id = dc.document_id
+     WHERE dd.library_id = :libraryId
+     ORDER BY dc.chunk_index
+     LIMIT 30`,
+    [stringParam('libraryId', session.library_id)]
+  );
+  const chunks = (chunkResult as any).rows || [];
+
+  const themeNames = themes.map((t: any) => t.name).join(', ');
+  const chunkContent = chunks.map((c: any) => `[${c.doc_title}]: ${(c.content || '').substring(0, 400)}`).join('\n').substring(0, 20000);
+
+  const prompt = `You are a Sensei AI tutor. Generate lesson #${seq + 1} for a training session on these themes: ${themeNames}.
+
+SOURCE MATERIAL:
+${chunkContent}
+
+Create a structured lesson block with:
+1. A title for this lesson
+2. The main content (educational, clear, engaging, 300-500 words)
+3. Key takeaways (3-5 bullet points)
+4. Source citations referencing the documents used
+
+Return JSON:
+{
+  "title": "Lesson title",
+  "content": "Main lesson content in markdown",
+  "key_takeaways": ["takeaway 1", "takeaway 2"],
+  "source_citations": ["Document Title, section X"],
+  "difficulty": "beginner|intermediate|advanced"
+}`;
+
+  try {
+    const llmResponse = await invokeDojoLLM(ctx.tenantId, prompt, { maxTokens: 2500 });
+    const jsonMatch = llmResponse.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('Invalid lesson response format');
+
+    const lesson = JSON.parse(jsonMatch[0]);
+    const blockResult = await executeStatement(
+      `INSERT INTO dojo_lesson_blocks (session_id, sequence, block_type, title, content, source_citations)
+       VALUES (:sessionId, :seq, 'lesson', :title, :content, :citations::JSONB)
+       RETURNING *`,
+      [
+        stringParam('sessionId', sessionId),
+        longParam('seq', seq + 1),
+        stringParam('title', lesson.title || `Lesson ${seq + 1}`),
+        stringParam('content', lesson.content || ''),
+        stringParam('citations', JSON.stringify(lesson.source_citations || [])),
+      ]
+    );
+
+    return success({ block: (blockResult as any).rows?.[0], key_takeaways: lesson.key_takeaways || [] });
+  } catch (error) {
+    logger.error('Lesson generation failed', { sessionId, error: String(error) });
+    return serverError(`Lesson generation failed: ${error instanceof Error ? error.message : String(error)}`);
+  }
 }
 
 async function handleGetSparringQuestion(ctx: RequestContext, sessionId: string) {
@@ -521,13 +703,88 @@ async function handleGetSparringQuestion(ctx: RequestContext, sessionId: string)
     `SELECT * FROM dojo_sparring_questions WHERE session_id = :sessionId ORDER BY created_at DESC LIMIT 1`,
     [stringParam('sessionId', sessionId)]
   );
-  if (result.records?.length) {
-    return success({ question: result.records[0] });
+  if (result.rows?.length) {
+    return success({ question: result.rows[0] });
   }
-  throw new Error(
-    'Sparring question generation requires the AI pipeline. The Adversarial agent generates ' +
-    'questions based on theme content with difficulty scaling. Deploy the Dojo AI Lambda.'
+  // Get session and theme context
+  const sessionResult = await executeStatement(
+    `SELECT s.*, array_to_json(s.theme_ids) as theme_id_list FROM dojo_sessions s WHERE s.id = :sessionId`,
+    [stringParam('sessionId', sessionId)]
   );
+  const session = (sessionResult as any).rows?.[0];
+  if (!session) return notFound('Session not found');
+
+  const themeIds = JSON.parse(session.theme_id_list || '[]');
+  const themeResult = await executeStatement(
+    `SELECT * FROM dojo_themes WHERE id = ANY(:themeIds::UUID[])`,
+    [stringParam('themeIds', `{${themeIds.join(',')}}`)]
+  );
+  const themes = (themeResult as any).rows || [];
+
+  // Get source chunks for grounding
+  const chunkResult = await executeStatement(
+    `SELECT dc.content, dd.title as doc_title FROM dojo_document_chunks dc
+     JOIN dojo_documents dd ON dd.id = dc.document_id
+     WHERE dd.library_id = :libraryId ORDER BY RANDOM() LIMIT 10`,
+    [stringParam('libraryId', session.library_id)]
+  );
+  const chunks = (chunkResult as any).rows || [];
+
+  const questionsAsked = parseInt(session.questions_asked || '0', 10);
+  const accuracy = parseInt(session.questions_asked || '0', 10) > 0
+    ? parseInt(session.questions_correct || '0', 10) / parseInt(session.questions_asked || '1', 10)
+    : 0.5;
+  const difficultyHint = accuracy > 0.8 ? 'harder' : accuracy < 0.4 ? 'easier' : 'moderate';
+
+  const themeNames = themes.map((t: any) => t.name).join(', ');
+  const chunkContent = chunks.map((c: any) => `[${c.doc_title}]: ${(c.content || '').substring(0, 300)}`).join('\n').substring(0, 15000);
+
+  const prompt = `You are an Adversarial training agent. Generate a ${difficultyHint} difficulty question (#${questionsAsked + 1}) testing knowledge of: ${themeNames}.
+
+SOURCE MATERIAL:
+${chunkContent}
+
+The question must be grounded in the source material. Include the correct answer and a brief explanation.
+
+Return JSON:
+{
+  "question": "The question text",
+  "question_type": "multiple_choice|open_ended|true_false",
+  "options": ["A) ...", "B) ...", "C) ...", "D) ..."],
+  "correct_answer": "The correct answer text",
+  "explanation": "Why this is correct, citing the source",
+  "difficulty": 1-5,
+  "source_citations": ["Document, relevant section"]
+}`;
+
+  try {
+    const llmResponse = await invokeDojoLLM(ctx.tenantId, prompt, { maxTokens: 1500 });
+    const jsonMatch = llmResponse.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('Invalid question format');
+
+    const q = JSON.parse(jsonMatch[0]);
+    const qResult = await executeStatement(
+      `INSERT INTO dojo_sparring_questions (session_id, tenant_id, question, question_type, options, correct_answer, explanation, difficulty, source_citations)
+       VALUES (:sessionId, :tenantId, :question, :qType, :options::JSONB, :answer, :explanation, :difficulty, :citations::JSONB)
+       RETURNING *`,
+      [
+        stringParam('sessionId', sessionId),
+        stringParam('tenantId', ctx.tenantId),
+        stringParam('question', q.question || ''),
+        stringParam('qType', q.question_type || 'open_ended'),
+        stringParam('options', JSON.stringify(q.options || [])),
+        stringParam('answer', q.correct_answer || ''),
+        stringParam('explanation', q.explanation || ''),
+        longParam('difficulty', q.difficulty || 3),
+        stringParam('citations', JSON.stringify(q.source_citations || [])),
+      ]
+    );
+
+    return success({ question: (qResult as any).rows?.[0] });
+  } catch (error) {
+    logger.error('Sparring question generation failed', { sessionId, error: String(error) });
+    return serverError(`Question generation failed: ${error instanceof Error ? error.message : String(error)}`);
+  }
 }
 
 async function handleSubmitSparringAnswer(ctx: RequestContext, sessionId: string, body: { question_id: string; answer: string; time_taken_seconds: number }) {
@@ -536,11 +793,11 @@ async function handleSubmitSparringAnswer(ctx: RequestContext, sessionId: string
     `SELECT * FROM dojo_sparring_questions WHERE id = :questionId`,
     [stringParam('questionId', body.question_id)]
   );
-  if (!qResult.records?.length) return notFound('Question not found');
-  const question = qResult.records[0];
+  if (!qResult.rows?.length) return notFound('Question not found');
+  const question = qResult.rows[0];
 
   // In production, LLM evaluates open-ended answers. For multiple choice, direct comparison.
-  const correct = (body.answer.toLowerCase().trim() === (question.correct_answer || '').toLowerCase().trim());
+  const correct = (body.answer.toLowerCase().trim() === String(question.correct_answer || '').toLowerCase().trim());
   const xpAwarded = correct ? 25 : 5;
 
   const result = await executeStatement(
@@ -586,9 +843,9 @@ async function handleCompleteSession(ctx: RequestContext, sessionId: string) {
     `UPDATE dojo_sessions SET status = 'completed', completed_at = NOW() WHERE id = :sessionId RETURNING *`,
     [stringParam('sessionId', sessionId)]
   );
-  if (!result.records?.length) return notFound('Session not found');
+  if (!result.rows?.length) return notFound('Session not found');
 
-  const session = result.records[0];
+  const session = result.rows[0];
 
   // Update user progress
   await executeStatement(
@@ -603,15 +860,15 @@ async function handleCompleteSession(ctx: RequestContext, sessionId: string) {
     [
       stringParam('tenantId', ctx.tenantId),
       stringParam('userId', ctx.userId),
-      longParam('xp', parseInt(session.xp_earned || '0', 10)),
+      longParam('xp', parseInt(String(session.xp_earned || '0'), 10)),
     ]
   );
 
   return success({
     session,
     xp_summary: {
-      total: parseInt(session.xp_earned || '0', 10),
-      breakdown: { sparring: parseInt(session.xp_earned || '0', 10) },
+      total: parseInt(String(session.xp_earned || '0'), 10),
+      breakdown: { sparring: parseInt(String(session.xp_earned || '0'), 10) },
     },
   });
 }
@@ -638,7 +895,7 @@ async function handleGetProgress(ctx: RequestContext, tenantId: string, userId: 
     [stringParam('tenantId', tenantId), stringParam('userId', userId)]
   );
 
-  const base = progressResult.records?.[0] || {
+  const base = progressResult.rows?.[0] || {
     user_id: userId, overall_rank: 'novice', overall_xp: 0, total_sessions: 0,
     total_time_minutes: 0, streak_days: 0,
   };
@@ -646,10 +903,10 @@ async function handleGetProgress(ctx: RequestContext, tenantId: string, userId: 
   return success({
     progress: {
       ...base,
-      theme_progress: themeResult.records || [],
-      recent_sessions: sessionsResult.records || [],
-      certifications: certResult.records || [],
-      xp_to_next_rank: calculateXpToNextRank(base.overall_rank, parseInt(base.overall_xp || '0', 10)),
+      theme_progress: themeResult.rows || [],
+      recent_sessions: sessionsResult.rows || [],
+      certifications: certResult.rows || [],
+      xp_to_next_rank: calculateXpToNextRank(String(base.overall_rank), parseInt(String(base.overall_xp || '0'), 10)),
     },
   });
 }
@@ -659,10 +916,10 @@ async function handleGetThemeProgress(ctx: RequestContext, tenantId: string, use
     `SELECT * FROM dojo_theme_progress WHERE tenant_id = :tenantId AND user_id = :userId AND theme_id = :themeId`,
     [stringParam('tenantId', tenantId), stringParam('userId', userId), stringParam('themeId', themeId)]
   );
-  if (!result.records?.length) {
+  if (!result.rows?.length) {
     return success({ progress: { theme_id: themeId, rank: 'novice', xp: 0, mastery_percentage: 0, questions_attempted: 0, questions_correct: 0, accuracy: 0, last_session_at: null, weaknesses: [], strengths: [] } });
   }
-  return success({ progress: result.records[0] });
+  return success({ progress: result.rows[0] });
 }
 
 function calculateXpToNextRank(rank: string, xp: number): number {
@@ -683,9 +940,9 @@ async function handleStartCertExam(ctx: RequestContext, tenantId: string, body: 
      RETURNING *`,
     [stringParam('tenantId', tenantId), stringParam('userId', body.user_id), stringParam('themeId', body.theme_id)]
   );
-  if (!sessionResult.records?.length) return notFound('Theme not found');
+  if (!sessionResult.rows?.length) return notFound('Theme not found');
   return success({
-    session_id: sessionResult.records[0].id,
+    session_id: sessionResult.rows[0].id,
     question_count: 20,
     time_limit_minutes: 30,
   });
@@ -699,7 +956,7 @@ async function handleGetCertifications(ctx: RequestContext, tenantId: string, us
      ORDER BY c.issued_at DESC`,
     [stringParam('tenantId', tenantId), stringParam('userId', userId)]
   );
-  return success({ certifications: result.records || [] });
+  return success({ certifications: result.rows || [] });
 }
 
 // =============================================================================
@@ -714,13 +971,65 @@ async function handleSendMobotMessage(ctx: RequestContext, sessionId: string, bo
     [stringParam('sessionId', sessionId), stringParam('tenantId', ctx.tenantId), stringParam('content', body.message)]
   );
 
-  // In production, invoke LLM with document context to generate grounded response.
-  // The Mobot agent searches theme chunks for relevant content and generates a cited answer.
-  throw new Error(
-    'Mobot responses require the AI pipeline. The Mobot Knowledge Agent retrieves ' +
-    'relevant chunks from the active library and generates a citation-grounded response. ' +
-    'Deploy the Dojo AI Lambda to enable conversational assistance.'
+  // Get session to find library
+  const sessionResult = await executeStatement(
+    `SELECT library_id FROM dojo_sessions WHERE id = :sessionId`,
+    [stringParam('sessionId', sessionId)]
   );
+  const session = (sessionResult as any).rows?.[0];
+  if (!session) return notFound('Session not found');
+
+  // Get relevant chunks for the question
+  const chunkResult = await executeStatement(
+    `SELECT dc.content, dd.title as doc_title FROM dojo_document_chunks dc
+     JOIN dojo_documents dd ON dd.id = dc.document_id
+     WHERE dd.library_id = :libraryId
+     ORDER BY RANDOM() LIMIT 15`,
+    [stringParam('libraryId', session.library_id)]
+  );
+  const chunks = (chunkResult as any).rows || [];
+
+  // Get conversation history
+  const historyResult = await executeStatement(
+    `SELECT role, content FROM dojo_mobot_messages WHERE session_id = :sessionId ORDER BY created_at DESC LIMIT 10`,
+    [stringParam('sessionId', sessionId)]
+  );
+  const history = ((historyResult as any).rows || []).reverse();
+  const historyText = history.map((h: any) => `${h.role}: ${h.content}`).join('\n');
+
+  const chunkContent = chunks.map((c: any) => `[${c.doc_title}]: ${(c.content || '').substring(0, 400)}`).join('\n').substring(0, 20000);
+
+  const prompt = `You are the Mobot Knowledge Agent, an AI tutor assistant. Answer the user's question using ONLY the source material provided. Always cite your sources.
+
+CONVERSATION HISTORY:
+${historyText || 'No prior messages.'}
+
+SOURCE MATERIAL:
+${chunkContent}
+
+USER QUESTION: ${body.message}
+
+Rules:
+1. Ground your answer in the source material
+2. Cite sources in [brackets]
+3. If the source material doesn't cover the question, say so honestly
+4. Be educational and encouraging`;
+
+  try {
+    const llmResponse = await invokeDojoLLM(ctx.tenantId, prompt, { maxTokens: 1500 });
+
+    // Store assistant response
+    await executeStatement(
+      `INSERT INTO dojo_mobot_messages (session_id, tenant_id, role, content)
+       VALUES (:sessionId, :tenantId, 'assistant', :content)`,
+      [stringParam('sessionId', sessionId), stringParam('tenantId', ctx.tenantId), stringParam('content', llmResponse)]
+    );
+
+    return success({ response: { role: 'assistant', content: llmResponse } });
+  } catch (error) {
+    logger.error('Mobot response failed', { sessionId, error: String(error) });
+    return serverError(`Mobot response failed: ${error instanceof Error ? error.message : String(error)}`);
+  }
 }
 
 async function handleGetMobotHistory(ctx: RequestContext, sessionId: string) {
@@ -728,7 +1037,7 @@ async function handleGetMobotHistory(ctx: RequestContext, sessionId: string) {
     `SELECT * FROM dojo_mobot_messages WHERE session_id = :sessionId ORDER BY created_at ASC`,
     [stringParam('sessionId', sessionId)]
   );
-  return success({ messages: result.records || [] });
+  return success({ messages: result.rows || [] });
 }
 
 // =============================================================================
@@ -740,7 +1049,7 @@ async function handleGetConfig(ctx: RequestContext, tenantId: string) {
     `SELECT * FROM dojo_config WHERE tenant_id = :tenantId`,
     [stringParam('tenantId', tenantId)]
   );
-  if (!result.records?.length) {
+  if (!result.rows?.length) {
     // Return defaults
     return success({
       config: {
@@ -753,7 +1062,7 @@ async function handleGetConfig(ctx: RequestContext, tenantId: string) {
       },
     });
   }
-  return success({ config: result.records[0] });
+  return success({ config: result.rows[0] });
 }
 
 async function handleUpdateConfig(ctx: RequestContext, tenantId: string, body: Record<string, any>) {
@@ -790,7 +1099,7 @@ async function handleUpdateConfig(ctx: RequestContext, tenantId: string, body: R
       stringParam('archytasConfig', JSON.stringify(body.archytas_config || null)),
     ]
   );
-  return success({ config: result.records?.[0] });
+  return success({ config: result.rows?.[0] });
 }
 
 // =============================================================================
@@ -811,7 +1120,7 @@ async function handleGetDecayDashboard(ctx: RequestContext, tenantId: string, us
     [stringParam('tenantId', tenantId), stringParam('userId', userId)]
   );
 
-  const records = curves.records || [];
+  const records = curves.rows || [];
   const atRisk = records.filter((r: any) => parseFloat(r.retention_probability) < 0.5).length;
   const stable = records.filter((r: any) => parseFloat(r.retention_probability) >= 0.7).length;
   const decayed = records.filter((r: any) => parseFloat(r.retention_probability) < 0.3).length;
@@ -838,7 +1147,7 @@ async function handleGetDecayDashboard(ctx: RequestContext, tenantId: string, us
 
   return success({
     dashboard: {
-      total_atoms: parseInt(atomCount.records?.[0]?.total || '0', 10),
+      total_atoms: parseInt(String(atomCount.rows?.[0]?.total || '0'), 10),
       atoms_at_risk: atRisk,
       atoms_stable: stable,
       atoms_decayed: decayed,
@@ -862,7 +1171,7 @@ async function handleGetDecayCurves(ctx: RequestContext, tenantId: string, userI
   }
 
   const result = await executeStatement(query, params);
-  const records = result.records || [];
+  const records = result.rows || [];
 
   const curves = records.map((r: any) => ({
     atom_id: r.atom_id, user_id: r.user_id, half_life_hours: parseFloat(r.half_life_hours),
@@ -898,7 +1207,7 @@ async function handleTriggerReinforcement(ctx: RequestContext, tenantId: string,
     session: {
       id: `reinforce-${Date.now()}`,
       user_id: userId,
-      atoms: (result.records || []).map((r: any) => ({
+      atoms: (result.rows || []).map((r: any) => ({
         atom: { id: r.atom_id, concept: r.concept, description: r.description, source_citations: r.source_citations || [], difficulty: parseFloat(r.difficulty) },
         decay: { atom_id: r.atom_id, half_life_hours: parseFloat(r.half_life_hours), retention_probability: parseFloat(r.retention_probability) },
         question: null,
@@ -916,9 +1225,9 @@ async function handleSubmitReinforcementAnswer(ctx: RequestContext, reinforcemen
     `SELECT id FROM dojo_decay_curves WHERE atom_id = :atomId AND user_id = :userId`,
     [stringParam('atomId', body.atom_id), stringParam('userId', ctx.userId)]
   );
-  if (!curveResult.records?.length) return notFound('Decay curve not found for this atom');
+  if (!curveResult.rows?.length) return notFound('Decay curve not found for this atom');
 
-  const curveId = curveResult.records[0].id;
+  const curveId = String(curveResult.rows[0].id);
   const correct = body.answer?.correct ?? (typeof body.answer === 'string' && body.answer.length > 0);
 
   await executeStatement(
@@ -934,7 +1243,7 @@ async function handleSubmitReinforcementAnswer(ctx: RequestContext, reinforcemen
 
   return success({
     result: { correct, xp_awarded: correct ? 15 : 3 },
-    updated_curve: updated.records?.[0],
+    updated_curve: updated.rows?.[0],
   });
 }
 
@@ -968,7 +1277,7 @@ async function handleStartScenario(ctx: RequestContext, sessionId: string, body:
     ]
   );
 
-  return created({ scenario: { ...result.records?.[0], persona, branches: [] } });
+  return created({ scenario: { ...result.rows?.[0], persona, branches: [] } });
 }
 
 async function handleRespondToScenario(ctx: RequestContext, scenarioId: string, responseText: string) {
@@ -986,10 +1295,82 @@ async function handleRespondToScenario(ctx: RequestContext, scenarioId: string, 
     [stringParam('scenarioId', scenarioId)]
   );
 
-  throw new Error(
-    'Scenario response generation requires the AI pipeline. The Adversarial agent generates ' +
-    'persona reactions with emotional shifts and consequence scoring. Deploy the Dojo AI Lambda.'
+  const scenario = (scenarioResult as any).rows?.[0];
+  if (!scenario) return notFound('Scenario not found');
+
+  const persona = typeof scenario.persona === 'string' ? JSON.parse(scenario.persona) : scenario.persona;
+  const branchHistory = await executeStatement(
+    `SELECT learner_response, persona_message, turn_number FROM dojo_scenario_branches
+     WHERE scenario_id = :scenarioId ORDER BY turn_number ASC`,
+    [stringParam('scenarioId', scenarioId)]
   );
+  const branches = (branchHistory as any).rows || [];
+  const historyText = branches.map((b: any) =>
+    `Turn ${b.turn_number}:\nLearner: ${b.learner_response}\nPersona: ${b.persona_message}`
+  ).join('\n\n');
+
+  const prompt = `You are playing the role of "${persona.name}", a ${persona.archetype.replace(/_/g, ' ')}.
+Backstory: ${persona.backstory}
+Current emotional state: ${persona.emotional_state}
+Communication style: ${persona.communication_style}
+Hidden objectives: ${(persona.hidden_objectives || []).join(', ')}
+
+SCENARIO: ${scenario.situation}
+OBJECTIVE FOR LEARNER: ${scenario.objective}
+
+CONVERSATION SO FAR:
+${historyText || 'No prior turns.'}
+
+LEARNER'S LATEST RESPONSE: "${responseText}"
+
+Stay in character. React naturally based on your persona. Show emotional shifts if warranted.
+Rate the learner's response quality.
+
+Return JSON:
+{
+  "persona_response": "Your in-character response",
+  "emotional_shift": "neutral|positive|negative|frustrated|satisfied",
+  "consequence": "What happens as a result of the learner's action",
+  "learner_score": 1-10,
+  "feedback_hint": "Brief coaching hint (hidden from the persona interaction)"
+}`;
+
+  try {
+    const llmResponse = await invokeDojoLLM(ctx.tenantId, prompt, { maxTokens: 1500, temperature: 0.7 });
+    const jsonMatch = llmResponse.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('Invalid scenario response format');
+
+    const result = JSON.parse(jsonMatch[0]);
+
+    // Update the branch with the persona's response
+    const branch = (branchResult as any).rows?.[0];
+    if (branch) {
+      await executeStatement(
+        `UPDATE dojo_scenario_branches SET persona_message = :message, consequence = :consequence,
+         learner_score = :score WHERE id = :branchId`,
+        [
+          stringParam('message', result.persona_response || ''),
+          stringParam('consequence', result.consequence || ''),
+          longParam('score', result.learner_score || 5),
+          stringParam('branchId', branch.id),
+        ]
+      );
+    }
+
+    return success({
+      branch: {
+        ...(branch || {}),
+        persona_message: result.persona_response,
+        consequence: result.consequence,
+        learner_score: result.learner_score,
+      },
+      emotional_shift: result.emotional_shift,
+      feedback_hint: result.feedback_hint,
+    });
+  } catch (error) {
+    logger.error('Scenario response failed', { scenarioId, error: String(error) });
+    return serverError(`Scenario response failed: ${error instanceof Error ? error.message : String(error)}`);
+  }
 }
 
 async function handleConcludeScenario(ctx: RequestContext, scenarioId: string) {
@@ -997,8 +1378,8 @@ async function handleConcludeScenario(ctx: RequestContext, scenarioId: string) {
     `UPDATE dojo_scenario_sessions SET status = 'completed', completed_at = NOW() WHERE id = :scenarioId RETURNING *`,
     [stringParam('scenarioId', scenarioId)]
   );
-  if (!result.records?.length) return notFound('Scenario not found');
-  return success({ scenario: result.records[0] });
+  if (!result.rows?.length) return notFound('Scenario not found');
+  return success({ scenario: result.rows[0] });
 }
 
 function getPersonaName(archetype: string): string {
@@ -1020,13 +1401,78 @@ async function handleExtractCompetencies(ctx: RequestContext, libraryId: string)
     `SELECT * FROM dojo_competencies WHERE library_id = :libraryId`,
     [stringParam('libraryId', libraryId)]
   );
-  if (existing.records?.length) {
-    return success({ competencies: existing.records });
+  if (existing.rows?.length) {
+    return success({ competencies: existing.rows });
   }
-  throw new Error(
-    'Competency extraction requires the AI pipeline. The system analyzes themes and documents ' +
-    'to auto-extract a competency graph with proficiency levels. Deploy the Dojo AI Lambda.'
+  // Get library themes for analysis
+  const themeResult = await executeStatement(
+    `SELECT name, description, difficulty_tier FROM dojo_themes WHERE library_id = :libraryId`,
+    [stringParam('libraryId', libraryId)]
   );
+  const themes = (themeResult as any).rows || [];
+  if (themes.length === 0) return badRequest('No themes found. Run theme discovery first.');
+
+  const themeList = themes.map((t: any) => `- ${t.name} (${t.difficulty_tier}): ${t.description}`).join('\n');
+
+  const prompt = `You are a competency framework designer. Analyze these training themes and extract a competency graph.
+
+THEMES:
+${themeList}
+
+For each competency, define:
+1. Name (concise skill/knowledge area)
+2. Category (technical, interpersonal, analytical, procedural)
+3. Description
+4. Max proficiency level (1-5)
+5. Related theme names
+6. Prerequisites (other competency names, if any)
+
+Return JSON array:
+[
+  {
+    "name": "Competency Name",
+    "category": "technical|interpersonal|analytical|procedural",
+    "description": "What this competency covers",
+    "max_level": 5,
+    "related_themes": ["Theme Name"],
+    "prerequisites": []
+  }
+]`;
+
+  try {
+    const llmResponse = await invokeDojoLLM(ctx.tenantId, prompt, { maxTokens: 3000 });
+    const jsonMatch = llmResponse.match(/\[[\s\S]*\]/);
+    if (!jsonMatch) throw new Error('Invalid competency response format');
+
+    const competencies = JSON.parse(jsonMatch[0]);
+    const stored: any[] = [];
+
+    for (const comp of competencies.slice(0, 30)) {
+      const insertResult = await executeStatement(
+        `INSERT INTO dojo_competencies (library_id, name, category, description, max_level, related_themes, prerequisites)
+         VALUES (:libraryId, :name, :category, :description, :maxLevel, :themes::JSONB, :prereqs::JSONB)
+         ON CONFLICT (library_id, name) DO UPDATE SET description = :description, category = :category, max_level = :maxLevel
+         RETURNING *`,
+        [
+          stringParam('libraryId', libraryId),
+          stringParam('name', comp.name || ''),
+          stringParam('category', comp.category || 'technical'),
+          stringParam('description', comp.description || ''),
+          longParam('maxLevel', comp.max_level || 5),
+          stringParam('themes', JSON.stringify(comp.related_themes || [])),
+          stringParam('prereqs', JSON.stringify(comp.prerequisites || [])),
+        ]
+      );
+      if ((insertResult as any).rows?.[0]) {
+        stored.push((insertResult as any).rows[0]);
+      }
+    }
+
+    return success({ competencies: stored });
+  } catch (error) {
+    logger.error('Competency extraction failed', { libraryId, error: String(error) });
+    return serverError(`Competency extraction failed: ${error instanceof Error ? error.message : String(error)}`);
+  }
 }
 
 async function handleGetCompetencyMesh(ctx: RequestContext, tenantId: string, userId: string, libraryId: string) {
@@ -1042,7 +1488,7 @@ async function handleGetCompetencyMesh(ctx: RequestContext, tenantId: string, us
     mesh: {
       user_id: userId,
       library_id: libraryId,
-      competencies: scoresResult.records || [],
+      competencies: scoresResult.rows || [],
       readiness_scores: [],
       recommended_path: [],
     },
@@ -1067,7 +1513,7 @@ async function handleGetTeamCompetencyGaps(ctx: RequestContext, tenantId: string
       competencies: [],
       readiness_scores: [],
       recommended_path: [],
-      team_gaps: result.records || [],
+      team_gaps: result.rows || [],
     },
   });
 }
@@ -1089,7 +1535,7 @@ async function handleStartDialectic(ctx: RequestContext, sessionId: string, body
       stringParam('proposition', proposition),
     ]
   );
-  return created({ dialectic: { ...result.records?.[0], turns: [] } });
+  return created({ dialectic: { ...result.rows?.[0], turns: [] } });
 }
 
 async function handleSubmitDialecticResponse(ctx: RequestContext, dialecticId: string, body: { content: string; reasoning_type: string }) {
@@ -1105,12 +1551,91 @@ async function handleSubmitDialecticResponse(ctx: RequestContext, dialecticId: s
     ]
   );
 
-  // In production, multi-agent system generates thesis/antithesis/synthesis responses
-  throw new Error(
-    'Dialectic response generation requires the AI pipeline. The multi-agent Socratic system ' +
-    'generates thesis, antithesis, and moderator responses with logical fallacy detection. ' +
-    'Deploy the Dojo AI Lambda.'
+  // Get dialectic context
+  const dialecticResult = await executeStatement(
+    `SELECT ds.*, dt.name as theme_name, dt.description as theme_description
+     FROM dojo_dialectic_sessions ds
+     LEFT JOIN dojo_themes dt ON dt.id = ds.theme_id
+     WHERE ds.id = :dialecticId`,
+    [stringParam('dialecticId', dialecticId)]
   );
+  const dialectic = (dialecticResult as any).rows?.[0];
+  if (!dialectic) return notFound('Dialectic session not found');
+
+  // Get conversation history
+  const turnsResult = await executeStatement(
+    `SELECT role, content, reasoning_type FROM dojo_dialectic_turns
+     WHERE dialectic_id = :dialecticId ORDER BY created_at ASC`,
+    [stringParam('dialecticId', dialecticId)]
+  );
+  const turns = (turnsResult as any).rows || [];
+  const turnHistory = turns.map((t: any) => `[${t.role} - ${t.reasoning_type}]: ${t.content}`).join('\n\n');
+
+  const prompt = `You are a Socratic dialectic system conducting a philosophical inquiry.
+
+PROPOSITION: "${dialectic.proposition}"
+THEME: ${dialectic.theme_name || 'General'} - ${dialectic.theme_description || ''}
+
+DIALOGUE SO FAR:
+${turnHistory || 'No prior turns.'}
+
+LEARNER'S LATEST ARGUMENT (${body.reasoning_type}): "${body.content}"
+
+Respond with THREE perspectives:
+1. THESIS AGENT: Strengthen the proposition, building on valid points
+2. ANTITHESIS AGENT: Challenge the argument, find weaknesses
+3. MODERATOR: Synthesize, identify logical fallacies, and guide deeper thinking
+
+Also detect any logical fallacies in the learner's argument.
+
+Return JSON:
+{
+  "thesis": {"content": "...", "reasoning_type": "support"},
+  "antithesis": {"content": "...", "reasoning_type": "challenge"},
+  "moderator": {"content": "...", "reasoning_type": "synthesis"},
+  "fallacies_detected": ["fallacy name: explanation"],
+  "dialectic_quality_score": 1-10,
+  "suggested_next_inquiry": "A question to deepen the discussion"
+}`;
+
+  try {
+    const llmResponse = await invokeDojoLLM(ctx.tenantId, prompt, { maxTokens: 2500, temperature: 0.5 });
+    const jsonMatch = llmResponse.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('Invalid dialectic response format');
+
+    const result = JSON.parse(jsonMatch[0]);
+
+    // Store the three agent responses
+    const agentTurns = [
+      { role: 'thesis_agent', ...result.thesis },
+      { role: 'antithesis_agent', ...result.antithesis },
+      { role: 'moderator', ...result.moderator },
+    ];
+
+    for (const turn of agentTurns) {
+      await executeStatement(
+        `INSERT INTO dojo_dialectic_turns (dialectic_id, tenant_id, role, content, reasoning_type)
+         VALUES (:dialecticId, :tenantId, :role, :content, :reasoningType)`,
+        [
+          stringParam('dialecticId', dialecticId),
+          stringParam('tenantId', ctx.tenantId),
+          stringParam('role', turn.role),
+          stringParam('content', turn.content || ''),
+          stringParam('reasoningType', turn.reasoning_type || 'response'),
+        ]
+      );
+    }
+
+    return success({
+      responses: agentTurns,
+      fallacies_detected: result.fallacies_detected || [],
+      dialectic_quality_score: result.dialectic_quality_score || 5,
+      suggested_next_inquiry: result.suggested_next_inquiry || '',
+    });
+  } catch (error) {
+    logger.error('Dialectic response failed', { dialecticId, error: String(error) });
+    return serverError(`Dialectic response failed: ${error instanceof Error ? error.message : String(error)}`);
+  }
 }
 
 async function handleConcludeDialectic(ctx: RequestContext, dialecticId: string) {
@@ -1118,14 +1643,14 @@ async function handleConcludeDialectic(ctx: RequestContext, dialecticId: string)
     `UPDATE dojo_dialectic_sessions SET status = 'concluded', completed_at = NOW() WHERE id = :dialecticId RETURNING *`,
     [stringParam('dialecticId', dialecticId)]
   );
-  if (!result.records?.length) return notFound('Dialectic session not found');
+  if (!result.rows?.length) return notFound('Dialectic session not found');
 
   const turns = await executeStatement(
     `SELECT * FROM dojo_dialectic_turns WHERE dialectic_id = :dialecticId ORDER BY created_at`,
     [stringParam('dialecticId', dialecticId)]
   );
 
-  return success({ dialectic: { ...result.records[0], turns: turns.records || [] } });
+  return success({ dialectic: { ...result.rows[0], turns: turns.rows || [] } });
 }
 
 // =============================================================================
@@ -1137,19 +1662,76 @@ async function handleGetMultimodalContent(ctx: RequestContext, lessonId: string)
     `SELECT * FROM dojo_multimodal_content WHERE lesson_id = :lessonId`,
     [stringParam('lessonId', lessonId)]
   );
-  if (!result.records?.length) {
+  if (!result.rows?.length) {
     return success({ content: { lesson_id: lessonId, audio_url: null, audio_duration_seconds: null, diagrams: [], glossary: [], key_takeaways: [], learning_style_adaptations: {} } });
   }
-  return success({ content: result.records[0] });
+  return success({ content: result.rows[0] });
 }
 
 async function handleGenerateMultimodal(ctx: RequestContext, lessonId: string, types: string[]) {
-  // In production, invokes LLM + TTS to generate multimodal content
-  throw new Error(
-    'Multimodal generation requires the AI pipeline. The system generates audio (TTS), ' +
-    'Mermaid diagrams, glossary, and learning style adaptations from lesson content. ' +
-    'Deploy the Dojo AI Lambda.'
+  // Get lesson content
+  const lessonResult = await executeStatement(
+    `SELECT * FROM dojo_lesson_blocks WHERE id = :lessonId`,
+    [stringParam('lessonId', lessonId)]
   );
+  const lesson = (lessonResult as any).rows?.[0];
+  if (!lesson) return notFound('Lesson not found');
+
+  const requestedTypes = types.length > 0 ? types : ['diagrams', 'glossary', 'key_takeaways'];
+
+  const prompt = `Analyze this lesson content and generate multimodal learning aids.
+
+LESSON TITLE: ${lesson.title || 'Untitled'}
+LESSON CONTENT:
+${(lesson.content || '').substring(0, 5000)}
+
+Generate the following (only include requested types: ${requestedTypes.join(', ')}):
+
+1. DIAGRAMS: Create 1-3 Mermaid diagram definitions that visualize key concepts
+2. GLOSSARY: Extract 5-10 key terms with definitions
+3. KEY_TAKEAWAYS: List 3-5 essential points to remember
+4. LEARNING_STYLE_ADAPTATIONS: Suggest how to present this content for visual, auditory, and kinesthetic learners
+
+Return JSON:
+{
+  "diagrams": [{"title": "...", "mermaid_code": "graph TD\\n  A-->B", "description": "..."}],
+  "glossary": [{"term": "...", "definition": "..."}],
+  "key_takeaways": ["..."],
+  "learning_style_adaptations": {
+    "visual": "How to present visually",
+    "auditory": "How to present for listeners",
+    "kinesthetic": "Hands-on activities"
+  }
+}`;
+
+  try {
+    const llmResponse = await invokeDojoLLM(ctx.tenantId, prompt, { maxTokens: 3000 });
+    const jsonMatch = llmResponse.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('Invalid multimodal response format');
+
+    const content = JSON.parse(jsonMatch[0]);
+
+    // Store multimodal content
+    await executeStatement(
+      `INSERT INTO dojo_multimodal_content (lesson_id, diagrams, glossary, key_takeaways, learning_style_adaptations)
+       VALUES (:lessonId, :diagrams::JSONB, :glossary::JSONB, :takeaways::JSONB, :adaptations::JSONB)
+       ON CONFLICT (lesson_id) DO UPDATE SET
+         diagrams = :diagrams::JSONB, glossary = :glossary::JSONB,
+         key_takeaways = :takeaways::JSONB, learning_style_adaptations = :adaptations::JSONB`,
+      [
+        stringParam('lessonId', lessonId),
+        stringParam('diagrams', JSON.stringify(content.diagrams || [])),
+        stringParam('glossary', JSON.stringify(content.glossary || [])),
+        stringParam('takeaways', JSON.stringify(content.key_takeaways || [])),
+        stringParam('adaptations', JSON.stringify(content.learning_style_adaptations || {})),
+      ]
+    );
+
+    return success({ content: { lesson_id: lessonId, ...content } });
+  } catch (error) {
+    logger.error('Multimodal generation failed', { lessonId, error: String(error) });
+    return serverError(`Multimodal generation failed: ${error instanceof Error ? error.message : String(error)}`);
+  }
 }
 
 // =============================================================================
@@ -1161,7 +1743,7 @@ async function handleGetKnowledgePulse(ctx: RequestContext, tenantId: string) {
     `SELECT * FROM dojo_knowledge_pulse WHERE tenant_id = :tenantId ORDER BY snapshot_at DESC LIMIT 1`,
     [stringParam('tenantId', tenantId)]
   );
-  if (!result.records?.length) {
+  if (!result.rows?.length) {
     // Generate a fresh pulse from current data
     const userCount = await executeStatement(
       `SELECT COUNT(DISTINCT user_id) as total FROM dojo_user_progress WHERE tenant_id = :tenantId`,
@@ -1170,14 +1752,15 @@ async function handleGetKnowledgePulse(ctx: RequestContext, tenantId: string) {
     return success({
       pulse: {
         tenant_id: tenantId, snapshot_at: new Date().toISOString(),
-        overall_health: 0, total_users: parseInt(userCount.records?.[0]?.total || '0', 10),
+        overall_health: 0, 
+        total_users: parseInt(String(userCount.rows?.[0]?.total || '0'), 10),
         active_users_30d: 0, department_health: [], theme_coverage: [], decay_alerts: [],
         trends: { knowledge_health_7d: [], knowledge_health_30d: [], training_hours_7d: [], new_certifications_7d: 0, avg_session_score_trend: 'flat' },
         roi_metrics: { estimated_cost_savings_monthly: 0, avg_time_to_competency_days: 0, certification_pass_rate: 0, knowledge_retention_rate: 0, training_hours_saved_vs_traditional: 0 },
       },
     });
   }
-  return success({ pulse: result.records[0] });
+  return success({ pulse: result.rows[0] });
 }
 
 async function handleGetPulseHistory(ctx: RequestContext, tenantId: string, days: number) {
@@ -1185,7 +1768,7 @@ async function handleGetPulseHistory(ctx: RequestContext, tenantId: string, days
     `SELECT * FROM dojo_knowledge_pulse WHERE tenant_id = :tenantId AND snapshot_at >= NOW() - (:days || ' days')::INTERVAL ORDER BY snapshot_at DESC`,
     [stringParam('tenantId', tenantId), longParam('days', days)]
   );
-  return success({ snapshots: result.records || [] });
+  return success({ snapshots: result.rows || [] });
 }
 
 // =============================================================================
@@ -1197,7 +1780,7 @@ async function handleGetArchytasConfig(ctx: RequestContext, tenantId: string) {
     `SELECT archytas_config FROM dojo_config WHERE tenant_id = :tenantId`,
     [stringParam('tenantId', tenantId)]
   );
-  const config = result.records?.[0]?.archytas_config;
+  const config = result.rows?.[0]?.archytas_config;
   if (!config) {
     return success({
       config: {
@@ -1238,12 +1821,58 @@ async function handleInvokeArchytasTool(ctx: RequestContext, sessionId: string, 
 
   // In production, this invokes the Archytas executor (code sandbox, web research, etc.)
   // For now, mark as pending — async execution handles completion
-  return created({ tool_call: result.records?.[0] });
+  return created({ tool_call: result.rows?.[0] });
 }
 
 async function handleGetArchytasSuggestions(ctx: RequestContext, sessionId: string, context: string) {
-  // In production, LLM generates tool suggestions based on session context
-  return success({ suggestions: [] });
+  // Get session's tool call history
+  const historyResult = await executeStatement(
+    `SELECT tool_type, input, status FROM dojo_archytas_tool_calls
+     WHERE session_id = :sessionId ORDER BY created_at DESC LIMIT 5`,
+    [stringParam('sessionId', sessionId)]
+  );
+  const recentCalls = (historyResult as any).rows || [];
+  const historyText = recentCalls.map((c: any) => `[${c.tool_type}] ${c.input} → ${c.status}`).join('\n');
+
+  // Get Archytas config for allowed tools
+  const configResult = await executeStatement(
+    `SELECT archytas_config FROM dojo_config WHERE tenant_id = :tenantId`,
+    [stringParam('tenantId', ctx.tenantId)]
+  );
+  const config = (configResult as any).rows?.[0]?.archytas_config;
+  const allowedTools = (typeof config === 'string' ? JSON.parse(config) : config)?.allowed_tools || ['code_execution', 'web_research', 'data_analysis', 'visualization'];
+
+  const prompt = `You are the Archytas AI assistant. Based on the learning context, suggest relevant tools the learner could use.
+
+AVAILABLE TOOLS: ${allowedTools.join(', ')}
+RECENT TOOL USAGE:
+${historyText || 'No tools used yet.'}
+
+CURRENT CONTEXT: ${context || 'General learning session'}
+
+Suggest 2-4 tool actions that would help the learner. Each suggestion should be actionable.
+
+Return JSON array:
+[
+  {
+    "tool_type": "code_execution|web_research|data_analysis|visualization",
+    "suggested_input": "What to do with the tool",
+    "rationale": "Why this would help",
+    "priority": "high|medium|low"
+  }
+]`;
+
+  try {
+    const llmResponse = await invokeDojoLLM(ctx.tenantId, prompt, { maxTokens: 1000 });
+    const jsonMatch = llmResponse.match(/\[[\s\S]*\]/);
+    if (!jsonMatch) return success({ suggestions: [] });
+
+    const suggestions = JSON.parse(jsonMatch[0]);
+    return success({ suggestions: suggestions.slice(0, 4) });
+  } catch (error) {
+    logger.error('Archytas suggestions failed', { sessionId, error: String(error) });
+    return success({ suggestions: [] });
+  }
 }
 
 async function handleGetArchytasSessionSummary(ctx: RequestContext, sessionId: string) {
@@ -1252,7 +1881,7 @@ async function handleGetArchytasSessionSummary(ctx: RequestContext, sessionId: s
     [stringParam('sessionId', sessionId)]
   );
 
-  const calls = result.records || [];
+  const calls = result.rows || [];
   const successful = calls.filter((c: any) => c.status === 'completed').length;
   const failed = calls.filter((c: any) => c.status === 'failed').length;
   const toolTypes = [...new Set(calls.map((c: any) => c.tool_type))];

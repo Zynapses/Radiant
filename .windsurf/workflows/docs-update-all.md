@@ -90,9 +90,13 @@ Before making ANY code change, identify what type of change it is:
 
 ### Think Tank Changes
 ```
-✅ CHANGELOG.md
+✅ CHANGELOG.md — with platform annotation: [Web], [Mac], or [Both]
 ✅ docs/01-THINK-TANK.md (user guide, admin guide, tenant admin — all in one doc)
+✅ docs/THINKTANK-MAC-GUIDE.md (if Mac user experience changed)
+✅ docs/THINKTANK-MAC-PORTABILITY-MANIFEST.md (Feature Parity Matrix — ALWAYS)
 ✅ docs/15-STRATEGY-COMPETITIVE.md (if major feature)
+⚠️  BIDIRECTIONAL: Web changes MUST mirror to Mac and vice versa
+    See: /.windsurf/workflows/thinktank-dual-platform.md
 ```
 
 ### Curator Changes
@@ -119,6 +123,16 @@ Before making ANY code change, identify what type of change it is:
 ```
 ✅ CHANGELOG.md
 ✅ docs/05-SWIFT-DEPLOYER.md
+```
+
+### Think Tank Mac App Changes
+```
+✅ CHANGELOG.md — with platform annotation: [Mac] or [Both]
+✅ docs/THINKTANK-MAC-GUIDE.md (Mac user documentation)
+✅ docs/THINKTANK-MAC-PORTABILITY-MANIFEST.md (Feature Parity Matrix)
+✅ docs/01-THINK-TANK.md (if feature also on web)
+⚠️  BIDIRECTIONAL: Mac changes MUST mirror to Web and vice versa
+    See: /.windsurf/workflows/thinktank-dual-platform.md
 ```
 
 ### Architecture / CDK / Lambda Changes
@@ -244,6 +258,9 @@ Before marking task complete, verify:
 □ Glossary (17) updated if new terms/acronyms
 □ Strategy (15) updated if competitive advantage
 □ Version numbers updated in all touched docs
+□ If Think Tank change: THINKTANK-MAC-PORTABILITY-MANIFEST.md updated
+□ If Think Tank change: THINKTANK-MAC-GUIDE.md updated (if Mac UX affected)
+□ If Think Tank change: Dual-platform sync verified per thinktank-dual-platform.md
 ```
 
 ---
@@ -278,6 +295,9 @@ See policy: `/.windsurf/workflows/docs-assemble-complete.md`
 │  DOJO:             ✅ docs/03-DOJO.md                     │
 │  RADIANT ADMIN:    ✅ docs/04-RADIANT-ADMIN.md            │
 │  SWIFT DEPLOYER:   ✅ docs/05-SWIFT-DEPLOYER.md           │
+│  TT MAC APP:       ✅ docs/THINKTANK-MAC-GUIDE.md          │
+│  TT MAC MANIFEST:  ✅ docs/THINKTANK-MAC-PORTABILITY-      │
+│                        MANIFEST.md                        │
 │                                                          │
 │  ARCHITECTURE:     ✅ docs/06-ARCHITECTURE-ENGINEERING.md  │
 │  AI BRAIN:         ✅ docs/07-AI-BRAIN-SYSTEMS.md          │

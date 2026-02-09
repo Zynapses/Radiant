@@ -39,6 +39,8 @@ OUT_PDF = OUT_DIR / "RADIANT-THINKTANK-COMPLETE-DOCUMENTATION.pdf"
 DOCUMENT_STRUCTURE = [
     ("Applications — Think Tank", [
         ("Think Tank — Complete Reference", "docs/01-THINK-TANK.md"),
+        ("Think Tank (Mac) — User Guide", "docs/THINKTANK-MAC-GUIDE.md"),
+        ("Think Tank (Mac) — Portability Manifest", "docs/THINKTANK-MAC-PORTABILITY-MANIFEST.md"),
     ]),
 
     ("Applications — Curator", [

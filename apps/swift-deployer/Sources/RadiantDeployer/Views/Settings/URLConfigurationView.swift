@@ -43,10 +43,57 @@ struct URLConfigurationView: View {
                     helpText: "Thematic mastery training platform with spaced repetition and competency mapping",
                     icon: "flame"
                 )
+                
+                URLInputField(
+                    label: "Cato Trainer URL",
+                    placeholder: "https://cato.example.com",
+                    value: $viewModel.catoTrainerUrl,
+                    helpText: "AI-powered knowledge base with grounded Q&A, semantic search, and citation-backed responses",
+                    icon: "shield.checkered"
+                )
+                
+                URLInputField(
+                    label: "Curator URL",
+                    placeholder: "https://curator.example.com",
+                    value: $viewModel.curatorUrl,
+                    helpText: "Knowledge graph curation, fact verification, and conflict resolution",
+                    icon: "book.pages"
+                )
             } header: {
                 Text("Platform URLs")
             } footer: {
                 Text("These URLs define where your RADIANT platform components are accessible.")
+            }
+            
+            // Genesis / OMEGA Section
+            Section {
+                URLInputField(
+                    label: "Genesis Lab URL",
+                    placeholder: "https://genesis.example.com",
+                    value: $viewModel.genesisLabUrl,
+                    helpText: "OMEGA brain monitoring dashboard with thermal visualization and Cortex Explorer",
+                    icon: "waveform.path.ecg"
+                )
+                
+                URLInputField(
+                    label: "Genesis Forge URL",
+                    placeholder: "https://forge.example.com",
+                    value: $viewModel.genesisForgeUrl,
+                    helpText: "OMEGA firmware creation tool for .bio files with Helix rules and personality traits",
+                    icon: "hammer.fill"
+                )
+                
+                URLInputField(
+                    label: "OMEGA API URL",
+                    placeholder: "https://omega.example.com",
+                    value: $viewModel.omegaApiUrl,
+                    helpText: "Bio-mimetic AI inference API with Time Warp and shadow mode",
+                    icon: "brain"
+                )
+            } header: {
+                Text("Genesis / OMEGA")
+            } footer: {
+                Text("Bio-mimetic AI organism monitoring and firmware management (Scale tier and above).")
             }
             
             // API Configuration Section
@@ -238,8 +285,15 @@ class URLConfigurationViewModel: ObservableObject {
     @Published var thinkTankUrl = ""
     @Published var adminDashboardUrl = ""
     
-    // Dojo URL
+    // App URLs
     @Published var dojoUrl = ""
+    @Published var catoTrainerUrl = ""
+    @Published var curatorUrl = ""
+    
+    // Genesis / OMEGA URLs
+    @Published var genesisLabUrl = ""
+    @Published var genesisForgeUrl = ""
+    @Published var omegaApiUrl = ""
     
     // API Configuration
     @Published var apiBaseUrl = ""
@@ -269,6 +323,11 @@ class URLConfigurationViewModel: ObservableObject {
             thinkTankUrl = config.thinkTankUrl
             adminDashboardUrl = config.adminDashboardUrl
             dojoUrl = config.dojoUrl ?? ""
+            catoTrainerUrl = config.catoTrainerUrl ?? ""
+            curatorUrl = config.curatorUrl ?? ""
+            genesisLabUrl = config.genesisLabUrl ?? ""
+            genesisForgeUrl = config.genesisForgeUrl ?? ""
+            omegaApiUrl = config.omegaApiUrl ?? ""
             apiBaseUrl = config.apiBaseUrl
             websocketUrl = config.websocketUrl
             cloudfrontUrl = config.cloudfrontUrl
@@ -290,6 +349,11 @@ class URLConfigurationViewModel: ObservableObject {
             ("Think Tank", thinkTankUrl),
             ("Admin Dashboard", adminDashboardUrl),
             ("Aurelius Dojo", dojoUrl),
+            ("Cato Trainer", catoTrainerUrl),
+            ("Curator", curatorUrl),
+            ("Genesis Lab", genesisLabUrl),
+            ("Genesis Forge", genesisForgeUrl),
+            ("OMEGA API", omegaApiUrl),
             ("API Base", apiBaseUrl),
             ("WebSocket", websocketUrl),
         ]
@@ -325,6 +389,11 @@ class URLConfigurationViewModel: ObservableObject {
             thinkTankUrl: thinkTankUrl,
             adminDashboardUrl: adminDashboardUrl,
             dojoUrl: dojoUrl.isEmpty ? nil : dojoUrl,
+            catoTrainerUrl: catoTrainerUrl.isEmpty ? nil : catoTrainerUrl,
+            curatorUrl: curatorUrl.isEmpty ? nil : curatorUrl,
+            genesisLabUrl: genesisLabUrl.isEmpty ? nil : genesisLabUrl,
+            genesisForgeUrl: genesisForgeUrl.isEmpty ? nil : genesisForgeUrl,
+            omegaApiUrl: omegaApiUrl.isEmpty ? nil : omegaApiUrl,
             apiBaseUrl: apiBaseUrl,
             websocketUrl: websocketUrl,
             cloudfrontUrl: cloudfrontUrl,
@@ -347,6 +416,11 @@ struct URLConfiguration: Codable {
     var thinkTankUrl: String
     var adminDashboardUrl: String
     var dojoUrl: String?
+    var catoTrainerUrl: String?
+    var curatorUrl: String?
+    var genesisLabUrl: String?
+    var genesisForgeUrl: String?
+    var omegaApiUrl: String?
     var apiBaseUrl: String
     var websocketUrl: String
     var cloudfrontUrl: String
@@ -361,6 +435,11 @@ struct URLConfiguration: Codable {
             thinkTankUrl: "https://thinktank.{{RADIANT_DOMAIN}}",
             adminDashboardUrl: "https://admin.{{RADIANT_DOMAIN}}",
             dojoUrl: "https://dojo.{{RADIANT_DOMAIN}}",
+            catoTrainerUrl: "https://cato.{{RADIANT_DOMAIN}}",
+            curatorUrl: "https://curator.{{RADIANT_DOMAIN}}",
+            genesisLabUrl: "https://genesis.{{RADIANT_DOMAIN}}",
+            genesisForgeUrl: "https://forge.{{RADIANT_DOMAIN}}",
+            omegaApiUrl: "https://omega.{{RADIANT_DOMAIN}}",
             apiBaseUrl: "https://api.{{RADIANT_DOMAIN}}",
             websocketUrl: "wss://ws.{{RADIANT_DOMAIN}}",
             cloudfrontUrl: "",

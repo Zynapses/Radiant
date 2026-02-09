@@ -5,6 +5,8 @@
  * Purpose: Sync app definitions from Activepieces and n8n registries
  */
 
+import * as crypto from 'crypto';
+import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
 import { ScheduledEvent, Context } from 'aws-lambda';
 import { executeStatement, stringParam, longParam } from '../shared/db/client';
 import { createRegisteredLogger } from '../shared/services/logging-registry.service';

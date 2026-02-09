@@ -431,7 +431,7 @@ async function routeRequest(
   if (pathParts[1] === 'brain') {
     if (pathParts[2] === 'ecd') {
       const { handler: ecdHandler } = await import('./ecd.js');
-      return ecdHandler(event);
+      return (await ecdHandler(event, MINIMAL_CONTEXT, NOOP_CALLBACK)) as APIGatewayProxyResult;
     }
     const { handler: brainHandler } = await import('./brain.js');
     return brainHandler(event);
@@ -623,15 +623,15 @@ async function routeRequest(
   if (pathParts[1] === 'sovereign-mesh') {
     if (pathParts[2] === 'ai-helper') {
       const { handler: aiHelperHandler } = await import('./admin-ai-helper.js');
-      return aiHelperHandler(event);
+      return (await aiHelperHandler(event, MINIMAL_CONTEXT, NOOP_CALLBACK)) as APIGatewayProxyResult;
     }
     if (pathParts[2] === 'performance') {
       const { handler: perfHandler } = await import('./sovereign-mesh-performance.js');
-      return perfHandler(event);
+      return (await perfHandler(event, MINIMAL_CONTEXT, NOOP_CALLBACK)) as APIGatewayProxyResult;
     }
     if (pathParts[2] === 'scaling') {
       const { handler: scalingHandler } = await import('./sovereign-mesh-scaling.js');
-      return scalingHandler(event);
+      return (await scalingHandler(event, MINIMAL_CONTEXT, NOOP_CALLBACK)) as APIGatewayProxyResult;
     }
     const { handler: meshHandler } = await import('./sovereign-mesh.js');
     return meshHandler(event);
@@ -641,7 +641,7 @@ async function routeRequest(
   if (pathParts[1] === 'platform') {
     if (pathParts[2] === 'bedrock' || pathParts[2] === 'bedrock-settings') {
       const { handler: bedrockHandler } = await import('./bedrock-management.js');
-      return bedrockHandler(event);
+      return (await bedrockHandler(event, MINIMAL_CONTEXT, NOOP_CALLBACK)) as APIGatewayProxyResult;
     }
     if (pathParts[2] === 'cartridge-operations') {
       const { handler: cartOpsHandler } = await import('./cartridge-operations.js');
@@ -681,7 +681,7 @@ async function routeRequest(
     }
     if (pathParts[2] === 'snapshots') {
       const { handler: snapHandler } = await import('./snapshot-storage.js');
-      return snapHandler(event);
+      return (await snapHandler(event, MINIMAL_CONTEXT, NOOP_CALLBACK)) as APIGatewayProxyResult;
     }
     if (pathParts[2] === 'state-registry') {
       const { handler: stateHandler } = await import('./state-registry.js');
@@ -689,7 +689,7 @@ async function routeRequest(
     }
     if (pathParts[2] === 'uds') {
       const { handler: udsHandler } = await import('./uds.js');
-      return udsHandler(event);
+      return (await udsHandler(event, MINIMAL_CONTEXT, NOOP_CALLBACK)) as APIGatewayProxyResult;
     }
   }
 
@@ -717,7 +717,7 @@ async function routeRequest(
     }
     if (pathParts[2] === 'model-weights') {
       const { handler: weightsHandler } = await import('./model-weights.js');
-      return weightsHandler(event);
+      return (await weightsHandler(event, MINIMAL_CONTEXT, NOOP_CALLBACK)) as APIGatewayProxyResult;
     }
     if (pathParts[2] === 'templates') {
       const { handler: templatesHandler } = await import('./orchestration-user-templates.js');
@@ -741,7 +741,7 @@ async function routeRequest(
   if (pathParts[1] === 'cortex') {
     if (pathParts[2] === 'v2') {
       const { handler: cortexV2Handler } = await import('./cortex-v2.js');
-      return cortexV2Handler(event);
+      return (await cortexV2Handler(event, MINIMAL_CONTEXT, NOOP_CALLBACK)) as APIGatewayProxyResult;
     }
     const { handler: cortexHandler } = await import('./cortex.js');
     return cortexHandler(event);
@@ -770,11 +770,11 @@ async function routeRequest(
   }
   if (pathParts[1] === 'dynamic-reports') {
     const { handler: dynReportsHandler } = await import('./dynamic-reports.js');
-    return dynReportsHandler(event);
+    return (await dynReportsHandler(event, MINIMAL_CONTEXT, NOOP_CALLBACK)) as APIGatewayProxyResult;
   }
   if (pathParts[1] === 'gateway') {
     const { handler: gatewayHandler } = await import('./gateway.js');
-    return gatewayHandler(event);
+    return (await gatewayHandler(event, MINIMAL_CONTEXT, NOOP_CALLBACK)) as APIGatewayProxyResult;
   }
   if (pathParts[1] === 'ghost-inference') {
     const { handler: ghostHandler } = await import('./ghost-inference.js');
@@ -783,7 +783,7 @@ async function routeRequest(
   if (pathParts[1] === 'hitl-orchestration') {
     const mod = await import('./hitl-orchestration.js');
     // V2 handler — cast event for compatibility
-    const result = await mod.handler(event as any, MINIMAL_CONTEXT);
+    const result = await mod.handler(event as any, MINIMAL_CONTEXT, NOOP_CALLBACK);
     return (result || notFoundResponse()) as APIGatewayProxyResult;
   }
   if (pathParts[1] === 'log-retention') {
@@ -804,11 +804,11 @@ async function routeRequest(
   }
   if (pathParts[1] === 'reports') {
     const { handler: reportsHandler } = await import('./reports.js');
-    return reportsHandler(event);
+    return (await reportsHandler(event, MINIMAL_CONTEXT, NOOP_CALLBACK)) as APIGatewayProxyResult;
   }
   if (pathParts[1] === 's3-storage' || pathParts[1] === 'storage') {
     const { handler: storageHandler } = await import('./s3-storage.js');
-    return storageHandler(event);
+    return (await storageHandler(event, MINIMAL_CONTEXT, NOOP_CALLBACK)) as APIGatewayProxyResult;
   }
   if (pathParts[1] === 'safety-matrix') {
     const mod = await import('./safety-matrix.js');

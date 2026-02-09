@@ -317,6 +317,7 @@ export class MultiAgentService {
   // ============================================================================
 
   async agentThink(agent: CognitiveAgent, context: {
+    tenantId: string;
     goal: string;
     currentPhase: string;
     recentMessages: AgentMessage[];
@@ -355,7 +356,7 @@ Format your response as JSON:
       messages: [{ role: 'user', content: prompt }],
       temperature: agent.temperature,
       maxTokens: agent.maxTokens,
-      tenantId: undefined, // TODO: Thread tenantId from caller
+      tenantId: context.tenantId,
     });
 
     try {
@@ -383,6 +384,7 @@ Format your response as JSON:
   }
 
   async agentRespond(agent: CognitiveAgent, message: AgentMessage, context: {
+    tenantId: string;
     goal: string;
     sharedMemory: Record<string, unknown>;
   }): Promise<{ response: string; confidence: number; messageType: MessageType }> {
@@ -409,7 +411,7 @@ Format your response as JSON:
       messages: [{ role: 'user', content: prompt }],
       temperature: agent.temperature,
       maxTokens: agent.maxTokens,
-      tenantId: undefined, // TODO: Thread tenantId from caller
+      tenantId: context.tenantId,
     });
 
     try {
@@ -462,6 +464,7 @@ Format your response as JSON:
       for (let round = 1; round <= maxRounds; round++) {
         // Phase 1: Planner proposes
         const plannerThink = await this.agentThink(planner, {
+          tenantId,
           goal,
           currentPhase: round === 1 ? 'initial_proposal' : 'refinement',
           recentMessages: messages.slice(-6),
@@ -476,7 +479,7 @@ Format your response as JSON:
         messages.push(proposalMsg);
 
         // Phase 2: Critic critiques
-        const criticResponse = await this.agentRespond(critic, proposalMsg, { goal, sharedMemory: { round } });
+        const criticResponse = await this.agentRespond(critic, proposalMsg, { tenantId, goal, sharedMemory: { round } });
         const critiqueMsg = await this.sendMessage(session.sessionId, critic.agentId, planner.agentId, criticResponse.messageType, criticResponse.response, {
           roundNumber: round,
           confidence: criticResponse.confidence,
@@ -486,7 +489,7 @@ Format your response as JSON:
 
         // Phase 3: Devil's advocate challenges (if available)
         if (devil) {
-          const devilResponse = await this.agentRespond(devil, proposalMsg, { goal, sharedMemory: { round, critique: criticResponse.response } });
+          const devilResponse = await this.agentRespond(devil, proposalMsg, { tenantId, goal, sharedMemory: { round, critique: criticResponse.response } });
           const devilMsg = await this.sendMessage(session.sessionId, devil.agentId, planner.agentId, devilResponse.messageType, devilResponse.response, {
             roundNumber: round,
             confidence: devilResponse.confidence,
@@ -521,6 +524,7 @@ Format your response as JSON:
           const synthesizer = await this.getAgentByRole(tenantId, 'synthesizer');
           if (synthesizer) {
             const synthThink = await this.agentThink(synthesizer, {
+              tenantId,
               goal,
               currentPhase: 'final_synthesis',
               recentMessages: messages,
@@ -584,6 +588,7 @@ Format your response as JSON:
       // Phase 1: Each agent proposes or evaluates options
       for (const agent of agents) {
         const agentThink = await this.agentThink(agent, {
+          tenantId,
           goal,
           currentPhase: 'brainstorm',
           recentMessages: messages,
@@ -606,7 +611,7 @@ Format your response as JSON:
         for (const agent of agents) {
           for (const proposal of proposals) {
             if (proposal.fromAgentId !== agent.agentId) {
-              const response = await this.agentRespond(agent, proposal, { goal, sharedMemory: { round } });
+              const response = await this.agentRespond(agent, proposal, { tenantId, goal, sharedMemory: { round } });
               const vote = response.messageType === 'agreement' ? 'agree' : 
                           response.messageType === 'disagreement' ? 'disagree' : 'abstain';
               await this.voteOnMessage(session.sessionId, proposal.messageId, agent.agentId, vote);
@@ -713,6 +718,7 @@ Format your response as JSON:
     try {
       // Phase 1: Planner decomposes task
       const planThink = await this.agentThink(planner, {
+        tenantId,
         goal,
         currentPhase: 'decomposition',
         recentMessages: [],
@@ -737,6 +743,7 @@ Format your response as JSON:
         const subtask = subtasks[i];
 
         const execThink = await this.agentThink(executor, {
+          tenantId,
           goal: subtask,
           currentPhase: 'execution',
           recentMessages: [planMsg],
@@ -765,6 +772,7 @@ Format your response as JSON:
 
       if (synthesizer) {
         const synthThink = await this.agentThink(synthesizer, {
+          tenantId,
           goal: `Combine the following subtask results into a coherent solution for: ${goal}`,
           currentPhase: 'synthesis',
           recentMessages: messages,
@@ -788,6 +796,7 @@ Format your response as JSON:
       // Phase 4: Verify (if verifier available)
       if (verifier) {
         const verifyThink = await this.agentThink(verifier, {
+          tenantId,
           goal: `Verify this solution meets the requirements: ${goal}`,
           currentPhase: 'verification',
           recentMessages: messages.slice(-3),
@@ -851,6 +860,7 @@ Format your response as JSON:
       for (let round = 1; round <= 3; round++) {
         // Critic reviews
         const critiqueThink = await this.agentThink(critic, {
+          tenantId,
           goal: `Review this ${artifactType} for issues and improvements`,
           currentPhase: 'review',
           recentMessages: messages.slice(-4),
@@ -871,6 +881,7 @@ Format your response as JSON:
 
         // Executor revises based on feedback
         const revisionThink = await this.agentThink(executor, {
+          tenantId,
           goal: `Revise the ${artifactType} based on the critique`,
           currentPhase: 'revision',
           recentMessages: [critiqueMsg],
@@ -890,6 +901,7 @@ Format your response as JSON:
       // Final verification
       if (verifier) {
         const verifyThink = await this.agentThink(verifier, {
+          tenantId,
           goal: `Verify the final ${artifactType} is correct and complete`,
           currentPhase: 'verification',
           recentMessages: messages.slice(-2),

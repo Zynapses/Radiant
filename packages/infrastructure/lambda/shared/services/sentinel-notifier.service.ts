@@ -641,7 +641,7 @@ export class SentinelNotifierService {
       service: incident.service,
       region: incident.region || 'us-east-1',
       environment: 'production',
-      tenantScope: incident.tenantScope,
+      tenantScope: incident.tenantScope as 'none' | 'all' | 'multi' | 'single',
       complianceContext: incident.complianceContext,
       title: incident.title,
       message: incident.description || incident.title,

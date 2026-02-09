@@ -527,6 +527,9 @@ export class LogReportService {
       infrastructure: 'Lambda execution metrics, CDK deployments, health check results',
       application: 'API request/response logs, application errors, warnings, cold start metrics',
       collaboration: 'Guest session events, invitation tracking, restriction enforcement logs',
+      access: 'Access control events, authorization checks, resource access logs',
+      platform: 'Platform-level operational events, service health, integration logs',
+      performance: 'Performance metrics, latency measurements, throughput monitoring',
     };
     return desc[cat];
   }
@@ -541,6 +544,9 @@ export class LogReportService {
       infrastructure: 'Legitimate interest (service reliability)',
       application: 'Legitimate interest (service operation)',
       collaboration: 'Consent (collaboration participation)',
+      access: 'Legitimate interest (access control)',
+      platform: 'Legitimate interest (platform operations)',
+      performance: 'Legitimate interest (performance monitoring)',
     };
     return basis[cat];
   }

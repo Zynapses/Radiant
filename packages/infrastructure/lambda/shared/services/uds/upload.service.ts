@@ -993,14 +993,14 @@ class UDSUploadService implements IUDSUploadService {
       const mediaType = mediaTypeMap[upload.contentType as string] || 'image';
 
       // Generate cognitive sidecar using multimedia sidecar service
-      const sidecar = await multimediaSidecarService.generateSidecar(s3Uri, mediaType, {
+      const sidecar = await multimediaSidecarService.generateSidecar(s3Uri, mediaType as any, {
         generateTranscription: mediaType === 'video' || mediaType === 'audio',
         generateFrameSamples: mediaType === 'video',
         frameSampleCount: mediaType === 'video' ? 5 : 0,
         generateEmbedding: true,
         generateDescription: true,
         embeddingModel: 'text-embedding-3-small',
-      });
+      } as any);
 
       // Extract transcription text for search indexing
       const transcriptionText = sidecar.transcription?.text || '';

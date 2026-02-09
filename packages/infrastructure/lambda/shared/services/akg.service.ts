@@ -267,7 +267,7 @@ Extract all entities and relationships from this conversation.`;
       const extracted = this.parseExtractionResponse(llmResult.content);
       if (!extracted) {
         logger.warn('AKG extraction returned unparseable result', { tenantId, userId, conversationId });
-        await this.logExtraction(tenantId, userId, conversationId, 0, 0, 0, 0, 0, Date.now() - startTime, llmResult.usage?.totalTokens || 0, config.extractionModel, 'Unparseable LLM response');
+        await this.logExtraction(tenantId, userId, conversationId, 0, 0, 0, 0, 0, Date.now() - startTime, (llmResult.inputTokens || 0) + (llmResult.outputTokens || 0), config.extractionModel, 'Unparseable LLM response');
         return this.emptyExtractionResult(startTime);
       }
 
@@ -329,7 +329,7 @@ Extract all entities and relationships from this conversation.`;
 
       // Step 5: Log extraction
       const latencyMs = Date.now() - startTime;
-      const tokensUsed = llmResult.usage?.totalTokens || 0;
+      const tokensUsed = (llmResult.inputTokens || 0) + (llmResult.outputTokens || 0);
       await this.logExtraction(tenantId, userId, conversationId, newNodes.length, updatedNodes.length, newEdges.length, updatedEdges.length, 0, latencyMs, tokensUsed, config.extractionModel);
 
       logger.info('AKG extraction completed', {

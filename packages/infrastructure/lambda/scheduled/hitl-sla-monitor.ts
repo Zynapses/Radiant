@@ -8,6 +8,7 @@
 import { ScheduledHandler } from 'aws-lambda';
 import { executeStatement, stringParam, longParam } from '../shared/db/client';
 import { createRegisteredLogger } from '../shared/services/logging-registry.service';
+import { notificationService } from '../shared/services/sovereign-mesh/notification.service';
 
 const logger = createRegisteredLogger({
   serviceName: 'scheduled/hitl-sla-monitor',

@@ -200,7 +200,7 @@ class ConversationHistoryLoaderService {
         offset: 0,
       });
 
-      if (conversations.length === 0) {
+      if (conversations.conversations.length === 0) {
         return {
           messages: [],
           conversationTitle: '',
@@ -213,9 +213,9 @@ class ConversationHistoryLoaderService {
       }
 
       // Use the most recent conversation (skip the current new one if it exists)
-      priorConversationId = conversations[0].id;
-      if (request.newConversationId && conversations[0].id === request.newConversationId && conversations.length > 1) {
-        priorConversationId = conversations[1].id;
+      priorConversationId = conversations.conversations[0].id;
+      if (request.newConversationId && conversations.conversations[0].id === request.newConversationId && conversations.conversations.length > 1) {
+        priorConversationId = conversations.conversations[1].id;
       }
     }
 

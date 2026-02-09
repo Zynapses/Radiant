@@ -205,7 +205,7 @@ class BedrockModelDiscoveryService {
               boolParam('streaming', model.responseStreamingSupported || false),
               stringParam('customizations', `{${(model.customizationsSupported || []).join(',')}}`),
               stringParam('inference', `{${(model.inferenceTypesSupported || []).join(',')}}`),
-              stringParam('lifecycle', model.modelLifecycleStatus || 'ACTIVE'),
+              stringParam('lifecycle', String(model.modelLifecycle || 'ACTIVE')),
               pricing ? doubleParam('inputPrice', pricing.input) : stringParam('inputPrice', ''),
               pricing ? doubleParam('outputPrice', pricing.output) : stringParam('outputPrice', ''),
               stringParam('metadata', JSON.stringify({
@@ -230,7 +230,7 @@ class BedrockModelDiscoveryService {
               boolParam('streaming', model.responseStreamingSupported || false),
               stringParam('customizations', `{${(model.customizationsSupported || []).join(',')}}`),
               stringParam('inference', `{${(model.inferenceTypesSupported || []).join(',')}}`),
-              stringParam('lifecycle', model.modelLifecycleStatus || 'ACTIVE'),
+              stringParam('lifecycle', String(model.modelLifecycle || 'ACTIVE')),
               pricing ? doubleParam('inputPrice', pricing.input) : stringParam('inputPrice', ''),
               pricing ? doubleParam('outputPrice', pricing.output) : stringParam('outputPrice', ''),
               stringParam('metadata', '{}'),

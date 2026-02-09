@@ -25,6 +25,8 @@ export type AgentSafetyProfile = 'minimal' | 'standard' | 'strict' | 'hipaa';
 export type AgentExecutionStatus = 'pending' | 'provisioning' | 'running' | 'paused' | 'completed' | 'failed' | 'timeout' | 'budget_exceeded' | 'cancelled';
 export type OODAPhase = 'observe' | 'orient' | 'decide' | 'act' | 'report';
 
+import { AIHelperConfig, aiHelperService } from './ai-helper.service';
+
 export interface Agent {
   id: string;
   name: string;

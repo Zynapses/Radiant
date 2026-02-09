@@ -47,8 +47,10 @@ python3 tools/scripts/assemble-complete-documentation.py
 
 ## Document Structure (18 Consolidated Documents)
 
-### App Documents (1–5)
+### App Documents (1–5 + Mac)
 1. **Think Tank** — User guide, admin guide, tenant admin, Mac, licensing, Delight, collaboration
+1b. **Think Tank (Mac) User Guide** — `docs/THINKTANK-MAC-GUIDE.md`
+1c. **Think Tank (Mac) Portability Manifest** — `docs/THINKTANK-MAC-PORTABILITY-MANIFEST.md`
 2. **Curator** — User guide + engineering guide
 3. **Dojo** — Aurelius Dojo training system
 4. **Radiant Admin** — Platform admin, deployment, system health, spend governor, SaaS metrics

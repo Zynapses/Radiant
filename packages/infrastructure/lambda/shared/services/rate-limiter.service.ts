@@ -236,7 +236,7 @@ export class RateLimiterService {
    */
   private async loadTenantOverridesFromDB(): Promise<void> {
     try {
-      const { executeStatement } = await import('../db/client');
+      const { executeStatement } = await import('../db/client.js');
       const result = await executeStatement(
         `SELECT tenant_id, max_requests_per_minute, window_seconds, reason, expires_at
          FROM tenant_rate_limit_overrides

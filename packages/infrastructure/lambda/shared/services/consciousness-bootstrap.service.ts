@@ -94,7 +94,7 @@ export class MonologueGeneratorService {
     userMessage: string;
     assistantResponse: string;
     timestamp: string;
-  }): Promise<string> {
+  }, tenantId?: string): Promise<string> {
     try {
       const messages: ChatMessage[] = [
         { 

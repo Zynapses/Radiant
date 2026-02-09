@@ -9,6 +9,7 @@ import { v4 as uuidv4 } from 'uuid';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as os from 'os';
+import { execFileSync } from 'child_process';
 import { describeImage } from './image-converter';
 import { createRegisteredLogger } from '../logging-registry.service';
 
@@ -442,19 +443,18 @@ function calculateFrameTimes(
  * 
  * Frame extraction strategy (in priority order):
  * 1. VIDEO_PROCESSOR_LAMBDA_ARN - Lambda with ffmpeg layer (preferred)
- * 2. Placeholder frames - Minimal JPEG indicating timestamp (fallback)
+ * 2. Local ffmpeg - If ffmpeg binary is available in the environment (e.g., Lambda layer, container)
+ * 3. Placeholder frames - Minimal JPEG timestamp markers (last resort)
  * 
  * Note: Vision models like GPT-4V and Claude can analyze video URLs directly,
  * so placeholder frames serve as timestamp markers when ffmpeg is unavailable.
- * Configure VIDEO_PROCESSOR_LAMBDA_ARN for actual frame extraction.
+ * Configure VIDEO_PROCESSOR_LAMBDA_ARN or install ffmpeg for actual frame extraction.
  */
 async function extractFrames(
   videoPath: string,
   timestamps: number[],
   outputDir: string
 ): Promise<Buffer[]> {
-  const frameBuffers: Buffer[] = [];
-
   // Strategy 1: Use video processor Lambda with ffmpeg layer
   if (process.env.VIDEO_PROCESSOR_LAMBDA_ARN) {
     try {
@@ -464,18 +464,100 @@ async function extractFrames(
         return result.frames.map((f: string) => Buffer.from(f, 'base64'));
       }
     } catch (error) {
-      logger.warn('Lambda frame extraction failed, using placeholder fallback', { error });
+      logger.warn('Lambda frame extraction failed, trying local ffmpeg', { error });
     }
-  } else {
-    logger.info('VIDEO_PROCESSOR_LAMBDA_ARN not configured - using placeholder frames. Vision models can still analyze the video URL directly.');
   }
 
-  // Strategy 2: Generate placeholder frames with timestamp markers
-  // These serve as position indicators; vision models analyze the video URL
+  // Strategy 2: Use local ffmpeg binary if available
+  const ffmpegFrames = await extractFramesWithFfmpeg(videoPath, timestamps, outputDir);
+  if (ffmpegFrames.length > 0) {
+    return ffmpegFrames;
+  }
+
+  // Strategy 3: Generate placeholder frames with timestamp markers (last resort)
+  logger.info('No frame extraction available - using placeholder frames. Vision models can still analyze the video URL directly.');
+  const frameBuffers: Buffer[] = [];
   for (let i = 0; i < timestamps.length; i++) {
-    const timestamp = timestamps[i];
-    const placeholderBuffer = await createPlaceholderFrame(timestamp, i, timestamps.length);
+    const placeholderBuffer = await createPlaceholderFrame(timestamps[i], i, timestamps.length);
     frameBuffers.push(placeholderBuffer);
+  }
+
+  return frameBuffers;
+}
+
+/**
+ * Attempt to extract frames using local ffmpeg binary
+ * Returns empty array if ffmpeg is not available
+ */
+async function extractFramesWithFfmpeg(
+  videoPath: string,
+  timestamps: number[],
+  outputDir: string
+): Promise<Buffer[]> {
+  // Locate ffmpeg binary - check common paths
+  const ffmpegPaths = [
+    process.env.FFMPEG_PATH,
+    '/opt/bin/ffmpeg',      // Lambda layer convention
+    '/usr/bin/ffmpeg',      // System install
+    '/usr/local/bin/ffmpeg', // Homebrew / manual install
+    'ffmpeg',               // PATH lookup
+  ].filter(Boolean) as string[];
+
+  let ffmpegBin: string | null = null;
+  for (const candidate of ffmpegPaths) {
+    try {
+      execFileSync(candidate, ['-version'], { stdio: 'pipe', timeout: 5000 });
+      ffmpegBin = candidate;
+      break;
+    } catch {
+      // Not available at this path
+    }
+  }
+
+  if (!ffmpegBin) {
+    logger.info('ffmpeg not found locally, skipping local frame extraction');
+    return [];
+  }
+
+  logger.info('Using local ffmpeg for frame extraction', { ffmpegBin, frameCount: timestamps.length });
+
+  const frameBuffers: Buffer[] = [];
+  const tempDir = path.join(outputDir || os.tmpdir(), `frames-${uuidv4()}`);
+  fs.mkdirSync(tempDir, { recursive: true });
+
+  try {
+    for (let i = 0; i < timestamps.length; i++) {
+      const timestamp = timestamps[i];
+      const outputFile = path.join(tempDir, `frame_${i}.jpg`);
+
+      try {
+        execFileSync(ffmpegBin, [
+          '-ss', timestamp.toString(),
+          '-i', videoPath,
+          '-frames:v', '1',
+          '-q:v', '2',
+          '-y',
+          outputFile,
+        ], { stdio: 'pipe', timeout: 30000 });
+
+        if (fs.existsSync(outputFile)) {
+          frameBuffers.push(fs.readFileSync(outputFile));
+        }
+      } catch (error) {
+        logger.warn('ffmpeg frame extraction failed for timestamp', { timestamp, frameIndex: i, error: String(error) });
+      }
+    }
+
+    if (frameBuffers.length > 0) {
+      logger.info('Extracted frames via local ffmpeg', { extracted: frameBuffers.length, requested: timestamps.length });
+    }
+  } finally {
+    // Clean up temp files
+    try {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    } catch {
+      // Ignore cleanup errors
+    }
   }
 
   return frameBuffers;

@@ -747,8 +747,8 @@ export class AWSSnapshotService {
         if (component.type === 'dynamodb_table' && component.awsSnapshotArn) {
           try {
             const list = await this.dynamoClient.send(new ListBackupsCommand({
-              BackupArn: component.awsSnapshotArn,
-            }));
+              TableName: component.name,
+            } as any));
             if (!list.BackupSummaries?.length) {
               componentValidation.exists = false;
               componentValidation.valid = false;

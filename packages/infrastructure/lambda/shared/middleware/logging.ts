@@ -161,4 +161,5 @@ function truncateBody(body: string, maxLength: number = 1000): string {
 /**
  * Re-export enhanced logger for backward compatibility
  */
+const enhancedLogger = logger;
 export { enhancedLogger as logger };

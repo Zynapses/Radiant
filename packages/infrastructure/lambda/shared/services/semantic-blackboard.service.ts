@@ -612,7 +612,7 @@ class SemanticBlackboardService {
       .replace(/\s+/g, ' ');
   }
 
-  private async generateEmbedding(text: string): Promise<number[]> {
+  private async generateEmbedding(text: string, tenantId?: string): Promise<number[]> {
     try {
       const result = await modelRouterService.invoke({
         tenantId,

@@ -120,7 +120,8 @@ class GraphRAGService {
    */
   private async extractTriples(
     content: string,
-    config: GraphRAGConfig
+    config: GraphRAGConfig,
+    tenantId?: string
   ): Promise<KnowledgeTriple[]> {
     const prompt = `Extract knowledge triples from this text. Return ONLY a valid JSON array, no other text:
 [{"subject": "X", "predicate": "Y", "object": "Z", "confidence": 0.9}]

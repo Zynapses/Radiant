@@ -232,6 +232,7 @@ Generate a helpful proactive suggestion. Return JSON:
   // ============================================================================
 
   async findAnalogies(
+    tenantId: string,
     sourceDomain: string,
     sourceConcept: string,
     limit = 5
@@ -287,10 +288,11 @@ Generate a helpful proactive suggestion. Return JSON:
     }
 
     // Generate new analogy
-    return this.generateAnalogy(sourceDomain, sourceConcept);
+    return this.generateAnalogy(tenantId, sourceDomain, sourceConcept);
   }
 
   async generateAnalogy(
+    tenantId: string,
     sourceDomain: string,
     sourceConcept: string
   ): Promise<AnalogicalMapping[]> {
@@ -318,7 +320,7 @@ Return JSON:
 
     try {
       const response = await modelRouterService.invoke({
-        tenantId: undefined, // TODO: Thread tenantId from caller
+        tenantId,
         modelId: 'anthropic/claude-3-haiku',
         messages: [{ role: 'user', content: prompt }],
         maxTokens: 1500,
@@ -369,6 +371,7 @@ Return JSON:
   }
 
   async applyAnalogy(
+    tenantId: string,
     mappingId: string,
     targetQuery: string
   ): Promise<{ inference: string; confidence: number }> {
@@ -404,7 +407,7 @@ Use the analogy to provide an inference. Return JSON:
         modelId: 'anthropic/claude-3-haiku',
         messages: [{ role: 'user', content: prompt }],
         maxTokens: 500,
-        tenantId: undefined, // TODO: Thread tenantId from caller
+        tenantId,
       });
 
       const jsonMatch = response.content.match(/\{[\s\S]*\}/);
@@ -963,6 +966,7 @@ Return JSON:
   }
 
   async applyAdaptations(
+    tenantId: string,
     content: string,
     adaptations: ContextAdaptation
   ): Promise<string> {
@@ -984,7 +988,7 @@ Rewrite the content applying these adaptations. Return only the adapted content.
 
     try {
       const response = await modelRouterService.invoke({
-        tenantId: undefined, // TODO: Thread tenantId from caller
+        tenantId,
         modelId: 'anthropic/claude-3-haiku',
         messages: [{ role: 'user', content: prompt }],
         maxTokens: 2000,

@@ -100,7 +100,7 @@ class SemanticEntropyService {
     const samples: string[] = [];
     for (let i = 0; i < sampleCount; i++) {
       const result = await modelRouterService.invoke({
-        tenantId,
+        tenantId: input.tenantId,
         modelId: 'anthropic/claude-3-5-sonnet-20241022',
         messages: [{ role: 'user', content: input.prompt }],
         temperature: temperature,
@@ -110,7 +110,7 @@ class SemanticEntropyService {
     }
 
     // Cluster samples by semantic equivalence using NLI
-    const clusters = await this.clusterBySemanticEquivalence(samples, clusteringMethod);
+    const clusters = await this.clusterBySemanticEquivalence(samples, clusteringMethod, input.tenantId);
     
     // Compute entropy: H = -Σ p(c) * log(p(c))
     const totalSamples = samples.length;
@@ -140,7 +140,7 @@ class SemanticEntropyService {
     };
   }
 
-  private async clusterBySemanticEquivalence(samples: string[], method: string): Promise<string[][]> {
+  private async clusterBySemanticEquivalence(samples: string[], method: string, tenantId?: string): Promise<string[][]> {
     if (method === 'exact') {
       // Exact string matching
       const clusterMap = new Map<string, string[]>();
@@ -159,7 +159,7 @@ class SemanticEntropyService {
     for (const sample of samples) {
       let foundCluster = false;
       for (const cluster of clusters) {
-        const isEquivalent = await this.areSemanticlyEquivalent(sample, cluster[0]);
+        const isEquivalent = await this.areSemanticlyEquivalent(sample, cluster[0], tenantId);
         if (isEquivalent) {
           cluster.push(sample);
           foundCluster = true;
@@ -173,7 +173,7 @@ class SemanticEntropyService {
     return clusters;
   }
 
-  private async areSemanticlyEquivalent(a: string, b: string): Promise<boolean> {
+  private async areSemanticlyEquivalent(a: string, b: string, tenantId?: string): Promise<boolean> {
     const result = await modelRouterService.invoke({
       tenantId,
       modelId: 'anthropic/claude-3-5-haiku-20241022',
@@ -217,7 +217,7 @@ class SEProbesService {
 
     for (let i = 0; i < sampleCount; i++) {
       const result = await modelRouterService.invoke({
-        tenantId,
+        tenantId: input.tenantId,
         modelId: 'openai/gpt-4o', // OpenAI supports logprobs
         messages: [{ role: 'user', content: input.prompt }],
         temperature: 0.7,
@@ -322,7 +322,7 @@ class KernelEntropyService {
     }
 
     // Get embeddings for each sample
-    const embeddings = await this.getEmbeddings(samples);
+    const embeddings = await this.getEmbeddings(samples, input.tenantId);
 
     // Compute KDE-based entropy
     const entropyResult = this.computeKernelEntropy(embeddings, kernel, bandwidth);
@@ -343,14 +343,14 @@ class KernelEntropyService {
     };
   }
 
-  private async getEmbeddings(texts: string[]): Promise<number[][]> {
+  private async getEmbeddings(texts: string[], tenantId?: string): Promise<number[][]> {
     // Use embedding model to get vector representations
     const embeddings: number[][] = [];
     
     for (const text of texts) {
       try {
         const result = await modelRouterService.invoke({
-          tenantId: input.tenantId,
+          tenantId,
           modelId: 'openai/text-embedding-3-small',
           messages: [{ role: 'user', content: text.substring(0, 8000) }],
           maxTokens: 1, // Embedding models don't use this
@@ -678,7 +678,7 @@ class SelfCheckService {
     }
 
     // Extract claims from original response
-    const claims = await this.extractClaims(originalResponse);
+    const claims = await this.extractClaims(originalResponse, input.tenantId);
 
     // Check each claim against samples
     const claimResults: Array<{ claim: string; supportCount: number; consistent: boolean }> = [];
@@ -686,7 +686,7 @@ class SelfCheckService {
     for (const claim of claims) {
       let supportCount = 0;
       for (const sample of additionalSamples) {
-        const supports = await this.claimSupportedBySample(claim, sample);
+        const supports = await this.claimSupportedBySample(claim, sample, input.tenantId);
         if (supports) supportCount++;
       }
       claimResults.push({
@@ -712,9 +712,9 @@ class SelfCheckService {
     };
   }
 
-  private async extractClaims(text: string): Promise<string[]> {
+  private async extractClaims(text: string, tenantId?: string): Promise<string[]> {
     const result = await modelRouterService.invoke({
-      tenantId: input.tenantId,
+      tenantId,
       modelId: 'anthropic/claude-3-5-haiku-20241022',
       messages: [{
         role: 'user',
@@ -734,9 +734,9 @@ List claims (one per line):`,
       .filter(line => line.length > 10);
   }
 
-  private async claimSupportedBySample(claim: string, sample: string): Promise<boolean> {
+  private async claimSupportedBySample(claim: string, sample: string, tenantId?: string): Promise<boolean> {
     const result = await modelRouterService.invoke({
-      tenantId: input.tenantId,
+      tenantId,
       modelId: 'anthropic/claude-3-5-haiku-20241022',
       messages: [{
         role: 'user',
@@ -1052,7 +1052,7 @@ class HallucinationDetectionService {
 
     // Attribution check (verify claims have sources)
     if (methods.includes('attribution')) {
-      scores.attribution = await this.checkAttribution(response, input.prompt);
+      scores.attribution = await this.checkAttribution(response, input.prompt, input.tenantId);
     }
 
     // Calculate weighted score
@@ -1079,9 +1079,9 @@ class HallucinationDetectionService {
     };
   }
 
-  private async checkAttribution(response: string, originalPrompt: string): Promise<number> {
+  private async checkAttribution(response: string, originalPrompt: string, tenantId?: string): Promise<number> {
     const result = await modelRouterService.invoke({
-      tenantId: input.tenantId,
+      tenantId,
       modelId: 'anthropic/claude-3-5-sonnet-20241022',
       messages: [{
         role: 'user',
@@ -1176,7 +1176,7 @@ class ProcessRewardService {
     const response = input.responses?.[0] || input.context || '';
     
     // Extract reasoning steps
-    const steps = await this.extractSteps(response);
+    const steps = await this.extractSteps(response, input.tenantId);
     
     // Verify each step
     const stepScores: Array<{ step: string; score: number; feedback: string }> = [];
@@ -1231,7 +1231,7 @@ FEEDBACK: [brief explanation]`,
     };
   }
 
-  private async extractSteps(text: string): Promise<string[]> {
+  private async extractSteps(text: string, tenantId?: string): Promise<string[]> {
     // Try to find numbered steps first
     const numberedSteps = text.match(/(?:^|\n)\s*\d+[.)]\s*(.+?)(?=\n\s*\d+[.)]|\n\n|$)/gs);
     if (numberedSteps && numberedSteps.length > 1) {
@@ -1246,7 +1246,7 @@ FEEDBACK: [brief explanation]`,
 
     // Use LLM to extract steps
     const result = await modelRouterService.invoke({
-      tenantId: input.tenantId,
+      tenantId,
       modelId: 'anthropic/claude-3-5-haiku-20241022',
       messages: [{
         role: 'user',
@@ -1343,7 +1343,7 @@ class HITLReviewService {
     const response = input.responses?.[0] || input.context || '';
 
     // Assess confidence and risk
-    const assessment = await this.assessForReview(input.prompt, response);
+    const assessment = await this.assessForReview(input.prompt, response, input.tenantId);
 
     // Decide: auto-approve or queue for human
     if (assessment.confidence >= autoApproveThreshold && assessment.riskLevel === 'low') {
@@ -1373,13 +1373,13 @@ class HITLReviewService {
     };
   }
 
-  private async assessForReview(prompt: string, response: string): Promise<{
+  private async assessForReview(prompt: string, response: string, tenantId?: string): Promise<{
     confidence: number;
     riskLevel: 'low' | 'medium' | 'high';
     flags: string[];
   }> {
     const result = await modelRouterService.invoke({
-      tenantId: input.tenantId,
+      tenantId,
       modelId: 'anthropic/claude-3-5-sonnet-20241022',
       messages: [{
         role: 'user',
@@ -1573,7 +1573,7 @@ class C3POCascadeService {
       const modelId = tier.models[0];
 
       const result = await modelRouterService.invoke({
-        tenantId,
+        tenantId: input.tenantId,
         modelId,
         messages: [{
           role: 'user',
@@ -1681,7 +1681,7 @@ class AutoMixService {
 
     // Self-verification: verify response quality
     if (selfVerification) {
-      const verification = await this.verifyResponse(input.prompt, response);
+      const verification = await this.verifyResponse(input.prompt, response, input.tenantId);
       confidence = verification.confidence;
 
       // Update belief based on verification
@@ -1699,7 +1699,7 @@ class AutoMixService {
           response = escalatedResult.content;
           selectedModel = strongerModel;
 
-          const reVerification = await this.verifyResponse(input.prompt, response);
+          const reVerification = await this.verifyResponse(input.prompt, response, input.tenantId);
           confidence = reVerification.confidence;
         }
       }
@@ -1745,9 +1745,9 @@ class AutoMixService {
     return models.reduce((best, m) => m.capability > best.capability ? m : best, models[0]);
   }
 
-  private async verifyResponse(prompt: string, response: string): Promise<{ confidence: number }> {
+  private async verifyResponse(prompt: string, response: string, tenantId?: string): Promise<{ confidence: number }> {
     const result = await modelRouterService.invoke({
-      tenantId: input.tenantId,
+      tenantId,
       modelId: 'anthropic/claude-3-5-haiku-20241022',
       messages: [{
         role: 'user',

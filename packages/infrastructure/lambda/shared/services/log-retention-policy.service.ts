@@ -21,7 +21,10 @@ export type LogCategory =
   | 'billing'
   | 'infrastructure'
   | 'application'
-  | 'collaboration';
+  | 'collaboration'
+  | 'access'
+  | 'platform'
+  | 'performance';
 
 export type LogStorageTier = 'hot' | 'warm' | 'cold' | 'deep_archive';
 
@@ -32,6 +35,7 @@ export type LogSourceType =
 export const ALL_LOG_CATEGORIES: LogCategory[] = [
   'audit', 'security', 'ai_model', 'compliance',
   'billing', 'infrastructure', 'application', 'collaboration',
+  'access', 'platform', 'performance',
 ];
 
 export const LOG_CATEGORY_LABELS: Record<LogCategory, string> = {
@@ -43,6 +47,9 @@ export const LOG_CATEGORY_LABELS: Record<LogCategory, string> = {
   infrastructure: 'Infrastructure Logs',
   application: 'Application Logs',
   collaboration: 'Collaboration Logs',
+  access: 'Access Logs',
+  platform: 'Platform Logs',
+  performance: 'Performance Logs',
 };
 
 export interface EffectiveRetention {

@@ -770,7 +770,7 @@ export class SpendGovernorService {
 
   private async quarantineAllModels(tenantId: string, reason: string): Promise<void> {
     try {
-      const { driftCorrectionService } = await import('./drift-correction.service');
+      const { driftCorrectionService } = await import('./drift-correction.service.js');
       // Get all models with spend for this tenant
       const result = await executeStatement(
         `SELECT DISTINCT model_id FROM cost_events
@@ -809,7 +809,7 @@ export class SpendGovernorService {
 
   private async unquarantineSpendSuspendedModels(tenantId: string): Promise<void> {
     try {
-      const { driftCorrectionService } = await import('./drift-correction.service');
+      const { driftCorrectionService } = await import('./drift-correction.service.js');
       // Only unquarantine models that were quarantined by the spend governor
       const result = await executeStatement(
         `SELECT model_id FROM model_weight_config

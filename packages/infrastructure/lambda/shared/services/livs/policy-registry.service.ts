@@ -98,10 +98,10 @@ export class PolicyRegistryService {
     updatedBy?: string
   ): Promise<PolicyRegistry> {
     const currentRegistry = await this.getRegistry(tenantId);
-    const mergedRegistry = this.deepMerge(currentRegistry, registry);
+    const mergedRegistry = this.deepMerge(currentRegistry as any, registry as any) as PolicyRegistry;
 
     // Update version info
-    mergedRegistry.meta_config.last_updated = new Date().toISOString();
+    (mergedRegistry.meta_config as any).last_updated = new Date().toISOString();
 
     await this.pool.query(
       `INSERT INTO livs_policy_registry (tenant_id, registry, updated_at, updated_by)
@@ -632,13 +632,13 @@ export class PolicyRegistryService {
    * Merge registry with defaults
    */
   private mergeWithDefaults(partial: Partial<PolicyRegistry>): PolicyRegistry {
-    return this.deepMerge(this.cloneRegistry(DEFAULT_POLICY_REGISTRY), partial);
+    return this.deepMerge(this.cloneRegistry(DEFAULT_POLICY_REGISTRY) as any, partial as any) as PolicyRegistry;
   }
 
   /**
    * Deep merge two objects
    */
-  private deepMerge<T extends Record<string, unknown>>(target: T, source: Partial<T>): T {
+  private deepMerge<T extends object>(target: T, source: Partial<T>): T {
     const result = { ...target };
 
     for (const key of Object.keys(source) as Array<keyof T>) {

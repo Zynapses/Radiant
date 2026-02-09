@@ -701,6 +701,9 @@ export interface CompareEnvironmentsRequest {
   targetEnvironment: EnvironmentName;
   comparedBy: string;
   includeDataDiff?: boolean;
+  includeInfrastructure?: boolean;
+  includePersistentData?: boolean;
+  includeFeatures?: boolean;
 }
 
 export interface CompareEnvironmentsResponse {
@@ -718,6 +721,7 @@ export interface StartSyncRequest {
   syncFeatures?: boolean;
   dataItemsToSync?: string[];
   skipConflicts?: boolean;
+  confirmProduction?: boolean;
 }
 
 export interface StartSyncResponse {

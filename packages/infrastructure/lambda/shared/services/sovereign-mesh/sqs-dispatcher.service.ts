@@ -6,6 +6,7 @@
  */
 
 import { SQSClient, SendMessageCommand, SendMessageBatchCommand, GetQueueAttributesCommand } from '@aws-sdk/client-sqs';
+import { executeStatement, stringParam } from '../../db/client';
 import { createRegisteredLogger } from '../logging-registry.service';
 
 const logger = createRegisteredLogger({

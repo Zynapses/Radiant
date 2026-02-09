@@ -333,7 +333,7 @@ export class AGIOrchestratorService {
 
     // Initialize PolicyRegistryService
     if (!this.policyRegistryService) {
-      this.policyRegistryService = new PolicyRegistryService(this.pool);
+      this.policyRegistryService = new PolicyRegistryService({ pool: this.pool });
     }
 
     // Create model invocation adapter
@@ -343,6 +343,7 @@ export class AGIOrchestratorService {
       userPrompt: string;
       temperature: number;
       maxTokens: number;
+      tenantId?: string;
     }): Promise<string> => {
       const response = await modelRouterService.invoke({
         modelId: params.modelId.includes('/') ? params.modelId : `anthropic/${params.modelId}`,
@@ -352,6 +353,7 @@ export class AGIOrchestratorService {
         ],
         temperature: params.temperature,
         maxTokens: params.maxTokens,
+        tenantId: params.tenantId,
       });
       return response.content;
     };
@@ -403,6 +405,7 @@ export class AGIOrchestratorService {
         messages: { role: string; content: string }[];
         temperature?: number;
         maxTokens?: number;
+        tenantId?: string;
       }): Promise<{ content: string; tokensUsed: number }> => {
         const response = await modelRouterService.invoke({
           modelId: params.model.includes('/') ? params.model : `anthropic/${params.model}`,
@@ -412,8 +415,9 @@ export class AGIOrchestratorService {
           })),
           temperature: params.temperature,
           maxTokens: params.maxTokens,
+          tenantId: params.tenantId,
         });
-        return { content: response.content, tokensUsed: response.usage?.totalTokens || 0 };
+        return { content: response.content, tokensUsed: (response.inputTokens || 0) + (response.outputTokens || 0) };
       },
     };
 
@@ -841,7 +845,7 @@ export class AGIOrchestratorService {
         const adaptations = await agiCompleteService.getAdaptations(request.tenantId, contextState);
         
         if (Object.keys(adaptations.styleAdaptations).length > 0 || Object.keys(adaptations.formatAdaptations).length > 0) {
-          result.finalResult = await agiCompleteService.applyAdaptations(result.finalResult, adaptations);
+          result.finalResult = await agiCompleteService.applyAdaptations(request.tenantId, result.finalResult, adaptations);
           adaptationsApplied = Object.keys(adaptations.styleAdaptations);
         }
       } catch { /* adaptation failed, continue */ }

@@ -375,8 +375,8 @@ export class LogIndexerService {
             windowEnd: entry.window_end,
             originalS3Key: s3Key,
           }),
-          body: undefined, // In production, stream from S3 → Glacier
-        }));
+          body: Buffer.alloc(0), // In production, stream from S3 → Glacier
+        } as any));
 
         // Update index to cold tier
         await this.pool.query(

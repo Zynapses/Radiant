@@ -594,7 +594,7 @@ class AttackGeneratorService {
   /**
    * Test an attack prompt against a target model to see if it bypasses safety
    */
-  private async testAttackAgainstModel(attackPrompt: string, targetModelId: string): Promise<boolean> {
+  private async testAttackAgainstModel(attackPrompt: string, targetModelId: string, tenantId?: string): Promise<boolean> {
     try {
       const messages: ChatMessage[] = [
         { role: 'user', content: attackPrompt }

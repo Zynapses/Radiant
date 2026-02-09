@@ -9,9 +9,13 @@
 
 import * as crypto from 'crypto';
 import { Pool, PoolClient } from 'pg';
-import { createLogger } from '../../utils/logger';
+import { createRegisteredLogger } from '../logging-registry.service';
 
-const logger = createLogger('MLSService');
+const logger = createRegisteredLogger({
+  serviceName: 'mls/mls-service',
+  category: 'security',
+  sourceType: 'application',
+});
 
 // ============================================================================
 // Types
@@ -942,7 +946,7 @@ export class MLSService {
 
   private deriveKey(secret: Buffer | string, info: string, length: number): Buffer {
     const secretBuffer = typeof secret === 'string' ? Buffer.from(secret) : secret;
-    return crypto.hkdfSync('sha256', secretBuffer, Buffer.alloc(0), info, length);
+    return Buffer.from(crypto.hkdfSync('sha256', secretBuffer, Buffer.alloc(0), info, length));
   }
 
   private ratchetGroupSecret(currentSecret: Buffer, epoch: number): Buffer {

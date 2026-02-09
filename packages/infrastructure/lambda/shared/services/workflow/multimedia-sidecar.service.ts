@@ -182,6 +182,7 @@ class MultimediaSidecarService {
    * Called during upload/ingest to pre-compute representations
    */
   async generateSidecar(
+    tenantId: string,
     sourceUri: string,
     mediaType: MediaType,
     options: SidecarGenerationOptions = {}
@@ -222,6 +223,7 @@ class MultimediaSidecarService {
       if (['image', 'video', 'audio'].includes(mediaType) && 
           options.generateEmbedding !== false) {
         tasks.push(this.generateEmbedding(
+          tenantId,
           sourceUri, 
           mediaType, 
           sidecar,
@@ -232,7 +234,7 @@ class MultimediaSidecarService {
       // Description (image/video)
       if (['image', 'video'].includes(mediaType) && 
           options.generateDescription !== false) {
-        tasks.push(this.generateDescription(sourceUri, mediaType, sidecar));
+        tasks.push(this.generateDescription(tenantId, sourceUri, mediaType, sidecar));
       }
       
       // Document content extraction
@@ -519,6 +521,7 @@ class MultimediaSidecarService {
    * Generate embedding for semantic search/routing
    */
   private async generateEmbedding(
+    tenantId: string,
     sourceUri: string,
     mediaType: MediaType,
     sidecar: CognitiveSidecar,
@@ -545,7 +548,7 @@ class MultimediaSidecarService {
         modelId: 'openai/text-embedding-3-small',
         messages: [{ role: 'user', content: textToEmbed.substring(0, 8000) }],
         maxTokens: 1,
-        tenantId: undefined, // TODO: Thread tenantId from caller
+        tenantId,
       });
       
       // Extract embedding from result
@@ -573,6 +576,7 @@ class MultimediaSidecarService {
    * Generate description using vision model
    */
   private async generateDescription(
+    tenantId: string,
     sourceUri: string,
     mediaType: MediaType,
     sidecar: CognitiveSidecar
@@ -581,7 +585,7 @@ class MultimediaSidecarService {
       // Use vision model to describe the content
       const result = await modelRouterService.invoke({
         modelId: 'openai/gpt-4o',
-        tenantId: undefined, // TODO: Thread tenantId from caller
+        tenantId,
         messages: [{
           role: 'user',
           content: `Describe this ${mediaType} in three levels:
@@ -890,6 +894,7 @@ ${mediaType === 'image' ? `Image URL: ${sourceUri}` : `First frame of video: ${s
    * Logic: Visual content is the ANCHOR, text streams are ANNOTATIONS
    */
   async synthesizeStreams(
+    tenantId: string,
     streams: MultimediaStream[],
     synthesisPrompt?: string
   ): Promise<{ synthesized: string; confidence: number }> {
@@ -926,7 +931,7 @@ ${mediaType === 'image' ? `Image URL: ${sourceUri}` : `First frame of video: ${s
     
     const result = await modelRouterService.invoke({
       modelId: 'anthropic/claude-3-5-sonnet-20241022',
-      tenantId: undefined, // TODO: Thread tenantId from caller
+      tenantId,
       messages: [{
         role: 'user',
         content: `${prompt}

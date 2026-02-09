@@ -1799,12 +1799,8 @@ export class AdminStack extends cdk.Stack {
 
     // =========================================================================
     // OMEGA Quantum Architecture API routes (v4.18.0)
+    // (Extends omega and omegaFirmware declared in Genesis/OMEGA v7.5.0 block above)
     // =========================================================================
-
-    const omega = admin.addResource('omega');
-
-    // Firmware management
-    const omegaFirmware = omega.addResource('firmware');
 
     // POST /admin/omega/firmware/activate
     omegaFirmware.addResource('activate').addMethod('POST', adminIntegration, {

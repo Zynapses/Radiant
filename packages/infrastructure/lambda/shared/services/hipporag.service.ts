@@ -351,7 +351,8 @@ CONFIDENCE: [0-1 score]`;
    * Extract entities and relations from content using LLM
    */
   private async extractEntitiesAndRelations(
-    content: string
+    content: string,
+    tenantId?: string
   ): Promise<{ entities: HippoRAGEntity[]; relations: HippoRAGRelation[] }> {
     const prompt = `Extract entities and relationships from the following text.
 
@@ -472,7 +473,7 @@ Only return the JSON, no other text.`;
   /**
    * Extract entities from query
    */
-  private async extractQueryEntities(query: string): Promise<string[]> {
+  private async extractQueryEntities(query: string, tenantId?: string): Promise<string[]> {
     const prompt = `Extract the key entities (nouns, names, concepts) from this query:
 "${query}"
 

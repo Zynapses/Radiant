@@ -122,10 +122,10 @@ class ContextAssemblerService {
     // Auto-load history from UDS if conversationId provided but no history passed
     if (!conversationHistory && conversationId) {
       try {
-        const { conversationHistoryLoader } = await import('./conversation-history-loader.service');
+        const { conversationHistoryLoader } = await import('./conversation-history-loader.service.js');
         conversationHistory = await conversationHistoryLoader.loadForContextAssembly(
           tenantId, userId, conversationId
-        );
+        ) as any;
       } catch (error) {
         logger.warn('Failed to auto-load conversation history', { conversationId, error: String(error) });
       }

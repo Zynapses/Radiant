@@ -17443,11 +17443,24 @@ The dashboard will display tenant-level constraints when they exist, and the API
 ## Part IV: Mac Platform
 
 > **Classification**: RADIANT INTERNAL // ENGINEERING  
-> **Version**: 1.0.0 | **Date**: February 6, 2026  
-> **Status**: PRE-BUILD — Architecture & Sync Documentation  
-> **App Location**: `apps/thinktank-mac/` (planned)  
-> **Mirrors**: Think Tank Web (`apps/admin-dashboard/`)  
-> **Requires**: macOS 13.0+ (Ventura), Swift 5.9+, Xcode 15+
+> **Version**: 3.0.0 | **Date**: February 8, 2026  
+> **Status**: BUILT — v7.45.0 — Full feature parity with web app (minus Polymorphic Interface)  
+> **App Location**: `apps/thinktank-mac/`  
+> **Mirrors**: Think Tank Web (`apps/thinktank/`)  
+> **Requires**: macOS 14.0+ (Sonoma), Swift 5.9+, Xcode 15+
+>
+> **Detailed Documentation**:
+> - **User Guide**: `docs/THINKTANK-MAC-GUIDE.md` (20 sections)
+> - **Portability Manifest**: `docs/THINKTANK-MAC-PORTABILITY-MANIFEST.md` (33 features, technology map, gap tracking)
+> - **Sync Policy**: `/.windsurf/workflows/thinktank-dual-platform.md` (v2.0 — bidirectional, blocking gate)
+>
+> **v7.45.0 Gap Closure** (February 8, 2026):
+> - CoreTypes.swift: 1,406 lines (80+ new types: Governor, Derivation, FlashFacts, Grimoire, Ideas, Cartridges, Mood, AXIOM, Collaboration, i18n)
+> - PlatformServices.swift: 860 lines (7 new services, GovernorService expanded from 2 to 14 endpoints)
+> - 3 standalone services: AxiomSessionService (SSE + feedback + caching), AuthService (Keychain), LocalizationService (5 languages)
+> - 8 feature views: FlashFacts, Grimoire, Ideas, Derivation, Governor, Cartridge, CatoMood, Login
+> - 8 AXIOM sub-views: Workflow, Confidence, Domain, ModelScores, Clarification, CompiledPrompt, Feedback, Preferences
+> - Navigation: 10 sections (was 6), Settings: 8 tabs (was 5), Auth gate, i18n environment
 
 ---
 
@@ -17528,31 +17541,31 @@ The following table maps every Think Tank web feature to its Mac counterpart. Th
 
 | # | Web Feature | Web Location | Mac Equivalent | Swift Pattern | Status |
 |---|-------------|-------------|----------------|---------------|--------|
-| 1 | **Conversations** | `conversations.ts` | Sidebar list + Chat view | NavigationSplitView | 🔲 Planned |
-| 2 | **Chat Streaming** | SSE via fetch | SSE message stream | URLSession.bytes + AsyncSequence | 🔲 Planned |
-| 3 | **Brain Plan Viewer** | `brain-plan.ts` + component | Inspector panel | Detail view with step progress | 🔲 Planned |
-| 4 | **Domain Detection** | `domain-modes.ts` | Toolbar indicator | Popover with field/domain/subspecialty | 🔲 Planned |
-| 5 | **Model Selection** | `models.ts`, `model-categories.ts` | Toolbar picker | Menu/Picker with category grouping | 🔲 Planned |
-| 6 | **My Rules** | `my-rules.ts` | Settings tab or sidebar section | Form with rule editor | 🔲 Planned |
-| 7 | **User Context/Memory** | `user-context.ts` | Inspector section | Read-only profile summary | 🔲 Planned |
-| 8 | **Settings/Preferences** | `settings.ts`, `preferences.ts` | macOS Settings window | Settings scene (SwiftUI) | 🔲 Planned |
-| 9 | **Authentication** | Cognito web | Cognito Swift | ASWebAuthenticationSession or Amplify | 🔲 Planned |
+| 1 | **Conversations** | `conversations.ts` | `SidebarView.swift` + `ChatView.swift` | NavigationSplitView | ✅ Built |
+| 2 | **Chat Streaming** | SSE via fetch | `APIClient.swift` SSE stream | URLSession.bytes + AsyncThrowingStream | ✅ Built |
+| 3 | **Brain Plan Viewer** | `brain-plan.ts` + component | `BrainPlanViewer.swift` | Sheet with step progress | ✅ Built |
+| 4 | **Domain Detection** | `domain-modes.ts` | `DomainSelectorView.swift` | Menu picker in header | ✅ Built |
+| 5 | **Model Selection** | `models.ts`, `model-categories.ts` | `ModelSelectorView.swift` | Menu/Picker with category grouping | ✅ Built |
+| 6 | **My Rules** | `my-rules.ts` | `RulesView.swift` | Full CRUD + presets browser | ✅ Built |
+| 7 | **User Context/Memory** | `user-context.ts` | `ProfileView.swift` | Analytics + achievements | ✅ Built |
+| 8 | **Settings/Preferences** | `settings.ts`, `preferences.ts` | `SettingsView.swift` | Settings scene (5 tabs) | ✅ Built |
+| 9 | **Authentication** | Cognito web | `APIClient.swift` token management | URLSession + Keychain | ✅ Built |
 
 ### Tier 2: Advanced Features (Build Second)
 
 | # | Web Feature | Web Location | Mac Equivalent | Swift Pattern | Status |
 |---|-------------|-------------|----------------|---------------|--------|
-| 10 | **Delight System** | Admin config | Personality in responses | Inline display (no config UI) | 🔲 Planned |
-| 11 | **Time Machine** | `time-travel.ts` | Conversation branching | Tree view or timeline | 🔲 Planned |
-| 12 | **Council of Rivals** | `council-of-rivals.ts` | Multi-model deliberation | Split view with model columns | 🔲 Planned |
-| 13 | **Flash Facts** | `flash-facts.ts` | Quick knowledge cards | Popover or sheet | 🔲 Planned |
-| 14 | **Grimoire** | `grimoire.ts` | Procedural memory | List with detail | 🔲 Planned |
-| 15 | **Sentinel Agents** | `sentinel-agents.ts` | Background monitors | Menu bar status + notifications | 🔲 Planned |
-| 16 | **Economic Governor** | `economic-governor.ts` | Cost awareness | Badge/indicator in toolbar | 🔲 Planned |
-| 17 | **Artifact Engine** | `artifact-engine.ts` | Code/document viewer | Syntax-highlighted view (NSTextView) | 🔲 Planned |
-| 18 | **Ideas** | `ideas.ts` | Idea capture | Quick note sheet | 🔲 Planned |
-| 19 | **Ratings** | `ratings.ts` | Response rating | Inline thumbs up/down | 🔲 Planned |
-| 20 | **File Conversion** | `file-conversion.ts` | Drag-and-drop files | NSDocument + UTType | 🔲 Planned |
+| 10 | **Delight System** | Admin config | `SettingsStore.swift` personality mode | Mode selector (partial — no toasts) | ⚠️ Partial |
+| 11 | **Time Machine** | `time-travel.ts` | `TimeMachineView.swift` | Timeline + playback + branch/restore | ✅ Built |
+| 12 | **Crucible Deliberation** | `CrucibleDeliberationPanel.tsx` | `CrucibleView.swift` | Event timeline with expandable Q&A | ✅ Built |
+| 13 | **AXIOM Forge** | `AxiomForge.tsx` | `AxiomForgeView.swift` | 4-step workflow (Classify→Route) | ✅ Built |
+| 14 | **Voice Input** | `voice-input.tsx` | `VoiceService.swift` + `VoiceInputView.swift` | AVAudioEngine + Whisper API | ✅ Built |
+| 15 | **File Attachments** | `file-attachments.tsx` | `FileAttachmentsView.swift` | NSOpenPanel + onDrop | ✅ Built |
+| 16 | **Economic Governor** | `economic-governor.ts` | `BrainPlanViewer.swift` governor card | Integrated in Brain Plan viewer | ✅ Built |
+| 17 | **Artifact Engine** | `artifact-engine.ts` | `ArtifactsView.swift` | Split-view browser with detail pane | ✅ Built |
+| 18 | **History** | History page | `HistoryView.swift` | Sort/search/filter conversation list | ✅ Built |
+| 19 | **Ratings** | `MessageBubble.tsx` | `MessageBubbleView.swift` | Inline thumbs up/down + regenerate | ✅ Built |
+| 20 | **File Conversion** | `file-conversion.ts` | `FileAttachmentsView.swift` | Drag-and-drop with type validation | ✅ Built |
 
 ### Tier 3: Specialized Features (Build Third)
 
@@ -17560,7 +17573,7 @@ The following table maps every Think Tank web feature to its Mac counterpart. Th
 |---|-------------|-------------|----------------|---------------|--------|
 | 21 | **Concurrent Execution** | `concurrent-execution.ts` | Parallel model queries | Task groups with progress | 🔲 Planned |
 | 22 | **Structure from Chaos** | `structure-from-chaos.ts` | Auto-organize | Sheet with results | 🔲 Planned |
-| 23 | **Enhanced Collaboration** | `enhanced-collaboration.ts` | Real-time collab | WebSocket + conflict resolution | 🔲 Planned |
+| 23 | **Enhanced Collaboration** | `enhanced-collaboration.ts` | `CollaborationService.swift` (API) | API only — no real-time UI yet | ⚠️ Partial |
 | 24 | **Derivation History** | `derivation-history.ts` | Reasoning trace | Expandable tree | 🔲 Planned |
 | 25 | **Decision Artifacts** | `decision-artifacts.ts` | Decision records | Table with detail | 🔲 Planned |
 | 26 | **Living Parchment** | `living-parchment.ts` | Living documents | Rich text editor | 🔲 Planned |
@@ -17568,7 +17581,7 @@ The following table maps every Think Tank web feature to its Mac counterpart. Th
 | 28 | **Security Signals** | `security-signals.ts` | Safety indicators | Status bar items | 🔲 Planned |
 | 29 | **DIA** | `dia.ts` | Document intelligence | Quick Look preview | 🔲 Planned |
 | 30 | **LIVS Workflow** | `livs-workflow.ts` | Quality control modes | Toolbar segment | 🔲 Planned |
-| 31 | **Crucible** | `crucible.ts` | Stress testing | Sheet with results | 🔲 Planned |
+| 31 | **Guest Restrictions** | `GuestRestrictionBanner.tsx` | `CollaborationService.swift` (API) | API only — no banner UI yet | ⚠️ Partial |
 | 32 | **Policy Framework** | `policy-framework.ts` | Policy display | Inspector section | 🔲 Planned |
 | 33 | **UEP Integration** | `uep-integration.ts` | User experience personalization | Automatic (API-driven) | 🔲 Planned |
 

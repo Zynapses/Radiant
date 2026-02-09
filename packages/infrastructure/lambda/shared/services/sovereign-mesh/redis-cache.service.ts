@@ -6,6 +6,7 @@
  */
 
 import { createRegisteredLogger } from '../logging-registry.service';
+import type { Agent, AgentExecution, OODAState } from './agent-runtime.service';
 
 const logger = createRegisteredLogger({
   serviceName: 'sovereign-mesh/redis-cache',

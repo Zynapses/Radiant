@@ -738,7 +738,7 @@ class OrgMemoryMeshService {
         action: String(r.action) as OrgMemoryAuditAction,
         targetNodeId: r.target_node_id ? String(r.target_node_id) : undefined,
         details: typeof r.details === 'string' ? JSON.parse(r.details) : (r.details as Record<string, unknown>) || {},
-        complianceFramework: (r.compliance_framework as string[]) || [],
+        complianceFramework: ((r.compliance_framework as string[]) || []) as ('gdpr' | 'hipaa' | 'soc2' | 'ccpa')[],
         ipAddress: r.ip_address ? String(r.ip_address) : undefined,
         createdAt: new Date(r.created_at as string),
       };

@@ -37,6 +37,7 @@ export interface ModelInvocationParams {
   userPrompt: string;
   temperature: number;
   maxTokens: number;
+  tenantId?: string;
 }
 
 export interface SupervisorEvaluationRequest {
@@ -268,6 +269,7 @@ Evaluate this submission against the POLICY_REGISTRY and respond with your decis
         userPrompt,
         temperature: supervisorConfig.temperature,
         maxTokens: supervisorConfig.max_tokens_per_response,
+        tenantId,
       });
 
       // Parse the LLM response

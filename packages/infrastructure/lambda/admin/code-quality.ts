@@ -7,6 +7,7 @@
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { executeStatement, stringParam } from '../shared/db/client';
+import { createResponse, createErrorResponse } from '../shared/utils/response';
 import { createRegisteredLogger } from '../shared/services/logging-registry.service';
 
 const logger = createRegisteredLogger({

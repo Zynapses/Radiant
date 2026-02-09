@@ -127,7 +127,7 @@ class HallucinationDetectionService {
     
     // 3. Claim extraction and verification
     if (options?.runClaimVerification ?? config.claimExtractionEnabled) {
-      const claims = await this.extractAndVerifyClaims(response, options?.context);
+      const claims = await this.extractAndVerifyClaims(tenantId, response, options?.context);
       results.claimVerificationResults = claims;
       const avgClaimScore = claims.length > 0
         ? claims.reduce((s, c) => s + (c.isSupported ? c.confidence : 0), 0) / claims.length
@@ -220,6 +220,7 @@ class HallucinationDetectionService {
    * Extract factual claims and verify them
    */
   async extractAndVerifyClaims(
+    tenantId: string,
     response: string,
     context?: string
   ): Promise<ClaimVerification[]> {
@@ -227,7 +228,7 @@ class HallucinationDetectionService {
     const verifications: ClaimVerification[] = [];
     
     for (const claim of claims) {
-      const verification = await this.verifyClaim(claim, context);
+      const verification = await this.verifyClaim(tenantId, claim, context);
       verifications.push(verification);
     }
     
@@ -396,7 +397,7 @@ class HallucinationDetectionService {
     return overlapRatio > 0.3;
   }
   
-  private async verifyClaim(claim: string, context?: string): Promise<ClaimVerification> {
+  private async verifyClaim(tenantId: string, claim: string, context?: string): Promise<ClaimVerification> {
     // First check against provided context if available
     if (context) {
       const isGrounded = this.isSentenceGrounded(claim, context);
@@ -427,7 +428,7 @@ Respond with ONLY a JSON object:
 {"verifiable": true/false, "likely_accurate": true/false, "confidence": 0.0-1.0, "reasoning": "brief explanation", "evidence": "supporting information if any"}`;
 
       const result = await modelRouterService.invoke({
-        tenantId: undefined, // TODO: Thread tenantId from caller
+        tenantId,
         modelId: 'anthropic/claude-3-haiku',
         messages: [{ role: 'user', content: verificationPrompt }],
         temperature: 0,

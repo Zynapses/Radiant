@@ -1,0 +1,2 @@
+This directory contains bundled resources for Think Tank (Mac).
+Add app icons, localization files, and other assets here.

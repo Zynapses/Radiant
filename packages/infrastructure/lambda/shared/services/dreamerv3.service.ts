@@ -417,7 +417,8 @@ Format as JSON:
   private async imagineTrajectorywithLLM(
     startState: WorldState,
     goal: string,
-    horizon: number
+    horizon: number,
+    tenantId?: string
   ): Promise<TrajectoryStep[]> {
     const prompt = `You are a world model predicting future states.
 

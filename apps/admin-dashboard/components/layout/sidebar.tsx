@@ -100,6 +100,11 @@ const navigation: NavigationItem[] = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
   { name: 'Health', href: '/health', icon: Activity },
   
+  // Applications Section
+  { type: 'separator', label: 'Applications' },
+  { name: 'All Apps', href: '/apps', icon: Grid },
+  { name: 'URL Configuration', href: '/settings/urls', icon: Link2 },
+  
   // AI & Models Section
   { type: 'separator', label: 'AI & Models' },
   { name: 'Models', href: '/models', icon: Cpu },

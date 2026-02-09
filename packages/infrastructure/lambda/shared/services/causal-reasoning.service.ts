@@ -604,7 +604,7 @@ Return JSON:
   // Helper Methods
   // ============================================================================
 
-  private async generateEmbedding(text: string): Promise<number[]> {
+  private async generateEmbedding(text: string, tenantId?: string): Promise<number[]> {
     try {
       await modelRouterService.invoke({
         tenantId,
@@ -617,7 +617,7 @@ Return JSON:
     }
   }
 
-  private async invokeModel(prompt: string): Promise<string> {
+  private async invokeModel(prompt: string, tenantId?: string): Promise<string> {
     const response = await modelRouterService.invoke({
       tenantId,
       modelId: 'anthropic/claude-3-haiku',

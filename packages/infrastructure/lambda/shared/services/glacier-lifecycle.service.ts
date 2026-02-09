@@ -448,7 +448,7 @@ export class GlacierLifecycleService {
       await glacierClient.send(new DeleteArchiveCommand({
         vaultName: glacierVaultName,
         archiveId: glacierArchiveId,
-      }));
+      } as any));
     }
 
     // Also delete the S3 object (may be the same object transitioned via lifecycle)

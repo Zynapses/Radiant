@@ -31,6 +31,7 @@ export interface ContextAnchorServiceDeps {
       messages: { role: string; content: string }[];
       temperature?: number;
       maxTokens?: number;
+      tenantId?: string;
     }) => Promise<{ content: string; tokensUsed: number }>;
   };
 }
@@ -249,7 +250,7 @@ export class ContextAnchorService {
   /**
    * Extract context anchor using LLM (accurate path)
    */
-  async extractContextLLM(input: string): Promise<Partial<ContextAnchor>> {
+  async extractContextLLM(input: string, tenantId?: string): Promise<Partial<ContextAnchor>> {
     const extractionPrompt = `Analyze the following user request and extract context:
 
 USER REQUEST:
@@ -274,6 +275,7 @@ Respond ONLY with valid JSON.`;
         messages: [{ role: 'user', content: extractionPrompt }],
         temperature: 0.1,
         maxTokens: 500,
+        tenantId,
       });
 
       const parsed = JSON.parse(response.content);
@@ -330,7 +332,7 @@ Respond ONLY with valid JSON.`;
     // Extract context (pattern-based or LLM)
     let extractedContext: Partial<ContextAnchor>;
     if (gateConfig.useLLMExtraction) {
-      extractedContext = await this.extractContextLLM(input);
+      extractedContext = await this.extractContextLLM(input, tenantId);
     } else {
       extractedContext = this.extractContextPatternBased(input);
     }

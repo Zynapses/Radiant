@@ -931,7 +931,7 @@ Complete the task and provide the result.`;
     }
   }
 
-  private async invokeModel(prompt: string): Promise<string> {
+  private async invokeModel(prompt: string, tenantId?: string): Promise<string> {
     const response = await modelRouterService.invoke({
       tenantId,
       modelId: 'anthropic/claude-3-haiku',
