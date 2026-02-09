@@ -236,7 +236,7 @@ struct BrainPlanViewer: View {
                     Text("Last Decision")
                         .font(.system(size: 10))
                         .foregroundStyle(.tertiary)
-                    Text("\(decision.originalModel) -> \(decision.selectedModel)")
+                    Text("\(decision.model) (\(decision.tier))")
                         .font(.system(size: 11, design: .monospaced))
                     Text(decision.reason)
                         .font(.system(size: 11))
