@@ -110,6 +110,18 @@ struct LoginView: View {
 
             Spacer()
 
+            #if DEBUG
+            Button {
+                authService.loginAsDevUser()
+            } label: {
+                Label("Dev Mode (Skip Login)", systemImage: "hammer.fill")
+                    .font(.caption)
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(.secondary)
+            .padding(.bottom, 8)
+            #endif
+
             HStack(spacing: 4) {
                 Text("RADIANT Platform")
                     .font(.caption2)

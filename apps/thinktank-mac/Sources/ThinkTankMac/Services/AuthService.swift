@@ -94,6 +94,27 @@ class AuthService: ObservableObject {
         }
     }
 
+    // MARK: - Dev Mode (offline bypass)
+
+    func loginAsDevUser() {
+        let devUser = AuthUser(
+            id: "dev-user-001",
+            email: "dev@radiant.local",
+            displayName: "Dev User",
+            avatar: nil,
+            tenantId: "dev-tenant",
+            role: "admin"
+        )
+        user = devUser
+        isAuthenticated = true
+        isLoading = false
+        error = nil
+
+        Task {
+            await APIClient.shared.setToken("dev-token")
+        }
+    }
+
     // MARK: - Logout
 
     func logout() {
