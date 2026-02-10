@@ -179,7 +179,7 @@ struct PackageManifest: Codable, Sendable {
 
 // MARK: - Deployment Package (full loaded package)
 
-struct DeploymentPackage: Sendable {
+struct LoadedPackage: Sendable {
     let manifest: PackageManifest
     let extractedPath: URL
     let originalPath: URL
@@ -342,7 +342,7 @@ actor PackageService {
     }
     
     /// Download package from appropriate source
-    func downloadPackageFromSource(info: PackageInfo) async throws -> DeploymentPackage {
+    func downloadPackageFromSource(info: PackageInfo) async throws -> LoadedPackage {
         if info.bucket == "github" {
             return try await downloadFromGitHub(info: info)
         } else {
@@ -351,7 +351,7 @@ actor PackageService {
     }
     
     /// Download package from GitHub
-    private func downloadFromGitHub(info: PackageInfo) async throws -> DeploymentPackage {
+    private func downloadFromGitHub(info: PackageInfo) async throws -> LoadedPackage {
         // Find the entry in GitHub registry
         let entries = try await githubRegistry.listPackages()
         guard let entry = entries.first(where: { $0.version == info.version && $0.buildId == info.buildId }) else {
@@ -561,7 +561,7 @@ actor PackageService {
     // MARK: - Package Download
     
     /// Download package to local cache
-    func downloadPackage(info: PackageInfo) async throws -> DeploymentPackage {
+    func downloadPackage(info: PackageInfo) async throws -> LoadedPackage {
         let localPath = cacheDirectory.appendingPathComponent(info.filename)
         
         // Check if already cached
@@ -602,7 +602,7 @@ actor PackageService {
     }
     
     /// Download package by version
-    func downloadPackage(version: String, channel: ReleaseChannel = .stable) async throws -> DeploymentPackage {
+    func downloadPackage(version: String, channel: ReleaseChannel = .stable) async throws -> LoadedPackage {
         let packages = try await listAvailablePackages()
         
         guard let info = packages.first(where: { 
@@ -617,7 +617,7 @@ actor PackageService {
     // MARK: - Package Loading
     
     /// Load and parse a deployment package from disk
-    func loadPackage(from url: URL) throws -> DeploymentPackage {
+    func loadPackage(from url: URL) throws -> LoadedPackage {
         // Packages are zip files with .radpkg extension
         let tempDir = fileManager.temporaryDirectory
             .appendingPathComponent(UUID().uuidString)
@@ -642,7 +642,7 @@ actor PackageService {
         // Verify checksums
         try verifyChecksums(in: tempDir)
         
-        return DeploymentPackage(
+        return LoadedPackage(
             manifest: manifest,
             extractedPath: tempDir,
             originalPath: url
@@ -693,7 +693,7 @@ actor PackageService {
     // MARK: - Integrity Verification
     
     /// Verify package hash
-    private func verifyPackageIntegrity(_ package: DeploymentPackage, expectedHash: String) -> Bool {
+    private func verifyPackageIntegrity(_ package: LoadedPackage, expectedHash: String) -> Bool {
         guard let data = try? Data(contentsOf: package.originalPath) else {
             return false
         }
@@ -828,7 +828,7 @@ actor PackageService {
     
     /// Upload package to instance snapshot storage
     func uploadPackageForSnapshot(
-        package: DeploymentPackage,
+        package: LoadedPackage,
         app: ManagedApp,
         environment: DeployEnvironment,
         snapshotId: String
@@ -845,7 +845,7 @@ actor PackageService {
         app: ManagedApp,
         environment: DeployEnvironment,
         snapshotId: String
-    ) async throws -> DeploymentPackage {
+    ) async throws -> LoadedPackage {
         let bucket = "radiant-\(app.id)-\(environment.rawValue.lowercased())-deployments"
         let key = "snapshots/\(snapshotId)/package.radpkg"
         

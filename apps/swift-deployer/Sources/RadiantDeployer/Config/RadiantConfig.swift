@@ -15,6 +15,7 @@ enum RadiantLogger {
     static let seeds = Logger(subsystem: subsystem, category: "seeds")
     static let aws = Logger(subsystem: subsystem, category: "aws")
     static let credentials = Logger(subsystem: subsystem, category: "credentials")
+    static let security = Logger(subsystem: subsystem, category: "security")
     
     /// Log an error with context
     static func error(_ message: String, error: Error? = nil, category: Logger = general) {

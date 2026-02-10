@@ -62,11 +62,13 @@ export class CredentialLifecycleStack extends cdk.Stack {
       );
     }
 
-    // Forward to existing alert topic if provided
+    // Forward to existing alert topic if provided (SNS-to-SNS subscription)
     if (props.alertTopic) {
-      this.securityAlertTopic.addSubscription(
-        new subscriptions.SnsSubscription(props.alertTopic as sns.Topic)
-      );
+      new sns.CfnSubscription(this, 'ForwardToAlertTopic', {
+        protocol: 'sns',
+        topicArn: this.securityAlertTopic.topicArn,
+        endpoint: props.alertTopic.topicArn,
+      });
     }
 
     // ========================================================================

@@ -85,7 +85,7 @@ struct DeploymentPackagesView: View {
                     Spacer()
                 } else {
                     List(viewModel.filteredPackages, selection: $selectedPackage) { pkg in
-                        PackageRow(package: pkg)
+                        DeploymentPackageRow(package: pkg)
                             .tag(pkg)
                     }
                     .listStyle(.inset)
@@ -95,7 +95,7 @@ struct DeploymentPackagesView: View {
             
             // Detail View
             if let package = selectedPackage {
-                PackageDetailView(
+                DeploymentPackageDetailView(
                     package: package,
                     onRestore: {
                         showRestoreSheet = true
@@ -217,7 +217,7 @@ struct DeploymentPackage: Identifiable, Hashable {
 
 // MARK: - Package Row
 
-struct PackageRow: View {
+struct DeploymentPackageRow: View {
     let package: DeploymentPackage
     
     var body: some View {
@@ -286,7 +286,7 @@ struct PackageRow: View {
 
 // MARK: - Package Detail View
 
-struct PackageDetailView: View {
+struct DeploymentPackageDetailView: View {
     let package: DeploymentPackage
     let onRestore: () -> Void
     let onValidate: () -> Void

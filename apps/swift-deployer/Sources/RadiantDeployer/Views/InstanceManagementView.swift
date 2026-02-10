@@ -131,7 +131,7 @@ struct InstancePanel: View {
                 
                 Spacer()
                 
-                StatusBadge(status: status.overallHealth)
+                InstanceStatusBadge(status: status.overallHealth)
             }
             
             Divider()
@@ -236,7 +236,7 @@ struct InstancePanel: View {
     }
 }
 
-struct StatusBadge: View {
+struct InstanceStatusBadge: View {
     let status: InstanceHealth
     
     var body: some View {

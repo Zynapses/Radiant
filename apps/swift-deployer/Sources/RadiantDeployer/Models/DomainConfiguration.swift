@@ -34,7 +34,7 @@ struct DomainConfiguration: Identifiable, Codable, Sendable {
 
 // MARK: - DNS Record
 
-struct DNSRecord: Identifiable, Codable, Sendable {
+struct DomainDNSRecord: Identifiable, Codable, Sendable {
     let id: String
     var type: RecordType
     var name: String
@@ -118,12 +118,12 @@ struct SESRecords: Sendable {
     var mailFromMX: String?
     var mailFromSPF: String?
     
-    func toDNSRecords(domain: String, mailFromDomain: String?) -> [DNSRecord] {
-        var records: [DNSRecord] = []
+    func toDomainDNSRecords(domain: String, mailFromDomain: String?) -> [DomainDNSRecord] {
+        var records: [DomainDNSRecord] = []
         
         // Domain verification TXT record
         if let token = verificationToken {
-            records.append(DNSRecord(
+            records.append(DomainDNSRecord(
                 id: "ses-verification",
                 type: .TXT,
                 name: "_amazonses.\(domain)",
@@ -137,7 +137,7 @@ struct SESRecords: Sendable {
         
         // DKIM CNAME records
         for (index, token) in dkimTokens.enumerated() {
-            records.append(DNSRecord(
+            records.append(DomainDNSRecord(
                 id: "dkim-\(index + 1)",
                 type: .CNAME,
                 name: "\(token)._domainkey.\(domain)",
@@ -152,7 +152,7 @@ struct SESRecords: Sendable {
         // Mail FROM records (if custom MAIL FROM domain)
         if let mailFrom = mailFromDomain {
             if let mx = mailFromMX {
-                records.append(DNSRecord(
+                records.append(DomainDNSRecord(
                     id: "mailfrom-mx",
                     type: .MX,
                     name: mailFrom,
@@ -165,7 +165,7 @@ struct SESRecords: Sendable {
             }
             
             if let spf = mailFromSPF {
-                records.append(DNSRecord(
+                records.append(DomainDNSRecord(
                     id: "mailfrom-spf",
                     type: .TXT,
                     name: mailFrom,
@@ -187,9 +187,9 @@ struct SESRecords: Sendable {
 struct CertificateRecords: Sendable {
     var validationRecords: [(name: String, value: String)]
     
-    func toDNSRecords() -> [DNSRecord] {
+    func toDomainDNSRecords() -> [DomainDNSRecord] {
         return validationRecords.enumerated().map { index, record in
-            DNSRecord(
+            DomainDNSRecord(
                 id: "acm-validation-\(index + 1)",
                 type: .CNAME,
                 name: record.name,
@@ -208,7 +208,7 @@ struct CertificateRecords: Sendable {
 struct DomainSetupSummary: Sendable {
     var baseDomain: String
     var subdomains: [String]
-    var dnsRecords: [DNSRecord]
+    var dnsRecords: [DomainDNSRecord]
     var certificateStatus: CertificateStatus
     var domainVerified: Bool
     var emailVerified: Bool

@@ -22,19 +22,19 @@ struct MigrationsView: View {
                 
                 // Environment Cards
                 HStack(alignment: .top, spacing: RadiantSpacing.lg) {
-                    EnvironmentCard(
+                    MigrationEnvironmentCard(
                         environment: .dev,
                         deployment: migrationService.devDeployment,
                         onPromote: { promotionTarget = .staging; showPromoteConfirmation = true }
                     )
                     
-                    EnvironmentCard(
+                    MigrationEnvironmentCard(
                         environment: .staging,
                         deployment: migrationService.stagingDeployment,
                         onPromote: { showShadowModeConfig = true }
                     )
                     
-                    EnvironmentCard(
+                    MigrationEnvironmentCard(
                         environment: .prod,
                         deployment: migrationService.prodDeployment,
                         onPromote: nil
@@ -220,7 +220,7 @@ struct PipelineArrow: View {
 
 // MARK: - Environment Card
 
-struct EnvironmentCard: View {
+struct MigrationEnvironmentCard: View {
     let environment: DeployEnvironment
     let deployment: EnvironmentDeployment?
     let onPromote: (() -> Void)?
@@ -239,7 +239,7 @@ struct EnvironmentCard: View {
                 Spacer()
                 
                 if let status = deployment?.status {
-                    StatusBadge(status: status)
+                    MigrationStatusBadge(status: status)
                 }
             }
             
@@ -248,10 +248,10 @@ struct EnvironmentCard: View {
             if let deployment = deployment {
                 // Version info
                 VStack(alignment: .leading, spacing: RadiantSpacing.xs) {
-                    InfoRow(label: "Version", value: deployment.version)
-                    InfoRow(label: "Package", value: deployment.packageName)
-                    InfoRow(label: "Deployed", value: deployment.deployedAt.formatted(.relative(presentation: .named)))
-                    InfoRow(label: "Domain", value: deployment.domain ?? "Not configured")
+                    MigrationInfoRow(label: "Version", value: deployment.version)
+                    MigrationInfoRow(label: "Package", value: deployment.packageName)
+                    MigrationInfoRow(label: "Deployed", value: deployment.deployedAt.formatted(.relative(presentation: .named)))
+                    MigrationInfoRow(label: "Domain", value: deployment.domain ?? "Not configured")
                 }
                 
                 // Metrics
@@ -318,7 +318,7 @@ struct EnvironmentCard: View {
     }
 }
 
-struct StatusBadge: View {
+struct MigrationStatusBadge: View {
     let status: DeploymentStatus
     
     var body: some View {
@@ -333,7 +333,7 @@ struct StatusBadge: View {
     }
 }
 
-struct InfoRow: View {
+struct MigrationInfoRow: View {
     let label: String
     let value: String
     
@@ -688,7 +688,7 @@ struct RecentMigrationsTable: View {
                     .width(min: 100, ideal: 120)
                     
                     TableColumn("Status") { migration in
-                        StatusBadge(status: migration.status)
+                        MigrationStatusBadge(status: migration.status)
                     }
                     .width(min: 80, ideal: 100)
                     

@@ -182,7 +182,7 @@ struct AWSSnapshotsView: View {
             
             // Summary Cards
             HStack(spacing: 16) {
-                SummaryCard(
+                AWSSnapshotSummaryCard(
                     title: "Total Snapshots",
                     value: "\(viewModel.snapshots.count)",
                     subtitle: "\(viewModel.snapshots.filter { $0.status == .completed }.count) completed",
@@ -190,7 +190,7 @@ struct AWSSnapshotsView: View {
                     color: .blue
                 )
                 
-                SummaryCard(
+                AWSSnapshotSummaryCard(
                     title: "Total Size",
                     value: formatBytes(viewModel.totalSize),
                     subtitle: "Across all snapshots",
@@ -198,7 +198,7 @@ struct AWSSnapshotsView: View {
                     color: .green
                 )
                 
-                SummaryCard(
+                AWSSnapshotSummaryCard(
                     title: "Est. Monthly Cost",
                     value: String(format: "$%.2f", viewModel.totalCost),
                     subtitle: "For storage",
@@ -206,7 +206,7 @@ struct AWSSnapshotsView: View {
                     color: .orange
                 )
                 
-                SummaryCard(
+                AWSSnapshotSummaryCard(
                     title: "Next Scheduled",
                     value: "2:00 AM",
                     subtitle: "Pacific Time (daily)",
@@ -241,7 +241,7 @@ struct AWSSnapshotsView: View {
                 Spacer()
             } else {
                 List(viewModel.snapshots, selection: $selectedSnapshot) { snapshot in
-                    SnapshotRow(snapshot: snapshot)
+                    AWSSnapshotRow(snapshot: snapshot)
                         .tag(snapshot)
                         .contextMenu {
                             if snapshot.status == .completed {
@@ -274,7 +274,7 @@ struct AWSSnapshotsView: View {
             }
         }
         .sheet(isPresented: $showCreateSheet) {
-            CreateSnapshotSheet(viewModel: viewModel)
+            AWSCreateSnapshotSheet(viewModel: viewModel)
         }
         .sheet(isPresented: $showConfigSheet) {
             SnapshotConfigSheet(config: $viewModel.config, onSave: {
@@ -315,7 +315,7 @@ struct AWSSnapshotsView: View {
 
 // MARK: - Summary Card
 
-struct SummaryCard: View {
+struct AWSSnapshotSummaryCard: View {
     let title: String
     let value: String
     let subtitle: String
@@ -350,7 +350,7 @@ struct SummaryCard: View {
 
 // MARK: - Snapshot Row
 
-struct SnapshotRow: View {
+struct AWSSnapshotRow: View {
     let snapshot: AWSSnapshot
     
     var body: some View {
@@ -483,7 +483,7 @@ struct SnapshotRow: View {
 
 // MARK: - Create Snapshot Sheet
 
-struct CreateSnapshotSheet: View {
+struct AWSCreateSnapshotSheet: View {
     @ObservedObject var viewModel: AWSSnapshotsViewModel
     @Environment(\.dismiss) private var dismiss
     @State private var description = ""

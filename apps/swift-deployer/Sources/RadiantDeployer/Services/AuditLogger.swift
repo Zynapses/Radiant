@@ -51,6 +51,16 @@ actor AuditLogger {
         case modelDeployed = "model_deployed"
         case modelStopped = "model_stopped"
         
+        // AWS Credential Management
+        case masterKeyCreated = "master_key_created"
+        case masterKeyUpdated = "master_key_updated"
+        case masterKeyRestored = "master_key_restored"
+        case environmentKeyRotated = "environment_key_rotated"
+        case environmentKeyRestored = "environment_key_restored"
+        case environmentSetupComplete = "environment_setup_complete"
+        case iamUserCreated = "iam_user_created"
+        case environmentCredentialCreated = "environment_credential_created"
+        
         // Domain & DNS (GDPR/SOC2 compliance)
         case domainConfigured = "domain_configured"
         case domainRemoved = "domain_removed"

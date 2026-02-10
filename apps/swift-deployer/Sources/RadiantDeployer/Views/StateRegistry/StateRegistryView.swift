@@ -77,7 +77,7 @@ struct StateRegistryView: View {
     private var detailView: some View {
         switch selectedTab {
         case .overview:
-            DashboardView(viewModel: viewModel)
+            StateRegistryDashboardView(viewModel: viewModel)
         case .environment(let env):
             EnvironmentDetailView(environment: env, viewModel: viewModel)
         case .compare:
@@ -143,7 +143,7 @@ enum StateRegistryTab: Hashable {
 
 // MARK: - Dashboard View
 
-struct DashboardView: View {
+struct StateRegistryDashboardView: View {
     @ObservedObject var viewModel: StateRegistryViewModel
     
     var body: some View {
@@ -163,7 +163,7 @@ struct DashboardView: View {
             GridItem(.flexible())
         ], spacing: RadiantSpacing.md) {
             ForEach(EnvironmentName.allCases, id: \.self) { env in
-                EnvironmentCard(
+                StateEnvironmentCard(
                     environment: env,
                     manifest: viewModel.manifest(for: env),
                     onCapture: { Task { await viewModel.captureManifest(for: env) } }
@@ -196,7 +196,7 @@ struct DashboardView: View {
 
 // MARK: - Environment Card
 
-struct EnvironmentCard: View {
+struct StateEnvironmentCard: View {
     let environment: EnvironmentName
     let manifest: EnvironmentStateManifest?
     let onCapture: () -> Void
@@ -647,17 +647,6 @@ struct HealthBadge: View {
         case .unknown: return .gray
         }
     }
-}
-
-// MARK: - Spacing Constants
-
-enum RadiantSpacing {
-    static let xxs: CGFloat = 2
-    static let xs: CGFloat = 4
-    static let sm: CGFloat = 8
-    static let md: CGFloat = 12
-    static let lg: CGFloat = 16
-    static let xl: CGFloat = 24
 }
 
 // MARK: - Preview

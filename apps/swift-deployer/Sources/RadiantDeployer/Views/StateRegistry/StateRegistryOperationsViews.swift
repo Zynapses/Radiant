@@ -316,7 +316,7 @@ struct ActiveSyncOperationCard: View {
                     Text("Active Sync")
                         .font(.headline)
                     Spacer()
-                    StatusBadge(status: operation.status)
+                    SyncStatusBadge(status: operation.status)
                 }
                 
                 ProgressView(value: Double(operation.progress.percentComplete), total: 100) {
@@ -357,12 +357,12 @@ struct SyncOperationRow: View {
             
             Spacer()
             
-            StatusBadge(status: operation.status)
+            SyncStatusBadge(status: operation.status)
         }
     }
 }
 
-struct StatusBadge: View {
+struct SyncStatusBadge: View {
     let status: EnvSyncStatus
     
     var body: some View {
@@ -485,12 +485,12 @@ struct BackupRow: View {
             
             Spacer()
             
-            BackupStatusBadge(status: backup.status)
+            BackupSyncStatusBadge(status: backup.status)
         }
     }
 }
 
-struct BackupStatusBadge: View {
+struct BackupSyncStatusBadge: View {
     let status: BackupStatus
     
     var body: some View {

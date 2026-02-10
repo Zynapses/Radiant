@@ -17,7 +17,7 @@ struct RadiantCommands: Commands {
             .keyboardShortcut("n", modifiers: .command)
             
             Button("New App...") {
-                appState.selectedTab = .apps
+                appState.selectedTab = .instances
                 // Trigger new app sheet
             }
             .keyboardShortcut("n", modifiers: [.command, .shift])

@@ -1324,7 +1324,7 @@ struct OnePasswordSignInSheet: View {
     }
 }
 
-struct SetupStep: View {
+struct SetupStepRow: View {
     let number: Int
     let title: String
     var subtitle: String? = nil

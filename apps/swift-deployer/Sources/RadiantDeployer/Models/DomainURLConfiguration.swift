@@ -215,15 +215,15 @@ struct DomainURLConfiguration: Codable, Sendable, Equatable, Hashable {
     
     // MARK: - DNS Records Generation
     
-    func generateDNSRecords() -> [DNSRecord] {
-        var records: [DNSRecord] = []
+    func generateDNSRecords() -> [DomainDNSRecord] {
+        var records: [DomainDNSRecord] = []
         
         switch routingStrategy {
         case .subdomain:
             // Each app needs a CNAME to CloudFront
             for app in enabledApps {
                 let subdomain = appConfigs[app.rawValue]?.customSubdomain ?? app.defaultSubdomain
-                records.append(DNSRecord(
+                records.append(DomainDNSRecord(
                     id: "app-\(app.rawValue)",
                     type: .CNAME,
                     name: subdomain,
@@ -236,7 +236,7 @@ struct DomainURLConfiguration: Codable, Sendable, Equatable, Hashable {
             }
         case .pathBased:
             // Single A record (or ALIAS) to CloudFront
-            records.append(DNSRecord(
+            records.append(DomainDNSRecord(
                 id: "root",
                 type: .A,
                 name: "@",
