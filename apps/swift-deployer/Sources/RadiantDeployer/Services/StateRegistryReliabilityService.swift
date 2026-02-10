@@ -241,7 +241,7 @@ public final class StateRegistryStorageManager: ObservableObject {
         guard let usage = diskUsage else { return }
         
         if usage.usagePercent > Double(config.cleanupThresholdPercent) {
-            logger.warning("Disk usage \(usage.usagePercent)% exceeds threshold \(config.cleanupThresholdPercent)%, starting cleanup")
+            logger.warning("Disk usage \(usage.usagePercent)% exceeds threshold \(self.config.cleanupThresholdPercent)%, starting cleanup")
             try await performCleanup()
         }
     }

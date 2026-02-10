@@ -6,6 +6,7 @@ struct CredentialSet: Identifiable, Codable {
     var accessKeyId: String
     var secretAccessKey: String
     var region: String
+    var sessionToken: String?
     var accountId: String?
     var environment: CredentialEnvironment
     var createdAt: Date

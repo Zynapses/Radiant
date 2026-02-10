@@ -290,7 +290,7 @@ actor DeploymentService {
         return DeploymentExecutionResult(
             mode: .install,
             success: true,
-            version: package.manifest.version,
+            version: package.version,
             rollbackSnapshotId: nil,
             outputs: outputs,
             errors: nil,
@@ -430,7 +430,7 @@ actor DeploymentService {
         return DeploymentExecutionResult(
             mode: .update,
             success: true,
-            version: package.manifest.version,
+            version: package.version,
             rollbackSnapshotId: snapshotId,
             outputs: outputs,
             errors: nil,
@@ -633,6 +633,9 @@ actor DeploymentService {
             enableCollaboration: outputs["EnableCollaboration"] == "true",
             enableComplianceExport: outputs["EnableComplianceExport"] == "true",
             enableEgoSystem: outputs["EnableEgoSystem"] == "true",
+            enableOmegaBrain: outputs["EnableOmegaBrain"] == "true",
+            omegaShadowMode: outputs["OmegaShadowMode"] == "true",
+            omegaApiUrl: outputs["OmegaApiUrl"],
             domainConfig: nil,
             externalProviderMarkup: Double(outputs["ExternalProviderMarkup"] ?? "1.40") ?? 1.40,
             selfHostedMarkup: Double(outputs["SelfHostedMarkup"] ?? "1.75") ?? 1.75,
@@ -769,7 +772,7 @@ actor DeploymentService {
             appId: app.id,
             environment: environment.rawValue,
             version: currentParameters.version,
-            packageHash: package.manifest.integrity.packageHash,
+            packageHash: package.checksums.cdkBundle ?? "",
             parameters: currentParameters,
             createdAt: Date(),
             reason: .preUpdate,
@@ -1092,7 +1095,7 @@ actor DeploymentService {
         // Domain configuration
         if let domainConfig = parameters.domainConfig {
             context["baseDomain"] = domainConfig.baseDomain
-            context["useSubdomains"] = String(domainConfig.useSubdomains)
+            context["useSubdomains"] = String(domainConfig.routingStrategy == .subdomain)
             
             if let certArn = domainConfig.sslCertificateArn {
                 context["sslCertificateArn"] = certArn
@@ -1102,7 +1105,7 @@ actor DeploymentService {
             }
             
             // Serialize app paths as JSON
-            if let appPathsData = try? JSONEncoder().encode(domainConfig.appPaths),
+            if let appPathsData = try? JSONEncoder().encode(domainConfig.appConfigs),
                let appPathsJson = String(data: appPathsData, encoding: .utf8) {
                 context["appPaths"] = appPathsJson
             }

@@ -376,7 +376,9 @@ struct CodeSyncView: View {
                 name: "Default",
                 accessKeyId: "",
                 secretAccessKey: "",
-                region: "us-east-1"
+                region: "us-east-1",
+                environment: .dev,
+                createdAt: Date()
             )
             
             syncResult = try await scriptRunner.syncCodeToAWS(

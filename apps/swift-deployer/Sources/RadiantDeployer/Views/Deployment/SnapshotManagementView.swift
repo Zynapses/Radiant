@@ -526,9 +526,9 @@ struct SnapshotManagementView: View {
                         Text("Schema Only (No Data)").tag(SnapshotManager.SnapshotType.schemaOnly)
                     }
                     
-                    if let instance = appState.selectedInstance {
+                    if let app = appState.selectedApp {
                         Section("Target Instance") {
-                            Text("\(instance.appId) / \(instance.environment)")
+                            Text("\(app.id) / \(appState.selectedEnvironment.rawValue)")
                                 .fontWeight(.medium)
                         }
                     }
@@ -617,8 +617,8 @@ struct SnapshotManagementView: View {
     // MARK: - Actions
     
     private func loadSnapshots() async {
-        if let instance = appState.selectedInstance {
-            snapshots = await snapshotManager.listSnapshots(environment: instance.environment)
+        if let app = appState.selectedApp {
+            snapshots = await snapshotManager.listSnapshots(environment: appState.selectedEnvironment.rawValue)
         } else {
             snapshots = await snapshotManager.listSnapshots()
         }
@@ -627,8 +627,8 @@ struct SnapshotManagementView: View {
     }
     
     private func createSnapshot() async {
-        guard let instance = appState.selectedInstance,
-              let credentials = appState.credentials else { return }
+        guard let app = appState.selectedApp,
+              let credentials = appState.credentials.first else { return }
         
         isCreating = true
         
@@ -636,8 +636,8 @@ struct SnapshotManagementView: View {
             let result = try await snapshotManager.createSnapshot(
                 name: newSnapshotName,
                 description: newSnapshotDescription.isEmpty ? nil : newSnapshotDescription,
-                environment: instance.environment,
-                appId: instance.appId,
+                environment: appState.selectedEnvironment.rawValue,
+                appId: app.id,
                 credentials: credentials,
                 type: snapshotType,
                 onProgress: { message, progress in
@@ -664,7 +664,7 @@ struct SnapshotManagementView: View {
     }
     
     private func restoreSnapshot(_ snapshot: SnapshotManager.Snapshot) async {
-        guard let credentials = appState.credentials else { return }
+        guard let credentials = appState.credentials.first else { return }
         
         isRestoring = true
         
@@ -700,7 +700,7 @@ struct SnapshotManagementView: View {
     
     private func deleteSelectedSnapshot() async {
         guard let snapshot = selectedSnapshot,
-              let credentials = appState.credentials else { return }
+              let credentials = appState.credentials.first else { return }
         
         do {
             try await snapshotManager.deleteSnapshot(snapshotId: snapshot.id, credentials: credentials)

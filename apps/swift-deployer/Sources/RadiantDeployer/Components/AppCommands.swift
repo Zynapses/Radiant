@@ -45,7 +45,7 @@ struct RadiantCommands: Commands {
             .keyboardShortcut("1", modifiers: .command)
             
             Button("Show Apps") {
-                appState.selectedTab = .apps
+                appState.selectedTab = .instances
             }
             .keyboardShortcut("2", modifiers: .command)
             

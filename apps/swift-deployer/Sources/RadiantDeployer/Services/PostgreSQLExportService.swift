@@ -64,6 +64,10 @@ actor PostgreSQLExportService {
             }
         }
         
+        var requiresGDPRConsent: Bool {
+            containsPII
+        }
+        
         var containsPII: Bool {
             switch self {
             case .schemaOnly, .aiRegistryOnly, .seedData, .maskedData: return false

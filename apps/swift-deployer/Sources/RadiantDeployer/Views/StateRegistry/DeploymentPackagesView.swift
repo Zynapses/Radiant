@@ -1055,7 +1055,7 @@ class DeploymentPackagesViewModel: ObservableObject {
         packages.remove(at: index)
         
         do {
-            try packageService.removeFromCache(version: package.version)
+            try await packageService.removeFromCache(version: package.version)
         } catch {
             print("[DeploymentPackages] Delete from cache failed: \(error.localizedDescription)")
         }

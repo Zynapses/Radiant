@@ -6,7 +6,7 @@ import SwiftUI
 struct MigrationsView: View {
     @EnvironmentObject var appState: AppState
     @StateObject private var migrationService = MigrationService()
-    @State private var selectedPackage: PackageVersion?
+    @State private var selectedPackage: PackageInfo?
     @State private var showShadowModeConfig = false
     @State private var showPromoteConfirmation = false
     @State private var promotionTarget: DeployEnvironment?

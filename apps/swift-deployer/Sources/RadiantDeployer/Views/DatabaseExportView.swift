@@ -111,11 +111,11 @@ struct DatabaseExportView: View {
                         .foregroundColor(.secondary)
                         .font(.caption)
                 } else {
-                    ForEach(exportHistory.prefix(5), id: \.id) { export in
+                    ForEach(Array(exportHistory.prefix(5)), id: \.id) { export in
                         VStack(alignment: .leading, spacing: 2) {
                             Text(export.mode.displayName)
                                 .font(.caption.weight(.medium))
-                            Text(export.exportedAt, style: .relative)
+                            Text(export.createdAt, style: .relative)
                                 .font(.caption2)
                                 .foregroundColor(.secondary)
                         }
@@ -394,13 +394,8 @@ struct DatabaseExportView: View {
     // MARK: - Actions
     
     private func refreshData() async {
-        exportHistory = await PostgreSQLExportService.shared.getExportHistory()
-        // In production, fetch actual table list from connected environment
-        dynamoDBTables = [
-            DynamoDBExportService.TableInfo(tableName: "radiant-sessions", itemCount: 1250, sizeBytes: 2_500_000, status: "ACTIVE"),
-            DynamoDBExportService.TableInfo(tableName: "radiant-config", itemCount: 45, sizeBytes: 150_000, status: "ACTIVE"),
-            DynamoDBExportService.TableInfo(tableName: "radiant-cache", itemCount: 5000, sizeBytes: 10_000_000, status: "ACTIVE")
-        ]
+        exportHistory = []
+        dynamoDBTables = []
     }
     
     private func performPostgreSQLExport() async {
@@ -415,13 +410,27 @@ struct DatabaseExportView: View {
         progressMessage = "Starting export..."
         
         do {
-            let result = await PostgreSQLExportService.shared.exportDatabase(
-                appId: selectedApp.id,
-                region: "us-east-1",
+            let connection = DatabaseConnection(
+                host: "localhost", port: 5432,
+                database: selectedApp.id,
+                username: "radiant", password: "",
+                sslMode: .disable
+            )
+            let options = PostgreSQLExportService.ExportOptions(
                 mode: exportMode,
-                tables: includeAllTables ? nil : Array(selectedTables),
-                compress: enableCompression,
-                gdprConsent: gdprConsent
+                includeTables: includeAllTables ? nil : Array(selectedTables),
+                excludeTables: nil,
+                compressOutput: enableCompression,
+                splitByTable: false,
+                includeDropStatements: false,
+                gdprConsent: gdprConsent,
+                consentRecordId: nil
+            )
+            let result = try await PostgreSQLExportService.shared.exportDatabase(
+                connection: connection,
+                options: options,
+                appId: selectedApp.id,
+                environment: "dev"
             ) { prog, msg in
                 Task { @MainActor in
                     self.progress = prog
@@ -437,9 +446,7 @@ struct DatabaseExportView: View {
                 duration: result.duration
             )
             showingExportResult = true
-            
-            // Refresh history
-            exportHistory = await PostgreSQLExportService.shared.getExportHistory()
+            exportHistory.insert(result, at: 0)
             
         } catch {
             errorMessage = error.localizedDescription
@@ -461,11 +468,20 @@ struct DatabaseExportView: View {
         progressMessage = "Starting export..."
         
         do {
-            let result = await DynamoDBExportService.shared.exportTables(
-                appId: selectedApp.id,
+            let dynamoOptions = DynamoDBExportService.ExportOptions(
+                mode: .configTables,
+                selectedTables: Array(selectedDynamoTables),
+                includeStreamData: false,
+                compressOutput: enableCompression,
+                maxItemsPerTable: nil,
+                exportToS3: false,
+                s3Bucket: nil,
+                s3Prefix: nil
+            )
+            let result = try await DynamoDBExportService.shared.exportTables(
                 region: "us-east-1",
-                tableNames: Array(selectedDynamoTables),
-                compress: enableCompression
+                appPrefix: selectedApp.id,
+                options: dynamoOptions
             ) { prog, msg in
                 Task { @MainActor in
                     self.progress = prog
@@ -476,7 +492,7 @@ struct DatabaseExportView: View {
             exportResult = ExportResult(
                 success: true,
                 message: "Export completed successfully.\n\(result.tables.count) tables exported.",
-                filePath: result.outputDirectory,
+                filePath: result.filePath,
                 fileSize: result.totalSize,
                 duration: result.duration
             )
