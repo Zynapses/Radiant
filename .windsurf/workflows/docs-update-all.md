@@ -2,11 +2,11 @@
 description: MANDATORY - Update ALL relevant documentation on ANY code change. This is the MASTER documentation policy.
 ---
 
-# Master Documentation Policy (v3.0 — Merged)
+# Master Documentation Policy (v3.1 — Merged)
 
 > ⚠️ **THIS POLICY IS MANDATORY AND HAS NO EXCEPTIONS** ⚠️
 >
-> **Every code change requires documentation updates.** Documentation merged from 22 files into 15 documents (2026-02-10).
+> **Every code change requires documentation updates.** Documentation merged from 22 files into 16 documents (2026-02-10).
 
 ---
 
@@ -22,7 +22,7 @@ Do NOT:
 
 ---
 
-## The 15 Consolidated Documents
+## The 16 Consolidated Documents
 
 ### App Documents (one per app)
 | # | Document | What It Covers |
@@ -46,6 +46,7 @@ Do NOT:
 | 16 | `docs/16-IMPLEMENTATION-SPECS.md` | Sections 00–46 (build specs + DB schema) |
 | 17 | `docs/17-GLOSSARY.md` | Terms, definitions, acronyms |
 | 18 | `docs/18-UI-UX-LIBRARIES.md` | Design patterns, open source libraries |
+| 19 | `docs/19-STRATEGIC-SECURITY.md` | Credential lifecycle security, NIST/CIS/SOC2/PCI/ISO compliance, rotation automation, Swift Deployer + Admin + SDK |
 
 ---
 
@@ -65,6 +66,7 @@ Before making ANY code change, identify what type of change it is:
 | `database` | migration, table, column, schema, SQL |
 | `api_endpoint` | route, endpoint, API, REST, MCP, A2A |
 | `security` | auth, permission, HIPAA, compliance, MFA, OAuth |
+| `credential_lifecycle` | key rotation, dormant key, API key security, IAM audit, secrets rotation |
 | `brain` | consciousness, cognitive, cortex, expert system |
 | `cato` | safety, ethics, CBF, grounding |
 | `omega` | OMEGA Protocol, Genesis, Helix Kernel, firmware |
@@ -118,6 +120,15 @@ Before making ANY code change, identify what type of change it is:
 ```
 ✅ CHANGELOG.md
 ✅ docs/05-SWIFT-DEPLOYER.md
+✅ docs/19-STRATEGIC-SECURITY.md (if credential/security features)
+```
+
+### Credential Lifecycle / Security Changes
+```
+✅ CHANGELOG.md
+✅ docs/19-STRATEGIC-SECURITY.md (rotation, dormant keys, IAM audit, compliance)
+✅ docs/13-SECURITY-AUTH-COMPLIANCE.md (auth middleware, access control)
+✅ docs/05-SWIFT-DEPLOYER.md (if Swift Deployer security features)
 ```
 
 ### Think Tank Mac App Changes

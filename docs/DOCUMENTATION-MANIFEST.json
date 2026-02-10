@@ -98,12 +98,18 @@
         "priority": "LOW",
         "triggers": ["ui_component", "design_pattern", "dependency", "library"],
         "description": "UI/UX design patterns + open source library inventory"
+      },
+      {
+        "path": "docs/19-STRATEGIC-SECURITY.md",
+        "priority": "HIGH",
+        "triggers": ["credential_lifecycle", "key_rotation", "dormant_key", "api_key_security", "iam_audit", "secrets_manager_rotation", "security_compliance", "nist_800_57", "cis_aws", "soc2_cc6"],
+        "description": "Strategic Security Implementation: credential lifecycle framework, NIST/CIS/SOC2/PCI/ISO compliance, rotation automation, Swift Deployer + Admin UI + SDK integration"
       }
     ]
   },
 
   "triggerMatrix": {
-    "description": "Maps code change types to required documentation updates (v3.0 — 15-doc structure)",
+    "description": "Maps code change types to required documentation updates (v3.1 — 16-doc structure)",
     "matrix": {
       "any_change": ["CHANGELOG.md"],
       "database": ["CHANGELOG.md", "docs/06-ARCHITECTURE-ENGINEERING.md", "docs/16-IMPLEMENTATION-SPECS.md"],
@@ -119,7 +125,8 @@
       "orchestration": ["CHANGELOG.md", "docs/10-ORCHESTRATION-WORKFLOWS.md", "docs/06-ARCHITECTURE-ENGINEERING.md"],
       "competitive_advantage": ["CHANGELOG.md", "docs/15-STRATEGY-COMPETITIVE.md"],
       "architecture": ["CHANGELOG.md", "docs/06-ARCHITECTURE-ENGINEERING.md"],
-      "security": ["CHANGELOG.md", "docs/13-SECURITY-AUTH-COMPLIANCE.md", "docs/04-RADIANT-ADMIN.md"],
+      "security": ["CHANGELOG.md", "docs/13-SECURITY-AUTH-COMPLIANCE.md", "docs/04-RADIANT-ADMIN.md", "docs/19-STRATEGIC-SECURITY.md"],
+      "credential_lifecycle": ["CHANGELOG.md", "docs/19-STRATEGIC-SECURITY.md", "docs/05-SWIFT-DEPLOYER.md", "docs/13-SECURITY-AUTH-COMPLIANCE.md"],
       "auth": ["CHANGELOG.md", "docs/13-SECURITY-AUTH-COMPLIANCE.md"],
       "billing": ["CHANGELOG.md", "docs/04-RADIANT-ADMIN.md"],
       "models": ["CHANGELOG.md", "docs/04-RADIANT-ADMIN.md", "docs/06-ARCHITECTURE-ENGINEERING.md"],
@@ -131,7 +138,7 @@
       "new_term": ["CHANGELOG.md", "docs/17-GLOSSARY.md"],
       "new_subsystem": ["CHANGELOG.md", "docs/17-GLOSSARY.md", "docs/06-ARCHITECTURE-ENGINEERING.md"],
       "curator": ["CHANGELOG.md", "docs/02-CURATOR.md", "docs/15-STRATEGY-COMPETITIVE.md"],
-      "deployer": ["CHANGELOG.md", "docs/05-SWIFT-DEPLOYER.md"],
+      "deployer": ["CHANGELOG.md", "docs/05-SWIFT-DEPLOYER.md", "docs/19-STRATEGIC-SECURITY.md"],
       "dojo": ["CHANGELOG.md", "docs/01-THINK-TANK.md", "docs/04-RADIANT-ADMIN.md"],
       "omega": ["CHANGELOG.md", "docs/09-OMEGA-GENESIS.md", "docs/06-ARCHITECTURE-ENGINEERING.md"],
       "omega_quantum": ["CHANGELOG.md", "docs/09-OMEGA-GENESIS.md"],

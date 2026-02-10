@@ -520,6 +520,8 @@ struct DetailContentView: View {
             SpendGovernorView()
         case .intrusionDetection:
             IntrusionDetectionView()
+        case .credentialLifecycle:
+            CredentialLifecycleView()
         case .domainURLs:
             SettingsView() // Domain URLs configured in Settings
         case .curator:

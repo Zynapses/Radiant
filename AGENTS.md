@@ -103,6 +103,7 @@ DYNAMIC: New policies in /.windsurf/workflows/ are AUTOMATICALLY enforced.
 | **Database schema** | `docs/16-IMPLEMENTATION-SPECS.md` |
 | **New terms/acronyms** | `docs/17-GLOSSARY.md` |
 | **UI/UX/Dependencies** | `docs/18-UI-UX-LIBRARIES.md` |
+| **Credential lifecycle/security** | `docs/19-STRATEGIC-SECURITY.md` |
 
 ### The Golden Rule
 

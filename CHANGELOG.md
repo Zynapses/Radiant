@@ -5,6 +5,43 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.58.0] - 2026-02-10
+
+### Credential Lifecycle Security Framework
+
+Comprehensive security framework implementing NIST SP 800-57, CIS AWS Foundations Benchmark v3.0, SOC 2 Type II (CC6.1), AWS Well-Architected Security Pillar, PCI DSS v4.0, and ISO 27001:2022.
+
+#### Phase A — Zero-Code Storage & Compliance
+- **`.husky/pre-commit`**: Enhanced git-secrets hook with 11 secret pattern categories
+- **`credential-lifecycle-stack.ts`**: New CDK stack with 4 AWS Config managed rules (unused credentials, key rotation, root key check, root MFA), IAM Access Analyzer with EventBridge alerting
+- **`bin/radiant.ts`**: cdk-nag AwsSolutions pack enforcement (auto-enabled in prod)
+
+#### Phase B — Key Restrictions & DB Credential Rotation
+- **`V2026_02_10_001__credential_lifecycle_security.sql`**: Migration adding `allowed_ips`, `allowed_origins`, `encryption_key_id`, dormant tracking, rotation lineage columns + `validate_api_key_with_restrictions()` and `rotate_api_key()` DB functions
+- **`lambda/shared/middleware/auth.ts`**: IP CIDR matching, origin enforcement, expiry check, `X-Key-Expires-In` response header
+- **CDK**: Secrets Manager auto-rotation for Aurora DB credentials (30d prod / 90d dev)
+
+#### Phase C — Mandatory Rotation & Dormant Key Cleanup
+- **`lambda/scheduled/dormant-key-audit.ts`**: Daily Lambda — 30d warn → 45d final → 60d auto-disable
+- **`lambda/scheduled/api-key-rotation.ts`**: Daily Lambda — auto-generate successor keys with 14-day grace
+- **`lambda/scheduled/jwt-signing-rotation.ts`**: Secrets Manager rotation for JWT HMAC signing keys with dual-key validation
+- **`thinktank-tenant-admin/handler.ts`**: Full CRUD key management — list, create, rotate, restrictions, revoke
+
+#### Phase D — Least Privilege & Observability
+- **`lambda/scheduled/iam-access-report.ts`**: Monthly IAM credential + Access Analyzer report → SNS
+- **`apps/admin-dashboard/api-keys/page.tsx`**: Rotate Key button + Manage Restrictions dialog (IP CIDRs, HTTP origins)
+- **`packages/sdk/src/client.ts`**: `onKeyExpiring` callback + automatic key swap on `X-Key-Expires-In` detection
+
+#### Swift Deployer Integration
+- **`Services/CredentialLifecycleService.swift`**: Full security audit engine with IAM key audit, Config rule evaluation, Access Analyzer scanning, Secrets Manager inventory, tenant API key lifecycle analysis, remediation actions (rotate/disable/delete), CDK stack deployment, compliance scoring against 6 standards
+- **`Views/CredentialLifecycleView.swift`**: SwiftUI dashboard with 7 audit sections (Overview, IAM Keys, Config Rules, Access Analyzer, Secrets Manager, Tenant API Keys, Compliance), rotation schedule editor, one-click CDK deployment
+- **`AppState.swift` + `MainView_macOS.swift`**: New "Credential Security" sidebar tab
+
+#### Documentation
+- **`docs/19-STRATEGIC-SECURITY.md`**: New standalone document — 20-section Strategic Security Implementation covering all phases, standards mapping, deployment, maintenance, troubleshooting, and incident response
+- **`docs/DOCUMENTATION-MANIFEST.json`**: Added doc 19 with `credential_lifecycle` triggers, updated trigger matrix to v3.1 (16 docs)
+- **`.windsurf/workflows/docs-update-all.md`**: Updated to v3.1 with credential lifecycle change type and required docs
+
 ## [7.57.0] - 2026-02-10
 
 ### Placeholder Stubs Eliminated & Pool Consolidation
