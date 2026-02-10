@@ -4,19 +4,17 @@
  */
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { Pool } from 'pg';
+import { getDbPool } from '../shared/services/database';
 import { EnhancedCollaborationService } from '../shared/services/enhanced-collaboration.service';
 
-const pool = new Pool({
-  host: process.env.DB_HOST,
-  port: parseInt(process.env.DB_PORT || '5432'),
-  database: process.env.DB_NAME,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
-});
+let collaborationService: EnhancedCollaborationService;
 
-const collaborationService = new EnhancedCollaborationService(pool);
+async function initServices() {
+  if (!collaborationService) {
+    const pool = await getDbPool();
+    collaborationService = new EnhancedCollaborationService(pool);
+  }
+}
 
 export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   const tenantId = event.requestContext.authorizer?.tenantId;
@@ -25,7 +23,9 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
   const method = event.httpMethod;
 
   try {
-    await pool.query(`SET app.current_tenant_id = '${tenantId}'`);
+    await initServices();
+    const pool = await getDbPool();
+    await pool.query(`SELECT set_config('app.current_tenant_id', $1, false)`, [tenantId]);
 
     // Parse request body
     const body = event.body ? JSON.parse(event.body) : {};

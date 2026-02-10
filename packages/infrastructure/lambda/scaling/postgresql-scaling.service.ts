@@ -307,7 +307,7 @@ class PostgreSQLScalingService {
     try {
       // Set tenant context for RLS
       if (tenantId) {
-        await client.query(`SET app.current_tenant_id = '${tenantId}'`);
+        await client.query(`SELECT set_config('app.current_tenant_id', $1, false)`, [tenantId]);
       }
 
       const result = await client.query(query, params);

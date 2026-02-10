@@ -22,7 +22,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
   const method = event.httpMethod;
 
   try {
-    await pool.query(`SET app.current_tenant_id = '${tenantId}'`);
+    await pool.query(`SELECT set_config('app.current_tenant_id', $1, false)`, [tenantId]);
     const body = event.body ? JSON.parse(event.body) : {};
 
     // =========================================================================

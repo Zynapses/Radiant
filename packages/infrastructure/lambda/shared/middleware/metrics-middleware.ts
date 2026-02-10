@@ -74,7 +74,7 @@ export function withMetrics(handler: HandlerFunction): HandlerFunction {
     const userId = event.requestContext.authorizer?.userId;
     
     if (tenantId) {
-      await pool.query(`SET app.current_tenant_id = '${tenantId}'`);
+      await pool.query(`SELECT set_config('app.current_tenant_id', $1, false)`, [tenantId]);
     }
 
     const metricsContext: MetricsContext = {

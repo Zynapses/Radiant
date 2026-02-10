@@ -5,6 +5,54 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.56.0] - 2026-02-10
+
+### Think Tank Suite — Tenant Isolation Hardening
+
+Full audit of tenant isolation across all Think Tank Suite apps (Think Tank, Curator, Dojo, Tenant Admin, Omega Lab, Think Tank Mac). Seven issues identified and fixed.
+
+#### CRITICAL: SQL Injection in Tenant Context (17 files fixed)
+All 17 Lambda handlers that used string interpolation for `SET app.current_tenant_id` have been converted to parameterized `set_config()`:
+- `lambda/curator/index.ts`, `lambda/thinktank-tenant-admin/handler.ts`
+- `lambda/thinktank/crucible.ts`, `lambda/thinktank/enhanced-collaboration.ts`
+- `lambda/thinktank-admin/crucible.ts`, `lambda/thinktank-admin/agent-registry.ts`
+- `lambda/admin/sentinel.ts`, `lambda/admin/livs.ts`, `lambda/admin/crucible.ts`
+- `lambda/admin/mls.ts`, `lambda/admin/blackboard.ts`, `lambda/admin/cortex.ts`
+- `lambda/admin/cato-trainer.ts`, `lambda/admin/metrics.ts`
+- `lambda/admin/collaboration-settings.ts`, `lambda/shared/middleware/metrics-middleware.ts`
+- `lambda/scaling/postgresql-scaling.service.ts`
+
+#### CRITICAL: OMEGA Forge Reclassified as Platform-Only Tool
+- Added `apps/omega-forge/middleware.ts` — system admin auth middleware
+- Updated `apps/omega-forge/lib/db/client.ts` header — explicit platform-only classification
+- Forge is NOT part of the Think Tank Suite; it's a system admin tool with intentional cross-tenant DB access
+
+#### HIGH: Think Tank Handler Now Sets RLS Context
+- `lambda/thinktank/handler.ts` — added `setTenantContext()` call before dispatching to sub-handlers
+- Acts as safety net: even if a sub-handler query omits `WHERE tenant_id`, RLS prevents cross-tenant data leaks
+
+#### HIGH: Consolidated Independent Database Pools
+Replaced inline `new Pool()` with shared `getDbPool()` from `database.ts`:
+- `lambda/thinktank/crucible.ts` — was creating its own pool
+- `lambda/thinktank-admin/crucible.ts` — was creating its own pool
+- `lambda/thinktank/enhanced-collaboration.ts` — was creating its own pool
+
+#### HIGH: Tenant Infrastructure Operations API
+- Created `lambda/platform/tenant-ops.ts` — 8 operations (enable/disable OMEGA brain, provision storage, wire feature, reload cartridges, reset cache, rotate API keys, health check)
+- Tenant admins can request operations; system admins approve and execute
+- Wired into `lambda/admin/handler.ts` at `/admin/tenant-ops/*`
+
+#### MEDIUM: Fixed SET vs SET LOCAL Context Leak
+- `lambda/shared/services/database.ts` — `queryWithRls()` and `transactionWithRls()` now use `SET LOCAL` via `set_config($1, true)` inside transactions, preventing context leak across pooled connections
+
+#### Policy: Tenant DB Context Enforcement
+- Created `.windsurf/workflows/tenant-db-context-enforcement.md`
+- Classifies all apps as Think Tank Suite (tenant) vs Platform (system admin)
+- Mandates parameterized `set_config()`, shared pool, service-layer access
+
+**Files Modified**: 22 Lambda files, 1 database service, 1 admin handler
+**Files Created**: `lambda/platform/tenant-ops.ts`, `apps/omega-forge/middleware.ts`, `.windsurf/workflows/tenant-db-context-enforcement.md`
+
 ## [7.55.1] - 2026-02-10
 
 ### Documentation Audit — 248 File Path Mismatches Fixed

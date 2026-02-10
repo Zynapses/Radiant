@@ -29,8 +29,8 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
       return createErrorResponse('Tenant ID required', 401);
     }
 
-    // Set tenant context for RLS
-    await db.query(`SET app.current_tenant_id = '${tenantId}'`);
+    // Set tenant context for RLS (parameterized)
+    await db.query(`SELECT set_config('app.current_tenant_id', $1, false)`, [tenantId]);
 
     // Route handling
     if (path === '/registry' && method === 'GET') {

@@ -39,8 +39,8 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
       return errorResponse(401, 'Tenant ID required');
     }
 
-    // Set tenant context
-    await executeStatement(`SET app.current_tenant_id = '${tenantId}'`, []);
+    // Set tenant context (parameterized)
+    await executeStatement(`SELECT set_config('app.current_tenant_id', $1, false)`, [tenantId]);
 
     // Route requests
     // Dashboard

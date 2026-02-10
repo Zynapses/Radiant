@@ -90,8 +90,8 @@ export const handler = async (
   const tenantId = getTenantId(event);
   const userId = getUserId(event);
 
-  // Set tenant context for RLS
-  await pool.query(`SET app.current_tenant_id = '${tenantId}'`);
+  // Set tenant context for RLS (parameterized)
+  await pool.query(`SELECT set_config('app.current_tenant_id', $1, false)`, [tenantId]);
 
   try {
     // Route handling

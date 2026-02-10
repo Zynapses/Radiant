@@ -11,19 +11,17 @@
  */
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { Pool } from 'pg';
+import { getDbPool } from '../shared/services/database';
 import { CrucibleConfigService } from '../shared/services/crucible';
 
-const pool = new Pool({
-  host: process.env.DB_HOST,
-  port: parseInt(process.env.DB_PORT || '5432'),
-  database: process.env.DB_NAME,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : undefined,
-});
+let configService: CrucibleConfigService;
 
-const configService = new CrucibleConfigService(pool);
+async function initServices() {
+  if (!configService) {
+    const pool = await getDbPool();
+    configService = new CrucibleConfigService(pool);
+  }
+}
 
 function getTenantId(event: APIGatewayProxyEvent): string {
   const tenantId = event.requestContext.authorizer?.claims?.['custom:tenant_id'];
@@ -51,10 +49,12 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
   try {
     const tenantId = getTenantId(event);
+    await initServices();
+    const pool = await getDbPool();
 
-    // Set tenant context for RLS
-    await pool.query(`SET app.current_tenant_id = '${tenantId}'`);
-    await pool.query(`SET app.current_role = 'tenant_admin'`);
+    // Set tenant context for RLS (parameterized)
+    await pool.query(`SELECT set_config('app.current_tenant_id', $1, false)`, [tenantId]);
+    await pool.query(`SELECT set_config('app.current_role', 'tenant_admin', false)`);
 
     // GET /config - Get tenant config with system defaults
     if (method === 'GET' && path === '/config') {

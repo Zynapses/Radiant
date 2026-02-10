@@ -1,12 +1,18 @@
 /**
  * Direct Aurora PostgreSQL connection for OMEGA Forge
  *
- * Unlike the tenant admin dashboard which goes through Lambda + Data API,
- * Forge connects directly via pg driver through RDS Proxy.
+ * ⚠️  OMEGA Forge is a PLATFORM-LEVEL SYSTEM ADMIN tool.
+ * ⚠️  It is NOT part of the Think Tank Suite of tenant apps.
+ * ⚠️  Access is restricted to authenticated system admins via middleware.ts.
  *
- * NO ROW-LEVEL SECURITY is enforced at this level.
- * Forge sees ALL tenants, ALL data. This is intentional.
- * Forge is a SYSTEM ADMIN tool behind the firewall.
+ * Unlike tenant apps (Think Tank, Curator, Dojo, etc.) which go through
+ * the Lambda service layer with RLS, Forge connects directly via pg driver
+ * through RDS Proxy with full cross-tenant visibility. This is intentional —
+ * Forge manages cartridges, brains, and firmware across ALL tenants.
+ *
+ * Authentication: System admin token validated by middleware.ts
+ * Authorization: Pool B super_admin role required
+ * Audit: All write operations are logged to cartridge_audit_log
  */
 
 import { Pool, PoolClient } from 'pg';

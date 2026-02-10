@@ -98,7 +98,9 @@ export async function query<T extends QueryResultRow = QueryResultRow>(
 }
 
 /**
- * Execute a query with Row-Level Security context
+ * Execute a query with Row-Level Security context.
+ * Uses SET LOCAL inside a transaction so context is automatically
+ * cleaned up when the transaction ends — no leak risk with pooled connections.
  */
 export async function queryWithRls<T extends QueryResultRow = QueryResultRow>(
   tenantId: string,
@@ -108,16 +110,17 @@ export async function queryWithRls<T extends QueryResultRow = QueryResultRow>(
   const client = await getClient();
   
   try {
-    // Set tenant context for RLS
-    await client.query('SET app.current_tenant_id = $1', [tenantId]);
+    await client.query('BEGIN');
+    // SET LOCAL is transaction-scoped — automatically reset on COMMIT/ROLLBACK
+    await client.query(`SELECT set_config('app.current_tenant_id', $1, true)`, [tenantId]);
     
-    // Execute the actual query
     const result = await client.query<T>(text, values);
     
-    // Reset context
-    await client.query('RESET app.current_tenant_id');
-    
+    await client.query('COMMIT');
     return result;
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw error;
   } finally {
     client.release();
   }
@@ -145,7 +148,8 @@ export async function transaction<T>(
 }
 
 /**
- * Execute a transaction with RLS context
+ * Execute a transaction with RLS context.
+ * Uses SET LOCAL so tenant context is automatically cleaned up on COMMIT/ROLLBACK.
  */
 export async function transactionWithRls<T>(
   tenantId: string,
@@ -155,11 +159,11 @@ export async function transactionWithRls<T>(
   
   try {
     await client.query('BEGIN');
-    await client.query('SET app.current_tenant_id = $1', [tenantId]);
+    // SET LOCAL is transaction-scoped — no need to RESET
+    await client.query(`SELECT set_config('app.current_tenant_id', $1, true)`, [tenantId]);
     
     const result = await fn(client);
     
-    await client.query('RESET app.current_tenant_id');
     await client.query('COMMIT');
     return result;
   } catch (error) {

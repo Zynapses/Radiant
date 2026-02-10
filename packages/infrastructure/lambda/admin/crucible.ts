@@ -59,8 +59,8 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
   try {
     const tenantId = getTenantId(event);
 
-    // Set tenant context for RLS
-    await pool.query(`SET app.current_tenant_id = '${tenantId}'`);
+    // Set tenant context for RLS (parameterized)
+    await pool.query(`SELECT set_config('app.current_tenant_id', $1, false)`, [tenantId]);
 
     // GET /dashboard - Full dashboard data
     if (method === 'GET' && path === '/dashboard') {

@@ -41,7 +41,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
       return createErrorResponse('Tenant ID required', 401);
     }
 
-    await db.query(`SET app.current_tenant_id = '${tenantId}'`);
+    await db.query(`SELECT set_config('app.current_tenant_id', $1, false)`, [tenantId]);
 
     // ─────────────────────────────────────────────────────────────────────
     // Dashboard

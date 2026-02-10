@@ -34,12 +34,12 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
     return response(401, { error: 'Unauthorized' });
   }
 
-  // Set tenant context for RLS
+  // Set tenant context for RLS (parameterized)
   if (tenantId) {
-    await pool.query(`SET app.current_tenant_id = '${tenantId}'`);
+    await pool.query(`SELECT set_config('app.current_tenant_id', $1, false)`, [tenantId]);
   }
   if (isSuperAdmin) {
-    await pool.query(`SET app.is_super_admin = true`);
+    await pool.query(`SELECT set_config('app.is_super_admin', 'true', false)`);
   }
 
   try {

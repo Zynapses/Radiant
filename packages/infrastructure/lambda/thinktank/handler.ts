@@ -2,12 +2,28 @@
 // Routes all /api/v2/thinktank/* requests to appropriate sub-handlers
 
 import type { APIGatewayProxyEvent, APIGatewayProxyResult, Context, APIGatewayProxyHandler } from 'aws-lambda';
+import { getDbPool } from '../shared/services/database';
 
 // Helper to invoke sub-handlers with correct signature
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function invokeHandler(h: any, event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> {
   const result = await h(event, context, () => {});
   return result as APIGatewayProxyResult;
+}
+
+/**
+ * Set tenant context for RLS before dispatching to sub-handlers.
+ * This is a safety net — sub-handlers also filter by tenantId in queries,
+ * but RLS at the DB level prevents cross-tenant leaks if a query forgets WHERE.
+ */
+async function setTenantContext(event: APIGatewayProxyEvent): Promise<void> {
+  const tenantId = event.requestContext.authorizer?.claims?.['custom:tenant_id']
+    || event.requestContext.authorizer?.claims?.['custom:tenantId']
+    || event.requestContext.authorizer?.tenantId;
+  if (tenantId) {
+    const pool = await getDbPool();
+    await pool.query(`SELECT set_config('app.current_tenant_id', $1, false)`, [tenantId]);
+  }
 }
 
 const corsHeaders = {
@@ -32,6 +48,9 @@ export const handler = async (
   const resource = pathParts[3] || '';
 
   try {
+    // Set tenant context for RLS safety net
+    await setTenantContext(event);
+
     // Route based on resource
     switch (resource) {
       // Core Think Tank Features

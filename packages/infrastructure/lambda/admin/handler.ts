@@ -260,6 +260,12 @@ async function routeRequest(
     return handleIntrusionDetection(event);
   }
 
+  // Tenant Infrastructure Operations (v7.56.0)
+  if (pathParts[1] === 'tenant-ops') {
+    const { handler: tenantOpsHandler } = await import('../platform/tenant-ops.js');
+    return tenantOpsHandler(event);
+  }
+
   // Data Lake (v7.42.0)
   if (pathParts[1] === 'data-lake') {
     const { handleDataLake } = await import('./data-lake.js');
