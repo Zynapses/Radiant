@@ -5,7 +5,6 @@ import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard, Package, PenTool, Brain, Bot,
   Store, Target, Globe, Key, FileText, Shield,
-  Activity, Database, Beaker, Layers,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 

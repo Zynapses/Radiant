@@ -2,7 +2,6 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { Bot, Loader2 } from 'lucide-react';
-import Link from 'next/link';
 
 export default function CatoPage() {
   const { data, isLoading } = useQuery({

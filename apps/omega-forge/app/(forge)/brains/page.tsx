@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { Brain, Loader2, Activity } from 'lucide-react';
+import { Brain, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 
 export default function BrainsPage() {

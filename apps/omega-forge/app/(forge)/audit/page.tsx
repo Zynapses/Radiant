@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { FileText, Loader2, Search } from 'lucide-react';
+import { FileText, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 
 export default function AuditPage() {
