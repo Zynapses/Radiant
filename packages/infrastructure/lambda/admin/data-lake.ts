@@ -13,7 +13,8 @@
  */
 
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { Pool } from 'pg';
+import type { Pool } from 'pg';
+import { getDbPool } from '../shared/services/database';
 import { successResponse, errorResponse } from '../shared/response';
 import { NotFoundError, ValidationError } from '../shared/errors';
 import { createRegisteredLogger } from '../shared/services/logging-registry.service';
@@ -28,19 +29,9 @@ const logger = createRegisteredLogger({
 
 let pool: Pool | null = null;
 
-function getPool(): Pool {
+async function ensurePool(): Promise<Pool> {
   if (!pool) {
-    pool = new Pool({
-      host: process.env.DB_HOST,
-      port: parseInt(process.env.DB_PORT || '5432', 10),
-      database: process.env.DB_NAME || 'radiant',
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : undefined,
-      max: 5,
-      idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 10000,
-    });
+    pool = await getDbPool();
   }
   return pool;
 }
@@ -101,7 +92,7 @@ export async function handleDataLake(
 // =========================================================================
 
 async function getGlobalStats(): Promise<APIGatewayProxyResult> {
-  const db = getPool();
+  const db = await ensurePool();
 
   const statsResult = await db.query(`
     SELECT
@@ -150,7 +141,7 @@ async function getGlobalStats(): Promise<APIGatewayProxyResult> {
 // =========================================================================
 
 async function getTierBreakdown(): Promise<APIGatewayProxyResult> {
-  const db = getPool();
+  const db = await ensurePool();
 
   const result = await db.query(`
     SELECT
@@ -188,7 +179,7 @@ async function getTierBreakdown(): Promise<APIGatewayProxyResult> {
 // =========================================================================
 
 async function getDataTypes(): Promise<APIGatewayProxyResult> {
-  const queryService = new DataLakeQueryService(getPool());
+  const queryService = new DataLakeQueryService(await ensurePool());
   const dataTypes = await queryService.getDataTypes();
   return successResponse(dataTypes);
 }
@@ -198,7 +189,7 @@ async function getDataTypes(): Promise<APIGatewayProxyResult> {
 // =========================================================================
 
 async function getGlacierQueueStats(): Promise<APIGatewayProxyResult> {
-  const db = getPool();
+  const db = await ensurePool();
 
   const result = await db.query(`
     SELECT
@@ -229,7 +220,7 @@ async function getGlacierQueueStats(): Promise<APIGatewayProxyResult> {
 // =========================================================================
 
 async function getLifecycleStatus(): Promise<APIGatewayProxyResult> {
-  const db = getPool();
+  const db = await ensurePool();
 
   const result = await db.query(`
     SELECT
@@ -252,7 +243,7 @@ async function getLifecycleStatus(): Promise<APIGatewayProxyResult> {
 // =========================================================================
 
 async function getTenantStats(tenantId: string): Promise<APIGatewayProxyResult> {
-  const db = getPool();
+  const db = await ensurePool();
 
   const result = await db.query(`
     SELECT
@@ -312,7 +303,7 @@ async function executeQuery(body: {
   filters?: Record<string, string | number | boolean>;
   limit?: number;
 }): Promise<APIGatewayProxyResult> {
-  const queryService = new DataLakeQueryService(getPool());
+  const queryService = new DataLakeQueryService(await ensurePool());
 
   if (body.sql) {
     // Raw SQL query
@@ -350,7 +341,7 @@ async function triggerReconciliation(body: {
     return errorResponse(new ValidationError('tenantId is required'));
   }
 
-  const reconciler = new RetentionReconcilerService(getPool());
+  const reconciler = new RetentionReconcilerService(await ensurePool());
   const result = await reconciler.reconcile({
     tenantId: body.tenantId,
     dataTypeId: body.dataTypeId,

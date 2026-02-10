@@ -5,6 +5,39 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.57.0] - 2026-02-10
+
+### Placeholder Stubs Eliminated & Pool Consolidation
+
+Deep audit of 746 "placeholder" matches identified 5 real stub implementations and 1 CDK deployment bug. All fixed. Additionally, consolidated 21 inline database pool creations to the shared `getDbPool()` service, and discovered + fixed 1 additional SQL injection.
+
+#### BUG FIX: CDK Deployment Blocker
+- **`lib/stacks/storage-stack.ts`**: Fixed `noncurrentVersionTransition` → `noncurrentVersionTransitions` (plural). This typo caused CDK synth to fail, blocking all deployments touching the CartridgeBucket.
+
+#### Placeholder Stubs → Real Implementations (4 files)
+- **`lambda/axiom-clarion/handler.ts`**: `handleListQuestions()`, `handleCreateQuestion()`, `handleListSignatures()` — were returning empty arrays/fake IDs. Now query `clarion_questions` and `axiom_domain_signatures` tables via Data API with proper named params and tenant filtering.
+- **`lambda/admin/security-schedules.ts`**: Manual trigger endpoint was a no-op (created DB record but never invoked the scan). Now invokes the security monitoring Lambda asynchronously with proper error handling and execution status updates.
+- **`lambda/admin/cartridge-pki.ts`**: Root CA initialization stored a fake public key placeholder. Now generates real Ed25519 key pair via Node `crypto.generateKeyPairSync`, stores private key in AWS Secrets Manager, and records the real public key + SHA-256 fingerprint.
+- **`lambda/shared/services/cartridge-rnir.service.ts`**: LoRA training queue created a pending DB record but never invoked SageMaker. Now uploads JSONL training data to S3, creates a `CreateTrainingJob` via SageMaker SDK with proper hyperparameters, tags, and resource config. Falls back gracefully on SageMaker errors.
+
+#### SQL Injection Fix (1 additional file)
+- **`lambda/admin/checklist-registry.ts`**: Found `SET LOCAL app.current_tenant_id = '${tenantId}'` at line 82 — missed in prior audit. Converted to parameterized `set_config()`.
+
+#### Database Pool Consolidation (21 files migrated)
+All inline `new Pool({...})` creations replaced with shared `getDbPool()` from `lambda/shared/services/database.ts`. This eliminates duplicate connection configs, reduces cold-start overhead, and ensures consistent SSL/timeout settings.
+
+**Admin handlers** (10): `collaboration-settings.ts`, `checklist-registry.ts`, `metrics.ts`, `crucible.ts`, `cato-pipeline.ts`, `log-retention.ts`, `sentinel.ts`, `livs.ts`, `profile.ts`, `data-lake.ts`
+**Auth/OAuth** (2): `oauth/handler.ts`, `auth/mfa.handler.ts`
+**Shared** (3): `shared/middleware/metrics-middleware.ts`, `shared/services/sovereign-mesh/agent-runtime.service.ts`, `shared/services/dia/sniper-validator.ts`
+**Public** (1): `public/tenant-signup.ts`
+**Scheduled** (4): `scheduled/retention-reconciler.ts`, `scheduled/data-lake-lifecycle.ts`, `scheduled/learning-aggregation.ts`, `scheduled/learning-snapshots.ts`
+**Gateway** (1): `gateway/mcp-worker.ts`
+
+**Intentional exclusions** (4 files retained with dedicated pools):
+- `public/status-page.handler.ts` — uses Secrets Manager for credentials (public endpoint)
+- `scaling/postgresql-scaling.service.ts` (×2) — manages primary/replica pools with separate configs
+- `scaling/batch-writer.ts` — uses RDS Proxy with dedicated credentials
+
 ## [7.56.0] - 2026-02-10
 
 ### Think Tank Suite — Tenant Isolation Hardening

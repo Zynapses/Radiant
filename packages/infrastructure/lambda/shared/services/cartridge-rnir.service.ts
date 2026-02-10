@@ -444,15 +444,14 @@ export class CartridgeRNIRService {
     job: RNIRCompilationJob,
     docs: Record<string, unknown>[]
   ): Promise<RNIRCompiledArtifact> {
-    // In production, this would invoke SageMaker training
-    // For now, create a pending artifact
     const s3Path = `${job.tenantId}/${job.request.cartridgeId}/compiled/${job.request.modelFamily}/lora-adapter/`;
 
+    // Create the artifact record first
     const artifactResult = await executeStatement(
       `INSERT INTO rnir_compiled_artifacts (
         job_id, cartridge_id, tenant_id, target, model_family, model_id, artifact_path,
         size_bytes, checksum, status, started_at
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'pending', NOW())
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'training', NOW())
       RETURNING *`,
       [
         job.id,
@@ -467,10 +466,103 @@ export class CartridgeRNIRService {
       ]
     );
 
-    logger.info('LoRA training queued', { 
-      artifactId: artifactResult.rows[0].id,
-      modelFamily: job.request.modelFamily,
-    });
+    const artifactId = (artifactResult.rows[0] as Record<string, unknown>).id;
+
+    // Prepare training data and upload to S3
+    const trainingData = docs.map(d => ({
+      document_id: d.id,
+      content: d.content,
+      domain: d.domain,
+    }));
+
+    const trainingDataKey = `${s3Path}training-data.jsonl`;
+    const trainingContent = trainingData.map(d => JSON.stringify(d)).join('\n');
+
+    await s3Client.send(new PutObjectCommand({
+      Bucket: RNIR_BUCKET,
+      Key: trainingDataKey,
+      Body: trainingContent,
+      ContentType: 'application/jsonl',
+    }));
+
+    // Invoke SageMaker training job
+    const loraSettings = (job.request.loraSettings || {}) as Record<string, unknown>;
+    const trainingJobName = `rnir-lora-${job.request.cartridgeId}-${Date.now()}`.substring(0, 63);
+
+    try {
+      const { SageMakerClient, CreateTrainingJobCommand } = await import('@aws-sdk/client-sagemaker');
+      const sagemakerClient = new SageMakerClient({ region: process.env.AWS_REGION || 'us-east-1' });
+
+      await sagemakerClient.send(new CreateTrainingJobCommand({
+        TrainingJobName: trainingJobName,
+        AlgorithmSpecification: {
+          TrainingImage: process.env.LORA_TRAINING_IMAGE || `${process.env.AWS_ACCOUNT_ID}.dkr.ecr.${process.env.AWS_REGION || 'us-east-1'}.amazonaws.com/radiant-lora-trainer:latest`,
+          TrainingInputMode: 'File',
+        },
+        RoleArn: process.env.SAGEMAKER_ROLE_ARN || `arn:aws:iam::${process.env.AWS_ACCOUNT_ID}:role/radiant-sagemaker-training`,
+        InputDataConfig: [{
+          ChannelName: 'training',
+          DataSource: {
+            S3DataSource: {
+              S3DataType: 'S3Prefix',
+              S3Uri: `s3://${RNIR_BUCKET}/${trainingDataKey}`,
+              S3DataDistributionType: 'FullyReplicated',
+            },
+          },
+        }],
+        OutputDataConfig: {
+          S3OutputPath: `s3://${RNIR_BUCKET}/${s3Path}`,
+        },
+        ResourceConfig: {
+          InstanceType: (loraSettings.instanceType as string || 'ml.g5.xlarge') as any,
+          InstanceCount: 1,
+          VolumeSizeInGB: 50,
+        },
+        StoppingCondition: {
+          MaxRuntimeInSeconds: loraSettings.maxRuntimeSeconds as number || 7200,
+        },
+        HyperParameters: {
+          model_id: loraSettings.modelId as string || 'meta-llama/Llama-3-8b',
+          lora_rank: String(loraSettings.rank || 16),
+          lora_alpha: String(loraSettings.alpha || 32),
+          epochs: String(loraSettings.epochs || 3),
+          learning_rate: String(loraSettings.learningRate || 2e-4),
+          artifact_id: String(artifactId),
+          cartridge_id: job.request.cartridgeId,
+          tenant_id: job.tenantId,
+        },
+        Tags: [
+          { Key: 'radiant:tenant_id', Value: job.tenantId },
+          { Key: 'radiant:cartridge_id', Value: job.request.cartridgeId },
+          { Key: 'radiant:artifact_id', Value: String(artifactId) },
+        ],
+      }));
+
+      // Update artifact with SageMaker job name
+      await executeStatement(
+        `UPDATE rnir_compiled_artifacts SET
+          checksum = $2, status = 'training'
+         WHERE id = $1`,
+        [artifactId, trainingJobName]
+      );
+
+      logger.info('LoRA SageMaker training job created', {
+        artifactId,
+        trainingJobName,
+        modelFamily: job.request.modelFamily,
+      });
+    } catch (smError) {
+      logger.error('Failed to create SageMaker training job', smError as Error, {
+        artifactId,
+        modelFamily: job.request.modelFamily,
+      });
+
+      // Update artifact status to failed
+      await executeStatement(
+        `UPDATE rnir_compiled_artifacts SET status = 'failed', checksum = $2 WHERE id = $1`,
+        [artifactId, `sagemaker_error: ${(smError as Error).message}`]
+      );
+    }
 
     return this.mapArtifact(artifactResult.rows[0]);
   }

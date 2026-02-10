@@ -9,7 +9,8 @@ import type { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { createHash, randomBytes } from 'crypto';
 import * as jwt from 'jsonwebtoken';
 import * as bcrypt from 'bcryptjs';
-import { Pool } from 'pg';
+import type { Pool } from 'pg';
+import { getDbPool } from '../shared/services/database';
 import { Redis } from 'ioredis';
 import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
 import { Logger } from '../shared/logger';
@@ -36,14 +37,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
   try {
     // Initialize connections
     if (!pool) {
-      pool = new Pool({
-        host: process.env.DB_HOST,
-        port: parseInt(process.env.DB_PORT || '5432'),
-        database: process.env.DB_NAME,
-        user: process.env.DB_USER,
-        password: process.env.DB_PASSWORD,
-        ssl: { rejectUnauthorized: false },
-      });
+      pool = await getDbPool();
     }
 
     if (!redis && process.env.REDIS_HOST) {

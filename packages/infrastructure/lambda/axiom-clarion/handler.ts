@@ -13,6 +13,7 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { axiomService } from '../shared/services/axiom.service';
 import { clarionService } from '../shared/services/clarion.service';
+import { executeStatement, stringParam, longParam, doubleParam } from '../shared/db/client';
 import { createRegisteredLogger } from '../shared/services/logging-registry.service';
 
 const logger = createRegisteredLogger({
@@ -430,11 +431,38 @@ async function handleListQuestions(event: APIGatewayProxyEvent): Promise<APIGate
   const domain = getQueryParam(event, 'domain');
   const category = getQueryParam(event, 'category');
   const limit = parseInt(getQueryParam(event, 'limit') || '50', 10);
+  const tenantId = event.requestContext.authorizer?.tenantId;
 
-  // For now, return a placeholder - would implement full listing
+  let query = `SELECT * FROM clarion_questions WHERE is_active = true`;
+  const params: ReturnType<typeof stringParam>[] = [];
+
+  if (tenantId) {
+    query += ` AND (tenant_id IS NULL OR tenant_id = :tenantId)`;
+    params.push(stringParam('tenantId', tenantId));
+  }
+
+  if (domain) {
+    query += ` AND (domain_applicability @> '"*"'::jsonb OR domain_applicability @> :domainJson::jsonb)`;
+    params.push(stringParam('domainJson', JSON.stringify([domain])));
+  }
+
+  if (category) {
+    query += ` AND category = :category`;
+    params.push(stringParam('category', category));
+  }
+
+  query += ` ORDER BY priority DESC LIMIT :lim`;
+  params.push(longParam('lim', limit));
+
+  const result = await executeStatement(query, params);
+  const countResult = await executeStatement(
+    `SELECT COUNT(*) as total FROM clarion_questions WHERE is_active = true`,
+    []
+  );
+
   return createResponse(200, {
-    questions: [],
-    total: 0,
+    questions: result.rows,
+    total: parseInt(String((countResult.rows[0] as Record<string, unknown>)?.total || '0'), 10),
     domain,
     category,
     limit,
@@ -452,9 +480,40 @@ async function handleCreateQuestion(event: APIGatewayProxyEvent): Promise<APIGat
     return createResponse(400, { error: 'text, type, and category are required' });
   }
 
-  // Would implement question creation
+  const tenantId = event.requestContext.authorizer?.tenantId || null;
+  const userId = event.requestContext.authorizer?.userId || null;
+  const questionId = `q_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+  const textLocalized = typeof body.text === 'string' ? { en: body.text } : body.text;
+  const optionsLocalized = body.options ? (typeof body.options === 'object' && !Array.isArray(body.options) ? body.options : { en: body.options }) : null;
+
+  const result = await executeStatement(
+    `INSERT INTO clarion_questions (
+      question_id, tenant_id, domain_applicability, question_type,
+      text_localized, options_localized, priority, information_gain,
+      category, requires_answers, conflicts_with, is_active, created_by
+    ) VALUES (:questionId, :tenantId, :domains::jsonb, :questionType,
+      :textLocalized::jsonb, :optionsLocalized::jsonb, :priority, :infoGain,
+      :category, :requiresAnswers::jsonb, :conflictsWith::jsonb, true, :createdBy)
+    RETURNING *`,
+    [
+      stringParam('questionId', questionId),
+      stringParam('tenantId', tenantId),
+      stringParam('domains', JSON.stringify(body.domainApplicability || ['*'])),
+      stringParam('questionType', String(body.type)),
+      stringParam('textLocalized', JSON.stringify(textLocalized)),
+      stringParam('optionsLocalized', optionsLocalized ? JSON.stringify(optionsLocalized) : null),
+      doubleParam('priority', Number(body.priority) || 0.5),
+      doubleParam('infoGain', Number(body.informationGain) || 0.5),
+      stringParam('category', String(body.category)),
+      stringParam('requiresAnswers', JSON.stringify(body.requiresAnswers || [])),
+      stringParam('conflictsWith', JSON.stringify(body.conflictsWith || [])),
+      stringParam('createdBy', userId),
+    ]
+  );
+
   return createResponse(201, {
-    questionId: `q_${Date.now()}`,
+    questionId,
+    question: result.rows[0],
     message: 'Question created',
   });
 }
@@ -488,10 +547,34 @@ async function handleGetQuestion(event: APIGatewayProxyEvent): Promise<APIGatewa
  * List all domain signatures
  */
 async function handleListSignatures(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
-  // Would implement full listing
+  const tenantId = event.requestContext.authorizer?.tenantId;
+  const limit = parseInt(getQueryParam(event, 'limit') || '50', 10);
+  const offset = parseInt(getQueryParam(event, 'offset') || '0', 10);
+
+  const result = await executeStatement(
+    `SELECT * FROM axiom_domain_signatures
+     WHERE is_active = true
+     AND (tenant_id IS NULL OR tenant_id = :tenantId)
+     ORDER BY effectiveness_score DESC, usage_count DESC
+     LIMIT :lim OFFSET :off`,
+    [
+      stringParam('tenantId', tenantId || null),
+      longParam('lim', limit),
+      longParam('off', offset),
+    ]
+  );
+
+  const countResult = await executeStatement(
+    `SELECT COUNT(*) as total FROM axiom_domain_signatures
+     WHERE is_active = true AND (tenant_id IS NULL OR tenant_id = :tenantId)`,
+    [stringParam('tenantId', tenantId || null)]
+  );
+
   return createResponse(200, {
-    signatures: [],
-    total: 0,
+    signatures: result.rows,
+    total: parseInt(String((countResult.rows[0] as Record<string, unknown>)?.total || '0'), 10),
+    limit,
+    offset,
   });
 }
 

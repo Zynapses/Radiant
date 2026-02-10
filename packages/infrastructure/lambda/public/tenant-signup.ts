@@ -16,22 +16,15 @@
  */
 
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { Pool } from 'pg';
+import type { Pool } from 'pg';
+import { getDbPool } from '../shared/services/database';
 import { TenantProvisioningService } from '../shared/services/tenant-provisioning.service';
 
 let pool: Pool | null = null;
 
-function getPool(): Pool {
+async function ensurePool(): Promise<Pool> {
   if (!pool) {
-    pool = new Pool({
-      host: process.env.DB_HOST,
-      port: parseInt(process.env.DB_PORT || '5432'),
-      database: process.env.DB_NAME || 'radiant',
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : undefined,
-      max: 5,
-    });
+    pool = await getDbPool();
   }
   return pool;
 }
@@ -55,7 +48,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
     return response(200, {});
   }
 
-  const service = new TenantProvisioningService(getPool());
+  const service = new TenantProvisioningService(await ensurePool());
   const method = event.httpMethod;
   const path = event.path.replace(/^\/api\/tenant-signup/, '') || '/';
   const body = event.body ? JSON.parse(event.body) : {};

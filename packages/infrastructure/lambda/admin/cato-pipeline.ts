@@ -6,7 +6,8 @@
  */
 
 import { APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda';
-import { Pool } from 'pg';
+import { getDbPool } from '../shared/services/database';
+import type { Pool } from 'pg';
 import { createCatoMethodRegistryService } from '../shared/services/cato-method-registry.service';
 import { createCatoSchemaRegistryService } from '../shared/services/cato-schema-registry.service';
 import { createCatoToolRegistryService } from '../shared/services/cato-tool-registry.service';
@@ -16,24 +17,29 @@ import { createCatoPipelineOrchestratorService } from '../shared/services/cato-p
 import { createCatoMerkleService } from '../shared/services/cato-merkle.service';
 import { CatoCheckpointDecision } from '@radiant/shared';
 
-const pool = new Pool({
-  host: process.env.DB_HOST,
-  port: parseInt(process.env.DB_PORT || '5432'),
-  database: process.env.DB_NAME,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
-});
+let pool: Pool;
+let schemaRegistry: ReturnType<typeof createCatoSchemaRegistryService>;
+let methodRegistry: ReturnType<typeof createCatoMethodRegistryService>;
+let toolRegistry: ReturnType<typeof createCatoToolRegistryService>;
+let checkpointService: ReturnType<typeof createCatoCheckpointService>;
+let compensationService: ReturnType<typeof createCatoCompensationService>;
+let merkleService: ReturnType<typeof createCatoMerkleService>;
+let pipelineOrchestrator: ReturnType<typeof createCatoPipelineOrchestratorService>;
 
-const schemaRegistry = createCatoSchemaRegistryService(pool);
-const methodRegistry = createCatoMethodRegistryService(pool);
-const toolRegistry = createCatoToolRegistryService(pool);
-const checkpointService = createCatoCheckpointService(pool);
-const compensationService = createCatoCompensationService(pool, toolRegistry);
-const merkleService = createCatoMerkleService(pool);
-const pipelineOrchestrator = createCatoPipelineOrchestratorService(
-  pool, methodRegistry, schemaRegistry, toolRegistry, checkpointService, compensationService
-);
+async function initPool() {
+  if (!pool) {
+    pool = await getDbPool();
+    schemaRegistry = createCatoSchemaRegistryService(pool);
+    methodRegistry = createCatoMethodRegistryService(pool);
+    toolRegistry = createCatoToolRegistryService(pool);
+    checkpointService = createCatoCheckpointService(pool);
+    compensationService = createCatoCompensationService(pool, toolRegistry);
+    merkleService = createCatoMerkleService(pool);
+    pipelineOrchestrator = createCatoPipelineOrchestratorService(
+      pool, methodRegistry, schemaRegistry, toolRegistry, checkpointService, compensationService
+    );
+  }
+}
 
 const corsHeaders = {
   'Content-Type': 'application/json',
@@ -56,6 +62,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
   const path = event.path.replace('/api/admin/cato/pipeline', '');
   const method = event.httpMethod;
   const tenantId = event.requestContext.authorizer?.tenantId || event.headers['x-tenant-id'] || 'default';
+  await initPool();
 
   try {
     // ============ PIPELINE EXECUTIONS ============

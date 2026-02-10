@@ -293,8 +293,8 @@ async function simulateToolExecution(
 ): Promise<unknown> {
   // Import tool registry for lookup
   const { createCatoToolRegistryService } = await import('../cato-tool-registry.service.js');
-  const { Pool } = await import('pg');
-  const pool = new Pool();
+  const { getDbPool } = await import('../database.js');
+  const pool = await getDbPool();
   const toolRegistry = createCatoToolRegistryService(pool);
   
   try {

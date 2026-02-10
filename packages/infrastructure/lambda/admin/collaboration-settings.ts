@@ -4,16 +4,10 @@
  */
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { Pool } from 'pg';
+import { getDbPool } from '../shared/services/database';
+import type { Pool } from 'pg';
 
-const pool = new Pool({
-  host: process.env.DB_HOST,
-  port: parseInt(process.env.DB_PORT || '5432'),
-  database: process.env.DB_NAME,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
-});
+let pool: Pool;
 
 export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   const tenantId = event.requestContext.authorizer?.tenantId;
@@ -22,6 +16,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
   const method = event.httpMethod;
 
   try {
+    if (!pool) pool = await getDbPool();
     await pool.query(`SELECT set_config('app.current_tenant_id', $1, false)`, [tenantId]);
     const body = event.body ? JSON.parse(event.body) : {};
 

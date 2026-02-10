@@ -267,14 +267,8 @@ export class MCPWorkerService {
     tenantId: string
   ): Promise<MCPResponse> {
     // Fetch tools from database - both system tools and tenant-specific tools
-    const { Pool } = await import('pg');
-    const pool = new Pool({
-      host: process.env.DATABASE_HOST,
-      database: process.env.DATABASE_NAME,
-      user: process.env.DATABASE_USER,
-      password: process.env.DATABASE_PASSWORD,
-      ssl: process.env.DATABASE_SSL === 'true' ? { rejectUnauthorized: false } : undefined,
-    });
+    const { getDbPool } = await import('../shared/services/database.js');
+    const pool = await getDbPool();
 
     try {
       const result = await pool.query(`

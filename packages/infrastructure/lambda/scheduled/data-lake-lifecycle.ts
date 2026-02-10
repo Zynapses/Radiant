@@ -8,7 +8,8 @@
  */
 
 import { ScheduledHandler } from 'aws-lambda';
-import { Pool } from 'pg';
+import type { Pool } from 'pg';
+import { getDbPool } from '../shared/services/database';
 import { createRegisteredLogger } from '../shared/services/logging-registry.service';
 import { DataLakeLifecycleManagerService } from '../shared/services/data-lake-lifecycle-manager.service';
 import { flushEventBuffer } from '../shared/services/event-firehose.service';
@@ -21,19 +22,9 @@ const logger = createRegisteredLogger({
 
 let pool: Pool | null = null;
 
-function getPool(): Pool {
+async function ensurePool(): Promise<Pool> {
   if (!pool) {
-    pool = new Pool({
-      host: process.env.DB_HOST,
-      port: parseInt(process.env.DB_PORT || '5432', 10),
-      database: process.env.DB_NAME || 'radiant',
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : undefined,
-      max: 5,
-      idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 10000,
-    });
+    pool = await getDbPool();
   }
   return pool;
 }
@@ -42,7 +33,7 @@ export const handler: ScheduledHandler = async (_event): Promise<void> => {
   logger.info('Starting data lake lifecycle cycle');
 
   try {
-    const lifecycleManager = new DataLakeLifecycleManagerService(getPool());
+    const lifecycleManager = new DataLakeLifecycleManagerService(await ensurePool());
     const result = await lifecycleManager.runLifecycleCycle();
 
     logger.info('Data lake lifecycle cycle complete', {

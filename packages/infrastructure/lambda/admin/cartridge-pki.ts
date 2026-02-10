@@ -195,10 +195,30 @@ async function initializeRootCA(
     return response(409, { error: 'Active Root CA already exists' });
   }
 
-  // In production, this would generate a key pair in HSM
-  // For now, create a placeholder
-  const fingerprint = `root-ca-${Date.now()}-${Math.random().toString(36).substring(7)}`;
-  const publicKey = `-----BEGIN PUBLIC KEY-----\nROOT_CA_PLACEHOLDER_${fingerprint}\n-----END PUBLIC KEY-----`;
+  // Generate a real Ed25519 key pair
+  const crypto = await import('crypto');
+  const { publicKey: pubKeyObj, privateKey: privKeyObj } = crypto.generateKeyPairSync('ed25519');
+  const publicKey = pubKeyObj.export({ type: 'spki', format: 'pem' }) as string;
+  const privateKeyDer = privKeyObj.export({ type: 'pkcs8', format: 'der' }) as Buffer;
+  const fingerprint = crypto.createHash('sha256').update(publicKey).digest('hex');
+
+  // Store private key in AWS Secrets Manager (not in DB)
+  try {
+    const { SecretsManagerClient, CreateSecretCommand } = await import('@aws-sdk/client-secrets-manager');
+    const smClient = new SecretsManagerClient({ region: process.env.AWS_REGION || 'us-east-1' });
+    await smClient.send(new CreateSecretCommand({
+      Name: `radiant/pki/root-ca/${fingerprint}`,
+      Description: `RADIANT Root CA private key for cluster ${clusterId}`,
+      SecretBinary: privateKeyDer,
+      Tags: [
+        { Key: 'radiant:purpose', Value: 'root-ca-private-key' },
+        { Key: 'radiant:cluster', Value: clusterId },
+      ],
+    }));
+  } catch (smError) {
+    logger.error('Failed to store Root CA private key in Secrets Manager', smError as Error);
+    return response(500, { error: 'Failed to securely store private key' });
+  }
   
   const validFrom = new Date();
   const validUntil = new Date(Date.now() + (validityYears || 10) * 365 * 24 * 60 * 60 * 1000);

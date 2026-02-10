@@ -3,6 +3,7 @@
 // ============================================================================
 
 import { APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda';
+import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
 import { createRegisteredLogger } from '../shared/services/logging-registry.service';
 
 const logger = createRegisteredLogger({
@@ -197,8 +198,41 @@ async function triggerSchedule(
     scheduleType as ScheduleType
   );
 
-  // Note: The actual execution would be triggered by invoking the monitoring Lambda
-  // This is a placeholder - in production, you'd invoke the Lambda here
+  // Invoke the monitoring Lambda asynchronously to run the scan
+  const lambdaFunctionName = process.env.SECURITY_MONITORING_LAMBDA_ARN
+    || `radiant-${process.env.ENVIRONMENT || 'prod'}-security-monitoring`;
+
+  try {
+    const lambdaClient = new LambdaClient({ region: process.env.AWS_REGION || 'us-east-1' });
+    await lambdaClient.send(new InvokeCommand({
+      FunctionName: lambdaFunctionName,
+      InvocationType: 'Event',
+      Payload: Buffer.from(JSON.stringify({
+        source: 'admin-manual-trigger',
+        scheduleType,
+        executionId,
+        tenantId,
+      })),
+    }));
+
+    logger.info('Security scan Lambda invoked', { scheduleType, executionId, lambdaFunctionName });
+  } catch (invokeError) {
+    logger.error('Failed to invoke security monitoring Lambda', invokeError as Error, {
+      scheduleType,
+      executionId,
+      lambdaFunctionName,
+    });
+    // Update execution status to reflect invocation failure
+    await securityScheduleService.completeExecution(executionId, {
+      status: 'failed',
+      errorMessage: `Lambda invocation failed: ${(invokeError as Error).message}`,
+    });
+    return response(500, {
+      error: 'Failed to invoke security monitoring Lambda',
+      executionId,
+      detail: (invokeError as Error).message,
+    });
+  }
 
   return response(200, {
     success: true,

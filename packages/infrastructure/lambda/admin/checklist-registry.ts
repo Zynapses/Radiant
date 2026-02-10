@@ -5,22 +5,20 @@
  */
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { Pool } from 'pg';
+import { getDbPool } from '../shared/services/database';
+import type { Pool } from 'pg';
 import { getChecklistRegistryService } from '../shared/services/checklist-registry.service';
 import { logger } from '../shared/logging/enhanced-logger';
 
-const pool = new Pool({
-  host: process.env.DB_HOST,
-  port: parseInt(process.env.DB_PORT || '5432'),
-  database: process.env.DB_NAME,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  // Note: rejectUnauthorized: false is acceptable for Aurora within AWS VPC
-  // Aurora uses AWS-managed certificates that may not chain to public CAs
-  ssl: { rejectUnauthorized: false }
-});
+let pool: Pool;
+let checklistService: ReturnType<typeof getChecklistRegistryService>;
 
-const checklistService = getChecklistRegistryService(pool);
+async function initPool() {
+  if (!pool) {
+    pool = await getDbPool();
+    checklistService = getChecklistRegistryService(pool);
+  }
+}
 
 // ============================================================================
 // RESPONSE HELPERS
@@ -78,10 +76,11 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
                  event.headers['x-user-id'];
   const path = event.path.replace('/api/admin/compliance/checklists', '');
   const method = event.httpMethod;
+  await initPool();
 
-  // Set tenant context for RLS
+  // Set tenant context for RLS (parameterized)
   if (tenantId) {
-    await pool.query(`SET LOCAL app.current_tenant_id = '${tenantId}'`);
+    await pool.query(`SELECT set_config('app.current_tenant_id', $1, false)`, [tenantId]);
   }
 
   try {

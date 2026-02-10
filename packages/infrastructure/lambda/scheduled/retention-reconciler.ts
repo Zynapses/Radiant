@@ -7,7 +7,8 @@
  */
 
 import { SQSHandler, SQSRecord } from 'aws-lambda';
-import { Pool } from 'pg';
+import type { Pool } from 'pg';
+import { getDbPool } from '../shared/services/database';
 import { createRegisteredLogger } from '../shared/services/logging-registry.service';
 import {
   RetentionReconcilerService,
@@ -23,19 +24,9 @@ const logger = createRegisteredLogger({
 
 let pool: Pool | null = null;
 
-function getPool(): Pool {
+async function ensurePool(): Promise<Pool> {
   if (!pool) {
-    pool = new Pool({
-      host: process.env.DB_HOST,
-      port: parseInt(process.env.DB_PORT || '5432', 10),
-      database: process.env.DB_NAME || 'radiant',
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : undefined,
-      max: 3,
-      idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 10000,
-    });
+    pool = await getDbPool();
   }
   return pool;
 }
@@ -70,7 +61,7 @@ function parseMessage(record: SQSRecord): ReconcilerMessage {
 export const handler: SQSHandler = async (event): Promise<void> => {
   logger.info('Retention reconciler invoked', { recordCount: event.Records.length });
 
-  const reconciler = new RetentionReconcilerService(getPool());
+  const reconciler = new RetentionReconcilerService(await ensurePool());
 
   for (const record of event.Records) {
     try {

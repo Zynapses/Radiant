@@ -693,8 +693,8 @@ Respond with factual, concise observations.`,
     try {
       // Import tool registry for execution
       const { createCatoToolRegistryService } = await import('../cato-tool-registry.service.js');
-      const { Pool } = await import('pg');
-      const pool = new Pool();
+      const { getDbPool } = await import('../database.js');
+      const pool = await getDbPool();
       const toolRegistry = createCatoToolRegistryService(pool);
 
       // Find tool in registry

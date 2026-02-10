@@ -10,27 +10,26 @@
  */
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { Pool } from 'pg';
-import { CrucibleService } from '../shared/services/crucible';
+import { getDbPool } from '../shared/services/database';
+import type { Pool } from 'pg';
+import { CrucibleService, CrucibleConfigService } from '../shared/services/crucible';
 import {
   CrucibleConfig,
   CrucibleDashboardData,
   CrucibleCostMode,
 } from '@radiant/shared';
 
-const pool = new Pool({
-  host: process.env.DB_HOST,
-  port: parseInt(process.env.DB_PORT || '5432'),
-  database: process.env.DB_NAME,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : undefined,
-});
+let pool: Pool;
+let crucibleService: CrucibleService;
+let configService: CrucibleConfigService;
 
-import { CrucibleConfigService } from '../shared/services/crucible';
-
-const crucibleService = new CrucibleService(pool);
-const configService = new CrucibleConfigService(pool);
+async function initPool() {
+  if (!pool) {
+    pool = await getDbPool();
+    crucibleService = new CrucibleService(pool);
+    configService = new CrucibleConfigService(pool);
+  }
+}
 
 function getTenantId(event: APIGatewayProxyEvent): string {
   const tenantId = event.requestContext.authorizer?.claims?.['custom:tenant_id'];
@@ -57,6 +56,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
   const path = event.path.replace('/api/admin/crucible', '');
 
   try {
+    await initPool();
     const tenantId = getTenantId(event);
 
     // Set tenant context for RLS (parameterized)

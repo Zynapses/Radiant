@@ -8,31 +8,23 @@
  */
 
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { Pool } from 'pg';
+import { getDbPool } from '../shared/services/database';
+import type { Pool } from 'pg';
 import { ContactVerificationService } from '../shared/services/contact-verification.service';
 
 let pool: Pool | null = null;
 let verificationService: ContactVerificationService | null = null;
 
-function getPool(): Pool {
+async function ensurePool(): Promise<Pool> {
   if (!pool) {
-    pool = new Pool({
-      host: process.env.DB_HOST,
-      port: parseInt(process.env.DB_PORT || '5432'),
-      database: process.env.DB_NAME || 'radiant',
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : undefined,
-      max: 5,
-      idleTimeoutMillis: 60000,
-    });
+    pool = await getDbPool();
   }
   return pool;
 }
 
 function getService(): ContactVerificationService {
   if (!verificationService) {
-    verificationService = new ContactVerificationService(getPool());
+    verificationService = new ContactVerificationService(pool!);
   }
   return verificationService;
 }
@@ -74,6 +66,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
     return response(401, { error: 'Unauthorized — missing user context' });
   }
 
+  await ensurePool();
   const service = getService();
   const path = event.path.replace(/^\/api\/profile/, '') || '/';
   const method = event.httpMethod;

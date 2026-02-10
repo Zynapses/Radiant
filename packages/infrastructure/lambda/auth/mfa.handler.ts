@@ -6,7 +6,8 @@
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { TOTPService, BackupCodesService, DeviceTrustService } from '../shared/services/mfa/totp.service';
-import { Pool } from 'pg';
+import type { Pool } from 'pg';
+import { getDbPool } from '../shared/services/database';
 
 // ============================================================================
 // TYPES
@@ -31,16 +32,9 @@ const deviceTrustService = new DeviceTrustService(30, 5);
 
 let pool: Pool | null = null;
 
-function getPool(): Pool {
+async function ensurePool(): Promise<Pool> {
   if (!pool) {
-    pool = new Pool({
-      host: process.env.DB_HOST,
-      port: parseInt(process.env.DB_PORT || '5432'),
-      database: process.env.DB_NAME,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      ssl: { rejectUnauthorized: false },
-    });
+    pool = await getDbPool();
   }
   return pool;
 }
@@ -95,7 +89,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
 // ============================================================================
 
 async function getStatus(ctx: MFAContext, event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
-  const db = getPool();
+  const db = await ensurePool();
   const table = ctx.userType === 'platform_admin' ? 'platform_admins' : 'tenant_users';
 
   const userResult = await db.query(
@@ -152,7 +146,7 @@ async function getStatus(ctx: MFAContext, event: APIGatewayProxyEvent): Promise<
 }
 
 async function startEnrollment(ctx: MFAContext, event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
-  const db = getPool();
+  const db = await ensurePool();
   const table = ctx.userType === 'platform_admin' ? 'platform_admins' : 'tenant_users';
 
   // Check if already enrolled
@@ -191,7 +185,7 @@ async function verifyEnrollment(ctx: MFAContext, event: APIGatewayProxyEvent): P
     return response(400, { error: 'Code required' });
   }
 
-  const db = getPool();
+  const db = await ensurePool();
   const table = ctx.userType === 'platform_admin' ? 'platform_admins' : 'tenant_users';
 
   // Get stored secret
@@ -254,7 +248,7 @@ async function verifyCode(ctx: MFAContext, event: APIGatewayProxyEvent): Promise
     return response(400, { error: 'Code required' });
   }
 
-  const db = getPool();
+  const db = await ensurePool();
   const table = ctx.userType === 'platform_admin' ? 'platform_admins' : 'tenant_users';
 
   // Check lockout
@@ -380,7 +374,7 @@ async function verifyCode(ctx: MFAContext, event: APIGatewayProxyEvent): Promise
 }
 
 async function regenerateBackupCodes(ctx: MFAContext, event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
-  const db = getPool();
+  const db = await ensurePool();
 
   // Delete old codes
   await db.query(
@@ -408,7 +402,7 @@ async function regenerateBackupCodes(ctx: MFAContext, event: APIGatewayProxyEven
 }
 
 async function listDevices(ctx: MFAContext, _event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
-  const db = getPool();
+  const db = await ensurePool();
 
   const result = await db.query(
     `SELECT id, device_name, trusted_at, last_used_at, expires_at
@@ -430,7 +424,7 @@ async function listDevices(ctx: MFAContext, _event: APIGatewayProxyEvent): Promi
 }
 
 async function revokeDevice(ctx: MFAContext, deviceId: string, event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
-  const db = getPool();
+  const db = await ensurePool();
 
   const result = await db.query(
     `UPDATE mfa_trusted_devices 
@@ -450,7 +444,7 @@ async function revokeDevice(ctx: MFAContext, deviceId: string, event: APIGateway
 }
 
 async function checkMFARequired(ctx: MFAContext, event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
-  const db = getPool();
+  const db = await ensurePool();
   const table = ctx.userType === 'platform_admin' ? 'platform_admins' : 'tenant_users';
 
   const userResult = await db.query(
@@ -521,7 +515,7 @@ async function logMFAEvent(
   eventType: string,
   details: Record<string, unknown>
 ): Promise<void> {
-  const db = getPool();
+  const db = await ensurePool();
   await db.query(
     `INSERT INTO mfa_audit_log (user_type, user_id, tenant_id, event_type, details, ip_address)
      VALUES ($1, $2, $3, $4, $5, $6)`,

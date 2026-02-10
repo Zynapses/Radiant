@@ -35,7 +35,8 @@
  */
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { Pool } from 'pg';
+import type { Pool } from 'pg';
+import { getDbPool } from '../shared/services/database';
 import { SentinelAlertProcessorService } from '../shared/services/sentinel-alert-processor.service';
 import { SentinelWatchdogService } from '../shared/services/sentinel-watchdog.service';
 import { SentinelNotifierService } from '../shared/services/sentinel-notifier.service';
@@ -55,18 +56,10 @@ let autoHealer: SentinelAutoHealerService;
 let evidenceLocker: SentinelEvidenceLockerService;
 let heartbeat: SentinelHeartbeatService;
 
-function initServices(): void {
+async function initServices(): Promise<void> {
   if (pool) return;
 
-  pool = new Pool({
-    host: process.env.DB_HOST,
-    port: parseInt(process.env.DB_PORT || '5432'),
-    database: process.env.DB_NAME,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    max: 5,
-    ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : undefined,
-  });
+  pool = await getDbPool();
 
   alertProcessor = new SentinelAlertProcessorService(pool);
 
@@ -113,7 +106,7 @@ function initServices(): void {
 // ---------------------------------------------------------------------------
 
 export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
-  initServices();
+  await initServices();
 
   const method = event.httpMethod;
   const path = event.path.replace(/^\/api\/admin\/sentinel/, '') || '/';

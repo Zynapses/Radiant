@@ -4,29 +4,29 @@
  */
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { Pool } from 'pg';
+import { getDbPool } from '../shared/services/database';
+import type { Pool } from 'pg';
 import { MetricsCollectionService } from '../shared/services/metrics-collection.service';
 import { LearningInfluenceService } from '../shared/services/learning-hierarchy.service';
 import { logger } from '../shared/logging/enhanced-logger';
 
-const pool = new Pool({
-  host: process.env.DB_HOST,
-  port: parseInt(process.env.DB_PORT || '5432'),
-  database: process.env.DB_NAME,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  // Note: rejectUnauthorized: false is acceptable for Aurora within AWS VPC
-  // Aurora uses AWS-managed certificates that may not chain to public CAs
-  ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
-});
+let pool: Pool;
+let metricsService: MetricsCollectionService;
+let learningService: LearningInfluenceService;
 
-const metricsService = new MetricsCollectionService(pool);
-const learningService = new LearningInfluenceService(pool);
+async function initPool() {
+  if (!pool) {
+    pool = await getDbPool();
+    metricsService = new MetricsCollectionService(pool);
+    learningService = new LearningInfluenceService(pool);
+  }
+}
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   const path = event.path.replace('/api/admin/metrics', '');
   const method = event.httpMethod;
   const tenantId = event.requestContext.authorizer?.tenantId;
+  await initPool();
   const userId = event.requestContext.authorizer?.userId;
   const isSuperAdmin = event.requestContext.authorizer?.isSuperAdmin === 'true';
 

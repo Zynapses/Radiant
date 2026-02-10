@@ -5,7 +5,8 @@
  */
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
-import { Pool } from 'pg';
+import type { Pool } from 'pg';
+import { getDbPool } from '../services/database';
 import type { FailureType, ViolationType, ViolationAction } from '@radiant/shared';
 import { MetricsCollectionService } from '../services/metrics-collection.service';
 import { LearningInfluenceService } from '../services/learning-hierarchy.service';
@@ -16,18 +17,9 @@ let pool: Pool | null = null;
 let metricsService: MetricsCollectionService | null = null;
 let learningService: LearningInfluenceService | null = null;
 
-function getPool(): Pool {
+async function ensurePool(): Promise<Pool> {
   if (!pool) {
-    pool = new Pool({
-      host: process.env.DB_HOST,
-      port: parseInt(process.env.DB_PORT || '5432'),
-      database: process.env.DB_NAME,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      // Note: rejectUnauthorized: false is acceptable for Aurora within AWS VPC
-      // Aurora uses AWS-managed certificates that may not chain to public CAs
-      ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
-    });
+    pool = await getDbPool();
     
     // Initialize services
     metricsService = new MetricsCollectionService(pool);
@@ -67,7 +59,7 @@ type HandlerFunction = (
 export function withMetrics(handler: HandlerFunction): HandlerFunction {
   return async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> => {
     const startTime = Date.now();
-    const pool = getPool();
+    const pool = await ensurePool();
     
     // Set tenant context for RLS
     const tenantId = event.requestContext.authorizer?.tenantId;
@@ -220,7 +212,7 @@ export async function recordBillingMetric(
   outputTokens: number,
   costCents?: number
 ): Promise<string | undefined> {
-  getPool(); // Ensure initialized
+  await ensurePool(); // Ensure initialized
   if (!metricsService) return undefined;
   
   return metricsService.recordBillingMetric({
@@ -246,7 +238,7 @@ export async function recordFailure(
   modelId?: string,
   endpoint?: string
 ): Promise<string | undefined> {
-  getPool(); // Ensure initialized
+  await ensurePool(); // Ensure initialized
   if (!metricsService) return undefined;
   
   return metricsService.recordFailure({
@@ -271,7 +263,7 @@ export async function recordViolation(
   promptSnippet?: string,
   actionTaken?: string
 ): Promise<string | undefined> {
-  getPool(); // Ensure initialized
+  await ensurePool(); // Ensure initialized
   if (!metricsService) return undefined;
   
   return metricsService.recordViolation({
@@ -295,7 +287,7 @@ export async function logSystem(
   data?: Record<string, unknown>,
   tenantId?: string
 ): Promise<string | undefined> {
-  getPool(); // Ensure initialized
+  await ensurePool(); // Ensure initialized
   if (!metricsService) return undefined;
   
   return metricsService.log({

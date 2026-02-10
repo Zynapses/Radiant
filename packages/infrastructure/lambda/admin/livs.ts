@@ -13,7 +13,8 @@
  */
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { Pool } from 'pg';
+import type { Pool } from 'pg';
+import { getDbPool } from '../shared/services/database';
 import {
   LIVSConfigService,
   LIVSSoftRulesService,
@@ -38,16 +39,9 @@ let orchestrationService: LIVSOrchestrationService;
 let interrogatorService: LIVSInterrogatorService;
 let versionService: LIVSVersionService;
 
-const initServices = () => {
+const initServices = async () => {
   if (!pool) {
-    pool = new Pool({
-      host: process.env.DB_HOST,
-      port: parseInt(process.env.DB_PORT || '5432'),
-      database: process.env.DB_NAME,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false
-    });
+    pool = await getDbPool();
 
     configService = new LIVSConfigService({ pool });
     softRulesService = new LIVSSoftRulesService({ pool });
@@ -84,7 +78,7 @@ const getUserId = (event: APIGatewayProxyEvent): string | undefined => {
 export const handler = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
-  initServices();
+  await initServices();
 
   const { httpMethod, path, pathParameters, body } = event;
   const tenantId = getTenantId(event);

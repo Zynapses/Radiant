@@ -5,22 +5,20 @@
  */
 
 import { ScheduledEvent } from 'aws-lambda';
-import { Pool } from 'pg';
+import { getDbPool } from '../shared/services/database';
+import type { Pool } from 'pg';
 import { LearningInfluenceService } from '../shared/services/learning-hierarchy.service';
 import { logger } from '../shared/logging/enhanced-logger';
 
-const pool = new Pool({
-  host: process.env.DB_HOST,
-  port: parseInt(process.env.DB_PORT || '5432'),
-  database: process.env.DB_NAME,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  // Note: rejectUnauthorized: false is acceptable for Aurora within AWS VPC
-  // Aurora uses AWS-managed certificates that may not chain to public CAs
-  ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
-});
+let pool: Pool;
+let learningService: LearningInfluenceService;
 
-const learningService = new LearningInfluenceService(pool);
+async function initPool() {
+  if (!pool) {
+    pool = await getDbPool();
+    learningService = new LearningInfluenceService(pool);
+  }
+}
 
 interface SnapshotResult {
   scopeType: 'user' | 'tenant' | 'global';
@@ -35,6 +33,7 @@ export const handler = async (event: ScheduledEvent): Promise<{
   body: string;
 }> => {
   logger.info('Learning Snapshots Lambda triggered', { time: event.time });
+  await initPool();
 
   const results: SnapshotResult[] = [];
   let globalSnapshotId: string | undefined;

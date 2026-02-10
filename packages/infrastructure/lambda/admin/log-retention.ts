@@ -30,7 +30,8 @@
  */
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
-import { Pool } from 'pg';
+import { getDbPool } from '../shared/services/database';
+import type { Pool } from 'pg';
 import { LogRetentionPolicyService, LogCategory } from '../shared/services/log-retention-policy.service';
 import { LogIndexerService } from '../shared/services/log-indexer.service';
 import { getLoggingCoverageReport } from '../shared/services/logging-registry.service';
@@ -47,28 +48,34 @@ const logger = createRegisteredLogger({
   sourceType: 'lambda',
 });
 
-const pool = new Pool({
-  host: process.env.DB_HOST,
-  port: parseInt(process.env.DB_PORT || '5432'),
-  database: process.env.DB_NAME || 'radiant',
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : undefined,
-});
+let pool: Pool;
+let retentionService: LogRetentionPolicyService;
+let indexerService: LogIndexerService;
+let reportService: LogReportService;
+let restoreService: LogGlacierRestoreService;
+let exportService: LogExportService;
+let verificationService: LogTamperVerificationService;
+let erasureService: LogGdprErasureService;
 
-const retentionService = new LogRetentionPolicyService(pool);
-const indexerService = new LogIndexerService(pool);
-const reportService = new LogReportService(pool);
-const restoreService = new LogGlacierRestoreService(pool);
-const exportService = new LogExportService(pool);
-const verificationService = new LogTamperVerificationService(pool);
-const erasureService = new LogGdprErasureService(pool);
+async function initPool() {
+  if (!pool) {
+    pool = await getDbPool();
+    retentionService = new LogRetentionPolicyService(pool);
+    indexerService = new LogIndexerService(pool);
+    reportService = new LogReportService(pool);
+    restoreService = new LogGlacierRestoreService(pool);
+    exportService = new LogExportService(pool);
+    verificationService = new LogTamperVerificationService(pool);
+    erasureService = new LogGdprErasureService(pool);
+  }
+}
 
 export async function handler(event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> {
   const requestId = context.awsRequestId;
   logger.withContext({ requestId });
 
   try {
+    await initPool();
     const path = event.path.replace(/^\/api\/admin\/log-retention/, '') || '/';
     const method = event.httpMethod;
     const tenantId = event.queryStringParameters?.tenantId || event.headers?.['x-tenant-id'] || '';

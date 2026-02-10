@@ -108,7 +108,7 @@ export class StorageStack extends cdk.Stack {
       lifecycleRules: [
         {
           id: 'ArchiveOldVersions',
-          noncurrentVersionTransition: [
+          noncurrentVersionTransitions: [
             {
               storageClass: s3.StorageClass.GLACIER,
               transitionAfter: cdk.Duration.days(90),
