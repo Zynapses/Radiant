@@ -578,20 +578,6 @@ struct ComplianceReportView: View {
     }
 }
 
-// MARK: - Extensions
-
-extension ComplianceReportService.ComplianceStatus {
-    var displayName: String {
-        switch self {
-        case .compliant: return "Compliant"
-        case .partiallyCompliant: return "Partial"
-        case .nonCompliant: return "Non-Compliant"
-        case .notApplicable: return "N/A"
-        case .needsReview: return "Review"
-        }
-    }
-}
-
 #Preview {
     ComplianceReportView()
         .environmentObject(AppState())

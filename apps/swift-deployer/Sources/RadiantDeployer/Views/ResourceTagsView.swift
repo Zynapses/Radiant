@@ -177,7 +177,7 @@ struct ResourceTagsView: View {
     }
     
     private func tagsDisplay(tags: [String: String]) -> some View {
-        FlowLayout(spacing: 4) {
+        TagsFlowLayout(spacing: 4) {
             ForEach(tags.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
                 HStack(spacing: 4) {
                     Text(key)
@@ -522,7 +522,7 @@ struct EditTagsView: View {
     }
 }
 
-struct FlowLayout: Layout {
+struct TagsFlowLayout: Layout {
     var spacing: CGFloat = 8
     
     func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {

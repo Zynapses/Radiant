@@ -209,7 +209,7 @@ struct DependencyManagerView: View {
                     Text("v\(version)")
                         .font(.caption)
                         .fontWeight(.medium)
-                        .foregroundStyle(status.meetsMinimumVersion ? .primary : .orange)
+                        .foregroundColor(status.meetsMinimumVersion ? .primary : .orange)
                 } else {
                     Text("Not Installed")
                         .font(.caption)

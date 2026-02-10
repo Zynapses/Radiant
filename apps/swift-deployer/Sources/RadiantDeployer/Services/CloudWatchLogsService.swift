@@ -42,7 +42,9 @@ actor CloudWatchLogsService {
         }
     }
     
-    struct LogGroup: Identifiable, Sendable {
+    struct LogGroup: Identifiable, Sendable, Hashable {
+        static func == (lhs: LogGroup, rhs: LogGroup) -> Bool { lhs.id == rhs.id }
+        func hash(into hasher: inout Hasher) { hasher.combine(id) }
         let id: String
         let name: String
         let arn: String

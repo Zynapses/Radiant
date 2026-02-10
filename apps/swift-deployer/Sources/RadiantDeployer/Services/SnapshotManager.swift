@@ -8,7 +8,9 @@ actor SnapshotManager {
     
     // MARK: - Types
     
-    struct Snapshot: Codable, Sendable, Identifiable {
+    struct Snapshot: Codable, Sendable, Identifiable, Hashable {
+        static func == (lhs: Snapshot, rhs: Snapshot) -> Bool { lhs.id == rhs.id }
+        func hash(into hasher: inout Hasher) { hasher.combine(id) }
         let id: String
         let version: String
         let name: String

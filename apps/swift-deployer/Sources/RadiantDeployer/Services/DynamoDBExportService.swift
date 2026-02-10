@@ -874,5 +874,4 @@ private extension Array {
 }
 
 // MARK: - Version Constant
-
-private let RADIANT_VERSION = "7.2.0"
+// Uses RADIANT_VERSION from Deployment.swift

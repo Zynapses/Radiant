@@ -412,7 +412,7 @@ struct ManualVerifySheet: View {
                                         .foregroundStyle(.secondary)
                                     Text(result.expectedChecksum)
                                         .font(.system(.caption, design: .monospaced))
-                                        .foregroundStyle(result.isValid ? .primary : .red)
+                                        .foregroundColor(result.isValid ? .primary : .red)
                                         .padding(8)
                                         .background(Color(nsColor: .textBackgroundColor))
                                         .cornerRadius(4)

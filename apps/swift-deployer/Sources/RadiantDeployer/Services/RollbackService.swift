@@ -38,7 +38,9 @@ actor RollbackService {
         }
     }
     
-    struct ResourceVersion: Identifiable, Sendable {
+    struct ResourceVersion: Identifiable, Sendable, Hashable {
+        static func == (lhs: ResourceVersion, rhs: ResourceVersion) -> Bool { lhs.id == rhs.id }
+        func hash(into hasher: inout Hasher) { hasher.combine(id) }
         let id: String
         let resourceType: ResourceType
         let resourceName: String

@@ -94,25 +94,25 @@ struct IntrusionDetectionView: View {
     
     private var statusCards: some View {
         HStack(spacing: 12) {
-            StatusCard(
+            IDSStatusCard(
                 title: "NIST SP 800-94",
                 value: "Compliant",
                 icon: "checkmark.shield.fill",
                 color: .green
             )
-            StatusCard(
+            IDSStatusCard(
                 title: "MITRE ATT&CK",
                 value: "11 Techniques",
                 icon: "target",
                 color: .blue
             )
-            StatusCard(
+            IDSStatusCard(
                 title: "Detectors",
                 value: "\(detectors.count) Active",
                 icon: "sensor.fill",
                 color: .purple
             )
-            StatusCard(
+            IDSStatusCard(
                 title: "Auto-Block",
                 value: autoBlockEnabled ? "Enabled" : "Disabled",
                 icon: "hand.raised.fill",
@@ -342,7 +342,7 @@ struct IntrusionDetectionView: View {
 
 // MARK: - Status Card Component
 
-private struct StatusCard: View {
+private struct IDSStatusCard: View {
     let title: String
     let value: String
     let icon: String

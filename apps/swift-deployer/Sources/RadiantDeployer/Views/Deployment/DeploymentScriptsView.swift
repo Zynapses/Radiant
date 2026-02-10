@@ -433,9 +433,7 @@ extension DeploymentScript: Hashable {
     }
 }
 
-extension DeployEnvironment: CaseIterable {
-    static var allCases: [DeployEnvironment] = [.dev, .staging, .prod]
-    
+extension DeployEnvironment {
     var displayName: String {
         switch self {
         case .dev: return "Dev"
