@@ -54,7 +54,7 @@ actor DNSService {
     }
     
     /// Get DNS records for a hosted zone
-    func getRecordSets(hostedZoneId: String) async throws -> [DNSRecord] {
+    func getRecordSets(hostedZoneId: String) async throws -> [DomainDNSRecord] {
         let output = try await runAWSCommand([
             "route53", "list-resource-record-sets",
             "--hosted-zone-id", hostedZoneId,
@@ -70,7 +70,7 @@ actor DNSService {
         return recordSets.compactMap { record in
             guard let name = record["Name"] as? String,
                   let typeStr = record["Type"] as? String,
-                  let type = DNSRecord.RecordType(rawValue: typeStr) else { return nil }
+                  let type = DomainDNSRecord.RecordType(rawValue: typeStr) else { return nil }
             
             let ttl = record["TTL"] as? Int ?? 300
             
@@ -81,7 +81,7 @@ actor DNSService {
                 value = alias["DNSName"] as? String ?? ""
             }
             
-            return DNSRecord(
+            return DomainDNSRecord(
                 id: "\(name)-\(typeStr)",
                 type: type,
                 name: name.hasSuffix(".") ? String(name.dropLast()) : name,
@@ -97,7 +97,7 @@ actor DNSService {
     /// Create or update a DNS record
     func upsertRecord(
         hostedZoneId: String,
-        record: DNSRecord
+        record: DomainDNSRecord
     ) async throws {
         let changeBatch: [String: Any] = [
             "Changes": [[
@@ -170,7 +170,7 @@ actor DNSService {
     }
     
     /// Get certificate validation DNS records
-    func getCertificateValidationRecords(certificateArn: String) async throws -> [DNSRecord] {
+    func getCertificateValidationRecords(certificateArn: String) async throws -> [DomainDNSRecord] {
         let output = try await runAWSCommand([
             "acm", "describe-certificate",
             "--certificate-arn", certificateArn,
@@ -184,19 +184,19 @@ actor DNSService {
             return []
         }
         
-        return domainValidations.compactMap { validation -> DNSRecord? in
+        return domainValidations.compactMap { validation -> DomainDNSRecord? in
             guard let resourceRecord = validation["ResourceRecord"] as? [String: Any],
                   let name = resourceRecord["Name"] as? String,
                   let value = resourceRecord["Value"] as? String else { return nil }
             
-            let status: DNSRecord.VerificationStatus
+            let status: DomainDNSRecord.VerificationStatus
             if let validationStatus = validation["ValidationStatus"] as? String {
                 status = validationStatus == "SUCCESS" ? .verified : .pending
             } else {
                 status = .pending
             }
             
-            return DNSRecord(
+            return DomainDNSRecord(
                 id: "acm-\(name)",
                 type: .CNAME,
                 name: name,
@@ -327,13 +327,13 @@ actor DNSService {
         cloudFrontDomain: String?,
         albDomain: String?,
         apiGatewayDomain: String?
-    ) -> [DNSRecord] {
-        var records: [DNSRecord] = []
+    ) -> [DomainDNSRecord] {
+        var records: [DomainDNSRecord] = []
         let envPrefix = environment == .prod ? "" : "\(environment.shortName.lowercased())."
         
         // Main app domain (CloudFront)
         if let cf = cloudFrontDomain {
-            records.append(DNSRecord(
+            records.append(DomainDNSRecord(
                 id: "app-\(envPrefix)\(domain)",
                 type: .CNAME,
                 name: "\(envPrefix)\(domain)",
@@ -347,7 +347,7 @@ actor DNSService {
         
         // API subdomain (API Gateway or ALB)
         if let api = apiGatewayDomain ?? albDomain {
-            records.append(DNSRecord(
+            records.append(DomainDNSRecord(
                 id: "api-\(envPrefix)\(domain)",
                 type: .CNAME,
                 name: "api.\(envPrefix)\(domain)",
@@ -361,7 +361,7 @@ actor DNSService {
         
         // Admin dashboard
         if let cf = cloudFrontDomain {
-            records.append(DNSRecord(
+            records.append(DomainDNSRecord(
                 id: "admin-\(envPrefix)\(domain)",
                 type: .CNAME,
                 name: "admin.\(envPrefix)\(domain)",
@@ -375,7 +375,7 @@ actor DNSService {
         
         // WebSocket endpoint (if using ALB)
         if let alb = albDomain {
-            records.append(DNSRecord(
+            records.append(DomainDNSRecord(
                 id: "ws-\(envPrefix)\(domain)",
                 type: .CNAME,
                 name: "ws.\(envPrefix)\(domain)",
@@ -430,7 +430,7 @@ struct HostedZone: Identifiable, Hashable, Sendable {
 struct CertificateRequest: Sendable {
     let arn: String
     let domain: String
-    let validationRecords: [DNSRecord]
+    let validationRecords: [DomainDNSRecord]
 }
 
 // MARK: - Singleton

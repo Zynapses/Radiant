@@ -327,9 +327,9 @@ actor CredentialLifecycleService {
         )
         
         await auditLogger.log(
-            action: "security_audit_completed",
-            category: .security,
-            details: ["environment": environment, "score": "\(overallScore)", "findings": "\(iamAudits.count + analyzerFindings.count + tenantKeyAudits.count)"]
+            action: .securityAuditCompleted,
+            details: "Security audit completed for \(environment) with score \(overallScore)",
+            metadata: ["environment": environment, "score": "\(overallScore)", "findings": "\(iamAudits.count + analyzerFindings.count + tenantKeyAudits.count)"]
         )
         
         progressCallback("Security audit complete. Overall score: \(overallScore)/100")
@@ -786,9 +786,9 @@ actor CredentialLifecycleService {
         )
         
         await auditLogger.log(
-            action: "iam_key_rotated",
-            category: .security,
-            details: ["user": userName, "old_key": oldKeyId, "new_key": newKeyId]
+            action: .iamKeyRotated,
+            details: "Rotated IAM key for \(userName) from \(oldKeyId) to \(newKeyId)",
+            metadata: ["user": userName, "old_key": oldKeyId, "new_key": newKeyId]
         )
         
         return newKeyId
@@ -803,9 +803,9 @@ actor CredentialLifecycleService {
         )
         
         await auditLogger.log(
-            action: "iam_key_disabled",
-            category: .security,
-            details: ["user": userName, "key": keyId, "reason": "dormant"]
+            action: .iamKeyDisabled,
+            details: "Disabled dormant IAM key \(keyId) for \(userName)",
+            metadata: ["user": userName, "key": keyId, "reason": "dormant"]
         )
     }
     
@@ -818,9 +818,9 @@ actor CredentialLifecycleService {
         )
         
         await auditLogger.log(
-            action: "iam_key_deleted",
-            category: .security,
-            details: ["user": userName, "key": keyId]
+            action: .iamKeyDeleted,
+            details: "Deleted IAM key \(keyId) for \(userName)",
+            metadata: ["user": userName, "key": keyId]
         )
     }
     
@@ -839,9 +839,9 @@ actor CredentialLifecycleService {
         )
         
         await auditLogger.log(
-            action: "secret_rotation_enabled",
-            category: .security,
-            details: ["secret": secretArn, "interval_days": "\(rotationDays)"]
+            action: .secretRotationEnabled,
+            details: "Enabled rotation for \(secretArn) every \(rotationDays) days",
+            metadata: ["secret": secretArn, "interval_days": "\(rotationDays)"]
         )
     }
     
@@ -868,9 +868,9 @@ actor CredentialLifecycleService {
         _ = try await runShellCommand(command: command, cwd: "packages/infrastructure")
         
         await auditLogger.log(
-            action: "credential_lifecycle_stack_deployed",
-            category: .security,
-            details: ["environment": environment, "region": region]
+            action: .credentialLifecycleStackDeployed,
+            details: "Deployed credential lifecycle stack to \(environment) in \(region)",
+            metadata: ["environment": environment, "region": region]
         )
         
         progressCallback("Credential Lifecycle Stack deployed successfully.")

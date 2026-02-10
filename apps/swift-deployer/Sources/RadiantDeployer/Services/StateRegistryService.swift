@@ -121,7 +121,7 @@ public final class StateRegistryService: ObservableObject, StateRegistryServiceP
     // MARK: - Dashboard
     
     public func getDashboard() async throws -> StateRegistryDashboard {
-        let response: APIResponse<StateRegistryDashboard> = try await request(
+        let response: StateRegistryAPIResponse<StateRegistryDashboard> = try await request(
             method: "GET",
             path: ""
         )
@@ -137,7 +137,7 @@ public final class StateRegistryService: ObservableObject, StateRegistryServiceP
             return cached
         }
         
-        let response: APIResponse<EnvironmentStateManifest> = try await request(
+        let response: StateRegistryAPIResponse<EnvironmentStateManifest> = try await request(
             method: "GET",
             path: "/manifests/\(environment.rawValue)"
         )
@@ -157,7 +157,7 @@ public final class StateRegistryService: ObservableObject, StateRegistryServiceP
             let duration: Int
         }
         
-        let response: APIResponse<CaptureResponse> = try await self.request(
+        let response: StateRegistryAPIResponse<CaptureResponse> = try await self.request(
             method: "POST",
             path: "/manifests/\(request.environment.rawValue)/capture",
             body: request
@@ -194,7 +194,7 @@ public final class StateRegistryService: ObservableObject, StateRegistryServiceP
     public func compareEnvironments(request: CompareEnvironmentsRequest) async throws -> EnvironmentComparison {
         guard !isOffline else { throw StateRegistryError.offlineMode }
         
-        let response: APIResponse<EnvironmentComparison> = try await self.request(
+        let response: StateRegistryAPIResponse<EnvironmentComparison> = try await self.request(
             method: "POST",
             path: "/compare",
             body: request
@@ -211,7 +211,7 @@ public final class StateRegistryService: ObservableObject, StateRegistryServiceP
             let config: SyncConfiguration
         }
         
-        let response: APIResponse<ConfigResponse> = try await request(
+        let response: StateRegistryAPIResponse<ConfigResponse> = try await request(
             method: "GET",
             path: "/config/\(environment.rawValue)"
         )
@@ -223,7 +223,7 @@ public final class StateRegistryService: ObservableObject, StateRegistryServiceP
     public func updateSyncConfig(environment: EnvironmentName, config: SyncConfiguration) async throws {
         guard !isOffline else { throw StateRegistryError.offlineMode }
         
-        let _: APIResponse<EmptyResponse> = try await request(
+        let _: StateRegistryAPIResponse<EmptyResponse> = try await request(
             method: "PUT",
             path: "/config/\(environment.rawValue)",
             body: config
@@ -243,7 +243,7 @@ public final class StateRegistryService: ObservableObject, StateRegistryServiceP
             let message: String
         }
         
-        let response: APIResponse<SyncStartResponse> = try await self.request(
+        let response: StateRegistryAPIResponse<SyncStartResponse> = try await self.request(
             method: "POST",
             path: "/sync",
             body: request
@@ -254,7 +254,7 @@ public final class StateRegistryService: ObservableObject, StateRegistryServiceP
     }
     
     public func getSyncStatus(operationId: String) async throws -> SyncOperation {
-        let response: APIResponse<SyncOperation> = try await request(
+        let response: StateRegistryAPIResponse<SyncOperation> = try await request(
             method: "GET",
             path: "/sync/\(operationId)"
         )
@@ -272,7 +272,7 @@ public final class StateRegistryService: ObservableObject, StateRegistryServiceP
     public func cancelSync(operationId: String) async throws {
         guard !isOffline else { throw StateRegistryError.offlineMode }
         
-        let _: APIResponse<EmptyResponse> = try await request(
+        let _: StateRegistryAPIResponse<EmptyResponse> = try await request(
             method: "POST",
             path: "/sync/\(operationId)/cancel"
         )
@@ -295,7 +295,7 @@ public final class StateRegistryService: ObservableObject, StateRegistryServiceP
             let history: [SyncOperation]
         }
         
-        let response: APIResponse<HistoryResponse> = try await request(
+        let response: StateRegistryAPIResponse<HistoryResponse> = try await request(
             method: "GET",
             path: "/sync/history\(queryParams)"
         )
@@ -315,7 +315,7 @@ public final class StateRegistryService: ObservableObject, StateRegistryServiceP
             let backups: [BackupManifest]
         }
         
-        let response: APIResponse<BackupsResponse> = try await request(
+        let response: StateRegistryAPIResponse<BackupsResponse> = try await request(
             method: "GET",
             path: "/backups\(queryParams)"
         )
@@ -332,7 +332,7 @@ public final class StateRegistryService: ObservableObject, StateRegistryServiceP
             let message: String
         }
         
-        let response: APIResponse<BackupResponse> = try await self.request(
+        let response: StateRegistryAPIResponse<BackupResponse> = try await self.request(
             method: "POST",
             path: "/backups",
             body: request
@@ -343,7 +343,7 @@ public final class StateRegistryService: ObservableObject, StateRegistryServiceP
     }
     
     public func getBackup(backupId: String) async throws -> BackupManifest {
-        let response: APIResponse<BackupManifest> = try await request(
+        let response: StateRegistryAPIResponse<BackupManifest> = try await request(
             method: "GET",
             path: "/backups/\(backupId)"
         )
@@ -361,7 +361,7 @@ public final class StateRegistryService: ObservableObject, StateRegistryServiceP
             let message: String
         }
         
-        let response: APIResponse<RestoreResponse> = try await self.request(
+        let response: StateRegistryAPIResponse<RestoreResponse> = try await self.request(
             method: "POST",
             path: "/backups/\(request.backupId)/restore",
             body: request
@@ -374,7 +374,7 @@ public final class StateRegistryService: ObservableObject, StateRegistryServiceP
     public func deleteBackup(backupId: String) async throws {
         guard !isOffline else { throw StateRegistryError.offlineMode }
         
-        let _: APIResponse<EmptyResponse> = try await request(
+        let _: StateRegistryAPIResponse<EmptyResponse> = try await request(
             method: "DELETE",
             path: "/backups/\(backupId)"
         )
@@ -392,7 +392,7 @@ public final class StateRegistryService: ObservableObject, StateRegistryServiceP
             let persistentData: [PersistentDataItem]
         }
         
-        let response: APIResponse<DataResponse> = try await request(
+        let response: StateRegistryAPIResponse<DataResponse> = try await request(
             method: "GET",
             path: "/persistent-data/\(environment.rawValue)"
         )
@@ -408,7 +408,7 @@ public final class StateRegistryService: ObservableObject, StateRegistryServiceP
             let includeInSync: Bool
         }
         
-        let _: APIResponse<EmptyResponse> = try await request(
+        let _: StateRegistryAPIResponse<EmptyResponse> = try await request(
             method: "PUT",
             path: "/persistent-data/\(environment.rawValue)",
             body: UpdateRequest(itemId: itemId, includeInSync: includeInSync)
@@ -447,7 +447,7 @@ public final class StateRegistryService: ObservableObject, StateRegistryServiceP
     private func request<T: Decodable>(
         method: String,
         path: String
-    ) async throws -> APIResponse<T> {
+    ) async throws -> StateRegistryAPIResponse<T> {
         let url = baseURL.appendingPathComponent(path)
         var request = URLRequest(url: url)
         request.httpMethod = method
@@ -460,7 +460,7 @@ public final class StateRegistryService: ObservableObject, StateRegistryServiceP
         method: String,
         path: String,
         body: B
-    ) async throws -> APIResponse<T> {
+    ) async throws -> StateRegistryAPIResponse<T> {
         let url = baseURL.appendingPathComponent(path)
         var request = URLRequest(url: url)
         request.httpMethod = method
@@ -470,7 +470,7 @@ public final class StateRegistryService: ObservableObject, StateRegistryServiceP
         return try await executeRequest(request)
     }
     
-    private func executeRequest<T: Decodable>(_ request: URLRequest) async throws -> APIResponse<T> {
+    private func executeRequest<T: Decodable>(_ request: URLRequest) async throws -> StateRegistryAPIResponse<T> {
         do {
             let (data, response) = try await session.data(for: request)
             
@@ -493,7 +493,7 @@ public final class StateRegistryService: ObservableObject, StateRegistryServiceP
             }
             
             do {
-                return try decoder.decode(APIResponse<T>.self, from: data)
+                return try decoder.decode(StateRegistryAPIResponse<T>.self, from: data)
             } catch {
                 throw StateRegistryError.decodingError(error.localizedDescription)
             }
@@ -532,7 +532,7 @@ public final class StateRegistryService: ObservableObject, StateRegistryServiceP
 
 // MARK: - Response Types
 
-private struct APIResponse<T: Decodable>: Decodable {
+private struct StateRegistryAPIResponse<T: Decodable>: Decodable {
     let success: Bool
     let data: T
 }

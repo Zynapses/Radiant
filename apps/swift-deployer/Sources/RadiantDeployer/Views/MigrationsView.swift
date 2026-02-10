@@ -162,7 +162,7 @@ struct PipelineVisualization: View {
 struct PipelineStage: View {
     let name: String
     let version: String
-    let status: DeploymentStatus
+    let status: EnvironmentStatus
     let isFirst: Bool
     
     var body: some View {
@@ -319,7 +319,7 @@ struct MigrationEnvironmentCard: View {
 }
 
 struct MigrationStatusBadge: View {
-    let status: DeploymentStatus
+    let status: EnvironmentStatus
     
     var body: some View {
         Text(status.displayName)
@@ -724,7 +724,7 @@ struct EnvironmentBadge: View {
 
 // MARK: - Models
 
-enum DeploymentStatus: String, Sendable {
+enum EnvironmentStatus: String, Sendable {
     case healthy = "Healthy"
     case deploying = "Deploying"
     case degraded = "Degraded"
@@ -750,7 +750,7 @@ struct EnvironmentDeployment: Identifiable, Sendable {
     let version: String
     let packageName: String
     let deployedAt: Date
-    let status: DeploymentStatus
+    let status: EnvironmentStatus
     let domain: String?
     let metrics: DeploymentMetrics?
 }
@@ -776,7 +776,7 @@ struct MigrationRecord: Identifiable, Sendable {
     let version: String
     let fromEnvironment: DeployEnvironment
     let toEnvironment: DeployEnvironment
-    let status: DeploymentStatus
+    let status: EnvironmentStatus
     let duration: String?
 }
 

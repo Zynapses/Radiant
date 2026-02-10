@@ -114,8 +114,8 @@ actor SafeSchemaMigrationService {
     
     /// Detect schema changes between live instance and package
     func detectSchemaChanges(
-        instanceSchema: InstanceStateExtractor.ExtractedDatabaseSchema,
-        packageSchema: InstanceStateExtractor.ExtractedDatabaseSchema,
+        instanceSchema: InstanceStateExtractor.DatabaseSchema,
+        packageSchema: InstanceStateExtractor.DatabaseSchema,
         packageMigrations: [String], // List of migration files in package
         credentials: CredentialSet
     ) async throws -> [DetectedSchemaChange] {

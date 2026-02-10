@@ -60,6 +60,12 @@ actor AuditLogger {
         case environmentSetupComplete = "environment_setup_complete"
         case iamUserCreated = "iam_user_created"
         case environmentCredentialCreated = "environment_credential_created"
+        case securityAuditCompleted = "security_audit_completed"
+        case iamKeyRotated = "iam_key_rotated"
+        case iamKeyDisabled = "iam_key_disabled"
+        case iamKeyDeleted = "iam_key_deleted"
+        case secretRotationEnabled = "secret_rotation_enabled"
+        case credentialLifecycleStackDeployed = "credential_lifecycle_stack_deployed"
         
         // Domain & DNS (GDPR/SOC2 compliance)
         case domainConfigured = "domain_configured"
