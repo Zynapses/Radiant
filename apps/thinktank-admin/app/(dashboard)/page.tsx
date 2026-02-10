@@ -678,31 +678,3 @@ function StatCard({
   );
 }
 
-function QuickAction({
-  title,
-  description,
-  href,
-  icon: Icon,
-}: {
-  title: string;
-  description: string;
-  href: string;
-  icon: React.ComponentType<{ className?: string }>;
-}) {
-  return (
-    <a
-      href={href}
-      className="block bg-card rounded-lg border p-6 hover:border-primary/50 transition-colors"
-    >
-      <div className="flex items-start gap-4">
-        <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-          <Icon className="h-5 w-5 text-primary" />
-        </div>
-        <div>
-          <h3 className="font-semibold">{title}</h3>
-          <p className="text-sm text-muted-foreground mt-1">{description}</p>
-        </div>
-      </div>
-    </a>
-  );
-}

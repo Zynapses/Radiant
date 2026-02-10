@@ -438,7 +438,7 @@ export default function StackingResolutionPage() {
               <div>
                 <h4 className="text-sm font-medium mb-2">Section Sources</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-                  {Object.entries(resolved.sections).map(([section, source]) => (
+                  {Object.entries(resolved.sections as Record<string, { cartridge_name: string; cartridge_type: string }>).map(([section, source]) => (
                     <div
                       key={section}
                       className="p-2 rounded border border-white/10 bg-white/[0.02]"
@@ -457,7 +457,7 @@ export default function StackingResolutionPage() {
               </div>
 
               {/* Firmware Contributing Cartridges */}
-              {resolved.firmware?.contributing_cartridges && (
+              {Array.isArray(resolved.firmware?.contributing_cartridges) && (
                 <div>
                   <h4 className="text-sm font-medium mb-2">Firmware Contributors</h4>
                   <div className="flex items-center gap-2 flex-wrap">

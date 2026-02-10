@@ -754,7 +754,7 @@ function CreateCartridgeDialog({ open, onOpenChange, onCreated }: CreateCartridg
                 <Checkbox
                   id="lora"
                   checked={includeLoRA}
-                  onCheckedChange={(checked) => setIncludeLoRA(checked === true)}
+                  onCheckedChange={(checked: boolean | 'indeterminate') => setIncludeLoRA(checked === true)}
                 />
                 <label htmlFor="lora" className="text-sm">
                   Include LoRA Adapters
@@ -764,7 +764,7 @@ function CreateCartridgeDialog({ open, onOpenChange, onCreated }: CreateCartridg
                 <Checkbox
                   id="curator"
                   checked={includeCurator}
-                  onCheckedChange={(checked) => setIncludeCurator(checked === true)}
+                  onCheckedChange={(checked: boolean | 'indeterminate') => setIncludeCurator(checked === true)}
                 />
                 <label htmlFor="curator" className="text-sm">
                   Include Curator Knowledge
