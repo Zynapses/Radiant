@@ -21,6 +21,7 @@ export interface AuthContext {
   apiKeyId?: string;
   tier: string;
   scopes: string[];
+  expiresAt?: string;
 }
 
 // Extended event type with auth context
@@ -73,8 +74,12 @@ export function authMiddleware(options: {
       }
 
       try {
+        // Extract source IP and origin for restriction checks
+        const sourceIp = event.requestContext?.identity?.sourceIp;
+        const origin = event.headers['Origin'] || event.headers['origin'];
+
         // Validate token and extract context
-        const auth = await validateToken(token);
+        const auth = await validateToken(token, sourceIp, origin);
         
         // Check required scopes
         if (scopes.length > 0) {
@@ -97,7 +102,18 @@ export function authMiddleware(options: {
         // Attach auth context to event
         (event as AuthenticatedEvent).auth = auth;
         
-        return next(event, context);
+        const response = await next(event, context);
+
+        // Inject X-Key-Expires-In header for API key requests
+        if (auth.expiresAt && response?.headers) {
+          const msUntilExpiry = new Date(auth.expiresAt).getTime() - Date.now();
+          if (msUntilExpiry > 0) {
+            const daysUntilExpiry = Math.ceil(msUntilExpiry / (1000 * 60 * 60 * 24));
+            response.headers['X-Key-Expires-In'] = `${daysUntilExpiry}d`;
+          }
+        }
+
+        return response;
       } catch (error) {
         return {
           statusCode: 401,
@@ -114,17 +130,25 @@ export function authMiddleware(options: {
   };
 }
 
-async function validateToken(token: string): Promise<AuthContext> {
+async function validateToken(
+  token: string,
+  sourceIp?: string,
+  origin?: string,
+): Promise<AuthContext> {
   // Check if it's an API key (starts with 'rad_')
   if (token.startsWith('rad_')) {
-    return validateApiKey(token);
+    return validateApiKey(token, sourceIp, origin);
   }
   
   // Otherwise treat as JWT
   return validateJwt(token);
 }
 
-async function validateApiKey(key: string): Promise<AuthContext> {
+async function validateApiKey(
+  key: string,
+  sourceIp?: string,
+  origin?: string,
+): Promise<AuthContext> {
   const client = await getPoolClient();
 
   try {
@@ -134,6 +158,9 @@ async function validateApiKey(key: string): Promise<AuthContext> {
         ak.tenant_id,
         ak.scopes,
         ak.is_active,
+        ak.expires_at,
+        ak.allowed_ips,
+        ak.allowed_origins,
         t.tier,
         t.status as tenant_status
        FROM api_keys ak
@@ -157,8 +184,32 @@ async function validateApiKey(key: string): Promise<AuthContext> {
       throw new ForbiddenError('Tenant account is not active');
     }
 
+    // Check expiration
+    if (row.expires_at && new Date(row.expires_at) < new Date()) {
+      throw new UnauthorizedError('API key has expired');
+    }
+
+    // Enforce IP restriction
+    if (sourceIp && row.allowed_ips) {
+      const allowedIps: string[] = row.allowed_ips;
+      const ipAllowed = allowedIps.some(cidr => isIpInCidr(sourceIp, cidr));
+      if (!ipAllowed) {
+        logger.warn('API key IP restriction denied', { keyId: row.id, sourceIp });
+        throw new ForbiddenError('Source IP is not in the allowed list for this API key');
+      }
+    }
+
+    // Enforce origin restriction
+    if (origin && row.allowed_origins) {
+      const allowedOrigins: string[] = row.allowed_origins;
+      if (!allowedOrigins.includes(origin)) {
+        logger.warn('API key origin restriction denied', { keyId: row.id, origin });
+        throw new ForbiddenError('Origin is not in the allowed list for this API key');
+      }
+    }
+
     await client.query(
-      `UPDATE api_keys SET last_used_at = NOW() WHERE id = $1`,
+      `UPDATE api_keys SET last_used_at = NOW(), use_count = use_count + 1 WHERE id = $1`,
       [row.id]
     );
 
@@ -167,10 +218,33 @@ async function validateApiKey(key: string): Promise<AuthContext> {
       apiKeyId: row.id,
       tier: row.tier || 'starter',
       scopes: row.scopes || ['chat'],
+      expiresAt: row.expires_at || undefined,
     };
   } finally {
     client.release();
   }
+}
+
+/**
+ * Simple CIDR match check for IPv4.
+ * For production-grade matching, consider a library like 'ip-cidr'.
+ */
+function isIpInCidr(ip: string, cidr: string): boolean {
+  // Exact match shortcut
+  if (cidr === ip || cidr === `${ip}/32`) return true;
+
+  const [cidrBase, cidrBits] = cidr.split('/');
+  if (!cidrBits) return ip === cidrBase;
+
+  const mask = ~(2 ** (32 - parseInt(cidrBits, 10)) - 1) >>> 0;
+  const ipNum = ipToInt(ip);
+  const cidrNum = ipToInt(cidrBase);
+
+  return (ipNum & mask) === (cidrNum & mask);
+}
+
+function ipToInt(ip: string): number {
+  return ip.split('.').reduce((acc, octet) => (acc << 8) + parseInt(octet, 10), 0) >>> 0;
 }
 
 async function validateJwt(token: string): Promise<AuthContext> {

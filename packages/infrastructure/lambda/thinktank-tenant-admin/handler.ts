@@ -139,6 +139,27 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
     }
 
     // ─────────────────────────────────────────────────────────────────────
+    // API Keys — Credential Lifecycle Management
+    // ─────────────────────────────────────────────────────────────────────
+    if (path === '/keys' && method === 'GET') {
+      return listApiKeys(tenantId);
+    }
+    if (path === '/keys' && method === 'POST') {
+      const body = JSON.parse(event.body || '{}');
+      return createApiKey(tenantId, userId, body);
+    }
+    if (path.match(/^\/keys\/[\w-]+\/rotate$/) && method === 'POST') {
+      return rotateApiKey(tenantId, path.split('/')[2], userId);
+    }
+    if (path.match(/^\/keys\/[\w-]+\/restrictions$/) && method === 'PUT') {
+      const body = JSON.parse(event.body || '{}');
+      return updateKeyRestrictions(tenantId, path.split('/')[2], body);
+    }
+    if (path.match(/^\/keys\/[\w-]+\/revoke$/) && method === 'POST') {
+      return revokeApiKey(tenantId, path.split('/')[2], userId);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────
     // Reports
     // ─────────────────────────────────────────────────────────────────────
     if (path === '/reports' && method === 'GET') {
@@ -495,4 +516,213 @@ async function getReportDetail(tenantId: string, reportId: string): Promise<APIG
   );
   if (result.rows.length === 0) return createErrorResponse('Report not found', 404);
   return createResponse({ success: true, report: result.rows[0] });
+}
+
+// =============================================================================
+// API Keys — Credential Lifecycle Management
+// =============================================================================
+
+async function listApiKeys(tenantId: string): Promise<APIGatewayProxyResult> {
+  const result = await db.query(
+    `SELECT id, name, key_prefix, interface_type, scopes,
+            allowed_ips, allowed_origins, allowed_endpoints,
+            rate_limit_per_minute, rate_limit_per_hour, rate_limit_per_day,
+            is_active, expires_at, last_used_at, use_count,
+            dormant_flagged_at, dormant_warning_level,
+            replaced_by_key_id, replaces_key_id,
+            created_at, updated_at, revoked_at
+     FROM api_keys
+     WHERE tenant_id = $1
+     ORDER BY created_at DESC`,
+    [tenantId]
+  );
+  return createResponse({ success: true, keys: result.rows });
+}
+
+async function createApiKey(
+  tenantId: string,
+  userId: string | undefined,
+  body: Record<string, unknown>,
+): Promise<APIGatewayProxyResult> {
+  const { createHash, randomBytes } = await import('crypto');
+  const keyBytes = randomBytes(32);
+  const raw = `rad_${keyBytes.toString('base64url')}`;
+  const prefix = raw.substring(0, 12);
+  const hash = createHash('sha256').update(raw).digest('hex');
+
+  // Get tenant default expiry
+  const tenantResult = await db.query(
+    `SELECT api_key_default_expiry_days, api_key_max_expiry_days, require_api_key_ip_restriction
+     FROM tenants WHERE id = $1`,
+    [tenantId]
+  );
+  const tenant = tenantResult.rows[0] || {};
+  const defaultExpiry = Number(tenant.api_key_default_expiry_days) || 90;
+  const maxExpiry = Number(tenant.api_key_max_expiry_days) || 365;
+
+  // Validate IP restriction requirement
+  if (tenant.require_api_key_ip_restriction && !body.allowed_ips) {
+    return createErrorResponse('This tenant requires IP restrictions on all API keys', 400);
+  }
+
+  // Calculate expiry
+  let expiryDays = body.expiry_days ? Number(body.expiry_days) : defaultExpiry;
+  if (expiryDays > maxExpiry) expiryDays = maxExpiry;
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + expiryDays);
+
+  const result = await db.query(
+    `INSERT INTO api_keys (
+      tenant_id, name, description, key_prefix, key_hash,
+      interface_type, scopes,
+      allowed_ips, allowed_origins,
+      rate_limit_per_minute,
+      is_active, expires_at,
+      created_by, created_by_app
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, true, $11, $12, 'thinktank_admin')
+    RETURNING id, name, key_prefix, interface_type, scopes, expires_at, created_at`,
+    [
+      tenantId,
+      body.name || 'Untitled Key',
+      body.description || null,
+      prefix,
+      hash,
+      body.interface_type || 'api',
+      body.scopes || ['chat', 'models'],
+      body.allowed_ips ? JSON.stringify(body.allowed_ips) : null,
+      body.allowed_origins ? JSON.stringify(body.allowed_origins) : null,
+      body.rate_limit_per_minute || null,
+      expiresAt.toISOString(),
+      userId || null,
+    ]
+  );
+
+  // Log creation
+  await db.query(
+    `INSERT INTO api_key_audit_log (tenant_id, key_id, action, details)
+     VALUES ($1, $2, 'created', $3::jsonb)`,
+    [tenantId, result.rows[0].id, JSON.stringify({ created_by: userId, interface_type: body.interface_type || 'api' })]
+  );
+
+  return createResponse({
+    success: true,
+    key: {
+      ...result.rows[0],
+      raw_key: raw, // Only returned once!
+    },
+  }, 201);
+}
+
+async function rotateApiKey(
+  tenantId: string,
+  keyId: string,
+  userId: string | undefined,
+): Promise<APIGatewayProxyResult> {
+  const { createHash, randomBytes } = await import('crypto');
+  const keyBytes = randomBytes(32);
+  const raw = `rad_${keyBytes.toString('base64url')}`;
+  const prefix = raw.substring(0, 12);
+  const hash = createHash('sha256').update(raw).digest('hex');
+
+  // Use the DB function for atomic rotation
+  const result = await db.query(
+    `SELECT * FROM rotate_api_key($1::uuid, $2, $3)`,
+    [String(keyId), prefix, hash]
+  );
+
+  if (!result.rows[0]?.success) {
+    return createErrorResponse(String(result.rows[0]?.error_message || 'Rotation failed'), 400);
+  }
+
+  return createResponse({
+    success: true,
+    new_key: {
+      id: result.rows[0].new_key_id,
+      raw_key: raw, // Only returned once!
+      prefix,
+      replaces_key_id: keyId,
+    },
+  });
+}
+
+async function updateKeyRestrictions(
+  tenantId: string,
+  keyId: string,
+  body: Record<string, unknown>,
+): Promise<APIGatewayProxyResult> {
+  const setClauses: string[] = ['updated_at = NOW()'];
+  const values: unknown[] = [];
+  let idx = 1;
+
+  if (body.allowed_ips !== undefined) {
+    setClauses.push(`allowed_ips = $${idx}`);
+    values.push(body.allowed_ips ? JSON.stringify(body.allowed_ips) : null);
+    idx++;
+  }
+  if (body.allowed_origins !== undefined) {
+    setClauses.push(`allowed_origins = $${idx}`);
+    values.push(body.allowed_origins ? JSON.stringify(body.allowed_origins) : null);
+    idx++;
+  }
+  if (body.allowed_endpoints !== undefined) {
+    setClauses.push(`allowed_endpoints = $${idx}`);
+    values.push(body.allowed_endpoints || null);
+    idx++;
+  }
+  if (body.denied_endpoints !== undefined) {
+    setClauses.push(`denied_endpoints = $${idx}`);
+    values.push(body.denied_endpoints || null);
+    idx++;
+  }
+  if (body.rate_limit_per_minute !== undefined) {
+    setClauses.push(`rate_limit_per_minute = $${idx}`);
+    values.push(body.rate_limit_per_minute);
+    idx++;
+  }
+
+  values.push(keyId, tenantId);
+  const result = await db.query(
+    `UPDATE api_keys SET ${setClauses.join(', ')}
+     WHERE id = $${idx} AND tenant_id = $${idx + 1}
+     RETURNING id, name, allowed_ips, allowed_origins, allowed_endpoints, denied_endpoints, rate_limit_per_minute`,
+    values
+  );
+
+  if (result.rows.length === 0) return createErrorResponse('API key not found', 404);
+
+  await db.query(
+    `INSERT INTO api_key_audit_log (tenant_id, key_id, action, details)
+     VALUES ($1, $2, 'updated', $3::jsonb)`,
+    [tenantId, keyId, JSON.stringify({ updated_fields: Object.keys(body) })]
+  );
+
+  return createResponse({ success: true, key: result.rows[0] });
+}
+
+async function revokeApiKey(
+  tenantId: string,
+  keyId: string,
+  userId: string | undefined,
+): Promise<APIGatewayProxyResult> {
+  const result = await db.query(
+    `UPDATE api_keys SET
+       is_active = false,
+       revoked_at = NOW(),
+       revoked_by = $3,
+       revoked_reason = 'manual_revoke',
+       updated_at = NOW()
+     WHERE id = $1 AND tenant_id = $2
+     RETURNING id, name, key_prefix`,
+    [keyId, tenantId, userId || null]
+  );
+
+  if (result.rows.length === 0) return createErrorResponse('API key not found', 404);
+
+  await db.query(
+    `INSERT INTO api_key_audit_log (tenant_id, key_id, action, details)
+     VALUES ($1, $2, 'revoked', $3::jsonb)`,
+    [tenantId, keyId, JSON.stringify({ revoked_by: userId, reason: 'manual_revoke' })]
+  );
+
+  return createResponse({ success: true, key: result.rows[0] });
 }

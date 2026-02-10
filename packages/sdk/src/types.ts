@@ -23,6 +23,21 @@ export interface RadiantConfig {
   
   /** Enable debug logging */
   debug?: boolean;
+
+  /**
+   * Auto-rotation: callback invoked when the server returns X-Key-Expires-In
+   * header indicating the key is nearing expiry. The callback receives the
+   * number of days until expiry and should return a new API key string
+   * (e.g. by calling POST /api/v1/keys/{id}/rotate). If provided, the client
+   * will automatically swap to the new key for subsequent requests.
+   */
+  onKeyExpiring?: (daysUntilExpiry: number) => Promise<string | null>;
+
+  /**
+   * Auto-rotation: threshold in days. When X-Key-Expires-In is at or below
+   * this value, the onKeyExpiring callback is triggered. Default: 14.
+   */
+  keyExpiryThresholdDays?: number;
 }
 
 export interface ChatMessage {

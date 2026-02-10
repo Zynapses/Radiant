@@ -13,12 +13,33 @@ else
   echo "⚠️  Neither pnpm nor npx found - skipping lint-staged"
 fi
 
-# Check for secrets
+# Check for secrets (expanded patterns)
 echo "🔍 Checking for secrets..."
-if git diff --cached --name-only | xargs grep -l -E "(AKIA[A-Z0-9]{16}|sk-[a-zA-Z0-9]{48}|password\s*=\s*['\"][^'\"]+['\"])" 2>/dev/null; then
-  echo "❌ Potential secrets detected in staged files!"
-  echo "Please remove secrets before committing."
-  exit 1
+SECRET_PATTERNS=(
+  "AKIA[A-Z0-9]{16}"                          # AWS Access Key ID
+  "ASIA[A-Z0-9]{16}"                          # AWS Temporary Access Key
+  "['\"]sk-[a-zA-Z0-9]{20,}"                  # OpenAI / generic secret keys
+  "-----BEGIN (RSA |EC |DSA )?PRIVATE KEY"     # Private keys
+  "password\s*[:=]\s*['\"][^'\"]{8,}['\"]"     # Hardcoded passwords (8+ chars)
+  "ghp_[A-Za-z0-9]{36}"                       # GitHub PAT
+  "xox[bpors]-[A-Za-z0-9-]+"                  # Slack tokens
+  "eyJ[A-Za-z0-9_-]{20,}\\.eyJ[A-Za-z0-9_-]+" # JWT tokens
+  "postgres://[^:]+:[^@]+@"                    # Connection strings with creds
+  "mongodb(\\+srv)?://[^:]+:[^@]+@"           # MongoDB connection strings
+  "RADIANT_DB_PASSWORD=['\"]?[^'\" ]+"         # RADIANT-specific env vars
+)
+PATTERN=$(IFS='|'; echo "${SECRET_PATTERNS[*]}")
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=d 2>/dev/null | grep -v -E '\.(lock|png|jpg|ico|woff|ttf|eot|svg)$')
+if [ -n "$STAGED_FILES" ]; then
+  if echo "$STAGED_FILES" | xargs grep -l -E "$PATTERN" 2>/dev/null; then
+    echo "❌ Potential secrets detected in staged files!"
+    echo "   Review the files above and remove any credentials."
+    echo "   Use AWS Secrets Manager or SSM Parameter Store instead."
+    echo "   Set SKIP_SECRETS_CHECK=1 to bypass (not recommended)."
+    if [ -z "$SKIP_SECRETS_CHECK" ]; then
+      exit 1
+    fi
+  fi
 fi
 
 # Version bump enforcement (PROMPT-33 requirement)

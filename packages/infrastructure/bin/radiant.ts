@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
+import { Aspects } from 'aws-cdk-lib';
+import { AwsSolutionsChecks } from 'cdk-nag';
 import { FoundationStack } from '../lib/stacks/foundation-stack';
 import { NetworkingStack } from '../lib/stacks/networking-stack';
 import { SecurityStack } from '../lib/stacks/security-stack';
@@ -18,6 +20,7 @@ import { ThinkTankAuthStack } from '../lib/stacks/thinktank-auth-stack';
 import { ThinkTankAdminApiStack } from '../lib/stacks/thinktank-admin-api-stack';
 import { LiteLLMGatewayStack } from '../lib/stacks/litellm-gateway-stack';
 import { DataLakeStack } from '../lib/stacks/data-lake-stack';
+import { CredentialLifecycleStack } from '../lib/stacks/credential-lifecycle-stack';
 import { 
   RADIANT_VERSION, 
   getTierConfig,
@@ -438,6 +441,33 @@ const catoTierTransitionStack = new CatoTierTransitionStack(app, `${stackPrefix}
 });
 catoTierTransitionStack.addDependency(adminStack);
 catoTierTransitionStack.addDependency(dataStack);
+
+// ============================================================================
+// CREDENTIAL LIFECYCLE STACK (Security Framework)
+// ============================================================================
+
+const credentialLifecycleStack = new CredentialLifecycleStack(app, `${stackPrefix}-credential-lifecycle`, {
+  env,
+  appId,
+  environment,
+  alertEmail: app.node.tryGetContext('alertEmail'),
+  secretsKey: securityStack.secretsKey,
+  dbSecretArn: dataStack.cluster.secret?.secretArn,
+  auroraClusterArn: dataStack.cluster.clusterArn,
+  tags,
+  description: `RADIANT Credential Lifecycle - ${appId} ${environment}`,
+});
+credentialLifecycleStack.addDependency(securityStack);
+credentialLifecycleStack.addDependency(dataStack);
+
+// ============================================================================
+// CDK-NAG COMPLIANCE CHECKS
+// ============================================================================
+
+// Apply AwsSolutions checks to all stacks (warnings only in dev, errors in prod)
+if (environment === 'prod' || app.node.tryGetContext('enableCdkNag') === 'true') {
+  Aspects.of(app).add(new AwsSolutionsChecks({ verbose: true }));
+}
 
 // ============================================================================
 // TAGGING

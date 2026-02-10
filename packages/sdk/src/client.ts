@@ -29,7 +29,11 @@ const DEFAULT_TIMEOUT = 60000;
 const DEFAULT_MAX_RETRIES = 3;
 
 export class RadiantClient {
-  private readonly config: Required<RadiantConfig>;
+  private readonly config: Required<Omit<RadiantConfig, 'onKeyExpiring' | 'keyExpiryThresholdDays'>>;
+  private _apiKey: string;
+  private readonly _onKeyExpiring?: (daysUntilExpiry: number) => Promise<string | null>;
+  private readonly _keyExpiryThresholdDays: number;
+  private _rotationInProgress = false;
   
   public readonly chat: ChatResource;
   public readonly models: ModelsResource;
@@ -39,6 +43,10 @@ export class RadiantClient {
     if (!config.apiKey) {
       throw new Error('API key is required');
     }
+
+    this._apiKey = config.apiKey;
+    this._onKeyExpiring = config.onKeyExpiring;
+    this._keyExpiryThresholdDays = config.keyExpiryThresholdDays ?? 14;
 
     this.config = {
       apiKey: config.apiKey,
@@ -56,6 +64,11 @@ export class RadiantClient {
     this.billing = new BillingResource(this);
   }
 
+  /** Returns the current API key (may change after auto-rotation) */
+  get apiKey(): string {
+    return this._apiKey;
+  }
+
   async request<T>(
     method: string,
     path: string,
@@ -65,7 +78,7 @@ export class RadiantClient {
     const url = `${this.config.baseUrl}/${this.config.version}${path}`;
     
     const headers: Record<string, string> = {
-      'Authorization': `Bearer ${this.config.apiKey}`,
+      'Authorization': `Bearer ${this._apiKey}`,
       'Content-Type': 'application/json',
       'X-Radiant-SDK': 'js',
       'X-Radiant-SDK-Version': '4.18.0',
@@ -107,6 +120,9 @@ export class RadiantClient {
           
           throw error;
         }
+
+        // Check for key expiry header and trigger auto-rotation
+        this.handleKeyExpiryHeader(response);
 
         if (options?.stream) {
           return response as unknown as T;
@@ -203,6 +219,43 @@ export class RadiantClient {
 
   private sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  /**
+   * Check X-Key-Expires-In response header and trigger auto-rotation
+   * if the key is nearing expiry and a callback is configured.
+   */
+  private handleKeyExpiryHeader(response: Response): void {
+    if (!this._onKeyExpiring || this._rotationInProgress) return;
+
+    const expiresIn = response.headers.get('x-key-expires-in');
+    if (!expiresIn) return;
+
+    const match = expiresIn.match(/^(\d+)d$/);
+    if (!match) return;
+
+    const days = parseInt(match[1], 10);
+    if (days > this._keyExpiryThresholdDays) return;
+
+    // Trigger rotation asynchronously (don't block the current request)
+    this._rotationInProgress = true;
+    this._onKeyExpiring(days)
+      .then((newKey) => {
+        if (newKey) {
+          this._apiKey = newKey;
+          if (this.config.debug) {
+            console.log(`[RADIANT] API key auto-rotated. New prefix: ${newKey.substring(0, 12)}...`);
+          }
+        }
+      })
+      .catch((err) => {
+        if (this.config.debug) {
+          console.error('[RADIANT] Auto-rotation failed:', err);
+        }
+      })
+      .finally(() => {
+        this._rotationInProgress = false;
+      });
   }
 }
 

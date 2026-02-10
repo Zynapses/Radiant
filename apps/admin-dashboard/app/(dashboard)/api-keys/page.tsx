@@ -221,6 +221,47 @@ export default function ApiKeysPage() {
     },
   });
 
+  // Rotate key mutation
+  const rotateKeyMutation = useMutation({
+    mutationFn: (keyId: string) => fetch(`${API_BASE}/${keyId}/rotate`, {
+      method: 'POST',
+    }).then(r => r.json()),
+    onSuccess: (result) => {
+      if (result.new_key) {
+        setNewKeyResult({ key: result.new_key.raw_key, id: result.new_key.id });
+        toast({ title: 'Key Rotated', description: 'New key generated. Old key remains active during grace period.' });
+      }
+      queryClient.invalidateQueries({ queryKey: ['api-keys'] });
+      queryClient.invalidateQueries({ queryKey: ['api-keys-dashboard'] });
+    },
+    onError: (error: Error) => {
+      toast({ title: 'Rotation Failed', description: error.message, variant: 'destructive' });
+    },
+  });
+
+  // Update key restrictions mutation
+  const updateRestrictionsMutation = useMutation({
+    mutationFn: ({ keyId, restrictions }: { keyId: string; restrictions: Record<string, unknown> }) =>
+      fetch(`${API_BASE}/${keyId}/restrictions`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(restrictions),
+      }).then(r => r.json()),
+    onSuccess: () => {
+      toast({ title: 'Restrictions Updated' });
+      queryClient.invalidateQueries({ queryKey: ['api-keys'] });
+      setRestrictionsKey(null);
+    },
+    onError: (error: Error) => {
+      toast({ title: 'Update Failed', description: error.message, variant: 'destructive' });
+    },
+  });
+
+  // State for restrictions dialog
+  const [restrictionsKey, setRestrictionsKey] = useState<ApiKey | null>(null);
+  const [restrictionIps, setRestrictionIps] = useState('');
+  const [restrictionOrigins, setRestrictionOrigins] = useState('');
+
   // Update agent status mutation
   const updateAgentStatusMutation = useMutation({
     mutationFn: ({ agentId, status }: { agentId: string; status: string }) =>
@@ -566,6 +607,26 @@ export default function ApiKeysPage() {
                               <Copy className="h-4 w-4 mr-2" />
                               Copy Prefix
                             </DropdownMenuItem>
+                            {key.isActive && (
+                              <>
+                                <DropdownMenuItem
+                                  onClick={() => rotateKeyMutation.mutate(key.id)}
+                                >
+                                  <RefreshCw className="h-4 w-4 mr-2" />
+                                  Rotate Key
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    setRestrictionsKey(key);
+                                    setRestrictionIps('');
+                                    setRestrictionOrigins('');
+                                  }}
+                                >
+                                  <Shield className="h-4 w-4 mr-2" />
+                                  Manage Restrictions
+                                </DropdownMenuItem>
+                              </>
+                            )}
                             <DropdownMenuSeparator />
                             {key.isActive ? (
                               <DropdownMenuItem
@@ -768,6 +829,74 @@ export default function ApiKeysPage() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Restrictions Management Dialog */}
+      <Dialog open={!!restrictionsKey} onOpenChange={() => setRestrictionsKey(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Shield className="h-5 w-5" />
+              Manage Key Restrictions
+            </DialogTitle>
+            <DialogDescription>
+              {restrictionsKey?.keyPrefix}... &mdash; {restrictionsKey?.name}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="allowed-ips">Allowed IP Addresses / CIDRs</Label>
+              <Textarea
+                id="allowed-ips"
+                value={restrictionIps}
+                onChange={(e) => setRestrictionIps(e.target.value)}
+                placeholder={"One per line, e.g.:\n10.0.0.0/8\n203.0.113.5/32\n\nLeave empty to allow all IPs"}
+                rows={4}
+                className="font-mono text-sm"
+              />
+              <p className="text-xs text-muted-foreground">
+                CIDR notation supported. Leave empty to remove IP restrictions.
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="allowed-origins">Allowed HTTP Origins</Label>
+              <Textarea
+                id="allowed-origins"
+                value={restrictionOrigins}
+                onChange={(e) => setRestrictionOrigins(e.target.value)}
+                placeholder={"One per line, e.g.:\nhttps://app.example.com\nhttps://dashboard.example.com\n\nLeave empty to allow all origins"}
+                rows={4}
+                className="font-mono text-sm"
+              />
+              <p className="text-xs text-muted-foreground">
+                For browser-facing keys only. Leave empty to remove origin restrictions.
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRestrictionsKey(null)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                if (!restrictionsKey) return;
+                const ips = restrictionIps.trim()
+                  ? restrictionIps.split('\n').map(s => s.trim()).filter(Boolean)
+                  : null;
+                const origins = restrictionOrigins.trim()
+                  ? restrictionOrigins.split('\n').map(s => s.trim()).filter(Boolean)
+                  : null;
+                updateRestrictionsMutation.mutate({
+                  keyId: restrictionsKey.id,
+                  restrictions: { allowed_ips: ips, allowed_origins: origins },
+                });
+              }}
+              disabled={updateRestrictionsMutation.isPending}
+            >
+              {updateRestrictionsMutation.isPending ? 'Saving...' : 'Save Restrictions'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
