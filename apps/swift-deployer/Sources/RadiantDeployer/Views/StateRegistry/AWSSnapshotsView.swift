@@ -38,7 +38,9 @@ struct AWSSnapshotConfig: Codable, Sendable {
     }
 }
 
-struct AWSSnapshot: Identifiable, Codable, Sendable {
+struct AWSSnapshot: Identifiable, Codable, Sendable, Hashable {
+    static func == (lhs: AWSSnapshot, rhs: AWSSnapshot) -> Bool { lhs.id == rhs.id }
+    func hash(into hasher: inout Hasher) { hasher.combine(id) }
     let id: String
     let environment: String
     let createdAt: Date

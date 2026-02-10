@@ -693,7 +693,7 @@ actor PackageService {
     // MARK: - Integrity Verification
     
     /// Verify package hash
-    private func verifyPackageIntegrity(_ package: LoadedPackage, expectedHash: String) -> Bool {
+    func verifyPackageIntegrity(_ package: LoadedPackage, expectedHash: String) -> Bool {
         guard let data = try? Data(contentsOf: package.originalPath) else {
             return false
         }
@@ -702,6 +702,37 @@ actor PackageService {
         let hashString = hash.compactMap { String(format: "%02x", $0) }.joined()
         
         return hashString == expectedHash
+    }
+    
+    /// Verify a package hash by string
+    func verifyPackageIntegrity(packageHash: String) async throws -> Bool {
+        guard let latestInfo = try await listAvailablePackages().first else {
+            return false
+        }
+        let package = try await downloadPackage(info: latestInfo)
+        return verifyPackageIntegrity(package, expectedHash: packageHash)
+    }
+    
+    /// Download and verify a package in one step
+    func downloadAndVerify(_ info: PackageInfo) async throws -> LoadedPackage {
+        let package = try await downloadPackage(info: info)
+        if !info.packageHash.isEmpty {
+            guard verifyPackageIntegrity(package, expectedHash: info.packageHash) else {
+                throw PackageError.integrityCheckFailed
+            }
+        }
+        return package
+    }
+    
+    /// Remove a package from the local cache
+    func removeFromCache(version: String) throws {
+        let contents = try fileManager.contentsOfDirectory(
+            at: cacheDirectory,
+            includingPropertiesForKeys: nil
+        )
+        for file in contents where file.lastPathComponent.contains(version) {
+            try fileManager.removeItem(at: file)
+        }
     }
     
     /// Verify internal checksums

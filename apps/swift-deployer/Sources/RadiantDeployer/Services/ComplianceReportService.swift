@@ -147,7 +147,9 @@ actor ComplianceReportService {
         }
     }
     
-    struct ControlAssessment: Codable, Sendable, Identifiable {
+    struct ControlAssessment: Codable, Sendable, Identifiable, Hashable {
+        static func == (lhs: ControlAssessment, rhs: ControlAssessment) -> Bool { lhs.id == rhs.id }
+        func hash(into hasher: inout Hasher) { hasher.combine(id) }
         let id: String
         let controlId: String
         let category: String
