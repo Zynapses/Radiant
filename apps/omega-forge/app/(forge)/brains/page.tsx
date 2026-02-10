@@ -3,6 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Brain, Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import type { Row } from '@/lib/types';
 
 export default function BrainsPage() {
   const { data, isLoading } = useQuery({
@@ -32,7 +33,7 @@ export default function BrainsPage() {
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-8 text-center text-zinc-500">No brain instances found</div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {brains.map((b: any) => (
+          {brains.map((b: Row) => (
             <Link key={b.tenant_id} href={`/brains/${b.tenant_id}`} className="block rounded-lg border border-zinc-800 bg-zinc-900 p-5 hover:border-zinc-700 transition-colors">
               <div className="flex items-center gap-3 mb-3">
                 <Brain className="h-5 w-5 text-purple-400" />

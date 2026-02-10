@@ -77,9 +77,9 @@ export async function POST(
   ).catch(() => ({ rows: [] }));
 
   if (patterns.rows.length > 0) {
-    catoLearned['evolved_patterns.json'] = patterns.rows.map((r: any) => ({
-      text: r.pattern_text,
-      fitness: r.fitness_score,
+    catoLearned['evolved_patterns.json'] = patterns.rows.map((r) => ({
+      text: (r as { pattern_text: string }).pattern_text,
+      fitness: (r as { fitness_score: number }).fitness_score,
     }));
   }
 
@@ -89,9 +89,9 @@ export async function POST(
   ).catch(() => ({ rows: [] }));
 
   if (catoConfig.rows.length > 0) {
-    const prefs: Record<string, any> = {};
-    for (const row of catoConfig.rows as any[]) {
-      prefs[row.config_key] = row.config_value;
+    const prefs: Record<string, unknown> = {};
+    for (const row of catoConfig.rows) {
+      prefs[(row as { config_key: string }).config_key] = (row as { config_value: string }).config_value;
     }
     catoLearned['cato_soft_preferences.json'] = prefs;
   }

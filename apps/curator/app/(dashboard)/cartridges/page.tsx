@@ -91,6 +91,7 @@ export default function CartridgesPage() {
   useEffect(() => {
     loadDashboard();
     loadCartridges();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
   async function loadDashboard() {

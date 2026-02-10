@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
   let sql = `SELECT id, name, display_name, version, cartridge_type, targets,
     sections_present, status, total_size_bytes, created_at, updated_at
     FROM cartridge_universal WHERE 1=1`;
-  const params: any[] = [];
+  const params: unknown[] = [];
   let idx = 1;
 
   if (status) {

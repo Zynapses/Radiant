@@ -3,6 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { FileText, Loader2 } from 'lucide-react';
 import { useState } from 'react';
+import type { AuditEntry } from '@/lib/types';
 
 export default function AuditPage() {
   const [actionFilter, setActionFilter] = useState('');
@@ -19,7 +20,7 @@ export default function AuditPage() {
 
   const entries = data?.entries || [];
 
-  const uniqueActions = [...new Set(entries.map((e: any) => e.action))].sort();
+  const uniqueActions = [...new Set(entries.map((e: AuditEntry) => e.action))].sort();
 
   return (
     <div className="space-y-6">
@@ -61,7 +62,7 @@ export default function AuditPage() {
               </tr>
             </thead>
             <tbody>
-              {entries.map((e: any, i: number) => (
+              {entries.map((e: AuditEntry, i: number) => (
                 <tr key={e.id || i} className="border-b border-zinc-800 last:border-0 hover:bg-zinc-900/80 transition-colors">
                   <td className="py-3 px-4">
                     <span className="text-xs bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded font-mono">{e.action}</span>

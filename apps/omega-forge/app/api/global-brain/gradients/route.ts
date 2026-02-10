@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
     FROM global_brain_gradients g
     LEFT JOIN tenants t ON t.id = g.tenant_id
     WHERE 1=1`;
-  const params: any[] = [];
+  const params: unknown[] = [];
   let idx = 1;
 
   if (status) {

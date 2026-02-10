@@ -234,6 +234,7 @@ enum NavigationTab: String, CaseIterable, Identifiable, Sendable {
     case spendGovernor = "Spend Governor"
     case intrusionDetection = "Intrusion Detection"
     case credentialLifecycle = "Credential Security"
+    case endpointSecurity = "Endpoint Security"
     
     // Configuration (v7.4.0)
     case domainURLs = "Domain URLs"
@@ -262,6 +263,7 @@ enum NavigationTab: String, CaseIterable, Identifiable, Sendable {
         case .spendGovernor: return "gauge.with.dots.needle.33percent"
         case .intrusionDetection: return "shield.checkered"
         case .credentialLifecycle: return "shield.lefthalf.filled.badge.checkmark"
+        case .endpointSecurity: return "lock.shield"
         case .domainURLs: return "globe"
         case .curator: return "book.pages"
         case .cortexMemory: return "brain.head.profile"
@@ -287,6 +289,7 @@ enum NavigationTab: String, CaseIterable, Identifiable, Sendable {
         case .spendGovernor: return .orange
         case .intrusionDetection: return .blue
         case .credentialLifecycle: return .orange
+        case .endpointSecurity: return .red
         case .domainURLs: return .blue
         case .curator: return .teal
         case .cortexMemory: return .purple
@@ -312,6 +315,7 @@ enum NavigationTab: String, CaseIterable, Identifiable, Sendable {
         case .spendGovernor: return "Budget limits, freeze/thaw AWS services"
         case .intrusionDetection: return "Real-time threat detection & prevention"
         case .credentialLifecycle: return "Credential lifecycle security audit & automation"
+        case .endpointSecurity: return "MCP, A2A & REST endpoint penetration testing"
         case .domainURLs: return "Configure domain URLs and routing"
         case .curator: return "Knowledge graph curation settings"
         case .cortexMemory: return "Three-tier memory system configuration"
@@ -321,7 +325,7 @@ enum NavigationTab: String, CaseIterable, Identifiable, Sendable {
     
     /// Primary tabs shown in sidebar
     static var primaryTabs: [NavigationTab] {
-        [.dashboard, .deploy, .bidirectionalSync, .instances, .snapshots, .history, .driftMonitor, .spendGovernor, .intrusionDetection, .credentialLifecycle]
+        [.dashboard, .deploy, .bidirectionalSync, .instances, .snapshots, .history, .driftMonitor, .spendGovernor, .intrusionDetection, .credentialLifecycle, .endpointSecurity]
     }
     
     /// Configuration tabs

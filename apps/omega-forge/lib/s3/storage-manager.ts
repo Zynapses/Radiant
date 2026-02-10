@@ -113,8 +113,9 @@ export async function retrieveObject(
       size: data.length,
       lastModified: response.LastModified,
     };
-  } catch (error: any) {
-    if (error.name === 'NoSuchKey' || error.$metadata?.httpStatusCode === 404) {
+  } catch (error: unknown) {
+    const err = error as { name?: string; $metadata?: { httpStatusCode?: number } };
+    if (err.name === 'NoSuchKey' || err.$metadata?.httpStatusCode === 404) {
       return null;
     }
     throw error;

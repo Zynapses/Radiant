@@ -38,7 +38,7 @@ export function getPool(): Pool {
 /**
  * Execute a query. No RLS. Full access.
  */
-export async function query<T = any>(sql: string, params?: any[]): Promise<{ rows: T[]; rowCount: number }> {
+export async function query<T = Record<string, unknown>>(sql: string, params?: unknown[]): Promise<{ rows: T[]; rowCount: number }> {
   const client = await getPool().connect();
   try {
     const result = await client.query(sql, params);
@@ -69,10 +69,10 @@ export async function transaction<T>(fn: (client: PoolClient) => Promise<T>): Pr
 /**
  * Query with tenant context (optional — Forge can set tenant context for testing RLS)
  */
-export async function queryAsTenant<T = any>(
+export async function queryAsTenant<T = Record<string, unknown>>(
   tenantId: string,
   sql: string,
-  params?: any[]
+  params?: unknown[]
 ): Promise<{ rows: T[]; rowCount: number }> {
   const client = await getPool().connect();
   try {

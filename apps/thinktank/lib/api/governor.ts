@@ -155,12 +155,10 @@ class GovernorService {
   async getStatus(): Promise<GovernorStatus> {
     const dashboard = await this.getDashboard();
     return {
-      mode: dashboard.config.mode,
-      budgetRemaining: dashboard.fuelGauge.level * dashboard.config.budgetLimit / 100,
-      budgetLimit: dashboard.config.budgetLimit,
-      savingsToday: parseFloat(dashboard.savingsSparkline.total.replace('$', '')),
-      currentTier: dashboard.modeIndicator.mode,
-    } as GovernorStatus;
+      mode: dashboard.modeIndicator.mode as GovernorStatus['mode'],
+      totalSavings: dashboard.metrics.savings?.totalSavings || 0,
+      decisionsToday: 0,
+    };
   }
 
   /**
@@ -309,17 +307,15 @@ class GovernorService {
       
       // Convert model usage data into decision records
       if (metrics.costByModel) {
-        for (const [model, cost] of Object.entries(metrics.costByModel)) {
-          const tokens = metrics.tokensByModel?.[model] || 0;
+        for (const [model, _cost] of Object.entries(metrics.costByModel)) {
+          const _tokens = metrics.tokensByModel?.[model] || 0;
           decisions.push({
-            id: crypto.randomUUID(),
-            timestamp: new Date().toISOString(),
-            model,
-            tier: this.inferTierFromModel(model),
-            cost,
-            tokens,
+            originalModel: model,
+            selectedModel: model,
+            complexityScore: 0.5,
+            savingsAmount: 0,
             reason: 'Auto-selected based on task complexity',
-            taskType: 'general',
+            timestamp: new Date().toISOString(),
           });
         }
       }

@@ -210,7 +210,7 @@ export default function StatusPage() {
           <h2 className="text-xl font-semibold mb-2">Unable to Load Status</h2>
           <p className="text-gray-600 dark:text-gray-400 mb-4">{error}</p>
           <button
-            onClick={fetchStatus}
+            onClick={() => fetchStatus()}
             className="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600"
           >
             Retry

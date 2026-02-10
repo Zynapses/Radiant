@@ -15,6 +15,7 @@
  */
 
 import React, { useState } from 'react';
+import NextImage from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
@@ -234,9 +235,11 @@ function FrameSamplesGallery({
   return (
     <div className="space-y-4">
       <div className="aspect-video rounded-lg overflow-hidden bg-black/50 border border-white/10">
-        <img
+        <NextImage
           src={frames[selectedFrame].signedUrl}
           alt={`Frame at ${formatTime(frames[selectedFrame].timestampMs / 1000)}`}
+          width={640}
+          height={360}
           className="w-full h-full object-contain"
         />
       </div>
@@ -253,9 +256,11 @@ function FrameSamplesGallery({
                 : 'border-white/10 hover:border-white/30'
             )}
           >
-            <img
+            <NextImage
               src={frame.signedUrl}
               alt={`Thumbnail ${idx + 1}`}
+              width={80}
+              height={48}
               className="w-full h-full object-cover"
             />
           </button>

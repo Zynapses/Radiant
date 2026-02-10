@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Package, Plus, Loader2, Search } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
+import type { Row } from '@/lib/types';
 import { formatBytes, formatRelativeTime } from '@/lib/utils';
 
 function StatusBadge({ status }: { status: string }) {
@@ -34,7 +35,7 @@ export default function CartridgesPage() {
 
   const cartridges = data?.cartridges || [];
   const filtered = search
-    ? cartridges.filter((c: any) =>
+    ? cartridges.filter((c: Row) =>
         c.name?.toLowerCase().includes(search.toLowerCase()) ||
         c.display_name?.toLowerCase().includes(search.toLowerCase())
       )
@@ -90,7 +91,7 @@ export default function CartridgesPage() {
               </tr>
             </thead>
             <tbody>
-              {filtered.map((c: any) => (
+              {filtered.map((c: Row) => (
                 <tr key={c.id} className="border-b border-zinc-800 last:border-0 hover:bg-zinc-900/80 transition-colors">
                   <td className="py-3 px-4">
                     <Link href={`/cartridges/${c.id}`} className="text-amber-400 hover:text-amber-300 font-medium">

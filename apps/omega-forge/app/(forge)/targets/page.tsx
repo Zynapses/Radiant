@@ -3,6 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Target, Loader2, Plus } from 'lucide-react';
 import Link from 'next/link';
+import type { Row } from '@/lib/types';
 
 export default function TargetsPage() {
   const { data, isLoading } = useQuery({
@@ -37,7 +38,7 @@ export default function TargetsPage() {
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-8 text-center text-zinc-500">No target services registered</div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {targets.map((t: any) => (
+          {targets.map((t: Row) => (
             <div key={t.id || t.service_key} className="rounded-lg border border-zinc-800 bg-zinc-900 p-5">
               <div className="flex items-center justify-between mb-2">
                 <span className="font-semibold text-white">{t.display_name || t.service_key}</span>

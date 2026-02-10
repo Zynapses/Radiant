@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
     FROM cartridge_audit_log cal
     LEFT JOIN cartridge_universal cu ON cu.id = cal.cartridge_id
     WHERE 1=1`;
-  const params: any[] = [];
+  const params: unknown[] = [];
   let idx = 1;
 
   if (action) {

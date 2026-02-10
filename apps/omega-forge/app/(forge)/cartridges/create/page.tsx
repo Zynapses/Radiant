@@ -4,6 +4,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { Package, Loader2, CheckCircle2 } from 'lucide-react';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import type { Row } from '@/lib/types';
 
 export default function CreateCartridgePage() {
   const router = useRouter();
@@ -130,7 +131,7 @@ export default function CreateCartridgePage() {
         <div>
           <label className="block text-sm font-medium text-zinc-300 mb-2">Target Services</label>
           <div className="grid grid-cols-2 gap-2">
-            {targets.map((t: any) => (
+            {targets.map((t: Row) => (
               <button
                 key={t.service_key}
                 onClick={() => toggleTarget(t.service_key)}

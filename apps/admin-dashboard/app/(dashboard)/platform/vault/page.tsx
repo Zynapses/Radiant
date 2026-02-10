@@ -89,10 +89,6 @@ export default function VaultPage() {
   const [rotateReason, setRotateReason] = useState('');
   const { toast } = useToast();
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -114,6 +110,9 @@ export default function VaultPage() {
       setLoading(false);
     }
   };
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { fetchData(); }, []);
 
   const handleAddSecret = async () => {
     try {

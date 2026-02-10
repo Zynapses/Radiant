@@ -5,6 +5,7 @@ import { Brain, Package, Loader2, HardDrive, Clock } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { formatBytes } from '@/lib/utils';
+import type { Row } from '@/lib/types';
 
 export default function BrainDetailPage() {
   const params = useParams();
@@ -76,7 +77,7 @@ export default function BrainDetailPage() {
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-5">
           <h2 className="text-lg font-semibold text-white mb-4">Installed Cartridges</h2>
           <div className="space-y-2">
-            {cartridges.map((c: any) => (
+            {cartridges.map((c: Row) => (
               <div key={c.cartridge_id} className="flex items-center justify-between py-2 border-b border-zinc-800 last:border-0">
                 <div>
                   <span className="text-white font-medium">{c.display_name || c.name}</span>
@@ -94,7 +95,7 @@ export default function BrainDetailPage() {
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-5">
           <h2 className="text-lg font-semibold text-white mb-4">Dream Cycle History</h2>
           <div className="space-y-2">
-            {dreams.map((d: any) => (
+            {dreams.map((d: Row) => (
               <div key={d.id} className="flex items-center justify-between py-2 border-b border-zinc-800 last:border-0 text-sm">
                 <span className={`font-medium ${d.status === 'completed' ? 'text-green-400' : d.status === 'failed' ? 'text-red-400' : 'text-zinc-300'}`}>
                   {d.status}

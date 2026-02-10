@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Card,
@@ -317,7 +318,7 @@ export default function OAuthAppsPage() {
                         <TableCell>
                           <div className="flex items-center gap-3">
                             {app.logoUrl ? (
-                              <img src={app.logoUrl} alt="" className="h-8 w-8 rounded" />
+                              <Image src={app.logoUrl} alt="" width={32} height={32} className="h-8 w-8 rounded" />
                             ) : (
                               <div className="h-8 w-8 rounded bg-muted flex items-center justify-center text-sm font-medium">
                                 {app.name.charAt(0)}
@@ -452,7 +453,7 @@ export default function OAuthAppsPage() {
                         <TableCell>
                           <div className="flex items-center gap-3">
                             {app.logoUrl ? (
-                              <img src={app.logoUrl} alt="" className="h-10 w-10 rounded-lg" />
+                              <Image src={app.logoUrl} alt="" width={40} height={40} className="h-10 w-10 rounded-lg" />
                             ) : (
                               <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center font-medium">
                                 {app.name.charAt(0)}

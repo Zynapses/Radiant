@@ -8,6 +8,7 @@
 import * as crypto from 'crypto';
 import AdmZip from 'adm-zip';
 import { signManifestWithKMS, getSigningPublicKeyPem } from '../kms/signer';
+import type { CartridgeManifest } from '../types';
 import { query } from '../db/client';
 import { storeObject, buildCartridgePath } from '../s3/storage-manager';
 
@@ -27,7 +28,7 @@ export interface CartridgeBuildResult {
   s3_key: string;
   size_bytes: number;
   checksum_sha256: string;
-  manifest: any;
+  manifest: CartridgeManifest;
   validation_result: { passed: boolean; errors: string[]; warnings: string[] };
 }
 
@@ -37,7 +38,7 @@ export async function buildCartridge(req: CartridgeBuildRequest): Promise<Cartri
     `SELECT service_key FROM cartridge_target_services WHERE service_key = ANY($1) AND is_active = TRUE`,
     [req.targets]
   );
-  const found = targetCheck.rows.map((r: any) => r.service_key);
+  const found = targetCheck.rows.map((r) => (r as { service_key: string }).service_key);
   const missing = req.targets.filter(t => !found.includes(t));
   if (missing.length > 0) {
     throw new Error(`Unknown targets: ${missing.join(', ')}`);
@@ -68,7 +69,7 @@ export async function buildCartridge(req: CartridgeBuildRequest): Promise<Cartri
   }
 
   // 3. Build manifest
-  const manifest: any = {
+  const manifest: CartridgeManifest = {
     schema_version: '1.0.0',
     cartridge_id: crypto.randomUUID(),
     name: req.name,
@@ -108,6 +109,7 @@ export async function buildCartridge(req: CartridgeBuildRequest): Promise<Cartri
   // 5. Compress with ZSTD (if available) or use raw ZIP
   let radzBuffer: Buffer;
   try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const fzstd = require('fzstd');
     const zipBuffer = zip.toBuffer();
     const compressed = fzstd.compress(new Uint8Array(zipBuffer));
@@ -145,7 +147,7 @@ export async function buildCartridge(req: CartridgeBuildRequest): Promise<Cartri
     radzBuffer.length,
   ]);
 
-  const cartridgeId = insertResult.rows[0].id;
+  const cartridgeId = insertResult.rows[0].id as string;
 
   // 9. Audit log
   await query(`

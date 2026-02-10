@@ -114,6 +114,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useToast } from '@/components/ui/use-toast';
+import Image from 'next/image';
 
 interface SchemaColumn {
   name: string;
@@ -908,7 +909,7 @@ function AIReportWriter() {
                         <div className="border-2 border-dashed rounded-lg p-4 text-center cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => fileInputRef.current?.click()}>
                           {brandKit.logoUrl ? (
                             <div className="space-y-2">
-                              <img src={brandKit.logoUrl} alt="Logo" className="max-h-16 mx-auto object-contain" />
+                              <Image src={brandKit.logoUrl} alt="Logo" width={160} height={64} className="max-h-16 mx-auto object-contain" />
                               <p className="text-xs text-muted-foreground">Click to change</p>
                             </div>
                           ) : (
@@ -950,7 +951,7 @@ function AIReportWriter() {
                         <Label className="text-xs">Preview</Label>
                         <Card className="p-3" style={{ borderColor: brandKit.primaryColor }}>
                           <div className="flex items-center gap-2 mb-2">
-                            {brandKit.logoUrl && <img src={brandKit.logoUrl} alt="" className="h-6 object-contain" />}
+                            {brandKit.logoUrl && <Image src={brandKit.logoUrl} alt="" width={48} height={24} className="h-6 object-contain" />}
                             <span className="font-semibold text-sm" style={{ color: brandKit.primaryColor, fontFamily: brandKit.headerFont }}>{brandKit.companyName}</span>
                           </div>
                           <p className="text-xs" style={{ color: brandKit.secondaryColor, fontFamily: brandKit.fontFamily }}>{brandKit.tagline}</p>

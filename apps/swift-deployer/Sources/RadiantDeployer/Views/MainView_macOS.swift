@@ -522,6 +522,8 @@ struct DetailContentView: View {
             IntrusionDetectionView()
         case .credentialLifecycle:
             CredentialLifecycleView()
+        case .endpointSecurity:
+            EndpointSecurityTestingView()
         case .domainURLs:
             SettingsView() // Domain URLs configured in Settings
         case .curator:

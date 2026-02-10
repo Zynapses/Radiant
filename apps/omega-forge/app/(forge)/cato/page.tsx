@@ -2,6 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { Bot, Loader2 } from 'lucide-react';
+import type { Row } from '@/lib/types';
 
 export default function CatoPage() {
   const { data, isLoading } = useQuery({
@@ -31,7 +32,7 @@ export default function CatoPage() {
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-8 text-center text-zinc-500">No CATO instances found</div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {instances.map((inst: any) => (
+          {instances.map((inst: Row) => (
             <div key={inst.tenant_id} className="rounded-lg border border-zinc-800 bg-zinc-900 p-5">
               <div className="flex items-center gap-3 mb-3">
                 <Bot className="h-5 w-5 text-green-400" />

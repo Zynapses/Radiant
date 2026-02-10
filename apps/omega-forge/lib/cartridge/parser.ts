@@ -6,9 +6,10 @@
 
 import AdmZip from 'adm-zip';
 import * as crypto from 'crypto';
+import type { CartridgeManifest } from '../types';
 
 export interface ParsedCartridge {
-  manifest: any;
+  manifest: CartridgeManifest | null;
   signature: Buffer | null;
   cert: string | null;
   sections: Map<string, Map<string, Buffer>>;
@@ -21,6 +22,7 @@ export function parseRADz(radzBuffer: Buffer): ParsedCartridge {
 
   // Try ZSTD decompress first, fall back to raw ZIP
   try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const fzstd = require('fzstd');
     zipBuffer = Buffer.from(fzstd.decompress(new Uint8Array(radzBuffer)));
   } catch {
@@ -36,7 +38,7 @@ export function parseRADz(radzBuffer: Buffer): ParsedCartridge {
     return { manifest: null, signature: null, cert: null, sections: new Map(), errors };
   }
 
-  let manifest: any;
+  let manifest: CartridgeManifest;
   try {
     manifest = JSON.parse(manifestEntry.getData().toString('utf8'));
   } catch (e) {

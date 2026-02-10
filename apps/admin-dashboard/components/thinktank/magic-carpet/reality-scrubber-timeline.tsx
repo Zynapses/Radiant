@@ -46,6 +46,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { format } from 'date-fns';
+import Image from 'next/image';
 
 // Types
 interface RealitySnapshot {
@@ -430,9 +431,11 @@ export function RealityScrubberTimeline({
               exit={{ opacity: 0, y: 10, scale: 0.9 }}
             >
               <div className="bg-background border rounded-lg shadow-xl p-2">
-                <img
+                <Image
                   src={hoveredSnapshot.thumbnail}
                   alt="Snapshot preview"
+                  width={192}
+                  height={128}
                   className="w-48 h-32 object-cover rounded"
                 />
                 <p className="text-xs text-center mt-1 text-muted-foreground">

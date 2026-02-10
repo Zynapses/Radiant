@@ -5,6 +5,7 @@ import {
   LayoutDashboard, Brain, Package, Bot, Globe,
   Activity, CheckCircle2, AlertTriangle, Loader2,
 } from 'lucide-react';
+import type { Row } from '@/lib/types';
 
 function StatCard({ icon: Icon, label, value, sub, color }: {
   icon: React.ElementType;
@@ -92,7 +93,7 @@ export default function ForgeDashboard() {
         </h2>
         {stats?.recentAudit?.length > 0 ? (
           <div className="space-y-2">
-            {stats.recentAudit.map((entry: any, i: number) => (
+            {stats.recentAudit.map((entry: Row, i: number) => (
               <div key={i} className="flex items-center gap-3 text-sm py-2 border-b border-zinc-800 last:border-0">
                 {entry.action?.includes('fail') ? (
                   <AlertTriangle className="h-4 w-4 text-red-400 shrink-0" />

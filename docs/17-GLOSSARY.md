@@ -607,6 +607,25 @@
 | 🔷 **Model Cost Anomaly** | Detector for token usage exceeding 3σ from user baseline — identifies compromised API keys or abuse patterns. |
 | 🔷 **IP Blocklist** | Active IP blocks with TTL, permanent escalation after repeat offenses, stored in `ip_blocklist` table. |
 
+### 🔷 Endpoint Security Testing Framework (v4.18.1)
+
+| Term | Definition |
+|------|------------|
+| 🔷 **Endpoint Security Testing** | Protocol-specific penetration testing module in Swift Deployer covering MCP, A2A, and REST API endpoints with 114 automated tests mapped to 8 industry standards. See `Services/SecurityTesting/`. |
+| 🔷 **Security Test Battery** | Full execution of all 114 security tests across MCP (31), A2A (27), REST (32), and Cross-cutting (24) protocol categories with PDF report generation. |
+| 🔷 **SOP (Security)** | Standard Operating Procedure — formal test group within the endpoint security framework (e.g., SOP-MCP-01: Tool Poisoning). Each SOP maps to specific OWASP, NIST, CWE, and ISO controls. |
+| 🔶 **Tool Poisoning** | MCP attack class where malicious instructions are embedded in tool description metadata fields (hidden `<IMPORTANT>` tags) that the LLM obeys while displaying benign output to users. >70% success rate in academic benchmarks. |
+| 🔶 **Rug Pull (MCP/A2A)** | Attack exploiting dynamic tool/agent updates — a benign tool or agent gains user trust then silently modifies behavior via `notifications/tools/list_changed` (MCP) or Agent Card updates (A2A) to exfiltrate data. |
+| 🔶 **Agent Session Smuggling** | A2A-specific attack (discovered by Palo Alto Unit 42, Oct 2025) exploiting stateful multi-turn sessions to inject covert instructions between legitimate client requests and server responses, invisible to end users. |
+| 🔶 **Tool Shadowing** | MCP attack where a malicious server B's tool description alters LLM behavior toward trusted server A's tools via cross-server prompt injection. |
+| 🔶 **Behavioral Drift (Security)** | Gradual, undetected change in AI agent or tool behavior over time — a trusted agent begins selectively manipulating results, harvesting data, or inserting harmful recommendations after building implicit trust. |
+| 🔶 **Canary Token** | Unique, trackable data marker injected into one AI provider's context to detect cross-provider data leakage — if the canary appears in another provider's responses, isolation has been violated. |
+| 🔶 **Cross-Protocol Prompt Injection** | Attack where injection payloads in one protocol boundary (e.g., MCP tool output) affect behavior in another protocol (e.g., REST API calls to LLM providers). Research shows MCP amplifies attack success by 23–41%. |
+| 🔶 **Sampling Exploitation** | MCP attack class exploiting reverse-direction LLM completions — servers request compute from the host LLM for resource theft, conversation hijacking, or covert tool invocation. |
+| 🔶 **Confused Deputy Attack** | OAuth attack crafting authorization links with static client IDs to hijack user consent flows, particularly relevant to MCP's Dynamic Client Registration. |
+| 🔷 **SecurityTestOrchestrator** | Swift `ObservableObject` managing test execution lifecycle, progress tracking, cancellation, persistence, and error handling for the Endpoint Security Testing module. |
+| 🔷 **SecurityReportGenerator** | PDF report generator for security test results with compliance matrix, classification banners, and evidence summaries using AppKit/PDFKit. |
+
 ### 🔷 Spend Governor (v7.39.0)
 
 | Term | Definition |
@@ -809,6 +828,29 @@
 | SEV | Severity level (1–5) for incident classification in SENTINEL |
 | SSF | Shared Signals Framework—OpenID Foundation identity federation standard |
 | UEBA | User and Entity Behavior Analytics—behavioral baseline deviation detection |
+| 🔶 **ETDI** | Enhanced Tool Definition Interface—cryptographic signing framework for MCP tool definitions |
+| 🔶 **BOLA** | Broken Object Level Authorization—OWASP API1:2023, most common API vulnerability (~40% of attacks) |
+| 🔶 **IDOR** | Insecure Direct Object Reference—accessing resources by manipulating object identifiers |
+| 🔶 **SSRF** | Server-Side Request Forgery—tricking server into accessing internal resources (CWE-918) |
+| 🔶 **XXE** | XML External Entity—injection attack resolving external XML entities (CWE-611) |
+| 🔶 **JWS** | JSON Web Signature (RFC 7515)—used for optional Agent Card signing in A2A |
+| 🔶 **PKCE** | Proof Key for Code Exchange—OAuth extension preventing authorization code interception |
+| 🔶 **AI-BOM** | AI Bill of Materials—inventory of all AI components for supply chain security |
+| 🔶 **SBOM** | Software Bill of Materials—comprehensive component inventory (OWASP CycloneDX format) |
+
+### Security Testing Standards
+
+| Acronym | Full Form |
+|---------|-----------|
+| **OWASP** | Open Worldwide Application Security Project |
+| **CWE** | Common Weakness Enumeration—taxonomy of software security weaknesses |
+| **MITRE ATLAS** | Adversarial Threat Landscape for AI Systems—66 techniques across 15 tactics |
+| **NIST AI RMF** | NIST AI Risk Management Framework (AI 100-1)—Govern-Map-Measure-Manage lifecycle |
+| **NIST SP 800-115** | Technical Guide to Information Security Testing and Assessment—4-phase methodology |
+| **NIST SP 800-53** | Security and Privacy Controls for Information Systems (Rev. 5) |
+| **WSTG** | Web Security Testing Guide—OWASP comprehensive testing methodology |
+| **AML** | Adversarial Machine Learning (MITRE ATLAS technique prefix) |
+| **MCPSecBench** | MCP Security Benchmark—academic framework for evaluating MCP attack success rates |
 
 ### Compliance
 
@@ -869,6 +911,14 @@
 | **RBAC** | Role-Based Access Control |
 | **Row-Level Security** | PostgreSQL tenant isolation mechanism |
 | **Tenant Isolation** | Complete separation of customer data |
+| 🔶 **BOLA/IDOR** | Broken Object Level Authorization / Insecure Direct Object Reference — API vulnerability where changing object IDs in requests grants access to other users' resources. ~40% of all API attacks (OWASP API1:2023). |
+| 🔶 **Mass Assignment** | API vulnerability where submitting unexpected fields (e.g., `{"role":"admin"}`) in update payloads modifies protected attributes (OWASP API3:2023, CWE-915). |
+| 🔶 **SSRF** | Server-Side Request Forgery — attack where a server is tricked into making requests to internal resources (localhost, cloud metadata 169.254.169.254, file:// URIs). Critical for MCP tools and A2A webhooks (CWE-918). |
+| 🔶 **JWT Algorithm Confusion** | Attack switching JWT signing algorithm (RS256→HS256) to sign tokens with the public key as an HMAC secret, bypassing signature validation. |
+| 🔶 **ETDI** | Enhanced Tool Definition Interface — framework for cryptographic signing of MCP tool definitions to prevent rug pull and tool poisoning attacks. |
+| 🔶 **Zero Data Retention** | API configuration ensuring AI providers do not retain request/response data for model training — critical for compliance when routing across multiple providers. |
+| 🔶 **AI-BOM/SBOM** | AI Bill of Materials / Software Bill of Materials — comprehensive inventory of all AI components (models, libraries, MCP servers, agent dependencies) for supply chain security (OWASP LLM03:2025). |
+| 🔶 **Cost-Spiking Attack** | Denial-of-wallet attack exploiting untracked token consumption to generate massive AI inference costs — up to $100K/day per NSFOCUS research (OWASP LLM10:2025). |
 
 ---
 
@@ -876,14 +926,19 @@
 
 | Term | Definition |
 |------|------------|
-| **A2A Protocol** | Google's Agent-to-Agent communication standard |
+| **A2A Protocol** | Google's Agent-to-Agent communication standard — connects agents to agents over HTTP(S) using JSON-RPC 2.0 with stateful multi-turn sessions. Tasks contain Messages composed of Parts. Agent discovery via `/.well-known/agent-card.json`. |
+| 🔶 **Agent Card** | JSON metadata file served at `/.well-known/agent-card.json` advertising A2A agent capabilities, security schemes, and endpoints. Optional JWS (RFC 7515) signing. Spoofing is trivial without signature enforcement. |
 | **CAEP** | Continuous Access Evaluation Profile |
 | **Envelope** | `CatoMethodEnvelope` - wrapper for all pipeline outputs |
 | **GraphQL** | Query language for flexible API access |
+| 🔶 **JSON-RPC 2.0** | Remote procedure call protocol encoded in JSON — transport layer for both MCP (over stdio/HTTP) and A2A (over HTTP/SSE). |
 | **LiteLLM** | Unified gateway for 100+ AI model APIs |
-| **MCP** | Model Context Protocol - Anthropic's tool invocation standard |
+| **MCP** | Model Context Protocol — Anthropic's tool invocation standard. Client-server architecture where MCP Host embeds the LLM, MCP Client manages JSON-RPC connections, and MCP Servers expose tools, resources, and prompts. |
+| 🔶 **MCP Sampling** | Reverse-direction capability where MCP servers request LLM completions from the host — creates resource theft, conversation hijacking, and covert tool invocation attack vectors. |
 | **OAuth 2.0** | Authorization framework for third-party access |
+| 🔶 **OAuth 2.1 + PKCE** | Updated OAuth specification with mandatory Proof Key for Code Exchange — used by MCP for HTTP transport authentication. PKCE does not authenticate the client itself. |
 | **OpenAPI** | REST API specification standard |
+| 🔶 **SecurityScheme** | A2A/OpenAPI construct declaring authentication methods (OAuth 2.0, OIDC, API keys, Bearer tokens, mTLS). Token lifetime and scope enforcement are implementation-dependent. |
 | **SSE** | Server-Sent Events for streaming responses |
 | **WebSocket** | Bidirectional real-time communication |
 | **Yjs** | CRDT library for real-time collaboration |
@@ -1093,6 +1148,7 @@
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 3.1.0 | Feb 10, 2026 | **Endpoint Security Testing Framework (v4.18.1)**: Added 🔷 Endpoint Security Testing subsection to §6 with 14 terms (Endpoint Security Testing, Security Test Battery, SOP, Tool Poisoning, Rug Pull, Agent Session Smuggling, Tool Shadowing, Behavioral Drift, Canary Token, Cross-Protocol Prompt Injection, Sampling Exploitation, Confused Deputy Attack, SecurityTestOrchestrator, SecurityReportGenerator). Added 8 terms to §11 Security & Compliance (BOLA/IDOR, Mass Assignment, SSRF, JWT Algorithm Confusion, ETDI, Zero Data Retention, AI-BOM/SBOM, Cost-Spiking Attack). Enhanced §12 API & Protocol (A2A Protocol expanded, Agent Card, JSON-RPC 2.0, MCP expanded, MCP Sampling, OAuth 2.1+PKCE, SecurityScheme). Added 9 new acronyms to §9 RADIANT-Specific (ETDI, BOLA, IDOR, SSRF, XXE, JWS, PKCE, AI-BOM, SBOM). Added new Security Testing Standards acronym subsection (OWASP, CWE, MITRE ATLAS, NIST AI RMF, NIST SP 800-115, NIST SP 800-53, WSTG, AML, MCPSecBench). |
 | 3.0.0 | Feb 8, 2026 | **Comprehensive Glossary Audit (v7.43.2)**: Full audit of all 18 consolidated docs, 280+ source code services, 42 CDK stacks, admin dashboard sidebar (360+ entries), and CHANGELOG (v7.18–7.43). **New sections**: §5 RADIANT Applications (6 apps, 6 user/tenant management terms), §6 Security & Intrusion Detection (RIDPS 13 terms, Spend Governor 6 terms), §7 Operations & Monitoring (SENTINEL 10 terms, Log Retention 5 terms, Data Lake 8 terms). **New subsystems**: Platform Services (13 entries: Admin AI Helper, Bedrock Model Discovery, Context Assembler, Conversation History Loader, Formal Reasoning, Hallucination Detection, Model Router, MLS Encryption, Organism Integration, State Registry, Tenant Settings, Translation Middleware, Conversation Export). **New acronyms**: RIDPS, IOC, UEBA, MLS, ONNX, DPO, ABAC, NLI, SEV, WORM. **New CDK stacks**: data-lake-stack, deployer-key-rotation-stack, foundation-stack, log-retention-stack, model-sync-scheduler-stack, OmegaStack, sentinel-stack, state-registry-stack. **New AWS services**: Kinesis Data Firehose, Athena, Glue. **New UI/UX**: Delight System. Renumbered sections 5→8 through 11→14. Updated version to 3.0.0. |
 | 2.4.0 | Feb 8, 2026 | **Data Lake Offload (v7.42.0)**: Added zero-database-write event pipeline terms: Data Lake, Event Firehose Service, Data Type Registry, Data Location Index, Glacier Deletion Queue, Glacier Lifecycle Service, Data Lake Lifecycle Manager, Retention Reconciler, Data Lake Query Service, Storage Tier (hot/warm/cold/glacier/deep_archive), Parquet, Glue Catalog, Athena Workgroup, Dynamic Partitioning, Object Lock, Minimum Storage Period, Early Deletion Cost |
 | 2.3.0 | Feb 8, 2026 | **RIDPS (v7.40.0)**: Added Real-Time Intrusion Detection & Prevention System terms: RIDPS, IOC, UEBA, Threat Detector, Sliding Window Store, Detection Rule, Intrusion Incident, IP Blocklist, Threat Indicator, MITRE ATT&CK mapping |

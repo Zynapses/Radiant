@@ -2,6 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { Globe, Loader2, Users, Activity, Database } from 'lucide-react';
+import type { Row } from '@/lib/types';
 
 export default function GlobalBrainPage() {
   const { data, isLoading } = useQuery({
@@ -36,12 +37,12 @@ export default function GlobalBrainPage() {
             <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-5">
               <div className="flex items-center gap-2 text-zinc-400 mb-2"><Activity className="h-4 w-4" /><span className="text-xs font-medium uppercase tracking-wide">Rounds</span></div>
               <div className="text-2xl font-bold text-white">{data?.rounds?.length || 0}</div>
-              <div className="text-xs text-zinc-500 mt-1">{data?.rounds?.filter((r: any) => r.status === 'completed').length || 0} completed</div>
+              <div className="text-xs text-zinc-500 mt-1">{data?.rounds?.filter((r: Row) => r.status === 'completed').length || 0} completed</div>
             </div>
             <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-5">
               <div className="flex items-center gap-2 text-zinc-400 mb-2"><Database className="h-4 w-4" /><span className="text-xs font-medium uppercase tracking-wide">Pipelines</span></div>
               <div className="text-2xl font-bold text-white">{data?.pipelines?.length || 0}</div>
-              <div className="text-xs text-zinc-500 mt-1">{data?.pipelines?.filter((p: any) => p.status === 'completed').length || 0} completed</div>
+              <div className="text-xs text-zinc-500 mt-1">{data?.pipelines?.filter((p: Row) => p.status === 'completed').length || 0} completed</div>
             </div>
           </div>
 
@@ -49,7 +50,7 @@ export default function GlobalBrainPage() {
             <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-5">
               <h2 className="text-lg font-semibold text-white mb-4">Recent Rounds</h2>
               <div className="space-y-2">
-                {data.rounds.slice(0, 10).map((r: any) => (
+                {data.rounds.slice(0, 10).map((r: Row) => (
                   <div key={r.id} className="flex items-center justify-between py-2 border-b border-zinc-800 last:border-0 text-sm">
                     <span className="text-white font-medium">Round #{r.round_number}</span>
                     <span className="font-mono text-xs text-zinc-500">{r.round_type}</span>

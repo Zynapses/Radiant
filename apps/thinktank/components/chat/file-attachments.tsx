@@ -19,6 +19,7 @@ import {
   Paperclip
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
 
 interface FileAttachment {
   id: string;
@@ -261,9 +262,11 @@ export function FileAttachments({
                       >
                         {/* Preview or Icon */}
                         {attachment.preview ? (
-                          <img
+                          <Image
                             src={attachment.preview}
                             alt={attachment.file.name}
+                            width={40}
+                            height={40}
                             className="w-10 h-10 rounded object-cover"
                           />
                         ) : (
