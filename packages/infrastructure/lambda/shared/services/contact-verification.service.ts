@@ -55,7 +55,7 @@ export class ContactVerificationService {
     const client = await this.pool.connect();
     try {
       await client.query('BEGIN');
-      await client.query(`SET LOCAL app.current_tenant_id = '${tenantId}'`);
+      await client.query(`SELECT set_config('app.current_tenant_id', $1, true)`, [tenantId]);
 
       // Fetch contact
       const contactResult = await client.query(
@@ -191,7 +191,7 @@ export class ContactVerificationService {
     const client = await this.pool.connect();
     try {
       await client.query('BEGIN');
-      await client.query(`SET LOCAL app.current_tenant_id = '${tenantId}'`);
+      await client.query(`SELECT set_config('app.current_tenant_id', $1, true)`, [tenantId]);
 
       // Fetch contact
       const contactResult = await client.query(
@@ -444,7 +444,7 @@ export class ContactVerificationService {
     const client = await this.pool.connect();
     try {
       await client.query('BEGIN');
-      await client.query(`SET LOCAL app.current_tenant_id = '${tenantId}'`);
+      await client.query(`SELECT set_config('app.current_tenant_id', $1, true)`, [tenantId]);
 
       // Check duplicate (within same tenant)
       const dupCheck = await client.query(
@@ -508,7 +508,7 @@ export class ContactVerificationService {
     const client = await this.pool.connect();
     try {
       await client.query('BEGIN');
-      await client.query(`SET LOCAL app.current_tenant_id = '${tenantId}'`);
+      await client.query(`SELECT set_config('app.current_tenant_id', $1, true)`, [tenantId]);
 
       const contact = await client.query(
         `SELECT * FROM user_contacts WHERE id = $1 AND user_id = $2 AND tenant_id = $3`,

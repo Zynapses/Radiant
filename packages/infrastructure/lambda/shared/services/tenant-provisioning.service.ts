@@ -392,7 +392,7 @@ export class TenantProvisioningService {
 
       // Add verified email contact
       await client.query(
-        `SET LOCAL app.current_tenant_id = '${tenantId}'`,
+        `SELECT set_config('app.current_tenant_id', $1, true)`, [tenantId],
       );
       await client.query(
         `INSERT INTO user_contacts
