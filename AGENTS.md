@@ -80,22 +80,22 @@ DYNAMIC: New policies in /.windsurf/workflows/ are AUTOMATICALLY enforced.
 **Master Policy**: `/.windsurf/workflows/docs-update-all.md`
 **Documentation Manifest**: `/docs/DOCUMENTATION-MANIFEST.json`
 
-### Quick Reference - Always Update These (18 Consolidated Docs):
+### Quick Reference - Always Update These (15 Consolidated Docs):
 
 | Change Type | Required Documentation |
 |-------------|----------------------|
 | **ANY change** | `CHANGELOG.md` |
-| **Think Tank feature** | `docs/01-THINK-TANK.md` (user, admin, tenant, Mac, Delight — all in one) |
+| **Think Tank feature** | `docs/01-THINK-TANK.md` (user, admin, tenant, Mac, Dojo, Delight — all in one) |
 | **Curator change** | `docs/02-CURATOR.md` |
-| **Dojo change** | `docs/03-DOJO.md` |
+| **Dojo change** | `docs/01-THINK-TANK.md` (Part XIII) |
 | **Platform/Admin feature** | `docs/04-RADIANT-ADMIN.md` (admin, deploy, health, spend governor) |
 | **Swift Deployer change** | `docs/05-SWIFT-DEPLOYER.md` |
-| **Architecture/CDK/Lambda** | `docs/06-ARCHITECTURE-ENGINEERING.md` |
-| **AI Brain/Consciousness** | `docs/07-AI-BRAIN-SYSTEMS.md` |
-| **CATO Safety** | `docs/08-CATO-SAFETY.md` |
-| **OMEGA/Genesis change** | `docs/09-OMEGA-GENESIS.md` |
+| **Architecture/CDK/Lambda** | `docs/06-ARCHITECTURE-ENGINEERING.md` (+ Data & Storage) |
+| **AI Brain/Consciousness** | `docs/07-AI-SYSTEMS.md` (Brain + CATO Safety combined) |
+| **CATO Safety** | `docs/07-AI-SYSTEMS.md` (CATO section) |
+| **OMEGA/Genesis change** | `docs/09-OMEGA-GENESIS.md` *(all OMEGA content — quantum, firmware, Global Brain)* |
 | **Orchestration/UEP** | `docs/10-ORCHESTRATION-WORKFLOWS.md` |
-| **Data/Storage** | `docs/11-DATA-STORAGE.md` |
+| **Data/Storage** | `docs/06-ARCHITECTURE-ENGINEERING.md` (Data & Storage section) |
 | **API/Service layer** | `docs/12-API-REFERENCE.md` |
 | **Security/Auth** | `docs/13-SECURITY-AUTH-COMPLIANCE.md` |
 | **Operations** | `docs/14-OPERATIONS-RUNBOOKS.md` |
@@ -216,11 +216,13 @@ Extension specs in: `radiant-cascade-extension-v4.18.0/docs/phases/`
 
 ## 📖 Documentation References
 
-- **18 consolidated docs**: `docs/01-THINK-TANK.md` through `docs/18-UI-UX-LIBRARIES.md`
+- **15 consolidated docs**: `docs/01-THINK-TANK.md` through `docs/18-UI-UX-LIBRARIES.md` (gaps at 03, 08, 11, 19 — merged into other docs)
 - **Complete assembled doc**: `docs/publications/RADIANT-THINKTANK-COMPLETE-DOCUMENTATION.md` (.pdf)
 - **Documentation manifest**: `docs/DOCUMENTATION-MANIFEST.json`
 - **Archive of originals**: `docs/archive/pre-consolidation/`
+- **Archive of merged sources**: `docs/archive/pre-merge-2026-02-10/`
 - **Assembly script**: `tools/scripts/assemble-complete-documentation.py`
+- **Merge script**: `tools/scripts/merge-documentation.py`
 - **Consolidation script**: `tools/scripts/consolidate-documentation.py`
 
 ## ✅ Verification Checklist

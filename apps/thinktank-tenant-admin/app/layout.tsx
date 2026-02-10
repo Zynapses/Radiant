@@ -6,8 +6,8 @@ import { Providers } from './providers';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Think Tank - Tenant Admin',
-  description: 'Manage your Think Tank tenant: users, security, settings, and reports',
+  title: 'Think Tank Tenant Administration',
+  description: 'Manage your Think Tank tenant: users, cartridges, security, settings, and reports',
 };
 
 export default function RootLayout({

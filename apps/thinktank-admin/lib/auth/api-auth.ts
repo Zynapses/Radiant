@@ -4,15 +4,16 @@
  * CRITICAL: This app MUST NOT use Cognito SDK directly.
  * All authentication goes through the Radiant API.
  * 
- * ADMIN-ONLY: This client uses /api/auth/admin/* endpoints which
- * validate that the user has TenantAdmin or SuperAdmin role.
- * Regular users CANNOT access Think Tank Admin. No exceptions.
+ * SUPER_ADMIN-ONLY (v7.52.0): This is a global platform app.
+ * Only Pool B super_admin users can access Think Tank Admin.
+ * Tenant context is provided via tenant picker, not from the user's token.
+ * Regular users and tenant_admins CANNOT access Think Tank Admin.
  */
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
 
-// Admin roles that are allowed to access Think Tank Admin
-const ADMIN_ROLES = ['SuperAdmin', 'TenantAdmin', 'super_admin', 'tenant_admin', 'admin'];
+// Only super_admin (Pool B) can access Think Tank Admin (v7.52.0)
+const ADMIN_ROLES = ['SuperAdmin', 'super_admin'];
 
 export interface AuthSession {
   accessToken: string;
@@ -26,14 +27,14 @@ export interface AuthUser {
   email: string;
   name: string;
   tenantId: string;
-  role: string; // Must be one of ADMIN_ROLES
+  role: string; // Must be super_admin (Pool B)
   permissions: string[];
 }
 
 export interface LoginCredentials {
   email: string;
   password: string;
-  tenantId: string;
+  tenantId?: string; // Optional — super_admin selects tenant via picker
 }
 
 export interface AuthError {
@@ -71,7 +72,7 @@ class ApiAuthClient {
       if (error.code === 'ADMIN_ACCESS_DENIED') {
         throw {
           code: 'ADMIN_ACCESS_DENIED',
-          message: 'This portal requires administrator privileges. Please contact your organization admin.',
+          message: 'This portal requires super_admin privileges (Pool B). Only platform super administrators can access Think Tank Admin.',
         } as AuthError;
       }
       
@@ -87,7 +88,7 @@ class ApiAuthClient {
     if (!isAdminRole(session.user.role)) {
       throw {
         code: 'ADMIN_ACCESS_DENIED',
-        message: 'Administrator privileges required.',
+        message: 'Super administrator privileges required. Only super_admin (Pool B) can access this app.',
       } as AuthError;
     }
     

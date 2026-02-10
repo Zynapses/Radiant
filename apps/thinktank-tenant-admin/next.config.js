@@ -5,7 +5,7 @@ const nextConfig = {
   // Environment variables for API-only auth
   env: {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000',
-    NEXT_PUBLIC_APP_NAME: 'Think Tank Tenant Admin',
+    NEXT_PUBLIC_APP_NAME: 'Think Tank Tenant Administration',
   },
 
   // Ensure no Cognito/AWS SDK is bundled

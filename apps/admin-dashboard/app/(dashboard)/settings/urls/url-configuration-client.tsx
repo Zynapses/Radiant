@@ -33,9 +33,9 @@ interface URLConfiguration {
   primaryDomain: string;
   useCustomDomain: boolean;
   customDomain?: string;
-  // v7.5.0 - Genesis/OMEGA URLs
-  genesisLabUrl: string;
-  genesisForgeUrl: string;
+  // v7.5.0 - OMEGA URLs
+  omegaLabUrl: string;
+  omegaForgeUrl: string;
   omegaApiUrl: string;
   // v7.17.0 - Aurelius Dojo
   dojoUrl: string;
@@ -61,9 +61,9 @@ export default function URLConfigurationClient() {
     primaryDomain: '',
     useCustomDomain: false,
     customDomain: '',
-    // v7.5.0 - Genesis/OMEGA URLs
-    genesisLabUrl: '',
-    genesisForgeUrl: '',
+    // v7.5.0 - OMEGA URLs
+    omegaLabUrl: '',
+    omegaForgeUrl: '',
     omegaApiUrl: '',
     // v7.17.0 - Aurelius Dojo
     dojoUrl: '',
@@ -123,8 +123,8 @@ export default function URLConfigurationClient() {
       { key: 'websocketUrl', label: 'WebSocket URL' },
       { key: 'cloudfrontUrl', label: 'CloudFront URL' },
       { key: 's3AssetsUrl', label: 'S3 Assets URL' },
-      { key: 'genesisLabUrl', label: 'Genesis Lab URL' },
-      { key: 'genesisForgeUrl', label: 'Genesis Forge URL' },
+      { key: 'omegaLabUrl', label: 'OMEGA Lab URL' },
+      { key: 'omegaForgeUrl', label: 'OMEGA Forge URL' },
       { key: 'omegaApiUrl', label: 'OMEGA API URL' },
       { key: 'dojoUrl', label: 'Aurelius Dojo URL' },
       { key: 'catoTrainerUrl', label: 'Cato Trainer URL' },
@@ -351,11 +351,11 @@ export default function URLConfigurationClient() {
         </div>
       </div>
 
-      {/* Genesis/OMEGA URLs - v7.5.0 */}
+      {/* OMEGA URLs - v7.5.0 */}
       <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
         <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
           <Dna className="w-5 h-5 text-pink-500" />
-          Genesis / OMEGA
+          OMEGA
         </h2>
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
           Bio-mimetic AI organism monitoring and firmware management (Scale tier and above).
@@ -363,19 +363,19 @@ export default function URLConfigurationClient() {
 
         <div className="space-y-4">
           <URLInputField
-            label="Genesis Lab URL"
-            placeholder="https://genesis.example.com"
-            value={config.genesisLabUrl}
-            onChange={(v) => updateField('genesisLabUrl', v)}
+            label="OMEGA Lab URL"
+            placeholder="https://omega-lab.example.com"
+            value={config.omegaLabUrl}
+            onChange={(v) => updateField('omegaLabUrl', v)}
             helpText="OMEGA brain monitoring dashboard with thermal visualization and Cortex Explorer"
             icon={<Activity className="w-4 h-4" />}
           />
 
           <URLInputField
-            label="Genesis Forge URL"
-            placeholder="https://forge.example.com"
-            value={config.genesisForgeUrl}
-            onChange={(v) => updateField('genesisForgeUrl', v)}
+            label="OMEGA Forge URL"
+            placeholder="https://omega-forge.example.com"
+            value={config.omegaForgeUrl}
+            onChange={(v) => updateField('omegaForgeUrl', v)}
             helpText="OMEGA firmware creation tool for .bio files with Helix rules and personality traits"
             icon={<Hammer className="w-4 h-4" />}
           />
@@ -483,11 +483,11 @@ export default function URLConfigurationClient() {
           {config.apiBaseUrl && (
             <QuickLink label="API Docs" url={`${config.apiBaseUrl}/docs`} />
           )}
-          {config.genesisLabUrl && (
-            <QuickLink label="Genesis Lab" url={config.genesisLabUrl} />
+          {config.omegaLabUrl && (
+            <QuickLink label="OMEGA Lab" url={config.omegaLabUrl} />
           )}
-          {config.genesisForgeUrl && (
-            <QuickLink label="Genesis Forge" url={config.genesisForgeUrl} />
+          {config.omegaForgeUrl && (
+            <QuickLink label="OMEGA Forge" url={config.omegaForgeUrl} />
           )}
           {config.omegaApiUrl && (
             <QuickLink label="OMEGA API" url={config.omegaApiUrl} />

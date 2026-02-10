@@ -15,7 +15,7 @@
 
 export type UserStatus = 'active' | 'suspended' | 'pending' | 'invited' | 'deactivated';
 
-export type TenantRole = 'standard_user' | 'tenant_admin' | 'tenant_owner' | 'viewer';
+export type TenantRole = 'standard_user' | 'tenant_admin' | 'viewer';
 
 export interface TenantUser {
   id: string;
@@ -36,7 +36,7 @@ export interface TenantUser {
   hasAccessCurator: boolean;
   hasAccessDojo: boolean;
   hasAccessCatoTrainer: boolean;
-  hasAccessGenesis: boolean;
+  hasAccessOmegaLab: boolean;
   hasAccessTenantAdmin: boolean;
 
   ssoProvider?: string;
@@ -74,7 +74,7 @@ export interface TenantUser {
 
 export type LicenseType = 'seat' | 'storage' | 'retention' | 'compliance' | 'feature' | 'api_rate' | 'addon';
 
-export type AppId = 'think_tank' | 'curator' | 'dojo' | 'cato_trainer' | 'genesis' | 'platform';
+export type AppId = 'think_tank' | 'curator' | 'dojo' | 'cato_trainer' | 'omega_lab' | 'platform';
 
 export type LicenseUnit = 'user' | 'gb' | 'days' | 'requests' | 'boolean' | 'token' | 'unit';
 
@@ -259,7 +259,7 @@ export interface InviteUserRequest {
   hasAccessCurator?: boolean;
   hasAccessDojo?: boolean;
   hasAccessCatoTrainer?: boolean;
-  hasAccessGenesis?: boolean;
+  hasAccessOmegaLab?: boolean;
   hasAccessTenantAdmin?: boolean;
 }
 
@@ -272,7 +272,7 @@ export interface UpdateUserRequest {
   hasAccessCurator?: boolean;
   hasAccessDojo?: boolean;
   hasAccessCatoTrainer?: boolean;
-  hasAccessGenesis?: boolean;
+  hasAccessOmegaLab?: boolean;
   hasAccessTenantAdmin?: boolean;
   mfaEnabled?: boolean;
   permissions?: Record<string, boolean>;

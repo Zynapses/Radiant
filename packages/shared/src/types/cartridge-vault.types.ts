@@ -2,7 +2,7 @@
  * Cartridge Vault Types (Keyhole Pattern)
  * 
  * Secrets management for cartridges - cartridges declare required secrets
- * but never contain actual credentials. Service Layer fetches from Genesis Vault.
+ * but never contain actual credentials. Service Layer fetches from Cartridge Vault.
  * 
  * @version 1.0.0
  * @since v6.2.0
@@ -74,7 +74,7 @@ export interface CartridgeVaultManifest {
 // =============================================================================
 
 /**
- * Stored secret in Genesis Vault
+ * Stored secret in Cartridge Vault
  */
 export interface VaultSecret {
   /** Unique identifier */

@@ -149,6 +149,20 @@ const navigation: NavigationItem[] = [
   { name: 'Patterns', href: '/orchestration-patterns', icon: Layers },
   { name: 'Pattern Editor', href: '/orchestration-patterns/editor', icon: Edit3 },
   
+  // Global Brain (PROMPT-53)
+  { type: 'separator', label: 'Global Brain' },
+  { name: 'Enrollment', href: '/global-brain', icon: Brain },
+  { name: 'Federated Rounds', href: '/global-brain/rounds', icon: Activity },
+  { name: 'Cartridge Pipeline', href: '/global-brain/pipeline', icon: Database },
+
+  // Universal Cartridge System (PROMPT-50)
+  { type: 'separator', label: 'Cartridge System' },
+  { name: 'Installed', href: '/cartridge-system', icon: Package },
+  { name: 'Marketplace', href: '/cartridge-system/marketplace', icon: Boxes },
+  { name: 'Stack & Resolution', href: '/cartridge-system/stack', icon: Layers },
+  { name: 'Target Registry', href: '/cartridge-system/targets', icon: Target },
+  { name: 'Cartridge Audit', href: '/cartridge-system/audit', icon: ScrollText },
+  
   // Platform Section
   { type: 'separator', label: 'Platform' },
   { name: 'Bedrock Settings', href: '/platform/bedrock-settings', icon: Cloud },

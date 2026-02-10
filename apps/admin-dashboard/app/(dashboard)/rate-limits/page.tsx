@@ -1,28 +1,11 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { AlertTriangle, Activity, Settings, RefreshCw, Zap } from 'lucide-react';
+import { api } from '@/lib/api/client';
 
-// Provider rate limit configuration
-interface ProviderRateLimit {
-  rpm: number;
-  tpm?: number;
-  dailyLimit?: number;
-  tier: string;
-}
-
-const PROVIDER_RATE_LIMITS: Record<string, ProviderRateLimit> = {
-  groq: { rpm: 30, tpm: 15000, dailyLimit: 14400, tier: 'Free' },
-  anthropic: { rpm: 60, tpm: 100000, tier: 'Standard' },
-  openai: { rpm: 60, tpm: 150000, tier: 'Standard' },
-  perplexity: { rpm: 50, tier: 'Standard' },
-  together: { rpm: 60, tpm: 100000, tier: 'Standard' },
-  xai: { rpm: 60, tier: 'Standard' },
-  bedrock: { rpm: 1000, tier: 'AWS' },
-  litellm: { rpm: 500, tier: 'Self-hosted' },
-};
-
-// Tier limits for tenants
+// Tier limits for tenants (configured in CDK, read-only reference)
 const TIER_LIMITS = {
   free: { requests: 100, windowMs: 60000 },
   starter: { requests: 500, windowMs: 60000 },
@@ -31,44 +14,46 @@ const TIER_LIMITS = {
   enterprise: { requests: 20000, windowMs: 60000 },
 };
 
-interface ProviderStatus {
-  limit: number;
-  used: number;
-  remaining: number;
-  resetInMs: number;
+interface RateLimitEntry {
+  key: string;
+  type: string;
+  windowStart: string;
+  windowSizeSeconds: number;
+  currentCount: number;
+  maxAllowed: number;
+  utilizationPercent: number;
+  lastRequest: string;
+}
+
+interface RateLimitSummary {
+  activeWindows: number;
+  nearLimit: number;
+  atLimit: number;
+}
+
+interface RateLimitResponse {
+  success: boolean;
+  data: {
+    summary: RateLimitSummary;
+    limits: RateLimitEntry[];
+  };
 }
 
 export default function RateLimitsPage() {
-  const [providerStatus, setProviderStatus] = useState<Record<string, ProviderStatus>>({});
-  const [isLoading, setIsLoading] = useState(false);
   const [selectedTab, setSelectedTab] = useState<'providers' | 'tenants' | 'settings'>('providers');
-  const [editingProvider, setEditingProvider] = useState<string | null>(null);
-  const [customLimits, setCustomLimits] = useState<Record<string, number>>({});
+  const queryClient = useQueryClient();
 
-  // Simulate fetching rate limit status
-  useEffect(() => {
-    refreshStatus();
-    const interval = setInterval(refreshStatus, 5000);
-    return () => clearInterval(interval);
-  }, []);
+  const { data, isLoading, isError, error } = useQuery<RateLimitResponse>({
+    queryKey: ['rate-limits'],
+    queryFn: () => api.get<RateLimitResponse>('/admin/scaling/rate-limits'),
+    refetchInterval: 5000,
+  });
+
+  const limits = data?.data?.limits ?? [];
+  const summary = data?.data?.summary ?? { activeWindows: 0, nearLimit: 0, atLimit: 0 };
 
   const refreshStatus = () => {
-    setIsLoading(true);
-    // Simulate API call - in production this would call the actual endpoint
-    setTimeout(() => {
-      const status: Record<string, ProviderStatus> = {};
-      for (const [provider, limits] of Object.entries(PROVIDER_RATE_LIMITS)) {
-        const used = Math.floor(Math.random() * limits.rpm * 0.7);
-        status[provider] = {
-          limit: limits.rpm,
-          used,
-          remaining: limits.rpm - used,
-          resetInMs: Math.floor(Math.random() * 60000),
-        };
-      }
-      setProviderStatus(status);
-      setIsLoading(false);
-    }, 500);
+    queryClient.invalidateQueries({ queryKey: ['rate-limits'] });
   };
 
   const getUsageColor = (used: number, limit: number) => {
@@ -121,22 +106,31 @@ export default function RateLimitsPage() {
         </div>
       </div>
 
+      {/* Error State */}
+      {isError && (
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+          <p className="text-red-700 dark:text-red-300">
+            Failed to load rate limit data: {(error as Error)?.message || 'Unknown error'}
+          </p>
+        </div>
+      )}
+
       {/* Stats Overview */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
           <div className="flex items-center gap-2 text-gray-500 text-sm mb-1">
             <Zap className="w-4 h-4" />
-            Active Providers
+            Active Windows
           </div>
-          <p className="text-2xl font-bold">{Object.keys(PROVIDER_RATE_LIMITS).length}</p>
+          <p className="text-2xl font-bold">{summary.activeWindows}</p>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
           <div className="flex items-center gap-2 text-gray-500 text-sm mb-1">
             <Activity className="w-4 h-4" />
-            Requests (1m)
+            Total Requests
           </div>
           <p className="text-2xl font-bold">
-            {Object.values(providerStatus).reduce((sum, s) => sum + s.used, 0)}
+            {limits.reduce((sum, l) => sum + l.currentCount, 0).toLocaleString()}
           </p>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
@@ -145,7 +139,7 @@ export default function RateLimitsPage() {
             Near Limit
           </div>
           <p className="text-2xl font-bold text-yellow-600">
-            {Object.values(providerStatus).filter(s => (s.used / s.limit) >= 0.7).length}
+            {summary.nearLimit}
           </p>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
@@ -181,113 +175,77 @@ export default function RateLimitsPage() {
         </nav>
       </div>
 
-      {/* Provider Limits Tab */}
+      {/* Active Rate Limits Tab */}
       {selectedTab === 'providers' && (
         <div className="space-y-4">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
             <table className="w-full">
               <thead className="bg-gray-50 dark:bg-gray-700">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Provider</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tier</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">RPM Limit</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">TPM Limit</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Key</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Window</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Usage</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Last Request</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                {Object.entries(PROVIDER_RATE_LIMITS).map(([provider, limits]) => {
-                  const status = providerStatus[provider] || { limit: limits.rpm, used: 0, remaining: limits.rpm, resetInMs: 0 };
-                  const usagePct = (status.used / status.limit) * 100;
-                  
-                  return (
-                    <tr key={provider} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-2">
-                          <div className={`w-2 h-2 rounded-full ${getUsageColor(status.used, status.limit)}`} />
-                          <span className="font-medium capitalize">{provider}</span>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className={`text-xs px-2 py-1 rounded ${
-                          limits.tier === 'Free' ? 'bg-gray-100 text-gray-700' :
-                          limits.tier === 'AWS' ? 'bg-orange-100 text-orange-700' :
-                          limits.tier === 'Self-hosted' ? 'bg-purple-100 text-purple-700' :
-                          'bg-blue-100 text-blue-700'
-                        }`}>
-                          {limits.tier}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 font-mono text-sm">
-                        {editingProvider === provider ? (
-                          <input
-                            type="number"
-                            value={customLimits[provider] || limits.rpm}
-                            onChange={(e) => setCustomLimits({ ...customLimits, [provider]: parseInt(e.target.value) })}
-                            className="w-20 px-2 py-1 border rounded"
+                {limits.length === 0 && !isLoading && (
+                  <tr>
+                    <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
+                      No active rate limit windows in the last hour
+                    </td>
+                  </tr>
+                )}
+                {limits.map((entry) => (
+                  <tr key={entry.key} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <div className={`w-2 h-2 rounded-full ${getUsageColor(entry.currentCount, entry.maxAllowed)}`} />
+                        <span className="font-medium font-mono text-sm">{entry.key}</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className={`text-xs px-2 py-1 rounded ${
+                        entry.type === 'provider' ? 'bg-blue-100 text-blue-700' :
+                        entry.type === 'tenant' ? 'bg-purple-100 text-purple-700' :
+                        entry.type === 'user' ? 'bg-green-100 text-green-700' :
+                        'bg-gray-100 text-gray-700'
+                      }`}>
+                        {entry.type}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 font-mono text-sm text-gray-500">
+                      {entry.windowSizeSeconds}s
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-24 bg-gray-200 dark:bg-gray-600 rounded-full h-2">
+                          <div
+                            className={`h-2 rounded-full transition-all ${getUsageColor(entry.currentCount, entry.maxAllowed)}`}
+                            style={{ width: `${Math.min(100, entry.utilizationPercent)}%` }}
                           />
-                        ) : (
-                          <span>{limits.rpm}/min</span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3 font-mono text-sm text-gray-500">
-                        {limits.tpm ? `${(limits.tpm / 1000).toFixed(0)}K` : '—'}
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-2">
-                          <div className="w-24 bg-gray-200 dark:bg-gray-600 rounded-full h-2">
-                            <div
-                              className={`h-2 rounded-full transition-all ${getUsageColor(status.used, status.limit)}`}
-                              style={{ width: `${Math.min(100, usagePct)}%` }}
-                            />
-                          </div>
-                          <span className={`text-xs ${getUsageTextColor(status.used, status.limit)}`}>
-                            {status.used}/{status.limit}
-                          </span>
                         </div>
-                      </td>
-                      <td className="px-4 py-3">
-                        {usagePct >= 90 ? (
-                          <span className="text-xs px-2 py-1 rounded bg-red-100 text-red-700">Critical</span>
-                        ) : usagePct >= 70 ? (
-                          <span className="text-xs px-2 py-1 rounded bg-yellow-100 text-yellow-700">Warning</span>
-                        ) : (
-                          <span className="text-xs px-2 py-1 rounded bg-green-100 text-green-700">Healthy</span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3">
-                        {editingProvider === provider ? (
-                          <div className="flex gap-1">
-                            <button
-                              onClick={() => setEditingProvider(null)}
-                              className="text-xs px-2 py-1 bg-blue-600 text-white rounded"
-                            >
-                              Save
-                            </button>
-                            <button
-                              onClick={() => {
-                                setEditingProvider(null);
-                                setCustomLimits({ ...customLimits, [provider]: limits.rpm });
-                              }}
-                              className="text-xs px-2 py-1 border rounded"
-                            >
-                              Cancel
-                            </button>
-                          </div>
-                        ) : (
-                          <button
-                            onClick={() => setEditingProvider(provider)}
-                            className="text-xs text-blue-600 hover:text-blue-800"
-                          >
-                            Edit
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
+                        <span className={`text-xs ${getUsageTextColor(entry.currentCount, entry.maxAllowed)}`}>
+                          {entry.currentCount}/{entry.maxAllowed}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      {entry.utilizationPercent >= 100 ? (
+                        <span className="text-xs px-2 py-1 rounded bg-red-100 text-red-700">At Limit</span>
+                      ) : entry.utilizationPercent >= 80 ? (
+                        <span className="text-xs px-2 py-1 rounded bg-yellow-100 text-yellow-700">Warning</span>
+                      ) : (
+                        <span className="text-xs px-2 py-1 rounded bg-green-100 text-green-700">Healthy</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-500">
+                      {entry.lastRequest ? new Date(entry.lastRequest).toLocaleTimeString() : '—'}
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>

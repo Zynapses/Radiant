@@ -42,13 +42,13 @@ export interface User {
   avatar_url?: string;
   email_verified?: boolean;
   role: string;
-  tenant_role: 'standard_user' | 'tenant_admin' | 'tenant_owner' | 'viewer';
+  tenant_role: 'standard_user' | 'tenant_admin' | 'viewer';
   status: 'active' | 'suspended' | 'pending' | 'invited' | 'deactivated';
   has_access_think_tank: boolean;
   has_access_curator: boolean;
   has_access_dojo: boolean;
   has_access_cato_trainer: boolean;
-  has_access_genesis: boolean;
+  has_access_omega_lab: boolean;
   has_access_tenant_admin: boolean;
   sso_provider?: string;
   mfa_enabled: boolean;
@@ -119,7 +119,7 @@ export interface Administrator {
   cognito_user_id: string;
   email: string;
   display_name: string;
-  role: 'super_admin' | 'admin' | 'operator' | 'auditor';
+  role: 'super_admin';
   permissions: string[];
   mfa_enabled: boolean;
   last_login_at?: string;
@@ -233,7 +233,7 @@ export interface AuditLog {
 export interface Invitation {
   id: string;
   email: string;
-  role: 'super_admin' | 'admin' | 'operator' | 'auditor';
+  role: 'super_admin';
   invited_by: string;
   token_hash: string;
   expires_at: string;

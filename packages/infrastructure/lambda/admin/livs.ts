@@ -19,7 +19,8 @@ import {
   LIVSSoftRulesService,
   LIVSWeightsService,
   LIVSOrchestrationService,
-  LIVSInterrogatorService
+  LIVSInterrogatorService,
+  LIVSVersionService,
 } from '../shared/services/livs';
 import {
   LIVSConfiguration,
@@ -35,6 +36,7 @@ let softRulesService: LIVSSoftRulesService;
 let weightsService: LIVSWeightsService;
 let orchestrationService: LIVSOrchestrationService;
 let interrogatorService: LIVSInterrogatorService;
+let versionService: LIVSVersionService;
 
 const initServices = () => {
   if (!pool) {
@@ -50,6 +52,7 @@ const initServices = () => {
     configService = new LIVSConfigService({ pool });
     softRulesService = new LIVSSoftRulesService({ pool });
     weightsService = new LIVSWeightsService({ pool });
+    versionService = new LIVSVersionService({ pool });
 
     // Note: interrogatorService and orchestrationService need LLM client
     // In production, this would be injected
@@ -96,6 +99,23 @@ export const handler = async (
     const resource = pathParts[0] || '';
     const resourceId = pathParts[1];
     const subResource = pathParts[2];
+
+    // =========================================================================
+    // Version Endpoints
+    // =========================================================================
+
+    if (resource === 'version') {
+      if (httpMethod === 'GET') {
+        // GET /api/admin/livs/version - Check for updates
+        const result = await versionService.checkForUpdates(tenantId);
+        return response(200, { success: true, data: result });
+      }
+      if (httpMethod === 'POST' && resourceId === 'upgrade') {
+        // POST /api/admin/livs/version/upgrade - Upgrade to latest version
+        const result = await versionService.upgradeTenant(tenantId, userId || 'admin');
+        return response(200, { success: true, data: result });
+      }
+    }
 
     // =========================================================================
     // Configuration Endpoints

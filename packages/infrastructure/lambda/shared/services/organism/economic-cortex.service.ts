@@ -325,13 +325,53 @@ class EconomicCortexService {
   }
 
   private async notifyAdmin(budget: Budget, alert: BudgetAlert): Promise<void> {
-    // Placeholder for admin notification
     logger.info(`Admin notification: Budget ${budget.budgetId} reached ${alert.thresholdPercent}%`);
+    try {
+      const { EventFirehoseService } = await import('../event-firehose.service.js');
+      const firehose = new EventFirehoseService();
+      await firehose.emit({
+        eventType: 'budget_alert_admin',
+        tenantId: budget.scopeId,
+        payload: {
+          budgetId: budget.budgetId,
+          scope: budget.scope,
+          scopeId: budget.scopeId,
+          thresholdPercent: alert.thresholdPercent,
+          level: alert.level,
+          usedBudget: budget.usedBudget,
+          totalBudget: budget.totalBudget,
+          utilization: budget.totalBudget > 0 ? (budget.usedBudget / budget.totalBudget) * 100 : 0,
+          pauseExecution: alert.pauseExecution,
+          switchToLowerTier: alert.switchToLowerTier,
+        },
+      });
+    } catch (err) {
+      logger.warn('Failed to emit admin budget alert event', { error: String(err) });
+    }
   }
 
   private async notifyUser(budget: Budget, alert: BudgetAlert): Promise<void> {
-    // Placeholder for user notification
     logger.info(`User notification: Budget ${budget.budgetId} reached ${alert.thresholdPercent}%`);
+    try {
+      const { EventFirehoseService } = await import('../event-firehose.service.js');
+      const firehose = new EventFirehoseService();
+      await firehose.emit({
+        eventType: 'budget_alert_user',
+        tenantId: budget.scopeId,
+        payload: {
+          budgetId: budget.budgetId,
+          scope: budget.scope,
+          scopeId: budget.scopeId,
+          thresholdPercent: alert.thresholdPercent,
+          level: alert.level,
+          usedBudget: budget.usedBudget,
+          totalBudget: budget.totalBudget,
+          utilization: budget.totalBudget > 0 ? (budget.usedBudget / budget.totalBudget) * 100 : 0,
+        },
+      });
+    } catch (err) {
+      logger.warn('Failed to emit user budget alert event', { error: String(err) });
+    }
   }
 
   // ==========================================================================

@@ -43,7 +43,8 @@ export default function ThinkTankChat() {
     setInput('');
     setIsTyping(true);
 
-    // Simulate AI response
+    // Demo page — intentionally uses canned responses to showcase the UI.
+    // Production chat is handled by Think Tank app with real model routing.
     setTimeout(() => {
       const responses = [
         "That's a great question! Let me break this down for you with some detailed insights.",

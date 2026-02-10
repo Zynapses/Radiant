@@ -63,8 +63,8 @@ const DEFAULT_CONFIG: RealityEngineConfig = {
     predictionTTLMs: 60000,
     computeBudgetMs: 5000,
     minConfidenceThreshold: 0.6,
-    useGenesisModel: true,
-    genesisModelId: 'llama-3-8b-instruct',
+    useBaseModel: true,
+    baseModelId: 'llama-3-8b-instruct',
   },
 };
 

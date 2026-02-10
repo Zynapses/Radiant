@@ -379,18 +379,12 @@ async function getSyncStatus(event: APIGatewayProxyEvent): Promise<APIGatewayPro
     return errorResponse(400, 'Missing operationId');
   }
   
-  // Would load from S3
-  return successResponse({
-    operationId,
-    status: 'pending', // Placeholder
-    progress: {
-      phase: 'unknown',
-      percentComplete: 0,
-      itemsCompleted: 0,
-      itemsTotal: 0,
-      bytesTransferred: 0,
-    },
-  });
+  const service = getStateService();
+  const operation = await service.getSyncOperation(operationId);
+  if (!operation) {
+    return errorResponse(404, `Sync operation ${operationId} not found`);
+  }
+  return successResponse(operation);
 }
 
 async function cancelSync(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
@@ -399,10 +393,14 @@ async function cancelSync(event: APIGatewayProxyEvent): Promise<APIGatewayProxyR
     return errorResponse(400, 'Missing operationId');
   }
   
-  // Would update operation in S3
+  const service = getStateService();
+  const operation = await service.cancelSyncOperation(operationId);
+  if (!operation) {
+    return errorResponse(404, `Sync operation ${operationId} not found`);
+  }
   return successResponse({
     operationId,
-    status: 'cancelled',
+    status: operation.status,
     message: 'Sync operation cancelled',
   });
 }
@@ -411,12 +409,13 @@ async function getSyncHistory(event: APIGatewayProxyEvent): Promise<APIGatewayPr
   const environment = event.queryStringParameters?.environment as EnvironmentName | undefined;
   const limit = parseInt(event.queryStringParameters?.limit || '20', 10);
   
-  // Would load from S3
+  const service = getStateService();
+  const history = await service.listSyncOperations({ environment: environment || undefined, limit });
   return successResponse({
-    history: [],
+    history,
     pagination: {
       limit,
-      hasMore: false,
+      hasMore: history.length >= limit,
     },
   });
 }
@@ -431,27 +430,11 @@ async function getSyncConfig(event: APIGatewayProxyEvent): Promise<APIGatewayPro
     return errorResponse(400, 'Invalid environment parameter');
   }
   
-  // Would load from S3
-  const defaultConfig: SyncConfiguration = {
-    enabled: environment !== 'prod',
-    syncInfrastructure: false,
-    syncPersistentData: true,
-    syncFeatureFlags: true,
-    syncSecrets: false,
-    includedDataItems: [],
-    excludedDataItems: ['audit_merkle', 'cato_safety_log', 'user_analytics'],
-    requireConfirmation: true,
-    allowDestructive: false,
-    requireApproval: environment === 'prod',
-    autoSyncEnabled: false,
-    notifyOnSync: true,
-    notifyOnConflict: true,
-    notificationChannels: ['email'],
-  };
-  
+  const service = getStateService();
+  const config = await service.getSyncConfig(environment);
   return successResponse({
     environment,
-    config: defaultConfig,
+    config,
   });
 }
 
@@ -471,9 +454,13 @@ async function updateSyncConfig(event: APIGatewayProxyEvent): Promise<APIGateway
     return errorResponse(400, 'Auto-sync cannot be enabled for production environment');
   }
   
-  // Would save to S3
+  const service = getStateService();
+  const currentConfig = await service.getSyncConfig(environment);
+  const mergedConfig: SyncConfiguration = { ...currentConfig, ...body };
+  await service.saveSyncConfig(environment, mergedConfig);
   return successResponse({
     environment,
+    config: mergedConfig,
     message: 'Sync configuration updated',
   });
 }
@@ -486,12 +473,13 @@ async function listBackups(event: APIGatewayProxyEvent): Promise<APIGatewayProxy
   const environment = event.queryStringParameters?.environment as EnvironmentName | undefined;
   const limit = parseInt(event.queryStringParameters?.limit || '20', 10);
   
-  // Would load from S3
+  const service = getStateService();
+  const backups = await service.listBackupManifests({ environment: environment || undefined, limit });
   return successResponse({
-    backups: [],
+    backups,
     pagination: {
       limit,
-      hasMore: false,
+      hasMore: backups.length >= limit,
     },
   });
 }
@@ -524,11 +512,12 @@ async function getBackup(event: APIGatewayProxyEvent): Promise<APIGatewayProxyRe
     return errorResponse(400, 'Missing backupId');
   }
   
-  // Would load from S3
-  return successResponse({
-    backupId,
-    status: 'unknown',
-  });
+  const service = getStateService();
+  const backup = await service.getBackupManifest(backupId);
+  if (!backup) {
+    return errorResponse(404, `Backup ${backupId} not found`);
+  }
+  return successResponse(backup);
 }
 
 async function restoreBackup(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
@@ -567,7 +556,11 @@ async function deleteBackup(event: APIGatewayProxyEvent): Promise<APIGatewayProx
     return errorResponse(400, 'Missing backupId');
   }
   
-  // Would delete from S3
+  const service = getStateService();
+  const deleted = await service.deleteBackupManifest(backupId);
+  if (!deleted) {
+    return errorResponse(404, `Backup ${backupId} not found`);
+  }
   return successResponse({
     backupId,
     message: 'Backup deleted',

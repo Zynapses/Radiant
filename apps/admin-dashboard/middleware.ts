@@ -6,33 +6,17 @@ import type { NextRequest } from 'next/server';
  * 
  * Handles:
  * - Route protection (redirects unauthenticated users to login)
- * - Admin role-based access control (super_admin, admin, operator, auditor)
+ * - Admin role-based access control (super_admin only)
  * - Rate limiting for API routes
  * - Security headers
  */
 
-// Admin role hierarchy (higher = more permissions)
-type AdminRole = 'super_admin' | 'admin' | 'operator' | 'auditor';
+// Only super_admin is allowed in Pool B (v7.52.0)
+type AdminRole = 'super_admin';
 
 const ROLE_HIERARCHY: Record<AdminRole, number> = {
   super_admin: 4,
-  admin: 3,
-  operator: 2,
-  auditor: 1,
 };
-
-// Routes that require specific minimum roles
-const ROLE_RESTRICTED_ROUTES: Array<{ pattern: string; minRole: AdminRole }> = [
-  { pattern: '/administrators', minRole: 'super_admin' },
-  { pattern: '/security', minRole: 'super_admin' },
-  { pattern: '/security/', minRole: 'super_admin' },
-  { pattern: '/settings/security', minRole: 'super_admin' },
-  { pattern: '/billing', minRole: 'admin' },
-  { pattern: '/pricing', minRole: 'admin' },
-  { pattern: '/configuration', minRole: 'admin' },
-  { pattern: '/system-config', minRole: 'admin' },
-  { pattern: '/settings', minRole: 'admin' },
-];
 
 // Routes that don't require authentication
 const PUBLIC_ROUTES = [
@@ -149,24 +133,19 @@ function isTokenValid(token: string): boolean {
 function getAdminRoleFromToken(token: string): AdminRole {
   try {
     const parts = token.split('.');
-    if (parts.length !== 3) return 'operator';
+    if (parts.length !== 3) return 'super_admin';
     const payload = JSON.parse(atob(parts[1]));
-    const role = payload['custom:admin_role'] || payload.admin_role || 'operator';
-    return ROLE_HIERARCHY[role as AdminRole] ? (role as AdminRole) : 'operator';
+    const role = payload['custom:admin_role'] || payload.admin_role || 'super_admin';
+    // Only super_admin is valid in Pool B (v7.52.0)
+    return 'super_admin';
   } catch {
-    return 'operator';
+    return 'super_admin';
   }
 }
 
 function isRouteAllowedForRole(pathname: string, role: AdminRole): boolean {
-  for (const restriction of ROLE_RESTRICTED_ROUTES) {
-    if (pathname === restriction.pattern || pathname.startsWith(restriction.pattern + '/')) {
-      if (ROLE_HIERARCHY[role] < ROLE_HIERARCHY[restriction.minRole]) {
-        return false;
-      }
-    }
-  }
-  return true;
+  // All routes allowed for super_admin (v7.52.0 - only role in Pool B)
+  return role === 'super_admin';
 }
 
 export function middleware(request: NextRequest) {

@@ -200,8 +200,20 @@ async function routeRequest(
     return mod.handler(event) as Promise<APIGatewayProxyResult>;
   }
 
-  // Cortex Graph-RAG
+  // Cortex — consolidated routing for all cortex sub-handlers
   if (pathParts[1] === 'cortex') {
+    // v2 routes: Golden Rules, Stub Nodes, Telemetry, Entrance Exams, Graph Expansion, Model Migration
+    if (pathParts[2] === 'v2') {
+      const { handler: cortexV2Handler } = await import('./cortex-v2.js');
+      return (await cortexV2Handler(event, MINIMAL_CONTEXT, NOOP_CALLBACK)) as APIGatewayProxyResult;
+    }
+    // Tiered Memory routes: overview, health, alerts, metrics, graph/*, housekeeping/*, mounts/*, gdpr/*
+    const tieredMemoryRoutes = ['overview', 'health', 'alerts', 'metrics', 'graph', 'housekeeping', 'mounts', 'gdpr'];
+    if (tieredMemoryRoutes.includes(pathParts[2])) {
+      const { handler: cortexHandler } = await import('./cortex.js');
+      return cortexHandler(event);
+    }
+    // Default: Graph-RAG (dashboard, config, entities, relationships, ingest, query)
     const mod = await import('./cortex-graph-rag.js');
     return mod.handler(event) as Promise<APIGatewayProxyResult>;
   }
@@ -525,6 +537,12 @@ async function routeRequest(
     return loraHandler(event);
   }
 
+  // Model Metadata - AI model metadata, research, and scheduling
+  if (pathParts[1] === 'model-metadata') {
+    const { handler: modelMetadataHandler } = await import('./model-metadata.js');
+    return (await modelMetadataHandler(event, MINIMAL_CONTEXT, NOOP_CALLBACK)) as APIGatewayProxyResult;
+  }
+
   // AI Reports v5.42.0 - AI Report Writer
   if (pathParts[1] === 'ai-reports') {
     const { handler: aiReportsHandler } = await import('./ai-reports.js');
@@ -737,15 +755,6 @@ async function routeRequest(
     }
   }
 
-  // Cortex (catch-all after cortex-graph-rag was matched above)
-  if (pathParts[1] === 'cortex') {
-    if (pathParts[2] === 'v2') {
-      const { handler: cortexV2Handler } = await import('./cortex-v2.js');
-      return (await cortexV2Handler(event, MINIMAL_CONTEXT, NOOP_CALLBACK)) as APIGatewayProxyResult;
-    }
-    const { handler: cortexHandler } = await import('./cortex.js');
-    return cortexHandler(event);
-  }
 
   // Direct route handlers
   if (pathParts[1] === 'axiom') {
@@ -829,6 +838,18 @@ async function routeRequest(
   if (pathParts[1] === 'security-policies') {
     const { handler: secPolHandler } = await import('./security-policies.js');
     return secPolHandler(event);
+  }
+
+  // Global Brain (PROMPT-53)
+  if (pathParts[1] === 'global-brain') {
+    const { handler: globalBrainHandler } = await import('./global-brain.js');
+    return globalBrainHandler(event);
+  }
+
+  // Universal Cartridge System (PROMPT-50)
+  if (pathParts[1] === 'cartridge-system') {
+    const { handler: cartridgeSystemHandler } = await import('./cartridge-universal.js');
+    return cartridgeSystemHandler(event);
   }
 
   // OMEGA Quantum Architecture (v4.18.0)

@@ -178,7 +178,7 @@ struct InstallationParameters: Codable, Sendable {
     var enableComplianceExport: Bool    // HIPAA/SOC2/GDPR exports
     var enableEgoSystem: Bool           // Zero-cost persistent identity
     
-    // v7.0.0 - OMEGA Bio-Mimetic AI (Project Genesis)
+    // v7.0.0 - OMEGA Bio-Mimetic AI
     var enableOmegaBrain: Bool          // Bio-mimetic AI organism with CVNN
     var omegaShadowMode: Bool           // Shadow mode for parallel inference
     var omegaApiUrl: String?            // OMEGA API endpoint URL

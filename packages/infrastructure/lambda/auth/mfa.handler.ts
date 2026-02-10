@@ -511,11 +511,7 @@ function extractMFAContext(event: APIGatewayProxyEvent): MFAContext {
 function isMFARequiredForRole(role: string): boolean {
   const requiredRoles = [
     'tenant_admin',
-    'tenant_owner', 
     'super_admin',
-    'admin',
-    'operator',
-    'auditor',
   ];
   return requiredRoles.includes(role);
 }

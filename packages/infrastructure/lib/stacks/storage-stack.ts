@@ -18,6 +18,8 @@ export class StorageStack extends cdk.Stack {
   public readonly mediaBucket: s3.Bucket;
   public readonly artifactsBucket: s3.Bucket;
   public readonly logsBucket: s3.Bucket;
+  public readonly cartridgeBucket: s3.Bucket;
+  public readonly globalBrainBucket: s3.Bucket;
   public readonly mediaDistribution?: cloudfront.Distribution;
 
   constructor(scope: Construct, id: string, props: StorageStackProps) {
@@ -94,6 +96,61 @@ export class StorageStack extends cdk.Stack {
       autoDeleteObjects: true,
     });
 
+    // Cartridge bucket for .RADz files (Universal Cartridge System)
+    // No CORS — admin dashboard uses pre-signed URLs via API
+    this.cartridgeBucket = new s3.Bucket(this, 'CartridgeBucket', {
+      bucketName: `${appId}-${environment}-cartridges-${this.account}`,
+      encryption: s3.BucketEncryption.KMS,
+      encryptionKey,
+      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+      versioned: true,
+      cors: [],
+      lifecycleRules: [
+        {
+          id: 'ArchiveOldVersions',
+          noncurrentVersionTransition: [
+            {
+              storageClass: s3.StorageClass.GLACIER,
+              transitionAfter: cdk.Duration.days(90),
+            },
+          ],
+          noncurrentVersionExpiration: cdk.Duration.days(365),
+        },
+        {
+          id: 'AbortIncompleteUploads',
+          abortIncompleteMultipartUploadAfter: cdk.Duration.days(7),
+        },
+      ],
+      serverAccessLogsBucket: this.logsBucket,
+      serverAccessLogsPrefix: 'cartridge-access-logs/',
+      removalPolicy: isProd ? cdk.RemovalPolicy.RETAIN : cdk.RemovalPolicy.DESTROY,
+      autoDeleteObjects: !isProd,
+    });
+
+    // Global Brain bucket for federated learning gradients and round results (PROMPT-53)
+    this.globalBrainBucket = new s3.Bucket(this, 'GlobalBrainBucket', {
+      bucketName: `${appId}-${environment}-global-brain-${this.account}`,
+      encryption: s3.BucketEncryption.KMS,
+      encryptionKey,
+      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+      versioned: false,
+      lifecycleRules: [
+        {
+          id: 'ExpireOldGradients',
+          prefix: 'global-brain/gradients/',
+          expiration: cdk.Duration.days(90),
+        },
+        {
+          id: 'AbortIncompleteUploads',
+          abortIncompleteMultipartUploadAfter: cdk.Duration.days(7),
+        },
+      ],
+      serverAccessLogsBucket: this.logsBucket,
+      serverAccessLogsPrefix: 'global-brain-access-logs/',
+      removalPolicy: isProd ? cdk.RemovalPolicy.RETAIN : cdk.RemovalPolicy.DESTROY,
+      autoDeleteObjects: !isProd,
+    });
+
     // CloudFront distribution for media (Tier 2+)
     if (tier >= 2) {
       const originAccessIdentity = new cloudfront.OriginAccessIdentity(this, 'MediaOAI', {
@@ -136,6 +193,18 @@ export class StorageStack extends cdk.Stack {
       value: this.artifactsBucket.bucketName,
       description: 'Artifacts bucket name',
       exportName: `${appId}-${environment}-artifacts-bucket`,
+    });
+
+    new cdk.CfnOutput(this, 'CartridgeBucketName', {
+      value: this.cartridgeBucket.bucketName,
+      description: 'Cartridge storage bucket name',
+      exportName: `${appId}-${environment}-cartridge-bucket`,
+    });
+
+    new cdk.CfnOutput(this, 'GlobalBrainBucketName', {
+      value: this.globalBrainBucket.bucketName,
+      description: 'Global Brain federated learning bucket name',
+      exportName: `${appId}-${environment}-global-brain-bucket`,
     });
   }
 }

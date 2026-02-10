@@ -19,7 +19,7 @@ import {
 // TYPES
 // ============================================================================
 
-export type AdminRole = 'super_admin' | 'admin' | 'operator' | 'auditor';
+export type AdminRole = 'super_admin';
 
 export interface AdminUser {
   id: string;

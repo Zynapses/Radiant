@@ -231,17 +231,27 @@ export default function ThinkTankChat() {
           }
         );
       } else {
-        await simulateResponse(assistantMessageId);
+        // Unauthenticated demo — show canned response prompting sign-in
+        await showDemoResponse(assistantMessageId);
       }
     } catch (error) {
       console.error('Failed to send message:', error);
       triggerDelight('error_recovery');
-      await simulateResponse(assistantMessageId);
+      // Show error state instead of faking a response
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === assistantMessageId
+            ? { ...m, content: 'Sorry, I encountered an error connecting to the AI service. Please try again.', isStreaming: false }
+            : m
+        )
+      );
+      setIsTyping(false);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isTyping, isAuthenticated, currentConversationId]);
 
-  const simulateResponse = useCallback(async (messageId: string) => {
+  // Demo response for unauthenticated visitors — intentionally uses canned text to showcase the UI
+  const showDemoResponse = useCallback(async (messageId: string) => {
     const responses = [
       "That's a great question! Let me break this down for you with some detailed insights.",
       "I'd be happy to help with that. Here's what I'm thinking...",
@@ -250,7 +260,7 @@ export default function ThinkTankChat() {
     ];
     
     const responseText = responses[Math.floor(Math.random() * responses.length)] + 
-      (isAuthenticated ? "" : "\n\nSign in to connect to the full Think Tank platform with 106+ AI models.");
+      "\n\nSign in to connect to the full Think Tank platform with 106+ AI models.";
 
     for (let i = 0; i <= responseText.length; i++) {
       await new Promise((resolve) => setTimeout(resolve, 15));
@@ -265,7 +275,7 @@ export default function ThinkTankChat() {
       prev.map((m) => (m.id === messageId ? { ...m, isStreaming: false } : m))
     );
     setIsTyping(false);
-  }, [isAuthenticated]);
+  }, []);
 
   const handleRateMessage = async (messageId: string, positive: boolean) => {
     if (!currentConversationId) return;

@@ -13,7 +13,7 @@
 // LAYER 1: END-USER AUTHENTICATION
 // ============================================================================
 
-export type AuthTenantUserRole = 'standard_user' | 'tenant_admin' | 'tenant_owner';
+export type AuthTenantUserRole = 'standard_user' | 'tenant_admin';
 
 export interface TenantUser {
   id: string;
@@ -58,7 +58,7 @@ export interface CreateTenantUserRequest {
 // LAYER 2: PLATFORM ADMINISTRATOR AUTHENTICATION
 // ============================================================================
 
-export type PlatformAdminRole = 'super_admin' | 'admin' | 'operator' | 'auditor';
+export type PlatformAdminRole = 'super_admin';
 
 export interface PlatformAdmin {
   id: string;
@@ -99,33 +99,6 @@ export const PLATFORM_ADMIN_ROLE_PERMISSIONS: Record<PlatformAdminRole, Platform
     'scaling:read', 'scaling:write',
     'security:read', 'security:write',
     'reports:read', 'reports:generate',
-  ],
-  admin: [
-    'tenants:read', 'tenants:write',
-    'users:read', 'users:write',
-    'models:read', 'models:write',
-    'billing:read',
-    'config:read', 'config:write',
-    'audit:read',
-    'scaling:read', 'scaling:write',
-    'security:read',
-    'reports:read', 'reports:generate',
-  ],
-  operator: [
-    'tenants:read',
-    'users:read',
-    'models:read',
-    'config:read',
-    'audit:read',
-    'scaling:read',
-    'reports:read',
-  ],
-  auditor: [
-    'tenants:read',
-    'users:read',
-    'billing:read',
-    'audit:read', 'audit:export',
-    'reports:read',
   ],
 };
 

@@ -160,7 +160,7 @@ export default function IngestPage() {
     setConnectorConfig({});
   };
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
+  const onDrop = useCallback(async (acceptedFiles: File[]) => {
     const newFiles: UploadedFile[] = acceptedFiles.map((file) => ({
       id: Math.random().toString(36).substring(7),
       name: file.name,
@@ -170,34 +170,56 @@ export default function IngestPage() {
     }));
     setFiles((prev) => [...prev, ...newFiles]);
 
-    // Simulate processing
-    newFiles.forEach((file) => {
-      setTimeout(() => {
-        setFiles((prev) =>
-          prev.map((f) =>
-            f.id === file.id ? { ...f, status: 'processing', progress: 30 } : f
-          )
-        );
-      }, 500);
+    // Upload each file to the Cortex Graph-RAG ingest endpoint
+    const API = process.env.NEXT_PUBLIC_API_URL || '';
+    for (const uploadFile of newFiles) {
+      const originalFile = acceptedFiles.find(f => f.name === uploadFile.name);
+      if (!originalFile) continue;
 
-      setTimeout(() => {
-        setFiles((prev) =>
-          prev.map((f) =>
-            f.id === file.id ? { ...f, progress: 70 } : f
-          )
-        );
-      }, 1500);
+      setFiles((prev) =>
+        prev.map((f) => f.id === uploadFile.id ? { ...f, status: 'processing', progress: 30 } : f)
+      );
 
-      setTimeout(() => {
+      try {
+        const content = await originalFile.text();
         setFiles((prev) =>
-          prev.map((f) =>
-            f.id === file.id
-              ? { ...f, status: 'complete', progress: 100, nodesCreated: Math.floor(Math.random() * 50) + 10 }
-              : f
-          )
+          prev.map((f) => f.id === uploadFile.id ? { ...f, progress: 70 } : f)
         );
-      }, 2500);
-    });
+
+        const res = await fetch(`${API}/admin/cortex/ingest`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            tenantId: 'default',
+            source: {
+              type: 'file',
+              content,
+              documentId: uploadFile.id,
+              metadata: { filename: uploadFile.name, size: uploadFile.size },
+            },
+          }),
+        });
+
+        if (res.ok) {
+          const result = await res.json();
+          setFiles((prev) =>
+            prev.map((f) =>
+              f.id === uploadFile.id
+                ? { ...f, status: 'complete', progress: 100, nodesCreated: result.data?.entitiesCreated || result.entitiesCreated || 0 }
+                : f
+            )
+          );
+        } else {
+          setFiles((prev) =>
+            prev.map((f) => f.id === uploadFile.id ? { ...f, status: 'error' as any, progress: 0 } : f)
+          );
+        }
+      } catch {
+        setFiles((prev) =>
+          prev.map((f) => f.id === uploadFile.id ? { ...f, status: 'error' as any, progress: 0 } : f)
+        );
+      }
+    }
   }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({

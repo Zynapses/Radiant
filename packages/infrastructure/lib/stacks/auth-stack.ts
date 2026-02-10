@@ -88,8 +88,8 @@ export class AuthStack extends cdk.Stack {
       },
     });
 
-    // Admin groups
-    const adminGroups = ['super_admin', 'admin', 'operator', 'auditor'];
+    // Admin groups — only super_admin in Pool B (v7.52.0)
+    const adminGroups = ['super_admin'];
     adminGroups.forEach(groupName => {
       new cognito.CfnUserPoolGroup(this, `AdminGroup${groupName}`, {
         userPoolId: this.adminUserPool.userPoolId,

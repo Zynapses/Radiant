@@ -53,7 +53,7 @@ export interface RootCACertificate {
 
 /**
  * Tenant Intermediate CA Certificate
- * Signed by Root CA, stored in Genesis Vault (HSM)
+ * Signed by Root CA, stored in Cartridge Vault (HSM)
  * Signs cartridges for this tenant
  */
 export interface TenantCACertificate {

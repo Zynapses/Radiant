@@ -180,7 +180,7 @@ export const TenantCreateSchema = z.object({
 
 export const InvitationCreateSchema = z.object({
   email: z.string().email(),
-  role: z.enum(['super_admin', 'admin', 'operator', 'auditor']),
+  role: z.enum(['super_admin']),
   message: z.string().max(500).optional(),
 });
 

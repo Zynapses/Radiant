@@ -548,8 +548,8 @@ async function handleGetSession(event: APIGatewayProxyEvent): Promise<APIGateway
 // =============================================================================
 // Think Tank Admin app MUST use /admin/login - validates TenantAdmin role
 // No exceptions. Regular users CANNOT access Think Tank Admin.
-// v7.38.0: System admin roles (super_admin, admin, operator, auditor) are NO LONGER
-// accepted here. System admins authenticate via Pool B to Radiant Admin only.
+// v7.52.0: Only super_admin exists in Pool B. System admins authenticate
+// via Pool B to Radiant Admin and Think Tank Admin.
 // =============================================================================
 
 const ADMIN_ROLES = ['SuperAdmin', 'TenantAdmin', 'tenant_admin'];

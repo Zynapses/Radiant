@@ -203,7 +203,7 @@ This document tracks all UI/UX patterns, styles, and behaviors used in RADIANT a
 | `danger` | `bg-red-100` | Critical metrics |
 
 **Files**: 
-- `apps/admin-dashboard/components/ui/stat-card.tsx`
+- `apps/admin-dashboard/components/dashboard/metric-card.tsx`
 - `apps/admin-dashboard/lib/design-tokens.ts`
 
 ### Dialog/Modal Pattern
@@ -237,7 +237,7 @@ This document tracks all UI/UX patterns, styles, and behaviors used in RADIANT a
 | `warning` | ⚠ Alert | 5s | Warnings |
 | `info` | ℹ Info | 4s | Information |
 
-**Files**: `apps/admin-dashboard/components/ui/toaster.tsx`
+**Files**: `apps/admin-dashboard/components/ui/use-toast.tsx`
 
 ---
 
@@ -381,7 +381,7 @@ container: {
 | Description | Why/what to do |
 | Action | CTA button |
 
-**Files**: `apps/admin-dashboard/components/ui/empty-state.tsx`
+**Files**: `apps/admin-dashboard/components/ui/skeleton.tsx`
 
 ---
 
@@ -1404,7 +1404,7 @@ When adding a new UI/UX pattern:
 
 ---
 
-## Category 11: Genesis Forge — Glass Foundry Patterns (v7.15.0)
+## Category 11: OMEGA Forge — Glass Foundry Patterns (v7.15.0)
 
 **Source**: Custom RADIANT "Bioluminescent Industrial" design system for the Behavioral ROM Forge
 
@@ -1420,7 +1420,7 @@ When adding a new UI/UX pattern:
 | **Accent (Emergency)** | `hsl(0, 80%, 60%)` / Red | Stability < 50% |
 | **Font** | `JetBrains Mono` | Monospaced — "Dangerous" aesthetic |
 
-**Files**: `apps/genesis/tailwind.config.ts`, `apps/genesis/app/globals.css`
+**Files**: `apps/omega-lab/tailwind.config.ts`, `apps/omega-lab/app/globals.css`
 
 ### Shard Node Pattern (React Flow Custom Nodes)
 
@@ -1433,7 +1433,7 @@ When adding a new UI/UX pattern:
 
 **Shape**: Hexagonal glass prism (`clipPath: polygon(8% 0%, 92% 0%, 100% 15%, 100% 85%, 92% 100%, 8% 100%, 0% 85%, 0% 15%)`)
 
-**Files**: `apps/genesis/components/forge/nodes/`
+**Files**: `apps/omega-lab/components/forge/nodes/`
 
 ### Catenary Wire Edge Pattern
 
@@ -1445,7 +1445,7 @@ When adding a new UI/UX pattern:
 | **Particles** | Light dots traveling along path (count = `frequency * 5`) |
 | **Rejection** | Red color, vibration animation, spark particles, reason label |
 
-**Files**: `apps/genesis/components/forge/edges/CatenaryEdge.tsx`
+**Files**: `apps/omega-lab/components/forge/edges/CatenaryEdge.tsx`
 
 ### Retractable Panel Pattern
 
@@ -1456,7 +1456,7 @@ When adding a new UI/UX pattern:
 
 **Animation**: Framer Motion spring (`damping: 20, stiffness: 200`)
 
-**Files**: `apps/genesis/components/forge/TheArmory.tsx`, `TheOracle.tsx`
+**Files**: `apps/omega-lab/components/forge/TheArmory.tsx`, `TheOracle.tsx`
 
 ### Reactor Core Button Pattern
 
@@ -1468,7 +1468,7 @@ When adding a new UI/UX pattern:
 | **Forging** | Spinning loader icon + progress bar |
 | **Disabled** | 30% opacity when no shards placed |
 
-**Files**: `apps/genesis/components/forge/ReactorCore.tsx`
+**Files**: `apps/omega-lab/components/forge/ReactorCore.tsx`
 
 ### Global Stability → UI Hue Shift
 
@@ -1480,7 +1480,7 @@ The entire Glass Foundry UI shifts color based on `stability_score` from Shadow 
 | 0.5–0.7 | Orange (30°) | `hsl(30, 15%, 4%)` → `#050505` |
 | < 0.5 | Red (0°) | `hsl(0, 15%, 4%)` + red overlay at `0.15 * (1 - score)` opacity |
 
-**Files**: `apps/genesis/components/forge/GlassFoundry.tsx`
+**Files**: `apps/omega-lab/components/forge/GlassFoundry.tsx`
 
 ### Void Mode Pattern — 9-Layer 3D PCB (Full Implementation)
 
@@ -1516,7 +1516,7 @@ The entire Glass Foundry UI shifts color based on `stability_score` from Shadow 
 | Thermal LED | Continuous HSL: `hue = (1 - tempNorm) * 120` from `node.data.temperature` |
 | Ambient light | `stabilityScore` → hue 210°/30°/0° |
 
-**Files**: `apps/genesis/components/forge/VoidModePCB.tsx` (800 LOC), `GlassFoundry.tsx`
+**Files**: `apps/omega-lab/components/forge/VoidModePCB.tsx` (800 LOC), `GlassFoundry.tsx`
 
 ### Firmware ROM Forge Pattern — Behavioral Directives
 
@@ -1544,7 +1544,7 @@ Firmware = immutable behavioral software (not hardware). Burned once, never edit
 
 **Weight bar**: 10 clickable segments, color transitions: omega-500 (1-4) → amber-500 (5-7) → red-500 (8-10)
 
-**Files**: `apps/genesis/components/GenesisForge.tsx` (1054 LOC), `apps/genesis/lib/api.ts`
+**Files**: `apps/omega-lab/components/OmegaForge.tsx` (1054 LOC), `apps/omega-lab/lib/api.ts`
 
 ---
 
@@ -1880,7 +1880,7 @@ Libraries used internally by Think Tank applications.
 | `d3-geo` | Geographic projections | ISC | 2024-01-01 | ✅ |
 | `react-simple-maps` | Map components | MIT | 2024-01-01 | ✅ |
 | `topojson-client` | TopoJSON parsing | ISC | 2024-01-01 | ✅ |
-| `reactflow` | Node-based graph canvas (Genesis Forge Glass Foundry) | MIT | 2026-02-06 | ✅ |
+| `reactflow` | Node-based graph canvas (OMEGA Forge Glass Foundry) | MIT | 2026-02-06 | ✅ |
 | `three` | 3D rendering engine (Void Mode PCB visualization) | MIT | 2026-02-06 | ✅ |
 | `@react-three/fiber` | React renderer for Three.js | MIT | 2026-02-06 | ✅ |
 | `@react-three/drei` | Useful helpers for react-three-fiber | MIT | 2026-02-06 | ✅ |

@@ -453,10 +453,25 @@ export default function CouncilPage() {
   }, []);
 
   const handleRunRound = async () => {
+    if (!session?.id) return;
     setRunningRound(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    setRunningRound(false);
+    try {
+      const API = process.env.NEXT_PUBLIC_API_URL || '';
+      const res = await fetch(`${API}/admin/cato/council/debates/${session.id}/advance`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        if (updated.rounds) {
+          setSession(prev => prev ? { ...prev, rounds: updated.rounds } : null);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to advance round:', err);
+    } finally {
+      setRunningRound(false);
+    }
   };
 
   const handleConclude = async () => {

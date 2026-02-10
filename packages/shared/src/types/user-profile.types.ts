@@ -13,7 +13,7 @@
  *   Admins can map specific contacts to alert categories/severity levels.
  *   e.g., "Send SEV 1 security alerts to my on-call phone AND work email"
  *
- * Shared across ALL apps: Think Tank, Curator, Genesis, Dojo, RADIANT Admin.
+ * Shared across ALL apps: Think Tank, Curator, OMEGA Lab, Dojo, RADIANT Admin.
  * Policy: /.windsurf/workflows/user-profile-consistency.md
  */
 
@@ -320,7 +320,7 @@ export interface AdminContactRoutingSummary {
 // SYSTEM ADMINISTRATOR TYPES (Feature B)
 // =============================================================================
 
-export type SystemAdminRole = 'super_admin' | 'admin' | 'operator' | 'auditor';
+export type SystemAdminRole = 'super_admin';
 
 export interface SystemAdminPermissionSet {
   // Admin management
@@ -396,90 +396,6 @@ export const SYSTEM_ADMIN_PERMISSIONS: Record<SystemAdminRole, SystemAdminPermis
     canViewAuditLogs: true,
     canExportAuditLogs: true,
     canManageSystemAdmins: true,
-  },
-  // admin: Platform infrastructure admin
-  admin: {
-    canCreateAdmins: false,
-    canDeleteAdmins: false,
-    canChangeAdminRoles: false,
-    canCreateSuperAdmins: false,
-    canCreateTenants: true,
-    canDeleteTenants: false,
-    canManageTenants: true,
-    canViewTenants: true,
-    canManageUsers: true,
-    canViewUsers: true,
-    canManageModels: true,
-    canManageProviders: true,
-    canViewModels: true,
-    canManageSystemConfig: true,
-    canManageSecurityPolicies: false,
-    canViewConfig: true,
-    canManageBilling: true,
-    canViewBilling: true,
-    canDeploy: true,
-    canApprove: true,
-    canAccessSentinel: true,
-    canManageSentinel: false,
-    canViewAuditLogs: true,
-    canExportAuditLogs: true,
-    canManageSystemAdmins: false,
-  },
-  // operator: Operations
-  operator: {
-    canCreateAdmins: false,
-    canDeleteAdmins: false,
-    canChangeAdminRoles: false,
-    canCreateSuperAdmins: false,
-    canCreateTenants: false,
-    canDeleteTenants: false,
-    canManageTenants: false,
-    canViewTenants: true,
-    canManageUsers: false,
-    canViewUsers: true,
-    canManageModels: true,
-    canManageProviders: true,
-    canViewModels: true,
-    canManageSystemConfig: false,
-    canManageSecurityPolicies: false,
-    canViewConfig: true,
-    canManageBilling: false,
-    canViewBilling: false,
-    canDeploy: true,
-    canApprove: false,
-    canAccessSentinel: true,
-    canManageSentinel: false,
-    canViewAuditLogs: true,
-    canExportAuditLogs: false,
-    canManageSystemAdmins: false,
-  },
-  // auditor: Read-only
-  auditor: {
-    canCreateAdmins: false,
-    canDeleteAdmins: false,
-    canChangeAdminRoles: false,
-    canCreateSuperAdmins: false,
-    canCreateTenants: false,
-    canDeleteTenants: false,
-    canManageTenants: false,
-    canViewTenants: true,
-    canManageUsers: false,
-    canViewUsers: true,
-    canManageModels: false,
-    canManageProviders: false,
-    canViewModels: true,
-    canManageSystemConfig: false,
-    canManageSecurityPolicies: false,
-    canViewConfig: false,
-    canManageBilling: false,
-    canViewBilling: true,
-    canDeploy: false,
-    canApprove: false,
-    canAccessSentinel: false,
-    canManageSentinel: false,
-    canViewAuditLogs: true,
-    canExportAuditLogs: true,
-    canManageSystemAdmins: false,
   },
 };
 
@@ -595,15 +511,11 @@ export const ADMIN_BOOTSTRAP_DEFAULTS: AdminBootstrapConfig = {
 /**
  * Role domains — RADIANT platform vs. tenant:
  *
- * PLATFORM (RADIANT Admin):
- *   super_admin → inherits admin + RADIANT Admin + ALL RADIANT app access
- *   admin       → platform admin, NO RADIANT app access
- *   operator    → operations, NO RADIANT app access
- *   auditor     → read-only, NO RADIANT app access
+ * PLATFORM (RADIANT Admin + Think Tank Admin):
+ *   super_admin → full platform control, RADIANT Admin + Think Tank Admin access
  *
  * TENANT (Customer side):
  *   tenant_admin   → full tenant control, assigned to first sign-up user
- *   tenant_owner   → ownership rights (billing, deletion)
  *   standard_user  → regular user
  *   viewer         → read-only user
  */
@@ -684,7 +596,7 @@ export const TENANT_PROVISIONING_DEFAULTS = {
     hasAccessCurator: true,
     hasAccessDojo: false,
     hasAccessCatoTrainer: false,
-    hasAccessGenesis: false,
+    hasAccessOmegaLab: false,
     hasAccessTenantAdmin: true,
   },
 };

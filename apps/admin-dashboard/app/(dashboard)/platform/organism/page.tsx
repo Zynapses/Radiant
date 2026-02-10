@@ -171,9 +171,9 @@ export default function OrganismPage() {
             <Wrench className="h-4 w-4" />
             Tools
           </TabsTrigger>
-          <TabsTrigger value="genesis" className="flex items-center gap-2">
+          <TabsTrigger value="tool-forge" className="flex items-center gap-2">
             <Sparkles className="h-4 w-4" />
-            Genesis
+            Tool Forge
           </TabsTrigger>
           <TabsTrigger value="compute" className="flex items-center gap-2">
             <Cpu className="h-4 w-4" />
@@ -409,13 +409,13 @@ export default function OrganismPage() {
           </div>
         </TabsContent>
 
-        {/* Genesis Tab */}
-        <TabsContent value="genesis" className="space-y-6">
+        {/* Tool Forge Tab */}
+        <TabsContent value="tool-forge" className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Sparkles className="h-5 w-5" />
-                Genesis Auto-Tool Pipeline
+                Tool Forge Pipeline
               </CardTitle>
               <CardDescription>
                 Generate new tools on-demand from API documentation

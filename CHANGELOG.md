@@ -5,6 +5,549 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.55.1] - 2026-02-10
+
+### Documentation Audit — 248 File Path Mismatches Fixed
+
+Full code review of all 15 documentation files against the actual codebase. Every backtick-quoted file path was verified against the filesystem.
+
+#### Mismatch Categories Fixed
+- **`apps/omega-lab` → `apps/omega-forge`** (13 fixes in `09-OMEGA-GENESIS.md`) — Forge library/API files were documented under wrong app
+- **Missing `(dashboard)` route group** in thinktank-admin paths (5 fixes)
+- **Wrong `thinktank/` prefix** in admin-dashboard page paths (9 fixes across 01, 04)
+- **Ellipsis shortcut paths** (`apps/swift-deployer/.../`) expanded to full paths (8 fixes in 04)
+- **`lambda/admin/cartridge.ts`** → `cartridge-universal.ts` (3 docs)
+- **Missing service files** mapped to actual equivalents (34 fixes)
+- **Old-style migration refs** (`NNN_*.sql`, `V2026_01_*`) → `000_consolidated_schema.sql` (80+ fixes)
+- **Package path corrections** in `16-IMPLEMENTATION-SPECS.md` (15 fixes)
+- **Component path corrections** in `18-UI-UX-LIBRARIES.md` (3 fixes)
+- **`cartridge-manager`** → `cartridge-system` page rename (2 fixes)
+
+#### Documents Fixed
+| Document | Fixes |
+|----------|:-----:|
+| `04-RADIANT-ADMIN.md` | 106 |
+| `06-ARCHITECTURE-ENGINEERING.md` | 41 |
+| `01-THINK-TANK.md` | 36 |
+| `09-OMEGA-GENESIS.md` | 21 |
+| `16-IMPLEMENTATION-SPECS.md` | 20 |
+| `15-STRATEGY-COMPETITIVE.md` | 8 |
+| `07-AI-SYSTEMS.md` | 6 |
+| `18-UI-UX-LIBRARIES.md` | 6 |
+| `10-ORCHESTRATION-WORKFLOWS.md` | 3 |
+| `05-SWIFT-DEPLOYER.md` | 1 |
+
+**Result**: 0 mismatched file paths remaining (excluding intentional glob patterns).
+
+**Files Modified**: `docs/*.md`, `CHANGELOG.md`
+**Scripts Created**: `tools/scripts/fix-doc-mismatches.py`, `tools/scripts/fix-doc-mismatches-pass2.py`
+
+## [7.55.0] - 2026-02-10
+
+### Documentation Merge — Reduced from 22 to 15 Files
+
+Comprehensive documentation audit and merge to reduce complexity without losing any detail. All deprecated source files archived to `docs/archive/pre-merge-2026-02-10/` with DEPRECATED headers and remain in git.
+
+#### Merges Executed
+- **19-OMEGA-QUANTUM-MODEL-AI.md → 09-OMEGA-GENESIS.md** — Single authoritative OMEGA doc (was split across two files)
+- **THINKTANK-MAC-GUIDE.md → 01-THINK-TANK.md** (Part XI) — Mac user guide now in main Think Tank doc
+- **THINKTANK-MAC-PORTABILITY-MANIFEST.md → 01-THINK-TANK.md** (Part XII) — Feature parity matrix consolidated
+- **03-DOJO.md → 01-THINK-TANK.md** (Part XIII) — Dojo is a Think Tank ecosystem app
+- **08-CATO-SAFETY.md → 07-AI-SYSTEMS.md** — Brain + Safety are architecturally coupled; renamed from 07-AI-BRAIN-SYSTEMS.md
+- **11-DATA-STORAGE.md → 06-ARCHITECTURE-ENGINEERING.md** — Data & storage is core infrastructure
+- **Marketing content from 09 → 15-STRATEGY-COMPETITIVE.md** — Competitive positioning belongs in strategy doc
+- **EXECUTIVE-REPORT-2026-02-09.md** — Archived (point-in-time sprint report, not living documentation)
+
+#### Files Updated
+- `docs/DOCUMENTATION-MANIFEST.json` — v3.0.0, 15 consolidated documents
+- `AGENTS.md` — Updated doc reference table and documentation references
+- `.windsurf/workflows/docs-update-all.md` — v3.0, 15-doc quick reference
+- `.windsurf/workflows/omega-docs-policy.md` — Updated to point to 09 instead of 19
+- `tools/scripts/assemble-complete-documentation.py` — Updated DOCUMENT_STRUCTURE for 15 docs
+- `tools/scripts/merge-documentation.py` — New merge script (rerunnable)
+
+**Files Modified**: `docs/*.md`, `AGENTS.md`, `CHANGELOG.md`, `.windsurf/workflows/*.md`, `tools/scripts/*.py`, `docs/DOCUMENTATION-MANIFEST.json`
+
+## [7.54.0] - 2026-02-09
+
+### Stub Elimination Audit — Clean Codebase Initiative
+
+Comprehensive audit and fix of all unimplemented, stubbed, and simulated code across the entire codebase. Every simulated API call has been replaced with a real backend connection or explicitly documented as intentional demo/dev-mode behavior.
+
+#### Admin Dashboard — Real API Connections
+- **`rate-limits/page.tsx`** — Replaced simulated `setTimeout` with `useQuery` fetching from `/admin/scaling/rate-limits`
+- **`model-metadata/page.tsx`** — Connected `handleResearch` to new `/admin/model-metadata/models/:id/research` endpoint
+- **`platform/snapshots/page.tsx`** — Replaced mock data + simulated handlers with real API calls to `/admin/platform/snapshots/*` (dashboard, transitions, config, tier rules, tier costs)
+- **`api/config/route.ts`** — PUT handler now proxies updates to Lambda `system-config` endpoint instead of returning success without persisting
+
+#### New Lambda Handlers & Endpoints
+- **`lambda/admin/model-metadata.ts`** — New handler for model metadata CRUD + research triggering
+- **`lambda/admin/handler.ts`** — Wired `model-metadata` route
+- **`lambda/admin/livs.ts`** — Added `LIVSVersionService`, `GET /version` (check updates), `POST /version/upgrade` (upgrade tenant)
+
+#### Think Tank — Error Handling & Intent Clarity
+- **`(chat)/page.tsx`** — Renamed `simulateResponse` → `showDemoResponse`, error fallback now shows real error message instead of faking a response
+- **`simulator/feature-components.tsx`** — Clarified voice recognition simulation as intentional UI playground behavior
+
+#### Think Tank Admin — Real API Round Advancement
+- **`living-parchment/council/page.tsx`** — `handleRunRound` now calls `POST /admin/cato/council/debates/:id/advance`
+- **`living-parchment/debate/page.tsx`** — `handleRunRound` now calls `POST /admin/cato/council/debates/:id/advance`
+- **`thinktank-admin/simulator/page.tsx`** — `checkLIVSVersion` / `upgradeLIVSVersion` now call real LIVS version API
+
+#### Swift Deployer — Service Wiring
+- **`DeploymentPackagesView.swift`** — `loadPackages`, `createPackage`, `validatePackage`, `restorePackage`, `deletePackage` now use `PackageService` instead of mock data
+
+#### Curator — Real Ingest API
+- **`ingest/page.tsx`** — File upload now calls `POST /admin/cortex/ingest` via Cortex Graph-RAG endpoint
+
+#### Intentional Demo/Dev-Mode (Documented, Not Stubs)
+- **`admin-dashboard/app/page.tsx`** + **`demo/page.tsx`** — Landing page demos for unauthenticated visitors (documented)
+- **`omega-lab/hooks/useShadowOmega.ts`** — WebSocket polling fallback for dev environments (documented)
+- **`thinktank/app/simulator/*`** — UI component playground (documented)
+- **`thinktank-mac/Services/APIClient.swift`** — Offline dev mode with MockDataProvider (documented)
+
+## [7.53.0] - 2026-02-09
+
+### Subsystem Naming Audit & Renames
+
+Comprehensive audit of subsystem naming inconsistencies across the codebase. The name "Genesis" was used by three unrelated subsystems, causing confusion.
+
+#### Genesis App → OMEGA Lab
+- **`apps/genesis/package.json`** — Renamed `@radiant/genesis` → `@radiant/omega-lab`
+- **`apps/genesis/app/layout.tsx`** — Title: "OMEGA Lab - Brain Management"
+- **`apps/genesis/app/page.tsx`** — Header: "OMEGA Lab", tab: "OMEGA Forge"
+- **`apps/genesis/components/GenesisForge.tsx`** — Export renamed `GenesisForge` → `OmegaForge`
+- **`apps/genesis/components/index.ts`** — Updated barrel export
+
+#### Genesis Forge App → OMEGA Forge
+- **`apps/genesis-forge/package.json`** — Renamed `@radiant/genesis-forge` → `@radiant/omega-forge`
+- **`apps/genesis-forge/app/layout.tsx`** — Title: "OMEGA Forge"
+- **`packages/infrastructure/lib/stacks/forge-stack.ts`** — Updated CDK stack comments, log group (`/radiant/omega-forge`), Docker path
+
+#### Genesis Auto-Tool → Tool Forge
+- **`packages/shared/src/types/autonomous-organism.types.ts`** — 11 types renamed: `GenesisToolStatus` → `ToolForgeStatus`, `GenesisToolRequest` → `ToolForgeRequest`, etc.
+- **`lambda/shared/services/organism/genesis-auto-tool.service.ts`** — Class `GenesisAutoToolService` → `ToolForgeService`, export `genesisAutoTool` → `toolForge`
+- **`lambda/shared/services/organism/index.ts`** — Updated barrel export
+- **`lambda/admin/organism.ts`** — Updated import and handler function names
+- **`migrations/V2026_02_09_001__tool_forge_rename.sql`** — Renames `genesis_tool_requests` → `tool_forge_requests`, `genesis_tool_results` → `tool_forge_results` with backward-compatible views
+
+#### Admin Dashboard Updates
+- **`apps/admin-dashboard/.../url-configuration-client.tsx`** — `genesisLabUrl` → `omegaLabUrl`, `genesisForgeUrl` → `omegaForgeUrl`, UI labels updated
+- **`apps/admin-dashboard/.../apps/page.tsx`** — App entries renamed to OMEGA Lab / OMEGA Forge
+- **`docs/DOCUMENTATION-MANIFEST.json`** — Triggers updated: `genesis_forge` → `omega_forge`, `genesis_lab` → `omega_lab`
+
+#### Policy & Documentation
+- **`.windsurf/workflows/subsystem-naming-policy.md`** — New enforcement policy for subsystem naming
+- **`docs/17-GLOSSARY.md`** — "Genesis Ecosystem" → "OMEGA Ecosystem", terms updated
+
+**Note**: CATO Genesis (safety maturation gates) is intentionally NOT renamed — it is correctly parent-scoped and deeply entrenched (14+ importers, 2 DB tables, triggers, RLS).
+
+#### Round 2: Deep Scan Cleanup
+- **`packages/shared/src/types/autonomous-organism.types.ts`** — `genesisQueueDepth` → `toolForgeQueueDepth`, `genesisMetrics` → `toolForgeMetrics`, `pendingGenesisRequests` → `pendingToolForgeRequests`, `deployedGenesisTools` → `deployedToolForgeTools`
+- **`genesis-auto-tool.service.ts`** — `serverId` prefix `genesis-` → `toolforge-`, SQL table names → `tool_forge_requests`/`tool_forge_results`
+- **`apps/omega-lab/`** — 6 files: updated comments, UI text ("GENESIS FORGE" → "OMEGA FORGE"), heading in GenesisForge.tsx, GlassFoundry, VoidModePCB, forge-store, omega-registry
+- **`apps/omega-forge/`** — 6 files: db/client, s3/storage-manager, page heading, sidebar title, kms/signer, cartridge author name
+- **`admin-dashboard/.../organism/page.tsx`** — Tab "genesis" → "tool-forge", heading → "Tool Forge Pipeline"
+- **`OmegaStack.ts`** — `genesisBucket` → `omegaFrontendBucket`, `genesisDistribution` → `omegaFrontendDistribution`, S3 bucket `radiant-omega-frontend-*`, all OAI/distribution/output names updated
+- **`admin-dashboard/.../vault/page.tsx`** — "Genesis Vault" → "Cartridge Vault" (cartridge secret manager, not CATO Genesis)
+
+#### Round 3: Full Codebase Re-Audit
+- **`user-identity.types.ts`** — `hasAccessGenesis` → `hasAccessOmegaLab` (3 interfaces), `AppId 'genesis'` → `'omega_lab'`
+- **`user-profile.types.ts`** — Comment + `hasAccessGenesis` → `hasAccessOmegaLab`
+- **`db/types.ts`** — `has_access_genesis` → `has_access_omega_lab` DB row type
+- **`db/queries.ts`** — `USER_COLUMNS` SQL string updated
+- **`tenant-provisioning.service.ts`** — SQL INSERT column + property reference updated
+- **`V2026_02_09_002__user_access_genesis_rename.sql`** — DB migration for column rename
+- **`cartridge-vault.types.ts`** + **`cartridge-vault.service.ts`** + **`cartridge-pki.types.ts`** — "Genesis Vault" → "Cartridge Vault"
+- **`cartridge/signing.ts`** — "Genesis Forge" → "OMEGA Forge"
+- **`reality-engine.types.ts`** — `useGenesisModel` → `useBaseModel`, `genesisModelId` → `baseModelId`
+- **`pre-cognition.service.ts`** + **`reality-engine.service.ts`** — Matching config + comment updates
+
+**Verified clean**: Consciousness (1454 refs, 119 files), LIVS (258 refs, 30 files), Cortex (50 refs, 25 files) — all properly scoped, no collisions.
+
+**File rename required** (manual): `apps/omega-lab/components/GenesisForge.tsx` → `OmegaForge.tsx`
+
+#### Round 4: Documentation Naming Audit
+Systematic scan and fix of all 18 consolidated docs + EXECUTIVE-REPORT for stale "Genesis" references. Mapping:
+- "Genesis Forge" → "OMEGA Forge" (firmware UI context) or "Tool Forge" (auto-tool/leapfrog context)
+- "Genesis Lab" → "OMEGA Lab"
+- "Genesis Vault" → "Cartridge Vault"
+- "Genesis Auto-Tool" → "Tool Forge"
+- `apps/genesis/` paths → `apps/omega-lab/`
+- `has_access_genesis` → `has_access_omega_lab` (in schema docs)
+
+**Files updated**: `01-THINK-TANK.md`, `03-DOJO.md`, `04-RADIANT-ADMIN.md`, `06-ARCHITECTURE-ENGINEERING.md`, `09-OMEGA-GENESIS.md`, `13-SECURITY-AUTH-COMPLIANCE.md`, `14-OPERATIONS-RUNBOOKS.md`, `15-STRATEGY-COMPETITIVE.md`, `16-IMPLEMENTATION-SPECS.md`, `17-GLOSSARY.md`, `18-UI-UX-LIBRARIES.md`, `19-OMEGA-QUANTUM-MODEL-AI.md`, `EXECUTIVE-REPORT-2026-02-09.md`
+
+**Preserved**: "CATO Genesis" (safety maturation gates) — legitimate parent-scoped term.
+
+#### Round 5: Swift Deployer Source Code & Cleanup
+- **`RadiantApplication.swift`** — Enum cases `genesisLab`/`genesisForge` → `omegaLab`/`omegaForge`, raw values `genesis-lab`/`genesis-forge` → `omega-lab`/`omega-forge`, display names, subdomains, paths, source directories (`apps/omega-lab`/`apps/omega-forge`), static var `genesisApps` → `omegaApps`
+- **`URLConfigurationView.swift`** — Properties `genesisLabUrl`/`genesisForgeUrl` → `omegaLabUrl`/`omegaForgeUrl`, UI labels "Genesis Lab URL"/"Genesis Forge URL" → "OMEGA Lab URL"/"OMEGA Forge URL", section header "Genesis / OMEGA" → "OMEGA", `URLConfiguration` struct fields, default URLs
+- **Deleted `apps/omega-lab/components/GenesisForge.tsx`** — stub file (replaced by OmegaForge.tsx)
+
+## [7.52.1] - 2026-02-09
+
+### Bug Fix: Cortex Route Shadowing
+
+- **`lambda/admin/handler.ts`** — Fixed critical routing bug where ALL `/admin/cortex/*` requests were caught by the first cortex route block and sent to `cortex-graph-rag.js`, making `cortex-v2.ts` and `cortex.ts` **completely unreachable**.
+  - Consolidated all cortex routing into a single dispatch block:
+    - `/admin/cortex/v2/*` → `cortex-v2.js`
+    - `/admin/cortex/{overview,health,alerts,metrics,graph,housekeeping,mounts,gdpr}/*` → `cortex.js`
+    - All other `/admin/cortex/*` (dashboard, config, entities, relationships) → `cortex-graph-rag.js` (default)
+  - Removed duplicate unreachable cortex block
+  - **Impact**: 5 admin dashboard pages were affected — `/cortex/`, `/cortex/graph/`, `/cortex/gdpr/`, `/cortex/conflicts/`
+
+### Placeholder/Stub Elimination
+
+Comprehensive audit found and fixed **5 genuine placeholder implementations** across 6 files (out of 861 pattern matches — the rest were content strings like icon imports, LIVS governance rules, harm category keywords, and Kanban column IDs).
+
+- **`lambda/admin/organism.ts`** — `find-by-intent` endpoint now calls `embeddingService.generateEmbedding()` instead of using a hardcoded zero `Float32Array(1536)`. Falls back to zero vector on failure (consistent with codebase pattern).
+- **`lambda/shared/services/organism/economic-cortex.service.ts`** — `notifyAdmin()` and `notifyUser()` now emit budget alert events via Event Firehose (per no-database-logging policy) instead of logging only. Includes budget utilization, threshold, level, and action flags.
+- **`lambda/shared/services/organism/organism-integration.service.ts`** — `executeToolOnLocation()` now makes actual HTTP calls to MCP servers using server config (URL, auth, timeout) from `mcpServerManager`, with proper error handling and metrics tracking. Replaces 100ms sleep + fake response.
+- **`lambda/admin/state-registry.ts`** — 8 placeholder functions (`getSyncStatus`, `cancelSync`, `getSyncHistory`, `getSyncConfig`, `updateSyncConfig`, `listBackups`, `getBackup`, `deleteBackup`) now read/write real data from S3 via new `EnvironmentStateService` public methods.
+- **`lambda/shared/services/state-registry/environment-state.service.ts`** — Added 9 public accessor methods: `getSyncOperation`, `cancelSyncOperation`, `listSyncOperations`, `getBackupManifest`, `listBackupManifests`, `deleteBackupManifest`, `getSyncConfig`, `saveSyncConfig`.
+- **`lambda/shared/services/liquid-interface/eject.service.ts`** — Generated component code now renders a functional component with description text and expandable props inspector instead of a `{/* TODO */}` comment.
+
+## [7.52.0] - 2026-02-16
+
+### Think Tank Tenant Administration, Pool B Simplification & Think Tank Admin Rewiring
+
+Renamed `thinktank-tenant-admin` to **Think Tank Tenant Administration** for consistency. Added tenant-level cartridge insertion, stacking management, and OMEGA brain status monitoring. Removed `tenant_owner` role from the identity model. **Simplified Pool B to `super_admin` only** — removed `admin`, `operator`, `auditor` roles. **Rewired Think Tank Admin** as a global platform app accessible only by Pool B `super_admin` with tenant picker.
+
+#### App Rename
+- **Think Tank Tenant Administration** — renamed from "Think Tank Tenant Admin" across package.json, layout, next.config.js, sidebar header
+
+#### Tenant-Level Cartridge Management
+- **`lambda/tenant/cartridge-management.ts`** — NEW: 11-endpoint tenant-scoped cartridge API
+  - `GET /tenant/cartridges` — List tenant + system cartridges
+  - `GET /tenant/cartridges/:id` — Cartridge detail
+  - `POST /tenant/cartridges/install` — Install cartridge for tenant (firmware restricted to platform admins)
+  - `POST /tenant/cartridges/uninstall` — Uninstall tenant cartridge (system cartridges protected)
+  - `GET /tenant/cartridges/stack` — Current stacking order with hierarchy diagram
+  - `PUT /tenant/cartridges/stack/reorder` — Reorder tenant cartridge priorities
+  - `GET /tenant/cartridges/resolved` — Resolved state after all layers merge
+  - `POST /tenant/cartridges/resolve` — Trigger manual re-resolution
+  - `GET /tenant/cartridges/omega/status` — OMEGA brain cartridge sync status
+  - `POST /tenant/cartridges/omega/reload` — Trigger OMEGA brain cartridge reload via EventBridge
+  - `GET /tenant/cartridges/audit` — Tenant-scoped audit log
+
+#### OMEGA Wiring
+- Cartridge install/uninstall/reorder automatically triggers:
+  1. Resolution engine re-computes effective stack via `resolveAndPersist()`
+  2. EventBridge `CartridgeStackChanged` event triggers OMEGA brain cartridge reload
+- Manual reload available via `POST /tenant/cartridges/omega/reload`
+- Stale detection: compares `cartridge_resolved_state.resolved_at` vs `omega_brain_checkpoints.updated_at`
+
+#### New UI Pages
+- **Stacking & Resolution** (`/cartridges/stacking`) — Hierarchy visualization, system vs tenant stack view, priority reordering (up/down), resolved state with section sources and firmware contributors, resolution log viewer
+- **OMEGA Brain Status** (`/cartridges/omega`) — Brain state metrics (Hilbert dimension, dopamine, cycles, Helix rules, knowledge facts), cartridge sync status with stale detection, 8-step boot sequence visualization, manual reload trigger
+
+#### UI Component Library
+- Created 10 shadcn/ui components for tenant admin app: card, button, badge, tabs, input, label, skeleton, alert, dialog, checkbox, progress
+- Added `lib/utils.ts` with `cn()` helper
+- Added radix-ui dependencies: react-checkbox, react-dialog, react-label, react-progress, react-slot, react-tabs
+
+#### Role Cleanup: `tenant_owner` Removed
+- **`packages/shared/src/types/auth-v51.types.ts`** — Removed from `AuthTenantUserRole`
+- **`packages/shared/src/types/user-identity.types.ts`** — Removed from `TenantRole`
+- **`packages/shared/src/types/user-profile.types.ts`** — Removed from role documentation
+- **`packages/shared/src/types/mfa.types.ts`** — Removed from `mfaRequiredRoles` and `mfaUiVisibleRoles`
+- **`packages/infrastructure/lambda/shared/db/types.ts`** — Removed from `tenant_role` type
+- **`packages/infrastructure/lambda/auth/mfa.handler.ts`** — Removed from required roles check
+- **`apps/admin-dashboard/app/(dashboard)/settings/sso/page.tsx`** — Removed from SSO default role dropdown
+
+#### Sidebar Updates
+- Added "Stacking & Resolution" and "OMEGA Brain Status" to Management section
+
+#### Pool B Simplification: `super_admin` Only
+Removed `admin`, `operator`, `auditor` roles from Pool B. Only `super_admin` remains as the platform administrator role.
+
+- **`packages/shared/src/types/auth-v51.types.ts`** — `PlatformAdminRole` simplified to `'super_admin'`; removed admin/operator/auditor permission entries
+- **`packages/shared/src/types/user-profile.types.ts`** — `SystemAdminRole` simplified to `'super_admin'`; removed 3 permission sets from `SYSTEM_ADMIN_PERMISSIONS`; updated role documentation
+- **`packages/shared/src/types/admin.types.ts`** — `AdminRole` simplified to `'super_admin'`; removed admin/operator/auditor from `ROLE_PERMISSIONS`
+- **`packages/shared/src/types/mfa.types.ts`** — Removed admin/operator/auditor from `mfaRequiredRoles` and `mfaUiVisibleRoles`
+- **`packages/infrastructure/lambda/shared/middleware/system-admin-auth.ts`** — Rejects non-super_admin tokens; simplified role hierarchy
+- **`packages/infrastructure/lambda/shared/middleware/admin-role-guard.ts`** — Simplified to super_admin only; `getAppAccess()` now returns `['radiant_admin', 'thinktank_admin']`
+- **`packages/infrastructure/lambda/shared/admin/types.ts`** — Removed ADMIN/OPERATOR/AUDITOR from const; simplified hierarchy & permissions; invitation schema accepts only `'super_admin'`
+- **`packages/infrastructure/lambda/shared/db/types.ts`** — Administrator and Invitation role types narrowed to `'super_admin'`
+- **`packages/infrastructure/lambda/shared/validation/request-schemas.ts`** — `InvitationCreateSchema` role enum narrowed to `['super_admin']`
+- **`packages/infrastructure/lambda/auth/mfa.handler.ts`** — Removed admin/operator/auditor from required roles
+- **`packages/infrastructure/lambda/thermal/manager.ts`** — Simplified permission check (only super_admin via `isSuperAdmin`)
+- **`packages/infrastructure/lib/stacks/auth-stack.ts`** — CDK only creates `super_admin` Cognito group in Pool B
+- **`packages/infrastructure/lambda/shared/__tests__/auth.test.ts`** — Updated tests for super_admin only
+
+#### Admin Dashboard Updates
+- **`apps/admin-dashboard/lib/api/types.ts`** — `AdminRole` narrowed to `'super_admin'`
+- **`apps/admin-dashboard/lib/auth/context.tsx`** — `AdminRole` narrowed to `'super_admin'`
+- **`apps/admin-dashboard/middleware.ts`** — Simplified: only super_admin role, all routes allowed, removed role-restricted route matrix
+- **`apps/admin-dashboard/app/(dashboard)/administrators/administrators-client.tsx`** — Removed admin/operator/auditor badges; default invite role is `super_admin`
+
+#### Think Tank Admin → Global Platform App (Pool B)
+Rewired Think Tank Admin as a **global platform app** accessible only by Pool B `super_admin` users. Added tenant picker for tenant context selection.
+
+- **`apps/thinktank-admin/lib/auth/api-auth.ts`** — `ADMIN_ROLES` narrowed to `['SuperAdmin', 'super_admin']`; removed TenantAdmin/admin access; `tenantId` in login credentials now optional; updated error messages
+- **`apps/thinktank-admin/components/layout/tenant-picker.tsx`** — NEW: Tenant picker component for super_admin to select tenant context. Fetches tenant list from admin API, supports search/filter, persists selection in sessionStorage, provides `getSelectedTenantId()` utility
+- **`apps/thinktank-admin/components/layout/header.tsx`** — Integrated tenant picker; added Super Admin badge indicator
+
+---
+
+## [7.51.0] - 2026-02-16
+
+### OMEGA Quantum / Model AI — Documentation Consolidation (Doc 19)
+
+New consolidated documentation document `docs/19-OMEGA-QUANTUM-MODEL-AI.md` establishing the **Five Pillars of Computational Architecture** — the complete reference for RADIANT's AI infrastructure.
+
+#### Five Pillars Documented
+- **Pillar 1: Quantum State Engine** — Hilbert space, complex amplitudes, unitarity enforcement, Born rule, decoherence simulation
+- **Pillar 2: Helix Safety Kernel** — Deterministic safety filter, destructive/dampening interference, severity-ordered rules, self-test protocol
+- **Pillar 3: Firmware & Cartridge Lifecycle** — .RADz format, 8-step cartridge-first boot, min() rule, firmware hot-swap with Ed25519, Soft ROM deltas
+- **Pillar 4: Model Routing & Drift Governance** — 106+ models, drift-aware selection, spend governor, circuit breakers, inference cache
+- **Pillar 5: Federated Intelligence (Global Brain)** — DP-SGD gradient upload, quality-weighted federated averaging, base cartridge pipeline
+
+#### New Policy
+- Created `/.windsurf/workflows/omega-docs-policy.md` — all OMEGA-related documentation must reside in `docs/19-OMEGA-QUANTUM-MODEL-AI.md`. Historical content remains in `docs/09-OMEGA-GENESIS.md` but no new OMEGA content goes there.
+
+#### Documentation Updates
+- **`docs/19-OMEGA-QUANTUM-MODEL-AI.md`** — NEW: 13-part document covering all five pillars, inference cycle, ambition chemicals, Soft ROM, admin API, OMEGA Forge, database schema, source file index
+- **`docs/DOCUMENTATION-MANIFEST.json`** — Updated to 19 documents, added OMEGA triggers and trigger matrix entries
+- **`.windsurf/workflows/docs-update-all.md`** — Updated to 19 documents, OMEGA section now points to doc 19
+- **`AGENTS.md`** — Updated doc count to 19, OMEGA row points to doc 19
+- **`.windsurf/workflows/omega-docs-policy.md`** — NEW: Enforcement policy for OMEGA documentation location
+
+### Beyond Copilots — Seven Principles Integration into Marketing Guide
+
+Integrated the full content of `docs/publications/BEYOND-COPILOTS-RADIANT-PRINCIPLES.md` into `docs/15-STRATEGY-COMPETITIVE.md` as **Part X: Beyond Copilots — The Seven RADIANT Principles**.
+
+#### Seven Principles Integrated
+- **Principle 1**: Transformation Over Augmentation (Polymorphic UI, Eject to App)
+- **Principle 2**: Institutional Memory Over Session Amnesia (Cortex three-tier, Graph-RAG)
+- **Principle 3**: Verified Intelligence Over Probabilistic Guessing (Empiricism Loop, Council of Rivals)
+- **Principle 4**: Elastic Intelligence Over Static Cost (Gearbox, Economic Governor)
+- **Principle 5**: Sovereign Infrastructure Over API Dependency (Tri-Layer Consciousness)
+- **Principle 6**: Mathematical Safety Over Prompt-Based Hope (Control Barrier Functions)
+- **Principle 7**: Compounding Value Over Static Tooling (Dreaming Cycle)
+
+#### Additional Content
+- **Copilots vs. Magic Carpet** — 11-dimension comparison table
+- **RADIANT Terms Glossary** — 18-term marketing reference glossary
+- **Document History** entry added to `docs/15-STRATEGY-COMPETITIVE.md`
+
+---
+
+## [7.50.0] - 2026-02-16
+
+### OMEGA Forge — System Admin Application (PROMPT-51)
+
+New standalone Next.js 14 application for RADIANT system administrators. OMEGA Forge provides direct Aurora PostgreSQL access (no RLS), cartridge authoring with .RADz builder/parser, KMS-backed signing, and platform-wide brain inspection. Deployed as ECS Fargate in a private subnet — no public access.
+
+#### New Application: `apps/omega-forge/`
+- **Direct Aurora connection** via `pg` driver through RDS Proxy — full cross-tenant visibility
+- **Storage Manager** (`lib/s3/storage-manager.ts`) — ALL S3 operations routed through this service
+- **Cartridge Builder** (`lib/cartridge/builder.ts`) — builds .RADz files with ZSTD compression, SHA-256 checksums, KMS signing
+- **Cartridge Parser** (`lib/cartridge/parser.ts`) — extracts and validates .RADz archives
+- **KMS Signer** (`lib/kms/signer.ts`) — ECDSA_SHA_256 signing via AWS KMS
+
+#### API Routes (12)
+- `GET /api/dashboard` — system-wide stats (cartridges, brains, CATO, Global Brain)
+- `GET /api/cartridges` — list with status/target filters
+- `GET /api/cartridges/[id]` — detail with installations
+- `DELETE /api/cartridges/[id]` — archive cartridge
+- `POST /api/cartridges/build` — build .RADz from authored sections
+- `GET /api/brains` — all OMEGA brain instances across tenants
+- `GET /api/brains/[tenantId]` — brain detail with cartridges, dreams, Soft ROM
+- `GET /api/brains/[tenantId]/soft-rom` — Soft ROM file listing
+- `POST /api/brains/[tenantId]/soft-rom` — export Soft ROM as .RADz cartridge
+- `GET /api/cato` — all CATO instances
+- `GET /api/targets` — target service registry
+- `POST /api/targets` — register new target
+- `GET /api/signing` — KMS key info and public key PEM
+- `GET /api/audit` — full audit trail with action/tenant filters
+- `GET /api/global-brain/gradients` — gradient monitor
+- `GET /api/global-brain/federated` — rounds, pipelines, enrollment stats
+
+#### UI Pages (11)
+- **Dashboard** — system overview with stat cards and recent activity
+- **Cartridges** — searchable list, create form with target selection
+- **Brains** — tenant brain cards, detail page with Soft ROM/dreams/cartridges
+- **CATO** — personality instances with pattern/config counts
+- **Global Brain** — enrollment, rounds, pipelines overview
+- **Targets** — target service registry with spec counts
+- **Signing & PKI** — KMS key inspector with public key PEM display
+- **Audit** — filterable audit log table
+
+#### CDK Infrastructure
+- **ForgeStack** (`lib/stacks/forge-stack.ts`) — ECS Fargate (ARM64, 1vCPU/2GB), private subnet, internal ALB, IAM for S3/KMS/Secrets Manager, CloudWatch logs, ECS Exec enabled
+
+#### Design Decisions
+- All S3 operations through Forge Storage Manager — no direct S3 calls
+- Dark theme (amber accent) to visually distinguish from tenant admin dashboard
+- No RLS — Forge sees all tenants, all data (system admin tool behind firewall)
+- Standalone Next.js app on port 3100, Docker-based deployment
+
+## [7.49.0] - 2026-02-15
+
+### RADIANT Global Brain — Bidirectional Architecture (PROMPT-53)
+
+Federated learning, privacy-safe gradient aggregation, and base cartridge generation. Every enrolled tenant brain uploads anonymized DP gradients nightly; the Global Brain aggregates them weekly and generates improved base .RADz cartridges monthly. All S3 operations via `cartridgeStorageManager`.
+
+#### Database
+- **Migration V2026_02_15_001**: 4 new tables (`global_brain_enrollment`, `global_brain_gradients`, `global_brain_rounds`, `global_brain_cartridge_pipeline`)
+- RLS policies on enrollment and gradients using `app.current_tenant_id`
+- Indexes on tenant, round, status, type, uploaded_at
+
+#### Lambda Services (3 new)
+- **gradient-upload.service.ts**: DP-SGD gradient processing (per-sample clipping + calibrated Gaussian noise), AES-256-GCM envelope encryption with KMS, uploads OMEGA Q-Node gradients, CORTEX performance metrics, CATO fitness statistics. All S3 via `cartridgeStorageManager.storeContent()`
+- **federated-averaging.service.ts**: Quality-weighted federated averaging with z-score outlier detection, configurable learning rate and momentum. Round management (create, activate, run). All S3 via storage manager
+- **cartridge-pipeline.service.ts**: Monthly base cartridge generation from completed rounds. Loads previous base weights, applies averaged gradients, stores new Q-Node sections and firmware. Publishes to marketplace and archives previous base
+
+#### Admin API (10 endpoints)
+- **global-brain.ts**: `GET/PUT enrollment`, `GET contributions`, `GET/POST rounds`, `POST rounds/:id/run`, `GET/POST pipeline`, `POST pipeline/:id/run`, `GET stats`
+
+#### CDK Infrastructure
+- **storage-stack.ts**: New `globalBrainBucket` S3 bucket with KMS encryption, 90-day gradient expiry lifecycle
+
+#### Storage Manager
+- **cartridge-storage-manager.service.ts**: Added `'global_brain'` content category and `buildGlobalBrainPath()` helper
+
+#### Dream Cycle Integration
+- **dream-scheduler.service.ts**: Step 6 added — after Soft ROM export (step 5), calls `uploadGradients()` with tenant's dream cycle data. Non-fatal — dream completes even if upload fails
+
+#### Admin Dashboard
+- **Sidebar**: New "Global Brain" section with 3 entries (Enrollment, Federated Rounds, Cartridge Pipeline)
+- **Enrollment page** (`/global-brain`): Stats overview, enrollment toggle, privacy config (DP-SGD params), data consent checkboxes, contribution history table
+- **Rounds page** (`/global-brain/rounds`): List rounds with status badges, create new rounds, trigger averaging
+- **Pipeline page** (`/global-brain/pipeline`): List pipelines with progress, schedule new pipelines, trigger execution
+- **React Query hooks** (`use-global-brain.ts`): 10 hooks for all Global Brain operations
+
+#### Shared Types (15 new)
+- `GlobalBrainEnrollmentTier`, `GlobalBrainGradientType`, `GlobalBrainGradientStatus`, `GlobalBrainRoundType`, `GlobalBrainRoundStatus`, `GlobalBrainPipelineType`, `GlobalBrainPipelineStatus`, `GlobalBrainPrivacyConfig`, `GlobalBrainDataConsent`, `GlobalBrainEnrollment`, `GlobalBrainGradient`, `GlobalBrainRound`, `GlobalBrainCartridgePipeline`, `GlobalBrainStats`
+
+#### Key Design Decisions
+- **No direct S3**: All storage via `cartridgeStorageManager` singleton
+- **DP-SGD**: Per-sample gradient clipping (configurable norm) + calibrated Gaussian noise (ε, δ configurable per tenant)
+- **Envelope encryption**: AES-256-GCM with KMS data keys for gradient blobs
+- **Quality-weighted averaging**: Higher-quality tenants contribute more; outliers rejected by z-score
+- **Minimum 3 participants**: Rounds fail if fewer than 3 valid gradients
+- **Non-fatal integration**: Dream cycle completes even if gradient upload fails
+
+### Files Created (8)
+| File | Purpose |
+|------|---------|
+| `migrations/V2026_02_15_001__global_brain.sql` | DB schema (4 tables) |
+| `lambda/shared/services/global-brain/gradient-upload.service.ts` | DP gradient upload |
+| `lambda/shared/services/global-brain/federated-averaging.service.ts` | Weighted averaging engine |
+| `lambda/shared/services/global-brain/cartridge-pipeline.service.ts` | Base cartridge generation |
+| `lambda/admin/global-brain.ts` | Admin API (10 endpoints) |
+| `admin-dashboard/lib/hooks/use-global-brain.ts` | React Query hooks |
+| `admin-dashboard/app/(dashboard)/global-brain/page.tsx` | Enrollment page |
+| `admin-dashboard/app/(dashboard)/global-brain/rounds/page.tsx` | Rounds page |
+| `admin-dashboard/app/(dashboard)/global-brain/pipeline/page.tsx` | Pipeline page |
+
+### Files Modified (5)
+| File | Changes |
+|------|---------|
+| `cartridge-storage-manager.service.ts` | Added `'global_brain'` category + `buildGlobalBrainPath()` |
+| `dream-scheduler.service.ts` | Added gradient upload step 6 after Soft ROM export |
+| `lambda/admin/handler.ts` | Route `global-brain` → `global-brain.js` |
+| `lib/stacks/storage-stack.ts` | Added `globalBrainBucket` |
+| `components/layout/sidebar.tsx` | Added Global Brain section (3 entries) |
+| `cartridge.types.ts` | Added 15 Global Brain types |
+| `migrations/manifest.json` | Entry #177 |
+
+## [7.48.0] - 2026-02-11
+
+### OMEGA Cartridge Integration (PROMPT-52)
+
+Rewires the OMEGA Consciousness Engine for cartridge-first operation. All hardcoded brain defaults replaced with cartridge-loaded configurations. All S3 operations routed through the cartridge storage manager.
+
+#### New OMEGA Services (5 files)
+- **omega-cartridge-boot.service.ts**: 8-step boot sequence — loads resolved cartridge state from DB, firmware (veto thresholds, parameter bounds), Q-Node weights, Soft ROM delta, knowledge facts, ambition config, development schedule, action gate config. Factory defaults fallback if cartridge state corrupted.
+- **omega-firmware-enforcer.service.ts**: Runtime veto threshold enforcement using min() rule (most restrictive wins). Parameter bounds clamping. Self-optimization adjustment gating.
+- **omega-ambition.service.ts**: Chemical system (dopamine, entropy, curiosity, frustration, satisfaction) driven by cartridge `ambition_config.json`. Replaces all hardcoded ambition constants. Includes self-optimization config and internet research triggers.
+- **omega-soft-rom.service.ts**: Soft ROM delta read/write via cartridge storage manager. Computes weight deltas (current − cartridge base), connection deltas, sub-cluster maps, preferences. All S3 through `cartridgeStorageManager.storeContent()` / `retrieveContent()`.
+- **omega-cartridge-events.service.ts**: EventBridge listener for `CortexModelUpdate`, `CatoConfigUpdate`, `CartridgeInstalled`, `CartridgeUninstalled`, `CartridgeResolved`, `FirmwareUpdate`. Triggers hot-reload of OMEGA brain state.
+
+#### Modified Files (3)
+| File | Changes |
+|------|---------|
+| `quantum-brain.service.ts` | Removed direct `S3Client`; added `bootFromCartridges()`, `writeSoftRomDelta()`, `checkCartridgeHealth()`, `getFirmwareEnforcer()`, `getAmbitionService()`, `getKnowledgeFacts()`; checkpoint now includes cartridge base ref; `getStateSummary()` reports cartridge boot status, firmware enforcement count, Soft ROM version, knowledge facts, ambition chemicals |
+| `dream-scheduler.service.ts` | Added Soft ROM export at Dream Cycle Phase 8 (step 5) — writes learning delta to S3 via storage manager after active verification |
+| `cartridge.types.ts` | Added 14 OMEGA cartridge integration types: `OmegaCartridgeBootStatus`, `OmegaChemicalConfig`, `OmegaAmbitionConfig`, `OmegaFirmwareConfig`, `OmegaDevelopmentScheduleConfig`, `OmegaActionGateConfig`, `OmegaSoftRomDelta`, `OmegaSoftRomPreferences`, `OmegaCartridgeHealthCheck`, `OmegaKnowledgeFact`, `OmegaBrainStateSummary`, `OmegaCartridgeEvent` |
+
+#### Key Design Decisions
+- **Firmware min() rule**: Veto thresholds can only be TIGHTENED by cartridges, never loosened. `FirmwareEnforcer.enforceVetoThreshold()` returns `Math.min(requested, firmware_floor)`.
+- **Soft ROM = delta**: Stored as `current_weights − cartridge_base_weights`, not absolute values. On boot, delta is applied additively on top of cartridge base.
+- **Factory defaults fallback**: If cartridge state is corrupted or missing, brain boots with safe factory defaults and sets status to `factory_defaults`.
+- **No direct S3**: All storage operations go through `cartridgeStorageManager` singleton.
+- **Metrics**: `cartridge_boot_duration_ms`, `firmware_enforcement_count`, `soft_rom_delta_size_bytes` tracked in brain state summary and checkpoint.
+
+## [7.47.0] - 2026-02-10
+
+### Universal Cartridge System (PROMPT-50)
+
+Complete implementation of the RADIANT Universal Cartridge System (.RADz) — portable AI intelligence packages that can target OMEGA, CORTEX, CATO, and tenant services.
+
+#### Database
+- **Migration V2026_02_10_022**: 7 new tables (`cartridge_target_services`, `cartridge_target_section_specs`, `cartridge_universal`, `cartridge_installations`, `cartridge_resolved_state`, `cartridge_audit_log`, `cato_cartridge_config`)
+- RLS policies on all tables using `app.current_tenant_id`
+- Seed data for 5 target services (omega, cortex, cato, tenant, global) with 14 section specs
+- Full JSON schema validation specs for firmware and personality sections
+
+#### CDK Infrastructure
+- **storage-stack.ts**: New `cartridgeBucket` S3 bucket with KMS encryption, versioning, Glacier lifecycle, access logging
+
+#### Lambda Services
+- **cartridge-storage-manager.service.ts**: Central storage manager for all cartridge S3 operations (no direct S3 access). Pre-signed URL generation, binary content store/retrieve, content registry tracking
+- **cartridge-universal.ts**: Admin API Lambda with 14 endpoints (list, detail, upload, validate, install, uninstall, stack, reorder, resolved, export-soft-rom, targets, target-specs, register-target, audit)
+- **cartridge-validator.ts**: SQS worker — ZSTD decompression, Ed25519/ECDSA signature verification, manifest validation, section file validation against DB specs, JSON schema validation, checksum verification
+- **cartridge-loader.ts**: SQS worker — extracts and dispatches sections to target services (OMEGA Q-Nodes, CORTEX ONNX, CATO personality → `cato_cartridge_config`, tenant config). All writes through storage manager
+- **cartridge-resolution.ts**: SQS worker — runs stacking resolution engine and persists result
+
+#### Signing & Resolution
+- **signing.ts**: Ed25519 + ECDSA verification, KMS signing, SHA-256 checksums, manifest checksum verification
+- **resolution.ts**: Tenant-prevails stacking engine. Firmware uses min() (most restrictive wins). Memory priority: tenant_facts(5.0x) > soft_rom(3.0x) > domain(2.0x) > cato_user(1.5x) > base(1.0x) > internet(0.6x)
+
+#### Shared Types
+- 15 new types in `@radiant/shared`: `UniversalCartridgeType`, `UniversalCartridgeStatus`, `CartridgeTargetService`, `CartridgeTargetSectionSpec`, `UniversalCartridge`, `CartridgeInstallation`, `CartridgeResolvedState`, `CartridgeAuditEntry`, etc.
+
+#### Admin Dashboard
+- **Sidebar**: New "Cartridge System" section with 5 entries
+- **Installed page** (`/cartridge-system`): Grid view of all cartridges with status badges, type filters, upload dialog, validate/install/uninstall actions
+- **Marketplace page** (`/cartridge-system/marketplace`): Browse validated cartridges available for installation
+- **Stack & Resolution page** (`/cartridge-system/stack`): Reorderable stack, resolved state viewer, Soft ROM export
+- **Target Registry page** (`/cartridge-system/targets`): Expandable target cards with section spec details
+- **Audit page** (`/cartridge-system/audit`): Full audit trail with action-specific icons and colors
+- **React Query hooks** (`use-cartridge-system.ts`): 12 hooks for all cartridge system operations
+
+#### Handler Wiring
+- **handler.ts**: Route `cartridge-system` → `cartridge-universal.js`
+
+### Files Created (14)
+| File | Purpose |
+|------|---------|
+| `migrations/V2026_02_10_022__universal_cartridge_system.sql` | DB schema + seed data |
+| `lambda/shared/services/cartridge-storage-manager.service.ts` | Storage manager (no direct S3) |
+| `lambda/shared/cartridge/signing.ts` | Ed25519/ECDSA/KMS signing |
+| `lambda/shared/cartridge/resolution.ts` | Stacking resolution engine |
+| `lambda/admin/cartridge-universal.ts` | Admin API (14 endpoints) |
+| `lambda/workers/cartridge-validator.ts` | Validation SQS worker |
+| `lambda/workers/cartridge-loader.ts` | Installation SQS worker |
+| `lambda/workers/cartridge-resolution.ts` | Resolution SQS worker |
+| `admin-dashboard/lib/hooks/use-cartridge-system.ts` | React Query hooks |
+| `admin-dashboard/app/(dashboard)/cartridge-system/page.tsx` | Installed cartridges page |
+| `admin-dashboard/app/(dashboard)/cartridge-system/marketplace/page.tsx` | Marketplace page |
+| `admin-dashboard/app/(dashboard)/cartridge-system/stack/page.tsx` | Stack & resolution page |
+| `admin-dashboard/app/(dashboard)/cartridge-system/targets/page.tsx` | Target registry page |
+| `admin-dashboard/app/(dashboard)/cartridge-system/audit/page.tsx` | Audit log page |
+
+### Files Modified (4)
+| File | Changes |
+|------|---------|
+| `lib/stacks/storage-stack.ts` | Added `cartridgeBucket` with KMS, versioning, Glacier lifecycle |
+| `lambda/admin/handler.ts` | Added `cartridge-system` route to `cartridge-universal.js` |
+| `components/layout/sidebar.tsx` | Added Cartridge System section (5 entries) |
+| `packages/shared/src/types/cartridge.types.ts` | Added 15 Universal Cartridge System types |
+
 ## [7.46.0] - 2026-02-08
 
 ### Core Service Gap Closure — tenantId Threading, Dojo AI Pipeline, Video Converter
@@ -157,12 +700,12 @@ Full native macOS SwiftUI application replicating the Think Tank web experience 
 ### Application Hub & URL Configuration
 
 #### Admin Dashboard
-- **New `/apps` page**: Platform Applications hub showing all 9 RADIANT apps (Think Tank, Curator, Dojo, Cato Trainer, Genesis Lab, Genesis Forge, OMEGA API, Admin, API) with descriptions, tier badges, tech stack info, configured URL launch links, and health check buttons
+- **New `/apps` page**: Platform Applications hub showing all 9 RADIANT apps (Think Tank, Curator, Dojo, Cato Trainer, OMEGA Lab, OMEGA Forge, OMEGA API, Admin, API) with descriptions, tier badges, tech stack info, configured URL launch links, and health check buttons
 - **New "Applications" sidebar section**: Added at top of navigation with "All Apps" and "URL Configuration" entries for discoverability
 
 #### Swift Deployer
-- **URLConfigurationView**: Added missing URL fields for Cato Trainer, Curator, Genesis Lab, Genesis Forge, and OMEGA API to the form, ViewModel, and URLConfiguration model
-- **URLConfiguration model**: Added `catoTrainerUrl`, `curatorUrl`, `genesisLabUrl`, `genesisForgeUrl`, `omegaApiUrl` with default subdomain-based URLs
+- **URLConfigurationView**: Added missing URL fields for Cato Trainer, Curator, OMEGA Lab, OMEGA Forge, and OMEGA API to the form, ViewModel, and URLConfiguration model
+- **URLConfiguration model**: Added `catoTrainerUrl`, `curatorUrl`, `omegaLabUrl`, `omegaForgeUrl`, `omegaApiUrl` with default subdomain-based URLs
 - **Validation**: All new URL fields included in validation pass
 
 ## [7.43.3] - 2026-02-08
@@ -172,7 +715,7 @@ Full native macOS SwiftUI application replicating the Think Tank web experience 
 Full audit of `docs/17-GLOSSARY.md` against all 18 consolidated docs, 280+ source code services, 42 CDK stacks, admin dashboard sidebar (360+ entries), and CHANGELOG (v7.18–7.43.2).
 
 #### New Sections Added (3)
-- **§5 RADIANT Applications**: 6 platform apps (Admin Dashboard, Swift Deployer, Aurelius Dojo, Cato Trainer, Genesis Forge, Genesis Lab) + 6 user/tenant management terms (System Admin Separation, Tenant Provisioning, Unified User Profile, Admin Role Hierarchy, Licensing System, Guest Collaboration)
+- **§5 RADIANT Applications**: 6 platform apps (Admin Dashboard, Swift Deployer, Aurelius Dojo, Cato Trainer, OMEGA Forge, OMEGA Lab) + 6 user/tenant management terms (System Admin Separation, Tenant Provisioning, Unified User Profile, Admin Role Hierarchy, Licensing System, Guest Collaboration)
 - **§6 Security & Intrusion Detection**: RIDPS (13 terms), Spend Governor (6 terms)
 - **§7 Operations & Monitoring**: SENTINEL (10 terms), Log Retention (5 terms), Data Lake Offload (8 terms)
 
@@ -1887,7 +2430,7 @@ Created dedicated user guide and administrator guide for the OMEGA Synthetic Bio
 
 #### New Documents
 
-- **`docs/OMEGA-USER-GUIDE.md`** (v2.0.0) — Comprehensive user guide covering: Bicameral Mind architecture, Q-Nodes (complex-valued quantum oscillators), Helix Kernel (deterministic safety), Cryogenic Engine (serverless time-warping), Neural Bridge (telepathy layer), Resonant Memory (O(1) lookup), Homeostatic Dreaming, Shadow Protocol, Genesis Lab, Genesis Forge, .bio firmware standard, file structure, thermal status
+- **`docs/OMEGA-USER-GUIDE.md`** (v2.0.0) — Comprehensive user guide covering: Bicameral Mind architecture, Q-Nodes (complex-valued quantum oscillators), Helix Kernel (deterministic safety), Cryogenic Engine (serverless time-warping), Neural Bridge (telepathy layer), Resonant Memory (O(1) lookup), Homeostatic Dreaming, Shadow Protocol, OMEGA Lab, OMEGA Forge, .bio firmware standard, file structure, thermal status
 - **`docs/OMEGA-ADMIN-GUIDE.md`** (v2.0.0) — Administrator operations guide covering: 20+ admin API endpoints (dashboard, config, shadow mode, cortex management, firmware CRUD, URL config), brain management (snapshots, restore, lobotomy), firmware administration (hot-swap, versioning, rollback), Shadow Mode config and monitoring, Neural Bridge settings, dream cycle administration, AWS infrastructure (Lambda, EFS, S3), instance registry, WebSocket tether, troubleshooting, security
 
 #### Documentation Policy Updates
@@ -2106,9 +2649,9 @@ New standalone web application (`apps/dojo/`) for agent-powered training on orga
 
 ## [7.15.0] - 2026-02-06
 
-### 🔥 Genesis Forge v3.0 — "The Glass Foundry"
+### 🔥 OMEGA Forge v3.0 — "The Glass Foundry"
 
-Complete rebuild of Genesis Forge from a basic firmware editor into a **Behavioral ROM Forge** permanently tethered to Shadow Omega. Firmware is now immutable behavioral directives (instincts, fears, morals, ambitions, boundaries) burned into the brain's ROM — not hardware firmware.
+Complete rebuild of OMEGA Forge from a basic firmware editor into a **Behavioral ROM Forge** permanently tethered to Shadow Omega. Firmware is now immutable behavioral directives (instincts, fears, morals, ambitions, boundaries) burned into the brain's ROM — not hardware firmware.
 
 #### Core Architecture
 
@@ -3586,12 +4129,12 @@ Complete implementation of the OMEGA serverless cryogenic architecture - a bio-m
 | `omega_heartbeat.py` | Pacemaker for scheduled maintenance and dream cycles |
 | `omega_admin.py` | Cortex Explorer admin API for brain management |
 
-#### Genesis Frontend (`apps/genesis/`)
+#### OMEGA Lab Frontend (`apps/omega-lab/`)
 
 New Next.js application with three main views:
 - **Dashboard**: Real-time brain monitoring with thermal distribution
 - **Cortex Explorer**: Brain inspection, snapshots, and lobotomy
-- **Genesis Forge**: Firmware editor with Helix rules, ambition, and personality sliders
+- **OMEGA Forge**: Firmware editor with Helix rules, ambition, and personality sliders
 
 #### Infrastructure
 
@@ -3625,8 +4168,8 @@ New tier in `ApplicationTier`:
 #### Admin Dashboard URL Configuration
 
 New URL fields in `url-configuration-client.tsx`:
-- `genesisLabUrl` - Genesis Lab monitoring URL
-- `genesisForgeUrl` - Genesis Forge firmware URL
+- `omegaLabUrl` - OMEGA Lab monitoring URL
+- `omegaForgeUrl` - OMEGA Forge firmware URL
 - `omegaApiUrl` - OMEGA inference API URL
 
 #### CDK Admin Routes
@@ -4740,7 +5283,7 @@ Complete implementation of the **RADIANT Autonomous Organism Architecture** - a 
 - Error rate and latency-aware routing
 - Constraint-based filtering (capabilities, cost, latency)
 
-**Genesis Auto-Tool Pipeline**:
+**Tool Forge Pipeline**:
 - API discovery via OpenAPI, GraphQL, HTML scraping
 - AI-powered MCP server code generation
 - Zod schema generation for type safety
@@ -5301,13 +5844,13 @@ Two-tier defense against AI "lying" behaviors that mirror human organizational f
 
 ### Added
 
-#### Genesis Vault - Keyhole Pattern (v1.0.0)
+#### Cartridge Vault - Keyhole Pattern (v1.0.0)
 
 Secrets management for cartridges using the Keyhole Pattern - cartridges declare required secrets but never contain actual credentials.
 
 **Architecture**:
 - Cartridges include `vault.req` manifest declaring required secrets
-- Service Layer fetches secrets from Genesis Vault at runtime
+- Service Layer fetches secrets from Cartridge Vault at runtime
 - Secrets encrypted with AWS KMS, never passed to AI models
 - Full audit trail for compliance (HIPAA, SOC2, GDPR)
 - Secret rotation with version history
@@ -5623,7 +6166,7 @@ Cartridges are now cryptographically signed on export and verified on import per
 
 **New Types** (`packages/shared/src/types/cartridge-pki.types.ts`):
 - `RootCACertificate`: Radiant Root CA, generated at Genesis, stored offline/HSM
-- `TenantCACertificate`: Signed by Root CA, stored in Genesis Vault
+- `TenantCACertificate`: Signed by Root CA, stored in Cartridge Vault
 - `CartridgeSigningKey`: Active signing keys for author/platform
 - `CartridgeSignature`: Individual signature with key fingerprint, algorithm
 - `CartridgeSignatureBlock`: Complete signature block stored as `signature.sig`

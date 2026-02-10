@@ -81,15 +81,15 @@
 | 🟣 **Freeze/Thaw/Warp Cycle** | Lifecycle: Freeze (serialize to EFS, $0), Thaw (load old state), Warp (apply decay formula). |
 | 🟣 **Thermal Status** | Brain activity indicator: Warm (active <15min), Cooling (15-60min), Cold (1-24h), Frozen (>24h). |
 
-### Genesis Ecosystem
+### OMEGA Ecosystem (formerly Genesis)
 
 | Term | Definition |
 |------|------------|
 | 🟣 **.bio Firmware** | Signed JSON file containing Helix Rules (safety DNA), Ambition Settings, and Personality Traits. Brain rejects unsigned firmware. |
-| 🟣 **Genesis Forge** | Web application for creating, signing, and hot-swapping .bio firmware files. Includes AI-assisted generation. |
-| 🟣 **Genesis Lab** | Real-time monitoring dashboard for OMEGA brains. Includes Dashboard, Cortex Explorer, Shadow Mode Monitor. |
+| 🟣 **OMEGA Forge** | Web application for creating, signing, and hot-swapping .bio firmware files. Includes AI-assisted generation. |
+| 🟣 **OMEGA Lab** | Real-time monitoring dashboard for OMEGA brains. Includes Dashboard, Cortex Explorer, Shadow Mode Monitor. |
 | 🟣 **Firmware Hot-Swap** | Loading new firmware into a running brain without restart. OMEGA detects new hash and reloads physics constants instantly. |
-| 🟣 **Cortex Explorer** | Genesis Lab tab for inspecting individual brains: metrics, ambition state, phase distribution, Helix status. |
+| 🟣 **Cortex Explorer** | OMEGA Lab tab for inspecting individual brains: metrics, ambition state, phase distribution, Helix status. |
 
 ### Quantum Architecture (v4.18.0)
 
@@ -401,7 +401,7 @@
 |-----------|-------------|-----------|
 | 🔷 **Cartridge (.RADz)** | Portable AI brain container packaging neural networks, LoRA adapters, knowledge graphs, and configuration into a single deployable archive | `cartridge.service.ts` |
 | 🔷 **Cartridge PKI** | Public key infrastructure for signing cartridges—verifies author identity and prevents tampering during distribution | `cartridge-pki.service.ts` |
-| 🔷 **Genesis Vault** | Secrets manager using Keyhole Pattern where cartridges declare needed secrets (API keys, credentials) without containing them | `cartridge-vault.service.ts` |
+| 🔷 **Cartridge Vault** | Secrets manager using Keyhole Pattern where cartridges declare needed secrets (API keys, credentials) without containing them | `cartridge-vault.service.ts` |
 | 🔷 **Keyhole Pattern** | Security pattern: cartridges specify secret "shapes" (name, type, scope) but actual values are injected at runtime from secure vault | `cartridge-vault.types.ts` |
 | 🔷 **RNIR Compiler** | Radiant Neural Intermediate Representation—model-agnostic training format that compiles to PyTorch, TensorFlow, or ONNX | `cartridge-rnir.service.ts` |
 | 🔷 **Cartridge Operations** | Long-running cartridge deployments with Time Machine checkpointing—can pause, resume, and rollback multi-hour operations | `cartridge-operations.service.ts` |
@@ -571,8 +571,8 @@
 | 🔷 **Swift Deployer** | macOS SwiftUI app for deploying RADIANT infrastructure to AWS. Manages CDK stacks, database migrations, environment configuration, and cost monitoring. | `apps/swift-deployer/` |
 | 🔷 **Aurelius Dojo** | Martial-arts-themed AI training system. Libraries → Theme extraction → Sparring sessions (MCQ/open-ended) → Scenarios → Dialectics. Ebbinghaus decay curves for spaced repetition. Belt-ranking system (White→Black). | `apps/dojo/` |
 | 🔷 **Cato Trainer** | Fabric.so-inspired knowledge base app. Grounded Q&A with verifiable citations, semantic/full-text/hybrid search, document libraries with chunking and embeddings. Port 3005. | `lambda/admin/cato-trainer.ts` |
-| 🔷 **Genesis Forge** | Web application for creating, signing, and hot-swapping .bio firmware files for OMEGA brains. Includes AI-assisted generation and firmware library management. | Genesis UI |
-| 🔷 **Genesis Lab** | Real-time monitoring dashboard for OMEGA brains. Dashboard, Cortex Explorer, Shadow Mode Monitor. | Genesis UI |
+| 🔷 **OMEGA Forge** | Web application for creating, signing, and hot-swapping .bio firmware files for OMEGA brains. Includes AI-assisted generation and firmware library management. | `apps/omega-lab/` |
+| 🔷 **OMEGA Lab** | Real-time monitoring dashboard for OMEGA brains. Dashboard, Cortex Explorer, Shadow Mode Monitor. | `apps/omega-lab/` |
 
 ### User & Tenant Management (v7.34–7.38)
 
@@ -1104,7 +1104,7 @@
 | 1.5.0 | Feb 1, 2026 | **Polish pass**: Fixed broken table rows; Updated Table of Contents with Quick Reference anchor; Improved vague definitions (Flash Facts, Grimoire, Stub Nodes, Blackboard, Spell, Sentinel Agent, Time Machine, Cato, Cognitive Router, Genesis); Restructured Quick Reference as single section with subsections |
 | 1.4.0 | Feb 1, 2026 | **CHANGELOG audit update**: Added Domain Intelligence section (Domain Expert Cortex, Domain Taxonomy, Safety Matrix); Added Neural Operations section (Neural Operations Center, Shadow Validation, PromptBreeder); Added to Safety & Verification (Sandboxed Expression Engine, Vector Semantic Router, Enhanced Uncertainty); Added to Memory & Storage (Multimedia Sidecar, UEP v2.0, Self-Healing System); Added to Economic & Governance (Cost Negotiation, Inference Components, Library Registry); New Quick Reference sections for Domain Expert Networks, PromptBreeder Operators, Safety Matrix Severities, UEP v2.0 Envelope Types |
 | 1.3.0 | Feb 1, 2026 | **Major consistency update**: Added Axiom Scorers, CLARION, CORTEX Networks, Anti-Drift System, Three-Tier Learning Architecture; Expanded Think Tank section with Applications (Think Tank, Think Tank Admin, Curator); Added Quick Reference sections for Sovereign Mesh, RAWS Dimensions, Axiom Scorers; New acronyms: AXIOM, CLARION, ESA, VOI; Enhanced descriptions throughout |
-| 1.2.0 | Feb 1, 2026 | Added Cartridge System (v6.2.0): Genesis Vault, Keyhole Pattern, RNIR Compiler, Cartridge Operations; New acronyms: RADz, RNIR, SAGA, CoC, UEP |
+| 1.2.0 | Feb 1, 2026 | Added Cartridge System (v6.2.0): Cartridge Vault, Keyhole Pattern, RNIR Compiler, Cartridge Operations; New acronyms: RADz, RNIR, SAGA, CoC, UEP |
 | 1.1.0 | Jan 29, 2026 | Added Model Management subsystems (Model Registry, HuggingFace Discovery, Deletion Queue, Thermal Manager) |
 | 1.0.0 | Jan 29, 2026 | Initial comprehensive glossary |
 

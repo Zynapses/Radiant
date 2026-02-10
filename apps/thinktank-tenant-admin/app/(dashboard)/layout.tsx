@@ -8,6 +8,8 @@ import {
   Users,
   Users2,
   Package,
+  Layers,
+  Brain,
   FileText,
   Settings,
   Shield,
@@ -40,6 +42,8 @@ const navigation: NavSection[] = [
     items: [
       { name: 'Users', href: '/users', icon: Users },
       { name: 'Cartridges', href: '/cartridges', icon: Package },
+      { name: 'Stacking & Resolution', href: '/cartridges/stacking', icon: Layers },
+      { name: 'OMEGA Brain Status', href: '/cartridges/omega', icon: Brain },
     ],
   },
   {
@@ -82,7 +86,7 @@ export default function DashboardLayout({
               </div>
               <div>
                 <span className="text-sm font-bold text-white">Think Tank</span>
-                <p className="text-[10px] text-slate-400">Tenant Admin</p>
+                <p className="text-[10px] text-slate-400">Tenant Administration</p>
               </div>
             </Link>
           )}

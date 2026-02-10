@@ -4,7 +4,7 @@
 
 export { mcpServerManager, MCPServerManagerService, MCPServerConfig } from './mcp-server-manager.service';
 export { neuralSchemaRegistry, NeuralSchemaRegistryService, ToolSchema } from './neural-schema-registry.service';
-export { genesisAutoTool, GenesisAutoToolService } from './genesis-auto-tool.service';
+export { toolForge, ToolForgeService } from './genesis-auto-tool.service';
 export { liquidCompute, LiquidComputeService } from './liquid-compute.service';
 export { ghostSimulation, GhostSimulationService } from './ghost-simulation.service';
 export { tensorLink, TensorLinkService } from './tensor-link.service';

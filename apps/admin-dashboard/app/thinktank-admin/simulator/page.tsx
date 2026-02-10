@@ -117,32 +117,20 @@ interface LIVSVersionCheckResult {
   releaseDate: string;
 }
 
-// Mock API function - in production, this calls the actual LIVS version service
 async function checkLIVSVersion(): Promise<LIVSVersionCheckResult> {
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-  
-  // Return mock version data - in production this comes from LIVSVersionService
-  return {
-    currentVersion: '2.0.0',
-    latestVersion: '2.1.0',
-    updateAvailable: true,
-    changelog: [
-      'Enhanced sycophancy detection with configurable thresholds',
-      'New consensus velocity limits for multi-agent verification',
-      'Improved stub detection patterns for modern frameworks',
-      'Policy registry now supports custom rule definitions',
-    ],
-    breakingChanges: false,
-    migrationRequired: false,
-    releaseDate: '2025-01-15',
-  };
+  const API = process.env.NEXT_PUBLIC_API_URL || '';
+  const res = await fetch(`${API}/admin/platform/livs/version`);
+  if (!res.ok) throw new Error('Failed to check LIVS version');
+  const { data } = await res.json();
+  return data;
 }
 
 async function upgradeLIVSVersion(): Promise<{ success: boolean; newVersion: string }> {
-  // Simulate upgrade process
-  await new Promise(resolve => setTimeout(resolve, 1500));
-  return { success: true, newVersion: '2.1.0' };
+  const API = process.env.NEXT_PUBLIC_API_URL || '';
+  const res = await fetch(`${API}/admin/platform/livs/version/upgrade`, { method: 'POST' });
+  if (!res.ok) throw new Error('Failed to upgrade LIVS version');
+  const { data } = await res.json();
+  return { success: data.success, newVersion: data.toVersion };
 }
 
 export default function AdminSimulatorPage() {

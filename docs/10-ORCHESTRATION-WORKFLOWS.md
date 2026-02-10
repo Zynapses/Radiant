@@ -4318,7 +4318,7 @@ interface ParallelExecutionResult {
 
 ## Database Schema
 
-Key tables in `packages/infrastructure/migrations/066_orchestration_patterns_registry.sql`:
+Key tables in `migrations/000_consolidated_schema.sql`:
 
 ```sql
 -- Core tables
@@ -4441,7 +4441,7 @@ The Workflow UEP Architecture integrates the Universal Envelope Protocol (UEP) v
 | UEP Node Service | `lambda/shared/services/workflow/uep-node.service.ts` |
 | Workflow Engine | `lambda/shared/services/workflow-engine.ts` |
 | Orchestration Patterns | `lambda/shared/services/orchestration-patterns.service.ts` |
-| Database Migration | `migrations/V2026_01_31_003__workflow_uep_integration.sql` |
+| Database Migration | `migrations/000_consolidated_schema.sql` |
 
 ---
 
@@ -6005,7 +6005,7 @@ const linkedEnvelopes = uepIntegrationService.linkEnvelopes([
 | `middleware/uep-middleware.ts` | Lambda/API middleware for UEP wrapping |
 | `thinktank/uep-integration.ts` | Think Tank specific UEP integration |
 | `services/cato-method-executor.service.ts` | Cato pipeline UEP integration |
-| `migrations/V2026_01_31_001__uds_envelopes.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 
 ---
 

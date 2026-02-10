@@ -43,7 +43,8 @@ export default function ThinkTankChat() {
     setInput('');
     setIsTyping(true);
 
-    // Simulate AI response
+    // Landing page demo — intentionally uses canned responses for unauthenticated visitors.
+    // Authenticated users are redirected to the dashboard which connects to real APIs.
     setTimeout(() => {
       const responses = [
         "That's a great question! Let me break this down for you with some detailed insights.",

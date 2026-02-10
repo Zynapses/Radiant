@@ -1009,6 +1009,149 @@ export class EnvironmentStateService {
     }
   }
 
+  // ==========================================================================
+  // Public Sync/Backup Accessors
+  // ==========================================================================
+
+  async getSyncOperation(operationId: string): Promise<SyncOperation | null> {
+    try {
+      const response = await this.s3Client.send(new GetObjectCommand({
+        Bucket: this.config.stateRegistryBucket,
+        Key: `operations/sync/${operationId}.json`,
+      }));
+      const body = await response.Body?.transformToString();
+      return body ? JSON.parse(body) as SyncOperation : null;
+    } catch {
+      return null;
+    }
+  }
+
+  async cancelSyncOperation(operationId: string): Promise<SyncOperation | null> {
+    const operation = await this.getSyncOperation(operationId);
+    if (!operation) return null;
+    operation.status = 'failed' as EnvSyncStatus;
+    operation.errors = [...(operation.errors || []), {
+      item: operationId,
+      itemType: 'sync_operation',
+      error: 'Sync operation cancelled by admin',
+      recoverable: false,
+      timestamp: new Date().toISOString(),
+      retryCount: 0,
+    }];
+    await this.saveSyncOperation(operation);
+    return operation;
+  }
+
+  async listSyncOperations(options?: { environment?: string; limit?: number }): Promise<SyncOperation[]> {
+    try {
+      const response = await this.s3Client.send(new ListObjectsV2Command({
+        Bucket: this.config.stateRegistryBucket,
+        Prefix: 'operations/sync/',
+        MaxKeys: options?.limit || 50,
+      }));
+      const operations: SyncOperation[] = [];
+      for (const obj of response.Contents || []) {
+        if (!obj.Key) continue;
+        try {
+          const getResp = await this.s3Client.send(new GetObjectCommand({
+            Bucket: this.config.stateRegistryBucket,
+            Key: obj.Key,
+          }));
+          const body = await getResp.Body?.transformToString();
+          if (body) {
+            const op = JSON.parse(body) as SyncOperation;
+            if (!options?.environment || op.sourceEnvironment === options.environment || op.targetEnvironment === options.environment) {
+              operations.push(op);
+            }
+          }
+        } catch { /* skip unreadable entries */ }
+      }
+      return operations.sort((a, b) => new Date(b.initiatedAt).getTime() - new Date(a.initiatedAt).getTime());
+    } catch {
+      return [];
+    }
+  }
+
+  async getBackupManifest(backupId: string): Promise<BackupManifest | null> {
+    try {
+      const response = await this.s3Client.send(new GetObjectCommand({
+        Bucket: this.config.stateRegistryBucket,
+        Key: `backups/${backupId}/manifest.json`,
+      }));
+      const body = await response.Body?.transformToString();
+      return body ? JSON.parse(body) as BackupManifest : null;
+    } catch {
+      return null;
+    }
+  }
+
+  async listBackupManifests(options?: { environment?: string; limit?: number }): Promise<BackupManifest[]> {
+    try {
+      const response = await this.s3Client.send(new ListObjectsV2Command({
+        Bucket: this.config.stateRegistryBucket,
+        Prefix: 'backups/',
+        MaxKeys: 500,
+      }));
+      const backups: BackupManifest[] = [];
+      for (const obj of response.Contents || []) {
+        if (!obj.Key?.endsWith('/manifest.json')) continue;
+        try {
+          const getResp = await this.s3Client.send(new GetObjectCommand({
+            Bucket: this.config.stateRegistryBucket,
+            Key: obj.Key,
+          }));
+          const body = await getResp.Body?.transformToString();
+          if (body) {
+            const backup = JSON.parse(body) as BackupManifest;
+            if (!options?.environment || backup.environment === options.environment) {
+              backups.push(backup);
+            }
+          }
+        } catch { /* skip unreadable entries */ }
+      }
+      backups.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      return backups.slice(0, options?.limit || 20);
+    } catch {
+      return [];
+    }
+  }
+
+  async deleteBackupManifest(backupId: string): Promise<boolean> {
+    try {
+      const backup = await this.getBackupManifest(backupId);
+      if (!backup) return false;
+      backup.status = 'deleted' as BackupManifest['status'];
+      await this.saveBackupManifest(backup);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async getSyncConfig(environment: EnvironmentName): Promise<SyncConfiguration> {
+    try {
+      const response = await this.s3Client.send(new GetObjectCommand({
+        Bucket: this.config.stateRegistryBucket,
+        Key: `config/sync/${environment}.json`,
+      }));
+      const body = await response.Body?.transformToString();
+      if (body) return JSON.parse(body) as SyncConfiguration;
+    } catch { /* fall through to default */ }
+    const defaults = this.getDefaultSyncConfig();
+    defaults.enabled = environment !== 'prod';
+    defaults.requireApproval = environment === 'prod';
+    return defaults;
+  }
+
+  async saveSyncConfig(environment: EnvironmentName, config: SyncConfiguration): Promise<void> {
+    await this.s3Client.send(new PutObjectCommand({
+      Bucket: this.config.stateRegistryBucket,
+      Key: `config/sync/${environment}.json`,
+      Body: JSON.stringify(config, null, 2),
+      ContentType: 'application/json',
+    }));
+  }
+
   private async saveSyncOperation(operation: SyncOperation): Promise<void> {
     await this.s3Client.send(new PutObjectCommand({
       Bucket: this.config.stateRegistryBucket,

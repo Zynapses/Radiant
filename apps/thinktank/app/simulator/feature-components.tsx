@@ -281,7 +281,7 @@ export const VoiceInputModal: React.FC<VoiceInputModalProps> = ({
     setVoiceState('listening');
     setTranscript('');
 
-    // Simulate voice recognition
+    // UI simulator — intentionally uses canned voice recognition for demo purposes
     setTimeout(() => {
       setVoiceState('processing');
       setTimeout(() => {

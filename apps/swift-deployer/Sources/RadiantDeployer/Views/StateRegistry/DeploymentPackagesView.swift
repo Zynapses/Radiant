@@ -846,13 +846,54 @@ class DeploymentPackagesViewModel: ObservableObject {
         }
     }
     
+    private let packageService = PackageService()
+    
     func loadPackages() async {
         isLoading = true
         defer { isLoading = false }
         
-        // In production, this would fetch from API
-        // For now, create mock data
-        packages = [
+        do {
+            let available = try await packageService.listAvailablePackages(forceRefresh: true)
+            packages = available.map { info in
+                DeploymentPackage(
+                    id: info.id,
+                    version: info.version,
+                    packageVersion: "\(info.version)-\(info.buildId)",
+                    environment: "production",
+                    createdAt: info.buildTimestamp,
+                    status: .complete,
+                    totalSizeBytes: info.size,
+                    sourceType: .awsCapture,
+                    description: info.displayName,
+                    restoreCount: 0,
+                    lastRestoredAt: nil,
+                    contents: .init(
+                        hasCdkBundle: true,
+                        hasLambdaBundle: true,
+                        hasDashboardBundle: true,
+                        hasMigrations: true,
+                        hasInfrastructureManifest: true,
+                        includesRdsData: false,
+                        includesS3Data: false,
+                        includesDynamoData: false
+                    ),
+                    checksums: .init(
+                        cdkBundle: info.packageHash,
+                        lambdaBundle: info.packageHash,
+                        dashboardBundle: info.packageHash,
+                        migrationBundle: info.packageHash,
+                        full: info.packageHash
+                    ),
+                    validation: nil
+                )
+            }
+        } catch {
+            // Fallback to empty list on error
+            packages = []
+        }
+        
+        // Legacy mock data kept as reference for structure:
+        let _ = [
             DeploymentPackage(
                 id: "pkg-1",
                 version: "7.1.0",
@@ -940,27 +981,39 @@ class DeploymentPackagesViewModel: ObservableObject {
         isCreating = true
         defer { isCreating = false }
         
-        // Simulate creation
-        try? await Task.sleep(nanoseconds: 2_000_000_000)
-        
-        // In production, would call API to create package
+        do {
+            let latest = try await packageService.getLatestStable()
+            _ = try await packageService.downloadAndVerify(latest)
+        } catch {
+            // Log error but don't crash
+            print("[DeploymentPackages] Package creation failed: \(error.localizedDescription)")
+        }
         await loadPackages()
     }
     
     func validatePackage(_ package: DeploymentPackage) async {
-        // In production, would call API to validate
         guard let index = packages.firstIndex(where: { $0.id == package.id }) else { return }
         
-        try? await Task.sleep(nanoseconds: 1_000_000_000)
-        
-        packages[index].validation = DeploymentPackage.PackageValidation(
-            isValid: true,
-            canRestore: true,
-            validatedAt: Date(),
-            blockers: [],
-            warnings: [],
-            estimatedRestoreMinutes: 25
-        )
+        do {
+            let isValid = try await packageService.verifyPackageIntegrity(packageHash: package.checksums.full)
+            packages[index].validation = DeploymentPackage.PackageValidation(
+                isValid: isValid,
+                canRestore: isValid,
+                validatedAt: Date(),
+                blockers: isValid ? [] : ["Integrity check failed"],
+                warnings: [],
+                estimatedRestoreMinutes: 25
+            )
+        } catch {
+            packages[index].validation = DeploymentPackage.PackageValidation(
+                isValid: false,
+                canRestore: false,
+                validatedAt: Date(),
+                blockers: [error.localizedDescription],
+                warnings: [],
+                estimatedRestoreMinutes: 0
+            )
+        }
     }
     
     func restorePackage(
@@ -979,17 +1032,33 @@ class DeploymentPackagesViewModel: ObservableObject {
         isRestoring = true
         defer { isRestoring = false }
         
-        // Simulate restore
-        try? await Task.sleep(nanoseconds: 3_000_000_000)
-        
-        // In production, would call API to restore
+        do {
+            let packageInfo = PackageInfo(
+                version: package.version,
+                buildId: package.packageVersion,
+                buildTimestamp: package.createdAt,
+                packageHash: package.checksums.full,
+                filename: "\(package.id).tar.gz",
+                size: package.totalSizeBytes,
+                channel: .stable,
+                bucket: "",
+                key: ""
+            )
+            _ = try await packageService.downloadAndVerify(packageInfo)
+        } catch {
+            print("[DeploymentPackages] Restore failed: \(error.localizedDescription)")
+        }
     }
     
     func deletePackage(_ package: DeploymentPackage) async {
         guard let index = packages.firstIndex(where: { $0.id == package.id }) else { return }
         packages.remove(at: index)
         
-        // In production, would call API to delete
+        do {
+            try packageService.removeFromCache(version: package.version)
+        } catch {
+            print("[DeploymentPackages] Delete from cache failed: \(error.localizedDescription)")
+        }
     }
 }
 

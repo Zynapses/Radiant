@@ -36,8 +36,8 @@ export class OmegaStack extends cdk.Stack {
   public readonly fileSystem: efs.FileSystem;
   public readonly backupBucket: s3.Bucket;
   public readonly firmwareBucket: s3.Bucket;
-  public readonly genesisBucket: s3.Bucket;
-  public readonly genesisDistribution: cloudfront.Distribution;
+  public readonly omegaFrontendBucket: s3.Bucket;
+  public readonly omegaFrontendDistribution: cloudfront.Distribution;
 
   constructor(scope: Construct, id: string, props: OmegaStackProps) {
     super(scope, id, props);
@@ -329,10 +329,10 @@ export class OmegaStack extends cdk.Stack {
     });
 
     // ==========================================================================
-    // GENESIS FRONTEND HOSTING (Genesis Lab + Genesis Forge)
+    // OMEGA FRONTEND HOSTING (OMEGA Lab + OMEGA Forge)
     // ==========================================================================
-    this.genesisBucket = new s3.Bucket(this, 'GenesisFrontendBucket', {
-      bucketName: `radiant-genesis-frontend-${environment}-${this.account}`,
+    this.omegaFrontendBucket = new s3.Bucket(this, 'OmegaFrontendBucket', {
+      bucketName: `radiant-omega-frontend-${environment}-${this.account}`,
       encryption: s3.BucketEncryption.S3_MANAGED,
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
       removalPolicy: environment === 'prod'
@@ -343,22 +343,22 @@ export class OmegaStack extends cdk.Stack {
 
     const originAccessIdentity = new cloudfront.OriginAccessIdentity(
       this,
-      'GenesisOAI',
+      'OmegaFrontendOAI',
       {
-        comment: `OAI for Genesis frontend ${environment}`,
+        comment: `OAI for OMEGA frontend ${environment}`,
       }
     );
 
-    this.genesisBucket.grantRead(originAccessIdentity);
+    this.omegaFrontendBucket.grantRead(originAccessIdentity);
 
-    this.genesisDistribution = new cloudfront.Distribution(
+    this.omegaFrontendDistribution = new cloudfront.Distribution(
       this,
-      'GenesisDistribution',
+      'OmegaFrontendDistribution',
       {
-        comment: `Genesis Lab & Forge frontend - ${environment}`,
+        comment: `OMEGA Lab & Forge frontend - ${environment}`,
         defaultRootObject: 'index.html',
         defaultBehavior: {
-          origin: new origins.S3Origin(this.genesisBucket, {
+          origin: new origins.S3Origin(this.omegaFrontendBucket, {
             originAccessIdentity,
           }),
           viewerProtocolPolicy:
@@ -401,16 +401,16 @@ export class OmegaStack extends cdk.Stack {
       }
     );
 
-    new cdk.CfnOutput(this, 'GenesisFrontendUrl', {
-      value: `https://${this.genesisDistribution.distributionDomainName}`,
-      description: 'Genesis Lab & Forge frontend URL',
-      exportName: `genesis-frontend-url-${environment}`,
+    new cdk.CfnOutput(this, 'OmegaFrontendUrl', {
+      value: `https://${this.omegaFrontendDistribution.distributionDomainName}`,
+      description: 'OMEGA Lab & Forge frontend URL',
+      exportName: `omega-frontend-url-${environment}`,
     });
 
-    new cdk.CfnOutput(this, 'GenesisBucketName', {
-      value: this.genesisBucket.bucketName,
-      description: 'Genesis frontend S3 bucket name',
-      exportName: `genesis-frontend-bucket-${environment}`,
+    new cdk.CfnOutput(this, 'OmegaFrontendBucketName', {
+      value: this.omegaFrontendBucket.bucketName,
+      description: 'OMEGA frontend S3 bucket name',
+      exportName: `omega-frontend-bucket-${environment}`,
     });
 
     // Tags

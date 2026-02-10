@@ -25,7 +25,7 @@ export interface Administrator {
   lastLoginAt?: Date;
 }
 
-export type AdminRole = 'super_admin' | 'admin' | 'operator' | 'auditor';
+export type AdminRole = 'super_admin';
 
 export type AdminStatus = 'active' | 'inactive' | 'suspended' | 'pending';
 
@@ -47,33 +47,6 @@ export const ROLE_PERMISSIONS: Record<AdminRole, AdminRolePermissions> = {
     canManageBilling: true,
     canDeploy: true,
     canApprove: true,
-    canViewAuditLogs: true,
-  },
-  admin: {
-    canManageAdmins: true,
-    canManageModels: true,
-    canManageProviders: true,
-    canManageBilling: true,
-    canDeploy: true,
-    canApprove: true,
-    canViewAuditLogs: true,
-  },
-  operator: {
-    canManageAdmins: false,
-    canManageModels: true,
-    canManageProviders: true,
-    canManageBilling: false,
-    canDeploy: true,
-    canApprove: false,
-    canViewAuditLogs: false,
-  },
-  auditor: {
-    canManageAdmins: false,
-    canManageModels: false,
-    canManageProviders: false,
-    canManageBilling: false,
-    canDeploy: false,
-    canApprove: false,
     canViewAuditLogs: true,
   },
 };

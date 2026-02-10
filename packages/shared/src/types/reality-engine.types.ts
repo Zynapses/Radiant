@@ -434,8 +434,8 @@ export interface PreCognitionConfig {
   predictionTTLMs: number;          // How long predictions stay valid
   computeBudgetMs: number;          // Time budget for background compute
   minConfidenceThreshold: number;   // Only cache predictions above this
-  useGenesisModel: boolean;         // Use fast local model for predictions
-  genesisModelId: string;           // Which Genesis model to use
+  useBaseModel: boolean;            // Use fast local model for predictions
+  baseModelId: string;              // Which base model to use
 }
 
 // =============================================================================

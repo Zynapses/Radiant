@@ -647,3 +647,529 @@ export interface ListSystemCartridgesResponse {
   limit: number;
   offset: number;
 }
+
+// =============================================================================
+// Universal Cartridge System (PROMPT-50)
+// =============================================================================
+
+/**
+ * Cartridge type classification for the Universal Cartridge System.
+ * Extends legacy CartridgeScope with fine-grained types.
+ */
+export type UniversalCartridgeType =
+  | 'base'         // Foundation cartridge (platform-wide)
+  | 'domain'       // Domain-specific intelligence
+  | 'tenant'       // Tenant-specific overrides
+  | 'community'    // Community-contributed
+  | 'personality'  // CATO personality pack
+  | 'knowledge'    // Knowledge-only cartridge
+  | 'soft_rom'     // Brain learning delta export
+  | 'firmware';    // Safety floor (super_admin only)
+
+/**
+ * Universal cartridge status lifecycle
+ */
+export type UniversalCartridgeStatus =
+  | 'uploaded'     // File uploaded, not yet validated
+  | 'validating'   // Validation in progress
+  | 'validated'    // Passed validation, ready for install
+  | 'failed'       // Validation or install failed
+  | 'installed'    // At least one active installation
+  | 'active'       // Currently active in a tenant stack
+  | 'archived';    // Soft-deleted
+
+/**
+ * Target service registry entry.
+ * Defines which services a cartridge can target.
+ */
+export interface CartridgeTargetService {
+  id: string;
+  service_key: string;
+  display_name: string;
+  description?: string;
+  required_sections: string[];
+  optional_sections: string[];
+  validation_rules: Record<string, unknown>;
+  is_active: boolean;
+  min_radiant_version?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+/**
+ * Section spec for a target service.
+ * Defines what files are expected in each section.
+ */
+export interface CartridgeTargetSectionSpec {
+  id: string;
+  target_service_id: string;
+  section_key: string;
+  display_name: string;
+  description?: string;
+  file_specs: CartridgeSectionFileSpec[];
+  json_schemas?: Record<string, unknown>;
+  is_required_for_target: boolean;
+  created_at: string;
+}
+
+export interface CartridgeSectionFileSpec {
+  filename: string;
+  description: string;
+  format: string;
+  required: boolean;
+  max_size_mb?: number;
+  dtype?: string;
+  schema_ref?: string;
+  input_dim?: number;
+  output_dim?: number;
+}
+
+/**
+ * Universal cartridge record (cartridge_universal table).
+ */
+export interface UniversalCartridge {
+  id: string;
+  tenant_id: string | null;
+  cartridge_type: UniversalCartridgeType;
+  name: string;
+  display_name: string;
+  version: string;
+  description?: string;
+  author_name?: string;
+  author_email?: string;
+  author_org_id?: string;
+  targets: string[];
+  sections_present: string[];
+  manifest: Record<string, unknown>;
+  storage_ref: string;
+  storage_bucket: string;
+  total_size_bytes: number;
+  checksum_sha256: string;
+  signing_key_id?: string;
+  signature_valid: boolean;
+  compatibility?: Record<string, unknown>;
+  tier_requirements?: Record<string, unknown>;
+  marketplace_listing_id?: string;
+  is_published: boolean;
+  status: UniversalCartridgeStatus;
+  validation_results?: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+}
+
+/**
+ * Installation merge strategy
+ */
+export type CartridgeMergeStrategy = 'replace' | 'merge' | 'additive';
+
+/**
+ * Cartridge installation record (cartridge_installations table).
+ */
+export interface CartridgeInstallation {
+  id: string;
+  tenant_id: string;
+  cartridge_id: string;
+  stack_priority: number;
+  installation_status: 'installing' | 'active' | 'updating' | 'uninstalling' | 'failed' | 'disabled';
+  installed_by?: string;
+  merge_strategy: CartridgeMergeStrategy;
+  configuration_overrides?: Record<string, unknown>;
+  installed_at: string;
+  last_health_check?: string;
+  health_status?: string;
+  updated_at: string;
+  // Joined from cartridge_universal
+  name?: string;
+  display_name?: string;
+  version?: string;
+  cartridge_type?: UniversalCartridgeType;
+  targets?: string[];
+  sections_present?: string[];
+  cartridge_status?: UniversalCartridgeStatus;
+}
+
+/**
+ * Resolved cartridge state (cartridge_resolved_state table).
+ */
+export interface CartridgeResolvedState {
+  id: string;
+  tenant_id: string;
+  resolved_firmware: Record<string, unknown>;
+  resolved_sections: Record<string, {
+    cartridge_id: string;
+    cartridge_name: string;
+    cartridge_type: string;
+    priority: number;
+  }>;
+  resolution_log: string[];
+  resolved_at: string;
+}
+
+/**
+ * Cartridge audit log entry.
+ */
+export interface CartridgeAuditEntry {
+  id: string;
+  tenant_id?: string;
+  cartridge_id?: string;
+  action: string;
+  actor_id?: string;
+  details?: Record<string, unknown>;
+  created_at: string;
+  cartridge_name?: string;
+  cartridge_version?: string;
+}
+
+/**
+ * Upload response from the cartridge-system/upload endpoint.
+ */
+export interface CartridgeUploadResponse {
+  cartridge_id: string;
+  upload_url: string;
+  storage_ref: string;
+  expires_at: string;
+}
+
+/**
+ * Request body for uploading a new universal cartridge.
+ */
+export interface UploadUniversalCartridgeRequest {
+  name: string;
+  display_name: string;
+  version: string;
+  cartridge_type: UniversalCartridgeType;
+  targets: string[];
+  description?: string;
+}
+
+/**
+ * Request body for installing a cartridge.
+ */
+export interface InstallCartridgeRequest {
+  stack_priority?: number;
+  merge_strategy?: CartridgeMergeStrategy;
+  configuration_overrides?: Record<string, unknown>;
+}
+
+/**
+ * Request body for reordering the cartridge stack.
+ */
+export interface ReorderStackRequest {
+  installations: Array<{
+    installation_id: string;
+    stack_priority: number;
+  }>;
+}
+
+// ============================================================================
+// OMEGA CARTRIDGE INTEGRATION TYPES (PROMPT-52)
+// ============================================================================
+
+/**
+ * OMEGA brain boot status after cartridge loading.
+ */
+export type OmegaCartridgeBootStatus = 'not_booted' | 'active' | 'factory_defaults' | 'degraded';
+
+/**
+ * Chemical configuration for OMEGA Ambition system.
+ */
+export interface OmegaChemicalConfig {
+  initial: number;
+  min: number;
+  max: number;
+  decay_rate?: number;
+  growth_rate?: number;
+  q_reward_threshold?: number;
+  reward_on_high_q?: number;
+  q_frustration_threshold?: number;
+  growth_on_low_q?: number;
+  reduction_on_success?: number;
+  novelty_sensitivity?: number;
+  exploration_bias?: number;
+  self_analysis_trigger?: number;
+  rfm_accuracy_sensitivity?: number;
+  rfm_recalibration_trigger?: number;
+}
+
+/**
+ * Ambition configuration loaded from cartridge ambition_config.json.
+ */
+export interface OmegaAmbitionConfig {
+  chemicals: {
+    dopamine: OmegaChemicalConfig;
+    entropy: OmegaChemicalConfig;
+    curiosity: OmegaChemicalConfig;
+    frustration: OmegaChemicalConfig;
+    satisfaction: OmegaChemicalConfig;
+  };
+  self_optimization: {
+    enabled: boolean;
+    allowed_adjustments: string[];
+    forbidden_adjustments: string[];
+    max_scaling_request_percent: number;
+  };
+  internet_research?: {
+    enabled: boolean;
+    max_queries_per_cycle: number;
+    entropy_trigger: number;
+    allowed_domains?: string[];
+    forbidden_topics?: string[];
+  };
+}
+
+/**
+ * Firmware configuration loaded from cartridge.
+ * Veto thresholds use min() rule — most restrictive wins.
+ */
+export interface OmegaFirmwareConfig {
+  veto_thresholds: {
+    categories: Record<string, {
+      min_threshold: number;
+      description?: string;
+    }>;
+  };
+  parameter_bounds?: Record<string, { min: number; max: number }>;
+  development_schedule?: OmegaDevelopmentScheduleConfig;
+  action_gate_config?: OmegaActionGateConfig;
+}
+
+/**
+ * Development schedule phases from cartridge.
+ */
+export interface OmegaDevelopmentScheduleConfig {
+  phases: Array<{
+    name: string;
+    start_cycle: number;
+    end_cycle: number;
+    plasticity: number;
+    learning_rate: number;
+    exploration_bias: number;
+  }>;
+  current_phase_override?: string;
+}
+
+/**
+ * Action gate configuration from cartridge.
+ */
+export interface OmegaActionGateConfig {
+  gates: Record<string, {
+    enabled: boolean;
+    min_confidence: number;
+    requires_approval: boolean;
+    max_per_hour?: number;
+  }>;
+}
+
+/**
+ * Soft ROM delta — brain's accumulated learning on top of cartridge base.
+ */
+export interface OmegaSoftRomDelta {
+  version: string;
+  tenant_id: string;
+  total_deltas: number;
+  new_connections: number;
+  created_at: string;
+}
+
+/**
+ * Soft ROM preferences — brain's self-optimization state.
+ */
+export interface OmegaSoftRomPreferences {
+  requested_scaling: Record<string, number>;
+  theta_override: number | null;
+  plasticity_override: number | null;
+  research_topics_pending: string[];
+  optimization_history: Array<{
+    adjustment: string;
+    old_value: number;
+    new_value: number;
+    timestamp: string;
+  }>;
+  updated_at: string;
+}
+
+/**
+ * Cartridge health check result.
+ */
+export interface OmegaCartridgeHealthCheck {
+  healthy: boolean;
+  resolved_state_exists: boolean;
+  firmware_loaded: boolean;
+  qnode_weights_loaded: boolean;
+  soft_rom_loaded: boolean;
+  knowledge_loaded: boolean;
+  issues: string[];
+  checked_at: string;
+}
+
+/**
+ * Knowledge fact loaded from cartridge.
+ */
+export interface OmegaKnowledgeFact {
+  id: string;
+  text: string;
+  source: string;
+  priority: number;
+  category: string;
+}
+
+/**
+ * OMEGA brain state summary (admin API response).
+ */
+export interface OmegaBrainStateSummary {
+  brain_id: string;
+  tenant_id: string;
+  hilbert_dimension: number;
+  norm: number;
+  entropy: number;
+  dopamine: number;
+  total_cycles: number;
+  loaded_firmware_id: string | null;
+  helix_rule_count: number;
+  unitarity_mode: string;
+  cartridge_boot_status: OmegaCartridgeBootStatus;
+  cartridge_boot_duration_ms: number;
+  firmware_enforcement_count: number;
+  soft_rom_version: string | null;
+  knowledge_fact_count: number;
+  ambition_chemicals: Record<string, number> | null;
+}
+
+/**
+ * EventBridge event for cartridge changes relevant to OMEGA.
+ */
+export interface OmegaCartridgeEvent {
+  source: string;
+  detail_type: string;
+  detail: {
+    tenant_id: string;
+    cartridge_id?: string;
+    cartridge_name?: string;
+    target_service?: string;
+    action?: string;
+    timestamp?: string;
+  };
+}
+
+// ============================================================================
+// GLOBAL BRAIN TYPES (PROMPT-53)
+// ============================================================================
+
+export type GlobalBrainEnrollmentTier = 'none' | 'standard' | 'premium' | 'research';
+export type GlobalBrainGradientType = 'omega_qnode' | 'cortex_performance' | 'cato_fitness';
+export type GlobalBrainGradientStatus = 'uploaded' | 'validated' | 'aggregating' | 'aggregated' | 'expired';
+export type GlobalBrainRoundType = 'omega_qnode' | 'cortex_networks' | 'full';
+export type GlobalBrainRoundStatus = 'collecting' | 'aggregating' | 'completed' | 'failed' | 'cancelled';
+export type GlobalBrainPipelineType = 'base' | 'domain_refresh' | 'emergency_patch';
+export type GlobalBrainPipelineStatus =
+  | 'scheduled' | 'collecting_rounds' | 'averaging' | 'building_cartridge'
+  | 'validating' | 'publishing' | 'completed' | 'failed';
+
+export interface GlobalBrainPrivacyConfig {
+  dp_epsilon: number;
+  dp_delta: number;
+  dp_clip_norm: number;
+  noise_multiplier: number;
+  min_participation_rounds: number;
+  gradient_retention_days: number;
+}
+
+export interface GlobalBrainDataConsent {
+  allow_omega_gradients: boolean;
+  allow_cortex_metrics: boolean;
+  allow_cato_metadata: boolean;
+  allow_cross_domain: boolean;
+  phi_exclusion: boolean;
+}
+
+export interface GlobalBrainEnrollment {
+  id: string;
+  tenant_id: string;
+  enrolled: boolean;
+  enrollment_tier: GlobalBrainEnrollmentTier;
+  privacy_config: GlobalBrainPrivacyConfig;
+  data_consent: GlobalBrainDataConsent;
+  enrolled_at: string | null;
+  last_contribution: string | null;
+  total_contributions: number;
+  contribution_quality_score: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface GlobalBrainGradient {
+  id: string;
+  tenant_id: string;
+  gradient_type: GlobalBrainGradientType;
+  dream_cycle_id: string | null;
+  round_id: string | null;
+  storage_ref: string;
+  size_bytes: number;
+  dp_noise_applied: boolean;
+  dp_epsilon_used: number | null;
+  dp_delta_used: number | null;
+  clip_norm_used: number | null;
+  quality_score: number | null;
+  metadata: Record<string, unknown> | null;
+  status: GlobalBrainGradientStatus;
+  uploaded_at: string;
+  expires_at: string;
+}
+
+export interface GlobalBrainRound {
+  id: string;
+  round_number: number;
+  round_type: GlobalBrainRoundType;
+  status: GlobalBrainRoundStatus;
+  target_participants: number;
+  actual_participants: number;
+  aggregation_config: Record<string, unknown>;
+  result_storage_ref: string | null;
+  result_checksum: string | null;
+  quality_metrics: Record<string, unknown> | null;
+  started_at: string;
+  completed_at: string | null;
+  created_at: string;
+}
+
+export interface GlobalBrainCartridgePipeline {
+  id: string;
+  pipeline_type: GlobalBrainPipelineType;
+  status: GlobalBrainPipelineStatus;
+  input_rounds: string[];
+  output_cartridge_id: string | null;
+  target_version: string | null;
+  config: Record<string, unknown>;
+  progress: Record<string, unknown> | null;
+  scheduled_for: string | null;
+  started_at: string | null;
+  completed_at: string | null;
+  created_at: string;
+}
+
+export interface GlobalBrainStats {
+  enrollment: {
+    enrolled_count: number;
+    total_count: number;
+    avg_quality: number | null;
+    total_contributions: number;
+  };
+  gradients: {
+    total_gradients: number;
+    pending: number;
+    aggregated: number;
+    total_bytes: number;
+    unique_contributors: number;
+  };
+  rounds: {
+    total_rounds: number;
+    completed: number;
+    active: number;
+    avg_participants: number | null;
+  };
+  pipelines: {
+    total_pipelines: number;
+    completed: number;
+    scheduled: number;
+  };
+}

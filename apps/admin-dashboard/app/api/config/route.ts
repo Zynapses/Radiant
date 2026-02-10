@@ -159,7 +159,24 @@ export const PUT = withAdminAuth(async (request: AuthenticatedRequest) => {
       }
     }
 
-    // In production, would update database here
+    // Proxy the update to the admin Lambda system-config endpoint
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL || '';
+    if (API_URL) {
+      const proxyRes = await fetch(`${API_URL}/admin/system/config/parameters/${key}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': request.headers.get('Authorization') || '',
+          'x-tenant-id': request.headers.get('x-tenant-id') || '',
+        },
+        body: JSON.stringify({ category, key, value }),
+      });
+      if (!proxyRes.ok) {
+        const errBody = await proxyRes.json().catch(() => ({}));
+        return apiError('UPDATE_FAILED', errBody.error?.message || 'Backend update failed', proxyRes.status);
+      }
+    }
+
     return NextResponse.json({
       success: true,
       updated: {

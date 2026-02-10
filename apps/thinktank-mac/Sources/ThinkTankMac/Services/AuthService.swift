@@ -112,6 +112,7 @@ class AuthService: ObservableObject {
 
         Task {
             await APIClient.shared.setToken("dev-token")
+            await APIClient.shared.enableDevMode()
         }
     }
 

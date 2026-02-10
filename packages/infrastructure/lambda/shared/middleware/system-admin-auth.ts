@@ -69,7 +69,7 @@ export function extractSystemAdminContext(event: APIGatewayProxyEvent): SystemAd
 
     const adminId = claims.sub || claims['cognito:username'] || event.headers['x-admin-id'];
     const email = claims.email || event.headers['x-admin-email'] || '';
-    const adminRole = (claims['custom:admin_role'] || event.headers['x-admin-role'] || 'operator') as SystemAdminRole;
+    const adminRole = (claims['custom:admin_role'] || event.headers['x-admin-role'] || 'super_admin') as SystemAdminRole;
     const isBootstrap = claims['custom:is_bootstrap'] === 'true' || event.headers['x-is-bootstrap'] === 'true';
     const displayName = claims.name || claims['custom:display_name'] || email;
     const status = claims['custom:status'] || 'active';
@@ -79,9 +79,12 @@ export function extractSystemAdminContext(event: APIGatewayProxyEvent): SystemAd
       return null;
     }
 
-    // Validate role is one of the known system admin roles
-    const validRoles: SystemAdminRole[] = ['super_admin', 'admin', 'operator', 'auditor'];
-    const resolvedRole = validRoles.includes(adminRole) ? adminRole : 'operator';
+    // Only super_admin is valid in Pool B (v7.52.0)
+    const resolvedRole: SystemAdminRole = 'super_admin';
+    if (adminRole !== 'super_admin') {
+      logger.warn('Non-super_admin role in Pool B token rejected', { adminRole, email });
+      return null;
+    }
 
     const permissions = SYSTEM_ADMIN_PERMISSIONS[resolvedRole];
 
@@ -153,9 +156,6 @@ export function requireSystemPermission(
 
 const ROLE_HIERARCHY: Record<SystemAdminRole, number> = {
   super_admin: 4,
-  admin: 3,
-  operator: 2,
-  auditor: 1,
 };
 
 export function requireSystemMinRole(

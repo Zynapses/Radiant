@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { api } from '@/lib/api/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -71,70 +72,6 @@ interface SnapshotPolicy {
   preSchemaMigrationSnapshotEnabled: boolean;
 }
 
-// Mock data for demonstration
-const mockSnapshots: Snapshot[] = [
-  {
-    id: 'radiant-prod-20260205-021500',
-    version: '20260205-021500',
-    name: 'Pre-deployment backup',
-    description: 'Automatic snapshot before v4.18.0 deployment',
-    createdAt: '2026-02-05T02:15:00Z',
-    createdBy: 'system',
-    environment: 'production',
-    appId: 'radiant',
-    snapshotType: 'full',
-    status: 'available',
-    storageTier: 'hot',
-    auroraSnapshotArn: 'arn:aws:rds:us-east-1:123456789:cluster-snapshot:radiant-prod-20260205',
-    dynamoDBBackupArns: ['arn:aws:dynamodb:us-east-1:123456789:table/sessions/backup/001'],
-    sizeBytes: 5368709120, // 5 GB
-    tableCount: 44,
-    resourceCount: 12,
-    tags: { 'radiant:snapshot': 'true' },
-    restoreCount: 0,
-  },
-  {
-    id: 'radiant-prod-20260204-020000',
-    version: '20260204-020000',
-    name: 'Daily backup',
-    createdAt: '2026-02-04T02:00:00Z',
-    createdBy: 'scheduled',
-    environment: 'production',
-    appId: 'radiant',
-    snapshotType: 'full',
-    status: 'available',
-    storageTier: 'warm',
-    tierTransitionDate: '2026-02-11T02:00:00Z',
-    auroraSnapshotArn: 'arn:aws:rds:us-east-1:123456789:cluster-snapshot:radiant-prod-20260204',
-    dynamoDBBackupArns: [],
-    sizeBytes: 5200000000,
-    tableCount: 44,
-    resourceCount: 10,
-    tags: {},
-    restoreCount: 1,
-    lastRestoredAt: '2026-02-04T15:30:00Z',
-  },
-  {
-    id: 'radiant-prod-20260128-020000',
-    version: '20260128-020000',
-    name: 'Weekly backup',
-    createdAt: '2026-01-28T02:00:00Z',
-    createdBy: 'scheduled',
-    environment: 'production',
-    appId: 'radiant',
-    snapshotType: 'full',
-    status: 'available',
-    storageTier: 'cold',
-    tierTransitionDate: '2026-02-04T02:00:00Z',
-    auroraSnapshotArn: 'arn:aws:rds:us-east-1:123456789:cluster-snapshot:radiant-prod-20260128',
-    dynamoDBBackupArns: [],
-    sizeBytes: 4800000000,
-    tableCount: 42,
-    resourceCount: 10,
-    tags: {},
-    restoreCount: 0,
-  },
-];
 
 const defaultPolicy: SnapshotPolicy = {
   autoSnapshotEnabled: true,
@@ -235,7 +172,7 @@ const defaultTierCosts: TierCost[] = [
 ];
 
 export default function SnapshotManagementPage() {
-  const [snapshots, setSnapshots] = useState<Snapshot[]>(mockSnapshots);
+  const [snapshots, setSnapshots] = useState<Snapshot[]>([]);
   const [selectedSnapshot, setSelectedSnapshot] = useState<Snapshot | null>(null);
   const [policy, setPolicy] = useState<SnapshotPolicy>(defaultPolicy);
   const [tierRules, setTierRules] = useState<TierRule[]>(defaultTierRules);
@@ -243,8 +180,29 @@ export default function SnapshotManagementPage() {
   const [isCreating, setIsCreating] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [createProgress, setCreateProgress] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [filterTier, setFilterTier] = useState<StorageTier | 'all'>('all');
+
+  const loadDashboard = useCallback(async () => {
+    setIsLoading(true);
+    setLoadError(null);
+    try {
+      const res = await api.get<{ success: boolean; data: { snapshots: Snapshot[]; config: SnapshotPolicy; tierRules: TierRule[]; tierCosts: TierCost[] } }>('/admin/platform/snapshots/dashboard');
+      if (res.success && res.data) {
+        setSnapshots(res.data.snapshots || []);
+        if (res.data.config) setPolicy(res.data.config);
+        if (res.data.tierRules) setTierRules(res.data.tierRules);
+        if (res.data.tierCosts) setTierCosts(res.data.tierCosts);
+      }
+    } catch (err) {
+      setLoadError(err instanceof Error ? err.message : 'Failed to load snapshot data');
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { loadDashboard(); }, [loadDashboard]);
 
   // Tier summary
   const tierCounts = {
@@ -262,35 +220,32 @@ export default function SnapshotManagementPage() {
 
   const handleCreateSnapshot = async () => {
     setIsCreating(true);
-    setCreateProgress(0);
-    
-    // Simulate creation progress
-    for (let i = 0; i <= 100; i += 10) {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      setCreateProgress(i);
+    try {
+      await api.post('/admin/platform/snapshots/process-transitions');
+      await loadDashboard();
+    } catch (err) {
+      console.error('Snapshot creation failed:', err);
+    } finally {
+      setIsCreating(false);
     }
-    
-    setIsCreating(false);
   };
 
   const handleRestore = async (snapshot: Snapshot) => {
     setIsRestoring(true);
-    // Would call API to restore
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    setIsRestoring(false);
+    try {
+      await api.post(`/admin/platform/snapshots/snapshots/${snapshot.id}/restore`);
+      await loadDashboard();
+    } catch (err) {
+      console.error('Snapshot restore failed:', err);
+    } finally {
+      setIsRestoring(false);
+    }
   };
 
   const handleTransitionTier = async (snapshotId: string, targetTier: StorageTier) => {
-    // Call API to transition tier
     try {
-      await fetch(`/api/admin/snapshot-storage/snapshots/${snapshotId}/transition`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ targetTier }),
-      });
-      setSnapshots(prev => prev.map(s => 
-        s.id === snapshotId ? { ...s, storageTier: targetTier, tierTransitionDate: new Date().toISOString() } : s
-      ));
+      await api.post(`/admin/platform/snapshots/snapshots/${snapshotId}/transition`, { targetTier });
+      await loadDashboard();
     } catch (error) {
       console.error('Failed to transition tier:', error);
     }
@@ -300,11 +255,7 @@ export default function SnapshotManagementPage() {
   const handleSavePolicy = async (updates: Partial<SnapshotPolicy>) => {
     setIsSaving(true);
     try {
-      await fetch('/api/admin/snapshot-storage/config', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updates),
-      });
+      await api.put('/admin/platform/snapshots/config', updates);
     } catch (error) {
       console.error('Failed to save policy:', error);
     }
@@ -315,11 +266,7 @@ export default function SnapshotManagementPage() {
   const handleSaveTierRules = async (rules: TierRule[]) => {
     setIsSaving(true);
     try {
-      await fetch('/api/admin/snapshot-storage/tier-rules', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ rules }),
-      });
+      await api.put('/admin/platform/snapshots/tier-rules', { rules });
     } catch (error) {
       console.error('Failed to save tier rules:', error);
     }
@@ -330,60 +277,12 @@ export default function SnapshotManagementPage() {
   const handleSaveTierCosts = async (costs: TierCost[]) => {
     setIsSaving(true);
     try {
-      await fetch('/api/admin/snapshot-storage/tier-costs', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ costs }),
-      });
+      await api.put('/admin/platform/snapshots/tier-costs', { costs });
     } catch (error) {
       console.error('Failed to save tier costs:', error);
     }
     setIsSaving(false);
   };
-
-  // Load data from backend on mount
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const response = await fetch('/api/admin/snapshot-storage/dashboard');
-        if (response.ok) {
-          const data = await response.json();
-          if (data.data?.config) {
-            setPolicy({
-              ...defaultPolicy,
-              autoSnapshotEnabled: data.data.config.auto_snapshot_enabled ?? true,
-              autoSnapshotSchedule: data.data.config.auto_snapshot_schedule ?? '0 2 * * *',
-              retentionDays: data.data.config.retention_days ?? 365,
-              maxSnapshotsPerTier: data.data.config.max_snapshots_per_tier ?? 10,
-              preDeploymentSnapshotEnabled: data.data.config.pre_deployment_snapshot_enabled ?? true,
-              preSchemaMigrationSnapshotEnabled: data.data.config.pre_migration_snapshot_enabled ?? true,
-            });
-          }
-          if (data.data?.tierRules?.length) {
-            setTierRules(data.data.tierRules.map((r: any) => ({
-              id: r.id,
-              fromTier: r.from_tier,
-              toTier: r.to_tier,
-              afterDays: r.after_days,
-              isEnabled: r.is_enabled,
-            })));
-          }
-          if (data.data?.tierCosts?.length) {
-            setTierCosts(data.data.tierCosts.map((c: any) => ({
-              id: c.id,
-              tier: c.tier,
-              costPerGbMonth: parseFloat(c.cost_per_gb_month) || 0,
-              retrievalCostPerGb: parseFloat(c.retrieval_cost_per_gb) || 0,
-              retrievalTimeHours: parseFloat(c.retrieval_time_hours) || 0,
-            })));
-          }
-        }
-      } catch (error) {
-        console.error('Failed to load snapshot storage config:', error);
-      }
-    };
-    loadData();
-  }, []);
 
   return (
     <div className="container mx-auto py-6 space-y-6">
@@ -418,12 +317,9 @@ export default function SnapshotManagementPage() {
       {isCreating && (
         <Card>
           <CardContent className="pt-6">
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span>Creating snapshot...</span>
-                <span>{createProgress}%</span>
-              </div>
-              <Progress value={createProgress} />
+            <div className="flex items-center gap-2 text-sm">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span>Processing snapshot transitions...</span>
             </div>
           </CardContent>
         </Card>

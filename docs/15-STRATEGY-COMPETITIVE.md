@@ -17,6 +17,7 @@
 - **Part VII: Technical Debt**
 - **Part VIII: Firmware Hot-Swap — Marketing & Positioning (v6.4.0)**
 - **Part IX: Firmware Hot-Swap — Strategic Investor Brief (v6.4.0)**
+- **Part X: Beyond Copilots — The Seven RADIANT Principles (v7.51.0)**
 
 ---
 
@@ -2625,20 +2626,20 @@ Model B: "As Model A correctly stated..."
 
 | Technology | What It Does | Why Competitors Can't Match |
 |------------|--------------|---------------------------|
-| **Genesis Forge** | Creates any tool in < 2 minutes from API docs | Requires 7-phase pipeline with Firecracker sandbox |
+| **Tool Forge** | Creates any tool in < 2 minutes from API docs | Requires 7-phase pipeline with Firecracker sandbox |
 | **Liquid Compute** | Routes to Browser/Local/Edge/Cloud by privacy | Needs edge infrastructure + sensitivity rules |
 | **Neural Affinity** | Routes to optimal MCP server semantically | Requires 4096-dim embeddings + proficiency tracking |
 | **Ghost Simulation** | Predicts user satisfaction before execution | Needs 4-component psychological vectors |
 | **Economic Cortex** | Negotiates budgets autonomously | Requires multi-scope budget hierarchy |
 
-### Genesis Forge: Infinite Tool Generation
+### Tool Forge: Infinite Tool Generation
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                       GENESIS FORGE PIPELINE                                 │
+│                       TOOL FORGE PIPELINE                                    │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                              │
-│   User Intent ──▶ No Tool Exists? ──▶ GENESIS FORGE ACTIVATES               │
+│   User Intent ──▶ No Tool Exists? ──▶ TOOL FORGE ACTIVATES                  │
 │                                              │                               │
 │   Phase 1: Detection ────────────────────────┤ (100ms)                      │
 │   Phase 2: API Scouting ─────────────────────┤ (5-30s) OpenAPI/GraphQL/HTML │
@@ -2843,6 +2844,7 @@ Competitors are *trained* to be helpful. RADIANT is *constrained* to be accurate
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 7.51.0 | February 2026 | **Beyond Copilots — The Seven RADIANT Principles (Part X)**: Integrated full content from `docs/publications/BEYOND-COPILOTS-RADIANT-PRINCIPLES.md` into the strategy guide as Part X. Seven Principles framework: (1) Transformation Over Augmentation, (2) Institutional Memory Over Session Amnesia, (3) Verified Intelligence Over Probabilistic Guessing, (4) Elastic Intelligence Over Static Cost, (5) Sovereign Infrastructure Over API Dependency, (6) Mathematical Safety Over Prompt-Based Hope, (7) Compounding Value Over Static Tooling. Includes Copilots vs Magic Carpet comparison table and RADIANT Terms Glossary for marketing reference. |
 | 7.39.0 | February 2026 | **Spend Governor — Two-Layer Budget Control System**: Prevents runaway AWS and AI costs with dual enforcement. Layer 1: global instance budget with AWS service freeze/thaw (ECS→0, Lambda concurrency→0, SageMaker flagged) — admin plane always stays alive. Layer 2: per-tenant AI budget enforced as pre-invocation gate in ModelRouterService with 60s in-memory cache. End users never see "out of credits" — they get generic "service temporarily unavailable" (HTTP 503). Super admins get full visibility via SENTINEL alerts (SEV 1 for instance freeze, SEV 2 for tenant suspend), scheduled cost report emails (configurable X hours / Y days) with per-tenant and per-model breakdowns, and a CriticalAlertBanner at the top of every admin page. Recovery: increase budget, grant temporary override, or wait for rolling window. Swift Deployer integration with budget config and emergency freeze/thaw controls. 6 new tables, 3 SQL functions, 2 EventBridge Lambdas, 9 admin API endpoints. |
 | 7.38.0 | February 2026 | **System Administrator Separation — Dual Identity Plane**: Separates system admins from tenant users into isolated identity domains. Cognito Pool B (system-admins) with MFA required, 16-char passwords, 30-min sessions. Service layer firewall: Admin API GW accepts Pool B tokens only, Tenant API GW accepts Pool A tokens only. `system_admins` table (global, no tenant_id, no RLS) with dedicated contacts, alert routing, and audit log tables. SENTINEL dual-resolution: system admin contacts resolved globally for ALL alerts + tenant contacts resolved per-tenant. Bootstrap flow via Swift Deployer/CLI with forced setup (password change + MFA + phone verification). Progressive lockout (5→15min, 10→1hr, 20→auto-deactivation). DB trigger prevents removing last super_admin. System admin roles removed from tenant auth — cannot log into Think Tank, Curator, Genesis, Dojo, or Cato. |
 | 7.37.2 | February 2026 | **Enforced Logging Policy & Complete Migration**: Mandatory policy requiring all Lambda services to use the Logging Registry (`createRegisteredLogger`/`withEnforcedLogging`) for structured, enforced logging. ALL 324 files migrated via automated script. Category-aware assignment (admin→audit, security→security, analytics→performance). 0 legacy `enhancedLogger` imports remain in source. Redaction disabled by default (opt-in via `LOG_REDACT_SENSITIVE=true`) — compliance enforced at dedicated middleware layers. Log storage pipeline confirmed intact: stdout→CloudWatch→S3 (KMS)→Glacier→Deep Archive via `LogIndexerService`. |
@@ -2882,14 +2884,14 @@ Competitors are *trained* to be helpful. RADIANT is *constrained* to be accurate
 | 5.44.0 | January 22, 2026 | **LIVING PARCHMENT 2029 VISION**: "Information Has a Heartbeat" - Comprehensive decision intelligence suite with sensory UI. **War Room (Strategic Decision Theater)**: Confidence terrain 3D visualization, AI advisory council, decision paths with outcome predictions, ghost branches. **Council of Experts**: 8 AI personas (Pragmatist, Ethicist, Innovator, Skeptic, Synthesizer, Analyst, Strategist, Humanist), consensus visualization with gravitational convergence, dissent sparks, minority reports. **Debate Arena**: Resolution meter (-100 to +100), attack/defense flows, weak point detection, steel-man generation. **Design Philosophy**: Breathing interfaces (4-12 BPM), living ink (weight 350-500), ghost paths, confidence terrain. 5 additional features coming: Memory Palace, Oracle View, Synthesis Engine, Cognitive Load Monitor, Temporal Drift Observatory. 40+ new database tables. **Competitive Moats**: 4 new moats (#17-20) documented in THINKTANK-MOATS.md. |
 | 5.52.5 | January 24, 2026 | **SERVICES LAYER**: Complete interface-based access control. A2A Protocol with 13 message types, mTLS support. API Keys with interface types (api/mcp/a2a/all). Cedar policies for database access restrictions. Key sync between Radiant Admin and Think Tank Admin. |
 | 5.52.6 | January 24, 2026 | **COMPLETE CDK WIRING AUDIT**: Critical infrastructure fix - ALL 62 admin Lambda handlers now wired to API Gateway. Categories: Cato Safety (5), Memory Systems (4), AI/ML (7), Security (5), Operations (5), Reporting (4), Configuration (7), Infrastructure (6), Compliance (4), Models (5), Orchestration (2), Users (2), Time & Translation (3). Entire admin API surface now operational. |
-| 6.6.0 | February 4, 2026 | **AUTONOMOUS ORGANISM ARCHITECTURE (PROMPT-43)**: "Project Metamorphosis" - RADIANT transforms from Agentic Software to Neural Infrastructure. **5 Leapfrog Technologies**: (1) Genesis Forge - JIT tool generation from API documentation with Firecracker sandbox validation; (2) Liquid Topology - Dynamic compute routing (Browser/Local/Edge/Cloud) based on privacy, latency, cost; (3) Tensor-Link - Vector-based agent communication with FP16/INT8 quantization; (4) Ghost Simulation - User digital twins (4096-dim vectors) for outcome prediction and calibration; (5) Economic Cortex - Autonomous budget management with negotiation strategies. **Neural Affinity Routing**: Semantic similarity + domain proficiency + error rate + latency + cost scoring for intelligent MCP server selection. **BrainRouter Integration**: Organism services enhance existing orchestration layer. **Implementation**: 9 core services (~6,226 lines), 37 Admin API endpoints, 6-tab Admin Dashboard, 18 database tables, 14 enums with RLS. **Competitive Moat**: Tier 0 Platform Moat (highest) - 18-24 months to replicate, network effects from generated tools, high switching cost from Ghost Vectors + Economic history. |
+| 6.6.0 | February 4, 2026 | **AUTONOMOUS ORGANISM ARCHITECTURE (PROMPT-43)**: "Project Metamorphosis" - RADIANT transforms from Agentic Software to Neural Infrastructure. **5 Leapfrog Technologies**: (1) Tool Forge - JIT tool generation from API documentation with Firecracker sandbox validation; (2) Liquid Topology - Dynamic compute routing (Browser/Local/Edge/Cloud) based on privacy, latency, cost; (3) Tensor-Link - Vector-based agent communication with FP16/INT8 quantization; (4) Ghost Simulation - User digital twins (4096-dim vectors) for outcome prediction and calibration; (5) Economic Cortex - Autonomous budget management with negotiation strategies. **Neural Affinity Routing**: Semantic similarity + domain proficiency + error rate + latency + cost scoring for intelligent MCP server selection. **BrainRouter Integration**: Organism services enhance existing orchestration layer. **Implementation**: 9 core services (~6,226 lines), 37 Admin API endpoints, 6-tab Admin Dashboard, 18 database tables, 14 enums with RLS. **Competitive Moat**: Tier 0 Platform Moat (highest) - 18-24 months to replicate, network effects from generated tools, high switching cost from Ghost Vectors + Economic history. |
 | 6.5.0 | February 3, 2026 | **Cartridge PKI KMS Integration (PROMPT-42)**: Real AWS KMS asymmetric signing for .RADz cartridges replacing placeholder strings. Platform root CA with ECC_NIST_P256 (ECDSA). Tenant CA hierarchy created dynamically per tenant. Purpose-specific signing keys (author, publisher, validator). CDK SecurityStack with cartridgeSigningKey. IAM policies for tenant key creation. 3 database tables (tenant_ca_certificates, cartridge_signing_keys, pki_audit_log) with RLS. Admin API with 10 endpoints. Competitive moat: No competitor offers cryptographic signing for portable AI packages. |
 | 6.5.0 | February 3, 2026 | **MLS (Message Layer Security)**: RFC 9420-inspired group encryption for secure agent-to-agent communication. Forward secrecy with epoch-based HKDF key ratcheting. Post-compromise security via key updates. Cryptographic primitives: X25519 (ECDH), Ed25519 (signatures), AES-256-GCM (authenticated encryption). 7 database tables with RLS. Admin API with 12 endpoints. Competitive moat: No competitor offers cryptographically-secure group encryption for AI agents. |
 | 5.52.26 | January 25, 2026 | **OAUTH 2.0 PROVIDER & DEVELOPER PORTAL (PROMPT-41A)**: RFC 6749 compliant OAuth Authorization Server enabling third-party app integrations. **Grant Types**: Authorization Code (with PKCE), Client Credentials, Refresh Token (with rotation). **14 Scopes** across 3 risk levels (low/medium/high). **Admin Dashboard**: App management, pending approvals, scope configuration, authorization viewer. **OIDC Discovery**: Full OpenID Connect support with JWKS, userinfo, introspection. **Use Cases Enabled**: MCP Servers (Claude Desktop, Cursor), Zapier/Make automation, partner integrations, mobile apps, Slack/Teams bots. **Security**: SHA-256 token hashing, RS256 JWT signing, PKCE for public clients, audit logging. |
 | 5.52.28 | January 25, 2026 | **TWO-FACTOR AUTHENTICATION (PROMPT-41B)**: Role-based MFA enforcement with industry-standard TOTP (RFC 6238). **Required Roles**: All admin roles (tenant_admin, tenant_owner, super_admin, admin, operator, auditor) MUST enroll and CANNOT disable. **Enrollment Gate**: Full-screen forced enrollment at login, cannot be bypassed. **TOTP Service**: AES-256-GCM secret encryption, ±30s clock drift tolerance. **Backup Codes**: 10 one-time recovery codes (SHA-256 hashed), low-code warnings at <3 remaining. **Device Trust**: 30-day tokens, max 5 per user, revocable from settings. **Lockout**: 3 failed attempts triggers 5-minute lockout. **Security Settings Page**: /settings/security with MFA status, backup codes management, trusted devices list. **Database**: mfa_backup_codes, mfa_trusted_devices, mfa_audit_log (partitioned) tables. **Competitive Moat**: Enterprise-grade security that competitors lack. |
 | 5.52.29 | January 25, 2026 | **INTERNATIONALIZATION & MULTI-LANGUAGE SEARCH (PROMPT-41D)**: Global-ready platform with 18 languages. **Language Support**: en, es, fr, de, pt, it, nl, pl, ru, tr, ja, ko, zh-CN, zh-TW, ar (RTL), hi, th, vi. **CJK Full-Text Search**: pg_bigm bi-gram indexing for Chinese, Japanese, Korean without word boundaries. **Auth Localization**: ~230 translation keys for login, MFA, OAuth, password reset screens. **RTL Support**: Arabic users get proper right-to-left layouts with dir="rtl", flipped margins/paddings, LTR preservation for codes. **Search Service**: Automatic language detection, appropriate search method routing (PostgreSQL FTS or pg_bigm), relevance ranking. **Database**: detected_language column, search_vector_simple/english tsvector columns, GIN bi-gram indexes. **Competitive Moat**: True global enterprise readiness vs English-only competitors. |
 | 5.52.57 | January 29, 2026 | **MODEL REGISTRY ENHANCEMENT SYSTEM**: Comprehensive self-hosted model lifecycle management. **HuggingFace Discovery**: Automated polling for new model versions with configurable watchlist per family (Llama, Qwen, DeepSeek, Mistral). **Version Manager**: S3 storage tracking, thermal state management (Hot/Warm/Cold/Off), bulk operations. **Deletion Queue**: Safe model deletion with usage session tracking - models wait for active sessions to end before deletion. **Admin Dashboard**: 5-tab interface (Overview, Versions, Watchlist, Deletion Queue, Discovery Jobs). **Scheduler Integration**: Discovery and deletion processing integrated into hourly model-sync. **Database**: 5 new tables (model_versions, model_family_watchlist, model_discovery_jobs, model_deletion_queue, model_usage_sessions). **Competitive Moat**: Automated model fleet management that competitors lack. |
-| 6.2.0 | February 1, 2026 | **GENESIS VAULT (KEYHOLE PATTERN)**: Secrets management for cartridges - cartridges declare required secrets via vault.req manifest but NEVER contain credentials. KMS encryption, rotation with history, Merkle audit trail, Chain of Custody. CBFs for secret access that NEVER relax. PARANOID/BALANCED/COWBOY governance presets. Admin UI at Platform → Vault. **RNIR COMPILER**: Radiant Neural Intermediate Representation - model-agnostic cognitive source code (JSONL training pairs). Compiles to LoRA weights, system prompts, few-shot examples, RAG chunks. Cortex integration for knowledge-aware compilation. Twilight Dreaming scheduling for background compilation. Axiom domain signatures with model-specific variants. Admin UI at Platform → RNIR. **CARTRIDGE OPERATIONS**: Long-running operations with Time Machine checkpointing. Cato CP1-CP5 checkpoint levels. SAGA compensation pattern for proper rollback. Universal Envelope Protocol tracing (traceId/spanId). Pause/Resume/Cancel controls. Admin UI at Platform → Cartridge Operations. **v4.21.0 SPEC ALIGNMENT**: Types enhanced with Merkle audit, Chain of Custody, CBFs, governance presets from unified architecture spec. |
+| 6.2.0 | February 1, 2026 | **CARTRIDGE VAULT (KEYHOLE PATTERN)**: Secrets management for cartridges - cartridges declare required secrets via vault.req manifest but NEVER contain credentials. KMS encryption, rotation with history, Merkle audit trail, Chain of Custody. CBFs for secret access that NEVER relax. PARANOID/BALANCED/COWBOY governance presets. Admin UI at Platform → Vault. **RNIR COMPILER**: Radiant Neural Intermediate Representation - model-agnostic cognitive source code (JSONL training pairs). Compiles to LoRA weights, system prompts, few-shot examples, RAG chunks. Cortex integration for knowledge-aware compilation. Twilight Dreaming scheduling for background compilation. Axiom domain signatures with model-specific variants. Admin UI at Platform → RNIR. **CARTRIDGE OPERATIONS**: Long-running operations with Time Machine checkpointing. Cato CP1-CP5 checkpoint levels. SAGA compensation pattern for proper rollback. Universal Envelope Protocol tracing (traceId/spanId). Pause/Resume/Cancel controls. Admin UI at Platform → Cartridge Operations. **v4.21.0 SPEC ALIGNMENT**: Types enhanced with Merkle audit, Chain of Custody, CBFs, governance presets from unified architecture spec. |
 | 6.1.0 | February 1, 2026 | **AXIOM PROMPT OPTIMIZATION PIPELINE**: 8 AXIOM Scorers (~3.3M params) for intelligent prompt optimization. CLARION Adaptive Questioning. UEP real-time streaming. Thermal state management. **CARTRIDGE PKI & FEDERATION**: Cryptographic signing of .RADz cartridges with dual signatures (author + platform). SHA-256 hash verification. Cross-cluster federation via Root CA exchange. PKI Admin Dashboard for managing certificates, signing keys, and trusted roots. Tamper-proof AI knowledge transfer. Supply chain security for regulated industries. New Moat #31 (27/30 score). **SYSTEM CARTRIDGE REGISTRY**: Domain experts as system cartridges with audit trail. Tenant visibility toggles. Thermal state management. |
 | 7.19.0 | February 6, 2026 | **AURELIUS DOJO v1.2.0 — BACKEND WIRING (COMPLETE STACK)**: Full backend infrastructure connecting the Dojo frontend to production services. **Dedicated Lambda Handler** (`lambda/admin/dojo.ts`): 35+ endpoints across 12 route groups — Libraries (CRUD + upload + theme discovery), Sessions (start/lesson/spar/complete), Progress (user + theme), Certifications (exam start + history), Mobot (chat + history), Config (get/update), Decay Engine (dashboard + curves + reinforcement), Scenarios (start + respond + conclude), Competencies (extract + mesh + team gaps), Dialectic (start + respond + conclude), Multimodal (get + generate), Pulse (snapshot + history), Archytas (config + invoke + suggest + summary). **Database Migration** (`V2026_02_06_005`): 19 RLS-protected tables with `app.current_tenant_id` isolation; 13 custom PostgreSQL enums; 3 helper functions — `dojo_calculate_retention()` (Ebbinghaus exponential decay), `dojo_xp_to_rank()` (XP threshold mapping), `dojo_update_decay_after_review()` (half-life adjustment with streak/lapse tracking). **CDK Integration**: Separate `DojoFunction` Lambda sharing `adminLambdaRole` IAM policies; proxy resource routing (`/admin/dojo/{proxy+}`) avoiding 50+ individual API Gateway resources. **AI Pipeline Boundary**: Non-AI endpoints (CRUD, config, progress, decay tracking) work immediately; AI-dependent features (theme discovery, lesson generation, sparring questions, scenario responses, dialectic responses, multimodal generation) throw descriptive errors indicating pipeline requirements — clean separation of data layer from AI layer. **Competitive Moat**: Complete production-ready backend for the only training platform combining thematic gating, adversarial sparring, Ebbinghaus decay, competency mapping, Socratic dialectic, and org-wide knowledge pulse. |
 | 7.18.0 | February 6, 2026 | **CATO TRAINER v1.0.0 — THE GROUNDING ENGINE**: New standalone knowledge base app (`apps/cato-trainer/`, port 3005) using the Cato persona for ground-truth AI. **Grounded Q&A**: Citation-backed answers with confidence tiers (exact ≥90%, high ≥70%, moderate ≥50%, low). **Semantic Search**: Three modes — semantic (meaning-based), full-text (keyword), hybrid (combined). **Document Intelligence**: Auto-chunking, embedding, AI summaries, auto-tagging, smart links (references, contradicts, extends, summarizes, related). **Multi-Document Digest**: 6 types — summary, comparison, contradiction analysis, timeline, key facts, action items with custom instructions. **Libraries & Spaces**: Independent knowledge bases with status tracking; project-based collections. **Design System**: Cool teal/cyan palette with ground-truth emerald accents, dark glass panels, Lora serif for documents. 15 API types, 25+ endpoints, Zustand store (30+ fields), 7-tab sidebar, 6 components. Swift Deployer + Admin Dashboard integration. **Competitive Moat**: No competitor offers citation-guaranteed grounded Q&A with multi-document contradiction detection and cross-document smart linking from a single unified knowledge base platform. |
@@ -2932,7 +2934,7 @@ While traditional AI platforms offer API orchestration over third-party models, 
 
 | Technology | Capability | Business Impact |
 |------------|------------|-----------------|
-| **Genesis Forge** | Infinite tool generation | Any integration in < 2 minutes |
+| **Tool Forge** | Infinite tool generation | Any integration in < 2 minutes |
 | **Liquid Compute** | Data sovereignty | Sensitive data never leaves device |
 | **Tensor-Link** | Vector communication | 100x faster, zero semantic loss |
 | **Ghost Simulation** | Predictive safety | Prevents regret before it happens |
@@ -2942,11 +2944,11 @@ While traditional AI platforms offer API orchestration over third-party models, 
 
 # PART 1: THE FIVE LEAPFROG TECHNOLOGIES
 
-## 1.1 Genesis Forge — Infinite Tool Generation
+## 1.1 Tool Forge — Infinite Tool Generation
 
 ### The Capability
 
-Genesis Forge transforms Think Tank from a platform with *thousands* of integrations into a platform with *infinite* integrations. When a user needs a capability that doesn't exist, Genesis creates it automatically.
+Tool Forge transforms Think Tank from a platform with *thousands* of integrations into a platform with *infinite* integrations. When a user needs a capability that doesn't exist, Tool Forge creates it automatically.
 
 | Dimension | Capability |
 |-----------|------------|
@@ -2964,7 +2966,7 @@ User: "Connect to our inventory system at inventory.acme.com"
 
 Think Tank: "I don't have that integration yet. Let me create one..."
 
-[Genesis Forge activates]
+[Tool Forge activates]
   ✓ Searching for API documentation...
   ✓ Generating MCP server code...
   ✓ Security validation (SAST, CVE scan)...
@@ -2975,11 +2977,11 @@ Think Tank: "I don't have that integration yet. Let me create one..."
 Timeline: 90 seconds
 ```
 
-### The 9-Step Genesis Pipeline
+### The 9-Step Tool Forge Pipeline
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                          GENESIS FORGE PIPELINE                              │
+│                          TOOL FORGE PIPELINE                                 │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
 │  1. DETECTION      → Identify missing capability from user intent           │
@@ -2997,7 +2999,7 @@ Timeline: 90 seconds
 
 ### Security Guarantees
 
-Every Genesis-created tool passes through:
+Every Tool Forge-created tool passes through:
 - **SAST (Static Analysis)** — Code vulnerability detection
 - **CVE Scanning** — Known vulnerability database check
 - **Behavioral Analysis** — Runtime behavior validation
@@ -3006,7 +3008,7 @@ Every Genesis-created tool passes through:
 
 ### Replication Barrier
 
-To replicate Genesis Forge, a competitor would need:
+To replicate Tool Forge, a competitor would need:
 - AGI-level code generation capability
 - Automated security validation pipeline
 - Firecracker sandbox infrastructure
@@ -3379,7 +3381,7 @@ To replicate Economic Cortex, a competitor would need:
 | Capability | Think Tank | Industry Standard | Advantage |
 |------------|------------|-------------------|-----------|
 | Static Integrations | 3,000+ | 20-100 | 30-150x |
-| Dynamic Tool Creation | Genesis Forge (∞) | None | ∞ |
+| Dynamic Tool Creation | Tool Forge (∞) | None | ∞ |
 | Tool Generation Time | < 2 minutes | Weeks-months | 10,000x |
 | Tool Security | SAST + CVE + Sandbox | Varies | Qualitative |
 
@@ -3465,7 +3467,7 @@ To replicate Economic Cortex, a competitor would need:
 10. **Configuration Portability** — .ttworkflow, .ttdomain files
 
 ### Leapfrog Moats (11-15):
-11. **Genesis Forge** — Infinite tool generation
+11. **Tool Forge** — Infinite tool generation
 12. **Liquid Compute** — Edge sovereignty (6 execution nodes)
 13. **Tensor-Link Protocol** — Vector communication (100x faster)
 14. **Ghost Simulation** — Personalized predictive safety
@@ -3475,7 +3477,7 @@ To replicate Economic Cortex, a competitor would need:
 
 | Moat | Replication Time | Replication Cost | Difficulty |
 |------|------------------|------------------|------------|
-| Genesis Forge | 18-24 months | $5-10M | Very High |
+| Tool Forge | 18-24 months | $5-10M | Very High |
 | Liquid Compute | 24-36 months | $10-20M | Extreme |
 | Tensor-Link | 12-18 months | $2-5M | High |
 | Ghost Simulation | 24+ months | $5-10M | Very High |
@@ -3545,7 +3547,7 @@ To replicate Economic Cortex, a competitor would need:
 │                                                                              │
 │  • Trainable neural networks at every layer                                  │
 │  • Liquid Compute (browser → local → edge → cloud)                           │
-│  • Infinite tool generation (Genesis Forge)                                  │
+│  • Infinite tool generation (Tool Forge)                                  │
 │  • Vector communication (Tensor-Link, 100x faster)                           │
 │  • Personalized predictive safety (Ghost Simulation)                         │
 │  • Autonomous budget management (Economic Cortex)                            │
@@ -3563,7 +3565,7 @@ To replicate Economic Cortex, a competitor would need:
 | **Healthcare IT** | ★★★★★ | Liquid Compute: patient data never leaves device |
 | **Legal Tech** | ★★★★★ | Accuracy + confidentiality + audit trail |
 | **Financial Services** | ★★★★★ | Economic Cortex + regulatory compliance |
-| **Engineering** | ★★★★★ | Genesis Forge + domain intelligence |
+| **Engineering** | ★★★★★ | Tool Forge + domain intelligence |
 | **Research** | ★★★★★ | 106+ models + specialized analysis |
 | **Privacy-sensitive** | ★★★★★ | Liquid Compute + Ghost privacy |
 | **Accuracy-critical** | ★★★★★ | CBFs + multi-model validation |
@@ -3580,7 +3582,7 @@ To replicate Economic Cortex, a competitor would need:
 
 Foundation model companies spend $200B+ annually on research. Think Tank inherits all AI improvements without that capital expenditure. Our moat is the orchestration intelligence, not the models themselves.
 
-**Genesis Forge amplifies this:** We also inherit ALL possible integrations—we can create any tool in 2 minutes.
+**Tool Forge amplifies this:** We also inherit ALL possible integrations—we can create any tool in 2 minutes.
 
 ### "Compounding vs Constant"
 
@@ -3588,7 +3590,7 @@ Traditional AI platforms deliver the same value on Day 1 as Day 365 (same platfo
 
 Think Tank compounds:
 - Day 1 << Day 365 (system learned from every interaction)
-- Genesis Forge adds new tools continuously
+- Tool Forge adds new tools continuously
 - Ghost Simulation calibrates to each user
 - Economic Cortex optimizes spending patterns
 - CATO evolves nightly with Twilight Dreaming
@@ -3652,7 +3654,7 @@ This creates stickiness through VALUE, not lock-in.
 
 ## 7.1 The Investment Thesis
 
-1. **Genesis Forge** makes tool scarcity obsolete
+1. **Tool Forge** makes tool scarcity obsolete
 2. **Liquid Compute** makes privacy trade-offs obsolete
 3. **Tensor-Link** makes semantic loss obsolete
 4. **Ghost Simulation** makes reactive safety obsolete
@@ -3665,7 +3667,7 @@ Together, these five technologies create a **3-5 year architectural moat**.
 | Dimension | Think Tank Capability |
 |-----------|----------------------|
 | Technology | Neural infrastructure that compounds |
-| Tools | Infinite via Genesis Forge |
+| Tools | Infinite via Tool Forge |
 | Privacy | Complete sovereignty via Liquid Compute |
 | Safety | Predictive via Ghost Simulation |
 | Cost | Autonomous via Economic Cortex |
@@ -4092,7 +4094,7 @@ Active Inference-based safety system that replaces traditional reward maximizati
 - **The Watcher**: Self-awareness via prediction error → dopamine signal
 - **Biological Lock-In**: Brain physically densifies over time; impossible to export to competitors
 
-**Genesis Forge v3.0 — "The Glass Foundry" (Moonshot #3)**:
+**OMEGA Forge v3.0 — "The Glass Foundry" (Moonshot #3)**:
 - **Digital Smithy**: Not a code editor — a real-time physics simulation environment for neural firmware
 - **Shadow Omega Tether**: Permanently hard-wired WebSocket to simulation kernel; adversarial workflow
 - **Catenary Wire Physics**: Gravity-obeying data cables with light particle flow; heavier data = deeper sag
@@ -4104,8 +4106,8 @@ Active Inference-based safety system that replaces traditional reward maximizati
 **Implementation**:
 - Core: `omega_core/bridge.py`, `omega_core/reflection.py`, `omega_core/physics.py`
 - Handler: `handlers/omega_vllm_server.py`, `handlers/omega_inference.py`
-- Glass Foundry: `apps/genesis/components/forge/` (GlassFoundry, TheArmory, TheOracle, OmegaSelector, ReactorCore, 3 node types, catenary edge)
-- State: `apps/genesis/lib/forge-store.ts` (Zustand), `hooks/useShadowOmega.ts` (WebSocket)
+- Glass Foundry: `apps/omega-lab/components/forge/` (GlassFoundry, TheArmory, TheOracle, OmegaSelector, ReactorCore, 3 node types, catenary edge)
+- State: `apps/omega-lab/lib/forge-store.ts` (Zustand), `hooks/useShadowOmega.ts` (WebSocket)
 - Admin API: `lambda/admin/cato.ts`
 - Database: `cato_cbf_config`, `cato_audit_log`, `omega_replay_logs`, `omega_bridge_state`, `omega_watcher_metrics`, `omega_dream_history`, `omega_instance_registry`, `omega_forge_sessions`, `omega_forge_artifacts`, `omega_telemetry_history`
 - CDK: `lib/stacks/cato-genesis-stack.ts`
@@ -4190,13 +4192,13 @@ Unlike competitors whose AI "dies" between requests (Lambda cold starts erase al
 |-----------|---------|------------|
 | **MCP Server Manager** | Registry with Neural Affinity Routing | Semantic tool selection at scale |
 | **Neural Schema Registry** | Tool embeddings for intelligent discovery | Sub-50ms tool matching |
-| **Genesis Auto-Tool** | On-demand tool generation from APIs | Never "tool not available" |
+| **Tool Forge** | On-demand tool generation from APIs | Never "tool not available" |
 | **Liquid Compute** | Privacy-aware compute location selection | Local-first for sensitive data |
 | **Ghost Simulation** | Predict user satisfaction before execution | Proactive UX optimization |
 | **Tensor-Link Protocol** | Vector-based transport with quantization | 50%+ bandwidth reduction |
 | **Economic Cortex** | Autonomous budget negotiation | 30%+ cost savings |
 
-**Genesis Auto-Tool Pipeline** (Industry First):
+**Tool Forge Pipeline** (Industry First):
 ```
 Intent → API Discovery → Code Generation → Sandbox Validation → Hot-Deploy
 ```
@@ -4231,7 +4233,7 @@ Intent → API Discovery → Code Generation → Sandbox Validation → Hot-Depl
 Competitors face the impossible task of replicating not just the code, but the accumulated intelligence. It's like trying to compete with a company by hiring their employees—you get the people, not their accumulated institutional knowledge.
 
 **Implementation**:
-- Services: `lambda/shared/services/organism/*`
+- Services: `lambda/shared/services/organism/`
 - Types: `packages/shared/src/types/autonomous-organism.types.ts`
 - Migration: `V2026_02_03_001__autonomous_organism_architecture.sql`
 - 18 database tables, 14 enums, 9 services
@@ -4242,7 +4244,7 @@ Competitors face the impossible task of replicating not just the code, but the a
 
 The Autonomous Organism Architecture comprises five individually defensible moats, each with significant replication barriers:
 
-#### Leapfrog #1: Genesis Forge — Infinite Tool Generation
+#### Leapfrog #1: Tool Forge — Infinite Tool Generation
 
 | Dimension | Capability | Replication Barrier |
 |-----------|------------|---------------------|
@@ -4342,7 +4344,7 @@ Intent → API Discovery → Code Generation → SAST → CVE Scan → Sandbox �
 
 | Technology | Time | Cost | Difficulty |
 |------------|------|------|------------|
-| Genesis Forge | 18-24 months | $5-10M | Very High |
+| Tool Forge | 18-24 months | $5-10M | Very High |
 | Liquid Compute | 24-36 months | $10-20M | Extreme |
 | Tensor-Link | 12-18 months | $2-5M | High |
 | Ghost Simulation | 24+ months | $5-10M | Very High |
@@ -4527,7 +4529,7 @@ W_Final = W_Genesis + (scale × W_Cato) + (scale × W_User) + (scale × W_Domain
 - Service: `lambda/shared/services/lora-inference.service.ts`
 - Service: `lambda/shared/services/adapter-management.service.ts`
 - Admin API: `lambda/admin/enhanced-learning.ts`
-- Migration: `packages/infrastructure/migrations/108_enhanced_learning.sql`
+- Migration: `migrations/000_consolidated_schema.sql`
 - Admin UI: `apps/admin-dashboard/app/(dashboard)/models/lora-adapters/page.tsx`
 - Documentation: `docs/EXPERT-SYSTEM-ADAPTERS.md`
 
@@ -5139,8 +5141,8 @@ RADIANT Cartridges are **portable AI brains** — complete neural intelligence p
 
 **Implementation:**
 - Service: `lambda/shared/services/cartridge.service.ts`
-- Admin: `lambda/admin/cartridge.ts`
-- Dashboard: `apps/admin-dashboard/app/(dashboard)/cartridge-manager/page.tsx`
+- Admin: `lambda/admin/cartridge-universal.ts`
+- Dashboard: `apps/admin-dashboard/app/(dashboard)/cartridge-system/page.tsx`
 
 ---
 
@@ -5212,7 +5214,7 @@ Every RADIANT Cartridge (.RADz) is **cryptographically signed** with dual signat
 
 **PKI Architecture:**
 ```
-Radiant Root CA (Genesis Vault / HSM)
+Radiant Root CA (Cartridge Vault / HSM)
     └── Tenant Intermediate CA (per organization)
             └── Cartridge Signing Keys
                     └── Dual Signatures (Author + Platform)
@@ -5247,7 +5249,7 @@ Radiant Root CA (Genesis Vault / HSM)
 - Service: `lambda/shared/services/cartridge-pki.service.ts`
 - Admin API: `lambda/admin/cartridge-pki.ts`
 - Dashboard: `apps/admin-dashboard/app/(dashboard)/platform/pki/page.tsx`
-- Migration: `migrations/V2026_02_01_009__cartridge_pki.sql`
+- Migration: `migrations/000_consolidated_schema.sql`
 
 ---
 
@@ -5321,7 +5323,7 @@ A **novel orchestration primitive** where multiple LLMs engage in competitive cr
 - Service: `lambda/shared/services/crucible/crucible.service.ts`
 - Orchestrator: `lambda/shared/services/crucible/crucible-orchestrator.service.ts`
 - Admin API: `lambda/admin/crucible.ts`
-- Migration: `migrations/V2026_02_01_014__crucible_deliberation.sql`
+- Migration: `migrations/000_consolidated_schema.sql`
 
 ---
 
@@ -5398,7 +5400,7 @@ When optional models are unavailable, services automatically reduce capabilities
 - Service Definitions: `packages/infrastructure/lib/config/services/`
 - Thermal Management: `packages/infrastructure/lambda/thermal/`
 - Service Orchestrators: `packages/infrastructure/lambda/services/`
-- Database: `migrations/006_self_hosted_models.sql`
+- Database: `migrations/000_consolidated_schema.sql`
 - LiteLLM Routing: `litellm/config/self-hosted.yaml`
 
 ---
@@ -6305,7 +6307,7 @@ Zero-cost persistent consciousness through database state injection:
 | Goals | Active goal tracking |
 
 **Implementation**:
-- Service: `lambda/shared/services/ego-context.service.ts`
+- Service: `lambda/shared/services/local-ego.service.ts`
 - Admin UI: `apps/thinktank-admin/app/(dashboard)/ego/page.tsx`
 
 ---
@@ -8537,7 +8539,7 @@ A manufacturing customer imports a pre-built "Quality Control Expert" cartridge 
 | Hot-Swap | **Live Update** | Changing AI behavior without any service interruption |
 | Helix Rules | **Safety Guardrails** | Mathematically-enforced rules that make certain behaviors physically impossible for the AI |
 | Ambition Settings | **Learning Configuration** | Controls how fast the AI learns and adapts to your organization |
-| Genesis Forge | **AI Command Center** | The admin dashboard for managing AI behavior profiles |
+| OMEGA Forge | **AI Command Center** | The admin dashboard for managing AI behavior profiles |
 | OVERLAY mode | **Seamless Update** | Updates applied on top of existing AI knowledge |
 | SHADOW mode | **Safe Testing** | Test new behavior in parallel before going live |
 | EMERGENCY mode | **Instant Lockdown** | Immediate safety enforcement |
@@ -8560,7 +8562,7 @@ A: Three layers of protection. First, every firmware must pass validation and cr
 A: Yes. Firmware signing uses AWS KMS (FIPS 140-2 validated). Every swap is logged in an immutable audit trail. Production deployments require two-person approval and re-authentication (FDA 21 CFR Part 11 pattern). The PKI trust chain (Platform CA → Tenant CA → Signing Key) satisfies SOC 2 cryptographic controls.
 
 **Q: Can customers create their own firmware?**
-A: Yes, through the Genesis Forge (AI Command Center). They can author safety rules, adjust learning parameters, and define personality — with AI-assisted drafting that helps non-technical admins create expert-level configurations. Everything is signed and versioned.
+A: Yes, through the OMEGA Forge (AI Command Center). They can author safety rules, adjust learning parameters, and define personality — with AI-assisted drafting that helps non-technical admins create expert-level configurations. Everything is signed and versioned.
 
 ### 6. Taglines & Copy Options
 
@@ -8765,3 +8767,453 @@ Firmware hot-swap transforms RADIANT from an AI routing platform into an **AI ev
 3. **Biological lock-in:** Accumulated wisdom cannot be exported to competitors
 
 This is not incremental. This is the difference between selling propellers and selling jet engines.
+
+---
+
+## Part X: Beyond Copilots — The Seven RADIANT Principles (v7.51.0)
+
+> *Integrated from `docs/publications/BEYOND-COPILOTS-RADIANT-PRINCIPLES.md`*
+>
+> **Why We Refuse to Build Another Copilot — And What We're Building Instead**
+>
+> *RADIANT Platform | February 2026*
+
+---
+
+### The Copilot Consensus Is Wrong
+
+Every major technology company has arrived at the same answer: **build a Copilot**. Microsoft Copilot. GitHub Copilot. Salesforce Einstein Copilot. Google Duet AI. Adobe Firefly. The metaphor is everywhere, and it has become the unquestioned default for how AI should relate to humans.
+
+The metaphor is also a ceiling.
+
+A copilot sits in the passenger seat. It watches you drive. It suggests turns. It might warn you about traffic. But **you are still driving**. You are still steering. You are still responsible for every decision, every action, every line of code. The copilot makes you a marginally better version of what you already are — it does not change the nature of the work.
+
+This is the universal copilot pitch: *"Your existing workflow, but 15-30% faster."* Microsoft sells this for Word, Excel, and Teams. GitHub sells it for code editors. Salesforce sells it for CRM. Each copilot watches what you do and tries to predict what you'll do next. It autocompletes your sentences, suggests your next function, drafts your next email. When it works well, it saves you a few keystrokes. When it works poorly, you spend time correcting its suggestions. Either way, you are still the one doing the work.
+
+We believe this is the wrong ambition for AI in 2026. The copilot metaphor accepts the current workflow as permanent and asks only: *"How do we make it slightly faster?"* We ask a fundamentally different question:
+
+> **What if the workflow itself is the problem?**
+
+What if, instead of helping a developer write code 30% faster, you could let a non-developer describe what they need and have the system produce the finished result? What if, instead of helping an analyst format a spreadsheet, the system could generate an interactive dashboard from a plain-English description? What if the AI didn't sit beside you while you work — but instead did the work while you directed?
+
+That is what RADIANT builds. We call our design philosophy **"the Magic Carpet."** A copilot sits next to you while *you* navigate a road that already exists. A magic carpet takes you where you want to go — there is no road, no steering wheel, no fuel gauge. You say "take me there," and the ground beneath you reshapes itself. The distinction is not "slightly better augmentation." It is the difference between **making a process faster** and **replacing the need for the process entirely**.
+
+---
+
+### The Seven Principles
+
+#### Principle 1: Transformation Over Augmentation
+
+**The copilot thesis**: Help people do their existing jobs faster.
+**Our thesis**: Eliminate the need for the job as currently defined.
+
+Copilots augment. At their core, every copilot on the market today is a sophisticated autocomplete engine dressed in conversational UI. The human remains the author, the decision-maker, the one doing the cognitive work.
+
+RADIANT transforms. The difference is not a matter of degree — it is a difference in kind.
+
+**In practice — the "Polymorphic UI."** RADIANT's interface *physically transforms itself* based on what you're trying to accomplish. The system selects from three fundamental layouts:
+
+- **Sniper View**: Command-center layout for direct, focused tasks. Single AI model, instant execution, ~$0.01 per query.
+- **Scout View**: Infinite canvas for exploration and research. Multiple models in parallel, evidence clustered as spatial maps.
+- **Sage View**: Split-screen diff editor for verification and compliance. Source documents on the right, confidence highlighting on the left.
+
+None of these interfaces exist before the user asks a question. They are generated on the fly. The system reads your intent and builds the appropriate workspace.
+
+**The "Eject to App" capability.** When RADIANT generates a complex interactive result, the user can click "Eject to App" and receive the actual source code as a standalone, deployable application. The AI didn't just show you a chart — it built you software.
+
+We are not in the business of making developers faster. We are in the business of making everyone capable of producing software — without writing a single line of code.
+
+---
+
+#### Principle 2: Institutional Memory Over Session Amnesia
+
+**The copilot problem**: Every session starts from zero.
+
+Open ChatGPT and ask it a question. Close the tab. Open it again tomorrow. It has no idea who you are. It doesn't remember what you discussed. Every enterprise AI platform today suffers from **goldfish memory** — the AI's entire world resets every time you start a new session.
+
+**RADIANT's answer — the "Cortex" Memory System.** A three-tier architecture:
+
+- **Hot Memory (<10ms)**: Working memory — current session context, recent history. 4-hour TTL.
+- **Warm Memory (<100ms)**: Long-term knowledge — knowledge graph + vector embeddings. Entity relationships, causal chains, cross-session context. 90-day active window.
+- **Cold Memory (<2s)**: Archival — **seven years** of compliance-grade, immutable history.
+
+The knowledge graph uses **Graph-RAG** (Graph-enhanced Retrieval-Augmented Generation) — hybrid search combining explicit graph traversal with vector similarity. ~40% better retrieval accuracy than vector-only approaches.
+
+On Day 365, RADIANT has internalized your team's decision-making patterns, compliance requirements, codebase conventions, project histories, and institutional knowledge. When a new employee joins, the AI can brief them on months of project history. When someone leaves, their knowledge stays.
+
+Copilots have conversations. RADIANT has a **memory that compounds**.
+
+---
+
+#### Principle 3: Verified Intelligence Over Probabilistic Guessing
+
+**The copilot risk**: Hallucinations are someone else's problem.
+
+Independent studies show legal AI tools hallucinate 17-33% even with retrieval augmentation. Medical AI shows 50-82.7% under adversarial conditions. A single hallucination in these domains can trigger malpractice suits, regulatory sanctions, or manufacturing recalls.
+
+**RADIANT's answer — the "Empiricism Loop."**
+
+1. **Hypothesis Generation**: Generate an internal prediction of the correct answer.
+2. **Sandbox Execution**: Write and run executable code that tests this prediction in a secure environment.
+3. **Surprise Detection**: Compare results. Low surprise → respond with confidence. High surprise → **rethink cycle** (up to 3 times).
+4. **Self-Calibration via "Ego"**: Persistent self-assessment (confidence, frustration, curiosity) that influences future behavior.
+
+**For high-stakes decisions — the "Council of Rivals."** Structured adversarial debate between multiple AI models:
+
+- **The Advocate**: Builds the strongest case for the proposed answer.
+- **The Critic**: Systematically attacks it.
+- **The Pragmatist**: Evaluates against real-world constraints.
+- **The Arbiter**: Renders final judgment with explicit confidence score.
+
+Council of Rivals reduces hallucination by ~90% on high-stakes queries compared to single-model responses.
+
+---
+
+#### Principle 4: Elastic Intelligence Over Static Cost
+
+**The copilot economics**: Every query costs the same.
+
+**RADIANT's answer — "the Gearbox."** Three gears:
+
+| Gear | Mode | Cost | Architecture | Use Case |
+|------|------|------|-------------|----------|
+| **Low** | Sniper | ~$0.01 | Single model, read-only memory | Quick answers, lookups |
+| **Mid** | Scout | ~$0.10 | Multiple models in parallel | Research, exploration |
+| **High** | War Room | ~$0.50+ | Full multi-agent swarm, read-write | Strategy, compliance, debugging |
+
+**Critical innovation**: Sniper Mode has read-only access to everything the War Room has ever decided. The expensive thinking is done once. The cheap retrieval is done forever.
+
+The **Economic Governor** routes automatically based on complexity signals. A typical enterprise: 80% Sniper, 15% Scout, 5% War Room — dramatically lower blended cost with dramatically higher quality on the hardest 5%.
+
+---
+
+#### Principle 5: Sovereign Infrastructure Over API Dependency
+
+**The copilot trap**: Your intelligence lives on someone else's servers.
+
+**RADIANT's answer — the "Tri-Layer Consciousness" architecture.**
+
+- **Layer 0 — Genesis (Foundation)**: 56 self-hosted open-source models. **No data ever leaves your environment.** Zero data leakage, zero API rent.
+- **Layer 1 — Cato (Global Conscience)**: Shared intelligence and safety. Aggregates anonymized learning. **Never sees private user data.**
+- **Layer 2 — User Persona (Personal)**: Per-user LoRA adaptation. Remembers your coding style, preferences, project history. Private — never shared.
+
+**Weight Formula**: `W_Final = W_Genesis + (scale × W_Cato) + (scale × W_User)`
+
+External APIs used only for frontier capabilities self-hosted models can't match. Sensitive data redacted before crossing infrastructure boundary. A model router evaluates 106+ models based on cost, capability, latency, and data sensitivity.
+
+You are not renting intelligence. You are **building and owning** it.
+
+---
+
+#### Principle 6: Mathematical Safety Over Prompt-Based Hope
+
+**The copilot gamble**: Safety through good intentions.
+
+RLHF and system prompts are **probabilistic guardrails on a probabilistic system**. A determined adversary can circumvent them. These systems are "safe" the way a door with a "Please Don't Enter" sign is secure.
+
+**RADIANT's answer — "Control Barrier Functions" (CBF).** Borrowed from robotics and control theory. A CBF defines a "safe region" that the system **provably cannot leave**. Not "usually doesn't leave." **Cannot**, as in mathematically demonstrated.
+
+CBFs enforced across:
+- **Content safety**: Preventing PII/classified data disclosure
+- **Behavioral safety**: Preventing unauthorized actions (query a database but cannot modify it)
+- **Compliance safety**: HIPAA, SOC2, GDPR as hard constraints
+- **Operational safety**: Preventing runaway costs, infinite loops
+
+For regulated industries: the difference between "our AI tries to be compliant" and "our AI is **provably** compliant, and here is the mathematical proof."
+
+---
+
+#### Principle 7: Compounding Value Over Static Tooling
+
+**The copilot plateau**: Day 1,000 is the same as Day 1. A copilot does not get smarter over time.
+
+RADIANT is an **asset that appreciates in value the more you use it**.
+
+**The "Dreaming Cycle."** Every night during off-peak hours (2-6 AM UTC):
+
+1. **Twilight Trigger**: Low traffic detected, learning activates.
+2. **Flash Consolidation**: Reviews all interactions, corrects contradictions, promotes key memories.
+3. **Active Verification**: Identifies areas of uncertainty, runs targeted tests, patches knowledge gaps.
+4. **Counterfactual Dreaming**: Replays key interactions — "what if I answered differently?"
+5. **LoRA Merge** (weekly): Individual learning aggregated, anonymized, merged into Cato global layer.
+
+**What compounds**:
+- Every cheap Sniper query draws on institutional memory. Every expensive War Room deliberation *adds* to it.
+- Every Empiricism Loop correction feeds the knowledge graph.
+- Every Dreaming Cycle corrects gaps yesterday's cycle couldn't detect.
+- Every user's LoRA adapter becomes more precisely tuned.
+
+On Day 1,000, RADIANT *is* your organization's brain — the accumulated intelligence of every question asked, every pattern discovered, every lesson learned.
+
+Copilots are tools you subscribe to. They don't know you. They don't remember you.
+
+RADIANT is **intelligence you own, and it grows**.
+
+---
+
+### The Stakes
+
+The market is consolidating around the copilot metaphor because it is safe, familiar, and easy to sell. But comfort is not strategy. And augmentation is not transformation.
+
+Gartner predicts over 40% of agentic AI projects will be canceled by 2027 due to costs, unclear value, or inadequate risk controls. The survivors will not be the ones that made typing 15% faster. They will be the ones that changed what was possible — and built the verification, memory, and safety infrastructure to do it responsibly.
+
+> *"Everyone else is building Copilots — assistants that sit in the passenger seat and nag you while you drive.*
+>
+> *We are building the Magic Carpet.*
+>
+> *You don't drive it. You don't write code for it. You just say where you want to go, and the ground beneath you reshapes itself to take you there instantly.*
+>
+> *We aren't selling a better IDE. We are selling the feeling of being a Magician."*
+
+---
+
+### Copilots vs. the Magic Carpet — Summary
+
+| Dimension | Copilots | RADIANT |
+|-----------|----------|---------|
+| **Philosophy** | Augment the human in their existing workflow | Transform the outcome — eliminate the workflow |
+| **Interface** | Chat bubble (same UI for every task) | Polymorphic UI (morphs into canvas, diff editor, command center) |
+| **Memory** | Session-based — resets when you close the tab | Institutional — three-tier Cortex persists for 7 years |
+| **Verification** | Trust the model, hope it's right | Empiricism Loop: test claims in sandbox before responding |
+| **High-Stakes Decisions** | Single model, single answer | Council of Rivals: adversarial multi-model debate with audit trail |
+| **Economics** | Fixed cost per query | Gearbox: auto-routes $0.01 (Sniper) to $0.50+ (War Room) |
+| **Infrastructure** | Rent from API providers | Sovereign: 56 self-hosted models, sensitive data never leaves |
+| **Personalization** | Generic — same model for everyone | LoRA adapters per user — remembers style, domain, history |
+| **Safety** | Prompt-based guardrails (jailbreakable) | Control Barrier Functions: mathematically provable constraints |
+| **Growth** | Static tool — same on Day 1,000 as Day 1 | Dreaming Cycle: autonomous nightly learning, compounding value |
+| **Output** | Text in a chat bubble | Applications, canvases, dashboards — with Eject to App |
+
+---
+
+### RADIANT Terms Glossary (Marketing Reference)
+
+| Term | What It Is |
+|------|-----------|
+| **Magic Carpet** | Design philosophy: the AI produces outcomes directly, rather than advising while you do the work |
+| **Polymorphic UI** | Interface that physically transforms (Sniper/Scout/Sage views) based on intent |
+| **Eject to App** | Export AI-generated interactive results as standalone, deployable application source code |
+| **Cortex** | Three-tier memory architecture (Hot/Warm/Cold) providing institutional memory across sessions and years |
+| **Graph-RAG** | Hybrid search combining knowledge graph traversal with vector similarity for higher-accuracy retrieval |
+| **Empiricism Loop** | Verification: generate hypothesis → test in sandbox → only respond if results match prediction |
+| **Ego** | Persistent self-assessment metrics (confidence, frustration, curiosity) that calibrate AI behavior |
+| **Council of Rivals** | Adversarial multi-model debate (Advocate, Critic, Pragmatist, Arbiter) for high-stakes decisions |
+| **Gearbox** | Elastic compute router that auto-selects Sniper, Scout, or War Room mode per query |
+| **Sniper / Scout / War Room** | Three compute tiers: cheap & fast / exploratory / full multi-agent deliberation |
+| **Economic Governor** | Routes queries to the appropriate Gearbox tier based on complexity analysis |
+| **Genesis (Layer 0)** | Self-hosted open-source AI models — zero data leakage |
+| **Cato (Layer 1)** | Shared intelligence and safety governance; enforces constitutional rules; never sees private data |
+| **User Persona / LoRA (Layer 2)** | Per-user model adaptation that remembers individual preferences, style, and expertise |
+| **Control Barrier Functions (CBF)** | Mathematical constraints making it provably impossible for AI to violate safety rules at runtime |
+| **Genesis Gates** | Staged maturity process new AI capabilities must pass before reaching production |
+| **Dreaming Cycle** | Autonomous nightly learning: memory consolidation, self-testing, counterfactual replay, global merge |
+| **Ghost Vectors** | Shared memory representations allowing multiple AI agents to synchronize knowledge instantly |
+
+
+---
+
+## Part IX: Autonomous Organism — Marketing & Positioning
+
+> *Merged from `09-OMEGA-GENESIS.md` (Autonomous Organism section) — all marketing and competitive positioning content consolidated here.*
+
+# PART I: MARKETING & POSITIONING
+
+---
+
+## Chapter 1: Executive Value Proposition
+
+### 1.1 The One-Sentence Pitch
+
+**RADIANT Think Tank is the world's first Neural Infrastructure platform—an AI system that doesn't just use tools, it becomes them, creating infinite capabilities on-demand while keeping your data sovereign.**
+
+### 1.2 The Problem We Solve
+
+| Problem | How Competitors Fail | How RADIANT Solves It |
+|---------|---------------------|----------------------|
+| **Tool Scarcity** | ChatGPT/Claude have ~50 built-in tools | Tool Forge creates any tool in < 2 minutes |
+| **Cloud Lock-In** | Every query goes to remote servers | Liquid Compute runs locally, data never leaves |
+| **Dumb Routing** | Same model for all queries | Neural Affinity routes to optimal model from 106+ |
+| **Generic Safety** | Static content filters | Ghost Simulation predicts YOUR reaction |
+| **Cost Chaos** | No visibility, surprise bills | Economic Cortex manages budgets autonomously |
+
+### 1.3 Neural Infrastructure vs. Agentic Software
+
+**Agentic Software** (Competitors):
+- Wraps LLM around fixed APIs
+- Hard-coded integrations that break
+- Static capabilities requiring engineering
+- Cloud-dependent, privacy-invasive
+
+**Neural Infrastructure** (RADIANT):
+- AI IS the infrastructure—generates, routes, executes dynamically
+- Self-healing integrations via overnight Twilight Dreaming
+- Infinite capabilities through JIT tool generation
+- Edge-native execution respecting data sovereignty
+
+### 1.4 Target Markets
+
+**Primary: Professional Knowledge Workers**
+- Lawyers needing accuracy (malpractice risk)
+- Doctors needing compliance (patient safety)
+- Engineers needing precision (tolerances)
+- Researchers needing depth (citations)
+
+**Secondary: Enterprise AI Teams**
+- Building internal AI applications
+- Need infrastructure, not chatbots
+- Want to inherit AI advances without rebuilding
+
+---
+
+## Chapter 2: The Five Moats
+
+### 2.1 MOAT #1: Tool Forge (Infinite Tool Generation)
+
+**The 7-Phase Pipeline:**
+
+| Phase | Duration | Description |
+|-------|----------|-------------|
+| 1. Detection | 100ms | No existing tool matches intent |
+| 2. Scouting | 5-30s | Search API docs (OpenAPI, GraphQL, HTML) |
+| 3. Fabrication | 30-60s | AGI Brain generates MCP server code |
+| 4. Sandboxing | 10-20s | Firecracker microVM isolation |
+| 5. Validation | 5-10s | SAST scan, functional tests |
+| 6. Mounting | 1-2s | Hot-load into active session |
+| 7. Twilight Review | Overnight | Promote to global library |
+
+**Competitor Comparison:**
+
+| Competitor | Tools | Time to New Tool |
+|------------|-------|------------------|
+| ChatGPT | ~50 | Months (OpenAI engineering) |
+| Claude | ~30 | Months (Anthropic engineering) |
+| Abacus.AI | ~50 | Weeks (human developers) |
+| **RADIANT** | **∞** | **< 2 minutes, automatic** |
+
+**Defensibility:** 18+ months to replicate from scratch.
+
+---
+
+### 2.2 MOAT #2: Liquid Compute Topology (Data Sovereignty)
+
+**Compute Nodes:**
+
+| Node | Location | Privacy | Speed | Cost |
+|------|----------|---------|-------|------|
+| Browser WASM | Your browser | ★★★★★ | 5ms | $0 |
+| Local Native | Your computer | ★★★★★ | 1ms | $0 |
+| Lambda@Edge | Nearest AWS | ★★★☆☆ | 20ms | $0.0001 |
+| Lambda Regional | Tenant region | ★★★☆☆ | 50ms | $0.001 |
+| ECS Fargate | Cloud container | ★★☆☆☆ | 100ms | $0.01 |
+| GPU Cluster | Cloud GPU | ★☆☆☆☆ | 200ms | $0.10 |
+
+**Sensitivity Rules:**
+- `public`: Anywhere
+- `internal`: Not browser
+- `confidential`: Local or cloud only
+- `restricted`: Local ONLY
+
+**Scoring Formula:**
+```
+score = (privacy × 0.25) + (latency × 0.30) + (cost × 0.20) 
+      + (capability × 0.15) + (availability × 0.10)
+```
+
+---
+
+### 2.3 MOAT #3: Neural Affinity Routing (106+ Models)
+
+**The Formula:**
+```
+affinityScore = (semantic × 0.35) + (domain × 0.25) + ((1-error) × 0.20)
+              + (latency × 0.10) + (cost × 0.10)
+```
+
+**Example Routing:**
+
+| Query | Routed To | Why |
+|-------|-----------|-----|
+| "What's 2+2?" | GPT-4 Mini | Fast, cheap |
+| "Analyze this contract" | Claude Opus + Legal Expert | Highest legal accuracy |
+| "Translate to Japanese" | GPT-4 Turbo | Best multilingual |
+| "Summarize private notes" | Local Llama | Privacy-sensitive |
+
+---
+
+### 2.4 MOAT #4: Ghost Simulation (Personalized Safety)
+
+**Ghost Vector Architecture (4096 dimensions):**
+- Preference Vector (1024 dim): Communication style, risk tolerance
+- Behavior Vector (1024 dim): Patterns, time-of-day preferences
+- Emotional Vector (1024 dim): Anxiety, frustration thresholds
+- Knowledge Vector (1024 dim): Domain expertise, vocabulary
+
+**Simulation Types:**
+- `user_reaction`: Predict emotional response
+- `outcome_prediction`: Predict task success
+- `safety_check`: Identify regret potential
+- `cost_estimation`: Predict financial impact
+- `latency_estimation`: Predict time requirements
+
+---
+
+### 2.5 MOAT #5: Economic Cortex (Budget Management)
+
+**Budget Hierarchy:**
+```
+Tenant ($10,000/month)
+  └── User ($500/month)
+       └── Session ($20/day)
+            └── Task ($5)
+```
+
+**Alert Thresholds:**
+| Threshold | Level | Actions |
+|-----------|-------|---------|
+| 50% | info | Notify user |
+| 75% | warning | Notify admin, switch tier |
+| 90% | critical | Force lower tier |
+| 100% | exceeded | Pause (if hardLimit) |
+
+**Model Tiers:**
+| Tier | Cost/Token | Quality |
+|------|------------|---------|
+| economy | $0.0001 | 0.70 |
+| selfhosted | $0.00005 | 0.75 |
+| standard | $0.0005 | 0.85 |
+| premium | $0.002 | 0.92 |
+| flagship | $0.006 | 0.98 |
+
+---
+
+## Chapter 3: Competitive Positioning
+
+### 3.1 vs ChatGPT
+
+| Dimension | ChatGPT | RADIANT |
+|-----------|---------|---------|
+| Models | GPT-4 only | 106+ optimal selection |
+| Tools | ~50 | ∞ (Tool Forge) |
+| Privacy | All to OpenAI | Edge-native, sovereign |
+| Safety | Generic filters | Personalized Ghost |
+| Cost | No control | Autonomous Cortex |
+
+### 3.2 vs Claude
+
+| Dimension | Claude | RADIANT |
+|-----------|--------|---------|
+| Tools | Limited MCP | 3,000+ static, ∞ dynamic |
+| Privacy | All to Anthropic | Your choice |
+| Context | 200K tokens | 200K + CORTEX memory |
+| Specialization | General | 800+ domain experts |
+
+### 3.3 vs Abacus.AI
+
+| Dimension | Abacus.AI | RADIANT |
+|-----------|-----------|---------|
+| Price | $10/month | Premium |
+| Tools | 50 static | ∞ dynamic |
+| Architecture | Cloud-locked | Liquid Compute |
+| Interface | JSON-RPC | Tensor-Link (100x faster) |
+
+---
+

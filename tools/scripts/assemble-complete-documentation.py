@@ -37,18 +37,12 @@ OUT_PDF = OUT_DIR / "RADIANT-THINKTANK-COMPLETE-DOCUMENTATION.pdf"
 # ---------------------------------------------------------------------------
 
 DOCUMENT_STRUCTURE = [
-    ("Applications — Think Tank", [
-        ("Think Tank — Complete Reference", "docs/01-THINK-TANK.md"),
-        ("Think Tank (Mac) — User Guide", "docs/THINKTANK-MAC-GUIDE.md"),
-        ("Think Tank (Mac) — Portability Manifest", "docs/THINKTANK-MAC-PORTABILITY-MANIFEST.md"),
+    ("Applications — Think Tank + Dojo", [
+        ("Think Tank + Dojo — Complete Reference", "docs/01-THINK-TANK.md"),
     ]),
 
     ("Applications — Curator", [
         ("Curator — Complete Reference", "docs/02-CURATOR.md"),
-    ]),
-
-    ("Applications — Aurelius Dojo", [
-        ("Dojo — Complete Reference", "docs/03-DOJO.md"),
     ]),
 
     ("Applications — Radiant Admin", [
@@ -59,28 +53,20 @@ DOCUMENT_STRUCTURE = [
         ("Swift Deployer — Complete Reference", "docs/05-SWIFT-DEPLOYER.md"),
     ]),
 
-    ("Architecture & Engineering", [
-        ("Architecture & Engineering — Complete Reference", "docs/06-ARCHITECTURE-ENGINEERING.md"),
+    ("Architecture, Engineering & Data Storage", [
+        ("Architecture, Engineering & Data — Complete Reference", "docs/06-ARCHITECTURE-ENGINEERING.md"),
     ]),
 
-    ("AI Brain Systems", [
-        ("AI Brain Systems — Complete Reference", "docs/07-AI-BRAIN-SYSTEMS.md"),
-    ]),
-
-    ("CATO Safety System", [
-        ("CATO Safety — Complete Reference", "docs/08-CATO-SAFETY.md"),
+    ("AI Systems — Brain & CATO Safety", [
+        ("AI Systems — Complete Reference", "docs/07-AI-SYSTEMS.md"),
     ]),
 
     ("OMEGA Protocol & Genesis", [
-        ("OMEGA & Genesis — Complete Reference", "docs/09-OMEGA-GENESIS.md"),
+        ("OMEGA — Complete Reference", "docs/09-OMEGA-GENESIS.md"),
     ]),
 
     ("Orchestration & Workflows", [
         ("Orchestration & Workflows — Complete Reference", "docs/10-ORCHESTRATION-WORKFLOWS.md"),
-    ]),
-
-    ("Data & Storage", [
-        ("Data & Storage — Complete Reference", "docs/11-DATA-STORAGE.md"),
     ]),
 
     ("API Reference", [

@@ -6,18 +6,12 @@ import { z } from 'zod';
 
 export const AdminRole = {
   SUPER_ADMIN: 'super_admin',
-  ADMIN: 'admin',
-  OPERATOR: 'operator',
-  AUDITOR: 'auditor',
 } as const;
 
 export type AdminRoleType = typeof AdminRole[keyof typeof AdminRole];
 
 export const ROLE_HIERARCHY: Record<AdminRoleType, number> = {
   [AdminRole.SUPER_ADMIN]: 100,
-  [AdminRole.ADMIN]: 75,
-  [AdminRole.OPERATOR]: 50,
-  [AdminRole.AUDITOR]: 25,
 };
 
 export const ROLE_PERMISSIONS: Record<AdminRoleType, string[]> = {
@@ -28,28 +22,6 @@ export const ROLE_PERMISSIONS: Record<AdminRoleType, string[]> = {
     'deployments:*',
     'approvals:*',
     'audit:*',
-  ],
-  [AdminRole.ADMIN]: [
-    'admin:read',
-    'admin:write',
-    'billing:read',
-    'settings:read',
-    'settings:write',
-    'deployments:read',
-    'deployments:write',
-    'approvals:read',
-    'approvals:initiate',
-  ],
-  [AdminRole.OPERATOR]: [
-    'admin:read',
-    'billing:read',
-    'settings:read',
-    'deployments:read',
-  ],
-  [AdminRole.AUDITOR]: [
-    'admin:read',
-    'billing:read',
-    'audit:read',
   ],
 };
 
@@ -73,7 +45,7 @@ export interface Invitation {
 
 export const createInvitationSchema = z.object({
   email: z.string().email(),
-  role: z.enum(['super_admin', 'admin', 'operator', 'auditor']),
+  role: z.enum(['super_admin']),
   message: z.string().max(500).optional(),
   expiresInHours: z.number().int().min(1).max(168).default(48),
 });

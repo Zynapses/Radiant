@@ -5027,8 +5027,8 @@ import {
 ```
 
 **DO NOT recreate** the following files (they come from Section 0):
-- `lib/config/tiers.ts` - Import from @radiant/shared instead
-- `lib/config/regions.ts` - Import from @radiant/shared instead
+- `packages/shared/src/constants/tiers.ts` - Import from @radiant/shared instead
+- `packages/shared/src/constants/regions.ts` - Import from @radiant/shared instead
 
 **DO create** these CDK-specific files:
 - `lib/config/tags.ts` - CDK tagging utilities (shown in Section 1)
@@ -5534,7 +5534,7 @@ export function validateTierForEnvironment(tier: TierLevel, environment: string)
 }
 ```
 
-### packages/infrastructure/lib/config/regions.ts
+### packages/infrastructure/packages/shared/src/constants/regions.ts
 
 ```typescript
 /**
@@ -24619,7 +24619,7 @@ license_catalog (Available Types)      â”‚ allow_password/google/apple/ms     â”
 | has_access_curator | BOOLEAN | DEFAULT false | Curator access |
 | has_access_dojo | BOOLEAN | DEFAULT false | Dojo access |
 | has_access_cato_trainer | BOOLEAN | DEFAULT false | Cato Trainer access |
-| has_access_genesis | BOOLEAN | DEFAULT false | Genesis access |
+| has_access_omega_lab | BOOLEAN | DEFAULT false | OMEGA Lab access |
 | has_access_tenant_admin | BOOLEAN | DEFAULT false | Tenant admin access |
 | sso_provider | VARCHAR(100) | | SSO provider |
 | sso_provider_user_id | VARCHAR(255) | | SSO user ID |
@@ -24653,7 +24653,7 @@ license_catalog (Available Types)      â”‚ allow_password/google/apple/ms     â”
 | id | UUID | PK | License ID |
 | tenant_id | UUID | FK tenants(id) CASCADE, NOT NULL | Owning tenant |
 | license_type | VARCHAR(50) | CHECK(seat, storage, retention, compliance, feature, api_rate, addon) | Type of license |
-| app_id | VARCHAR(50) | CHECK(think_tank, curator, dojo, cato_trainer, genesis, platform) | Which app |
+| app_id | VARCHAR(50) | CHECK(think_tank, curator, dojo, cato_trainer, omega_lab, platform) | Which app |
 | feature_code | VARCHAR(100) | | Compliance/feature code (e.g. hipaa, gdpr) |
 | quantity | INTEGER | NOT NULL, DEFAULT 0 | Licensed amount |
 | used | INTEGER | NOT NULL, DEFAULT 0 | Currently consumed |
@@ -52371,7 +52371,7 @@ CREATE TRIGGER trigger_log_translation_changes
 
 ## 41.3 TYPESCRIPT TYPES & CONSTANTS
 
-### File: `packages/shared/src/i18n/types.ts`
+### File: `packages/shared/src/types/localization.types.ts`
 
 ```typescript
 // ============================================================================
@@ -52526,7 +52526,7 @@ export const TRANSLATION_CATEGORIES = {
 export type TranslationCategory = keyof typeof TRANSLATION_CATEGORIES;
 ```
 
-### File: `packages/shared/src/i18n/constants.ts`
+### File: `lambda/shared/services/localization.ts`
 
 ```typescript
 // ============================================================================
@@ -52601,7 +52601,7 @@ export const TRANSLATION_RATE_LIMITS = {
 
 ## 41.4 AI TRANSLATION LAMBDA
 
-### File: `lambda/localization/translate.ts`
+### File: `lambda/localization/handler.ts`
 
 ```typescript
 // ============================================================================
@@ -52778,7 +52778,7 @@ async function notifyAdminOfNewTranslation(
 }
 ```
 
-### File: `lambda/localization/process-queue.ts`
+### File: `lambda/localization/handler.ts`
 
 ```typescript
 // ============================================================================
@@ -52845,7 +52845,7 @@ export const handler: ScheduledHandler = async () => {
 
 ## 41.5 LOCALIZATION SERVICE (API)
 
-### File: `lambda/localization/api.ts`
+### File: `lambda/localization/handler.ts`
 
 ```typescript
 // ============================================================================
@@ -53273,7 +53273,7 @@ async function getTranslations(registryId: string): Promise<APIGatewayProxyResul
 
 ## 41.6 REACT i18n IMPLEMENTATION
 
-### File: `packages/shared/src/i18n/react/I18nProvider.tsx`
+### File: `lambda/shared/services/localization.ts`
 
 ```typescript
 // ============================================================================
@@ -53428,7 +53428,7 @@ export function useTranslation() {
 }
 ```
 
-### File: `packages/shared/src/i18n/react/LanguageSelector.tsx`
+### File: `apps/admin-dashboard/app/(dashboard)/localization/localization-client.tsx`
 
 ```typescript
 // ============================================================================
@@ -53478,7 +53478,7 @@ export function LanguageSelector({
 }
 ```
 
-### File: `packages/shared/src/i18n/react/Trans.tsx`
+### File: `lambda/shared/services/localization.ts`
 
 ```typescript
 // ============================================================================
@@ -53573,7 +53573,7 @@ export function Trans({ i18nKey, values, components, fallback }: TransProps) {
 
 ## 41.7 ESLINT PLUGIN (HARDCODE PREVENTION)
 
-### File: `packages/eslint-plugin-i18n/src/index.ts`
+### File: `packages/shared/src/validation/schemas.ts`
 
 ```typescript
 // ============================================================================
@@ -55700,7 +55700,7 @@ INSERT INTO system_configuration (key, category_id, value_type, value_boolean, d
 
 ## 42.4 TYPESCRIPT TYPES
 
-### File: `packages/shared/src/config/types.ts`
+### File: `packages/shared/src/config/validator.ts`
 
 ```typescript
 // ============================================================================
@@ -55844,7 +55844,7 @@ export interface ConfigExport {
 }
 ```
 
-### File: `packages/shared/src/config/constants.ts`
+### File: `packages/shared/src/constants/index.ts`
 
 ```typescript
 // ============================================================================
@@ -55925,7 +55925,7 @@ export type ConfigKey = typeof CONFIG_KEYS[keyof typeof CONFIG_KEYS];
 
 ## 42.5 CONFIGURATION SERVICE
 
-### File: `packages/shared/src/config/ConfigurationService.ts`
+### File: `packages/shared/src/config/environment.ts`
 
 ```typescript
 // ============================================================================
@@ -56871,7 +56871,7 @@ export default function ConfigurationPage() {
 
 ## 42.7 API LAMBDA
 
-### File: `lambda/configuration/api.ts`
+### File: `lambda/configuration/handler.ts`
 
 ```typescript
 // ============================================================================

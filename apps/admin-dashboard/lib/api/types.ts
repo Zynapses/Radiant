@@ -11,7 +11,7 @@ export type HealthStatus = 'healthy' | 'degraded' | 'unhealthy';
 export type ThermalState = 'OFF' | 'COLD' | 'WARM' | 'HOT' | 'AUTOMATIC';
 export type ServiceState = 'RUNNING' | 'DEGRADED' | 'DISABLED' | 'OFFLINE';
 export type ModelStatus = 'active' | 'beta' | 'deprecated' | 'coming_soon';
-export type AdminRole = 'super_admin' | 'admin' | 'operator' | 'auditor';
+export type AdminRole = 'super_admin';
 export type AdminStatus = 'active' | 'pending' | 'inactive' | 'suspended';
 
 export type ModelCategory = 

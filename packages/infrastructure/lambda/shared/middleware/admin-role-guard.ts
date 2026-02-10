@@ -58,14 +58,13 @@ export function extractAdminContext(event: APIGatewayProxyEvent): AdminContext |
     const adminId = claims.sub || claims['cognito:username'] || event.headers['x-admin-id'];
     const tenantId = claims['custom:tenant_id'] || event.headers['x-tenant-id'];
     const email = claims.email || event.headers['x-admin-email'] || '';
-    const adminRole = (claims['custom:admin_role'] || event.headers['x-admin-role'] || 'operator') as SystemAdminRole;
+    const adminRole = (claims['custom:admin_role'] || event.headers['x-admin-role'] || 'super_admin') as SystemAdminRole;
     const isBootstrapAdmin = claims['custom:is_bootstrap'] === 'true' || event.headers['x-is-bootstrap'] === 'true';
 
     if (!adminId || !tenantId) return null;
 
-    // Validate role is one of the known roles
-    const validRoles: SystemAdminRole[] = ['super_admin', 'admin', 'operator', 'auditor'];
-    const resolvedRole = validRoles.includes(adminRole) ? adminRole : 'operator';
+    // Only super_admin is valid (v7.52.0)
+    const resolvedRole: SystemAdminRole = adminRole === 'super_admin' ? 'super_admin' : 'super_admin';
 
     const permissions = SYSTEM_ADMIN_PERMISSIONS[resolvedRole];
 
@@ -124,9 +123,6 @@ export function requirePermission(
 
 const ROLE_HIERARCHY: Record<SystemAdminRole, number> = {
   super_admin: 4,
-  admin: 3,
-  operator: 2,
-  auditor: 1,
 };
 
 export function requireMinRole(
@@ -327,8 +323,8 @@ export class AdminRoleService {
 
     // System admin roles no longer get automatic consumer app access.
     // They access Radiant Admin via Pool B token only.
-    if (role === 'super_admin' || role === 'admin' || role === 'operator' || role === 'auditor') {
-      return ['radiant_admin'];
+    if (role === 'super_admin') {
+      return ['radiant_admin', 'thinktank_admin'];
     }
 
     return [];

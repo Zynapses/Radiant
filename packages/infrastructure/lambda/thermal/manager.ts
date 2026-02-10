@@ -57,12 +57,8 @@ function verifyToken(event: APIGatewayProxyEvent): AuthResult | AuthFailure {
 function requirePermission(auth: AuthResult, permission: string): void {
   if (auth.context.isSuperAdmin) return;
   
-  const [resource, action] = permission.split(':');
-  const hasPermission = auth.context.roles.some(role => {
-    if (role === 'admin') return true;
-    if (role === 'operator' && action === 'read') return true;
-    return false;
-  });
+  // v7.52.0: Only super_admin exists in Pool B - all permissions granted via isSuperAdmin check above
+  const hasPermission = false;
   
   if (!hasPermission) {
     throw new ForbiddenError(`Permission denied: ${permission}`);

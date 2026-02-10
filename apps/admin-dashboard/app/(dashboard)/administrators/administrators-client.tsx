@@ -63,7 +63,7 @@ interface Invitation {
 export function AdministratorsClient() {
   const [showInviteDialog, setShowInviteDialog] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
-  const [inviteRole, setInviteRole] = useState('operator');
+  const [inviteRole, setInviteRole] = useState('super_admin');
   const queryClient = useQueryClient();
 
   const { data: administrators } = useQuery({
@@ -88,7 +88,7 @@ export function AdministratorsClient() {
       queryClient.invalidateQueries({ queryKey: ['invitations'] });
       setShowInviteDialog(false);
       setInviteEmail('');
-      setInviteRole('operator');
+      setInviteRole('super_admin');
     },
   });
 
@@ -96,12 +96,6 @@ export function AdministratorsClient() {
     switch (role) {
       case 'super_admin':
         return <Badge className="bg-red-500"><ShieldAlert className="mr-1 h-3 w-3" />Super Admin</Badge>;
-      case 'admin':
-        return <Badge className="bg-purple-500"><ShieldCheck className="mr-1 h-3 w-3" />Admin</Badge>;
-      case 'operator':
-        return <Badge className="bg-blue-500"><Shield className="mr-1 h-3 w-3" />Operator</Badge>;
-      case 'auditor':
-        return <Badge variant="secondary"><Shield className="mr-1 h-3 w-3" />Auditor</Badge>;
       default:
         return <Badge variant="outline">{role}</Badge>;
     }

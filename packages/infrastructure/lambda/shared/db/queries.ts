@@ -75,7 +75,7 @@ export async function createTenant(tenant: Omit<Tenant, 'id' | 'created_at' | 'u
 // USER QUERIES
 // ============================================================================
 
-const USER_COLUMNS = 'id, tenant_id, cognito_user_id, email, display_name, first_name, last_name, avatar_url, email_verified, role, tenant_role, status, has_access_think_tank, has_access_curator, has_access_dojo, has_access_cato_trainer, has_access_genesis, has_access_tenant_admin, sso_provider, mfa_enabled, mfa_methods, invitation_token, invitation_expires_at, invited_by, deactivated_at, deletion_requested_at, deletion_scheduled_for, last_login_at, login_count, last_active_at, message_count, token_usage, permissions, settings, created_at, updated_at';
+const USER_COLUMNS = 'id, tenant_id, cognito_user_id, email, display_name, first_name, last_name, avatar_url, email_verified, role, tenant_role, status, has_access_think_tank, has_access_curator, has_access_dojo, has_access_cato_trainer, has_access_omega_lab, has_access_tenant_admin, sso_provider, mfa_enabled, mfa_methods, invitation_token, invitation_expires_at, invited_by, deactivated_at, deletion_requested_at, deletion_scheduled_for, last_login_at, login_count, last_active_at, message_count, token_usage, permissions, settings, created_at, updated_at';
 
 export async function getUserById(id: string, tenantId: string): Promise<User | null> {
   await setTenantContext(tenantId);

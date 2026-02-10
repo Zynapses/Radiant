@@ -3091,7 +3091,7 @@ swift test --filter "testSaveAndLoadConfiguration"
 - **OMEGA Brain** — A living AI system running on Lambda/ECS. Maintains persistent state between requests and learns continuously.
 - **Firmware (.bio file)** — A signed JSON file containing the brain's "instincts": safety rules (Helix), learning speed (Ambition), and personality (Broca prompt).
 - **Hot-Swap** — Replacing firmware on a running brain without downtime. The brain detects the new firmware hash on its next inference cycle and atomically swaps (~50ms).
-- **Genesis Forge** — The admin web UI where you author, sign, and deploy firmware.
+- **OMEGA Forge** — The admin web UI where you author, sign, and deploy firmware.
 
 ### 2. Swap Modes Cheat Sheet
 
@@ -3123,7 +3123,7 @@ curl -s https://api.radiant.example/api/v2/omega/status | jq '.active_streams, .
 
 **Steps:**
 
-1. Open **Genesis Forge** → Firmware Library
+1. Open **OMEGA Forge** → Firmware Library
 2. Click **"New Firmware"** or clone existing
 3. Edit Helix Rules, Ambition Settings, or Personality as needed
 4. Click **"Validate"** — all checks must pass (green)
@@ -3147,7 +3147,7 @@ curl -s https://api.radiant.example/api/v2/firmware/swaps?limit=1 | jq '.'
 
 1. Deploy firmware with **SHADOW** mode
 2. Shadow brain processes requests in parallel — does NOT serve users
-3. Monitor **Coherence Score** in Genesis Dashboard (target: >90% over 7 days)
+3. Monitor **Coherence Score** in OMEGA Forge Dashboard (target: >90% over 7 days)
 4. When score crosses threshold, the **"Promote to Production"** button unlocks
 5. Click Promote → triggers OVERLAY swap from shadow to primary
 
@@ -3171,7 +3171,7 @@ curl -X POST https://api.radiant.example/api/v2/firmware/{firmware-id}/rollback 
   -H "Authorization: Bearer $ADMIN_TOKEN"
 ```
 
-Or in Genesis Forge: Firmware Library → click the superseded firmware → **"Rollback to This Version"**
+Or in OMEGA Forge: Firmware Library → click the superseded firmware → **"Rollback to This Version"**
 
 **Automatic rollback triggers:**
 

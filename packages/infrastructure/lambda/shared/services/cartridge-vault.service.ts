@@ -2,7 +2,7 @@
  * Cartridge Vault Service (Keyhole Pattern)
  * 
  * Manages secrets for cartridges - cartridges declare required secrets
- * but never contain actual credentials. Service Layer fetches from Genesis Vault.
+ * but never contain actual credentials. Service Layer fetches from Cartridge Vault.
  * 
  * @version 1.0.0
  * @since v6.2.0

@@ -4812,7 +4812,7 @@ Annual assessment includes:
 
 ## 1. Context & Problem Statement
 
-RADIANT is a multi-tenant SaaS platform with multiple user-facing applications (Think Tank, Curator, Aurelius Dojo, Cato Trainer, Genesis, and future apps). Several interrelated concerns must be resolved together before implementing authentication:
+RADIANT is a multi-tenant SaaS platform with multiple user-facing applications (Think Tank, Curator, Aurelius Dojo, Cato Trainer, OMEGA Lab, and future apps). Several interrelated concerns must be resolved together before implementing authentication:
 
 1. **User provisioning**: How do new users get into the system?
 2. **Licensing model**: Per-app seats + storage + retention + regulatory compliance features
@@ -4884,14 +4884,14 @@ users table:
 
 **Rule**: A user can ONLY enter the system if a tenant administrator explicitly invites them.
 
-**Who can invite**: Only users with `tenant_admin` or `tenant_owner` role.
+**Who can invite**: Only users with `tenant_admin` role.
 
 **Invitation flow**:
 
 ```
-1. Tenant Admin opens Think Tank Tenant Admin → Users → Invite
+1. Tenant Admin opens Think Tank Tenant Administration → Users → Invite
 2. System checks:
-   a. Does the inviter have tenant_admin or tenant_owner role?      → If no, REJECT
+   a. Does the inviter have tenant_admin role?                      → If no, REJECT
    b. Does the tenant have available seat licenses for the app(s)?  → If no, REJECT
 3. If all checks pass:
    - Create tenant_user_memberships row with status='invited'
@@ -5024,7 +5024,7 @@ tenant_licenses:
 
 | Setting | Value |
 |---------|-------|
-| **Apps** | Think Tank (Web+Mac), Curator, Dojo, Cato Trainer, Genesis, Tenant Admin, ALL future apps |
+| **Apps** | Think Tank (Web+Mac), Curator, Dojo, Cato Trainer, OMEGA Lab, Tenant Admin, ALL future apps |
 | **Login** | Email+password, Google, Apple, Microsoft, Enterprise SSO (SAML/OIDC per-tenant) |
 | **MFA** | Configurable per-tenant |
 | **Federation** | ENABLED — authenticates only, never creates accounts |
@@ -5100,22 +5100,22 @@ If someone authenticates via Google but has no user record → **rejected**.
 2. System creates:
    - Tenant record with name, settings
    - Default licenses based on subscription tier
-   - First user with tenant_owner role + tenant_admin permissions
+   - First user with tenant_admin role
 3. First user is ALWAYS an administrator
-4. First user can see ALL permissions in Think Tank Tenant Admin
+4. First user can see ALL permissions in Think Tank Tenant Administration
    (even ones that are off — so they know what's available)
 ```
 
 **Personal accounts**:
 - Single-user personal accounts still get a tenant name
-- The one user is `tenant_owner` with admin privileges
+- The one user is `tenant_admin` with full admin privileges
 - They can later invite others if their license allows
 
 **Permissions model**:
 - Permissions are SOFT — can be added/modified/removed without code changes
 - Stored as configurable data, not hardcoded
-- Admin-settable per role type (User, Admin, Owner)
-- All permissions visible in Think Tank Tenant Admin UI with toggle on/off
+- Admin-settable per role type (User, Admin)
+- All permissions visible in Think Tank Tenant Administration UI with toggle on/off
 - Eventually refined to exact per-action permissions
 
 ---
@@ -5128,46 +5128,45 @@ If someone authenticates via Google but has no user record → **rejected**.
 
 | Role | Scope | Default Permissions |
 |------|-------|--------------------|
-| `tenant_owner` | Full tenant control | All permissions, billing, delete tenant |
-| `tenant_admin` | User & config management | Invite users, manage roles, configure settings |
+| `tenant_admin` | Full tenant control | All permissions, billing, delete tenant, invite users, manage roles, configure settings |
 | `standard_user` | Use apps | Access licensed apps, own data only |
 | `viewer` | Read-only | View dashboards, no create/edit |
 
 **Default Permissions Matrix** (soft — admin-configurable per tenant):
 
-| Permission | `tenant_owner` | `tenant_admin` | `standard_user` | `viewer` |
-|-----------|:-:|:-:|:-:|:-:|
-| **User Management** | | | | |
-| Invite users | ✅ | ✅ | ❌ | ❌ |
-| Deactivate/reactivate users | ✅ | ✅ | ❌ | ❌ |
-| Change user roles | ✅ | ✅ | ❌ | ❌ |
-| Toggle user app access | ✅ | ✅ | ❌ | ❌ |
-| Request user deletion | ✅ | ❌ | ❌ | ❌ |
-| **Tenant Config** | | | | |
-| Edit tenant settings | ✅ | ✅ | ❌ | ❌ |
-| Configure auth (MFA, SSO) | ✅ | ✅ | ❌ | ❌ |
-| Manage billing/licenses | ✅ | ❌ | ❌ | ❌ |
-| Delete tenant | ✅ | ❌ | ❌ | ❌ |
-| **Content** | | | | |
-| Create conversations | ✅ | ✅ | ✅ | ❌ |
-| View own conversations | ✅ | ✅ | ✅ | ✅ |
-| View others' conversations | ❌ | ❌ | ❌ | ❌ |
-| Create/edit templates | ✅ | ✅ | ❌ | ❌ |
-| View shared templates | ✅ | ✅ | ✅ | ✅ |
-| Manage cartridges | ✅ | ✅ | ❌ | ❌ |
-| Use cartridges | ✅ | ✅ | ✅ | ❌ |
-| **Reporting** | | | | |
-| View tenant usage reports | ✅ | ✅ | ❌ | ✅ |
-| View own usage | ✅ | ✅ | ✅ | ✅ |
-| Export audit logs | ✅ | ✅ | ❌ | ❌ |
-| **Compliance** | | | | |
-| Enable/disable compliance features | ✅ | ❌ | ❌ | ❌ |
-| View compliance dashboards | ✅ | ✅ | ❌ | ✅ |
-| Initiate GDPR erasure | ✅ | ✅ | ❌ | ❌ |
+| Permission | `tenant_admin` | `standard_user` | `viewer` |
+|-----------|:-:|:-:|:-:|
+| **User Management** | | | |
+| Invite users | ✅ | ❌ | ❌ |
+| Deactivate/reactivate users | ✅ | ❌ | ❌ |
+| Change user roles | ✅ | ❌ | ❌ |
+| Toggle user app access | ✅ | ❌ | ❌ |
+| Request user deletion | ✅ | ❌ | ❌ |
+| **Tenant Config** | | | |
+| Edit tenant settings | ✅ | ❌ | ❌ |
+| Configure auth (MFA, SSO) | ✅ | ❌ | ❌ |
+| Manage billing/licenses | ✅ | ❌ | ❌ |
+| Delete tenant | ✅ | ❌ | ❌ |
+| **Content** | | | |
+| Create conversations | ✅ | ✅ | ❌ |
+| View own conversations | ✅ | ✅ | ✅ |
+| View others' conversations | ❌ | ❌ | ❌ |
+| Create/edit templates | ✅ | ❌ | ❌ |
+| View shared templates | ✅ | ✅ | ✅ |
+| Manage cartridges | ✅ | ❌ | ❌ |
+| Use cartridges | ✅ | ✅ | ❌ |
+| **Reporting** | | | |
+| View tenant usage reports | ✅ | ❌ | ✅ |
+| View own usage | ✅ | ✅ | ✅ |
+| Export audit logs | ✅ | ❌ | ❌ |
+| **Compliance** | | | |
+| Enable/disable compliance features | ✅ | ❌ | ❌ |
+| View compliance dashboards | ✅ | ❌ | ✅ |
+| Initiate GDPR erasure | ✅ | ❌ | ❌ |
 
 **Key rules**:
 - All permissions are stored in the `users.permissions` JSONB column
-- Roles provide defaults; admins can override per-user in Think Tank Tenant Admin → Permissions
+- Roles provide defaults; admins can override per-user in Think Tank Tenant Administration → Permissions
 - New permissions can be added without migrations (JSONB is flexible)
 - The UI shows ALL available permissions with toggles, even if off — so admins know what exists
 
@@ -5176,8 +5175,7 @@ If someone authenticates via Google but has no user record → **rejected**.
 - Users NEVER see other tenants' data
 - RLS (`app.current_tenant_id`) enforces tenant isolation at the database level
 - User-level data isolation enforced by `user_id` checks in queries
-- `tenant_owner` cannot be demoted by `tenant_admin`
-- Only `tenant_owner` can delete the tenant or manage billing
+- `tenant_admin` has full control including billing and tenant deletion
 
 ---
 
@@ -5256,9 +5254,9 @@ Every API endpoint must:
 | **API enforces licensing** | Every endpoint checks license via middleware |
 | **Two Cognito pools** | `radiant-admins` (no federation) and `radiant-users` (federation enabled) |
 | **Radiant Admin: no federation** | Platform admin is email+password+MFA only, always |
-| **Tenant Admin = hub** | Think Tank Tenant Admin is the central management UI |
+| **Tenant Admin = hub** | Think Tank Tenant Administration is the central management UI |
 | **Apps don't manage users** | Individual apps have no user management UI |
-| **First user = admin** | First user in any tenant gets tenant_owner role |
+| **First user = admin** | First user in any tenant gets tenant_admin role |
 | **Soft permissions** | Configurable, admin-visible, UI for toggle on/off |
 | **Data isolation** | Users never see other users' data. RLS + user_id checks. |
 | **Deactivation frees seats** | Deactivated user's seat is returned to the pool |

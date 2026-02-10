@@ -10,8 +10,7 @@
  *   6. First user accepts invitation → tenant active
  *
  * The first user is ALWAYS assigned tenant_admin role.
- * Admin privileges (admin, operator, auditor) do NOT apply to RADIANT apps.
- * Only super_admin gets RADIANT app access.
+ * v7.52.0: Only super_admin exists in Pool B with full RADIANT app access.
  */
 
 import { Pool, PoolClient } from 'pg';
@@ -371,7 +370,7 @@ export class TenantProvisioningService {
           role, tenant_role, status,
           email_verified,
           has_access_think_tank, has_access_curator, has_access_dojo,
-          has_access_cato_trainer, has_access_genesis, has_access_tenant_admin,
+          has_access_cato_trainer, has_access_omega_lab, has_access_tenant_admin,
           invitation_token, invitation_expires_at, created_at, updated_at)
          VALUES ($1, $2, $3, $4, $5,
           'user', $6, 'invited',
@@ -385,7 +384,7 @@ export class TenantProvisioningService {
           row.first_name, row.last_name,
           TENANT_PROVISIONING_DEFAULTS.firstUserRole,
           apps.hasAccessThinkTank, apps.hasAccessCurator, apps.hasAccessDojo,
-          apps.hasAccessCatoTrainer, apps.hasAccessGenesis, apps.hasAccessTenantAdmin,
+          apps.hasAccessCatoTrainer, apps.hasAccessOmegaLab, apps.hasAccessTenantAdmin,
           invitationToken, invitationExpiresAt.toISOString(),
         ],
       );

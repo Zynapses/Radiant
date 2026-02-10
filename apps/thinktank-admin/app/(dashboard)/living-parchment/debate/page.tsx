@@ -378,9 +378,25 @@ export default function DebateArenaPage() {
   }, []);
 
   const handleRunRound = async () => {
+    if (!arena?.id) return;
     setRunningRound(true);
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    setRunningRound(false);
+    try {
+      const API = process.env.NEXT_PUBLIC_API_URL || '';
+      const res = await fetch(`${API}/admin/cato/council/debates/${arena.id}/advance`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        if (updated.rounds) {
+          setArena(prev => prev ? { ...prev, rounds: updated.rounds } : null);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to advance debate round:', err);
+    } finally {
+      setRunningRound(false);
+    }
   };
 
   if (loading || !arena) {

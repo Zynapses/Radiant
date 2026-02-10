@@ -171,7 +171,7 @@ export class AdminStack extends cdk.Stack {
       accountRecovery: cognito.AccountRecovery.EMAIL_ONLY,
       customAttributes: {
         admin_pool: new cognito.StringAttribute({ mutable: false }), // Always 'system'
-        admin_role: new cognito.StringAttribute({ mutable: true }), // super_admin|admin|operator|auditor
+        admin_role: new cognito.StringAttribute({ mutable: true }), // super_admin (v7.52.0: only role in Pool B)
         is_bootstrap: new cognito.StringAttribute({ mutable: false }), // 'true'|'false'
         display_name: new cognito.StringAttribute({ mutable: true }),
         status: new cognito.StringAttribute({ mutable: true }), // active|suspended|deactivated

@@ -382,14 +382,62 @@ class OrganismIntegrationService {
     input: Record<string, unknown>,
     location: string
   ): Promise<unknown> {
-    // Placeholder for actual tool execution
-    // Would integrate with MCP client based on location
-    logger.info(`Executing tool ${tool.name} on ${location}`);
-    
-    // Simulate execution
-    await new Promise(resolve => setTimeout(resolve, 100));
-    
-    return { result: 'Tool executed successfully', input };
+    logger.info(`Executing tool ${tool.name} on ${location}`, { serverId: tool.serverId });
+
+    const server = mcpServerManager.getServer(tool.serverId);
+    if (!server) {
+      throw new Error(`MCP server ${tool.serverId} not found`);
+    }
+
+    if (!server.url) {
+      throw new Error(`MCP server ${tool.serverId} has no URL configured`);
+    }
+
+    const timeoutMs = server.timeout || 30000;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+    try {
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+
+      if (server.authType === 'api_key' && server.credentials?.encrypted) {
+        headers['Authorization'] = `Bearer ${server.credentials.encrypted}`;
+      }
+
+      const response = await fetch(`${server.url}/tools/${tool.name}/execute`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          input,
+          location,
+          serverId: tool.serverId,
+        }),
+        signal: controller.signal,
+      });
+
+      if (!response.ok) {
+        const errorBody = await response.text().catch(() => 'Unknown error');
+        throw new Error(`MCP tool execution failed (${response.status}): ${errorBody}`);
+      }
+
+      const result = await response.json();
+
+      await mcpServerManager.updateServerMetrics(
+        tool.serverId,
+        true,
+        Date.now(),
+        server.costPerCall
+      );
+
+      return result;
+    } catch (error) {
+      await mcpServerManager.updateServerMetrics(tool.serverId, false, Date.now());
+      throw error;
+    } finally {
+      clearTimeout(timeoutId);
+    }
   }
 
   // ==========================================================================

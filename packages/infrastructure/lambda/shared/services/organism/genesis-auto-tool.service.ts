@@ -1,4 +1,4 @@
-// RADIANT Autonomous Organism - Genesis Auto-Tool Pipeline
+// RADIANT Autonomous Organism - Tool Forge Pipeline (formerly Genesis Auto-Tool)
 // On-demand tool generation with AI-powered code synthesis
 // Version: 1.0.0
 
@@ -7,7 +7,7 @@ import { executeStatement, stringParam, longParam, doubleParam, boolParam } from
 import { createRegisteredLogger } from '../logging-registry.service';
 
 const logger = createRegisteredLogger({
-  serviceName: 'organism/genesis-auto-tool',
+  serviceName: 'organism/tool-forge',
   category: 'infrastructure',
   sourceType: 'application',
 });
@@ -18,7 +18,7 @@ import { neuralSchemaRegistry } from './neural-schema-registry.service';
 // Types
 // ============================================================================
 
-type GenesisToolStatus = 
+type ToolForgeStatus = 
   | 'queued' 
   | 'scraping' 
   | 'generating' 
@@ -29,10 +29,10 @@ type GenesisToolStatus =
   | 'deployed' 
   | 'failed';
 
-type GenesisValidationResult = 'pass' | 'fail' | 'warn';
+type ToolForgeValidationResult = 'pass' | 'fail' | 'warn';
 type ToolSensitivity = 'public' | 'internal' | 'confidential' | 'restricted';
 
-interface GenesisToolRequest {
+interface ToolForgeRequest {
   requestId: string;
   tenantId: string;
   userId: string;
@@ -45,13 +45,13 @@ interface GenesisToolRequest {
   maxGenerationTimeMs: number;
   requireSandboxValidation: boolean;
   securityLevel: ToolSensitivity;
-  status: GenesisToolStatus;
+  status: ToolForgeStatus;
   createdAt: Date;
   updatedAt: Date;
   completedAt?: Date;
 }
 
-interface GenesisToolResult {
+interface ToolForgeResult {
   requestId: string;
   toolId?: string;
   mcpServerCode?: string;
@@ -62,8 +62,8 @@ interface GenesisToolResult {
     passed: boolean;
     executionTimeMs: number;
     memoryUsageMb: number;
-    securityScan: GenesisValidationResult;
-    functionalTests: GenesisValidationResult;
+    securityScan: ToolForgeValidationResult;
+    functionalTests: ToolForgeValidationResult;
     errorMessages?: string[];
   };
   deployedAt?: Date;
@@ -73,10 +73,10 @@ interface GenesisToolResult {
   estimatedCost: number;
 }
 
-interface GenesisAPIDiscovery {
+interface ToolForgeAPIDiscovery {
   serviceUrl: string;
   discoveryMethod: 'openapi' | 'graphql' | 'grpc' | 'html_scrape' | 'documentation';
-  endpoints: GenesisEndpoint[];
+  endpoints: ToolForgeEndpoint[];
   authRequirements?: {
     type: 'api_key' | 'oauth2' | 'basic' | 'bearer' | 'custom';
     location: 'header' | 'query' | 'body';
@@ -91,7 +91,7 @@ interface GenesisAPIDiscovery {
   confidenceScore: number;
 }
 
-interface GenesisEndpoint {
+interface ToolForgeEndpoint {
   path: string;
   method: string;
   description: string;
@@ -106,13 +106,13 @@ interface GenesisEndpoint {
 }
 
 // ============================================================================
-// Genesis Auto-Tool Pipeline Service
+// Tool Forge Pipeline Service
 // ============================================================================
 
-class GenesisAutoToolService {
-  private pendingRequests: Map<string, GenesisToolRequest> = new Map();
-  private completedResults: Map<string, GenesisToolResult> = new Map();
-  private apiDiscoveryCache: Map<string, GenesisAPIDiscovery> = new Map();
+class ToolForgeService {
+  private pendingRequests: Map<string, ToolForgeRequest> = new Map();
+  private completedResults: Map<string, ToolForgeResult> = new Map();
+  private apiDiscoveryCache: Map<string, ToolForgeAPIDiscovery> = new Map();
 
   // ==========================================================================
   // REQUEST MANAGEMENT
@@ -126,7 +126,7 @@ class GenesisAutoToolService {
     naturalLanguageSpec: string;
     userContext?: Record<string, unknown>;
     securityLevel?: ToolSensitivity;
-  }): Promise<GenesisToolRequest> {
+  }): Promise<ToolForgeRequest> {
     const requestId = randomUUID();
     const now = new Date();
 
@@ -140,7 +140,7 @@ class GenesisAutoToolService {
     // Find existing similar tools
     const existingSimilarTools = await this.findSimilarTools(intentEmbedding);
 
-    const request: GenesisToolRequest = {
+    const request: ToolForgeRequest = {
       requestId,
       tenantId: params.tenantId,
       userId: params.userId,
@@ -161,24 +161,24 @@ class GenesisAutoToolService {
     this.pendingRequests.set(requestId, request);
     await this.saveRequestToDatabase(request);
 
-    logger.info(`Genesis tool request created: ${requestId}`, {
+    logger.info(`Tool Forge request created: ${requestId}`, {
       targetService: params.targetService,
       targetCapability: params.targetCapability,
     });
 
     // Start async processing
     this.processRequest(request).catch(err => {
-      logger.error(`Genesis request ${requestId} failed:`, err);
+      logger.error(`Tool Forge request ${requestId} failed:`, err);
     });
 
     return request;
   }
 
-  async getRequestStatus(requestId: string): Promise<GenesisToolRequest | null> {
+  async getRequestStatus(requestId: string): Promise<ToolForgeRequest | null> {
     return this.pendingRequests.get(requestId) || await this.loadRequestFromDatabase(requestId);
   }
 
-  async getResult(requestId: string): Promise<GenesisToolResult | null> {
+  async getResult(requestId: string): Promise<ToolForgeResult | null> {
     return this.completedResults.get(requestId) || await this.loadResultFromDatabase(requestId);
   }
 
@@ -186,7 +186,7 @@ class GenesisAutoToolService {
   // TOOL GENERATION PIPELINE
   // ==========================================================================
 
-  private async processRequest(request: GenesisToolRequest): Promise<GenesisToolResult> {
+  private async processRequest(request: ToolForgeRequest): Promise<ToolForgeResult> {
     const startTime = Date.now();
     let tokensUsed = 0;
 
@@ -209,7 +209,7 @@ class GenesisAutoToolService {
       }
 
       // Phase 4: Sandbox Testing (if required)
-      let sandboxResult: GenesisToolResult['sandboxValidation'];
+      let sandboxResult: ToolForgeResult['sandboxValidation'];
       if (request.requireSandboxValidation) {
         await this.updateRequestStatus(request.requestId, 'sandbox_testing');
         sandboxResult = await this.runSandboxTests(generatedCode.code, generatedCode.testCases);
@@ -223,13 +223,13 @@ class GenesisAutoToolService {
       // Phase 5: Register Tool
       await this.updateRequestStatus(request.requestId, 'approved');
       const registeredTool = await neuralSchemaRegistry.registerTool({
-        serverId: `genesis-${request.requestId}`,
+        serverId: `toolforge-${request.requestId}`,
         name: this.generateToolName(request),
         description: request.naturalLanguageSpec,
         inputSchemaJSON: generatedCode.inputSchema,
         outputSchemaJSON: generatedCode.outputSchema,
         category: 'api_integration',
-        tags: ['genesis', 'auto-generated', request.targetService],
+        tags: ['tool-forge', 'auto-generated', request.targetService],
         isStructuredOutput: true,
         successRate: 1,
         avgExecutionMs: 0,
@@ -246,7 +246,7 @@ class GenesisAutoToolService {
       // Phase 6: Deploy
       await this.updateRequestStatus(request.requestId, 'deployed');
 
-      const result: GenesisToolResult = {
+      const result: ToolForgeResult = {
         requestId: request.requestId,
         toolId: registeredTool.toolId,
         mcpServerCode: generatedCode.code,
@@ -264,7 +264,7 @@ class GenesisAutoToolService {
       this.completedResults.set(request.requestId, result);
       await this.saveResultToDatabase(result);
 
-      logger.info(`Genesis tool deployed: ${registeredTool.toolId}`, {
+      logger.info(`Tool Forge deployed: ${registeredTool.toolId}`, {
         requestId: request.requestId,
         generationTimeMs: result.generationTimeMs,
       });
@@ -274,7 +274,7 @@ class GenesisAutoToolService {
     } catch (error) {
       await this.updateRequestStatus(request.requestId, 'failed');
       
-      const failedResult: GenesisToolResult = {
+      const failedResult: ToolForgeResult = {
         requestId: request.requestId,
         generationTimeMs: Date.now() - startTime,
         tokensUsed,
@@ -292,7 +292,7 @@ class GenesisAutoToolService {
   // API DISCOVERY
   // ==========================================================================
 
-  private async discoverAPI(serviceUrl: string): Promise<GenesisAPIDiscovery> {
+  private async discoverAPI(serviceUrl: string): Promise<ToolForgeAPIDiscovery> {
     // Check cache first
     const cached = this.apiDiscoveryCache.get(serviceUrl);
     if (cached && Date.now() - cached.lastScrapedAt.getTime() < 3600000) { // 1 hour cache
@@ -323,7 +323,7 @@ class GenesisAutoToolService {
     return discovery;
   }
 
-  private async tryOpenAPIDiscovery(serviceUrl: string): Promise<GenesisAPIDiscovery | null> {
+  private async tryOpenAPIDiscovery(serviceUrl: string): Promise<ToolForgeAPIDiscovery | null> {
     const openApiPaths = [
       '/openapi.json',
       '/openapi.yaml',
@@ -351,8 +351,8 @@ class GenesisAutoToolService {
     return null;
   }
 
-  private parseOpenAPISpec(serviceUrl: string, spec: any): GenesisAPIDiscovery {
-    const endpoints: GenesisEndpoint[] = [];
+  private parseOpenAPISpec(serviceUrl: string, spec: any): ToolForgeAPIDiscovery {
+    const endpoints: ToolForgeEndpoint[] = [];
 
     const paths = spec.paths || {};
     for (const [path, methods] of Object.entries(paths)) {
@@ -401,7 +401,7 @@ class GenesisAutoToolService {
     };
   }
 
-  private parseOpenAPIAuth(spec: any): GenesisAPIDiscovery['authRequirements'] | undefined {
+  private parseOpenAPIAuth(spec: any): ToolForgeAPIDiscovery['authRequirements'] | undefined {
     const securitySchemes = spec.components?.securitySchemes || spec.securityDefinitions;
     if (!securitySchemes) return undefined;
 
@@ -425,7 +425,7 @@ class GenesisAutoToolService {
     return undefined;
   }
 
-  private async tryGraphQLDiscovery(serviceUrl: string): Promise<GenesisAPIDiscovery | null> {
+  private async tryGraphQLDiscovery(serviceUrl: string): Promise<ToolForgeAPIDiscovery | null> {
     const graphqlPaths = ['/graphql', '/api/graphql', '/v1/graphql'];
 
     for (const path of graphqlPaths) {
@@ -469,8 +469,8 @@ class GenesisAutoToolService {
     return null;
   }
 
-  private parseGraphQLSchema(serviceUrl: string, schema: any): GenesisAPIDiscovery {
-    const endpoints: GenesisEndpoint[] = [];
+  private parseGraphQLSchema(serviceUrl: string, schema: any): ToolForgeAPIDiscovery {
+    const endpoints: ToolForgeEndpoint[] = [];
 
     for (const type of schema.types || []) {
       if (type.name.startsWith('__')) continue;
@@ -499,7 +499,7 @@ class GenesisAutoToolService {
     };
   }
 
-  private async scrapeDocumentation(serviceUrl: string): Promise<GenesisAPIDiscovery | null> {
+  private async scrapeDocumentation(serviceUrl: string): Promise<ToolForgeAPIDiscovery | null> {
     // Simplified HTML scraping for API documentation
     try {
       const docPaths = ['/docs', '/api', '/documentation', '/api-reference'];
@@ -532,8 +532,8 @@ class GenesisAutoToolService {
     return null;
   }
 
-  private extractEndpointsFromHTML(html: string): GenesisEndpoint[] {
-    const endpoints: GenesisEndpoint[] = [];
+  private extractEndpointsFromHTML(html: string): ToolForgeEndpoint[] {
+    const endpoints: ToolForgeEndpoint[] = [];
     
     // Look for common API patterns in HTML
     const apiPatterns = [
@@ -562,7 +562,7 @@ class GenesisAutoToolService {
     return endpoints;
   }
 
-  private generateMinimalDiscovery(serviceUrl: string): GenesisAPIDiscovery {
+  private generateMinimalDiscovery(serviceUrl: string): ToolForgeAPIDiscovery {
     return {
       serviceUrl,
       discoveryMethod: 'documentation',
@@ -587,8 +587,8 @@ class GenesisAutoToolService {
   // ==========================================================================
 
   private async generateMCPServerCode(
-    request: GenesisToolRequest,
-    apiDiscovery: GenesisAPIDiscovery
+    request: ToolForgeRequest,
+    apiDiscovery: ToolForgeAPIDiscovery
   ): Promise<{
     code: string;
     schemas: string;
@@ -638,7 +638,7 @@ class GenesisAutoToolService {
     };
   }
 
-  private generateToolName(request: GenesisToolRequest): string {
+  private generateToolName(request: ToolForgeRequest): string {
     const serviceName = request.targetService
       .replace(/https?:\/\//, '')
       .replace(/[^a-zA-Z0-9]/g, '_')
@@ -648,10 +648,10 @@ class GenesisAutoToolService {
       .replace(/[^a-zA-Z0-9]/g, '_')
       .slice(0, 20);
 
-    return `genesis_${serviceName}_${capabilityName}`;
+    return `toolforge_${serviceName}_${capabilityName}`;
   }
 
-  private generateInputSchema(endpoint: GenesisEndpoint): Record<string, unknown> {
+  private generateInputSchema(endpoint: ToolForgeEndpoint): Record<string, unknown> {
     const properties: Record<string, unknown> = {};
     const required: string[] = [];
 
@@ -673,7 +673,7 @@ class GenesisAutoToolService {
     };
   }
 
-  private generateOutputSchema(endpoint: GenesisEndpoint): Record<string, unknown> {
+  private generateOutputSchema(endpoint: ToolForgeEndpoint): Record<string, unknown> {
     if (endpoint.responseSchema) {
       return endpoint.responseSchema;
     }
@@ -710,15 +710,15 @@ class GenesisAutoToolService {
 
   private generateMCPServerTemplate(
     toolName: string,
-    request: GenesisToolRequest,
-    apiDiscovery: GenesisAPIDiscovery,
-    endpoint: GenesisEndpoint
+    request: ToolForgeRequest,
+    apiDiscovery: ToolForgeAPIDiscovery,
+    endpoint: ToolForgeEndpoint
   ): string {
     const authHeader = apiDiscovery.authRequirements
       ? this.generateAuthHeader(apiDiscovery.authRequirements)
       : '';
 
-    return `// Genesis Auto-Generated MCP Server Tool
+    return `// Tool Forge Auto-Generated MCP Server Tool
 // Tool: ${toolName}
 // Generated: ${new Date().toISOString()}
 // Service: ${request.targetService}
@@ -789,14 +789,14 @@ export const ${toolName}Tool = {
 `;
   }
 
-  private generateAuthHeader(auth: NonNullable<GenesisAPIDiscovery['authRequirements']>): string {
+  private generateAuthHeader(auth: NonNullable<ToolForgeAPIDiscovery['authRequirements']>): string {
     switch (auth.type) {
       case 'api_key':
-        return `        '${auth.keyName || 'X-API-Key'}': process.env.GENESIS_API_KEY || '',`;
+        return `        '${auth.keyName || 'X-API-Key'}': process.env.TOOL_FORGE_API_KEY || '',`;
       case 'bearer':
-        return `        'Authorization': \`Bearer \${process.env.GENESIS_API_TOKEN || ''}\`,`;
+        return `        'Authorization': \`Bearer \${process.env.TOOL_FORGE_API_TOKEN || ''}\`,`;
       case 'oauth2':
-        return `        'Authorization': \`Bearer \${process.env.GENESIS_OAUTH_TOKEN || ''}\`,`;
+        return `        'Authorization': \`Bearer \${process.env.TOOL_FORGE_OAUTH_TOKEN || ''}\`,`;
       default:
         return '';
     }
@@ -836,7 +836,7 @@ export const ${toolName}OutputSchema = ${JSON.stringify(outputSchema, null, 2)};
 `;
   }
 
-  private generateTestCases(toolName: string, endpoint: GenesisEndpoint): string[] {
+  private generateTestCases(toolName: string, endpoint: ToolForgeEndpoint): string[] {
     const testCases: string[] = [];
 
     // Basic success test
@@ -891,9 +891,9 @@ describe('${toolName} error handling', () => {
 
   private generateDocumentation(
     toolName: string,
-    request: GenesisToolRequest,
-    apiDiscovery: GenesisAPIDiscovery,
-    endpoint: GenesisEndpoint
+    request: ToolForgeRequest,
+    apiDiscovery: ToolForgeAPIDiscovery,
+    endpoint: ToolForgeEndpoint
   ): string {
     return `# ${toolName}
 
@@ -959,26 +959,26 @@ ${apiDiscovery.authRequirements ? `- Type: ${apiDiscovery.authRequirements.type}
   private async runSandboxTests(
     code: string,
     testCases: string[]
-  ): Promise<NonNullable<GenesisToolResult['sandboxValidation']>> {
+  ): Promise<NonNullable<ToolForgeResult['sandboxValidation']>> {
     const startTime = Date.now();
 
     // In a real implementation, this would run in a Firecracker VM or similar sandbox
     // For now, we do basic validation
     
     const securityScan = this.performSecurityScan(code);
-    const functionalTests: GenesisValidationResult = testCases.length > 0 ? 'pass' : 'warn';
+    const functionalTests: ToolForgeValidationResult = testCases.length > 0 ? 'pass' : 'warn';
 
     return {
       passed: securityScan === 'pass' && functionalTests === 'pass',
       executionTimeMs: Date.now() - startTime,
       memoryUsageMb: 0,
       securityScan,
-      functionalTests: functionalTests as GenesisValidationResult,
+      functionalTests: functionalTests as ToolForgeValidationResult,
       errorMessages: securityScan === 'fail' ? ['Security scan failed'] : undefined,
     };
   }
 
-  private performSecurityScan(code: string): GenesisValidationResult {
+  private performSecurityScan(code: string): ToolForgeValidationResult {
     const dangerousPatterns = [
       'eval(',
       'Function(',
@@ -1047,9 +1047,9 @@ ${apiDiscovery.authRequirements ? `- Type: ${apiDiscovery.authRequirements.type}
   private inferPermissions(securityLevel: ToolSensitivity): string[] {
     const permissions: Record<ToolSensitivity, string[]> = {
       'public': [],
-      'internal': ['genesis:use'],
-      'confidential': ['genesis:use', 'genesis:confidential'],
-      'restricted': ['genesis:use', 'genesis:confidential', 'genesis:restricted'],
+      'internal': ['tool-forge:use'],
+      'confidential': ['tool-forge:use', 'tool-forge:confidential'],
+      'restricted': ['tool-forge:use', 'tool-forge:confidential', 'tool-forge:restricted'],
     };
 
     return permissions[securityLevel];
@@ -1066,7 +1066,7 @@ ${apiDiscovery.authRequirements ? `- Type: ${apiDiscovery.authRequirements.type}
   // DATABASE OPERATIONS
   // ==========================================================================
 
-  private async updateRequestStatus(requestId: string, status: GenesisToolStatus): Promise<void> {
+  private async updateRequestStatus(requestId: string, status: ToolForgeStatus): Promise<void> {
     const request = this.pendingRequests.get(requestId);
     if (request) {
       request.status = status;
@@ -1077,7 +1077,7 @@ ${apiDiscovery.authRequirements ? `- Type: ${apiDiscovery.authRequirements.type}
     }
 
     await executeStatement({
-      sql: `UPDATE genesis_tool_requests SET status = :status, updated_at = NOW() WHERE request_id = :requestId`,
+      sql: `UPDATE tool_forge_requests SET status = :status, updated_at = NOW() WHERE request_id = :requestId`,
       parameters: [
         stringParam('status', status),
         stringParam('requestId', requestId),
@@ -1085,10 +1085,10 @@ ${apiDiscovery.authRequirements ? `- Type: ${apiDiscovery.authRequirements.type}
     });
   }
 
-  private async saveRequestToDatabase(request: GenesisToolRequest): Promise<void> {
+  private async saveRequestToDatabase(request: ToolForgeRequest): Promise<void> {
     await executeStatement({
       sql: `
-        INSERT INTO genesis_tool_requests (
+        INSERT INTO tool_forge_requests (
           request_id, tenant_id, user_id, target_service, target_capability,
           natural_language_spec, existing_similar_tools, max_generation_time_ms,
           require_sandbox_validation, security_level, status, created_at, updated_at
@@ -1116,9 +1116,9 @@ ${apiDiscovery.authRequirements ? `- Type: ${apiDiscovery.authRequirements.type}
     });
   }
 
-  private async loadRequestFromDatabase(requestId: string): Promise<GenesisToolRequest | null> {
+  private async loadRequestFromDatabase(requestId: string): Promise<ToolForgeRequest | null> {
     const result = await executeStatement({
-      sql: `SELECT * FROM genesis_tool_requests WHERE request_id = :requestId`,
+      sql: `SELECT * FROM tool_forge_requests WHERE request_id = :requestId`,
       parameters: [stringParam('requestId', requestId)],
     });
 
@@ -1126,10 +1126,10 @@ ${apiDiscovery.authRequirements ? `- Type: ${apiDiscovery.authRequirements.type}
     return this.rowToRequest(result.rows[0]);
   }
 
-  private async saveResultToDatabase(result: GenesisToolResult): Promise<void> {
+  private async saveResultToDatabase(result: ToolForgeResult): Promise<void> {
     await executeStatement({
       sql: `
-        INSERT INTO genesis_tool_results (
+        INSERT INTO tool_forge_results (
           request_id, tool_id, mcp_server_code, zod_schemas, test_cases,
           documentation, sandbox_passed, generation_time_ms, tokens_used,
           estimated_cost, deployed_at, created_at
@@ -1155,9 +1155,9 @@ ${apiDiscovery.authRequirements ? `- Type: ${apiDiscovery.authRequirements.type}
     });
   }
 
-  private async loadResultFromDatabase(requestId: string): Promise<GenesisToolResult | null> {
+  private async loadResultFromDatabase(requestId: string): Promise<ToolForgeResult | null> {
     const result = await executeStatement({
-      sql: `SELECT * FROM genesis_tool_results WHERE request_id = :requestId`,
+      sql: `SELECT * FROM tool_forge_results WHERE request_id = :requestId`,
       parameters: [stringParam('requestId', requestId)],
     });
 
@@ -1165,7 +1165,7 @@ ${apiDiscovery.authRequirements ? `- Type: ${apiDiscovery.authRequirements.type}
     return this.rowToResult(result.rows[0]);
   }
 
-  private rowToRequest(row: Record<string, unknown>): GenesisToolRequest {
+  private rowToRequest(row: Record<string, unknown>): ToolForgeRequest {
     const getString = (key: string): string => String(row[key] || '');
     const getNumber = (key: string): number => Number(row[key]) || 0;
     const getDate = (key: string): Date | undefined => row[key] ? new Date(String(row[key])) : undefined;
@@ -1189,14 +1189,14 @@ ${apiDiscovery.authRequirements ? `- Type: ${apiDiscovery.authRequirements.type}
       maxGenerationTimeMs: getNumber('max_generation_time_ms'),
       requireSandboxValidation: row['require_sandbox_validation'] === true,
       securityLevel: (getString('security_level') || 'public') as ToolSensitivity,
-      status: (getString('status') || 'queued') as GenesisToolStatus,
+      status: (getString('status') || 'queued') as ToolForgeStatus,
       createdAt: getDate('created_at') || new Date(),
       updatedAt: getDate('updated_at') || new Date(),
       completedAt: getDate('completed_at'),
     };
   }
 
-  private rowToResult(row: Record<string, unknown>): GenesisToolResult {
+  private rowToResult(row: Record<string, unknown>): ToolForgeResult {
     const getString = (key: string): string => String(row[key] || '');
     const getNumber = (key: string): number => Number(row[key]) || 0;
     const getDate = (key: string): Date | undefined => row[key] ? new Date(String(row[key])) : undefined;
@@ -1220,8 +1220,8 @@ ${apiDiscovery.authRequirements ? `- Type: ${apiDiscovery.authRequirements.type}
         passed: row['sandbox_passed'] === true,
         executionTimeMs: 0,
         memoryUsageMb: 0,
-        securityScan: 'pass' as GenesisValidationResult,
-        functionalTests: 'pass' as GenesisValidationResult,
+        securityScan: 'pass' as ToolForgeValidationResult,
+        functionalTests: 'pass' as ToolForgeValidationResult,
       } : undefined,
       deployedAt: getDate('deployed_at'),
       generationTimeMs: getNumber('generation_time_ms'),
@@ -1235,5 +1235,5 @@ ${apiDiscovery.authRequirements ? `- Type: ${apiDiscovery.authRequirements.type}
 // Export Singleton
 // ============================================================================
 
-export const genesisAutoTool = new GenesisAutoToolService();
-export { GenesisAutoToolService };
+export const toolForge = new ToolForgeService();
+export { ToolForgeService };

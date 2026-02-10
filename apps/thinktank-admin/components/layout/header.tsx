@@ -1,8 +1,9 @@
 'use client';
 
 import { useAuth } from '@/lib/auth/context';
-import { Bell, Settings, LogOut, User, ChevronDown } from 'lucide-react';
+import { Bell, Settings, LogOut, User, ChevronDown, ShieldAlert } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
+import { TenantPicker } from './tenant-picker';
 
 export function Header() {
   const { user, logout } = useAuth();
@@ -27,9 +28,15 @@ export function Header() {
 
   return (
     <header className="h-16 border-b border-white/10 bg-slate-900/60 backdrop-blur-xl flex items-center justify-between px-6">
-      {/* Left - Breadcrumb / Title */}
-      <div>
-        <span className="text-sm text-muted-foreground">Think Tank Admin</span>
+      {/* Left - Title + Tenant Picker */}
+      <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
+          <ShieldAlert className="h-4 w-4 text-red-400" />
+          <span className="text-sm text-muted-foreground">Think Tank Admin</span>
+          <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-500/20 text-red-300 font-medium">Super Admin</span>
+        </div>
+        <div className="h-6 w-px bg-white/10" />
+        <TenantPicker />
       </div>
 
       {/* Right - Actions */}

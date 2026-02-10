@@ -41,8 +41,8 @@ const DEFAULT_CONFIG: PreCognitionConfig = {
   predictionTTLMs: 60000, // 1 minute
   computeBudgetMs: 5000,  // 5 seconds
   minConfidenceThreshold: 0.6,
-  useGenesisModel: true,
-  genesisModelId: 'llama-3-8b-instruct',
+  useBaseModel: true,
+  baseModelId: 'llama-3-8b-instruct',
 };
 
 class PreCognitionService {
@@ -413,7 +413,7 @@ class PreCognitionService {
     intent: MorphicIntent,
     prompt: string
   ): Promise<PreCognitionSolution> {
-    // Use Genesis model (Claude Sonnet) to pre-generate intelligent solutions
+    // Use base model (Claude Sonnet) to pre-generate intelligent solutions
     const solution: PreCognitionSolution = {
       type: 'morph',
       suggestedActions: [],

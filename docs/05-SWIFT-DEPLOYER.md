@@ -1989,7 +1989,7 @@ Discover and execute deployment bash scripts directly from the Deployer.
 Scripts are automatically discovered from:
 - `scripts/` - Main deployment scripts
 - `tools/scripts/` - Utility scripts
-- `packages/infrastructure/scripts/` - Infrastructure scripts
+- `packages/infrastructure/bin/` - Infrastructure scripts
 
 #### Script Categories
 

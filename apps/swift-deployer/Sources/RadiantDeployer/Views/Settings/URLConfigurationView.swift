@@ -65,20 +65,20 @@ struct URLConfigurationView: View {
                 Text("These URLs define where your RADIANT platform components are accessible.")
             }
             
-            // Genesis / OMEGA Section
+            // OMEGA Section
             Section {
                 URLInputField(
-                    label: "Genesis Lab URL",
-                    placeholder: "https://genesis.example.com",
-                    value: $viewModel.genesisLabUrl,
+                    label: "OMEGA Lab URL",
+                    placeholder: "https://omega-lab.example.com",
+                    value: $viewModel.omegaLabUrl,
                     helpText: "OMEGA brain monitoring dashboard with thermal visualization and Cortex Explorer",
                     icon: "waveform.path.ecg"
                 )
                 
                 URLInputField(
-                    label: "Genesis Forge URL",
+                    label: "OMEGA Forge URL",
                     placeholder: "https://forge.example.com",
-                    value: $viewModel.genesisForgeUrl,
+                    value: $viewModel.omegaForgeUrl,
                     helpText: "OMEGA firmware creation tool for .bio files with Helix rules and personality traits",
                     icon: "hammer.fill"
                 )
@@ -91,7 +91,7 @@ struct URLConfigurationView: View {
                     icon: "brain"
                 )
             } header: {
-                Text("Genesis / OMEGA")
+                Text("OMEGA")
             } footer: {
                 Text("Bio-mimetic AI organism monitoring and firmware management (Scale tier and above).")
             }
@@ -290,9 +290,9 @@ class URLConfigurationViewModel: ObservableObject {
     @Published var catoTrainerUrl = ""
     @Published var curatorUrl = ""
     
-    // Genesis / OMEGA URLs
-    @Published var genesisLabUrl = ""
-    @Published var genesisForgeUrl = ""
+    // OMEGA URLs
+    @Published var omegaLabUrl = ""
+    @Published var omegaForgeUrl = ""
     @Published var omegaApiUrl = ""
     
     // API Configuration
@@ -325,8 +325,8 @@ class URLConfigurationViewModel: ObservableObject {
             dojoUrl = config.dojoUrl ?? ""
             catoTrainerUrl = config.catoTrainerUrl ?? ""
             curatorUrl = config.curatorUrl ?? ""
-            genesisLabUrl = config.genesisLabUrl ?? ""
-            genesisForgeUrl = config.genesisForgeUrl ?? ""
+            omegaLabUrl = config.omegaLabUrl ?? ""
+            omegaForgeUrl = config.omegaForgeUrl ?? ""
             omegaApiUrl = config.omegaApiUrl ?? ""
             apiBaseUrl = config.apiBaseUrl
             websocketUrl = config.websocketUrl
@@ -351,8 +351,8 @@ class URLConfigurationViewModel: ObservableObject {
             ("Aurelius Dojo", dojoUrl),
             ("Cato Trainer", catoTrainerUrl),
             ("Curator", curatorUrl),
-            ("Genesis Lab", genesisLabUrl),
-            ("Genesis Forge", genesisForgeUrl),
+            ("OMEGA Lab", omegaLabUrl),
+            ("OMEGA Forge", omegaForgeUrl),
             ("OMEGA API", omegaApiUrl),
             ("API Base", apiBaseUrl),
             ("WebSocket", websocketUrl),
@@ -391,8 +391,8 @@ class URLConfigurationViewModel: ObservableObject {
             dojoUrl: dojoUrl.isEmpty ? nil : dojoUrl,
             catoTrainerUrl: catoTrainerUrl.isEmpty ? nil : catoTrainerUrl,
             curatorUrl: curatorUrl.isEmpty ? nil : curatorUrl,
-            genesisLabUrl: genesisLabUrl.isEmpty ? nil : genesisLabUrl,
-            genesisForgeUrl: genesisForgeUrl.isEmpty ? nil : genesisForgeUrl,
+            omegaLabUrl: omegaLabUrl.isEmpty ? nil : omegaLabUrl,
+            omegaForgeUrl: omegaForgeUrl.isEmpty ? nil : omegaForgeUrl,
             omegaApiUrl: omegaApiUrl.isEmpty ? nil : omegaApiUrl,
             apiBaseUrl: apiBaseUrl,
             websocketUrl: websocketUrl,
@@ -418,8 +418,8 @@ struct URLConfiguration: Codable {
     var dojoUrl: String?
     var catoTrainerUrl: String?
     var curatorUrl: String?
-    var genesisLabUrl: String?
-    var genesisForgeUrl: String?
+    var omegaLabUrl: String?
+    var omegaForgeUrl: String?
     var omegaApiUrl: String?
     var apiBaseUrl: String
     var websocketUrl: String
@@ -437,8 +437,8 @@ struct URLConfiguration: Codable {
             dojoUrl: "https://dojo.{{RADIANT_DOMAIN}}",
             catoTrainerUrl: "https://cato.{{RADIANT_DOMAIN}}",
             curatorUrl: "https://curator.{{RADIANT_DOMAIN}}",
-            genesisLabUrl: "https://genesis.{{RADIANT_DOMAIN}}",
-            genesisForgeUrl: "https://forge.{{RADIANT_DOMAIN}}",
+            omegaLabUrl: "https://omega-lab.{{RADIANT_DOMAIN}}",
+            omegaForgeUrl: "https://forge.{{RADIANT_DOMAIN}}",
             omegaApiUrl: "https://omega.{{RADIANT_DOMAIN}}",
             apiBaseUrl: "https://api.{{RADIANT_DOMAIN}}",
             websocketUrl: "wss://ws.{{RADIANT_DOMAIN}}",

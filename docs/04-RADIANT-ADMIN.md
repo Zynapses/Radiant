@@ -133,13 +133,12 @@ RADIANT is a multi-tenant AWS SaaS platform providing unified access to 106+ AI 
 | Role | Permissions | Use Case |
 |------|-------------|----------|
 | **Super Admin** | Full access to all features | Platform owner |
-| **Admin** | Tenant management, billing, models | Operations team |
-| **Operator** | Read access, limited actions | Support team |
-| **Auditor** | Read-only access to logs | Compliance team |
+
+> **v7.52.0**: Pool B simplified to `super_admin` only. The `admin`, `operator`, and `auditor` roles have been removed. All platform administration is performed by super administrators.
 
 #### Role Details
 
-**Super Admin** - The highest privilege level with unrestricted access:
+**Super Admin** - The sole platform administrator role with unrestricted access:
 - Create and delete tenants
 - Manage all administrators
 - Access all billing and financial data
@@ -147,32 +146,8 @@ RADIANT is a multi-tenant AWS SaaS platform providing unified access to 106+ AI 
 - Approve production database migrations
 - Impersonate any tenant for debugging
 - Access compliance and audit reports
+- Access both **Radiant Admin** and **Think Tank Admin** (global apps)
 - Typically limited to 1-3 people (CTO, lead engineer)
-
-**Admin** - Day-to-day operations management:
-- Create and modify tenants (cannot delete)
-- Manage users within tenants
-- Configure AI models and providers
-- View billing data (cannot modify pricing)
-- Monitor system health
-- Cannot access other admin accounts
-- Typically assigned to operations team members
-
-**Operator** - Limited support and monitoring:
-- View tenant information (read-only)
-- View user issues and support tickets
-- Monitor system health dashboards
-- Cannot modify any configuration
-- Cannot access billing or sensitive data
-- Typically assigned to support staff
-
-**Auditor** - Compliance and security review:
-- Full read access to audit logs
-- Access to compliance reports
-- Cannot modify anything
-- Cannot view sensitive data (API keys, passwords)
-- Access is logged for compliance
-- Typically assigned to compliance officers or external auditors
 
 ### 1.3 Key Concepts
 
@@ -418,11 +393,7 @@ RADIANT enforces role-based Multi-Factor Authentication (MFA) using industry-sta
 | Role | MFA Required | Can Disable |
 |------|--------------|-------------|
 | `super_admin` | **Yes** | No |
-| `admin` | **Yes** | No |
-| `operator` | **Yes** | No |
-| `auditor` | **Yes** | No |
 | `tenant_admin` | **Yes** | No |
-| `tenant_owner` | **Yes** | No |
 | `standard_user` | No (future) | N/A |
 
 **Critical Security Rules:**
@@ -1341,9 +1312,8 @@ FOR EACH ROW EXECUTE FUNCTION tms_prevent_orphan_users();
 | Role | Dashboard Access | API Access | Billing | Audit |
 |------|-----------------|------------|---------|-------|
 | **Super Admin** | Full | Full | Full | Full |
-| **Admin** | Full | Full | Read | Read |
-| **Operator** | Read | Read | None | Read |
-| **Auditor** | Logs only | None | None | Full |
+
+> **v7.52.0**: Only `super_admin` remains in Pool B. The `admin`, `operator`, and `auditor` roles have been removed.
 
 ### 5.2 Managing Administrators
 
@@ -5416,8 +5386,8 @@ console.log(`Integrated Information Phi: ${metrics.integratedInformationPhi}`);
 ```
 
 **Files:**
-- Service: `packages/infrastructure/lambda/shared/services/iit-phi-calculation.service.ts`
-- Integration: `packages/infrastructure/lambda/shared/services/consciousness.service.ts`
+- Service: `lambda/shared/services/iit-phi-calculation.service.ts`
+- Integration: `lambda/shared/services/cos/consciousness/ghost-vector-manager.ts`
 
 ---
 
@@ -7797,9 +7767,9 @@ Libraries are NOT AI models - they are tools that extend AI capabilities:
 | `lambda/admin/library-registry.ts` | Admin API |
 | `lambda/library-registry/update.ts` | Update Lambda |
 | `lib/stacks/library-registry-stack.ts` | CDK Stack with initial seed |
-| `migrations/103_library_registry.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `config/library-registry/seed-libraries.json` | Seed data (168 libraries) |
-| `apps/admin-dashboard/.../platform/libraries/page.tsx` | Admin UI |
+| `apps/admin-dashboard/app/(dashboard)/platform/libraries/page.tsx` | Admin UI |
 
 ### 28.3 Library Categories
 
@@ -7936,9 +7906,9 @@ User Request → Executor Service → Concurrency Check → Queue/Execute
 
 | File | Purpose |
 |------|---------|
-| `lambda/shared/services/library-executor.service.ts` | Execution service |
+| `lambda/shared/services/library-registry.service.ts` | Execution service |
 | `lib/stacks/library-execution-stack.ts` | CDK infrastructure |
-| `migrations/104_library_execution.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `shared/src/types/library-execution.types.ts` | Type definitions |
 
 ### 29.3 Concurrency Limits
@@ -8763,7 +8733,7 @@ The Genesis System is the boot sequence that initializes Cato's consciousness. I
 
 ### 33.3 Python Genesis Package
 
-**Location:** `packages/infrastructure/cato/genesis/`
+**Location:** `lambda/shared/services/omega/`
 
 | File | Lines | Purpose |
 |------|-------|---------|
@@ -8777,7 +8747,7 @@ The Genesis System is the boot sequence that initializes Cato's consciousness. I
 
 ### 33.4 TypeScript Services
 
-**Location:** `packages/infrastructure/lambda/shared/services/`
+**Location:** `lambda/shared/services/`
 
 | File | Lines | Purpose |
 |------|-------|---------|
@@ -9296,7 +9266,7 @@ SNS topic `radiant-security-alerts-{env}` for:
 
 ### 34.11 Database Migration
 
-Migration file: `packages/infrastructure/migrations/125_multi_app_user_registry.sql`
+Migration file: `packages/infrastructure/migrations/000_consolidated_schema.sql`
 
 Tables created/modified:
 - Extended: `tenants`, `users`, `registered_apps`
@@ -9995,7 +9965,7 @@ DELETE /api/admin/file-conversion/force-convert
 | File | Purpose |
 |------|---------|
 | `lambda/shared/services/file-conversion.service.ts` | Main conversion service with decision engine |
-| `lambda/shared/services/multi-model-file-prep.service.ts` | Multi-model preparation |
+| `lambda/shared/services/file-conversion.service.ts` | Multi-model preparation |
 | `lambda/shared/services/file-conversion-learning.service.ts` | Reinforcement learning |
 | `lambda/shared/services/converters/pdf-converter.ts` | PDF text extraction |
 | `lambda/shared/services/converters/docx-converter.ts` | DOCX extraction |
@@ -10008,8 +9978,8 @@ DELETE /api/admin/file-conversion/force-convert
 | `lambda/shared/services/converters/domain-formats.ts` | Domain format registry |
 | `lambda/shared/services/converters/domain-converter-selector.ts` | AGI Brain integration |
 | `lambda/thinktank/file-conversion.ts` | API handlers |
-| `migrations/127_file_conversion_service.sql` | Main database schema |
-| `migrations/128_file_conversion_learning.sql` | Learning schema |
+| `migrations/000_consolidated_schema.sql` | Main database schema |
+| `migrations/000_consolidated_schema.sql` | Learning schema |
 
 ### 35.13 Monitoring
 
@@ -10381,12 +10351,12 @@ On system reboot or failure:
 |------|---------|
 | `packages/shared/src/types/metrics-learning.types.ts` | TypeScript types |
 | `lambda/shared/services/metrics-collection.service.ts` | Metrics collection |
-| `lambda/shared/services/learning-influence.service.ts` | Learning hierarchy |
+| `lambda/shared/services/learning-hierarchy.service.ts` | Learning hierarchy |
 | `lambda/shared/middleware/metrics-middleware.ts` | Auto-metrics for AI endpoints |
 | `lambda/admin/metrics.ts` | API handlers |
 | `lambda/scheduled/learning-snapshots.ts` | Daily snapshot Lambda |
 | `lambda/scheduled/learning-aggregation.ts` | Weekly aggregation Lambda |
-| `migrations/129_metrics_persistent_learning.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `apps/admin-dashboard/app/(dashboard)/metrics/page.tsx` | Admin UI |
 | `lib/stacks/api-stack.ts` | CDK routes (lines 463-625) |
 | `lib/stacks/scheduled-tasks-stack.ts` | Scheduled Lambdas |
@@ -10794,7 +10764,7 @@ if (result.translationContext?.translationRequired) {
 | `packages/shared/src/types/translation-middleware.types.ts` | Translation types & matrices |
 | `lambda/shared/services/translation-middleware.service.ts` | Core translation service |
 | `lambda/admin/translation.ts` | Admin API handler |
-| `migrations/130_translation_middleware.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 
 ### 37.10 Monitoring
 
@@ -11031,8 +11001,8 @@ Base: `/api/admin/brain`
 | `lambda/brain/inference.ts` | Brain inference Lambda |
 | `lambda/brain/reconciliation.ts` | Reconciliation Lambda |
 | `lib/stacks/brain-stack.ts` | CDK stack |
-| `migrations/131_brain_v6_tables.sql` | Core tables |
-| `migrations/132_brain_config_tables.sql` | Config tables |
+| `migrations/000_consolidated_schema.sql` | Core tables |
+| `migrations/000_consolidated_schema.sql` | Config tables |
 
 ### 38.13 Troubleshooting
 
@@ -11307,7 +11277,7 @@ Base: `/api/admin/brain/ecd`
 | `lambda/shared/services/ecd-scorer.service.ts` | Entity extraction & scoring |
 | `lambda/shared/services/fact-anchor.service.ts` | Critical fact anchoring |
 | `lambda/shared/services/ecd-verification.service.ts` | Verification loop |
-| `migrations/133_ecd_tables.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `apps/admin-dashboard/app/(dashboard)/brain/ecd/page.tsx` | Admin UI |
 
 ### 39.12 Integration with SOFAI
@@ -11744,7 +11714,7 @@ Tracks causal relationships across conversation turns for context-aware response
 
 ### 40.12 Database Tables
 
-Migration: `migrations/152_advanced_cognition.sql`
+Migration: `migrations/000_consolidated_schema.sql`
 
 | Table | Purpose | RLS |
 |-------|---------|-----|
@@ -12178,7 +12148,7 @@ The v6.1.0 Advanced Cognition supplement adds these persistent learning stores:
 |------|---------|
 | `lambda/shared/services/feedback.service.ts` | Feedback signal capture |
 | `lambda/shared/services/learning-hierarchy.service.ts` | 60/30/10 weight distribution |
-| `lambda/shared/services/consolidation.service.ts` | Memory consolidation |
+| `lambda/shared/services/memory-consolidation.service.ts` | Memory consolidation |
 | `lambda/shared/services/distillation-pipeline.service.ts` | LoRA training pipeline |
 | `lambda/shared/services/ghost-manager.service.ts` | Ghost vector extraction |
 | `lambda/consciousness/evolution-pipeline.ts` | Weekly Twilight Dreaming Lambda |
@@ -12450,7 +12420,7 @@ The Empiricism Loop is RADIANT's "Ghost in the Machine" - a reality-testing circ
 
 **Key Files:**
 - **Service**: `lambda/shared/services/empiricism-loop.service.ts`
-- **Migration**: `migrations/V2026_01_17_001__empiricism_loop.sql`
+- **Migration**: `migrations/000_consolidated_schema.sql`
 
 ### 41B.2 Architecture
 
@@ -12610,7 +12580,7 @@ The Enhanced Learning Pipeline transforms RADIANT from a system that "reads code
 - **Tool Entropy**: `lambda/shared/services/tool-entropy.service.ts`
 - **Shadow Mode**: `lambda/shared/services/shadow-mode.service.ts`
 - **Paste-Back Detection**: `lambda/shared/services/paste-back-detection.service.ts`
-- **Migration**: `migrations/V2026_01_17_002__enhanced_learning_pipeline.sql`
+- **Migration**: `migrations/000_consolidated_schema.sql`
 
 ### 41C.2 Enhanced Learning Pipeline Architecture
 
@@ -12967,7 +12937,7 @@ Unprocessed feedback (skeletonization, recipe checks, DPO pairing) is queued for
 }
 ```
 
-**Migration:** `migrations/V2026_01_17_003__learning_session_persistence.sql`
+**Migration:** `migrations/000_consolidated_schema.sql`
 
 ---
 
@@ -13065,7 +13035,7 @@ Large user content is offloaded to S3 to prevent database scaling issues.
 
 **Cleanup Lambda:** `lambda/admin/s3-orphan-cleanup.ts` (EventBridge every 5 minutes)
 
-**Migration:** `migrations/V2026_01_17_004__s3_content_offloading.sql`
+**Migration:** `migrations/000_consolidated_schema.sql`
 
 ---
 
@@ -13181,7 +13151,7 @@ const status = await persistenceGuard.getIntegrityStatus(tenantId);
 
 **Service:** `lambda/shared/services/persistence-guard.service.ts`
 
-**Migration:** `migrations/V2026_01_17_005__persistence_guard.sql`
+**Migration:** `migrations/000_consolidated_schema.sql`
 
 ---
 
@@ -13305,7 +13275,7 @@ Ethics change over time (cultural, legal, organizational), so they must be:
 
 **Service:** `lambda/shared/services/ethics-enforcement.service.ts`
 
-**Migration:** `migrations/V2026_01_17_007__ethics_enforcement.sql`
+**Migration:** `migrations/000_consolidated_schema.sql`
 
 **Usage:**
 
@@ -13380,7 +13350,7 @@ Full report writer with scheduling, recipients, and multi-format generation.
 - Emails recipients (future)
 
 **Files:**
-- Migration: `migrations/V2026_01_17_006__admin_reports.sql`
+- Migration: `migrations/000_consolidated_schema.sql`
 - Generator: `lambda/shared/services/report-generator.service.ts`
 - API: `lambda/admin/reports.ts`
 - Scheduler: `lambda/admin/scheduled-reports.ts`
@@ -14071,7 +14041,7 @@ Navigate to **Cato** in the admin sidebar to access:
 | `lambda/shared/services/cato/redundant-perception.service.ts` | PHI/PII detection |
 | `lambda/shared/services/cato/redis.service.ts` | State management |
 | `lambda/admin/cato.ts` | Admin API handler |
-| `migrations/153_cato_safety_architecture.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `lib/stacks/cato-redis-stack.ts` | ElastiCache CDK stack |
 | `admin-dashboard/app/(dashboard)/cato/page.tsx` | Dashboard UI |
 
@@ -15577,7 +15547,7 @@ rake think_tank:health
 | `app/views/admin/think_tank/_prompt_form.html.erb` | Prompt form partial |
 | `app/helpers/admin/think_tank_helper.rb` | View helpers |
 | `app/jobs/think_tank_job.rb` | Background job |
-| `lib/tasks/think_tank_tasks.rake` | Rake tasks |
+| `lambda/thinktank/handler.ts` | Rake tasks |
 | `public/stylesheets/admin/think_tank.css` | Styles |
 
 ### 43.11 Security Guide
@@ -15700,7 +15670,7 @@ episodes.each { |e| puts "#{e.uuid}: #{e.status} (#{e.duration}s)" }
 ## 44. AWS Free Tier Monitoring
 
 **Location**: Radiant Deployer App → System → Monitoring  
-**Migration**: `migrations/160_aws_monitoring.sql`  
+**Migration**: `migrations/000_consolidated_schema.sql`  
 **Version**: v4.21.0
 
 The AWS Free Tier Monitoring system provides real-time visibility into CloudWatch metrics, X-Ray traces, and Cost Explorer data using AWS free tier services.
@@ -15758,12 +15728,12 @@ The AWS Free Tier Monitoring system provides real-time visibility into CloudWatc
 | File | Purpose |
 |------|---------|
 | `packages/shared/src/types/aws-monitoring.types.ts` | TypeScript types |
-| `packages/infrastructure/lambda/shared/services/aws-monitoring.service.ts` | Backend service |
+| `lambda/shared/services/aws-monitoring.service.ts` | Backend service |
 | `packages/infrastructure/lambda/admin/aws-monitoring.ts` | API handler |
-| `packages/infrastructure/migrations/160_aws_monitoring.sql` | Database schema |
-| `apps/swift-deployer/.../Models/AWSMonitoringModels.swift` | Swift models |
-| `apps/swift-deployer/.../Services/AWSMonitoringService.swift` | Swift service |
-| `apps/swift-deployer/.../Views/AWSMonitoringView.swift` | Swift UI |
+| `packages/infrastructure/migrations/000_consolidated_schema.sql` | Database schema |
+| `apps/swift-deployer/Sources/RadiantDeployer/Models/AWSMonitoringModels.swift` | Swift models |
+| `apps/swift-deployer/Sources/RadiantDeployer/Services/AWSMonitoringService.swift` | Swift service |
+| `apps/swift-deployer/Sources/RadiantDeployer/Services/AWSMonitoringService.swift` | Swift UI |
 
 ### 44.4 Database Schema
 
@@ -18052,14 +18022,14 @@ Version 5.0 transforms RADIANT from a stateless request-response system into a s
 
 | Component | File |
 |-----------|------|
-| **Migration** | `packages/infrastructure/migrations/V2026_01_09_001__v5_grimoire_governor.sql` |
-| **Governor Service** | `packages/infrastructure/lambda/shared/services/governor/economic-governor.ts` |
+| **Migration** | `migrations/000_consolidated_schema.sql` |
+| **Governor Service** | `lambda/shared/services/governor/economic-governor.ts` |
 | **Grimoire Tasks** | `packages/flyte/workflows/grimoire_tasks.py` |
 | **Cato Client** | `packages/flyte/utils/cato_client.py` |
 | **DB Utils** | `packages/flyte/utils/db.py` |
 | **CDK Stack** | `packages/infrastructure/lib/stacks/grimoire-stack.ts` |
-| **Grimoire UI** | `apps/admin-dashboard/app/(dashboard)/thinktank/grimoire/page.tsx` |
-| **Governor UI** | `apps/admin-dashboard/app/(dashboard)/thinktank/governor/page.tsx` |
+| **Grimoire UI** | `apps/thinktank-admin/app/(dashboard)/grimoire/page.tsx` |
+| **Governor UI** | `apps/thinktank-admin/app/(dashboard)/governor/page.tsx` |
 
 ### 51.7 Related Sections
 
@@ -18279,7 +18249,7 @@ The Facts Panel allows administrators to manage resolved decisions:
 | `lambda/consciousness/mcp-server.ts` | MCP tool definitions |
 | `components/decisions/FactsPanel.tsx` | Facts UI with edit/revoke |
 | `components/decisions/DecisionSidebar.tsx` | Decision cards |
-| `migrations/158_semantic_blackboard_orchestration.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 
 ### 52.10 Environment Variables
 
@@ -18532,7 +18502,7 @@ Base: `/api/admin/cognitive`
 | `python/cato/cognitive/workflows.py` | Flyte workflows |
 | `python/cato/cognitive/circuit_breaker.py` | Circuit breaker |
 | `python/cato/cognitive/metrics.py` | Python metrics |
-| `migrations/159_cognitive_architecture_v2.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 
 ### 53.12 Configuration
 
@@ -18709,7 +18679,7 @@ default_execution_mode: 'sniper' -- Default mode
 | `governor/economic-governor.ts` | `determineViewType()`, `determinePolymorphicRoute()` |
 | `consciousness/mcp-server.ts` | `render_interface`, `escalate_to_war_room` tools |
 | `python/cato/cognitive/workflows.py` | `determine_polymorphic_view`, `render_interface` tasks |
-| `migrations/160_polymorphic_ui.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `components/thinktank/polymorphic/` | React view components |
 
 ### 54.9 API Integration
@@ -18960,11 +18930,11 @@ export const SSF_GENESIS_EVENTS = {
 
 | File | Purpose |
 |------|---------|
-| `lambda/shared/services/genesis-telemetry.service.ts` | Telemetry polling and processing |
-| `lambda/shared/services/genesis-interlock.service.ts` | Immutable safety interlock logic |
-| `lambda/shared/services/genesis-ssf-emitter.service.ts` | SSF event emission to Cato |
-| `lambda/genesis/telemetry-handler.ts` | API handler for telemetry ingestion |
-| `migrations/161_genesis_infrastructure.sql` | Database schema |
+| `lambda/shared/services/event-firehose.service.ts` | Telemetry polling and processing |
+| `lambda/shared/services/omega/helix-kernel.service.ts` | Immutable safety interlock logic |
+| `lambda/shared/services/security-signals.service.ts` | SSF event emission to Cato |
+| `lambda/shared/services/event-firehose.service.ts` | API handler for telemetry ingestion |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `config/genesis/interlock-thresholds.yaml` | Immutable threshold configuration |
 
 ---
@@ -19248,11 +19218,11 @@ caep:
 
 | File | Purpose |
 |------|---------|
-| `lambda/shared/services/cato-integration.service.ts` | Cato SASE API integration |
-| `lambda/shared/services/cato-casb.service.ts` | CASB policy enforcement |
-| `lambda/shared/services/caep-handler.service.ts` | CAEP event processing |
-| `lambda/cato/threat-webhook.ts` | Webhook handler for Cato events |
-| `migrations/162_cato_security_grid.sql` | Database schema |
+| `lambda/shared/services/cato-cortex-bridge.service.ts` | Cato SASE API integration |
+| `lambda/shared/services/cato-checkpoint.service.ts` | CASB policy enforcement |
+| `lambda/shared/services/security-protection.service.ts` | CAEP event processing |
+| `lambda/shared/services/threat-response.service.ts` | Webhook handler for Cato events |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `config/cato/ai-ml-profiles.yaml` | AI/ML threat detection profiles |
 | `config/cato/casb-genai.yaml` | Generative AI CASB policies |
 
@@ -19588,12 +19558,12 @@ memory_safety:
 
 | File | Purpose |
 |------|---------|
-| `lambda/shared/services/identity-fabric.service.ts` | Identity Data Fabric integration |
-| `lambda/shared/services/autonomous-remediation.service.ts` | Autonomous remediation engine |
-| `lambda/shared/services/mcp-identity-provider.service.ts` | MCP context for identity |
-| `lambda/shared/services/memory-safety-scanner.service.ts` | Code safety scanning |
+| `lambda/shared/services/identity-core.service.ts` | Identity Data Fabric integration |
+| `lambda/shared/services/auto-resolve.ts` | Autonomous remediation engine |
+| `lambda/shared/services/identity-core.service.ts` | MCP context for identity |
+| `lambda/shared/services/memory-consolidation.service.ts` | Code safety scanning |
 | `python/cato/agents/identity_remediation.py` | fastWorkflow identity agent |
-| `migrations/163_agi_brain_identity.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `config/identity/autonomous-remediation.yaml` | Remediation configuration |
 
 ---
@@ -19760,7 +19730,7 @@ echo $RADIANT_ENV $AWS_PROFILE
 
 | File | Purpose |
 |------|---------|
-| `apps/swift-deployer/.../CDKService.swift` | Swift Deployer CDK service with safety enforcement |
+| `apps/swift-deployer/Sources/RadiantDeployer/Services/CDKService.swift` | Swift Deployer CDK service with safety enforcement |
 | `packages/infrastructure/bin/radiant.ts` | CDK entry point with safety check |
 | `packages/infrastructure/lib/config/environments.ts` | Environment configurations |
 | `scripts/setup_credentials.sh` | AWS credential setup |
@@ -19978,7 +19948,7 @@ Custom CSS is automatically injected for brand consistency:
 | `packages/shared/src/types/white-label.types.ts` | Type definitions |
 | `lambda/shared/services/white-label.service.ts` | Core service |
 | `lambda/admin/white-label.ts` | API handler |
-| `migrations/172_white_label.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 
 ### 59.15 Usage Example
 
@@ -20206,7 +20176,7 @@ Risk score (0-100) is calculated as sum of severity impacts for active violation
 | `lambda/shared/services/user-violation.service.ts` | Core service |
 | `lambda/admin/user-violations.ts` | API handler |
 | `apps/admin-dashboard/app/(dashboard)/compliance/violations/page.tsx` | Admin UI |
-| `migrations/173_user_violations.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 
 ### 60.13 Compliance Considerations
 
@@ -20359,11 +20329,11 @@ The Gateway admin interface provides comprehensive monitoring and configuration:
 | `services/egress-proxy/` | HTTP/2 connection pool |
 | `infrastructure/cedar/schema.cedarschema` | Cedar entity/action schema |
 | `infrastructure/cedar/policies/` | Authorization policies |
-| `packages/infrastructure/lambda/shared/services/cedar/` | Cedar TypeScript service |
+| `lambda/shared/services/cedar/` | Cedar TypeScript service |
 | `packages/infrastructure/lambda/gateway/mcp-worker.ts` | MCP NATS consumer Lambda |
 | `packages/infrastructure/lambda/admin/gateway.ts` | Gateway admin API Lambda |
 | `packages/infrastructure/__tests__/gateway/` | Gateway integration tests |
-| `packages/infrastructure/migrations/V2026_01_20_001__gateway_statistics.sql` | Statistics schema |
+| `migrations/000_consolidated_schema.sql` | Statistics schema |
 | `apps/admin-dashboard/app/(dashboard)/gateway/page.tsx` | Admin dashboard UI |
 | `apps/thinktank-admin/app/(dashboard)/gateway/page.tsx` | Think Tank status view |
 | `infrastructure/docker/gateway/` | Local dev stack |
@@ -20473,9 +20443,9 @@ Located in `lambda/shared/utils/safe-json.ts`:
 |------|---------|
 | `lambda/admin/code-quality.ts` | Admin API handler |
 | `lambda/shared/utils/safe-json.ts` | Safe JSON utilities |
-| `migrations/V2026_01_20_002__code_quality_metrics.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `apps/admin-dashboard/app/(dashboard)/code-quality/page.tsx` | Radiant dashboard |
-| `apps/admin-dashboard/app/(dashboard)/thinktank/code-quality/page.tsx` | Think Tank dashboard |
+| `apps/admin-dashboard/app/(dashboard)/code-quality/page.tsx` | Think Tank dashboard |
 
 ---
 
@@ -20649,14 +20619,14 @@ Time-travel debugging capabilities:
 **Database Migrations:**
 | File | Purpose |
 |------|---------|
-| `migrations/V2026_01_20_003__sovereign_mesh_agents.sql` | Agent schema |
-| `migrations/V2026_01_20_004__sovereign_mesh_apps.sql` | App schema |
-| `migrations/V2026_01_20_005__sovereign_mesh_ai_helper.sql` | AI Helper schema |
-| `migrations/V2026_01_20_006__sovereign_mesh_preflight.sql` | Pre-flight provisioning |
-| `migrations/V2026_01_20_007__sovereign_mesh_transparency.sql` | Transparency layer |
-| `migrations/V2026_01_20_008__sovereign_mesh_hitl.sql` | HITL approval queues |
-| `migrations/V2026_01_20_009__sovereign_mesh_replay.sql` | Execution replay |
-| `migrations/V2026_01_20_010__sovereign_mesh_seed.sql` | Seed data
+| `migrations/000_consolidated_schema.sql` | Agent schema |
+| `migrations/000_consolidated_schema.sql` | App schema |
+| `migrations/000_consolidated_schema.sql` | AI Helper schema |
+| `migrations/000_consolidated_schema.sql` | Pre-flight provisioning |
+| `migrations/000_consolidated_schema.sql` | Transparency layer |
+| `migrations/000_consolidated_schema.sql` | HITL approval queues |
+| `migrations/000_consolidated_schema.sql` | Execution replay |
+| `migrations/000_consolidated_schema.sql` | Seed data
 
 ---
 
@@ -20794,13 +20764,13 @@ Base: `/api/admin/hitl-orchestration`
 | File | Purpose |
 |------|---------|
 | `apps/admin-dashboard/app/(dashboard)/hitl-orchestration/page.tsx` | Radiant Admin |
-| `apps/thinktank-admin/app/hitl-orchestration/page.tsx` | Think Tank Admin |
+| `apps/thinktank-admin/app/(dashboard)/hitl-orchestration/page.tsx` | Think Tank Admin |
 
 **Database Migration:**
 | File | Purpose |
 |------|---------|
-| `migrations/V2026_01_20_011__hitl_orchestration_enhancements.sql` | Schema changes |
-| `migrations/V2026_01_20_012__hitl_semantic_deduplication.sql` | Semantic deduplication |
+| `migrations/000_consolidated_schema.sql` | Schema changes |
+| `migrations/000_consolidated_schema.sql` | Semantic deduplication |
 
 ### 64.11 Semantic Deduplication (v5.34.0)
 
@@ -21032,7 +21002,7 @@ radiant-cli raws audit search --domain healthcare --last 24h --env production
 
 | File | Purpose |
 |------|---------|
-| `migrations/V2026_01_21_004__raws_weighted_selection.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `lambda/shared/services/raws/types.ts` | TypeScript types |
 | `lambda/shared/services/raws/domain-detector.service.ts` | Domain detection |
 | `lambda/shared/services/raws/weight-profile.service.ts` | Profile management |
@@ -21210,7 +21180,7 @@ SELECT * FROM can_start_execution(:tenant_id, :user_id);
 | File | Purpose |
 |------|---------|
 | `packages/shared/src/types/sovereign-mesh-performance.types.ts` | TypeScript types |
-| `packages/infrastructure/migrations/V2026_01_21_001__sovereign_mesh_performance.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `lambda/shared/services/sovereign-mesh/sqs-dispatcher.service.ts` | SQS message dispatch |
 | `lambda/shared/services/sovereign-mesh/redis-cache.service.ts` | Redis/memory caching |
 | `lambda/shared/services/sovereign-mesh/performance-config.service.ts` | Configuration management |
@@ -21461,7 +21431,7 @@ Navigate to **Costs** in the Admin Dashboard to see:
 | File | Purpose |
 |------|---------|
 | `packages/shared/src/types/sovereign-mesh-scaling.types.ts` | TypeScript types |
-| `packages/infrastructure/migrations/V2026_01_21_002__sovereign_mesh_scaling.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `lambda/shared/services/sovereign-mesh/scaling.service.ts` | Scaling service |
 | `lambda/admin/sovereign-mesh-scaling.ts` | Admin API handler |
 | `apps/admin-dashboard/app/(dashboard)/sovereign-mesh/scaling/page.tsx` | Admin UI |
@@ -21775,9 +21745,9 @@ CREATE TABLE dynamic_report_schedules (
 
 | File | Purpose |
 |------|---------|
-| `packages/infrastructure/lambda/shared/services/schema-adaptive-reports.service.ts` | Core service |
+| `lambda/shared/services/schema-adaptive-reports.service.ts` | Core service |
 | `packages/infrastructure/lambda/admin/dynamic-reports.ts` | API handler |
-| `packages/infrastructure/migrations/V2026_01_21_003__dynamic_reports.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `apps/admin-dashboard/app/(dashboard)/reports/page.tsx` | Admin UI with Schema Builder tab |
 
 ### 68.10 Security Considerations
@@ -21865,7 +21835,7 @@ Cato Genesis enables:
 | File | Purpose |
 |------|---------|
 | `apps/admin-dashboard/app/(dashboard)/cato/genesis/page.tsx` | Admin UI |
-| `packages/infrastructure/lambda/shared/services/cato/genesis.service.ts` | Genesis service |
+| `lambda/shared/services/cato/genesis.service.ts` | Genesis service |
 | `packages/infrastructure/lambda/admin/cato-genesis.ts` | API handler |
 
 ---
@@ -22090,8 +22060,8 @@ POST   /gdpr/erasure                Create erasure request
 | File | Purpose |
 |------|---------|
 | `packages/shared/src/types/cortex-memory.types.ts` | Type definitions |
-| `packages/infrastructure/migrations/V2026_01_23_002__cortex_memory_system.sql` | Database schema |
-| `packages/infrastructure/lambda/shared/services/cortex/tier-coordinator.service.ts` | Orchestration |
+| `migrations/000_consolidated_schema.sql` | Database schema |
+| `lambda/shared/services/cortex/tier-coordinator.service.ts` | Orchestration |
 | `packages/infrastructure/lambda/admin/cortex.ts` | Admin API |
 | `apps/admin-dashboard/app/(dashboard)/cortex/page.tsx` | Dashboard UI |
 
@@ -22273,7 +22243,7 @@ Agent C waits for Agent A  ← CYCLE DETECTED
 | `lambda/shared/services/agent-orchestrator.service.ts` | Agent registry, locks |
 | `lambda/shared/services/process-hydration.service.ts` | State serialization |
 | `lambda/admin/blackboard.ts` | Admin API |
-| `migrations/158_semantic_blackboard_orchestration.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `apps/admin-dashboard/app/(dashboard)/blackboard/page.tsx` | Admin UI |
 
 ---
@@ -22387,7 +22357,7 @@ Cedar policies enforce that:
 
 | File | Purpose |
 |------|---------|
-| `migrations/V2026_01_24_001__services_layer_api_keys.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `lambda/admin/api-keys.ts` | Admin API handler |
 | `lambda/gateway/a2a-worker.ts` | A2A protocol worker |
 | `config/cedar/interface-access-policies.cedar` | Cedar access policies |
@@ -22547,7 +22517,7 @@ POST /api/admin/cortex/ingest
 | File | Purpose |
 |------|---------|
 | `packages/shared/src/types/cortex-graph-rag.types.ts` | Type definitions |
-| `packages/infrastructure/migrations/V2026_01_25_008__cortex_graph_rag.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `packages/infrastructure/lambda/admin/cortex-graph-rag.ts` | Admin API |
 | `apps/admin-dashboard/app/(dashboard)/cortex/graph-rag/page.tsx` | Dashboard UI |
 
@@ -22746,7 +22716,7 @@ Adapter selected if Score ≥ 0.5
 
 | File | Purpose |
 |------|---------|
-| `migrations/108_enhanced_learning.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `lambda/shared/services/enhanced-learning.service.ts` | Core learning service |
 | `lambda/shared/services/lora-inference.service.ts` | Tri-layer inference |
 | `lambda/shared/services/adapter-management.service.ts` | Adapter selection |
@@ -23135,7 +23105,7 @@ User Input → Security Check → [Block/Warn/Allow] → AI Processing
 **Key Integration Files**:
 - Service: `lambda/shared/services/security-policy.service.ts`
 - Admin API: `lambda/admin/security-policies.ts`
-- Migration: `migrations/V2026_01_26_001__security_policy_registry.sql`
+- Migration: `migrations/000_consolidated_schema.sql`
 
 ### 76.9 Database Tables
 
@@ -23789,11 +23759,11 @@ Navigate to **Admin > Neural Operations** to access:
 
 | File | Purpose |
 |------|---------|
-| `lambda/admin/cartridge.ts` | Cartridge CRUD operations |
+| `lambda/admin/cartridge-universal.ts` | Cartridge CRUD operations |
 | `lambda/admin/neural-operations.ts` | CORTEX network management |
-| `lambda/admin/thermal.ts` | Thermal state controls |
+| `lambda/shared/services/thermal-state.ts` | Thermal state controls |
 | `apps/admin-dashboard/app/(dashboard)/neural-operations/page.tsx` | Admin UI |
-| `apps/admin-dashboard/app/(dashboard)/cartridge-manager/page.tsx` | Cartridge UI |
+| `apps/admin-dashboard/app/(dashboard)/cartridge-system/page.tsx` | Cartridge UI |
 
 ---
 
@@ -24135,7 +24105,7 @@ All admin operations are logged with:
 | `lambda/shared/services/system-cartridge-registry.service.ts` | Core service |
 | `lambda/admin/system-cartridges.ts` | Admin API handler |
 | `apps/admin-dashboard/app/(dashboard)/platform/system-cartridges/page.tsx` | Admin UI |
-| `migrations/V2026_02_01_008__system_cartridge_registry.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 
 ---
 
@@ -24148,7 +24118,7 @@ All admin operations are logged with:
 All cartridges are cryptographically signed on export and verified on import to ensure integrity and prevent tampering. The PKI system implements a hierarchical certificate chain:
 
 ```
-Radiant Root CA (Genesis Vault / HSM)
+Radiant Root CA (Cartridge Vault / HSM)
     └── Tenant Intermediate CA
             └── Cartridge Signing Keys
                     └── Dual Signatures (Author + Platform)
@@ -24163,7 +24133,7 @@ Radiant Root CA (Genesis Vault / HSM)
 | Certificate Level | Location | Purpose | Validity |
 |-------------------|----------|---------|----------|
 | **Root CA** | Offline HSM | Signs all Tenant CAs | 10+ years |
-| **Tenant CA** | Genesis Vault | Signs cartridges for tenant | 5 years |
+| **Tenant CA** | Cartridge Vault | Signs cartridges for tenant | 5 years |
 | **Signing Keys** | KMS | Actual signing operations | 1 year |
 
 ### 89.3 Signing Ceremony (Export)
@@ -24390,7 +24360,7 @@ The PKI Management dashboard is available at **Platform → PKI** and provides:
 |------|---------|
 | `packages/shared/src/types/cartridge-pki.types.ts` | Type definitions |
 | `lambda/shared/services/cartridge-pki.service.ts` | Core PKI service |
-| `migrations/V2026_02_01_009__cartridge_pki.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `lambda/shared/services/cartridge.service.ts` | Integration (export/import) |
 
 ### 89.13 Cluster Compatibility (v6.1.0)
@@ -24689,7 +24659,7 @@ totalScore = (capability * 0.35) + (cost * 0.21) + (latency * 0.14) + (integrity
 | `lambda/shared/services/livs/livs-cato-integration.service.ts` | Cato integration |
 | `lambda/admin/livs.ts` | Admin API handler |
 | `apps/admin-dashboard/app/(dashboard)/platform/livs/page.tsx` | Admin UI |
-| `migrations/V2026_02_01_013__livs_integrity_system.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 
 ### 90.11 Competitive Moat
 
@@ -25156,7 +25126,7 @@ const bestOutput = crucibleResult.winnerReport;
 | `lambda/shared/services/crucible/crucible-orchestrator.service.ts` | Lifecycle orchestration |
 | `lambda/admin/crucible.ts` | Admin API handler |
 | `apps/admin-dashboard/app/(dashboard)/platform/crucible/page.tsx` | Admin UI |
-| `migrations/V2026_02_01_014__crucible_deliberation.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 
 ### 91.14 Competitive Moat
 
@@ -25376,7 +25346,7 @@ Base path: `/api/v2/admin/mls`
 | `packages/infrastructure/lib/config/services/` | Service definitions |
 | `packages/infrastructure/lambda/thermal/` | Thermal management |
 | `packages/infrastructure/lambda/services/` | Service orchestrators |
-| `migrations/006_self_hosted_models.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `litellm/config/self-hosted.yaml` | LiteLLM routing config |
 
 ### 92.15 Competitive Moat
@@ -25393,7 +25363,7 @@ MLS is a **Tier 1 Technical Moat** (Score: 27/30):
 ## 93. MLS (Message Layer Security) - Agent-to-Agent Encryption
 
 **Location**: Admin Dashboard → Platform → MLS Security  
-**Migration**: `migrations/140_mls_message_layer_security.sql`  
+**Migration**: `migrations/000_consolidated_schema.sql`  
 **Version**: 6.5.0 (PROMPT-43)
 
 ### 93.1 Overview
@@ -25549,7 +25519,7 @@ MLS_KMS_KEY_ARN=arn:aws:kms:region:account:key/key-id
 | `lambda/shared/services/mls/mls.service.ts` | Core MLS service (936 lines) |
 | `lambda/shared/services/mls/index.ts` | Module exports |
 | `lambda/admin/mls.ts` | Admin API endpoints |
-| `migrations/140_mls_message_layer_security.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 
 ### 93.10 Competitive Moat
 
@@ -25704,7 +25674,7 @@ this.cartridgeSigningKey = new kms.Key(this, 'CartridgeSigningKey', {
 |------|---------|
 | `lib/stacks/security-stack.ts` | CDK asymmetric key definition |
 | `lambda/shared/services/cartridge-pki.service.ts` | PKI service with real KMS |
-| `migrations/139_cartridge_pki_kms.sql` | Database schema for PKI keys |
+| `migrations/000_consolidated_schema.sql` | Database schema for PKI keys |
 
 ### 94.12 Verification Checklist
 
@@ -25739,7 +25709,7 @@ The Autonomous Organism Architecture transforms RADIANT from "Agentic Software" 
 
 | # | Technology | What It Does | Admin Control |
 |---|------------|--------------|---------------|
-| 1 | **Genesis Forge** | Generates tools on-demand | Approval gates, sandbox config |
+| 1 | **Tool Forge** | Generates tools on-demand | Approval gates, sandbox config |
 | 2 | **Liquid Topology** | Routes to browser/local/edge/cloud | Sensitivity rules, topology config |
 | 3 | **Tensor-Link** | Vector-based communication | Compression mode selection |
 | 4 | **Ghost Simulation** | Predicts user reaction | Calibration thresholds, simulation limits |
@@ -26426,8 +26396,8 @@ RADIANT supports multiple application URLs that must be configured consistently 
 | **Admin Dashboard URL** | Admin web application | `https://admin.example.com` |
 | **Think Tank URL** | Consumer AI workspace | `https://thinktank.example.com` |
 | **Status Page URL** | Public system status | `https://status.example.com` |
-| **Genesis Lab URL** | OMEGA brain monitoring dashboard | `https://genesis.example.com` |
-| **Genesis Forge URL** | OMEGA firmware creation tool | `https://forge.example.com` |
+| **OMEGA Lab URL** | OMEGA brain monitoring dashboard | `https://omega-lab.example.com` |
+| **OMEGA Forge URL** | OMEGA firmware creation tool | `https://forge.example.com` |
 | **OMEGA API URL** | Bio-mimetic AI inference API | `https://omega.example.com` |
 
 ### 97.2 Swift Deployer Configuration
@@ -26501,14 +26471,14 @@ const allowedOrigins = [
 | **Staging** | `https://{app}.staging.{domain}` |
 | **Development** | `http://localhost:{port}` |
 
-### 97.7 Genesis/OMEGA URLs (v7.5.0)
+### 97.7 OMEGA Lab/Forge URLs (v7.5.0)
 
-The Genesis/OMEGA apps are available for Scale tier and above:
+The OMEGA Lab/Forge apps are available for Scale tier and above:
 
 | Application | Default Subdomain | Default Path | Description |
 |-------------|-------------------|--------------|-------------|
-| **Genesis Lab** | `genesis` | `/genesis` | Real-time brain monitoring with thermal visualization, coherence metrics, and Cortex Explorer |
-| **Genesis Forge** | `forge` | `/forge` | Firmware creation tool for .bio files with Helix rules, ambition settings, and personality traits |
+| **OMEGA Lab** | `omega-lab` | `/omega-lab` | Real-time brain monitoring with thermal visualization, coherence metrics, and Cortex Explorer |
+| **OMEGA Forge** | `forge` | `/forge` | Firmware creation tool for .bio files with Helix rules, ambition settings, and personality traits |
 | **OMEGA API** | `omega` | `/omega` | Bio-mimetic AI inference API with Time Warp, shadow mode, and brain management |
 
 #### Admin API Routes for OMEGA
@@ -26532,10 +26502,10 @@ The Genesis/OMEGA apps are available for Scale tier and above:
 
 | File | Purpose |
 |------|---------|
-| `apps/swift-deployer/.../RadiantApplication.swift` | Application registry with Genesis apps |
-| `apps/swift-deployer/.../URLConfigurationView.swift` | Deployer URL settings UI |
-| `apps/admin-dashboard/.../settings/urls/page.tsx` | Admin URL settings page |
-| `apps/admin-dashboard/.../settings/urls/url-configuration-client.tsx` | URL configuration client with Genesis fields |
+| `apps/swift-deployer/Sources/RadiantDeployer/Models/RadiantApplication.swift` | Application registry with OMEGA Lab/Forge apps |
+| `apps/swift-deployer/Sources/RadiantDeployer/Views/Settings/URLConfigurationView.swift` | Deployer URL settings UI |
+| `apps/admin-dashboard/app/(dashboard)/settings/page.tsx` | Admin URL settings page |
+| `apps/admin-dashboard/app/(dashboard)/settings/page.tsx` | URL configuration client with OMEGA Lab/Forge fields |
 | `packages/shared/src/types/status-page.types.ts` | URL configuration types |
 | `packages/infrastructure/lib/stacks/admin-stack.ts` | CDK admin routes including OMEGA |
 | `packages/infrastructure/lib/stacks/OmegaStack.ts` | CDK OMEGA infrastructure stack |
@@ -26546,12 +26516,12 @@ The Genesis/OMEGA apps are available for Scale tier and above:
 
 | Version | Date | Changes |
 |---------|------|---------|
-| **6.6.0** | 2026-02-04 | **Autonomous Organism Architecture (PROMPT-43)**: 5 Leapfrog Technologies (Genesis Forge, Liquid Topology, Tensor-Link, Ghost Simulation, Economic Cortex); 9 core services (~6,226 lines); 37 Admin API endpoints; 6-tab Admin Dashboard; 18 database tables, 14 enums; BrainRouter integration; Neural Affinity Routing algorithm; JIT tool generation with Firecracker sandbox; Section 95 |
+| **6.6.0** | 2026-02-04 | **Autonomous Organism Architecture (PROMPT-43)**: 5 Leapfrog Technologies (Tool Forge, Liquid Topology, Tensor-Link, Ghost Simulation, Economic Cortex); 9 core services (~6,226 lines); 37 Admin API endpoints; 6-tab Admin Dashboard; 18 database tables, 14 enums; BrainRouter integration; Neural Affinity Routing algorithm; JIT tool generation with Firecracker sandbox; Section 95 |
 | **6.5.0** | 2026-02-03 | **Cartridge PKI KMS Integration (PROMPT-42)**: Real AWS KMS asymmetric signing for .RADz cartridges; Platform root CA with ECC_NIST_P256; Tenant CA hierarchy; IAM policies for tenant key creation; 3 database tables; Admin API with 10 endpoints; Section 94 |
 | **6.5.0** | 2026-02-03 | **MLS (Message Layer Security)**: RFC 9420-inspired group encryption for agent-to-agent communication; Forward secrecy with epoch-based key ratcheting; Post-compromise security via key updates; X25519 ECDH + Ed25519 signatures + AES-256-GCM encryption; 7 database tables; Admin API with 12 endpoints; Section 93 |
 | **6.4.0** | 2026-02-01 | **The Crucible**: Competitive multi-LLM deliberation system; LLMs question each other to refine answers; Integrity pre-prompting with evaluation weights; Provenance tracking and circular citation detection; Learning insights extraction; Model performance tracking; Admin Dashboard at Platform → The Crucible; Admin API with 10 endpoints; Section 91 |
 | **6.3.0** | 2026-02-01 | **LLM Integrity Verification System (LIVS)**: Two-tier defense against AI "lying"; Tier 1 Individual LLM Interrogation (5 depth levels, 5 question patterns, lie detection signals); Tier 2 Orchestration Integrity (5 failure patterns: Watermelon, Echo Chamber, Confidence Inflation, Circular Reasoning, Scope Drift); Soft Rules for domain-specific configuration; Cato integration with 30% integrity weight; Model integrity weights and global aggregation; Admin Dashboard at Platform → LIVS; Admin API with 16 endpoints |
-| **6.2.0** | 2026-02-01 | **Genesis Vault (Keyhole Pattern)**: Secrets management for cartridges; vault.req manifest; KMS encryption; Secret rotation with history; Admin UI at Platform → Vault; **RNIR Compiler**: Model-agnostic cognitive source code; Compiles to LoRA/prompts/few-shot; Generated from Curator; Admin UI at Platform → RNIR; **Cartridge Operations**: Time Machine integration; Checkpointing and resume; Step-by-step progress; Pause/Resume/Rollback; Admin UI at Platform → Cartridge Operations |
+| **6.2.0** | 2026-02-01 | **Cartridge Vault (Keyhole Pattern)**: Secrets management for cartridges; vault.req manifest; KMS encryption; Secret rotation with history; Admin UI at Platform → Vault; **RNIR Compiler**: Model-agnostic cognitive source code; Compiles to LoRA/prompts/few-shot; Generated from Curator; Admin UI at Platform → RNIR; **Cartridge Operations**: Time Machine integration; Checkpointing and resume; Step-by-step progress; Pause/Resume/Rollback; Admin UI at Platform → Cartridge Operations |
 | **6.1.0** | 2026-02-01 | **Cartridge PKI**: Cryptographic signing on export, verification on import; Dual signatures (author + platform); signature.sig in .RADz container; meta.json for web publishing; Federation support; **Cluster Compatibility**: Version/app/feature/environment checks; **System Cartridge Registry**: Domain experts as system cartridges; Full audit trail (HIPAA/SOC2/GDPR); Tenant visibility toggles; Thermal state management; Admin dashboard and API |
 | **6.0.0** | 2026-01-31 | **Neural Architecture v6.0.0**: RADIANT Cartridges (.RADz portable AI brains); CORTEX Neural Networks (6 MLPs, ~2.5M params); Three-Tier Learning Architecture; Ghost Vector System v3.2 (4096→64 compression); LoRA Adapter Pipeline; Expert System Adapters (ESAs); CATO Twilight Dreaming with 30% invention enforcement; Thermal State Management; Cartridge Manager Dashboard |
 | **5.52.57** | 2026-01-29 | Model Registry Enhancement System; HuggingFace discovery service; Model version manager with thermal states; Deletion queue with usage tracking; Admin dashboard; Scheduler integration |
@@ -27285,54 +27255,43 @@ Base: `/api/profile`
 
 ### 105.1 Overview
 
-RADIANT enforces a 4-tier admin role hierarchy. Each role has a specific set of permissions that controls access to dashboard routes, API endpoints, and platform features.
+RADIANT enforces a single-tier admin role model (v7.52.0). Only `super_admin` exists in Pool B, with full access to all dashboard routes, API endpoints, and platform features.
 
 ### 105.2 Role Hierarchy
 
 | Role | Level | Description |
 |------|-------|-------------|
 | `super_admin` | 4 | System administrator — full access to everything |
-| `admin` | 3 | Platform administrator — tenants, billing, config |
-| `operator` | 2 | Operations — deploy, manage models/providers, monitor |
-| `auditor` | 1 | Read-only — audit logs, billing reports, tenant data |
+
+> **v7.52.0**: `admin`, `operator`, and `auditor` roles removed. Only `super_admin` remains.
 
 ### 105.3 Permission Matrix
 
-| Capability | super_admin | admin | operator | auditor |
-|------------|:-----------:|:-----:|:--------:|:-------:|
-| Create/delete admins | ✅ | ❌ | ❌ | ❌ |
-| Change admin roles | ✅ | ❌ | ❌ | ❌ |
-| Create super_admins | ✅ | ❌ | ❌ | ❌ |
-| Delete tenants | ✅ | ❌ | ❌ | ❌ |
-| Security policies | ✅ | ❌ | ❌ | ❌ |
-| Create tenants | ✅ | ✅ | ❌ | ❌ |
-| Manage tenants | ✅ | ✅ | ❌ | ❌ |
-| Manage users | ✅ | ✅ | ❌ | ❌ |
-| System config | ✅ | ✅ | ❌ | ❌ |
-| Billing | ✅ | ✅ | ❌ | ❌ |
-| Models/providers | ✅ | ✅ | ✅ | ❌ |
-| Deploy | ✅ | ✅ | ✅ | ❌ |
-| SENTINEL access | ✅ | ✅ | ✅ | ❌ |
-| SENTINEL management | ✅ | ❌ | ❌ | ❌ |
-| View audit logs | ✅ | ✅ | ✅ | ✅ |
-| Export audit logs | ✅ | ✅ | ❌ | ✅ |
-| Auto-access all apps | ✅ | ❌ | ❌ | ❌ |
+| Capability | super_admin |
+|------------|:-----------:|
+| Create/delete admins | ✅ |
+| Change admin roles | ✅ |
+| Create super_admins | ✅ |
+| Delete tenants | ✅ |
+| Security policies | ✅ |
+| Create tenants | ✅ |
+| Manage tenants | ✅ |
+| Manage users | ✅ |
+| System config | ✅ |
+| Billing | ✅ |
+| Models/providers | ✅ |
+| Deploy | ✅ |
+| SENTINEL access | ✅ |
+| SENTINEL management | ✅ |
+| View audit logs | ✅ |
+| Export audit logs | ✅ |
+| Auto-access all apps | ✅ |
 
 ### 105.4 Route Protection
 
 The admin dashboard middleware blocks access to restricted routes based on role:
 
-| Route | Minimum Role |
-|-------|-------------|
-| `/administrators` | super_admin |
-| `/security/*` | super_admin |
-| `/settings/security` | super_admin |
-| `/billing` | admin |
-| `/pricing` | admin |
-| `/configuration` | admin |
-| `/settings` | admin |
-
-Users who attempt to access a restricted route are redirected to `/permission-denied`.
+All routes require `super_admin` (the only Pool B role as of v7.52.0). Non-super_admin tokens are rejected at the middleware layer.
 
 ### 105.5 Bootstrap Flow
 
@@ -27343,9 +27302,8 @@ Users who attempt to access a restricted route are redirected to `/permission-de
 
 ### 105.6 App Access
 
-- **super_admin**: Automatic access to ALL apps (Think Tank, Curator, Genesis, Dojo, RADIANT Admin, etc.), including any new apps added in the future
-- **admin/operator/auditor**: Require explicit app access grants via the `admin_app_access` table
-- App access is managed by the `AdminRoleService.grantAppAccess()` method
+- **super_admin**: Automatic access to ALL apps (Think Tank, Curator, Genesis, Dojo, RADIANT Admin, Think Tank Admin, etc.), including any new apps added in the future
+- As of v7.52.0, only `super_admin` exists in Pool B — no explicit app access grants are needed
 
 ### 105.7 Lambda API Guard
 
@@ -27384,10 +27342,10 @@ New tenants are provisioned through a self-service sign-up flow from marketing/s
 
 | Domain | Roles | App Access |
 |--------|-------|------------|
-| **Platform (RADIANT Admin)** | super_admin, admin, operator, auditor | Only super_admin gets RADIANT app access |
-| **Tenant (Customer)** | tenant_admin, tenant_owner, standard_user, viewer | Per-tenant app grants |
+| **Platform (Pool B)** | super_admin | Full access to RADIANT Admin + Think Tank Admin |
+| **Tenant (Pool A)** | tenant_admin, standard_user, viewer | Per-tenant app grants |
 
-**Key rule**: Admin privileges (admin, operator, auditor) do NOT apply to RADIANT-side apps. Only `super_admin` inherits admin privileges AND gets RADIANT Admin + all RADIANT app access.
+**Key rule** (v7.52.0): Only `super_admin` exists in Pool B. All platform administration is performed by super administrators with full access to both global admin apps.
 
 ### 106.2 Sign-Up Flow
 
@@ -31705,7 +31663,7 @@ func executeInstall(...) async throws -> DeploymentExecutionResult {
 
 ### Overview
 
-OMEGA Firmware Administration allows platform administrators to manage the behavior, safety rules, and cognitive parameters of OMEGA AI brains in real-time through the Genesis Forge interface. All firmware operations are cryptographically signed, auditable, and support automatic rollback.
+OMEGA Firmware Administration allows platform administrators to manage the behavior, safety rules, and cognitive parameters of OMEGA AI brains in real-time through the OMEGA Forge interface. All firmware operations are cryptographically signed, auditable, and support automatic rollback.
 
 ### Accessing Firmware Management
 
@@ -31717,7 +31675,7 @@ Navigate to **OMEGA → Firmware** in the admin sidebar, or directly visit `/ome
 
 | Status | Description | Next Action |
 |--------|-------------|-------------|
-| **Draft** | Being authored in Genesis Forge editor | Validate → Sign |
+| **Draft** | Being authored in OMEGA Forge editor | Validate → Sign |
 | **Signed** | Cryptographically signed via KMS | Activate |
 | **Active** | Currently loaded on the target brain | (Running) |
 | **Superseded** | Replaced by newer firmware | Rollback (if needed) |
@@ -31725,7 +31683,7 @@ Navigate to **OMEGA → Firmware** in the admin sidebar, or directly visit `/ome
 
 ### Creating New Firmware
 
-1. Open **Genesis Forge → Firmware Library**
+1. Open **OMEGA Forge → Firmware Library**
 2. Click **"New Firmware"** or clone an existing profile
 3. Configure sections:
    - **Helix Rules** — Safety guardrails (forbidden behaviors). Each rule defines a forbidden vector signature, severity (CRITICAL/HIGH/MEDIUM/LOW), and interference mode (DESTRUCTIVE or DAMPENING)

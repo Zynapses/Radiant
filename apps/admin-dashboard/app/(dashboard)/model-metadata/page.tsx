@@ -74,9 +74,23 @@ export default function ModelMetadataPage() {
 
   const handleResearch = async (modelId: string) => {
     setIsResearching(modelId);
-    // Simulate research
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    setIsResearching(null);
+    try {
+      const API = process.env.NEXT_PUBLIC_API_URL || '';
+      const res = await fetch(`${API}/admin/model-metadata/models/${modelId}/research`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ depth: 'standard' }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        console.error('Research failed:', err);
+      }
+      await loadData();
+    } catch (err) {
+      console.error('Research request failed:', err);
+    } finally {
+      setIsResearching(null);
+    }
   };
 
   return (

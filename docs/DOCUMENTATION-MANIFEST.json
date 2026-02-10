@@ -1,29 +1,23 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "version": "2.0.0",
-  "lastUpdated": "2026-02-07",
-  "description": "Master manifest of ALL documentation files in RADIANT. Consolidated from 244 files into 18 documents. AI agents MUST update relevant docs when making code changes.",
+  "version": "3.0.0",
+  "lastUpdated": "2026-02-10",
+  "description": "Master manifest of ALL documentation files in RADIANT. 15 consolidated documents (merged from 22 on 2026-02-10). AI agents MUST update relevant docs when making code changes.",
 
   "consolidatedDocs": {
-    "description": "The 18 consolidated documentation files. Each is self-contained and covers a specific domain.",
+    "description": "The 15 consolidated documentation files. Each is self-contained and covers a specific domain.",
     "appDocs": [
       {
         "path": "docs/01-THINK-TANK.md",
         "priority": "HIGH",
-        "triggers": ["thinktank_feature", "thinktank_admin", "tenant_admin", "user_facing", "ui_change", "delight", "licensing", "thinktank_mac", "user_rules", "collaboration"],
-        "description": "Complete Think Tank reference: user guide, admin guide, tenant admin, Mac platform, licensing, Delight UX, easter eggs, collaboration"
+        "triggers": ["thinktank_feature", "thinktank_admin", "tenant_admin", "user_facing", "ui_change", "delight", "licensing", "thinktank_mac", "user_rules", "collaboration", "dojo", "aurelius_dojo", "training", "spaced_repetition", "competency_mesh"],
+        "description": "Complete Think Tank + Dojo reference: user guide, admin guide, tenant admin, Mac platform + portability manifest, licensing, Delight UX, easter eggs, collaboration, Aurelius Dojo training system"
       },
       {
         "path": "docs/02-CURATOR.md",
         "priority": "HIGH",
         "triggers": ["curator", "knowledge_graph", "verification", "cartridge", "golden_rules"],
         "description": "Complete Curator reference: user guide + engineering guide"
-      },
-      {
-        "path": "docs/03-DOJO.md",
-        "priority": "HIGH",
-        "triggers": ["dojo", "aurelius_dojo", "training", "spaced_repetition", "competency_mesh"],
-        "description": "Complete Aurelius Dojo reference: training, adversarial scenarios, competency mesh"
       },
       {
         "path": "docs/04-RADIANT-ADMIN.md",
@@ -42,38 +36,26 @@
       {
         "path": "docs/06-ARCHITECTURE-ENGINEERING.md",
         "priority": "HIGH",
-        "triggers": ["architecture", "cdk", "lambda", "api", "database", "service", "technical", "gateway"],
-        "description": "Platform architecture, CDK stacks, engineering vision, gateway, app isolation"
+        "triggers": ["architecture", "cdk", "lambda", "api", "database", "service", "technical", "gateway", "uds", "raws", "data_retention", "user_data", "file_conversion", "cost_optimization"],
+        "description": "Platform architecture, CDK stacks, engineering vision, gateway, app isolation, Data & Storage (UDS, RAWS, retention)"
       },
       {
-        "path": "docs/07-AI-BRAIN-SYSTEMS.md",
+        "path": "docs/07-AI-SYSTEMS.md",
         "priority": "MEDIUM",
-        "triggers": ["brain", "consciousness", "cognitive", "cortex", "expert_system", "preprompt"],
-        "description": "AGI brain architecture, consciousness, cognitive framework, Cortex memory, expert adapters"
-      },
-      {
-        "path": "docs/08-CATO-SAFETY.md",
-        "priority": "MEDIUM",
-        "triggers": ["cato", "safety", "ethics", "cato_trainer", "grounding_engine"],
-        "description": "CATO safety system: documentation, ADRs, runbooks, architecture, GPU infrastructure, trainer"
+        "triggers": ["brain", "consciousness", "cognitive", "cortex", "expert_system", "preprompt", "cato", "safety", "ethics", "cato_trainer", "grounding_engine"],
+        "description": "AI Systems: AGI brain, consciousness, cognitive framework, Cortex memory, expert adapters, CATO safety, ethics, GPU infrastructure"
       },
       {
         "path": "docs/09-OMEGA-GENESIS.md",
         "priority": "MEDIUM",
-        "triggers": ["omega", "genesis", "omega_protocol", "bicameral", "helix_kernel", "resonant_index", "genesis_forge", "genesis_lab"],
-        "description": "OMEGA Protocol + Genesis: user/admin guides, Forge, Lab, Resonant Index, LIVS-M"
+        "triggers": ["omega", "omega_protocol", "bicameral", "helix_kernel", "resonant_index", "omega_forge", "omega_lab", "omega_quantum", "quantum_brain", "firmware", "cartridge_boot", "ambition", "soft_rom", "model_router", "drift", "global_brain", "federated"],
+        "description": "OMEGA Complete: user/admin guides, OMEGA Forge/Lab, Resonant Index, LIVS-M, Five Pillars, quantum state engine, Helix safety, firmware/cartridge lifecycle, model routing, Global Brain"
       },
       {
         "path": "docs/10-ORCHESTRATION-WORKFLOWS.md",
         "priority": "MEDIUM",
         "triggers": ["orchestration", "workflow", "uep", "envelope", "pipeline"],
         "description": "Orchestration engine: methods, reference, patterns, UEP specification"
-      },
-      {
-        "path": "docs/11-DATA-STORAGE.md",
-        "priority": "MEDIUM",
-        "triggers": ["uds", "raws", "data_retention", "user_data", "file_conversion", "cost_optimization"],
-        "description": "User Data Store, RAWS, data retention, cost optimization, file conversion"
       },
       {
         "path": "docs/12-API-REFERENCE.md",
@@ -97,7 +79,7 @@
         "path": "docs/15-STRATEGY-COMPETITIVE.md",
         "priority": "MEDIUM",
         "triggers": ["competitive_advantage", "moat", "investor", "pitch", "revenue", "marketing", "technical_debt"],
-        "description": "Strategic vision, capabilities, competitive moats, pitch points, revenue analytics, tech debt"
+        "description": "Strategic vision, capabilities, competitive moats, pitch points, revenue analytics, tech debt, Organism marketing/positioning"
       },
       {
         "path": "docs/16-IMPLEMENTATION-SPECS.md",
@@ -121,7 +103,7 @@
   },
 
   "triggerMatrix": {
-    "description": "Maps code change types to required documentation updates (consolidated paths)",
+    "description": "Maps code change types to required documentation updates (v3.0 — 15-doc structure)",
     "matrix": {
       "any_change": ["CHANGELOG.md"],
       "database": ["CHANGELOG.md", "docs/06-ARCHITECTURE-ENGINEERING.md", "docs/16-IMPLEMENTATION-SPECS.md"],
@@ -142,47 +124,52 @@
       "billing": ["CHANGELOG.md", "docs/04-RADIANT-ADMIN.md"],
       "models": ["CHANGELOG.md", "docs/04-RADIANT-ADMIN.md", "docs/06-ARCHITECTURE-ENGINEERING.md"],
       "dependency": ["CHANGELOG.md", "docs/18-UI-UX-LIBRARIES.md"],
-      "consciousness": ["CHANGELOG.md", "docs/07-AI-BRAIN-SYSTEMS.md", "docs/01-THINK-TANK.md"],
-      "cato": ["CHANGELOG.md", "docs/08-CATO-SAFETY.md"],
+      "consciousness": ["CHANGELOG.md", "docs/07-AI-SYSTEMS.md", "docs/01-THINK-TANK.md"],
+      "cato": ["CHANGELOG.md", "docs/07-AI-SYSTEMS.md"],
       "uep": ["CHANGELOG.md", "docs/10-ORCHESTRATION-WORKFLOWS.md", "docs/06-ARCHITECTURE-ENGINEERING.md"],
-      "cortex": ["CHANGELOG.md", "docs/07-AI-BRAIN-SYSTEMS.md"],
+      "cortex": ["CHANGELOG.md", "docs/07-AI-SYSTEMS.md"],
       "new_term": ["CHANGELOG.md", "docs/17-GLOSSARY.md"],
       "new_subsystem": ["CHANGELOG.md", "docs/17-GLOSSARY.md", "docs/06-ARCHITECTURE-ENGINEERING.md"],
       "curator": ["CHANGELOG.md", "docs/02-CURATOR.md", "docs/15-STRATEGY-COMPETITIVE.md"],
       "deployer": ["CHANGELOG.md", "docs/05-SWIFT-DEPLOYER.md"],
-      "dojo": ["CHANGELOG.md", "docs/03-DOJO.md", "docs/04-RADIANT-ADMIN.md"],
+      "dojo": ["CHANGELOG.md", "docs/01-THINK-TANK.md", "docs/04-RADIANT-ADMIN.md"],
       "omega": ["CHANGELOG.md", "docs/09-OMEGA-GENESIS.md", "docs/06-ARCHITECTURE-ENGINEERING.md"],
-      "genesis": ["CHANGELOG.md", "docs/09-OMEGA-GENESIS.md"],
+      "omega_quantum": ["CHANGELOG.md", "docs/09-OMEGA-GENESIS.md"],
+      "quantum_brain": ["CHANGELOG.md", "docs/09-OMEGA-GENESIS.md"],
+      "omega_lab": ["CHANGELOG.md", "docs/09-OMEGA-GENESIS.md"],
+      "omega_forge": ["CHANGELOG.md", "docs/09-OMEGA-GENESIS.md"],
+      "global_brain": ["CHANGELOG.md", "docs/09-OMEGA-GENESIS.md"],
+      "firmware": ["CHANGELOG.md", "docs/09-OMEGA-GENESIS.md"],
+      "cartridge_boot": ["CHANGELOG.md", "docs/09-OMEGA-GENESIS.md"],
       "delight": ["CHANGELOG.md", "docs/01-THINK-TANK.md"],
       "health": ["CHANGELOG.md", "docs/04-RADIANT-ADMIN.md"],
       "monitoring": ["CHANGELOG.md", "docs/04-RADIANT-ADMIN.md"],
       "spend_governor": ["CHANGELOG.md", "docs/04-RADIANT-ADMIN.md"],
-      "uds": ["CHANGELOG.md", "docs/11-DATA-STORAGE.md"],
-      "raws": ["CHANGELOG.md", "docs/11-DATA-STORAGE.md"],
+      "uds": ["CHANGELOG.md", "docs/06-ARCHITECTURE-ENGINEERING.md"],
+      "raws": ["CHANGELOG.md", "docs/06-ARCHITECTURE-ENGINEERING.md"],
       "mcp": ["CHANGELOG.md", "docs/12-API-REFERENCE.md", "docs/06-ARCHITECTURE-ENGINEERING.md"],
       "a2a": ["CHANGELOG.md", "docs/12-API-REFERENCE.md", "docs/06-ARCHITECTURE-ENGINEERING.md"],
       "service_layer": ["CHANGELOG.md", "docs/12-API-REFERENCE.md"],
       "licensing": ["CHANGELOG.md", "docs/01-THINK-TANK.md", "docs/04-RADIANT-ADMIN.md"],
       "i18n": ["CHANGELOG.md", "docs/13-SECURITY-AUTH-COMPLIANCE.md"],
       "testing": ["CHANGELOG.md", "docs/14-OPERATIONS-RUNBOOKS.md"],
-      "incident_response": ["CHANGELOG.md", "docs/14-OPERATIONS-RUNBOOKS.md"]
+      "incident_response": ["CHANGELOG.md", "docs/14-OPERATIONS-RUNBOOKS.md"],
+      "safety": ["CHANGELOG.md", "docs/07-AI-SYSTEMS.md"],
+      "brain": ["CHANGELOG.md", "docs/07-AI-SYSTEMS.md"]
     }
   },
 
   "versionedDocs": {
-    "description": "All 18 consolidated documents need version number updates when modified",
+    "description": "All 15 consolidated documents need version number updates when modified",
     "docs": [
       "docs/01-THINK-TANK.md",
       "docs/02-CURATOR.md",
-      "docs/03-DOJO.md",
       "docs/04-RADIANT-ADMIN.md",
       "docs/05-SWIFT-DEPLOYER.md",
       "docs/06-ARCHITECTURE-ENGINEERING.md",
-      "docs/07-AI-BRAIN-SYSTEMS.md",
-      "docs/08-CATO-SAFETY.md",
+      "docs/07-AI-SYSTEMS.md",
       "docs/09-OMEGA-GENESIS.md",
       "docs/10-ORCHESTRATION-WORKFLOWS.md",
-      "docs/11-DATA-STORAGE.md",
       "docs/12-API-REFERENCE.md",
       "docs/13-SECURITY-AUTH-COMPLIANCE.md",
       "docs/14-OPERATIONS-RUNBOOKS.md",
@@ -210,7 +197,7 @@
       }
     ],
     "regenerateCommand": "python3 tools/scripts/assemble-complete-documentation.py",
-    "parts": 18,
+    "parts": 15,
     "note": "Output files are build artifacts — generated from source docs, not edited directly"
   },
 
@@ -235,12 +222,27 @@
   },
 
   "archiveInfo": {
-    "description": "Original 244 documentation files are preserved in docs/archive/",
+    "description": "Original documentation files are preserved in docs/archive/",
     "archivePaths": {
       "preConsolidation": "docs/archive/pre-consolidation/",
+      "preMerge": "docs/archive/pre-merge-2026-02-10/",
       "buildArtifacts": "docs/archive/build-artifacts/",
       "codeExports": "docs/archive/code-exports/",
       "historical": "docs/archive/historical/"
+    },
+    "mergeScript": "tools/scripts/merge-documentation.py",
+    "mergeDate": "2026-02-10",
+    "mergeDetails": {
+      "merged": [
+        "03-DOJO.md → 01-THINK-TANK.md",
+        "08-CATO-SAFETY.md → 07-AI-SYSTEMS.md (renamed from 07-AI-BRAIN-SYSTEMS.md)",
+        "11-DATA-STORAGE.md → 06-ARCHITECTURE-ENGINEERING.md",
+        "19-OMEGA-QUANTUM-MODEL-AI.md → 09-OMEGA-GENESIS.md",
+        "THINKTANK-MAC-GUIDE.md → 01-THINK-TANK.md",
+        "THINKTANK-MAC-PORTABILITY-MANIFEST.md → 01-THINK-TANK.md",
+        "Marketing content from 09 → 15-STRATEGY-COMPETITIVE.md"
+      ],
+      "archived": "EXECUTIVE-REPORT-2026-02-09.md → archive/pre-merge-2026-02-10/"
     },
     "consolidationScript": "tools/scripts/consolidate-documentation.py",
     "consolidationDate": "2026-02-07"

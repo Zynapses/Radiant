@@ -1,5 +1,5 @@
 // RADIANT Admin API - Autonomous Organism Management
-// Endpoints for MCP Servers, Tool Schemas, Genesis, Liquid Compute, Ghost Simulation
+// Endpoints for MCP Servers, Tool Schemas, Tool Forge, Liquid Compute, Ghost Simulation
 // Version: 1.0.0
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
@@ -13,7 +13,7 @@ const logger = createRegisteredLogger({
 import { 
   mcpServerManager, 
   neuralSchemaRegistry, 
-  genesisAutoTool, 
+  toolForge, 
   liquidCompute, 
   ghostSimulation,
   economicCortex 
@@ -41,9 +41,9 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
       return await handleTools(path, method, event, tenantId);
     }
 
-    // Genesis Auto-Tool endpoints
+    // Tool Forge endpoints
     if (path.startsWith('/genesis')) {
-      return await handleGenesis(path, method, event, tenantId);
+      return await handleToolForge(path, method, event, tenantId);
     }
 
     // Liquid Compute endpoints
@@ -322,7 +322,15 @@ async function handleTools(
   // POST /tools/find-by-intent - Neural tool discovery
   if (subPath === '/find-by-intent' && method === 'POST') {
     const body = parseBody<{ intent: string; maxResults?: number }>(event);
-    const intentEmbedding = new Float32Array(1536); // Placeholder - would use embedding service
+    const { embeddingService } = await import('../shared/services/embedding.service.js');
+    let intentEmbedding: Float32Array;
+    try {
+      const result = await embeddingService.generateEmbedding(body.intent);
+      intentEmbedding = new Float32Array(result.embedding);
+    } catch (err) {
+      logger.warn('Embedding generation failed for intent, using zero vector', { error: String(err) });
+      intentEmbedding = new Float32Array(1536);
+    }
     const tools = await neuralSchemaRegistry.findToolsByIntent(intentEmbedding, body.maxResults || 5);
     return success({ tools });
   }
@@ -345,16 +353,16 @@ async function handleTools(
 }
 
 // ============================================================================
-// GENESIS AUTO-TOOL HANDLERS
+// TOOL FORGE HANDLERS
 // ============================================================================
 
-async function handleGenesis(
+async function handleToolForge(
   path: string,
   method: string,
   event: APIGatewayProxyEvent,
   tenantId: string
 ): Promise<APIGatewayProxyResult> {
-  const subPath = path.replace('/genesis', '');
+  const subPath = path.replace('/genesis', ''); // Route path kept for backward compat
   const userId = event.requestContext.authorizer?.userId || 'system';
 
   // GET /genesis/requests - List tool generation requests
@@ -366,7 +374,7 @@ async function handleGenesis(
   // POST /genesis/requests - Create new tool generation request
   if (subPath === '/requests' && method === 'POST') {
     const body = parseBody(event);
-    const request = await genesisAutoTool.createToolRequest({
+    const request = await toolForge.createToolRequest({
       tenantId,
       userId,
       targetService: body.targetService,
@@ -381,7 +389,7 @@ async function handleGenesis(
   // GET /genesis/requests/:id - Get request status
   const requestIdMatch = subPath.match(/^\/requests\/([a-f0-9-]+)$/);
   if (requestIdMatch && method === 'GET') {
-    const request = await genesisAutoTool.getRequestStatus(requestIdMatch[1]);
+    const request = await toolForge.getRequestStatus(requestIdMatch[1]);
     if (!request) return notFound('Request not found');
     return success({ request });
   }
@@ -389,12 +397,12 @@ async function handleGenesis(
   // GET /genesis/requests/:id/result - Get generation result
   const resultMatch = subPath.match(/^\/requests\/([a-f0-9-]+)\/result$/);
   if (resultMatch && method === 'GET') {
-    const result = await genesisAutoTool.getResult(resultMatch[1]);
+    const result = await toolForge.getResult(resultMatch[1]);
     if (!result) return notFound('Result not found');
     return success({ result });
   }
 
-  return notFound(`Unknown genesis endpoint: ${subPath}`);
+  return notFound(`Unknown tool-forge endpoint: ${subPath}`);
 }
 
 // ============================================================================

@@ -30,19 +30,11 @@ export interface MFAConfig {
 export const MFA_CONFIG_DEFAULTS: MFAConfig = {
   mfaRequiredRoles: [
     'tenant_admin',
-    'tenant_owner',
     'super_admin',
-    'admin',
-    'operator',
-    'auditor',
   ],
   mfaUiVisibleRoles: [
     'tenant_admin',
-    'tenant_owner',
     'super_admin',
-    'admin',
-    'operator',
-    'auditor',
   ],
   mfaCanDisableRoles: [],
   mfaMethodsAllowed: ['totp'],

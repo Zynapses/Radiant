@@ -1,10 +1,10 @@
 // RADIANT v4.18.0 - OMEGA Quantum Brain Service — TypeScript Management Layer
 // Manages quantum brain state, firmware lifecycle, and hot-swap.
 // Delegates actual neural compute to the Python physics engine.
+// Cartridge-first boot: all state loaded from Universal Cartridge System.
 
 import * as crypto from 'crypto';
 import { executeStatement } from '../../db/client';
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import {
@@ -31,6 +31,11 @@ import {
   innerProduct
 } from './quantum-math';
 import { HelixKernelService } from './helix-kernel.service';
+import { cartridgeStorageManager } from '../cartridge-storage-manager.service';
+import { omegaCartridgeBootService, type OmegaBrainState, type KnowledgeFact, type CartridgeHealthCheck } from './omega-cartridge-boot.service';
+import { FirmwareEnforcer, type FirmwareConfig, type AmbitionConfig, type DevelopmentScheduleConfig, type ActionGateConfig } from './omega-firmware-enforcer.service';
+import { OmegaAmbitionService } from './omega-ambition.service';
+import { omegaSoftRomService, type SoftRomDelta, type NetworkWeights, type SoftRomPreferences } from './omega-soft-rom.service';
 
 // ============================================================================
 // CONSTANTS
@@ -63,7 +68,18 @@ export class QuantumBrainService {
 
   // Sub-services
   private helixKernel: HelixKernelService;
-  private s3Client: S3Client;
+
+  // Cartridge integration
+  private cartridgeState: OmegaBrainState | null = null;
+  private firmwareEnforcer: FirmwareEnforcer | null = null;
+  private ambitionService: OmegaAmbitionService | null = null;
+  private cartridgeBaseWeights: NetworkWeights = {};
+  private softRomDelta: SoftRomDelta | null = null;
+  private knowledgeFacts: KnowledgeFact[] = [];
+  private developmentSchedule: DevelopmentScheduleConfig | null = null;
+  private actionGateConfig: ActionGateConfig | null = null;
+  private cartridgeBootDurationMs: number = 0;
+  private cartridgeBootStatus: 'not_booted' | 'active' | 'factory_defaults' | 'degraded' = 'not_booted';
 
   // Brain health
   private entropy: number = 0;
@@ -76,18 +92,111 @@ export class QuantumBrainService {
     options: {
       hilbertDimension?: number;
       unitarityMode?: UnitarityMode;
-      s3Bucket?: string;
     } = {}
   ) {
     this.brainId = brainId;
     this.tenantId = tenantId;
     this.hilbertDimension = options.hilbertDimension || DEFAULT_HILBERT_DIM;
     this.unitarityMode = options.unitarityMode || 'renormalize';
-    this.s3Client = new S3Client({});
     this.helixKernel = new HelixKernelService();
 
-    // Initialize to equal superposition
+    // Initialize to equal superposition (will be overwritten by cartridge boot)
     this.psi = equalSuperposition(this.hilbertDimension);
+  }
+
+  // ========================================================================
+  // CARTRIDGE BOOT SEQUENCE
+  // ========================================================================
+
+  /**
+   * Boot brain from cartridge state. Must be called before first inference.
+   * Loads firmware, Q-Node weights, Soft ROM, knowledge, and ambition config.
+   */
+  async bootFromCartridges(): Promise<OmegaBrainState> {
+    const state = await omegaCartridgeBootService.bootBrain(this.tenantId);
+
+    this.cartridgeState = state;
+    this.firmwareEnforcer = state.firmwareEnforcer;
+    this.ambitionService = state.ambition;
+    this.cartridgeBaseWeights = state.cartridgeBaseWeights;
+    this.softRomDelta = state.softRomDelta;
+    this.knowledgeFacts = state.knowledgeFacts;
+    this.developmentSchedule = state.developmentSchedule;
+    this.actionGateConfig = state.actionGateConfig;
+    this.cartridgeBootDurationMs = state.bootDurationMs;
+    this.cartridgeBootStatus = state.status;
+
+    // Apply cartridge network state to brain psi (use first network)
+    const networkNames = Object.keys(state.networks);
+    if (networkNames.length > 0) {
+      this.psi = state.networks[networkNames[0]];
+      this.hilbertDimension = this.psi.hilbertDimension;
+    }
+
+    // Sync chemical levels to brain health
+    const chemicals = state.ambition.getChemicals();
+    this.dopamine = chemicals.dopamine;
+    this.entropy = chemicals.entropy;
+
+    return state;
+  }
+
+  /**
+   * Get firmware enforcer — returns null if boot hasn't happened.
+   */
+  getFirmwareEnforcer(): FirmwareEnforcer | null {
+    return this.firmwareEnforcer;
+  }
+
+  /**
+   * Get ambition service — returns null if boot hasn't happened.
+   */
+  getAmbitionService(): OmegaAmbitionService | null {
+    return this.ambitionService;
+  }
+
+  /**
+   * Get knowledge facts loaded from cartridge.
+   */
+  getKnowledgeFacts(): KnowledgeFact[] {
+    return this.knowledgeFacts;
+  }
+
+  /**
+   * Get cartridge boot status.
+   */
+  getCartridgeBootStatus(): typeof this.cartridgeBootStatus {
+    return this.cartridgeBootStatus;
+  }
+
+  /**
+   * Run cartridge health check.
+   */
+  async checkCartridgeHealth(): Promise<CartridgeHealthCheck> {
+    return omegaCartridgeBootService.checkCartridgeHealth(this.tenantId);
+  }
+
+  /**
+   * Write Soft ROM delta at the end of a dream cycle (Phase 8).
+   * Computes delta = current weights - cartridge base weights.
+   */
+  async writeSoftRomDelta(preferences: SoftRomPreferences): Promise<{ totalDeltaBytes: number; networksWritten: number }> {
+    const currentWeights: NetworkWeights = {
+      default: this.psi.amplitudes.map(a => a.real),
+    };
+
+    // Extract connection deltas from pathway data
+    const connectionDeltas = (this.cartridgeState?.softRomDelta?.connectionDeltas || []);
+    const subClusterMap = (this.cartridgeState?.softRomDelta?.subClusterMap || {});
+
+    return omegaSoftRomService.writeSoftRom(
+      this.tenantId,
+      currentWeights,
+      this.cartridgeBaseWeights,
+      connectionDeltas,
+      subClusterMap,
+      preferences,
+    );
   }
 
   // ========================================================================
@@ -338,6 +447,27 @@ export class QuantumBrainService {
   }
 
   /**
+   * Create a checkpoint that includes cartridge base reference for Soft ROM delta.
+   */
+  private createCheckpointWithCartridgeRef(): QuantumBrainCheckpoint & {
+    cartridge_base_ref: string | null;
+    soft_rom_version: string | null;
+    cartridge_boot_status: string;
+    firmware_enforcement_count: number;
+  } {
+    const base = this.createCheckpoint();
+    return {
+      ...base,
+      cartridge_base_ref: this.cartridgeState
+        ? JSON.stringify(this.cartridgeState.cartridgeStack)
+        : null,
+      soft_rom_version: this.softRomDelta?.version || null,
+      cartridge_boot_status: this.cartridgeBootStatus,
+      firmware_enforcement_count: this.firmwareEnforcer?.getEnforcementCount() || 0,
+    };
+  }
+
+  /**
    * Restore brain state from a checkpoint.
    */
   private restoreFromCheckpoint(checkpoint: QuantumBrainCheckpoint): void {
@@ -359,19 +489,20 @@ export class QuantumBrainService {
   }
 
   /**
-   * Save checkpoint to S3 (cold backup).
+   * Save checkpoint to S3 (cold backup) via cartridge storage manager.
    */
-  async saveCheckpointToS3(bucket: string): Promise<string> {
-    const checkpoint = this.createCheckpoint();
-    const key = `${S3_CHECKPOINT_PREFIX}/${this.tenantId}/${this.brainId}/${Date.now()}.json`;
-    await this.s3Client.send(new PutObjectCommand({
-      Bucket: bucket,
-      Key: key,
-      Body: JSON.stringify(checkpoint),
-      ContentType: 'application/json',
-      ServerSideEncryption: 'aws:kms'
-    }));
-    return key;
+  async saveCheckpointToS3(): Promise<string> {
+    const checkpoint = this.createCheckpointWithCartridgeRef();
+    const filename = `${this.brainId}/${Date.now()}.json`;
+    const result = await cartridgeStorageManager.storeContent(
+      this.tenantId,
+      `brain-checkpoint-${this.brainId}`,
+      'soft_rom',
+      filename,
+      Buffer.from(JSON.stringify(checkpoint)),
+      'application/json',
+    );
+    return result.storage_ref;
   }
 
   // ========================================================================
@@ -773,6 +904,12 @@ export class QuantumBrainService {
     loadedFirmwareId: string | null;
     helixRuleCount: number;
     unitarityMode: UnitarityMode;
+    cartridgeBootStatus: string;
+    cartridgeBootDurationMs: number;
+    firmwareEnforcementCount: number;
+    softRomVersion: string | null;
+    knowledgeFactCount: number;
+    ambitionChemicals: Record<string, number> | null;
   } {
     return {
       brainId: this.brainId,
@@ -784,7 +921,13 @@ export class QuantumBrainService {
       totalCycles: this.totalCycles,
       loadedFirmwareId: this.loadedFirmwareId,
       helixRuleCount: this.helixKernel.getActiveRuleCount(),
-      unitarityMode: this.unitarityMode
+      unitarityMode: this.unitarityMode,
+      cartridgeBootStatus: this.cartridgeBootStatus,
+      cartridgeBootDurationMs: this.cartridgeBootDurationMs,
+      firmwareEnforcementCount: this.firmwareEnforcer?.getEnforcementCount() || 0,
+      softRomVersion: this.softRomDelta?.version || null,
+      knowledgeFactCount: this.knowledgeFacts.length,
+      ambitionChemicals: this.ambitionService?.getChemicals() || null,
     };
   }
 }

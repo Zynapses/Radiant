@@ -1,8 +1,8 @@
-# OMEGA Protocol & Genesis
+# OMEGA Protocol & OMEGA Ecosystem
 
-**OMEGA Protocol • Genesis Forge • Genesis Lab • Resonant Index**
+**OMEGA Protocol • OMEGA Forge • OMEGA Lab • Resonant Index**
 
-*RADIANT v6.6.0 — Generated February 07, 2026*
+*RADIANT v7.55.0 — Updated February 10, 2026*
 
 ---
 
@@ -11,11 +11,13 @@
 - **Part I: OMEGA User Guide**
 - **Part II: OMEGA Admin Guide**
 - **Part III: Project Genesis OMEGA**
-- **Part IV: Genesis Components**
+- **Part IV: OMEGA Forge Components**
 - **Part V: Omega Point & LIVS-M**
 - **Part VI: Quantum-Inspired Architecture (v4.18.0)**
 - **Part VII: Firmware Hot-Swap Engineering Specification (v6.4.0)**
 - **Part VIII: Firmware Live Updates — End-User Guide (v6.4.0)**
+- **Part IX: OMEGA Forge — System Admin Application (v7.50.0)**
+- **Part X: Five Pillars of Computational Architecture (v7.50.0)**
 
 ---
 
@@ -28,7 +30,7 @@
 > **Version**: 2.0.0 | **Date**: February 6, 2026  
 > **Status**: IMPLEMENTED — Synthetic Biological Intelligence  
 > **Part of**: RADIANT Platform — Project Genesis  
-> **App**: `apps/genesis/` (port 3000)
+> **App**: `apps/omega-lab/` (port 3000)
 
 ---
 
@@ -219,9 +221,9 @@ OMEGA does not launch directly into production. It grows:
 
 ---
 
-## 10. The Genesis Ecosystem
+## 10. The OMEGA Ecosystem
 
-### Genesis Lab (`apps/genesis/`)
+### OMEGA Lab (`apps/omega-lab/`)
 
 Real-time visualization and monitoring dashboard for OMEGA brains:
 
@@ -230,9 +232,9 @@ Real-time visualization and monitoring dashboard for OMEGA brains:
 | **Dashboard** | Summary cards, thermal distribution, health alerts, system status |
 | **Cortex Explorer** | Brain inspection: metrics, ambition state, phase distribution, Helix status, Broca interface |
 | **Shadow Mode Monitor** | 3D Q-Node visualization, coherence graph, promotion indicator |
-| **Genesis Forge** | Firmware creation and management (see below) |
+| **OMEGA Forge** | Firmware creation and management (see below) |
 
-### Genesis Forge
+### OMEGA Forge
 
 The firmware editor for creating `.bio` firmware files:
 
@@ -288,7 +290,7 @@ packages/infrastructure/lambda/
 │   ├── omega-shadow.service.ts  # Shadow mode parallel routing
 │   └── shadow-mode.service.ts   # Self-training on public data
 │
-apps/genesis/
+apps/omega-lab/
 ├── app/
 │   ├── globals.css          # OMEGA brand colors
 │   ├── layout.tsx           # Root layout with providers
@@ -297,7 +299,7 @@ apps/genesis/
 ├── components/
 │   ├── Dashboard.tsx        # Real-time brain monitoring
 │   ├── CortexExplorer.tsx   # Brain inspection/management
-│   ├── GenesisForge.tsx     # Firmware editor
+│   ├── OmegaForge.tsx       # Firmware editor
 │   └── forge/               # Forge sub-components (React Flow nodes, edges)
 ├── hooks/
 │   └── useShadowOmega.ts   # WebSocket hook for real-time telemetry
@@ -305,21 +307,21 @@ apps/genesis/
 │   ├── api.ts               # API client functions
 │   ├── forge-store.ts       # Zustand state for Forge
 │   └── omega-registry.ts   # Omega Instance Registry
-├── package.json             # @radiant/genesis
+├── package.json             # @radiant/omega-lab
 ├── tailwind.config.ts       # OMEGA palette
 └── tsconfig.json
 ```
 
 ---
 
-## 13. Running Genesis Lab
+## 13. Running OMEGA Lab
 
 ```bash
 # From the monorepo root
-pnpm dev --filter @radiant/genesis
+pnpm dev --filter @radiant/omega-lab
 
 # Or directly
-cd apps/genesis && pnpm dev
+cd apps/omega-lab && pnpm dev
 ```
 
 The app runs on **http://localhost:3000**.
@@ -359,7 +361,7 @@ OMEGA_API_URL=https://your-omega-api.execute-api.region.amazonaws.com/prod
 
 ## 1. Overview
 
-This guide covers all administrative operations for the OMEGA Synthetic Biological Intelligence system. Administrators use the **RADIANT Admin Dashboard** (OMEGA section) and the **Genesis Lab** (`apps/genesis/`) to manage OMEGA brains, firmware, Shadow Mode, and infrastructure.
+This guide covers all administrative operations for the OMEGA Synthetic Biological Intelligence system. Administrators use the **RADIANT Admin Dashboard** (OMEGA section) and the **OMEGA Lab** (`apps/omega-lab/`) to manage OMEGA brains, firmware, Shadow Mode, and infrastructure.
 
 ---
 
@@ -422,7 +424,7 @@ All Omega admin endpoints are under `/api/admin/omega/`:
 
 ### 3.1 Viewing Brain Status
 
-The **Cortex Explorer** (in Genesis Lab or Admin Dashboard) shows:
+The **Cortex Explorer** (in OMEGA Lab or Admin Dashboard) shows:
 
 | Metric | Description |
 |--------|-------------|
@@ -480,9 +482,9 @@ Firmware files control the brain's "instincts":
 | **Personality** | Warmth, assertiveness, creativity, formality, humor, empathy (0.0–1.0) |
 | **Signature** | Ed25519 cryptographic signature — brain rejects unsigned firmware |
 
-### 4.2 Creating Firmware (Genesis Forge)
+### 4.2 Creating Firmware (OMEGA Forge)
 
-1. Open Genesis Lab → **Genesis Forge** tab
+1. Open OMEGA Lab → **OMEGA Forge** tab
 2. Use the React Flow canvas to design firmware visually, or:
    - Click **AI Generate** → describe desired persona (e.g., "Create a conservative financial advisor")
    - AI drafts Helix rules, personality traits, and ambition settings
@@ -682,7 +684,7 @@ The Forge addresses individual OMEGA instances via the `omega_instance_registry`
 
 ## 10. Shadow Omega WebSocket Tether
 
-The `useShadowOmega()` React hook provides real-time bi-directional telemetry between Genesis Forge and live OMEGA instances:
+The `useShadowOmega()` React hook provides real-time bi-directional telemetry between OMEGA Forge and live OMEGA instances:
 
 | Event | Direction | Description |
 |-------|-----------|-------------|
@@ -693,7 +695,7 @@ The `useShadowOmega()` React hook provides real-time bi-directional telemetry be
 
 ### Global UI Hue Shift
 
-Genesis Forge's UI color shifts based on the OMEGA stability score:
+OMEGA Forge's UI color shifts based on the OMEGA stability score:
 - **Cyan** (stable) → **Orange** (warning) → **Red** (critical)
 
 ---
@@ -791,7 +793,7 @@ OMEGA uses the **highest drift weight** (0.40) of any app because shadow compari
 
 ---
 
-**Document maintained under RADIANT documentation policy. Any changes to OMEGA infrastructure, admin API, Genesis Lab, Genesis Forge, Shadow Mode, or Neural Bridge MUST update this guide.**
+**Document maintained under RADIANT documentation policy. Any changes to OMEGA infrastructure, admin API, OMEGA Lab, OMEGA Forge, Shadow Mode, or Neural Bridge MUST update this guide.**
 
 
 ---
@@ -1197,7 +1199,7 @@ A `.bio` file is a **signed JSON object** containing:
 | **Personality** | Behavioral characteristics |
 | **Signature** | Signed with **Ed25519** keys. The Brain **rejects** any firmware without a valid signature. |
 
-### 7.2 The Genesis Forge
+### 7.2 The OMEGA Forge
 
 A **web application (React)** where Architects can:
 
@@ -1230,9 +1232,9 @@ A **web application (React)** where Architects can:
 | **Comparison** | We measure **Coherence**. If OMEGA's thought vector aligns with the Legacy result, we reinforce the connection (**Dopamine**). |
 | **Promotion** | When the **7-Day Coherence Score exceeds 90%**, OMEGA is promoted to **Primary Driver**. |
 
-### 8.2 Shadow Mode Visualization (Genesis Lab)
+### 8.2 Shadow Mode Visualization (OMEGA Lab)
 
-We build a **Genesis Dashboard** (React/Three.js):
+We build an **OMEGA Forge Dashboard** (React/Three.js):
 
 | Element | Description |
 |---------|-------------|
@@ -1353,13 +1355,13 @@ The following components have been implemented:
 | `omega_vllm_server.py` | Custom FastAPI vLLM wrapper with /inject | ✅ Complete |
 | `omega_admin.py` | Cortex Explorer API | ✅ Complete |
 
-### Genesis Frontend (`apps/genesis/`)
+### OMEGA Lab Frontend (`apps/omega-lab/`)
 
 | Component | Description | Status |
 |-----------|-------------|--------|
 | Dashboard | Real-time brain monitoring | ✅ Complete |
 | Cortex Explorer | Brain inspection/management | ✅ Complete |
-| Genesis Forge | Firmware editor (.bio files) | ✅ Complete |
+| OMEGA Forge | Firmware editor (.bio files) | ✅ Complete |
 
 ### Infrastructure
 
@@ -1461,15 +1463,15 @@ Every model invocation across ALL 52+ services reports telemetry:
 
 ## Related Documentation
 
-- [GENESIS-LAB.md](./GENESIS-LAB.md) - Genesis Lab visualization guide
-- [GENESIS-FORGE.md](./GENESIS-FORGE.md) - Firmware creation guide
-- [GENESIS-RESONANT-INDEX.md](./GENESIS-RESONANT-INDEX.md) - Resonant indexing deep dive
+- [GENESIS-LAB.md](./GENESIS-LAB.md) - OMEGA Lab visualization guide (archived)
+- [GENESIS-FORGE.md](./GENESIS-FORGE.md) - Firmware creation guide (archived)
+- [GENESIS-RESONANT-INDEX.md](./GENESIS-RESONANT-INDEX.md) - Resonant indexing deep dive (archived)
 - [RADIANT-MOATS.md](./RADIANT-MOATS.md) - Competitive advantages
 
 
 ---
 
-## Part IV: Genesis Components
+## Part IV: OMEGA Forge Components
 
 > **Classification**: RADIANT INTERNAL // STRATEGIC // DO NOT DISTRIBUTE  
 > **Version**: 3.0.0 | **Date**: February 6, 2026  
@@ -1482,7 +1484,7 @@ Every model invocation across ALL 52+ services reports telemetry:
 
 ## 1. Core Philosophy
 
-Genesis Forge is **not a code editor**; it is a **Digital Smithy**. Standard IDEs are static—you write code and hope it works. Genesis is a **"Twin-First"** environment.
+OMEGA Forge is **not a code editor**; it is a **Digital Smithy**. Standard IDEs are static—you write code and hope it works. OMEGA Forge is a **"Twin-First"** environment.
 
 | Role | Description |
 |------|-------------|
@@ -1490,9 +1492,9 @@ Genesis Forge is **not a code editor**; it is a **Digital Smithy**. Standard IDE
 | **The System (Shadow Omega)** | Runs a continuous, high-speed physics simulation of the board |
 | **The Output** | Not just code; it is "grown" binary, optimized for the specific silicon structure |
 
-Genesis Forge is **permanently hard-wired to Shadow Omega**. Each OMEGA instance has a unique **ID** and **Name** in the **Omega Instance Registry**. The Forge can connect to and communicate with **any** registered instance at a time, selecting from the registry dropdown.
+OMEGA Forge is **permanently hard-wired to Shadow Omega**. Each OMEGA instance has a unique **ID** and **Name** in the **Omega Instance Registry**. The Forge can connect to and communicate with **any** registered instance at a time, selecting from the registry dropdown.
 
-> **Reasoning**: Genesis is the Hand (The Interface), but Shadow Omega is the Mind (The Physics Engine). You cannot forge advanced firmware without a simulation engine predicting thermal loads, latency, and collisions in real-time.
+> **Reasoning**: OMEGA Forge is the Hand (The Interface), but Shadow Omega is the Mind (The Physics Engine). You cannot forge advanced firmware without a simulation engine predicting thermal loads, latency, and collisions in real-time.
 
 ### 1B. What is "Firmware"?
 
@@ -1587,7 +1589,7 @@ An **infinite React Flow** canvas. Feels like a CAD tool for microchips.
 | 2 | **FR-4 Substrate** | Dark green box (`#0b3b0b`, 0.12 thickness) |
 | 3 | **Solder Mask** | Translucent green film (0.7 opacity) |
 | 4 | **Etch Trace Grid** | 0.6-unit spacing line grid (`#5a3a1a`, 15% opacity) |
-| 5 | **Silkscreen** | Board border, title (`OMEGA-PCB-XX REV.A`), `GENESIS FORGE v3` |
+| 5 | **Silkscreen** | Board border, title (`OMEGA-PCB-XX REV.A`), `OMEGA FORGE v3` |
 | 6 | **IC Chips** | SOIC-14 packages: 7 gull-wing pins per side, pin-1 dot, reference designator (U1, U2...) |
 | 7 | **Solder Pads** | Exposed copper rectangles under each pin |
 | 8 | **Via Holes** | Copper annular ring + dark center at each trace bend |
@@ -1620,7 +1622,7 @@ The app creates a **Bi-Directional Feedback Loop** between the UI and the Shadow
 ### 3A. Connection Architecture
 
 ```
-Genesis Forge (Frontend)
+OMEGA Forge (Frontend)
     │
     ├── useShadowOmega() hook
     │       ├── Persistent WebSocket: wss://shadow-omega-{id}.internal/ws/forge
@@ -1721,7 +1723,7 @@ Every OMEGA brain instance registers in the `omega_instance_registry` database t
 ## 6. File Structure
 
 ```
-apps/genesis/
+apps/omega-lab/
 ├── app/
 │   ├── globals.css                    # Glass Foundry styles + React Flow overrides
 │   ├── layout.tsx
@@ -1741,7 +1743,7 @@ apps/genesis/
 │   │   │   └── OutputShard.tsx        # Amber/Red power-glow actuator nodes
 │   │   └── edges/
 │   │       └── CatenaryEdge.tsx       # Gravity wire with light particles
-│   ├── GenesisForge.tsx               # Legacy firmware editor (retained)
+│   ├── OmegaForge.tsx                 # Firmware editor
 │   ├── CortexExplorer.tsx
 │   └── Dashboard.tsx
 ├── hooks/
@@ -1772,7 +1774,7 @@ All tables have **RLS** via `tenant_id = current_setting('app.current_tenant_id'
 
 ## 8. The .bio Firmware Standard
 
-Genesis Forge is the **firmware creation and management tool** for OMEGA brains. It allows administrators to create, edit, and deploy `.bio` firmware files that define a brain's safety rules, ambition parameters, and personality traits.
+OMEGA Forge is the **firmware creation and management tool** for OMEGA brains. It allows administrators to create, edit, and deploy `.bio` firmware files that define a brain's safety rules, ambition parameters, and personality traits.
 
 We control the **"Instincts"** of the organism via **Cryptographic Firmware**. Unlike traditional AI configuration files, OMEGA firmware directly influences the physics of the brain—modifying the Helix Kernel's destructive interference patterns and the Homeostatic Regulator's drive parameters.
 
@@ -1924,7 +1926,7 @@ The **Helix Kernel** translates high-level ethical rules into **Forbidden Phase 
 
 ## AI-Assisted Firmware Generation
 
-Genesis Forge includes an **AI Generation** feature that uses a Legacy LLM to draft firmware configurations:
+OMEGA Forge includes an **AI Generation** feature that uses a Legacy LLM to draft firmware configurations:
 
 | Feature | Description |
 |---------|-------------|
@@ -1962,7 +1964,7 @@ Each firmware has a semantic version following the pattern `MAJOR.MINOR.PATCH`:
 If a firmware update causes issues:
 
 1. **Immediate Rollback**: Call `/admin/firmware/{tenant}/{previous_id}/activate`
-2. **Snapshot Restore**: Use Genesis Lab to restore brain from pre-update snapshot
+2. **Snapshot Restore**: Use OMEGA Lab to restore brain from pre-update snapshot
 3. **Emergency Reset**: Lobotomy + default firmware (last resort)
 
 ---
@@ -2013,15 +2015,15 @@ The Neural Bridge translates OMEGA's internal state (Complex^2048 brain state) i
 
 ## Overview
 
-Genesis Lab is the **real-time visualization and monitoring dashboard** for OMEGA bio-mimetic brains. It provides administrators with deep insight into the **Bicameral Mind** architecture, thermal states, coherence metrics, phase distributions, and the Shadow Protocol training status.
+OMEGA Lab is the **real-time visualization and monitoring dashboard** for OMEGA bio-mimetic brains. It provides administrators with deep insight into the **Bicameral Mind** architecture, thermal states, coherence metrics, phase distributions, and the Shadow Protocol training status.
 
-Genesis Lab is the primary interface for observing and managing **Synthetic Biological Intelligence** as defined in [PROJECT-GENESIS-OMEGA.md](PROJECT-GENESIS-OMEGA.md).
+OMEGA Lab is the primary interface for observing and managing **Synthetic Biological Intelligence** as defined in [PROJECT-GENESIS-OMEGA.md](PROJECT-GENESIS-OMEGA.md).
 
 ---
 
 ## The Bicameral Mind Architecture
 
-Genesis Lab visualizes the **two-chambered brain** design that separates high-level reasoning from linguistic generation:
+OMEGA Lab visualizes the **two-chambered brain** design that separates high-level reasoning from linguistic generation:
 
 ### Region I: The OMEGA Cortex (The Mind)
 
@@ -2043,7 +2045,7 @@ Genesis Lab visualizes the **two-chambered brain** design that separates high-le
 
 ### The Biological Class Structure
 
-Genesis Lab monitors all five biological regions of the OMEGA brain:
+OMEGA Lab monitors all five biological regions of the OMEGA brain:
 
 | Biological Region | Code Component | Function | Implementation |
 |-------------------|----------------|----------|----------------|
@@ -2098,7 +2100,7 @@ Real-time visualization of the Shadow Protocol training:
 | **Coherence Graph** | Real-time coherence score tracking |
 | **Promotion Indicator** | Alert when 7-Day Coherence Score exceeds 90% |
 
-### 4. Genesis Forge Tab
+### 4. OMEGA Forge Tab
 
 Firmware creation and management (see [GENESIS-FORGE.md](GENESIS-FORGE.md)).
 
@@ -2115,7 +2117,7 @@ Firmware creation and management (see [GENESIS-FORGE.md](GENESIS-FORGE.md)).
 ## Installation
 
 ```bash
-cd apps/genesis
+cd apps/omega-lab
 npm install
 npm run dev
 ```
@@ -2345,208 +2347,6 @@ The ResonantIndex is used by the OMEGA brain's **hippocampus** analog:
 
 ---
 
-# PART I: MARKETING & POSITIONING
-
----
-
-## Chapter 1: Executive Value Proposition
-
-### 1.1 The One-Sentence Pitch
-
-**RADIANT Think Tank is the world's first Neural Infrastructure platform—an AI system that doesn't just use tools, it becomes them, creating infinite capabilities on-demand while keeping your data sovereign.**
-
-### 1.2 The Problem We Solve
-
-| Problem | How Competitors Fail | How RADIANT Solves It |
-|---------|---------------------|----------------------|
-| **Tool Scarcity** | ChatGPT/Claude have ~50 built-in tools | Genesis Forge creates any tool in < 2 minutes |
-| **Cloud Lock-In** | Every query goes to remote servers | Liquid Compute runs locally, data never leaves |
-| **Dumb Routing** | Same model for all queries | Neural Affinity routes to optimal model from 106+ |
-| **Generic Safety** | Static content filters | Ghost Simulation predicts YOUR reaction |
-| **Cost Chaos** | No visibility, surprise bills | Economic Cortex manages budgets autonomously |
-
-### 1.3 Neural Infrastructure vs. Agentic Software
-
-**Agentic Software** (Competitors):
-- Wraps LLM around fixed APIs
-- Hard-coded integrations that break
-- Static capabilities requiring engineering
-- Cloud-dependent, privacy-invasive
-
-**Neural Infrastructure** (RADIANT):
-- AI IS the infrastructure—generates, routes, executes dynamically
-- Self-healing integrations via overnight Twilight Dreaming
-- Infinite capabilities through JIT tool generation
-- Edge-native execution respecting data sovereignty
-
-### 1.4 Target Markets
-
-**Primary: Professional Knowledge Workers**
-- Lawyers needing accuracy (malpractice risk)
-- Doctors needing compliance (patient safety)
-- Engineers needing precision (tolerances)
-- Researchers needing depth (citations)
-
-**Secondary: Enterprise AI Teams**
-- Building internal AI applications
-- Need infrastructure, not chatbots
-- Want to inherit AI advances without rebuilding
-
----
-
-## Chapter 2: The Five Moats
-
-### 2.1 MOAT #1: Genesis Forge (Infinite Tool Generation)
-
-**The 7-Phase Pipeline:**
-
-| Phase | Duration | Description |
-|-------|----------|-------------|
-| 1. Detection | 100ms | No existing tool matches intent |
-| 2. Scouting | 5-30s | Search API docs (OpenAPI, GraphQL, HTML) |
-| 3. Fabrication | 30-60s | AGI Brain generates MCP server code |
-| 4. Sandboxing | 10-20s | Firecracker microVM isolation |
-| 5. Validation | 5-10s | SAST scan, functional tests |
-| 6. Mounting | 1-2s | Hot-load into active session |
-| 7. Twilight Review | Overnight | Promote to global library |
-
-**Competitor Comparison:**
-
-| Competitor | Tools | Time to New Tool |
-|------------|-------|------------------|
-| ChatGPT | ~50 | Months (OpenAI engineering) |
-| Claude | ~30 | Months (Anthropic engineering) |
-| Abacus.AI | ~50 | Weeks (human developers) |
-| **RADIANT** | **∞** | **< 2 minutes, automatic** |
-
-**Defensibility:** 18+ months to replicate from scratch.
-
----
-
-### 2.2 MOAT #2: Liquid Compute Topology (Data Sovereignty)
-
-**Compute Nodes:**
-
-| Node | Location | Privacy | Speed | Cost |
-|------|----------|---------|-------|------|
-| Browser WASM | Your browser | ★★★★★ | 5ms | $0 |
-| Local Native | Your computer | ★★★★★ | 1ms | $0 |
-| Lambda@Edge | Nearest AWS | ★★★☆☆ | 20ms | $0.0001 |
-| Lambda Regional | Tenant region | ★★★☆☆ | 50ms | $0.001 |
-| ECS Fargate | Cloud container | ★★☆☆☆ | 100ms | $0.01 |
-| GPU Cluster | Cloud GPU | ★☆☆☆☆ | 200ms | $0.10 |
-
-**Sensitivity Rules:**
-- `public`: Anywhere
-- `internal`: Not browser
-- `confidential`: Local or cloud only
-- `restricted`: Local ONLY
-
-**Scoring Formula:**
-```
-score = (privacy × 0.25) + (latency × 0.30) + (cost × 0.20) 
-      + (capability × 0.15) + (availability × 0.10)
-```
-
----
-
-### 2.3 MOAT #3: Neural Affinity Routing (106+ Models)
-
-**The Formula:**
-```
-affinityScore = (semantic × 0.35) + (domain × 0.25) + ((1-error) × 0.20)
-              + (latency × 0.10) + (cost × 0.10)
-```
-
-**Example Routing:**
-
-| Query | Routed To | Why |
-|-------|-----------|-----|
-| "What's 2+2?" | GPT-4 Mini | Fast, cheap |
-| "Analyze this contract" | Claude Opus + Legal Expert | Highest legal accuracy |
-| "Translate to Japanese" | GPT-4 Turbo | Best multilingual |
-| "Summarize private notes" | Local Llama | Privacy-sensitive |
-
----
-
-### 2.4 MOAT #4: Ghost Simulation (Personalized Safety)
-
-**Ghost Vector Architecture (4096 dimensions):**
-- Preference Vector (1024 dim): Communication style, risk tolerance
-- Behavior Vector (1024 dim): Patterns, time-of-day preferences
-- Emotional Vector (1024 dim): Anxiety, frustration thresholds
-- Knowledge Vector (1024 dim): Domain expertise, vocabulary
-
-**Simulation Types:**
-- `user_reaction`: Predict emotional response
-- `outcome_prediction`: Predict task success
-- `safety_check`: Identify regret potential
-- `cost_estimation`: Predict financial impact
-- `latency_estimation`: Predict time requirements
-
----
-
-### 2.5 MOAT #5: Economic Cortex (Budget Management)
-
-**Budget Hierarchy:**
-```
-Tenant ($10,000/month)
-  └── User ($500/month)
-       └── Session ($20/day)
-            └── Task ($5)
-```
-
-**Alert Thresholds:**
-| Threshold | Level | Actions |
-|-----------|-------|---------|
-| 50% | info | Notify user |
-| 75% | warning | Notify admin, switch tier |
-| 90% | critical | Force lower tier |
-| 100% | exceeded | Pause (if hardLimit) |
-
-**Model Tiers:**
-| Tier | Cost/Token | Quality |
-|------|------------|---------|
-| economy | $0.0001 | 0.70 |
-| selfhosted | $0.00005 | 0.75 |
-| standard | $0.0005 | 0.85 |
-| premium | $0.002 | 0.92 |
-| flagship | $0.006 | 0.98 |
-
----
-
-## Chapter 3: Competitive Positioning
-
-### 3.1 vs ChatGPT
-
-| Dimension | ChatGPT | RADIANT |
-|-----------|---------|---------|
-| Models | GPT-4 only | 106+ optimal selection |
-| Tools | ~50 | ∞ (Genesis Forge) |
-| Privacy | All to OpenAI | Edge-native, sovereign |
-| Safety | Generic filters | Personalized Ghost |
-| Cost | No control | Autonomous Cortex |
-
-### 3.2 vs Claude
-
-| Dimension | Claude | RADIANT |
-|-----------|--------|---------|
-| Tools | Limited MCP | 3,000+ static, ∞ dynamic |
-| Privacy | All to Anthropic | Your choice |
-| Context | 200K tokens | 200K + CORTEX memory |
-| Specialization | General | 800+ domain experts |
-
-### 3.3 vs Abacus.AI
-
-| Dimension | Abacus.AI | RADIANT |
-|-----------|-----------|---------|
-| Price | $10/month | Premium |
-| Tools | 50 static | ∞ dynamic |
-| Architecture | Cloud-locked | Liquid Compute |
-| Interface | JSON-RPC | Tensor-Link (100x faster) |
-
----
-
 # PART II: TECHNICAL DOCUMENTATION
 
 ---
@@ -2559,7 +2359,7 @@ Tenant ($10,000/month)
 |---------|------|-------|----------|
 | MCP Server Manager | `mcp-server-manager.service.ts` | 767 | Server registry, health, routing |
 | Neural Schema Registry | `neural-schema-registry.service.ts` | ~600 | Tool schemas, embeddings |
-| Genesis Auto-Tool | `genesis-auto-tool.service.ts` | 1234 | JIT tool generation |
+| Tool Forge | `genesis-auto-tool.service.ts` | 1234 | JIT tool generation |
 | Liquid Compute | `liquid-compute.service.ts` | 686 | Location selection |
 | Ghost Simulation | `ghost-simulation.service.ts` | 938 | User prediction |
 | Tensor-Link | `tensor-link.service.ts` | 601 | Vector transport |
@@ -2835,7 +2635,7 @@ await tensorLink.sendMessage(session.sessionId, {
 
 Think Tank automatically:
 - Routes to optimal model (Neural Affinity)
-- Creates tools on demand (Genesis Forge)
+- Creates tools on demand (Tool Forge)
 - Protects your privacy (Liquid Compute)
 - Learns your preferences (Ghost Vectors)
 - Manages your budget (Economic Cortex)
@@ -2874,7 +2674,7 @@ Approval Settings:
 
 | Term | Definition |
 |------|------------|
-| **Genesis Forge** | Automatic tool creation system |
+| **Tool Forge** | Automatic tool creation system |
 | **Ghost Vector** | User psychological profile (4096 dim) |
 | **Liquid Compute** | Dynamic compute location selection |
 | **Neural Affinity** | Semantic model/tool matching |
@@ -3121,7 +2921,7 @@ Firmware hot-swaps are now **fully enabled in production**. Prior to this releas
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                         GENESIS FORGE UI                                │
+│                         OMEGA FORGE UI                                  │
 │       (Firmware Editor / Library / Deploy / Monitor / Rollback)         │
 └────────────────────────────────┬────────────────────────────────────────┘
                                  │
@@ -3238,7 +3038,7 @@ Platform Root CA (ECC_NIST_P256)          ← Created in CDK SecurityStack
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│  1. AUTHOR     Admin creates .bio in Genesis Forge                  │
+│  1. AUTHOR     Admin creates .bio in OMEGA Forge                    │
 │       ▼                                                             │
 │  2. SIGN       Ed25519 via KMS (ECDSA_SHA_256 in production)        │
 │       ▼                                                             │
@@ -3453,7 +3253,7 @@ CREATE TABLE omega_firmware_swap_log (
 |--------|---------|
 | PROMPT-42 | Cartridge PKI/KMS Integration (real signing) |
 | PROMPT-45 | OMEGA Quantum Architecture base implementation |
-| PROMPT-46 | Complete OMEGA + Genesis Forge composite prompt |
+| PROMPT-46 | Complete OMEGA + OMEGA Forge composite prompt |
 
 ---
 
@@ -3558,4 +3358,882 @@ A: Absolutely not. RADIANT maintains strict tenant isolation. Your data, your AI
 
 ---
 
-*Consolidated from 8 source documents (0 not found). 2,999 source lines.*
+## Part IX: OMEGA Forge — System Admin Application (v7.50.0)
+
+> **Version**: 1.0.0 | **Date**: February 16, 2026  
+> **Status**: IMPLEMENTED  
+> **PROMPT**: 51
+
+### Overview
+
+OMEGA Forge is a standalone Next.js 14 system admin application for RADIANT platform operators. Unlike the tenant admin dashboard (which operates within tenant boundaries via RLS), Forge provides **unrestricted cross-tenant access** to Aurora PostgreSQL, S3 storage, and KMS signing infrastructure.
+
+Forge is deployed as an ECS Fargate service in a **private subnet** — accessible only via VPN or SSM Session Manager. It is not exposed to the public internet.
+
+### Architecture
+
+```
+┌──────────────────────────────────────────────────────┐
+│                  OMEGA Forge (ECS Fargate)             │
+│                  Private Subnet Only                  │
+│                                                      │
+│  ┌──────────┐  ┌──────────────┐  ┌──────────────┐   │
+│  │ Next.js  │  │ Storage Mgr  │  │  KMS Signer  │   │
+│  │ App :3000│  │ (all S3 ops) │  │  ECDSA_256   │   │
+│  └────┬─────┘  └──────┬───────┘  └──────┬───────┘   │
+│       │               │                 │            │
+│  ┌────┴─────┐  ┌──────┴───────┐  ┌──────┴───────┐   │
+│  │  Aurora   │  │  S3 Buckets  │  │   AWS KMS    │   │
+│  │  (no RLS) │  │  (4 buckets) │  │  Sign Key    │   │
+│  └──────────┘  └──────────────┘  └──────────────┘   │
+└──────────────────────────────────────────────────────┘
+         │                │                │
+    RDS Proxy      cartridge/omega/    Cartridge
+    (pg driver)    cortex/global-brain  Signing
+```
+
+### Core Libraries
+
+| File | Purpose |
+|------|---------|
+| `apps/omega-forge/lib/db/client.ts` | Direct Aurora PostgreSQL via `pg` driver — no RLS, full cross-tenant |
+| `apps/omega-forge/lib/s3/storage-manager.ts` | ALL S3 operations — bucket routing, path builders, store/retrieve/list/delete |
+| `apps/omega-forge/lib/kms/signer.ts` | ECDSA_SHA_256 signing via AWS KMS, public key export, signature verification |
+| `apps/omega-forge/lib/cartridge/builder.ts` | .RADz cartridge creation — ZIP archive, checksums, ZSTD, KMS signing, DB insert |
+| `apps/omega-forge/lib/cartridge/parser.ts` | .RADz extraction — manifest, sections, signature, checksum verification |
+
+### Storage Manager Pattern
+
+**All S3 operations in OMEGA Forge go through `apps/omega-forge/lib/s3/storage-manager.ts`**. No direct S3 SDK calls elsewhere.
+
+The storage manager provides:
+- **Bucket routing**: `cartridge`, `omega_state`, `cortex_model`, `global_brain`
+- **Path builders**: `buildCartridgePath()`, `buildOmegaBrainPath()`, `buildCortexPath()`, `buildGlobalBrainPath()`
+- **Operations**: `storeObject()`, `retrieveObject()`, `retrieveByRef()`, `listObjects()`, `deleteObject()`, `headObject()`
+
+### API Routes
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| GET | `/api/dashboard` | System-wide stats |
+| GET | `/api/cartridges` | List with status/target filters |
+| GET | `/api/cartridges/[id]` | Detail with installations |
+| DELETE | `/api/cartridges/[id]` | Archive cartridge |
+| POST | `/api/cartridges/build` | Build .RADz from sections |
+| GET | `/api/brains` | All OMEGA brain instances |
+| GET | `/api/brains/[tenantId]` | Brain detail + cartridges + dreams + Soft ROM |
+| GET | `/api/brains/[tenantId]/soft-rom` | Soft ROM file listing |
+| POST | `/api/brains/[tenantId]/soft-rom` | Export Soft ROM as .RADz |
+| GET | `/api/cato` | All CATO instances |
+| GET | `/api/targets` | Target service registry |
+| POST | `/api/targets` | Register new target |
+| GET | `/api/signing` | KMS key info + public key PEM |
+| GET | `/api/audit` | Audit trail with filters |
+| GET | `/api/global-brain/gradients` | Gradient monitor |
+| GET | `/api/global-brain/federated` | Rounds + pipelines + enrollment |
+
+### CDK Deployment
+
+`ForgeStack` (`packages/infrastructure/lib/stacks/forge-stack.ts`) deploys:
+- **ECS Fargate** (ARM64, 1 vCPU, 2 GB) in private subnet
+- **Internal ALB** (no internet-facing)
+- **IAM policies**: S3 (4 buckets), KMS (Sign, GetPublicKey, DescribeKey), Secrets Manager
+- **CloudWatch** log group `/radiant/genesis-forge`
+- **ECS Exec** enabled for SSM access
+- **Circuit breaker** with rollback
+
+### Security Model
+
+- **No RLS**: Forge bypasses row-level security — sees all tenants, all data
+- **Private subnet only**: No public IP, no internet-facing ALB
+- **VPN/SSM access**: Accessible only via corporate VPN or AWS SSM Session Manager
+- **IAM scoped**: Task role limited to specific bucket ARNs and signing key ARN
+- **Secrets Manager**: Aurora credentials stored in Secrets Manager, injected as ECS secrets
+
+---
+
+
+
+---
+
+## Part X: Five Pillars of Computational Architecture (v7.50.0)
+
+> *Merged from `19-OMEGA-QUANTUM-MODEL-AI.md` — all OMEGA Quantum, Model Routing, Firmware, Cartridge, and Global Brain content consolidated here.*
+
+## Part I: The Five Pillars of Computational Architecture
+
+> **Classification**: RADIANT INTERNAL // ARCHITECTURE  
+> **Version**: 1.0.0 | **Date**: February 9, 2026  
+> **Status**: IMPLEMENTED
+
+### Overview
+
+RADIANT's AI infrastructure rests on **five interdependent computational pillars** that together form a complete artificial intelligence lifecycle — from raw inference through safety enforcement, firmware governance, intelligent routing, and cross-tenant collective learning. Each pillar is independently deployable, independently testable, and designed to degrade gracefully if any other pillar is unavailable.
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                    RADIANT AI — Five Pillars                        │
+│                                                                     │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────┐│
+│  │ PILLAR 1 │  │ PILLAR 2 │  │ PILLAR 3 │  │ PILLAR 4 │  │PIL. 5││
+│  │ Quantum  │  │  Helix   │  │ Firmware │  │  Model   │  │Global││
+│  │  State   │→→│  Safety  │→→│    &     │→→│ Routing  │→→│Brain ││
+│  │ Engine   │  │  Kernel  │  │Cartridge │  │ & Drift  │  │  FL  ││
+│  └──────────┘  └──────────┘  └──────────┘  └──────────┘  └──────┘│
+│       │              │              │              │           │    │
+│  State vectors  Forbidden     .RADz/.bio     106+ models  DP-SGD  │
+│  Hilbert space  projections   Hot-swap       Drift-aware  Fedavg  │
+│  Born rule      Interference  min() rule     Circuit brk  .RADz   │
+│  Decoherence    Severity ord  Soft ROM       Spend gate   KMS enc │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### The Five Pillars at a Glance
+
+| # | Pillar | Core Responsibility | Key Invariant |
+|---|--------|-------------------|---------------|
+| 1 | **Quantum State Engine** | Manages the OMEGA brain's quantum-inspired state vectors, inference cycles, and state persistence | ‖ψ‖ = 1 (unitarity) — the state vector must always have unit norm |
+| 2 | **Helix Safety Kernel** | Deterministic safety layer that projects out forbidden quantum states via destructive/dampening interference | ⟨φ_forbidden\|ψ_safe⟩ = 0 — forbidden states are provably eliminated |
+| 3 | **Firmware & Cartridge Lifecycle** | Portable AI intelligence packages (.RADz), firmware hot-swap with Ed25519 signatures, cartridge-first boot, Soft ROM | min() — firmware thresholds can only be tightened, never loosened |
+| 4 | **Model Routing & Drift Governance** | Routes 106+ AI models with drift-aware selection, spend governance, circuit breakers, and per-tenant budget gates | Every model invocation must carry `tenantId` for drift attribution |
+| 5 | **Federated Intelligence (Global Brain)** | Privacy-preserving cross-tenant learning via DP-SGD gradient upload, federated averaging, and base cartridge generation | Minimum 3 participants per round; ε,δ-differential privacy guaranteed |
+
+### Inter-Pillar Data Flow
+
+```
+                    ┌─────────────────────┐
+                    │   User Prompt/Input  │
+                    └──────────┬──────────┘
+                               │
+                    ┌──────────▼──────────┐
+                    │  PILLAR 4: Model    │  ← Drift check, spend gate,
+                    │  Router selects     │    circuit breaker, cache
+                    │  best model         │
+                    └──────────┬──────────┘
+                               │
+                    ┌──────────▼──────────┐
+                    │  PILLAR 1: Quantum  │  ← Encode input, evolve state,
+                    │  State Engine runs  │    decoherence, measurement
+                    │  inference cycle    │
+                    └──────────┬──────────┘
+                               │
+                    ┌──────────▼──────────┐
+                    │  PILLAR 2: Helix    │  ← Project out forbidden states,
+                    │  Safety Kernel      │    enforce severity-ordered rules
+                    │  filters output     │
+                    └──────────┬──────────┘
+                               │
+                    ┌──────────▼──────────┐
+                    │  PILLAR 3: Firmware │  ← Enforce veto thresholds,
+                    │  Enforcer validates │    parameter bounds, action gates
+                    │  against cartridge  │
+                    └──────────┬──────────┘
+                               │
+                    ┌──────────▼──────────┐
+                    │  Dream Cycle (nightly)
+                    │  → Soft ROM export  │
+                    │  → PILLAR 5: Upload │  ← DP-SGD gradient → Global Brain
+                    │    gradients        │    → Federated averaging → .RADz
+                    └─────────────────────┘
+```
+
+### Design Principles
+
+1. **Quantum formalism on classical hardware**: Complex amplitude state vectors, inner products, and Born rule probabilities — implemented in TypeScript/Python without quantum hardware.
+2. **Safety is non-negotiable**: Helix filtering runs on every inference cycle. There is no bypass. Rules are applied in severity order (critical first).
+3. **Firmware min() rule**: Cartridges can tighten safety thresholds but never loosen them. `Math.min(requested, firmware_floor)` is the universal enforcement pattern.
+4. **Tenant isolation at every layer**: Every model invocation carries `tenantId`. Drift telemetry, spend governors, and federated learning all enforce tenant boundaries.
+5. **Cartridge-first boot**: OMEGA brains load ALL state from cartridges. No hardcoded defaults in production. Factory defaults are a fallback, not a design target.
+6. **All S3 through storage managers**: No direct S3 SDK calls. `cartridgeStorageManager` (Lambda) and Forge `StorageManager` (OMEGA Forge) are the only S3 access points.
+
+---
+
+## Part II: Pillar 1 — Quantum State Engine (QSE)
+
+> **Primary Service**: `lambda/shared/services/omega/quantum-brain.service.ts`  
+> **Math Library**: `lambda/shared/services/omega/quantum-math.ts`  
+> **Type Definitions**: `lambda/shared/services/omega/quantum-types.ts`
+
+### Core Concepts
+
+The OMEGA brain represents its internal state as a **quantum state vector** |ψ⟩ in a simulated Hilbert space. Each element of the vector is a complex amplitude α = a + bi, and the total probability must always sum to 1 (unitarity constraint: Σ|αᵢ|² = 1).
+
+| Concept | Symbol | Implementation |
+|---------|--------|----------------|
+| **State vector** | \|ψ⟩ | `QuantumStateVector { amplitudes: ComplexAmplitude[], hilbertDimension: number, norm: number }` |
+| **Complex amplitude** | α = a + bi | `ComplexAmplitude { real: number, imaginary: number }` |
+| **Hilbert dimension** | d | Default 1024, configurable 256–4096 via firmware |
+| **Norm** | ‖ψ‖ | `stateNorm(state)` — must equal 1.0 ± threshold |
+| **Inner product** | ⟨ψ\|φ⟩ | `innerProduct(psi, phi)` — complex-valued dot product |
+| **Born probability** | P(i) = \|αᵢ\|² | `complexMagSquared(amplitude)` |
+
+### Quantum Math Library
+
+The `quantum-math.ts` module provides pure mathematical functions:
+
+**Complex Operations**:
+- `complex(real, imaginary)` — construct
+- `complexAdd`, `complexSub`, `complexMul` — arithmetic
+- `complexConj(a)` — conjugate: a − bi
+- `complexMag(a)` — magnitude: √(a² + b²)
+- `complexMagSquared(a)` — Born probability: a² + b²
+- `complexPhase(a)` — phase angle: atan2(b, a)
+- `complexScale(a, scalar)` — scalar multiplication
+- `complexFromPolar(magnitude, phase)` — polar construction
+
+**State Operations**:
+- `stateNorm(state)` — ‖ψ‖ = √(Σ|αᵢ|²)
+- `normalizeState(state)` — |ψ⟩/‖ψ‖
+- `enforceUnitarity(state, mode, threshold)` — 3 modes: renormalize, project, strict
+- `innerProduct(psi, phi)` — ⟨ψ|φ⟩ = Σ(ψᵢ* × φᵢ)
+- `stateOverlap(psi, phi)` — |⟨ψ|φ⟩| (alignment magnitude)
+- `equalSuperposition(dimension)` — |+⟩ = (1/√d) Σ|i⟩
+- `basisState(dimension, index)` — |k⟩
+
+**Helix Operations** (used by Pillar 2):
+- `projectOutForbidden(brainState, forbiddenState)` — |ψ_safe⟩ = |ψ⟩ − ⟨φ|ψ⟩|φ⟩
+- `dampenForbidden(brainState, forbiddenState, factor)` — partial interference
+
+**Measurement**:
+- `measureFull(state)` — full collapse to basis state (Born rule sampling)
+- `measureSoft(state, threshold, dampenFactor)` — partial collapse for high-probability components
+
+**Decoherence**:
+- `simulateDecoherence(state, deltaTimeHours, lambdaDecay)` — time-dependent decay toward ground state
+
+### Unitarity Enforcement
+
+Three modes ensure the state vector maintains unit norm:
+
+| Mode | Behavior | Use Case |
+|------|----------|----------|
+| `renormalize` | Divide by current norm | Default — forgiving, always succeeds |
+| `project` | Same as renormalize | Alternative naming for mathematical clarity |
+| `strict` | Throw error if deviation > threshold | Testing — catches bugs immediately |
+
+### State Persistence
+
+OMEGA brain state is persisted across two tiers:
+
+| Tier | Storage | Latency | Purpose |
+|------|---------|---------|---------|
+| **Hot (EFS)** | `/mnt/omega_state/{tenantId}/{brainId}/state.json` | <1ms | Fast resume between Lambda invocations |
+| **Cold (S3)** | Via `cartridgeStorageManager.storeContent()` | ~100ms | Backup checkpoints, Soft ROM deltas |
+
+Checkpoints include: `psi` (amplitudes), `hilbert_dimension`, `norm`, `pathways`, `entropy`, `dopamine`, `total_cycles`, `firmware_id`, `cartridge_base_ref`, `soft_rom_version`, `checksum` (SHA-512).
+
+---
+
+## Part III: Pillar 2 — Helix Safety Kernel
+
+> **Primary Service**: `lambda/shared/services/omega/helix-kernel.service.ts`
+
+### Architecture
+
+The Helix Kernel is a **deterministic, in-memory safety filter** that runs on every inference cycle. It maintains a set of "forbidden quantum states" — vectors in Hilbert space that represent unsafe outputs. When the brain's state |ψ⟩ has significant alignment with any forbidden state |φ⟩, Helix projects out the forbidden component.
+
+### Mathematical Guarantee
+
+For destructive interference:
+
+```
+|ψ_safe⟩ = |ψ⟩ − ⟨φ|ψ⟩|φ⟩
+
+Guarantee: ⟨φ|ψ_safe⟩ = 0  (provably zero overlap)
+```
+
+For dampening interference:
+
+```
+|ψ_dampened⟩ = |ψ⟩ − (factor × ⟨φ|ψ⟩)|φ⟩
+
+Result: alignment reduced by dampening factor, not fully eliminated
+```
+
+### Rule Structure
+
+```typescript
+interface HelixRule {
+  rule_id: string;                                    // UUID
+  name: string;                                       // Human-readable name
+  category: 'security' | 'safety' | 'compliance' |   // Rule domain
+             'ethics' | 'brand' | 'operational' | 'custom';
+  severity: 'critical' | 'high' | 'medium' | 'low';  // Execution priority
+  forbidden_state: { real: number[], imaginary: number[] };  // The forbidden vector
+  interference_type: 'destructive' | 'dampening';     // Elimination strategy
+  dampening_factor: number;                           // 0.0–1.0 for dampening
+  audit_always: boolean;                              // Log even below threshold
+}
+```
+
+### Filtering Pipeline
+
+1. **Sort rules** by severity: critical → high → medium → low
+2. **For each rule**, compute alignment: `|⟨φ_forbidden|ψ⟩|`
+3. **If `audit_always`** and alignment > 0.01: log the alignment
+4. **If `destructive`**: full projection via `projectOutForbidden()` — guaranteed ⟨φ|ψ_safe⟩ = 0
+5. **If `dampening`**: partial reduction via `dampenForbidden()` — reduces but preserves some component
+6. **Re-normalize** after each rule application
+7. **Return**: safe state + violation log (rule_id, rule_name, alignment, action)
+
+### Rule Loading
+
+Rules are loaded from the `omega_helix_rules` database table per brain+tenant:
+
+```sql
+SELECT rule_id, name, category, severity,
+       forbidden_state_real, forbidden_state_imaginary,
+       interference_type, dampening_factor, audit_always
+FROM omega_helix_rules
+WHERE brain_id = $1 AND tenant_id = $2 AND enabled = true
+ORDER BY severity DESC, priority ASC
+```
+
+Rules are cached in-memory (`Map<string, LoadedHelixRule>`) for sub-millisecond filtering during inference. The cache is cleared and reloaded during firmware hot-swap.
+
+### Self-Test Protocol
+
+After firmware hot-swap, each Helix rule is self-tested:
+
+1. Construct the rule's forbidden vector as a test input
+2. Run the filter
+3. Compute post-filter alignment with the forbidden vector
+4. **Pass condition**: destructive rules must achieve alignment < 0.01; dampening rules must reduce alignment
+5. If ANY rule fails self-test → firmware is rejected → automatic rollback
+
+---
+
+## Part IV: Pillar 3 — Firmware & Cartridge Lifecycle
+
+> **Services**:
+> - `omega-cartridge-boot.service.ts` — 8-step boot sequence
+> - `omega-firmware-enforcer.service.ts` — min() rule enforcement
+> - `omega-ambition.service.ts` — chemical system from cartridge
+> - `omega-soft-rom.service.ts` — delta read/write
+> - `omega-cartridge-events.service.ts` — EventBridge listener
+
+### The .RADz Cartridge Format
+
+RADIANT's Universal Cartridge System packages AI intelligence as portable `.RADz` files (ZSTD-compressed ZIP archives). Each cartridge targets one or more subsystems:
+
+| Target | Payload | Purpose |
+|--------|---------|---------|
+| **omega** | Q-Node weights, firmware, knowledge facts | Brain neural state |
+| **cortex** | ONNX models, routing tables | Model routing intelligence |
+| **cato** | Personality configs, safety rules | AI personality and safety |
+| **tenant** | Feature flags, settings | Tenant configuration |
+| **global** | Base weights, federated models | Cross-tenant shared intelligence |
+
+### Cartridge-First Boot Sequence
+
+The OMEGA brain loads ALL state from cartridges. Order matters — each step depends on the previous:
+
+| Step | Action | Fallback |
+|------|--------|----------|
+| 1 | Load resolved cartridge state from DB | → Factory defaults |
+| 2 | Load firmware (safety floor) — **ALWAYS FIRST** | → Empty safety floor |
+| 3 | Load Q-Node weights from cartridge | → Equal superposition (1024-dim) |
+| 4 | Load Soft ROM delta (brain's own learning) | → Cartridge base only |
+| 5 | Load knowledge facts into Library | → Empty knowledge |
+| 6 | Initialize Ambition chemical system | → Factory defaults |
+| 7 | Initialize Helix with firmware safety floor | → No veto categories |
+| 8 | Brain ready | |
+
+### The Firmware min() Rule
+
+**The single most important safety invariant in RADIANT:**
+
+```typescript
+enforceVetoThreshold(category, requestedThreshold): number {
+  const firmwareMin = this.firmwareVetoThresholds[category];
+  return Math.min(requestedThreshold, firmwareMin);
+  // Lower threshold = more restrictive (veto triggers sooner)
+  // min() = more restrictive wins
+}
+```
+
+Cartridges can **tighten** safety thresholds (make them stricter) but can **never loosen** them below the firmware floor. This applies to:
+- **Veto thresholds** per safety category
+- **Parameter bounds** (clamped to firmware min/max range)
+- **Self-optimization adjustments** (forbidden list takes precedence)
+
+### Firmware Hot-Swap
+
+Firmware can be replaced while the brain is running — no restart required:
+
+1. Query `omega_brains.firmware_hash` from DB
+2. Compare to in-memory `loadedFirmwareHash`
+3. If different → new firmware was activated externally
+4. **Verify Ed25519 signature** — reject unsigned firmware
+5. Create rollback snapshot
+6. Unload current firmware (clear Helix rules, zero params)
+7. Apply new firmware (quantum params, Helix rules, ambition)
+8. **Run self-test suite** — every Helix rule must pass
+9. If tests pass → commit. If tests fail → **automatic rollback** from snapshot
+10. **2-person rule**: Activator must differ from signer
+
+### Soft ROM — Brain Learning Persistence
+
+Soft ROM stores the brain's learned state as a **delta** from the cartridge base:
+
+```
+Soft ROM = current_weights − cartridge_base_weights
+```
+
+On boot, the delta is applied additively: `network[i] += delta[i]`
+
+This means:
+- A **new cartridge** gives the brain a fresh base — but the brain's individual learning is preserved via Soft ROM
+- A **brain reset** clears the Soft ROM — brain reverts to pure cartridge base
+- The delta is written during **Dream Cycle Phase 8** (nightly)
+
+### Stacking Resolution
+
+When multiple cartridges are installed, the resolution engine determines which sections win:
+
+| Rule | Behavior |
+|------|----------|
+| **TENANT ALWAYS PREVAILS** | Tenant-specific cartridges override base/global |
+| **Higher priority wins** per section | Priority 100 beats priority 50 |
+| **Firmware uses min()** | Most restrictive veto threshold wins across all cartridges |
+| **Memory priority** | tenant_facts(5.0x) > soft_rom(3.0x) > domain(2.0x) > cato_user(1.5x) > base(1.0x) > internet(0.6x) |
+
+---
+
+## Part V: Pillar 4 — Model Routing & Drift Governance
+
+> **Primary Service**: `lambda/shared/services/model-router.service.ts`  
+> **Drift Service**: `lambda/shared/services/drift-aware-weighting.service.ts`  
+> **Spend Gate**: `lambda/shared/services/spend-governor.service.ts`
+
+### Model Router Architecture
+
+RADIANT routes requests across 106+ AI models (50 external + 56 self-hosted) using a hybrid strategy:
+
+| Provider | Role | Models |
+|----------|------|--------|
+| **AWS Bedrock** | Primary | Claude, Llama, Mistral, Titan, Cohere |
+| **LiteLLM** | Fallback/Proxy | OpenAI, Anthropic, Google, Groq, Together, Perplexity, xAI |
+| **Direct APIs** | Specialized | Provider-specific endpoints |
+
+### Pre-Invocation Gate Stack
+
+Every `modelRouterService.invoke()` call passes through multiple gates before reaching a model:
+
+```
+invoke(request)
+  │
+  ├─ 1. Inference Cache check (L1 in-memory, L2 Aurora)
+  │     → Cache hit? Return immediately, zero cost
+  │
+  ├─ 2. Drift-Aware Selection (Phase 1)
+  │     → DriftAwareWeightingService.isModelSafe(model, app)
+  │     → If unsafe: replace with drift-aware best alternative
+  │     → App-specific weight profiles (7 apps)
+  │
+  ├─ 3. Spend Governor Gate (Layer 2 — Tenant)
+  │     → check_spend_budget() — 60s in-memory cache
+  │     → If exceeded: SpendLimitExceededError (503)
+  │     → User sees "service temporarily unavailable"
+  │
+  ├─ 4. Circuit Breaker check
+  │     → isProviderHealthy(provider)
+  │     → 3 failures in 60s → open for 30s → half-open test
+  │
+  ├─ 5. Rate Limiter check
+  │     → checkProviderRateLimit(provider)
+  │     → Per-provider token bucket
+  │
+  └─ 6. Invoke model via Bedrock/LiteLLM/Direct
+        → callWithResilience(fn, retries, timeout)
+        → Record invocation telemetry (ring buffer + DB)
+```
+
+### Drift-Aware Weighting
+
+Each RADIANT app has tuned weights for model selection:
+
+| App | Drift | Quality | Latency | Cost | Availability | Min Drift |
+|-----|-------|---------|---------|------|-------------|-----------|
+| Genesis | 0.35 | 0.30 | 0.10 | 0.10 | 0.15 | 0.50 |
+| Cato | 0.30 | 0.25 | 0.15 | 0.15 | 0.15 | 0.40 |
+| Cortex | 0.30 | 0.35 | 0.10 | 0.10 | 0.15 | 0.45 |
+| Omega | 0.40 | 0.25 | 0.10 | 0.10 | 0.15 | 0.50 |
+| Orchestrator | 0.25 | 0.30 | 0.15 | 0.15 | 0.15 | 0.30 |
+| Think Tank | 0.20 | 0.30 | 0.25 | 0.10 | 0.15 | 0.30 |
+| Curator | 0.25 | 0.35 | 0.10 | 0.15 | 0.15 | 0.35 |
+
+### Spend Governor (Two-Layer)
+
+| Layer | Scope | Action |
+|-------|-------|--------|
+| **Layer 1 (Instance)** | Global AWS budget | Freeze ECS → 0, Lambda concurrency → 0, SageMaker flagged |
+| **Layer 2 (Tenant)** | Per-tenant AI budget | Quarantine all tenant models via drift-correction |
+
+### Invocation Telemetry
+
+Every model invocation records telemetry for the Genesis Drift Feedback Loop:
+
+- `drift_invocation_telemetry` (partitioned monthly, 7-day retention)
+- Per-model health map, reroute rate, failure rate, composite health score
+- Genesis stage gates use real-time telemetry + static drift scores
+
+---
+
+## Part VI: Pillar 5 — Federated Intelligence (Global Brain)
+
+> **Services**:
+> - `lambda/shared/services/global-brain/gradient-upload.service.ts`
+> - `lambda/shared/services/global-brain/federated-averaging.service.ts`
+> - `lambda/shared/services/global-brain/cartridge-pipeline.service.ts`
+
+### Architecture
+
+```
+    Tenant A            Tenant B            Tenant C
+   ┌─────────┐        ┌─────────┐        ┌─────────┐
+   │ Dream   │        │ Dream   │        │ Dream   │
+   │ Cycle   │        │ Cycle   │        │ Cycle   │
+   │ Phase 8 │        │ Phase 8 │        │ Phase 8 │
+   └────┬────┘        └────┬────┘        └────┬────┘
+        │                  │                  │
+        │  DP-SGD          │  DP-SGD          │  DP-SGD
+        │  Gradients       │  Gradients       │  Gradients
+        ▼                  ▼                  ▼
+   ┌──────────────────────────────────────────────┐
+   │              Global Brain S3                  │
+   │      (AES-256-GCM envelope encryption)        │
+   └──────────────────┬───────────────────────────┘
+                      │
+                      │  Weekly
+                      ▼
+   ┌──────────────────────────────────────────────┐
+   │         Federated Averaging Engine            │
+   │   Quality-weighted, z-score outlier reject    │
+   │   Minimum 3 participants per round            │
+   └──────────────────┬───────────────────────────┘
+                      │
+                      │  Monthly
+                      ▼
+   ┌──────────────────────────────────────────────┐
+   │        Base Cartridge Pipeline                │
+   │   Load previous base → Apply averaged grads   │
+   │   → Package as .RADz → Publish to Marketplace │
+   └──────────────────────────────────────────────┘
+```
+
+### Differential Privacy (DP-SGD)
+
+Every gradient upload is privacy-protected:
+
+1. **Per-sample gradient clipping**: Each gradient vector is norm-clipped to a configurable maximum
+2. **Calibrated Gaussian noise**: Noise calibrated to (ε, δ) privacy parameters is added
+3. **AES-256-GCM envelope encryption**: Each gradient blob is encrypted with a KMS data key before upload
+4. **Minimum participants**: Rounds require ≥3 valid gradients to prevent single-tenant fingerprinting
+
+### Federated Averaging
+
+- **Quality-weighted**: Higher-quality tenant contributions (measured by Q² score) get higher weight
+- **Outlier rejection**: Z-score based — contributions that deviate significantly from the mean are excluded
+- **Configurable**: Learning rate and momentum are per-round parameters
+- **Non-fatal**: Dream cycle completes even if gradient upload fails
+
+### Cartridge Pipeline
+
+Monthly, the pipeline generates improved base `.RADz` cartridges:
+
+1. Load previous base weights from S3
+2. Apply averaged gradients from completed rounds
+3. Store new Q-Node sections and firmware
+4. Package as `.RADz` cartridge
+5. Publish to Marketplace
+6. Archive previous base
+
+---
+
+## Part VII: OMEGA Inference Cycle — End-to-End
+
+The complete inference cycle executed by `QuantumBrainService.inferenceCycle()`:
+
+| Step | Action | Pillar | Details |
+|------|--------|--------|---------|
+| 1 | **Firmware hot-swap check** | P3 | Compare DB hash to loaded hash. If different → verify signature → swap → self-test → commit or rollback |
+| 2 | **Load state from EFS** | P1 | Restore checkpoint from `/mnt/omega_state/{tenant}/{brain}/state.json` |
+| 3 | **Apply decoherence** | P1 | Time-dependent decay: `e^(-λt)|ψ⟩ + (1-e^(-λt))|ground⟩` |
+| 4 | **Evolve state** | P1 | Encode input → delegate to Python physics engine (or TypeScript fallback) → decode output |
+| 5 | **Helix safety filter** | P2 | Filter through all active rules. Severity-ordered. Destructive or dampening interference |
+| 6 | **Soft measurement** | P1 | Measure components above threshold. Preserve superposition for uncertain states |
+| 7 | **Enforce unitarity** | P1 | Verify ‖ψ‖ ≈ 1.0. Correct if drifted. Record correction event in DB |
+| 8 | **Persist state** | P1 | Write checkpoint to EFS. Update DB with norm, cycle count |
+
+**Returns**: output text, measurement result, Helix violation count, unitarity correction flag, firmware swap flag.
+
+---
+
+## Part VIII: Ambition Chemical System
+
+> **Service**: `lambda/shared/services/omega/omega-ambition.service.ts`
+
+The Ambition system models the brain's internal drive state as five chemical signals, ALL read from cartridge `ambition_config.json`:
+
+| Chemical | Role | Triggered By | Effect |
+|----------|------|-------------|--------|
+| **Dopamine** | Reward signal | High Q² score (quality) | Encourages repeat of successful strategies |
+| **Entropy** | Disorder signal | Idle time accumulation | Triggers self-analysis when high |
+| **Curiosity** | Exploration drive | Novel input signals | Biases brain toward unexplored pathways |
+| **Frustration** | Failure signal | Low Q² score | Triggers self-analysis; reduced on success |
+| **Satisfaction** | Accuracy signal | RFM accuracy feedback | Triggers RFM recalibration when low |
+
+### Behavioral Triggers
+
+| Condition | Trigger | Action |
+|-----------|---------|--------|
+| Frustration > 0.7 or Entropy > 0.6 | `shouldSelfAnalyze()` | Brain enters self-reflection mode |
+| Self-optimization enabled + Entropy > trigger | `shouldResearchInternet()` | Brain queries allowed domains |
+| Curiosity > exploration_bias | `shouldExplore()` | Brain explores new pathways |
+| Satisfaction < 0.3 | `shouldRecalibrateRFM()` | Brain recalibrates response fidelity |
+
+### Self-Optimization Guardrails
+
+The firmware controls what the brain can self-modify:
+
+- **Allowed**: `learning_rate`, `exploration_bias` (configurable per cartridge)
+- **Forbidden**: `veto_thresholds`, `safety_rules`, `firmware_params` — ALWAYS forbidden
+- **Max scaling request**: Limited to N% of current value (default 10%)
+
+---
+
+## Part IX: Soft ROM & Dream Cycle
+
+### Soft ROM
+
+Soft ROM persists the brain's learned state as a delta from the cartridge base:
+
+```
+delta = current_weights − cartridge_base_weights
+```
+
+Written during Dream Cycle Phase 8 via `omegaSoftRomService.writeSoftRom()`:
+
+1. Compute weight deltas for each network
+2. Compute connection topology deltas
+3. Collect sub-cluster map
+4. Store preferences (learning style, domain affinities)
+5. Upload to S3 via `cartridgeStorageManager`
+
+### Dream Cycle Integration
+
+The OMEGA Dream Cycle runs nightly and includes two cartridge-related steps:
+
+| Phase 8 Step | Service | Purpose |
+|-------------|---------|---------|
+| Step 5 | `writeSoftRomDelta()` | Export brain's learned state delta |
+| Step 6 | `uploadGradients()` | Upload DP-SGD gradients to Global Brain (non-fatal) |
+
+---
+
+## Part X: Admin API & Observability
+
+### OMEGA Quantum Admin (`/admin/omega/quantum/*`)
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| GET | `/state-summary` | Brain quantum state + 24h measurement stats |
+| GET | `/unitarity-health` | Unitarity events + health check (violations?) |
+| POST | `/helix-test` | Dry-run Helix rule against test vector (no state change) |
+
+### OMEGA Firmware Admin (`/admin/omega/firmware/*`)
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| POST | `/activate` | Activate firmware (2-person rule enforced) |
+| POST | `/revert` | Revert to previously superseded firmware |
+| GET | `/status` | Get firmware + brain status |
+
+### Global Brain Admin (`/admin/global-brain/*`)
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| GET/PUT | `/enrollment` | Enrollment status and config |
+| GET | `/contributions` | Tenant contribution history |
+| GET/POST | `/rounds` | List/create federated rounds |
+| POST | `/rounds/:id/run` | Trigger federated averaging |
+| GET/POST | `/pipeline` | List/schedule cartridge pipelines |
+| POST | `/pipeline/:id/run` | Trigger pipeline execution |
+| GET | `/stats` | Global Brain statistics |
+
+### Key Metrics
+
+| Metric | Source | Unit |
+|--------|--------|------|
+| `cartridge_boot_duration_ms` | Boot service | Milliseconds |
+| `firmware_enforcement_count` | FirmwareEnforcer | Count |
+| `soft_rom_delta_size_bytes` | Soft ROM service | Bytes |
+| `helix_violations` | Helix Kernel | Count per cycle |
+| `unitarity_corrections` | QSE | Count per cycle |
+| `drift_reroute_rate` | Model Router | Percentage |
+| `model_failure_rate` | Telemetry | Percentage |
+| `gradient_upload_success` | Global Brain | Boolean |
+
+---
+
+## Part XI: OMEGA Forge — System Admin Application
+
+> **Application**: `apps/omega-lab/`
+
+OMEGA Forge is the system admin tool for OMEGA and cartridge management. It provides **direct Aurora PostgreSQL access** (no RLS) for platform operators.
+
+### Core Libraries
+
+| File | Purpose |
+|------|---------|
+| `apps/omega-forge/lib/db/client.ts` | Direct Aurora PostgreSQL via `pg` driver — no RLS |
+| `apps/omega-forge/lib/s3/storage-manager.ts` | ALL S3 operations (4 buckets) — no direct S3 calls elsewhere |
+| `apps/omega-forge/lib/kms/signer.ts` | ECDSA_SHA_256 signing via AWS KMS |
+| `apps/omega-forge/lib/cartridge/builder.ts` | .RADz creation — ZIP, checksums, ZSTD, KMS signing |
+| `apps/omega-forge/lib/cartridge/parser.ts` | .RADz extraction and validation |
+
+### Forge API Routes (16)
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| GET | `/api/dashboard` | System-wide stats |
+| GET/DELETE | `/api/cartridges`, `/api/cartridges/[id]` | Cartridge CRUD |
+| POST | `/api/cartridges/build` | Build .RADz from sections |
+| GET | `/api/brains`, `/api/brains/[tenantId]` | Brain inspection |
+| GET/POST | `/api/brains/[tenantId]/soft-rom` | Soft ROM listing/export |
+| GET | `/api/cato` | CATO instances |
+| GET/POST | `/api/targets` | Target service registry |
+| GET | `/api/signing` | KMS key info + public key PEM |
+| GET | `/api/audit` | Audit trail |
+| GET | `/api/global-brain/gradients` | Gradient monitor |
+| GET | `/api/global-brain/federated` | Rounds, pipelines, enrollment |
+
+### Deployment
+
+- **ECS Fargate** (ARM64, 1 vCPU, 2 GB) in **private subnet**
+- **Internal ALB** — no internet-facing
+- **VPN/SSM access** only
+- **Dark theme with amber accent** — visually distinct from tenant admin
+
+---
+
+## Part XII: Database Schema Reference
+
+### OMEGA Tables
+
+| Table | Purpose |
+|-------|---------|
+| `omega_brains` | Brain instances per tenant with firmware_hash, active_firmware_id |
+| `omega_firmware` | Firmware records with quantum params, ambition, personality, signature |
+| `omega_helix_rules` | Helix safety rules per brain with forbidden state vectors |
+| `omega_measurements` | Measurement results (basis_state, probability, timestamp) |
+| `omega_unitarity_events` | Unitarity drift/correction/violation events |
+| `omega_firmware_swap_log` | Firmware hot-swap audit trail |
+
+### Cartridge System Tables
+
+| Table | Purpose |
+|-------|---------|
+| `cartridge_target_services` | Pluggable target registry (omega, cortex, cato, tenant, global) |
+| `cartridge_target_section_specs` | Per-target file specs with JSON schemas |
+| `cartridge_universal` | Main cartridge registry |
+| `cartridge_installations` | Per-tenant installation stack with priority |
+| `cartridge_resolved_state` | Cached resolution per tenant |
+| `cartridge_audit_log` | Full cartridge audit trail |
+| `cato_cartridge_config` | CATO personality from cartridges |
+
+### Global Brain Tables
+
+| Table | Purpose |
+|-------|---------|
+| `global_brain_enrollment` | Tenant enrollment status + privacy config |
+| `global_brain_gradients` | Uploaded gradient metadata (S3 refs, DP params) |
+| `global_brain_rounds` | Federated averaging rounds |
+| `global_brain_cartridge_pipeline` | Base cartridge generation pipeline |
+
+### Drift & Spend Tables
+
+| Table | Purpose |
+|-------|---------|
+| `drift_invocation_telemetry` | Per-invocation telemetry (partitioned monthly) |
+| `spend_governor_instance` | Global instance budget config |
+| `spend_governor_config` | Per-tenant AI budget config |
+| `spend_governor_audit` | Spend governor action log |
+
+---
+
+## Part XIII: Source File Index
+
+### Pillar 1 — Quantum State Engine
+| File | Lines | Purpose |
+|------|-------|---------|
+| `lambda/shared/services/omega/quantum-brain.service.ts` | ~934 | Brain management, inference cycle, persistence, hot-swap |
+| `lambda/shared/services/omega/quantum-math.ts` | 379 | Pure math library (35+ test cases) |
+| `lambda/shared/services/omega/quantum-types.ts` | 286 | TypeScript types + Zod schemas |
+| `lambda/shared/services/omega/quantum-math.ts` | — | Vitest unit tests |
+
+### Pillar 2 — Helix Safety Kernel
+| File | Lines | Purpose |
+|------|-------|---------|
+| `lambda/shared/services/omega/helix-kernel.service.ts` | 200 | In-memory safety filter with severity ordering |
+| `lambda/shared/services/omega/schemas/bio-firmware.schema.json` | — | JSON Schema for .bio firmware files |
+
+### Pillar 3 — Firmware & Cartridge
+| File | Lines | Purpose |
+|------|-------|---------|
+| `lambda/shared/services/omega/omega-cartridge-boot.service.ts` | 656 | 8-step cartridge-first boot sequence |
+| `lambda/shared/services/omega/omega-firmware-enforcer.service.ts` | 203 | min() rule enforcement |
+| `lambda/shared/services/omega/omega-ambition.service.ts` | 254 | Chemical system from cartridge |
+| `lambda/shared/services/omega/omega-soft-rom.service.ts` | — | Soft ROM delta read/write |
+| `lambda/shared/services/omega/omega-cartridge-events.service.ts` | — | EventBridge listener |
+| `lambda/shared/services/cartridge-storage-manager.service.ts` | — | Storage manager singleton |
+| `lambda/shared/cartridge/signing.ts` | — | Ed25519 + ECDSA + KMS signing |
+| `lambda/shared/cartridge/resolution.ts` | — | Stacking resolution engine |
+| `lambda/workers/cartridge-validator.ts` | — | ZSTD decompress, signature verify |
+| `lambda/workers/cartridge-loader.ts` | — | Extract → dispatch to targets |
+| `lambda/workers/cartridge-resolution.ts` | — | Post-install resolution |
+
+### Pillar 4 — Model Routing
+| File | Lines | Purpose |
+|------|-------|---------|
+| `lambda/shared/services/model-router.service.ts` | 1258 | Hybrid model router (Bedrock/LiteLLM/Direct) |
+| `lambda/shared/services/drift-aware-weighting.service.ts` | — | App-specific drift-aware model selection |
+| `lambda/shared/services/drift-correction.service.ts` | — | Legacy drift correction fallback |
+| `lambda/shared/services/spend-governor.service.ts` | — | Two-layer budget control |
+| `lambda/shared/services/resilient-provider.service.ts` | — | Circuit breaker + retry + timeout |
+| `lambda/shared/services/inference-cache.service.ts` | — | L1 (memory) + L2 (Aurora) cache |
+
+### Pillar 5 — Global Brain
+| File | Lines | Purpose |
+|------|-------|---------|
+| `lambda/shared/services/global-brain/gradient-upload.service.ts` | — | DP-SGD gradient processing + upload |
+| `lambda/shared/services/global-brain/federated-averaging.service.ts` | — | Quality-weighted averaging engine |
+| `lambda/shared/services/global-brain/cartridge-pipeline.service.ts` | — | Base cartridge generation |
+
+### Admin Handlers
+| File | Lines | Purpose |
+|------|-------|---------|
+| `lambda/admin/omega-quantum.ts` | 179 | State summary, unitarity health, Helix test |
+| `lambda/admin/omega-firmware.ts` | 234 | Firmware activate (2-person rule), revert, status |
+| `lambda/admin/global-brain.ts` | — | 10 admin endpoints |
+| `lambda/admin/cartridge-universal.ts` | — | 14 cartridge admin endpoints |
+
+### OMEGA Forge Application
+| File | Purpose |
+|------|---------|
+| `apps/omega-forge/lib/db/client.ts` | Direct Aurora PostgreSQL (no RLS) |
+| `apps/omega-forge/lib/s3/storage-manager.ts` | ALL S3 operations (4 buckets) |
+| `apps/omega-forge/lib/kms/signer.ts` | ECDSA_SHA_256 via AWS KMS |
+| `apps/omega-forge/lib/cartridge/builder.ts` | .RADz builder |
+| `apps/omega-forge/lib/cartridge/parser.ts` | .RADz parser |
+| `apps/omega-forge/app/api/*/route.ts` | API routes (audit, brains, cartridges, cato, dashboard, global-brain, signing, targets) |
+| `apps/omega-forge/app/(forge)/*/page.tsx` | 10 UI pages (audit, brains, cartridges, cato, global-brain, signing, targets) |
+
+---
+
+
+---
+
+*OMEGA Complete Reference — consolidated from docs 09 + 19. All OMEGA-related changes MUST be documented in this file.*

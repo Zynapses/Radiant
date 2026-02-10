@@ -21,7 +21,7 @@ interface AdminRequest {
     authorizer?: {
       tenantId?: string;
       userId?: string;
-      role?: string; // 'super_admin' | 'tenant_admin' | 'tenant_owner' | etc.
+      role?: string; // 'super_admin' | 'tenant_admin' | 'standard_user' | etc.
     };
   };
 }

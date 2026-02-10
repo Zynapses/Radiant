@@ -192,7 +192,7 @@ export default function VaultPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Genesis Vault</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Cartridge Vault</h1>
           <p className="text-muted-foreground">
             Keyhole Pattern - Manage secrets for cartridges without exposing credentials
           </p>
@@ -213,7 +213,7 @@ export default function VaultPage() {
               <DialogHeader>
                 <DialogTitle>Add New Secret</DialogTitle>
                 <DialogDescription>
-                  Store a new secret in the Genesis Vault. Secrets are encrypted with KMS.
+                  Store a new secret in the Cartridge Vault. Secrets are encrypted with KMS.
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
@@ -342,7 +342,7 @@ export default function VaultPage() {
             <CardHeader>
               <CardTitle>Stored Secrets</CardTitle>
               <CardDescription>
-                Manage encrypted secrets in the Genesis Vault
+                Manage encrypted secrets in the Cartridge Vault
               </CardDescription>
             </CardHeader>
             <CardContent>

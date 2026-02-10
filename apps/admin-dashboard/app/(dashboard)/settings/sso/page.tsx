@@ -615,7 +615,7 @@ function SsoConnectionForm({ formData, setFormData, isNew }: SsoConnectionFormPr
             <Label>Default Role</Label>
             <Select
               value={formData.defaultRole || 'standard_user'}
-              onValueChange={(value) => setFormData(prev => ({ ...prev, defaultRole: value as 'standard_user' | 'tenant_admin' | 'tenant_owner' }))}
+              onValueChange={(value) => setFormData(prev => ({ ...prev, defaultRole: value as 'standard_user' | 'tenant_admin' }))}
             >
               <SelectTrigger>
                 <SelectValue />
@@ -623,7 +623,6 @@ function SsoConnectionForm({ formData, setFormData, isNew }: SsoConnectionFormPr
               <SelectContent>
                 <SelectItem value="standard_user">Standard User</SelectItem>
                 <SelectItem value="tenant_admin">Tenant Admin</SelectItem>
-                <SelectItem value="tenant_owner">Tenant Owner</SelectItem>
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground">Role assigned to new users from this IdP</p>

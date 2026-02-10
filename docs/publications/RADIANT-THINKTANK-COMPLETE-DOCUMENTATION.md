@@ -1,6 +1,6 @@
 # RADIANT & Think Tank — Complete Documentation
 
-**Version 6.6.0** | **Generated February 08, 2026** | **Zynapses Inc.**
+**Version 6.6.0** | **Generated February 10, 2026** | **Zynapses Inc.**
 
 > This document is the single authoritative assembly of ALL RADIANT and Think Tank
 > documentation. It is auto-generated from the source documentation files in the
@@ -14,86 +14,74 @@
 
 ## Table of Contents
 
-### Part 1: Applications — Think Tank
+### Part 1: Applications — Think Tank + Dojo
 
-  1.1. Think Tank — Complete Reference
+  1.1. Think Tank + Dojo — Complete Reference
 
 ### Part 2: Applications — Curator
 
   2.1. Curator — Complete Reference
 
-### Part 3: Applications — Aurelius Dojo
+### Part 3: Applications — Radiant Admin
 
-  3.1. Dojo — Complete Reference
+  3.1. Radiant Admin — Complete Reference
 
-### Part 4: Applications — Radiant Admin
+### Part 4: Applications — Swift Deployer
 
-  4.1. Radiant Admin — Complete Reference
+  4.1. Swift Deployer — Complete Reference
 
-### Part 5: Applications — Swift Deployer
+### Part 5: Architecture, Engineering & Data Storage
 
-  5.1. Swift Deployer — Complete Reference
+  5.1. Architecture, Engineering & Data — Complete Reference
 
-### Part 6: Architecture & Engineering
+### Part 6: AI Systems — Brain & CATO Safety
 
-  6.1. Architecture & Engineering — Complete Reference
+  6.1. AI Systems — Complete Reference
 
-### Part 7: AI Brain Systems
+### Part 7: OMEGA Protocol & Genesis
 
-  7.1. AI Brain Systems — Complete Reference
+  7.1. OMEGA — Complete Reference
 
-### Part 8: CATO Safety System
+### Part 8: Orchestration & Workflows
 
-  8.1. CATO Safety — Complete Reference
+  8.1. Orchestration & Workflows — Complete Reference
 
-### Part 9: OMEGA Protocol & Genesis
+### Part 9: API Reference
 
-  9.1. OMEGA & Genesis — Complete Reference
+  9.1. API Reference — Complete Reference
 
-### Part 10: Orchestration & Workflows
+### Part 10: Security, Authentication & Compliance
 
-  10.1. Orchestration & Workflows — Complete Reference
+  10.1. Security, Auth & Compliance — Complete Reference
 
-### Part 11: Data & Storage
+### Part 11: Operations & Runbooks
 
-  11.1. Data & Storage — Complete Reference
+  11.1. Operations & Runbooks — Complete Reference
 
-### Part 12: API Reference
+### Part 12: Strategy & Competitive Position
 
-  12.1. API Reference — Complete Reference
+  12.1. Strategy & Competitive — Complete Reference
 
-### Part 13: Security, Authentication & Compliance
+### Part 13: Implementation Specifications
 
-  13.1. Security, Auth & Compliance — Complete Reference
+  13.1. Implementation Specs — Sections 00–46
 
-### Part 14: Operations & Runbooks
+### Part 14: Glossary
 
-  14.1. Operations & Runbooks — Complete Reference
+  14.1. RADIANT & Think Tank Glossary
 
-### Part 15: Strategy & Competitive Position
+### Part 15: UI/UX & Libraries
 
-  15.1. Strategy & Competitive — Complete Reference
+  15.1. UI/UX Design & Libraries
 
-### Part 16: Implementation Specifications
+### Part 16: Changelog & History
 
-  16.1. Implementation Specs — Sections 00–46
-
-### Part 17: Glossary
-
-  17.1. RADIANT & Think Tank Glossary
-
-### Part 18: UI/UX & Libraries
-
-  18.1. UI/UX Design & Libraries
-
-### Part 19: Changelog & History
-
-  19.1. Changelog
-  19.2. Technical Debt
-  19.3. Security Policy
-  19.4. Contributing Guide
-  19.5. Code of Conduct
-  19.6. README
+  16.1. Changelog
+  16.2. Technical Debt
+  16.3. Security Policy
+  16.4. Contributing Guide
+  16.5. Code of Conduct
+  16.6. README
 
 
 ---
@@ -101,17 +89,17 @@
 
 \newpage
 
-# Part 1: Applications — Think Tank
+# Part 1: Applications — Think Tank + Dojo
 
 ---
 
 
 \newpage
 
-## 1.1 Think Tank — Complete Reference
+## 1.1 Think Tank + Dojo — Complete Reference
 
 
-*Source: `docs/01-THINK-TANK.md` (22,774 lines)*
+*Source: `docs/01-THINK-TANK.md` (22,917 lines)*
 
 ---
 
@@ -2172,7 +2160,7 @@ To see how Think Tank processed your question:
 | **Liquid Compute** | Data sovereignty system ensuring processing in compliant jurisdictions |
 | **Ghost Simulation** | Digital twin that learns preferences without storing actual prompts |
 | **Economic Cortex** | Autonomous budget management with hierarchical cost controls |
-| **Genesis Auto-Tool** | System that automatically creates new capabilities on demand |
+| **Tool Forge** | System that automatically creates new capabilities on demand |
 | **Neural Affinity Routing** | AI model selection based on semantic similarity and proficiency |
 | **Tensor-Link** | High-efficiency vector-based communication protocol for AI systems |
 
@@ -2299,7 +2287,7 @@ Think Tank v6.6.0 introduces the **Autonomous Organism Architecture** — a coll
 │  🌍 LIQUID COMPUTE       - Your data stays in your jurisdiction            │
 │  👻 GHOST SIMULATION     - AI learns your style without storing prompts    │
 │  💰 ECONOMIC CORTEX      - Smart budgeting keeps costs predictable         │
-│  🔧 GENESIS AUTO-TOOL    - New capabilities appear automatically           │
+│  🔧 TOOL FORGE           - New capabilities appear automatically           │
 │  🧠 NEURAL ROUTING       - Best AI model selected for each question        │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
@@ -2396,13 +2384,13 @@ Economic Cortex automatically manages AI costs while ensuring quality:
 3. Enable "Smart Downgrade" to auto-select cheaper models when appropriate
 4. Review your weekly cost report (emailed Mondays)
 
-### Genesis Auto-Tool - Automatic Capability Expansion
+### Tool Forge - Automatic Capability Expansion
 
-When you need a capability that doesn't exist, Genesis can create it:
+When you need a capability that doesn't exist, Tool Forge can create it:
 
 **How It Works:**
 1. You ask Think Tank to do something it can't do
-2. Genesis analyzes the request and builds a new tool
+2. Tool Forge analyzes the request and builds a new tool
 3. The tool is validated in a sandbox
 4. Within minutes, the capability is available
 
@@ -2410,7 +2398,7 @@ When you need a capability that doesn't exist, Genesis can create it:
 ```
 You: "Can you analyze this CSV and create a pivot table?"
 
-Think Tank: "I don't have a pivot table tool, but Genesis is building one..."
+Think Tank: "I don't have a pivot table tool, but Tool Forge is building one..."
 
 [2 minutes later]
 
@@ -2418,7 +2406,7 @@ Think Tank: "Done! Here's your pivot table. This capability is now
             available for future requests."
 ```
 
-**Note:** Genesis-created tools are reviewed by administrators before becoming permanent.
+**Note:** Tool Forge-created tools are reviewed by administrators before becoming permanent.
 
 ### Neural Affinity Routing
 
@@ -2455,7 +2443,7 @@ To see how these systems are working for you:
 | Version | Date | Changes |
 |---------|------|---------|
 | 7.9.0 | Feb 5, 2026 | **LIVS-M 2.0 Policy Modes**: Added comprehensive documentation for "Defcon-style" AI governance with Brainstorming, Standard, and Strict Audit policy modes. Updated Settings → Advanced → LIVS-M Policy access path. |
-| 6.6.0 | Feb 3, 2026 | **Autonomous Organism Architecture (Project Metamorphosis)**: Added Section 29 covering Liquid Compute (data sovereignty), Ghost Simulation (personalized safety), Economic Cortex (budget management), Genesis Auto-Tool (capability expansion), and Neural Affinity Routing (model selection) |
+| 6.6.0 | Feb 3, 2026 | **Autonomous Organism Architecture (Project Metamorphosis)**: Added Section 29 covering Liquid Compute (data sovereignty), Ghost Simulation (personalized safety), Economic Cortex (budget management), Tool Forge (capability expansion), and Neural Affinity Routing (model selection) |
 | 6.0.0 | Jan 31, 2026 | **Neural Architecture v6.0.0**: Added RADIANT Cartridges section, Domain Selector guide, Cartridge Indicator documentation, Three Learning Tiers explanation, expanded Glossary with neural architecture terms |
 | 5.52.58 | Jan 31, 2026 | Added Workflows & Orchestration Methods section (multi-AI selection, stream evaluation, workflow templates, configurable parameters) |
 | 5.52.52 | Jan 28, 2026 | Major update: Added Time Machine, Grimoire, Flash Facts, Sentinel Agents, Economic Governor, Council of Rivals, Voice Input & File Attachments sections |
@@ -4363,7 +4351,7 @@ The AGI Brain learns persistently from user interactions:
 | `lambda/shared/services/agi-ideas.service.ts` | Main service (570 lines) |
 | `lambda/thinktank/ideas.ts` | API handler |
 | `packages/shared/src/types/agi-ideas.types.ts` | Type definitions |
-| `migrations/049_agi_ideas.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 
 ### 14.10 Troubleshooting
 
@@ -7763,8 +7751,8 @@ The viewer provides:
 | `lambda/shared/services/artifact-engine/index.ts` | Public exports |
 | `lambda/thinktank/artifact-engine.ts` | API handlers |
 | `apps/admin-dashboard/components/thinktank/artifact-viewer.tsx` | Viewer component |
-| `apps/admin-dashboard/components/thinktank/chat-with-artifacts.tsx` | Split-screen chat |
-| `apps/admin-dashboard/app/(dashboard)/thinktank/artifacts/page.tsx` | Admin dashboard |
+| `apps/thinktank-admin/app/(dashboard)/artifacts/page.tsx` | Split-screen chat |
+| `apps/thinktank-admin/app/(dashboard)/artifacts/page.tsx` | Admin dashboard |
 
 ---
 
@@ -9777,16 +9765,16 @@ CREATE TABLE user_workflow_templates (
 
 | File | Purpose |
 |------|---------|
-| `migrations/066_orchestration_patterns_registry.sql` | Base schema with `is_system_method`/`is_system_workflow` |
-| `migrations/157_orchestration_methods_part1.sql` | Schema updates, display/scientific names |
-| `migrations/157_orchestration_methods_part2.sql` | Ensemble, verification methods |
-| `migrations/157_orchestration_methods_part3.sql` | Uncertainty, routing, neural methods |
+| `migrations/000_consolidated_schema.sql` | Base schema with `is_system_method`/`is_system_workflow` |
+| `migrations/000_consolidated_schema.sql` | Schema updates, display/scientific names |
+| `migrations/000_consolidated_schema.sql` | Ensemble, verification methods |
+| `migrations/000_consolidated_schema.sql` | Uncertainty, routing, neural methods |
 | `lambda/shared/services/orchestration-methods.service.ts` | **20 algorithm implementations** including SE Probes, Kernel Entropy, Pareto, C3PO, AutoMix |
 | `lambda/shared/services/cato/neural-decision.service.ts` | Cato Neural Decision Engine |
 | `lambda/admin/orchestration-methods.ts` | Methods API with system method protection |
 | `lambda/admin/orchestration-user-templates.ts` | User templates CRUD API |
 | `apps/admin-dashboard/app/(dashboard)/orchestration/methods/page.tsx` | Admin method config with system badge |
-| `apps/admin-dashboard/app/(dashboard)/thinktank/workflow-templates/page.tsx` | User templates UI |
+| `apps/thinktank-admin/app/(dashboard)/workflow-templates/page.tsx` | User templates UI |
 
 ---
 
@@ -9848,7 +9836,7 @@ Access via **Think Tank → Polymorphic UI** in admin dashboard.
 | `governor/economic-governor.ts` | `determineViewType()`, `determinePolymorphicRoute()` |
 | `consciousness/mcp-server.ts` | `render_interface`, `escalate_to_war_room` tools |
 | `python/cato/cognitive/workflows.py` | Flyte tasks for view selection |
-| `migrations/160_polymorphic_ui.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `components/thinktank/polymorphic/` | React view components |
 | `app/(dashboard)/thinktank/polymorphic/page.tsx` | Admin page |
 
@@ -10046,9 +10034,9 @@ policy_framework:
 | File | Purpose |
 |------|---------|
 | `lambda/shared/services/policy-framework.service.ts` | Policy context injection |
-| `lambda/shared/services/citation-manager.service.ts` | Citation tracking and validation |
-| `lambda/thinktank/policy-context.ts` | API handler for policy queries |
-| `migrations/164_policy_framework.sql` | Database schema |
+| `lambda/shared/services/fact-anchor.service.ts` | Citation tracking and fact anchoring |
+| `lambda/thinktank/handler.ts` | API handler (includes policy context) |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `config/policy/cato-principles.yaml` | Cato Institute policy principles |
 
 ---
@@ -10395,12 +10383,12 @@ Base: `/api/thinktank/security`
 
 | File | Purpose |
 |------|---------|
-| `lambda/shared/services/ssf-thinktank.service.ts` | SSF emitter/receiver for Think Tank |
-| `lambda/shared/services/caep-session.service.ts` | CAEP session management |
-| `lambda/shared/services/identity-remediation-thinktank.service.ts` | Think Tank remediation agent |
-| `lambda/thinktank/security-events.ts` | Security event API handler |
+| `lambda/shared/services/security-signals.service.ts` | Security signal processing for Think Tank |
+| `lambda/shared/services/security-protection.service.ts` | Security session protection |
+| `lambda/shared/services/identity-core.service.ts` | Identity remediation agent |
+| `lambda/thinktank/handler.ts` | Think Tank API handler (includes security events) |
 | `components/thinktank/ghost-indicator.tsx` | Ghost UI component |
-| `migrations/165_agentic_orchestration.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `config/security/ssf-events.yaml` | SSF event definitions |
 | `config/security/caep-policies.yaml` | CAEP policy configuration |
 
@@ -11025,7 +11013,7 @@ my-liquid-app/
 | `lambda/shared/services/liquid-interface/eject.service.ts` | App export service |
 | `lambda/shared/services/liquid-interface/component-registry.ts` | 50+ components |
 | `lambda/thinktank/liquid-interface.ts` | API handler |
-| `migrations/161_liquid_interface.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 
 ---
 
@@ -11324,7 +11312,7 @@ Base path: `/api/thinktank/reality-engine`
 | `lambda/shared/services/reality-engine/quantum-futures.service.ts` | Branching |
 | `lambda/shared/services/reality-engine/pre-cognition.service.ts` | Predictions |
 | `lambda/thinktank/reality-engine.ts` | API handler |
-| `migrations/162_reality_engine.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 
 ### 40.11 The "Code Curtain" Rule
 
@@ -11520,7 +11508,7 @@ Base path: `/api/thinktank/magic-carpet`
 |------|---------|
 | `packages/shared/src/types/magic-carpet.types.ts` | Type definitions |
 | `lambda/shared/services/magic-carpet/magic-carpet.service.ts` | Main service |
-| `migrations/163_magic_carpet.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 
 ### 41.12 Integration with Reality Engine
 
@@ -11767,7 +11755,7 @@ Three merge strategies are available:
 | `packages/shared/src/types/concurrent-execution.types.ts` | Type definitions |
 | `lambda/shared/services/concurrent-execution.service.ts` | Core service |
 | `lambda/thinktank/concurrent-execution.ts` | API handler |
-| `migrations/170_concurrent_execution.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 
 ---
 
@@ -11922,7 +11910,7 @@ const clusters = await parseWhiteboard(elements);
 | `packages/shared/src/types/structure-from-chaos.types.ts` | Type definitions |
 | `lambda/shared/services/structure-from-chaos.service.ts` | Core service |
 | `lambda/thinktank/structure-from-chaos.ts` | API handler |
-| `migrations/171_structure_from_chaos.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 
 ---
 
@@ -11983,7 +11971,7 @@ The Think Tank Code Quality page displays:
 | `lambda/shared/services/__tests__/delight.service.test.ts` | Core service tests |
 | `lambda/shared/services/__tests__/delight-orchestration.service.test.ts` | Orchestration tests |
 | `lambda/shared/services/__tests__/delight-events.service.test.ts` | Events service tests |
-| `apps/admin-dashboard/app/(dashboard)/thinktank/code-quality/page.tsx` | Dashboard UI |
+| `apps/admin-dashboard/app/(dashboard)/code-quality/page.tsx` | Dashboard UI |
 
 ---
 
@@ -12071,7 +12059,7 @@ HITL Orchestration implements industry best practices to reduce unnecessary ques
 
 | File | Purpose |
 |------|---------|
-| `apps/thinktank-admin/app/hitl-orchestration/page.tsx` | Dashboard page |
+| `apps/thinktank-admin/app/(dashboard)/hitl-orchestration/page.tsx` | Dashboard page |
 | `apps/thinktank-admin/components/layout/sidebar.tsx` | Navigation item |
 
 ---
@@ -12142,7 +12130,7 @@ Questions are prioritized based on domain-specific impact:
 
 | File | Purpose |
 |------|---------|
-| `apps/thinktank-admin/app/scout-hitl/page.tsx` | Dashboard page |
+| `apps/thinktank-admin/app/(dashboard)/scout-hitl/page.tsx` | Dashboard page |
 | `apps/thinktank-admin/components/layout/sidebar.tsx` | Navigation item |
 
 ---
@@ -12484,7 +12472,7 @@ Base: `/api/admin/dynamic-reports`
 | `apps/thinktank-admin/app/(dashboard)/reports/page.tsx` | Reports page |
 | `packages/infrastructure/lambda/shared/services/schema-adaptive-reports.service.ts` | Backend service |
 | `packages/infrastructure/lambda/admin/dynamic-reports.ts` | API handler |
-| `packages/infrastructure/migrations/V2026_01_21_003__dynamic_reports.sql` | Database migration |
+| `migrations/000_consolidated_schema.sql` | Database migration |
 
 ---
 
@@ -12768,9 +12756,9 @@ Base: `/api/thinktank/decision-artifacts`
 | `packages/infrastructure/lambda/shared/services/dia/` | Backend services |
 | `packages/infrastructure/lambda/thinktank/decision-artifacts.ts` | API handler |
 | `packages/infrastructure/lib/stacks/dia-stack.ts` | CDK infrastructure |
-| `packages/infrastructure/migrations/V2026_01_22_001__decision_artifacts.sql` | Core schema |
-| `packages/infrastructure/migrations/V2026_01_22_002__decision_artifact_versioning.sql` | Versioning functions |
-| `packages/infrastructure/migrations/V2026_01_22_003__decision_artifact_config.sql` | Config & templates |
+| `migrations/000_consolidated_schema.sql` | Core schema |
+| `migrations/000_consolidated_schema.sql` | Versioning functions |
+| `migrations/000_consolidated_schema.sql` | Config & templates |
 | `apps/thinktank-admin/app/(dashboard)/decision-records/` | Admin UI |
 | `apps/thinktank-admin/app/(dashboard)/decision-records/components/` | UI components |
 
@@ -14029,7 +14017,7 @@ The Topology Scorer evaluates these 9 orchestration modes:
 | `lambda/shared/services/axiom.service.ts` | AXIOM pipeline (uses Model/Topology scorers) |
 | `lambda/shared/services/clarion.service.ts` | CLARION (uses CLARION Scorer) |
 | `packages/shared/src/types/axiom-clarion.types.ts` | Scorer type definitions |
-| `migrations/V2026_02_01_001__axiom_neural_cortex.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 
 ### 56.9 Training Integration
 
@@ -15619,7 +15607,7 @@ The Zero-Cost Ego System provides persistent AI personality through database sta
 ### Implementation
 
 - **Lambda**: `lambda/admin/ego.ts`
-- **Service**: `lambda/shared/services/ego-context.service.ts`
+- **Service**: `lambda/shared/services/local-ego.service.ts`
 - **Database**: `ego_config`, `ego_identity`, `ego_affect`
 
 ---
@@ -15680,7 +15668,7 @@ Sovereign Mesh provides decentralized AI agent management and transparency for T
 
 ### Implementation
 
-- **App Files**: `apps/thinktank-admin/app/(dashboard)/sovereign-mesh/*.tsx`
+- **App Files**: `apps/thinktank-admin/app/(dashboard)/sovereign-mesh/ (agents, ai-helper, approvals, apps, transparency)`
 - **Navigation**: All pages linked in sidebar under "Sovereign Mesh" section
 
 ---
@@ -16413,7 +16401,7 @@ apps/thinktank/
 ## 25. GDPR & Compliance APIs
 
 **Path**: `/compliance`  
-**App File**: `apps/admin-dashboard/app/(dashboard)/thinktank/compliance/page.tsx`
+**App File**: `apps/admin-dashboard/app/(dashboard)/compliance/page.tsx`
 
 ### Features
 
@@ -16636,7 +16624,7 @@ See `/.windsurf/workflows/docs-update-all.md` for documentation policy.
 
 ## Overview
 
-The **Think Tank Tenant Admin** app is a dedicated administration interface for company/team-level settings. Unlike the Platform Admin (RADIANT Admin) which manages infrastructure across all tenants, and unlike the Think Tank Admin which is for Radiant super-admins configuring Think Tank features, the **Tenant Admin** is for organization administrators to manage their own tenant's settings, users, and content.
+The **Think Tank Tenant Administration** app is a dedicated administration interface for company/team-level settings. Unlike the Platform Admin (RADIANT Admin) which manages infrastructure across all tenants, and unlike the Think Tank Admin which is for Radiant super-admins configuring Think Tank features, the **Tenant Administration** app is for organization administrators to manage their own tenant's settings, users, and content.
 
 ### App Hierarchy
 
@@ -16644,12 +16632,12 @@ The **Think Tank Tenant Admin** app is a dedicated administration interface for 
 |-----|----------|-------|----------|
 | **RADIANT Admin** | Platform operators | All tenants, infrastructure | `apps/admin-dashboard/` |
 | **Think Tank Admin** | Radiant super-admins | Think Tank platform config | Documented in `THINKTANK-ADMIN-GUIDE.md` |
-| **Think Tank Tenant Admin** | Organization admins | Single tenant, team settings | `apps/thinktank-tenant-admin/` |
+| **Think Tank Tenant Administration** | Organization admins | Single tenant, team settings | `apps/thinktank-tenant-admin/` |
 | **Think Tank** | End users | Chat, workflows | `apps/thinktank/` |
 
 ### Key Principle: Tenant Isolation
 
-The Tenant Admin app sits **BEHIND the service layer**. All requests are automatically tenant-isolated:
+The Tenant Administration app sits **BEHIND the service layer**. All requests are automatically tenant-isolated:
 - Admins can only see/modify their own tenant's data
 - System-level resources appear as read-only
 - No cross-tenant access is possible
@@ -17474,8 +17462,8 @@ Use Bearer token from Think Tank session or API key with `tenant:admin` scope.
 
 | Component | Path | Status |
 |-----------|------|--------|
-| **Tenant API** | `lambda/tenant/handler.ts` | 🔲 Pending |
-| **Tenant Service** | `lambda/shared/services/tenant-admin.service.ts` | 🔲 Pending |
+| **Tenant API** | `lambda/thinktank-tenant-admin/handler.ts` | 🔲 Pending |
+| **Tenant Service** | `lambda/shared/services/tenant-provisioning.service.ts` | 🔲 Pending |
 
 ### Database Tables
 
@@ -17559,11 +17547,24 @@ The dashboard will display tenant-level constraints when they exist, and the API
 ## Part IV: Mac Platform
 
 > **Classification**: RADIANT INTERNAL // ENGINEERING  
-> **Version**: 1.0.0 | **Date**: February 6, 2026  
-> **Status**: PRE-BUILD — Architecture & Sync Documentation  
-> **App Location**: `apps/thinktank-mac/` (planned)  
-> **Mirrors**: Think Tank Web (`apps/admin-dashboard/`)  
-> **Requires**: macOS 13.0+ (Ventura), Swift 5.9+, Xcode 15+
+> **Version**: 3.0.0 | **Date**: February 8, 2026  
+> **Status**: BUILT — v7.45.0 — Full feature parity with web app (minus Polymorphic Interface)  
+> **App Location**: `apps/thinktank-mac/`  
+> **Mirrors**: Think Tank Web (`apps/thinktank/`)  
+> **Requires**: macOS 14.0+ (Sonoma), Swift 5.9+, Xcode 15+
+>
+> **Detailed Documentation**:
+> - **User Guide**: `docs/THINKTANK-MAC-GUIDE.md` (20 sections)
+> - **Portability Manifest**: `docs/THINKTANK-MAC-PORTABILITY-MANIFEST.md` (33 features, technology map, gap tracking)
+> - **Sync Policy**: `/.windsurf/workflows/thinktank-dual-platform.md` (v2.0 — bidirectional, blocking gate)
+>
+> **v7.45.0 Gap Closure** (February 8, 2026):
+> - CoreTypes.swift: 1,406 lines (80+ new types: Governor, Derivation, FlashFacts, Grimoire, Ideas, Cartridges, Mood, AXIOM, Collaboration, i18n)
+> - PlatformServices.swift: 860 lines (7 new services, GovernorService expanded from 2 to 14 endpoints)
+> - 3 standalone services: AxiomSessionService (SSE + feedback + caching), AuthService (Keychain), LocalizationService (5 languages)
+> - 8 feature views: FlashFacts, Grimoire, Ideas, Derivation, Governor, Cartridge, CatoMood, Login
+> - 8 AXIOM sub-views: Workflow, Confidence, Domain, ModelScores, Clarification, CompiledPrompt, Feedback, Preferences
+> - Navigation: 10 sections (was 6), Settings: 8 tabs (was 5), Auth gate, i18n environment
 
 ---
 
@@ -17644,31 +17645,31 @@ The following table maps every Think Tank web feature to its Mac counterpart. Th
 
 | # | Web Feature | Web Location | Mac Equivalent | Swift Pattern | Status |
 |---|-------------|-------------|----------------|---------------|--------|
-| 1 | **Conversations** | `conversations.ts` | Sidebar list + Chat view | NavigationSplitView | 🔲 Planned |
-| 2 | **Chat Streaming** | SSE via fetch | SSE message stream | URLSession.bytes + AsyncSequence | 🔲 Planned |
-| 3 | **Brain Plan Viewer** | `brain-plan.ts` + component | Inspector panel | Detail view with step progress | 🔲 Planned |
-| 4 | **Domain Detection** | `domain-modes.ts` | Toolbar indicator | Popover with field/domain/subspecialty | 🔲 Planned |
-| 5 | **Model Selection** | `models.ts`, `model-categories.ts` | Toolbar picker | Menu/Picker with category grouping | 🔲 Planned |
-| 6 | **My Rules** | `my-rules.ts` | Settings tab or sidebar section | Form with rule editor | 🔲 Planned |
-| 7 | **User Context/Memory** | `user-context.ts` | Inspector section | Read-only profile summary | 🔲 Planned |
-| 8 | **Settings/Preferences** | `settings.ts`, `preferences.ts` | macOS Settings window | Settings scene (SwiftUI) | 🔲 Planned |
-| 9 | **Authentication** | Cognito web | Cognito Swift | ASWebAuthenticationSession or Amplify | 🔲 Planned |
+| 1 | **Conversations** | `conversations.ts` | `SidebarView.swift` + `ChatView.swift` | NavigationSplitView | ✅ Built |
+| 2 | **Chat Streaming** | SSE via fetch | `APIClient.swift` SSE stream | URLSession.bytes + AsyncThrowingStream | ✅ Built |
+| 3 | **Brain Plan Viewer** | `brain-plan.ts` + component | `BrainPlanViewer.swift` | Sheet with step progress | ✅ Built |
+| 4 | **Domain Detection** | `domain-modes.ts` | `DomainSelectorView.swift` | Menu picker in header | ✅ Built |
+| 5 | **Model Selection** | `models.ts`, `model-categories.ts` | `ModelSelectorView.swift` | Menu/Picker with category grouping | ✅ Built |
+| 6 | **My Rules** | `my-rules.ts` | `RulesView.swift` | Full CRUD + presets browser | ✅ Built |
+| 7 | **User Context/Memory** | `user-context.ts` | `ProfileView.swift` | Analytics + achievements | ✅ Built |
+| 8 | **Settings/Preferences** | `settings.ts`, `preferences.ts` | `SettingsView.swift` | Settings scene (5 tabs) | ✅ Built |
+| 9 | **Authentication** | Cognito web | `APIClient.swift` token management | URLSession + Keychain | ✅ Built |
 
 ### Tier 2: Advanced Features (Build Second)
 
 | # | Web Feature | Web Location | Mac Equivalent | Swift Pattern | Status |
 |---|-------------|-------------|----------------|---------------|--------|
-| 10 | **Delight System** | Admin config | Personality in responses | Inline display (no config UI) | 🔲 Planned |
-| 11 | **Time Machine** | `time-travel.ts` | Conversation branching | Tree view or timeline | 🔲 Planned |
-| 12 | **Council of Rivals** | `council-of-rivals.ts` | Multi-model deliberation | Split view with model columns | 🔲 Planned |
-| 13 | **Flash Facts** | `flash-facts.ts` | Quick knowledge cards | Popover or sheet | 🔲 Planned |
-| 14 | **Grimoire** | `grimoire.ts` | Procedural memory | List with detail | 🔲 Planned |
-| 15 | **Sentinel Agents** | `sentinel-agents.ts` | Background monitors | Menu bar status + notifications | 🔲 Planned |
-| 16 | **Economic Governor** | `economic-governor.ts` | Cost awareness | Badge/indicator in toolbar | 🔲 Planned |
-| 17 | **Artifact Engine** | `artifact-engine.ts` | Code/document viewer | Syntax-highlighted view (NSTextView) | 🔲 Planned |
-| 18 | **Ideas** | `ideas.ts` | Idea capture | Quick note sheet | 🔲 Planned |
-| 19 | **Ratings** | `ratings.ts` | Response rating | Inline thumbs up/down | 🔲 Planned |
-| 20 | **File Conversion** | `file-conversion.ts` | Drag-and-drop files | NSDocument + UTType | 🔲 Planned |
+| 10 | **Delight System** | Admin config | `SettingsStore.swift` personality mode | Mode selector (partial — no toasts) | ⚠️ Partial |
+| 11 | **Time Machine** | `time-travel.ts` | `TimeMachineView.swift` | Timeline + playback + branch/restore | ✅ Built |
+| 12 | **Crucible Deliberation** | `CrucibleDeliberationPanel.tsx` | `CrucibleView.swift` | Event timeline with expandable Q&A | ✅ Built |
+| 13 | **AXIOM Forge** | `AxiomForge.tsx` | `AxiomForgeView.swift` | 4-step workflow (Classify→Route) | ✅ Built |
+| 14 | **Voice Input** | `voice-input.tsx` | `VoiceService.swift` + `VoiceInputView.swift` | AVAudioEngine + Whisper API | ✅ Built |
+| 15 | **File Attachments** | `file-attachments.tsx` | `FileAttachmentsView.swift` | NSOpenPanel + onDrop | ✅ Built |
+| 16 | **Economic Governor** | `economic-governor.ts` | `BrainPlanViewer.swift` governor card | Integrated in Brain Plan viewer | ✅ Built |
+| 17 | **Artifact Engine** | `artifact-engine.ts` | `ArtifactsView.swift` | Split-view browser with detail pane | ✅ Built |
+| 18 | **History** | History page | `HistoryView.swift` | Sort/search/filter conversation list | ✅ Built |
+| 19 | **Ratings** | `MessageBubble.tsx` | `MessageBubbleView.swift` | Inline thumbs up/down + regenerate | ✅ Built |
+| 20 | **File Conversion** | `file-conversion.ts` | `FileAttachmentsView.swift` | Drag-and-drop with type validation | ✅ Built |
 
 ### Tier 3: Specialized Features (Build Third)
 
@@ -17676,7 +17677,7 @@ The following table maps every Think Tank web feature to its Mac counterpart. Th
 |---|-------------|-------------|----------------|---------------|--------|
 | 21 | **Concurrent Execution** | `concurrent-execution.ts` | Parallel model queries | Task groups with progress | 🔲 Planned |
 | 22 | **Structure from Chaos** | `structure-from-chaos.ts` | Auto-organize | Sheet with results | 🔲 Planned |
-| 23 | **Enhanced Collaboration** | `enhanced-collaboration.ts` | Real-time collab | WebSocket + conflict resolution | 🔲 Planned |
+| 23 | **Enhanced Collaboration** | `enhanced-collaboration.ts` | `CollaborationService.swift` (API) | API only — no real-time UI yet | ⚠️ Partial |
 | 24 | **Derivation History** | `derivation-history.ts` | Reasoning trace | Expandable tree | 🔲 Planned |
 | 25 | **Decision Artifacts** | `decision-artifacts.ts` | Decision records | Table with detail | 🔲 Planned |
 | 26 | **Living Parchment** | `living-parchment.ts` | Living documents | Rich text editor | 🔲 Planned |
@@ -17684,7 +17685,7 @@ The following table maps every Think Tank web feature to its Mac counterpart. Th
 | 28 | **Security Signals** | `security-signals.ts` | Safety indicators | Status bar items | 🔲 Planned |
 | 29 | **DIA** | `dia.ts` | Document intelligence | Quick Look preview | 🔲 Planned |
 | 30 | **LIVS Workflow** | `livs-workflow.ts` | Quality control modes | Toolbar segment | 🔲 Planned |
-| 31 | **Crucible** | `crucible.ts` | Stress testing | Sheet with results | 🔲 Planned |
+| 31 | **Guest Restrictions** | `GuestRestrictionBanner.tsx` | `CollaborationService.swift` (API) | API only — no banner UI yet | ⚠️ Partial |
 | 32 | **Policy Framework** | `policy-framework.ts` | Policy display | Inspector section | 🔲 Planned |
 | 33 | **UEP Integration** | `uep-integration.ts` | User experience personalization | Automatic (API-driven) | 🔲 Planned |
 
@@ -22091,803 +22092,933 @@ Not per-session. The Compliance Auto-Restrict toggle is tenant-wide. If you disa
 
 ---
 
-*Consolidated from 12 source documents (0 not found). 21,932 source lines.*
-# Think Tank Real-Time Collaboration - Complete Guide
-
-> **The Only Consumer AI Platform with True Real-Time Multi-User Collaboration**
->
-> **Version**: 6.6.0 | **Last Updated**: February 4, 2026  
-> **Classification**: Internal + Investor Distribution
-
 ---
+
+## Part XI: Think Tank macOS Native Client — User Guide
+
+> *Merged from `THINKTANK-MAC-GUIDE.md` — complete Mac app user guide consolidated here.*
 
 ## Table of Contents
 
-1. [Executive Summary](#executive-summary)
-2. [Why This Matters: The Market Gap](#why-this-matters-the-market-gap)
-3. [Architecture Overview](#architecture-overview)
-4. [Core Features](#core-features)
-5. [Technical Implementation](#technical-implementation)
-6. [User Experience](#user-experience)
-7. [Competitive Analysis](#competitive-analysis)
-8. [Marketing & Sales Points](#marketing--sales-points)
-9. [Engineering Reference](#engineering-reference)
-10. [Deployment & Configuration](#deployment--configuration)
-11. [API Reference](#api-reference)
-12. [Security & Compliance](#security--compliance)
-13. [Roadmap](#roadmap)
+1. [Welcome](#1-welcome)
+2. [Getting Started](#2-getting-started)
+3. [The Interface](#3-the-interface)
+4. [Conversations](#4-conversations)
+5. [Chat Features](#5-chat-features)
+6. [My Rules](#6-my-rules)
+7. [Advanced Mode](#7-advanced-mode)
+8. [AXIOM Forge](#8-axiom-forge)
+9. [Brain Plans](#9-brain-plans)
+10. [Time Machine](#10-time-machine)
+11. [Crucible Deliberation](#11-crucible-deliberation)
+12. [Voice Input](#12-voice-input)
+13. [File Attachments](#13-file-attachments)
+14. [Artifacts](#14-artifacts)
+15. [History](#15-history)
+16. [Profile & Analytics](#16-profile--analytics)
+17. [Settings](#17-settings)
+18. [Keyboard Shortcuts](#18-keyboard-shortcuts)
+19. [Troubleshooting](#19-troubleshooting)
+20. [Platform Differences from Web](#20-platform-differences-from-web)
 
 ---
 
-## Executive Summary
+## 1. Welcome
 
-Think Tank's Real-Time Collaboration system represents the **largest feature gap in the consumer AI market**. While ChatGPT, Claude, and Gemini offer text-only, single-user experiences with at best asynchronous sharing, Think Tank delivers:
+Think Tank (Mac) is the native macOS client for RADIANT's Think Tank AI platform. It provides the same powerful AI conversation capabilities as the web app, built with SwiftUI for a fast, native macOS experience.
 
-- **True real-time co-editing** with Yjs CRDT (Conflict-free Replicated Data Types)
-- **Live presence indicators** showing who's in the conversation
-- **Typing attribution** so you know who's contributing
-- **Conversation branching** for parallel exploration of ideas
-- **AI Roundtables** with multiple AI models debating in real-time
-- **Knowledge Graph visualization** that builds as you collaborate
-- **Guest access** without requiring account creation
-- **Session recording and playback** for async review
-
-This is not an incremental improvement—it's a category-defining capability that no competitor can match without 12-18 months of development.
+**Key advantages of the Mac app:**
+- **Native performance** — Built with SwiftUI, launches instantly
+- **macOS integration** — Keyboard shortcuts, menu bar, native file dialogs, Notification Center
+- **Glassmorphism UI** — Translucent materials using macOS vibrancy
+- **Offline settings** — Preferences persist locally via UserDefaults
+- **Secure auth** — Token storage via macOS Keychain
 
 ---
 
-## Why This Matters: The Market Gap
+## 2. Getting Started
 
-### The Problem with Current AI Platforms
+### System Requirements
 
-Every major AI platform today operates on the same fundamental model: **one user, one conversation, one context**. This creates significant friction for teams:
+- macOS 14.0 (Sonoma) or later
+- Apple Silicon or Intel Mac
+- Internet connection (for API access)
+- Microphone access (optional, for voice input)
 
-| Scenario | ChatGPT/Claude/Gemini | Impact |
-|----------|----------------------|--------|
-| Team brainstorming | Share link, lose context | Ideas fragmented |
-| Project planning | Copy-paste between chats | Information silos |
-| Decision making | Sequential, not parallel | Slower decisions |
-| Knowledge capture | Buried in individual chats | Institutional memory lost |
+### First Launch
 
-### The Think Tank Solution
+1. Open Think Tank from your Applications folder or Launchpad
+2. The app opens to the **Welcome screen** with quick actions
+3. Configure your API server URL in **Settings** (⌘,) if not using the default
+4. Sign in with your RADIANT credentials
+5. Start chatting!
 
-Think Tank treats AI conversations as **collaborative workspaces**, not isolated chat threads:
+### Connecting to Your Server
 
-| Capability | How It Works | Business Value |
-|------------|--------------|----------------|
-| Real-time sync | Yjs CRDT ensures all participants see the same state | No "which version is correct?" confusion |
-| Presence awareness | Live indicators of who's active | Know when to jump in vs. wait |
-| Conversation branching | Fork a conversation to explore alternatives | Test ideas without derailing the main thread |
-| AI Roundtables | Multiple AI models debate a topic | Get diverse perspectives without prompt switching |
-| Knowledge Graph | Visual concept map builds automatically | See the shape of your team's thinking |
-| Guest access | Share a link, join instantly | Include stakeholders without IT friction |
+Go to **Think Tank > Settings > General > API** and enter your RADIANT API base URL (e.g., `https://api.radiant.yourcompany.com`).
 
 ---
 
-## Architecture Overview
+## 3. The Interface
 
-### System Components
+Think Tank (Mac) uses a **NavigationSplitView** layout:
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                    COLLABORATION ARCHITECTURE                     │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                   │
-│  ┌─────────────┐     ┌─────────────┐     ┌─────────────┐        │
-│  │   Client    │────▶│  WebSocket  │────▶│    Y.js     │        │
-│  │  (React)    │     │   Gateway   │     │  Provider   │        │
-│  └─────────────┘     └─────────────┘     └─────────────┘        │
-│         │                   │                   │                │
-│         │                   │                   ▼                │
-│         │                   │           ┌─────────────┐          │
-│         │                   │           │   Aurora    │          │
-│         │                   │           │ PostgreSQL  │          │
-│         │                   │           └─────────────┘          │
-│         │                   │                   │                │
-│         ▼                   ▼                   ▼                │
-│  ┌─────────────┐     ┌─────────────┐     ┌─────────────┐        │
-│  │  REST API   │────▶│  Lambda     │────▶│    S3       │        │
-│  │  (Next.js)  │     │  Handlers   │     │  Storage    │        │
-│  └─────────────┘     └─────────────┘     └─────────────┘        │
-│                                                                   │
-└─────────────────────────────────────────────────────────────────┘
++------------------+------------------------------------------+
+|                  |                                          |
+|    SIDEBAR       |              DETAIL VIEW                 |
+|                  |                                          |
+|  [New Chat]      |  [Header Bar]                           |
+|  [Search]        |  [Domain] [Model] [Advanced] [Focus]    |
+|  [Nav Sections]  |                                          |
+|  [Conversations] |  [Messages Area]                         |
+|                  |                                          |
+|                  |  [Chat Input]                            |
++------------------+------------------------------------------+
 ```
 
-### Data Flow
+### Sidebar
+- **New Chat** button (⌘N)
+- **Search** conversations
+- **Navigation sections**: My Rules, History, Artifacts, Settings, Profile
+- **Conversations** grouped by date (Today, Yesterday, This Week, etc.)
 
-1. **Connection**: Client establishes WebSocket connection with JWT authentication
-2. **Sync**: Yjs provider syncs local CRDT state with server
-3. **Presence**: Heartbeats broadcast participant status every 30 seconds
-4. **Messages**: Each message is a CRDT operation, ensuring conflict-free merge
-5. **Persistence**: All state persisted to Aurora PostgreSQL for durability
-6. **Media**: Attachments and recordings stored in S3 with signed URLs
-
-### Key Technologies
-
-| Component | Technology | Why This Choice |
-|-----------|------------|-----------------|
-| CRDT Engine | Yjs | Industry-leading CRDT library, used by Notion, Figma |
-| WebSocket | API Gateway WebSocket | Managed, scales to millions |
-| Database | Aurora PostgreSQL | ACID transactions, RLS for multi-tenancy |
-| Object Storage | S3 | Unlimited scale, lifecycle policies |
-| CDN | CloudFront | Global edge caching |
-| Authentication | Cognito + Guest Tokens | Secure but friction-free |
+### Detail View
+Changes based on the selected section — Chat, Rules, History, Artifacts, Settings, or Profile.
 
 ---
 
-## Core Features
+## 4. Conversations
 
-### 1. Real-Time Presence System
+### Creating a Conversation
+- Click **New Chat** in the sidebar, or press **⌘N**
+- Type your message and press **Return**
 
-**What It Does**: Shows who's currently in a collaboration session with live status updates.
+### Managing Conversations
+- **Rename**: Hover over a conversation, click the pencil icon
+- **Delete**: Hover over a conversation, click the trash icon
+- **Search**: Use the search bar at the top of the sidebar
+- **Favorites**: Starred conversations show a yellow star icon
 
-**Technical Details**:
-- WebSocket heartbeat every 30 seconds
-- Presence broadcast to all participants
-- Automatic "away" detection after 5 minutes of inactivity
-- Color-coded avatars with initials for quick identification
-
-**User Experience**:
-```
-┌─────────────────────────────────────────┐
-│ 🟢 Alice (you)    │ Viewing            │
-│ 🟢 Bob            │ Typing...          │
-│ 🟡 Carol          │ Away (5m)          │
-│ 🔴 David          │ Offline            │
-└─────────────────────────────────────────┘
-```
-
-**Implementation Files**:
-- Service: `lambda/shared/services/enhanced-collaboration.service.ts`
-- WebSocket: `lambda/websocket/collaboration-handler.ts`
-- UI: `components/collaboration/ParticipantsSidebar.tsx`
+### Conversation Grouping
+Conversations are automatically grouped:
+- **Today** — conversations updated today
+- **Yesterday** — updated yesterday
+- **This Week** — within the last 7 days
+- **This Month** — within the last 30 days
+- **Older** — everything else
 
 ---
 
-### 2. Typing Indicators with Attribution
+## 5. Chat Features
 
-**What It Does**: Shows when participants are typing, with their name and avatar visible.
+### Sending Messages
+- Type in the input area at the bottom
+- Press **Return** to send
+- Press **Shift+Return** for a new line
+- Click the send button (arrow icon)
 
-**Technical Details**:
-- Debounced typing events (250ms)
-- Auto-clear after 3 seconds of no input
-- Multiple simultaneous typers supported
-- Animated indicator with participant's color
+### Streaming Responses
+Responses stream in real-time via Server-Sent Events. You'll see a typing indicator and a blinking cursor as the AI generates its response. Toggle streaming in Settings > General.
 
-**User Experience**:
-```
-┌─────────────────────────────────────────┐
-│ 💬 Bob and Carol are typing...         │
-│ ●●●                                     │
-└─────────────────────────────────────────┘
-```
+### Model Selection
+Click the model selector in the header bar to choose which AI model to use. Models are grouped by category and show capability badges.
 
----
+### Domain Selection
+In Advanced Mode, a domain selector appears. Choose **Auto** for automatic domain detection, or manually select a domain (e.g., Medical, Legal, Engineering).
 
-### 3. Conversation Branching
+### Message Actions
+Hover over an assistant message to reveal:
+- **Copy** — copies the message to clipboard
+- **Thumbs Up/Down** — rate the response
+- **Regenerate** — get a new response
+- **Brain Plan** — view the AI's reasoning (Advanced Mode)
 
-**What It Does**: Fork a conversation at any point to explore alternative directions without losing the original thread.
-
-**Why It's Revolutionary**: No other AI platform offers this. When you're in a team brainstorm and someone says "what if we tried X instead?", you can literally branch the conversation and explore both paths simultaneously.
-
-**Technical Details**:
-- Git-like branching model with parent references
-- Messages belong to specific branches
-- Merge capability with AI-assisted conflict resolution
-- Branch comparison view ("diff" between branches)
-
-**User Experience**:
-```
-Main Branch
-    │
-    ├── Message 1: "Let's plan the product launch"
-    │
-    ├── Message 2: "AI: Here's a timeline..."
-    │
-    ├── 🔀 Branch: "Aggressive Timeline"
-    │   ├── Message 3a: "What if we launch in 2 weeks?"
-    │   └── Message 4a: "AI: That's tight but possible..."
-    │
-    └── Message 3: "Let's stick to the original plan"
-        └── Message 4: "AI: Good choice, here's why..."
-```
-
-**Merge Flow**:
-1. Select source branch
-2. AI analyzes both branches for insights
-3. Generates synthesis combining best ideas
-4. Optional: keep branches as historical record
-
-**Implementation Files**:
-- Service: `lambda/shared/services/enhanced-collaboration.service.ts` (createBranch, mergeBranch)
-- UI: `components/collaboration/BranchVisualization.tsx`
-- API: `lambda/thinktank/enhanced-collaboration.ts`
+### Message Metadata
+In Advanced Mode, messages show:
+- Model used
+- Token count
+- Latency (ms)
+- Cost estimate ($)
 
 ---
 
-### 4. Guest Access (No Account Required)
+## 6. My Rules
 
-**What It Does**: Generate a secure invite link that allows anyone to join a collaboration session without creating an account.
+Personalize how the AI responds to you with rules.
 
-**Why It Matters**: Reduces friction for:
-- Client meetings
-- Cross-company collaboration
-- Quick stakeholder input
-- User research sessions
+### Creating Rules
+1. Go to **My Rules** in the sidebar
+2. Click **Add Rule**
+3. Choose a rule type (Restriction, Preference, Format, Source, Tone, Topic, Privacy)
+4. Write your rule text
+5. Click **Save Rule**
 
-**Technical Details**:
-- Cryptographically secure invite tokens (UUID v4 + HMAC)
-- Configurable expiration (1 hour to 30 days)
-- Usage limits (single-use or unlimited)
-- Permission scoping (viewer, contributor, full access)
-- Audit trail for all guest actions
+### Rule Presets
+Browse curated rule presets by clicking **Presets**. Categories include professional, academic, creative, and more. Click the + button to add a preset to your rules.
 
-**User Experience**:
-```
-Share this link with your collaborators:
-┌─────────────────────────────────────────┐
-│ https://thinktank.app/join/abc123xyz   │
-│                                         │
-│ ⏱️ Expires: In 7 days                   │
-│ 👥 Uses: Unlimited                      │
-│ 🔒 Access: Contributor                  │
-│                                         │
-│ [Copy Link]  [Create New]  [Revoke]    │
-└─────────────────────────────────────────┘
-```
-
-**Implementation Files**:
-- Service: `createGuestInvite`, `joinAsGuest`, `getSessionGuests`
-- UI: `components/collaboration/dialogs/InviteDialog.tsx`
+### Managing Rules
+- **Toggle** — enable/disable rules with the switch
+- **Edit** — click the pencil icon to modify
+- **Delete** — click the trash icon to remove
+- **Priority** — set priority (1-100) to control which rules take precedence
 
 ---
 
-### 5. AI Facilitator
+## 7. Advanced Mode
 
-**What It Does**: An AI moderator that helps guide collaborative conversations, suggests discussion topics, identifies when the group is stuck, and synthesizes key decisions.
+Toggle Advanced Mode with the brain icon in the header bar, or press **⇧⌘D**.
 
-**Facilitator Behaviors**:
-
-| Behavior | Trigger | Action |
-|----------|---------|--------|
-| Topic suggestion | Silence > 2 minutes | "Perhaps we should discuss..." |
-| Consensus detection | 3+ participants agree | "It sounds like we've agreed on..." |
-| Conflict resolution | Opposing viewpoints | "Let me summarize both perspectives..." |
-| Time awareness | Meeting halfway point | "We have 15 minutes left. Key open items..." |
-| Action extraction | Decision language detected | "I'm capturing this as an action item..." |
-
-**Configuration Options**:
-- Intervention frequency (passive, balanced, active)
-- Personality style (formal, casual, Socratic)
-- Focus areas (decisions, actions, brainstorming)
-- Model selection (which AI powers the facilitator)
-
-**Implementation Files**:
-- Service: `enableFacilitator`, `getFacilitatorConfig`
-- UI: `components/collaboration/dialogs/FacilitatorSettingsDialog.tsx`
+Advanced Mode reveals:
+- **Message metadata** (model, tokens, latency, cost)
+- **Domain selector** in the header
+- **Time Machine** button
+- **AXIOM Forge** button
+- **Brain Plan viewer** on messages
 
 ---
 
-### 6. AI Roundtables
+## 8. AXIOM Forge
 
-**What It Does**: Summon multiple AI models to debate a topic, each bringing their unique perspective and capabilities.
+AXIOM Forge is a 4-step prompt optimization workflow.
 
-**Why It's Powerful**: Instead of asking one AI and accepting its answer, you can:
-- Get diverse perspectives (Claude's nuance, GPT's breadth, Gemini's reasoning)
-- Identify consensus across models
-- Spot disagreements that warrant human judgment
-- Avoid single-model bias
+### Steps
+1. **Classify** — AXIOM detects the domain of your prompt
+2. **Clarify** — AXIOM asks targeted questions to refine intent
+3. **Compile** — Your answers are compiled into an optimized prompt
+4. **Route** — The best model is selected based on scoring
 
-**Debate Styles**:
-
-| Style | Description | Best For |
-|-------|-------------|----------|
-| Collaborative | Models build on each other's ideas | Brainstorming, ideation |
-| Adversarial | Models challenge each other | Decision validation, risk assessment |
-| Socratic | Question-based exploration | Learning, complex topics |
-| Brainstorm | Free-form ideation | Creative projects |
-| Devil's Advocate | Counter-arguments for every point | Stress-testing decisions |
-
-**Roundtable Flow**:
-1. Define the topic and select participating models
-2. Choose debate style and number of rounds
-3. AI models take turns contributing
-4. Each can reference and respond to previous contributions
-5. Final synthesis summarizes consensus and disagreements
-
-**Output Structure**:
-```json
-{
-  "synthesis": "After 3 rounds of debate, the models agreed that...",
-  "consensusPoints": [
-    "Customer acquisition should prioritize organic channels",
-    "MVP scope should include core features only"
-  ],
-  "disagreementPoints": [
-    "Pricing strategy: Claude favors freemium, GPT-4 suggests premium-only"
-  ],
-  "recommendations": [
-    "Test both pricing models with user research before deciding"
-  ]
-}
-```
-
-**Implementation Files**:
-- Service: `createRoundtable`, `addRoundtableContribution`, `completeRoundtable`
-- UI: `components/collaboration/AIRoundtableView.tsx`
+### Using AXIOM
+1. Click the wand icon in the header (Advanced Mode)
+2. Enter your prompt
+3. Answer clarification questions
+4. Review model scores and the compiled prompt
+5. Click **Use This Prompt** to copy it
 
 ---
 
-### 7. Knowledge Graph Visualization
+## 9. Brain Plans
 
-**What It Does**: Automatically builds a visual concept map as the conversation progresses, showing how ideas connect.
+Brain Plans show the AI's decision-making process.
 
-**Node Types**:
+### What You See
+- **Orchestration mode** (Thinking, Extended Thinking, Coding, Creative, etc.)
+- **Domain detection** with confidence score
+- **Selected model** and reasoning
+- **Execution steps** with timing
+- **Spend Governor** status and savings
 
-| Type | Icon | Description |
+### Accessing Brain Plans
+Click the brain icon on any assistant message (visible in Advanced Mode).
+
+---
+
+## 10. Time Machine
+
+Scrub through conversation state snapshots.
+
+### Features
+- **Timeline** — visual track of all snapshots
+- **Playback** — auto-play through snapshots
+- **Bookmarks** — mark important points
+- **Branches** — create a new conversation branch from any snapshot
+- **Restore** — revert the conversation to a previous state
+
+### Using Time Machine
+1. Click the clock icon in the header (Advanced Mode)
+2. Browse snapshots in the list or timeline
+3. Click a snapshot to preview
+4. Use **Restore** to revert, or **Branch** to fork
+
+---
+
+## 11. Crucible Deliberation
+
+View multi-model verification when the AI cross-checks its answers.
+
+### What You See
+- Questions asked between models
+- Answers and quality scores
+- Circular citation detection warnings
+- Configuration (max questions, cost mode)
+
+---
+
+## 12. Voice Input
+
+Speak instead of typing using the built-in voice transcription.
+
+### Requirements
+- Microphone access (grant in System Settings > Privacy & Security > Microphone)
+- Active internet connection (uses Whisper API)
+
+### Using Voice
+1. Click the microphone icon in the input area
+2. Click the red record button
+3. Speak your message
+4. Click the green checkmark to transcribe
+5. The transcribed text appears in the input area
+
+### Audio Level Indicator
+A visual bar display shows your audio levels in real-time during recording.
+
+---
+
+## 13. File Attachments
+
+Attach files to your messages for context.
+
+### Supported File Types
+- **Documents**: PDF, TXT, RTF, HTML
+- **Images**: PNG, JPEG, GIF, SVG, WebP
+- **Data**: CSV, JSON, XML
+
+### Maximum File Size
+25 MB per file
+
+### How to Attach
+- Click the **paperclip icon** in the input area
+- Click **Browse Files** to use the native file picker
+- **Drag and drop** files into the attachment area
+- Files appear as chips above the input; click X to remove
+
+---
+
+## 14. Artifacts
+
+View code, documents, charts, and other generated content.
+
+### Browsing Artifacts
+1. Go to **Artifacts** in the sidebar
+2. Filter by type: All, Code, Document, Image, Chart
+3. Click an artifact to preview in the detail pane
+
+### Artifact Actions
+- **Copy** — copy content to clipboard
+- **Save** — export to a file using the native Save dialog
+
+---
+
+## 15. History
+
+Browse and search all your past conversations.
+
+### Features
+- **Search** by title or message content
+- **Sort** by newest, oldest, or most messages
+- **Domain filter** — filter by conversation domain
+- **Quick open** — click to jump to any conversation
+
+---
+
+## 16. Profile & Analytics
+
+### Overview Tab
+- Total conversations, messages, tokens, cost
+- Achievement count
+- Favorite models
+- Top domains
+
+### Achievements Tab
+- View all achievements with progress
+- Rarity levels: Common, Uncommon, Rare, Epic, Legendary
+- Points system
+
+### Usage Tab
+- Daily activity chart (last 30 days)
+
+---
+
+## 17. Settings
+
+Access via **Think Tank > Settings** (⌘,) or the sidebar.
+
+### General
+- **AI Personality** — Auto, Professional, Subtle, Expressive, Playful
+- **Streaming** — toggle real-time response streaming
+- **Notifications** — enable/disable
+- **API Server URL** — configure your RADIANT endpoint
+
+### Display
+- **Compact mode** — reduce spacing
+- **Show token count** — display in message metadata
+- **Show cost estimate** — display in message metadata
+- **Sound effects** — toggle
+
+### Voice
+- **Enable voice input** — toggle microphone access
+- **Open System Settings** — configure microphone permissions
+
+### Shortcuts
+- View all keyboard shortcuts
+- Enable/disable keyboard shortcuts globally
+
+### Privacy
+- Data storage information
+- Clear local settings
+
+---
+
+## 18. Keyboard Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| **⌘N** | New Conversation |
+| **⇧⌘D** | Toggle Advanced Mode |
+| **⇧⌘F** | Toggle Focus Mode |
+| **⌘\\** | Toggle Sidebar |
+| **⌘,** | Settings |
+| **Return** | Send Message |
+| **⇧Return** | New Line in Input |
+
+---
+
+## 19. Troubleshooting
+
+### Cannot Connect to Server
+1. Check your API URL in Settings > General > API
+2. Verify your internet connection
+3. Ensure the RADIANT server is running
+4. Check if your authentication token has expired
+
+### Microphone Not Working
+1. Go to System Settings > Privacy & Security > Microphone
+2. Ensure Think Tank has microphone access
+3. Check that no other app is using the microphone exclusively
+
+### Slow Performance
+1. Close unused conversations
+2. Disable streaming if experiencing network issues
+3. Check Activity Monitor for resource usage
+
+### Messages Not Loading
+1. Check your internet connection
+2. Try creating a new conversation
+3. Restart the app
+
+---
+
+## 20. Platform Differences from Web
+
+Think Tank (Mac) provides the same core functionality as the web app with platform-appropriate adaptations:
+
+| Feature | Web | Mac |
+|---------|-----|-----|
+| Styling | Tailwind CSS + glassmorphism | SwiftUI `.ultraThinMaterial` |
+| Animations | Framer Motion springs | SwiftUI `.spring()` animation |
+| State Management | Zustand stores | `@Observable` / `@Published` |
+| Clipboard | `navigator.clipboard` | `NSPasteboard` |
+| File Picker | `<input type="file">` | `NSOpenPanel` |
+| Audio Recording | `MediaRecorder` | `AVAudioEngine` |
+| Streaming | `ReadableStream` | `URLSession.bytes` |
+| Settings Storage | `localStorage` | `UserDefaults` |
+| Navigation | Next.js file routing | `NavigationSplitView` |
+
+### Excluded from Mac App
+- **Polymorphic Interface** — The morphing UI (Data Grid, Chart, Kanban, etc.) is excluded from Mac scope
+- **Admin features** — Admin dashboard remains web-only
+
+For the complete portability breakdown, see `docs/THINKTANK-MAC-PORTABILITY-MANIFEST.md`.
+
+---
+
+*This guide is maintained under the Think Tank Dual-Platform Sync Policy (`/.windsurf/workflows/thinktank-dual-platform.md`). Any change to the Mac app requires a corresponding update to this document.*
+
+
+
+---
+
+## Part XII: Think Tank — Mac Portability Manifest
+
+> *Merged from `THINKTANK-MAC-PORTABILITY-MANIFEST.md` — feature parity matrix and technology adaptation map.*
+
+This document is the **authoritative record** of every Think Tank web feature, its Mac portability status, and the technology adaptation required. It MUST be updated whenever a feature is added, removed, or changed on either platform.
+
+---
+
+## Feature Parity Matrix
+
+### Legend
+
+| Status | Meaning |
+|--------|---------|
+| ✅ Ported | Feature exists on Mac with full parity |
+| 🔄 Adapted | Feature exists on Mac with platform-appropriate adaptation |
+| ❌ Excluded | Feature intentionally excluded from Mac scope |
+| 🔲 Planned | Feature exists on web, Mac implementation planned |
+| ⚠️ Partial | Feature partially ported, gaps documented below |
+
+---
+
+### Tier 1: Core Features (Must Have)
+
+| # | Feature | Web | Mac | Status | Notes |
+|---|---------|-----|-----|--------|-------|
+| 1 | Chat Interface | `ModernChatInterface.tsx` | `ChatView.swift` | ✅ Ported | Full parity |
+| 2 | Message Bubbles | `MessageBubble.tsx` | `MessageBubbleView.swift` | ✅ Ported | Full parity |
+| 3 | Chat Input | `ChatInput.tsx` | `ChatInputView.swift` | ✅ Ported | Full parity |
+| 4 | Sidebar / Navigation | `Sidebar.tsx` | `SidebarView.swift` | ✅ Ported | NavigationSplitView |
+| 5 | Conversation List | `Sidebar.tsx` | `SidebarView.swift` | ✅ Ported | Grouped by date |
+| 6 | Conversation CRUD | `chat.ts` (API) | `ChatService.swift` | ✅ Ported | Full parity |
+| 7 | Message Streaming (SSE) | `ReadableStream` | `URLSession.bytes` | 🔄 Adapted | Different API, same result |
+| 8 | Model Selection | `ModernChatInterface.tsx` | `ModelSelectorView.swift` | ✅ Ported | Native Menu picker |
+| 9 | Domain Selection | `ModernChatInterface.tsx` | `DomainSelectorView.swift` | ✅ Ported | Native Menu picker |
+| 10 | Message Copy | `navigator.clipboard` | `NSPasteboard` | 🔄 Adapted | Platform clipboard API |
+| 11 | Message Rating | `MessageBubble.tsx` | `MessageBubbleView.swift` | ✅ Ported | Thumbs up/down |
+| 12 | Message Regeneration | `chat.ts` | `ChatStore.swift` | ✅ Ported | Full parity |
+| 13 | Search Conversations | `Sidebar.tsx` | `SidebarView.swift` | ✅ Ported | Full parity |
+| 14 | Keyboard Shortcuts | Web key handlers | SwiftUI `.keyboardShortcut` | 🔄 Adapted | Native macOS shortcuts |
+| 15 | Authentication | Cookie/JWT | URLSession + Keychain | 🔄 Adapted | Secure token storage |
+
+### Tier 2: Important Features
+
+| # | Feature | Web | Mac | Status | Notes |
+|---|---------|-----|-----|--------|-------|
+| 16 | My Rules | Rules page | `RulesView.swift` | ✅ Ported | Full CRUD + presets |
+| 17 | Rule Presets | Presets browser | `PresetsSheet` | ✅ Ported | Full parity |
+| 18 | Settings | Settings page | `SettingsView.swift` | ✅ Ported | Native macOS Settings window |
+| 19 | History | History page | `HistoryView.swift` | ✅ Ported | Sort + filter |
+| 20 | Artifacts | Artifacts page | `ArtifactsView.swift` | ✅ Ported | Split view with detail |
+| 21 | Profile / Analytics | Profile page | `ProfileView.swift` | ✅ Ported | Stats + achievements |
+| 22 | Advanced Mode | Toggle in header | Toggle in header | ✅ Ported | UserDefaults persisted |
+| 23 | Focus Mode | Toggle in header | Toggle in header | ✅ Ported | Full parity |
+| 24 | Voice Input | `MediaRecorder` | `AVAudioEngine` | 🔄 Adapted | Native audio capture |
+| 25 | File Attachments | HTML5 drag-and-drop | `NSOpenPanel` + `.onDrop` | 🔄 Adapted | Native file handling |
+| 26 | Brain Plan Viewer | Brain plan modal | `BrainPlanViewer.swift` | ✅ Ported | Sheet presentation |
+| 27 | Spend Governor | Governor display | `BrainPlanViewer.swift` | ✅ Ported | Integrated in Brain Plan |
+
+### Tier 3: Advanced Features
+
+| # | Feature | Web | Mac | Status | Notes |
+|---|---------|-----|-----|--------|-------|
+| 28 | Time Machine | `time-machine.tsx` | `TimeMachineView.swift` | ✅ Ported | Timeline + playback |
+| 29 | AXIOM Forge | `AxiomForge.tsx` | `AxiomForgeView.swift` | ✅ Ported | 4-step workflow |
+| 30 | Crucible Deliberation | `CrucibleDeliberationPanel.tsx` | `CrucibleView.swift` | ✅ Ported | Event timeline |
+| 31 | Guest Restrictions | `GuestRestrictionBanner.tsx` | (API only) | ⚠️ Partial | API support, no banner UI yet |
+| 32 | Compliance Export | Export API | `ComplianceExportService.swift` | ✅ Ported | API + NSSavePanel |
+| 33 | Delight System | `DelightSystem.tsx` | Personality mode only | ⚠️ Partial | Mode selection ported; animations/toasts need native adaptation |
+
+### Excluded Features
+
+| # | Feature | Web Component | Reason for Exclusion |
+|---|---------|--------------|---------------------|
+| E1 | **Polymorphic Interface** | `LiquidMorphPanel.tsx` | **Explicitly excluded by scope** — the morphing UI (Data Grid, Chart, Kanban, Calculator, Code Editor, Document sub-views) is web-specific and not part of Mac app scope |
+| E2 | **Admin UI** | Admin dashboard pages | Mac app is consumer-only; admin features remain web-only |
+| E3 | **CSS Glassmorphism** | Tailwind `backdrop-blur` | Replaced by native `.ultraThinMaterial` — equivalent effect, not a gap |
+
+---
+
+## Technology Adaptation Map
+
+| Web Technology | Swift/macOS Equivalent | Adaptation Complexity | Notes |
+|---------------|----------------------|----------------------|-------|
+| React (Next.js 14) | SwiftUI | **Medium** | Different paradigm; declarative in both cases |
+| TypeScript interfaces | Swift structs + Codable | **Low** | Direct 1:1 mapping |
+| Zustand stores | `@Observable` / `@Published` | **Low** | SwiftUI native state management |
+| Framer Motion | SwiftUI `.animation()` / `.spring()` | **Low** | Native animation system is excellent |
+| Tailwind CSS | SwiftUI ViewModifiers + custom styles | **Medium** | No utility classes; use modifier chains |
+| Radix UI primitives | Native macOS controls | **Low** | macOS controls are more capable |
+| `fetch` / `ReadableStream` | `URLSession` / `URLSession.bytes` | **Low** | Excellent async/await support |
+| `localStorage` / `persist` | `UserDefaults` | **Low** | Direct equivalent |
+| `navigator.clipboard` | `NSPasteboard` | **Low** | Direct equivalent |
+| `MediaRecorder` | `AVAudioEngine` / `AVFoundation` | **Medium** | More powerful but different API |
+| HTML5 drag-and-drop | SwiftUI `.onDrop` / `NSOpenPanel` | **Low** | Better native support |
+| `react-markdown` | `swift-markdown` + `AttributedString` | **Medium** | Rendering pipeline differs |
+| `recharts` | Swift Charts | **Low** | Native, beautiful charts |
+| `react-syntax-highlighter` | `Highlightr` | **Low** | Direct equivalent |
+| Server-Sent Events | `URLSession.bytes` line parsing | **Low** | Custom SSE parser (~40 lines) |
+| CSS Grid / Flexbox | SwiftUI `LazyVGrid` / `HStack` / `VStack` | **Low** | Declarative layout |
+| Web Push Notifications | `UserNotifications` framework | **Low** | Better native support |
+| Service Workers (offline) | Not implemented | **N/A** | Mac app requires network connectivity |
+| Browser URL routing | `NavigationSplitView` / state-based | **Low** | SwiftUI navigation |
+
+---
+
+## Known Gaps & Planned Work
+
+| Gap ID | Feature | Current State | Target | Priority | Est. Effort |
+|--------|---------|--------------|--------|----------|-------------|
+| G1 | Guest Restriction Banner | API service only | Full SwiftUI banner | Medium | 1 day |
+| G2 | Delight Animations | Mode selection only | Full toast + haptic system | Low | 3 days |
+| G3 | Markdown Rendering | Plain text display | Rich `AttributedString` rendering | High | 2 days |
+| G4 | Code Syntax Highlighting | Highlightr integrated (Package.swift) | Wire into message bubbles | High | 1 day |
+| G5 | Offline Caching | None | SwiftData local cache for conversations | Low | 3 days |
+| G6 | Notification Integration | None | macOS `UserNotifications` for achievements | Low | 1 day |
+
+---
+
+## Maintenance Policy
+
+**This manifest MUST be updated when:**
+
+1. A new feature is added to **either** the web or Mac Think Tank app
+2. A feature is removed or deprecated on **either** platform
+3. A technology adaptation is discovered to be insufficient
+4. A gap is resolved or a new gap is identified
+5. A Tier 1/2 feature's status changes
+
+**Update process:**
+1. Add/update the row in the appropriate Feature Parity Matrix table
+2. If adding a new technology, add a row to the Technology Adaptation Map
+3. If discovering a gap, add a row to Known Gaps & Planned Work
+4. Update the version number and date at the top
+5. Update `docs/01-THINK-TANK.md` Mac section if user-facing
+
+**Policy enforcement**: `/.windsurf/workflows/thinktank-dual-platform.md`
+
+
+---
+
+---
+
+## Part XIII: Aurelius Dojo — Training System
+
+> *Merged from `03-DOJO.md` — complete Dojo training platform reference.*
+
+## Table of Contents
+
+- **Part I: User Guide**
+
+---
+
+
+---
+
+## Part I: User Guide
+
+> **Classification**: RADIANT INTERNAL  
+> **Version**: 1.2.0 | **Date**: February 6, 2026  
+> **Status**: FULLY WIRED — Frontend + Lambda + Database + CDK  
+> **Part of**: RADIANT Think Tank Ecosystem  
+> **Port**: 3004
+
+---
+
+## 1. What is the Dojo?
+
+The Aurelius Dojo is an **agent-powered training platform** that transforms private document libraries into structured, thematic mastery experiences. It is designed for:
+
+- **New employee onboarding** — order taking rules, policies, procedures
+- **Cross-training** — learn a different area of the business
+- **Compliance training** — regulations, safety protocols, legal requirements
+- **Product knowledge** — product lists, pricing, specifications
+
+The Dojo is **not a chatbot**. It is a structured learning environment with AI-driven lesson generation, adversarial testing, and mastery tracking.
+
+---
+
+## 2. Core Concepts
+
+### 2.1 Thematic Gating Protocol (TGP)
+
+Users **never see the raw document library**. Instead, the AI analyzes all documents and discovers 10-15 **Central Themes** — the core knowledge pillars. Training is gated to selected themes only, ensuring:
+
+- **No cognitive overload** — focused learning, not library browsing
+- **100% thematic purity** — AI only retrieves content matching your selected themes
+- **Deep mastery** — forced to internalize, not just skim
+
+### 2.2 The Conservation Cycle
+
+Every training session follows a four-step cycle:
+
+| Step | Name | What Happens |
 |------|------|-------------|
-| Concept | 🔵 | Core ideas and topics |
-| Question | 🟡 | Open questions to resolve |
-| Decision | 🟢 | Decisions that have been made |
-| Insight | 🟣 | Key realizations or aha moments |
-| Action | 🔴 | Tasks or next steps |
-| Person | 🩷 | People mentioned or responsible |
+| 1 | **Follow** | Select 1-3 Central Themes from the theme HUD |
+| 2 | **Call** | Sensei delivers synthesized lessons (Lecture Mode) |
+| 3 | **Tranq** | Adversarial agent challenges you (Sparring Mode) |
+| 4 | **Collect** | Earn XP, advance rank, unlock harder themes |
 
-**Edge Types**:
+### 2.3 Rank System
 
-| Type | Visual | Meaning |
-|------|--------|---------|
-| relates_to | Solid gray | General relationship |
-| leads_to | Solid green | Causal or sequential |
-| contradicts | Dashed red | Conflicting ideas |
-| supports | Solid blue | Supporting evidence |
-| defines | Solid purple | Definition or specification |
-| questions | Dashed amber | Raises questions about |
-
-**Interactive Features**:
-- Zoom, pan, and explore
-- Click nodes to see related messages
-- Add nodes manually
-- Draw connections between concepts
-- Filter by node type
-- Export as image or JSON
-
-**Auto-Generation**: The system uses NLP to:
-- Extract key concepts from messages
-- Identify relationships between concepts
-- Suggest node types based on context
-- Update the graph in real-time
-
-**Implementation Files**:
-- Service: `getOrCreateKnowledgeGraph`, `addNode`, `addEdge`
-- UI: `components/collaboration/KnowledgeGraphVisualization.tsx`
+| Rank | XP Required | Badge Color | Access |
+|------|-------------|-------------|--------|
+| **Novice** | 0 | Slate | Fundamental themes only |
+| **Initiate** | 500 | Green | Intermediate themes unlock |
+| **Adept** | 2,000 | Blue | Advanced themes unlock |
+| **Master** | 5,000 | Purple | Expert themes + certification exams |
+| **Radiant** | 10,000 | Gold | Full mastery — all content unlocked |
 
 ---
 
-### 8. Session Recording and Playback
+## 3. Using the Dojo
 
-**What It Does**: Record collaboration sessions for later review, with full playback including message timing, presence changes, and AI interactions.
+### 3.1 Library Tab
 
-**Recording Captures**:
-- All messages with exact timestamps
-- Participant join/leave events
-- Typing indicators (reconstructed)
-- Branch creation and merges
-- AI model invocations
-- Media attachments
+1. Click **New Library** to create a knowledge base
+2. Give it a name (e.g., "Order Taking Procedures") and description
+3. **Upload documents** — drag-and-drop or browse for PDF, MD, TXT, CSV files
+4. Wait for ingestion (status indicators: pending → ingesting → analyzing → ready)
+5. Click **Discover Themes** to let the AI analyze and extract Central Themes
 
-**Playback Features**:
-- Variable speed (0.5x to 4x)
-- Jump to specific timestamp
-- Search within recording
-- Export transcript
-- Share specific moments via timestamp links
+### 3.2 Themes Tab
 
-**Use Cases**:
-- Onboard team members by showing past decisions
-- Review complex discussions at your own pace
-- Create training materials from real sessions
-- Audit trail for compliance
+1. Browse the discovered Central Themes — each shows difficulty tier, required rank, and chunk count
+2. **Select 1-3 themes** to focus your training
+3. Themes are color-coded by difficulty: green (fundamental), blue (intermediate), purple (advanced), gold (expert)
+4. Click **Start Training** to enter the arena
 
-**Implementation Files**:
-- Service: `startRecording`, `stopRecording`, `addRecordingEvent`
-- UI: `components/collaboration/panels/PlaybackPanel.tsx`
+### 3.3 Training Tab — Lecture Mode
 
----
+1. Choose **Lecture Mode** to learn from the Sensei
+2. The AI generates synthesized lesson blocks from your library, grounded in citations
+3. Click the **sources** link on any lesson to see the exact document excerpts
+4. Click **Next Lesson** to continue progressing
+5. Click **End Session** when done
 
-### 9. Voice and Media Notes
+### 3.4 Training Tab — Sparring Mode
 
-**What It Does**: Record voice notes, share images, and attach files directly in the collaboration.
+1. Choose **Sparring Mode** to be challenged
+2. The adversarial testing agent generates questions:
+   - **Multiple choice** — select the best answer
+   - **Scenario-based** — apply library principles to a situation
+   - **Open-ended** — explain your reasoning
+   - **True/False** — quick knowledge checks
+3. Submit your answer to receive:
+   - Correct/incorrect verdict with partial credit
+   - The correct answer with full explanation
+   - Reasoning analysis of your response
+   - Source citations proving the answer
+   - XP awarded
+4. Click **Next Question** to continue
 
-**Supported Media**:
-- Voice notes (MP3, WAV, up to 10 minutes)
-- Images (JPEG, PNG, GIF, WebP, up to 25MB)
-- Documents (PDF, DOCX, XLSX, up to 50MB)
-- Code snippets (syntax highlighted)
+### 3.5 Progress Tab
 
-**AI Processing**:
-- Voice notes: Transcribed automatically
-- Images: Described by vision models
-- Documents: Summarized and searchable
-- Code: Explained and annotated
+- View your **overall rank** and XP progress bar
+- See **per-theme mastery** with accuracy, strengths, and weaknesses
+- Track **streak days**, session count, and total time
+- View earned **certifications**
 
-**Implementation Files**:
-- Service: `uploadMediaNote`, `getMediaNoteUrl`
-- UI: Voice recording in `RealTimeChat.tsx`
+### 3.6 Mobot Sidebar
 
----
+Click the **Mobot** button in the top bar to open the Knowledge Agent:
 
-### 10. Annotations and Reactions
-
-**What It Does**: React to messages and add annotations without cluttering the main conversation.
-
-**Reaction Types**:
-- Quick emoji reactions (👍 ❤️ 😂 😮 😢)
-- Custom reactions
-- Threaded replies
-- Highlight and annotate
-
-**Annotation Types**:
-- Inline comments (like Google Docs)
-- Bookmark for later
-- Flag for review
-- Link to external resources
-
-**Implementation Files**:
-- Service: `createAnnotation`
-- UI: Reactions in `RealTimeChat.tsx`
+- Ask any question about your training topics
+- Answers are grounded in your library with hoverable citations
+- Mobot is context-aware — it knows your current session and selected themes
+- Use it for quick reference without leaving the training workflow
 
 ---
 
-## Technical Implementation
+## 4. API Architecture
 
-### Database Schema
+**All communication goes through the service layer.** The Dojo frontend never accesses data directly.
 
-The collaboration system uses the following core tables:
+| Endpoint Group | Base Path | Purpose |
+|---------------|-----------|---------|
+| Libraries | `/api/admin/dojo/libraries/` | CRUD, document upload, theme discovery |
+| Sessions | `/api/admin/dojo/sessions/` | Training sessions, lessons, sparring |
+| Progress | `/api/admin/dojo/progress/` | User progress, theme mastery |
+| Certifications | `/api/admin/dojo/certifications/` | Proctored exams |
+| Mobot | `/api/admin/dojo/mobot/` | Knowledge Agent |
+| Config | `/api/admin/dojo/config/` | Admin settings |
+| Decay | `/api/admin/dojo/decay/` | Ebbinghaus decay curves & reinforcement |
+| Scenarios | `/api/admin/dojo/scenarios/` | Adversarial scenario synthesis |
+| Competencies | `/api/admin/dojo/competencies/` | Predictive competency mesh |
+| Dialectic | `/api/admin/dojo/dialectic/` | Socratic dialectic engine |
+| Multimodal | `/api/admin/dojo/multimodal/` | Audio, diagrams, glossary generation |
+| Pulse | `/api/admin/dojo/pulse/` | Org-wide knowledge health dashboard |
+| Archytas | `/api/admin/dojo/archytas/` | Tool Master config, invocation, suggestions |
 
-```sql
--- Collaboration Sessions
-CREATE TABLE collaboration_sessions (
-    id UUID PRIMARY KEY,
-    tenant_id UUID NOT NULL REFERENCES tenants(id),
-    name VARCHAR(255) NOT NULL,
-    conversation_id UUID REFERENCES conversations(id),
-    status session_status DEFAULT 'active',
-    settings JSONB DEFAULT '{}',
-    created_by UUID NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW()
-);
+### Backend Infrastructure
 
--- Session Participants
-CREATE TABLE session_participants (
-    id UUID PRIMARY KEY,
-    session_id UUID NOT NULL REFERENCES collaboration_sessions(id),
-    user_id UUID REFERENCES users(id),
-    role participant_role DEFAULT 'contributor',
-    color VARCHAR(7) NOT NULL,
-    is_online BOOLEAN DEFAULT false,
-    last_seen_at TIMESTAMPTZ,
-    joined_at TIMESTAMPTZ DEFAULT NOW()
-);
+| Component | File | Details |
+|-----------|------|---------|
+| **Lambda Handler** | `packages/infrastructure/lambda/admin/dojo.ts` | 35+ endpoints, path-based routing |
+| **Database Migration** | `packages/infrastructure/migrations/V2026_02_06_005__aurelius_dojo.sql` | 19 tables, 13 enums, 3 functions |
+| **CDK Stack** | `packages/infrastructure/lib/stacks/admin-stack.ts` | DojoFunction + proxy resource |
 
--- Guest Invites
-CREATE TABLE collaboration_guest_invites (
-    id UUID PRIMARY KEY,
-    tenant_id UUID NOT NULL,
-    session_id UUID NOT NULL REFERENCES collaboration_sessions(id),
-    token VARCHAR(255) UNIQUE NOT NULL,
-    permissions JSONB DEFAULT '{}',
-    expires_at TIMESTAMPTZ,
-    max_uses INT,
-    use_count INT DEFAULT 0,
-    created_by UUID NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT NOW()
-);
+**Note**: All AI-dependent features (theme discovery, lesson generation, sparring questions, scenario responses, dialectic responses, multimodal generation, mobot, competency extraction, Archytas suggestions) are implemented inline via `modelRouterService` using the tenant-configured AI model. The `invokeDojoLLM()` helper routes all calls through drift enforcement and spend governance.
 
--- Guests (no account required)
-CREATE TABLE collaboration_guests (
-    id UUID PRIMARY KEY,
-    session_id UUID NOT NULL REFERENCES collaboration_sessions(id),
-    invite_id UUID REFERENCES collaboration_guest_invites(id),
-    display_name VARCHAR(100) NOT NULL,
-    guest_token VARCHAR(255) UNIQUE NOT NULL,
-    color VARCHAR(7) NOT NULL,
-    is_online BOOLEAN DEFAULT false,
-    last_seen_at TIMESTAMPTZ,
-    created_at TIMESTAMPTZ DEFAULT NOW()
-);
+---
 
--- Conversation Branches
-CREATE TABLE conversation_branches (
-    id UUID PRIMARY KEY,
-    tenant_id UUID NOT NULL,
-    session_id UUID NOT NULL REFERENCES collaboration_sessions(id),
-    parent_branch_id UUID REFERENCES conversation_branches(id),
-    source_message_id UUID,
-    name VARCHAR(255) NOT NULL,
-    status branch_status DEFAULT 'active',
-    created_by UUID NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT NOW()
-);
+## 5. Design System
 
--- AI Roundtables
-CREATE TABLE ai_roundtables (
-    id UUID PRIMARY KEY,
-    tenant_id UUID NOT NULL,
-    session_id UUID NOT NULL REFERENCES collaboration_sessions(id),
-    topic TEXT NOT NULL,
-    debate_style VARCHAR(50) NOT NULL,
-    participating_models TEXT[] NOT NULL,
-    max_rounds INT DEFAULT 3,
-    current_round INT DEFAULT 0,
-    status roundtable_status DEFAULT 'active',
-    synthesis TEXT,
-    consensus_points JSONB DEFAULT '[]',
-    disagreement_points JSONB DEFAULT '[]',
-    created_at TIMESTAMPTZ DEFAULT NOW()
-);
+The Dojo uses a **warm gold/amber "discipline" palette** distinct from the cool cyan of OMEGA Forge:
 
--- Knowledge Graph
-CREATE TABLE knowledge_graphs (
-    id UUID PRIMARY KEY,
-    session_id UUID NOT NULL REFERENCES collaboration_sessions(id),
-    nodes JSONB DEFAULT '[]',
-    edges JSONB DEFAULT '[]',
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW()
-);
+| Token | Value | Usage |
+|-------|-------|-------|
+| Background | `rgb(15, 12, 8)` | Near-black warm base |
+| Primary | `dojo-500` (#f59e0b) | Amber — discipline, mastery |
+| Accent | `omega-500` (#0ea5e9) | Cyan — platform continuity |
+| Glass Panel | `bg-[#0a0806]/85 backdrop-blur-md` | Frosted glass |
+| Font | Inter + JetBrains Mono | Display + monospaced |
+| Pattern | Tatami grid | 40px amber gridlines at 2% opacity |
 
--- Session Recordings
-CREATE TABLE session_recordings (
-    id UUID PRIMARY KEY,
-    session_id UUID NOT NULL REFERENCES collaboration_sessions(id),
-    status recording_status DEFAULT 'recording',
-    started_at TIMESTAMPTZ DEFAULT NOW(),
-    ended_at TIMESTAMPTZ,
-    duration_seconds INT,
-    s3_key VARCHAR(500)
-);
+### Rank Colors
+
+| Rank | Color | Tailwind |
+|------|-------|----------|
+| Novice | Slate | `text-slate-400` |
+| Initiate | Green | `text-green-400` |
+| Adept | Blue | `text-blue-400` |
+| Master | Purple | `text-purple-400` |
+| Radiant | Gold | `text-dojo-400` |
+
+---
+
+## 6. Leapfrog Features (v1.1.0)
+
+These 6 features put Dojo **3-5 years ahead** of every competitor (Docebo, Virti, Second Nature, Axonify, Sana Labs, Cornerstone, Degreed).
+
+### 6.1 Ebbinghaus Decay Engine (Retention Tab)
+
+Unlike Axonify's simple flashcard scheduling, the Decay Engine tracks a **per-concept neural decay model**:
+
+- Each "knowledge atom" has its own **half-life** (how fast you forget it)
+- **Retention probability** is calculated per-atom, per-user, per-theme
+- Correct answers **increase** the half-life → next review pushed further out
+- Incorrect answers **shorten** the half-life → more frequent reinforcement
+- Dashboard shows at-risk concepts, average retention, and per-theme decay bars
+- **Reinforcement sessions** are triggered at the optimal recall moment
+
+### 6.2 Adversarial Scenario Synthesis (Scenarios Tab)
+
+Unlike Second Nature's scripted sales roleplay, Dojo generates **branching multi-turn scenarios** from your actual policies:
+
+- **9 persona archetypes**: Confused Customer, Angry Customer, VIP Escalation, Compliance Auditor, Hostile Negotiator, etc.
+- Each persona has hidden objectives, emotional state, and communication style
+- Every response is scored: **optimal**, **acceptable**, **suboptimal**, or **critical error**
+- Personas react dynamically — emotional shifts based on your responses
+- Debrief includes: Emotional Intelligence, Policy Adherence, Resolution scores + per-turn timeline
+
+### 6.3 Socratic Dialectic Engine (Dialectic Tab)
+
+**No competitor has this.** Three AI agents debate a proposition from your library:
+
+- **Thesis Agent** (green) — Presents the proposition with evidence
+- **Antithesis Agent** (red) — Challenges with counterarguments and edge cases
+- **Synthesis Agent** (purple) — Reconciles positions after you take a stand
+- You participate by submitting Claims, Evidence, Rebuttals, Concessions, or Syntheses
+- Scored on: Reasoning Chain, Argument Quality, Evidence Usage, Critical Thinking
+- **Logical fallacy detection** — identifies ad hominem, straw man, false dichotomy, etc.
+
+### 6.4 Predictive Competency Mesh (Competency Tab)
+
+Unlike Degreed's manual skill tagging, Dojo **auto-extracts competencies** from your library:
+
+- AI discovers competency graph with proficiency levels and prerequisites
+- Per-user proficiency tracking with confidence scoring and trend (improving/stable/declining)
+- **Role readiness scores** — "You are 73% ready for Senior Customer Service Rep"
+- Missing competencies identified with estimated time-to-ready
+- **Recommended learning path** with priority ranking (critical → high → medium → low)
+- Team-level gap analysis for managers
+
+### 6.5 Multimodal Lesson Synthesis (Types + API)
+
+Auto-generates rich content from lesson blocks:
+
+- Audio narration of lessons
+- 6 diagram types: flowchart, mindmap, timeline, comparison, hierarchy, process (Mermaid)
+- Auto-extracted glossary with definitions and related terms
+- Key takeaways summary
+- Learning style adaptations (visual/auditory/kinesthetic/reading-writing)
+
+### 6.6 Organizational Knowledge Pulse (Pulse Tab)
+
+**No competitor offers real-time org-wide knowledge health monitoring:**
+
+- **Overall health score** (0-100%) with trend indicator
+- **Department health breakdown** — scores, accuracy, at-risk counts, training hours
+- **Decay alerts** — "Sales team hasn't been tested on Return Policy in 90 days" (critical/warning/info)
+- **Theme compliance coverage** — trained users, mastery, decay risk, compliance status
+- **ROI metrics**: cost savings/month, avg time-to-competency, cert pass rate, retention rate, hours saved vs traditional
+
+---
+
+## 7. File Structure
+
 ```
-
-### WebSocket Protocol
-
-**Connection**:
-```
-wss://ws.thinktank.app/collaboration?token=<JWT>&sessionId=<UUID>
-```
-
-**Message Types**:
-
-| Type | Direction | Payload |
-|------|-----------|---------|
-| `join` | Client→Server | `{ sessionId, userId }` |
-| `leave` | Client→Server | `{ sessionId }` |
-| `presence` | Bidirectional | `{ participants: [...] }` |
-| `typing_start` | Client→Server | `{ sessionId }` |
-| `typing_stop` | Client→Server | `{ sessionId }` |
-| `typing_indicator` | Server→Client | `{ userId, isTyping }` |
-| `message` | Bidirectional | `{ id, content, role, ... }` |
-| `yjs_sync` | Bidirectional | `{ update: Uint8Array }` |
-| `branch_created` | Server→Client | `{ branchId, name, ... }` |
-| `roundtable_update` | Server→Client | `{ roundtableId, ... }` |
-
-### CRDT Integration
-
-We use Yjs for conflict-free synchronization:
-
-```typescript
-import * as Y from 'yjs';
-import { WebsocketProvider } from 'y-websocket';
-
-// Create a Yjs document for the session
-const ydoc = new Y.Doc();
-
-// Connect to the server
-const provider = new WebsocketProvider(
-  'wss://ws.thinktank.app',
-  sessionId,
-  ydoc
-);
-
-// Shared data structures
-const yMessages = ydoc.getArray('messages');
-const yPresence = ydoc.getMap('presence');
-const yBranches = ydoc.getMap('branches');
-
-// Listen for changes
-yMessages.observe((event) => {
-  // Handle new messages
-  event.changes.added.forEach((item) => {
-    const message = item.content.getContent()[0];
-    renderMessage(message);
-  });
-});
-
-// Add a message (automatically synced to all clients)
-yMessages.push([{
-  id: generateId(),
-  content: 'Hello, team!',
-  userId: currentUser.id,
-  timestamp: Date.now()
-}]);
+apps/dojo/
+├── app/
+│   ├── globals.css          # Dojo design system CSS
+│   ├── layout.tsx           # Root layout with providers
+│   ├── page.tsx             # Main page with 9-tab routing
+│   └── providers.tsx        # React Query provider
+├── components/
+│   ├── DojoSidebar.tsx      # Left navigation sidebar (9 tabs)
+│   ├── LibraryView.tsx      # Document library management
+│   ├── ThemeSelector.tsx    # Central theme discovery & selection
+│   ├── TrainingArena.tsx    # Lecture + Sparring modes
+│   ├── ProgressDashboard.tsx # Rank, XP, certifications
+│   ├── MobotPanel.tsx       # Knowledge Agent sidebar
+│   ├── DecayEngine.tsx      # Ebbinghaus decay dashboard + reinforcement
+│   ├── ScenarioArena.tsx    # Digital twin scenario synthesis
+│   ├── DialecticArena.tsx   # Socratic multi-agent debate
+│   ├── CompetencyMesh.tsx   # Predictive competency mesh
+│   └── KnowledgePulse.tsx   # Org-wide knowledge health dashboard
+├── lib/
+│   ├── api.ts               # Service layer — 60+ typed endpoints
+│   ├── dojo-store.ts        # Zustand state management
+│   └── utils.ts             # Rank metadata, formatting helpers
+├── package.json             # @radiant/dojo — port 3004
+├── tailwind.config.ts       # Dojo color palette & animations
+├── tsconfig.json
+├── next.config.js
+└── postcss.config.js
 ```
 
 ---
 
-## Competitive Analysis
+## 7. Running the Dojo
 
-### Feature-by-Feature Comparison
+```bash
+# From the monorepo root
+pnpm dev --filter @radiant/dojo
 
-| Feature | ChatGPT | Claude | Gemini | Think Tank |
-|---------|---------|--------|--------|------------|
-| **Real-time sync** | ❌ | ❌ | ❌ | ✅ Yjs CRDT |
-| **Presence indicators** | ❌ | ❌ | ❌ | ✅ Live |
-| **Typing attribution** | ❌ | ❌ | ❌ | ✅ Animated |
-| **Conversation branching** | ❌ | ❌ | ❌ | ✅ Git-like |
-| **Guest access** | ❌ | ❌ | ❌ | ✅ No signup |
-| **AI Facilitator** | ❌ | ❌ | ❌ | ✅ Configurable |
-| **Multi-model roundtables** | ❌ | ❌ | ❌ | ✅ 5 styles |
-| **Knowledge graph** | ❌ | ❌ | ❌ | ✅ Auto-build |
-| **Session recording** | ❌ | ❌ | ❌ | ✅ Full playback |
-| **Voice notes** | ✅ | ❌ | ✅ | ✅ Transcribed |
-| **Share conversations** | ✅ Async | ✅ Async | ❌ | ✅ Real-time |
+# Or directly
+cd apps/dojo && pnpm dev
+```
 
-### Competitive Moat Depth
-
-| Moat | Time to Replicate | Why It's Hard |
-|------|-------------------|---------------|
-| Yjs CRDT integration | 6-9 months | Deep integration with AI systems, edge cases |
-| Guest access | 3-6 months | Security, abuse prevention, scaling |
-| AI Roundtables | 9-12 months | Multi-model orchestration, synthesis |
-| Knowledge Graph | 6-9 months | NLP extraction, visualization |
-| Session Recording | 3-6 months | Storage, playback, search |
-
-**Total estimated time for a competitor to reach feature parity: 12-18 months**
+The app runs on **http://localhost:3004**.
 
 ---
 
-## Marketing & Sales Points
+---
 
-### Elevator Pitch (30 seconds)
+## 8. Database Schema
 
-> "Think Tank is the only AI platform where your team can think together. While ChatGPT and Claude are single-player experiences, Think Tank lets your entire team collaborate in real-time—like Google Docs for AI conversations. Branch ideas, have AI models debate, and capture everything in a living knowledge graph. No more copy-pasting between chat windows or wondering 'what did we decide?'"
+The Dojo uses **19 RLS-protected tables** (migration `V2026_02_06_005`):
 
-### Key Differentiators (Bullet Points)
-
-- **Real-time collaboration**: Multiple users in the same AI conversation, simultaneously
-- **Conversation branching**: Explore "what if" scenarios without losing the main thread
-- **AI Roundtables**: Let Claude, GPT-4, and Gemini debate—you get the synthesis
-- **Guest access**: Share a link, they're in—no signup required
-- **Knowledge graphs**: See your team's thinking visualized
-- **Session recording**: Playback any collaboration, onboard new team members
-
-### Use Case Stories
-
-**1. Product Team Sprint Planning**
-
-> "Before Think Tank, our sprint planning meant one person sharing their screen with ChatGPT while everyone else watched. Now, all 8 engineers are in the same session. When we hit a technical decision, we branch the conversation and have two teams explore different approaches. The AI facilitator keeps us on track and captures action items. We cut planning time by 40%."
-> — VP Engineering, Series B SaaS
-
-**2. Investor Due Diligence**
-
-> "We needed to analyze a target company with our legal team, finance team, and external advisors. With Think Tank, everyone joined via guest links—no accounts needed. We had Claude and GPT-4 debate the key risks in a roundtable. The knowledge graph showed us exactly how the issues connected. What used to take 3 weeks of back-and-forth took 4 hours."
-> — Managing Partner, PE Fund
-
-**3. Customer Research Synthesis**
-
-> "After 50 user interviews, our team was drowning in notes. We uploaded everything to a Think Tank session and collaborated on synthesis. The AI extracted themes while we debated interpretations. The branching feature let us explore contradictory findings without losing context. Our CPO said it was 'like having a research assistant with perfect memory.'"
-> — Head of Research, Consumer App
-
-### Sales Objection Handling
-
-| Objection | Response |
-|-----------|----------|
-| "We already use ChatGPT Teams" | "ChatGPT Teams is async—you share links, not experiences. Think Tank is real-time. You'll see your colleagues typing, branch conversations, and have AI models debate. It's the difference between email and Google Docs." |
-| "It's expensive" | "Consider the cost of miscommunication. A typical enterprise loses 40+ hours/week to 'which version is correct?' and 'what did we decide?' Think Tank eliminates that with real-time sync and knowledge graphs." |
-| "Security concerns" | "We're SOC2 Type II certified, HIPAA compliant, and GDPR ready. All data is encrypted at rest and in transit. Guest access uses short-lived tokens with audit trails. Enterprise customers can bring their own encryption keys." |
-| "Learning curve" | "If your team can use Slack and Google Docs, they can use Think Tank. The interface is familiar, but with AI superpowers. We offer white-glove onboarding for enterprise." |
+| Table | Purpose |
+|-------|---------|
+| `dojo_libraries` | Document library containers |
+| `dojo_documents` | Uploaded files with S3 keys |
+| `dojo_themes` | AI-discovered Central Themes |
+| `dojo_sessions` | Training sessions |
+| `dojo_lesson_blocks` | Generated lessons with citations |
+| `dojo_sparring_questions` | Adversarial questions |
+| `dojo_sparring_results` | Answer results with XP |
+| `dojo_user_progress` | Overall rank & XP |
+| `dojo_theme_progress` | Per-theme mastery |
+| `dojo_certifications` | Exam results |
+| `dojo_mobot_messages` | Knowledge Agent chat |
+| `dojo_knowledge_atoms` | Decay engine concepts |
+| `dojo_decay_curves` | Per-atom decay tracking |
+| `dojo_scenario_sessions` | Scenario instances |
+| `dojo_scenario_branches` | Branching trees |
+| `dojo_competencies` | Competency graph |
+| `dojo_user_competency_scores` | Proficiency scores |
+| `dojo_dialectic_sessions` | Dialectic sessions |
+| `dojo_dialectic_turns` | Debate turns |
+| `dojo_multimodal_content` | Audio/diagrams/glossary |
+| `dojo_knowledge_pulse` | Org health snapshots |
+| `dojo_archytas_tool_calls` | Tool execution log |
+| `dojo_config` | Per-tenant configuration |
 
 ---
 
-## Security & Compliance
+**Document maintained under RADIANT documentation policy.**
 
-### Data Protection
 
-| Layer | Protection |
-|-------|------------|
-| Transport | TLS 1.3 for all connections |
-| At Rest | AES-256-GCM encryption |
-| Keys | AWS KMS with tenant isolation |
-| Access | JWT + fine-grained RBAC |
-| Audit | Full audit trail, tamper-evident |
-
-### Compliance Certifications
-
-- **SOC2 Type II**: Annual audit
-- **HIPAA**: BAA available for healthcare
-- **GDPR**: Right to erasure, data portability
-- **ISO 27001**: In progress
-
-### Guest Access Security
-
-- Cryptographically random tokens (UUID v4 + HMAC-SHA256)
-- Configurable expiration (1 hour minimum, 30 days maximum)
-- IP-based rate limiting
-- Action audit trail for all guest activities
-- Session owner can revoke access instantly
 
 ---
 
-## Roadmap
+*Consolidated from 1 source documents (0 not found). 325 source lines.*
 
-### Q1 2026 (Current)
-- ✅ Real-time sync with Yjs CRDT
-- ✅ Presence and typing indicators
-- ✅ Conversation branching
-- ✅ Guest access
-- ✅ AI Facilitator
-- ✅ AI Roundtables
-- ✅ Knowledge Graph
-- ✅ Session recording
-
-### Q2 2026
-- 🔄 Video/audio calls within sessions
-- 🔄 Whiteboard integration
-- 🔄 Mobile apps (iOS/Android)
-- 🔄 Slack/Teams integration
-
-### Q3 2026
-- 📋 Templates library (meeting types, workflows)
-- 📋 Custom AI personas for facilitation
-- 📋 Advanced analytics dashboard
-- 📋 API for third-party integrations
-
-### Q4 2026
-- 📋 Cross-organization collaboration
-- 📋 AI-generated session summaries
-- 📋 Automated follow-up actions
-- 📋 Enterprise SSO (SAML, OIDC)
 
 ---
 
-## Appendix: Implementation File Reference
-
-### Backend Services
-
-| File | Purpose |
-|------|---------|
-| `lambda/shared/services/enhanced-collaboration.service.ts` | Core collaboration logic |
-| `lambda/shared/services/workflow/crdt-workflow.service.ts` | CRDT operations |
-| `lambda/thinktank/enhanced-collaboration.ts` | API handler |
-| `lambda/websocket/collaboration-handler.ts` | WebSocket events |
-
-### Frontend Components
-
-| File | Purpose |
-|------|---------|
-| `components/collaboration/RealTimeChat.tsx` | Chat with reactions, replies |
-| `components/collaboration/ParticipantsSidebar.tsx` | Presence display |
-| `components/collaboration/BranchVisualization.tsx` | Branch tree/timeline |
-| `components/collaboration/AIRoundtableView.tsx` | Multi-model debates |
-| `components/collaboration/KnowledgeGraphVisualization.tsx` | Concept mapping |
-| `components/collaboration/dialogs/CreateSessionDialog.tsx` | Session creation |
-| `components/collaboration/dialogs/InviteDialog.tsx` | Guest invites |
-| `components/collaboration/dialogs/FacilitatorSettingsDialog.tsx` | AI facilitator config |
-
-### Database Migrations
-
-| File | Purpose |
-|------|---------|
-| `migrations/056_enhanced_collaboration.sql` | Core collaboration tables |
-| `migrations/057_collaboration_branches.sql` | Branching support |
-| `migrations/058_ai_roundtables.sql` | Roundtable tables |
-| `migrations/059_knowledge_graphs.sql` | Graph storage |
-
----
-
-*This document is maintained by the RADIANT Platform Team. For questions, contact platform@radiant.ai*
----
+*Think Tank Complete Reference — consolidated from original 01 + Mac Guide + Mac Portability Manifest + Dojo.*
 
 
 
@@ -25012,384 +25143,17 @@ DATABASE_URL=postgresql://...
 
 \newpage
 
-# Part 3: Applications — Aurelius Dojo
+# Part 3: Applications — Radiant Admin
 
 ---
 
 
 \newpage
 
-## 3.1 Dojo — Complete Reference
+## 3.1 Radiant Admin — Complete Reference
 
 
-*Source: `docs/03-DOJO.md` (347 lines)*
-
----
-
-
-**Training • Spaced Repetition • Adversarial Scenarios • Competency Mesh**
-
-*RADIANT v6.6.0 — Generated February 07, 2026*
-
----
-
-## Table of Contents
-
-- **Part I: User Guide**
-
----
-
-
----
-
-## Part I: User Guide
-
-> **Classification**: RADIANT INTERNAL  
-> **Version**: 1.2.0 | **Date**: February 6, 2026  
-> **Status**: FULLY WIRED — Frontend + Lambda + Database + CDK  
-> **Part of**: RADIANT Think Tank Ecosystem  
-> **Port**: 3004
-
----
-
-## 1. What is the Dojo?
-
-The Aurelius Dojo is an **agent-powered training platform** that transforms private document libraries into structured, thematic mastery experiences. It is designed for:
-
-- **New employee onboarding** — order taking rules, policies, procedures
-- **Cross-training** — learn a different area of the business
-- **Compliance training** — regulations, safety protocols, legal requirements
-- **Product knowledge** — product lists, pricing, specifications
-
-The Dojo is **not a chatbot**. It is a structured learning environment with AI-driven lesson generation, adversarial testing, and mastery tracking.
-
----
-
-## 2. Core Concepts
-
-### 2.1 Thematic Gating Protocol (TGP)
-
-Users **never see the raw document library**. Instead, the AI analyzes all documents and discovers 10-15 **Central Themes** — the core knowledge pillars. Training is gated to selected themes only, ensuring:
-
-- **No cognitive overload** — focused learning, not library browsing
-- **100% thematic purity** — AI only retrieves content matching your selected themes
-- **Deep mastery** — forced to internalize, not just skim
-
-### 2.2 The Conservation Cycle
-
-Every training session follows a four-step cycle:
-
-| Step | Name | What Happens |
-|------|------|-------------|
-| 1 | **Follow** | Select 1-3 Central Themes from the theme HUD |
-| 2 | **Call** | Sensei delivers synthesized lessons (Lecture Mode) |
-| 3 | **Tranq** | Adversarial agent challenges you (Sparring Mode) |
-| 4 | **Collect** | Earn XP, advance rank, unlock harder themes |
-
-### 2.3 Rank System
-
-| Rank | XP Required | Badge Color | Access |
-|------|-------------|-------------|--------|
-| **Novice** | 0 | Slate | Fundamental themes only |
-| **Initiate** | 500 | Green | Intermediate themes unlock |
-| **Adept** | 2,000 | Blue | Advanced themes unlock |
-| **Master** | 5,000 | Purple | Expert themes + certification exams |
-| **Radiant** | 10,000 | Gold | Full mastery — all content unlocked |
-
----
-
-## 3. Using the Dojo
-
-### 3.1 Library Tab
-
-1. Click **New Library** to create a knowledge base
-2. Give it a name (e.g., "Order Taking Procedures") and description
-3. **Upload documents** — drag-and-drop or browse for PDF, MD, TXT, CSV files
-4. Wait for ingestion (status indicators: pending → ingesting → analyzing → ready)
-5. Click **Discover Themes** to let the AI analyze and extract Central Themes
-
-### 3.2 Themes Tab
-
-1. Browse the discovered Central Themes — each shows difficulty tier, required rank, and chunk count
-2. **Select 1-3 themes** to focus your training
-3. Themes are color-coded by difficulty: green (fundamental), blue (intermediate), purple (advanced), gold (expert)
-4. Click **Start Training** to enter the arena
-
-### 3.3 Training Tab — Lecture Mode
-
-1. Choose **Lecture Mode** to learn from the Sensei
-2. The AI generates synthesized lesson blocks from your library, grounded in citations
-3. Click the **sources** link on any lesson to see the exact document excerpts
-4. Click **Next Lesson** to continue progressing
-5. Click **End Session** when done
-
-### 3.4 Training Tab — Sparring Mode
-
-1. Choose **Sparring Mode** to be challenged
-2. The adversarial testing agent generates questions:
-   - **Multiple choice** — select the best answer
-   - **Scenario-based** — apply library principles to a situation
-   - **Open-ended** — explain your reasoning
-   - **True/False** — quick knowledge checks
-3. Submit your answer to receive:
-   - Correct/incorrect verdict with partial credit
-   - The correct answer with full explanation
-   - Reasoning analysis of your response
-   - Source citations proving the answer
-   - XP awarded
-4. Click **Next Question** to continue
-
-### 3.5 Progress Tab
-
-- View your **overall rank** and XP progress bar
-- See **per-theme mastery** with accuracy, strengths, and weaknesses
-- Track **streak days**, session count, and total time
-- View earned **certifications**
-
-### 3.6 Mobot Sidebar
-
-Click the **Mobot** button in the top bar to open the Knowledge Agent:
-
-- Ask any question about your training topics
-- Answers are grounded in your library with hoverable citations
-- Mobot is context-aware — it knows your current session and selected themes
-- Use it for quick reference without leaving the training workflow
-
----
-
-## 4. API Architecture
-
-**All communication goes through the service layer.** The Dojo frontend never accesses data directly.
-
-| Endpoint Group | Base Path | Purpose |
-|---------------|-----------|---------|
-| Libraries | `/api/admin/dojo/libraries/` | CRUD, document upload, theme discovery |
-| Sessions | `/api/admin/dojo/sessions/` | Training sessions, lessons, sparring |
-| Progress | `/api/admin/dojo/progress/` | User progress, theme mastery |
-| Certifications | `/api/admin/dojo/certifications/` | Proctored exams |
-| Mobot | `/api/admin/dojo/mobot/` | Knowledge Agent |
-| Config | `/api/admin/dojo/config/` | Admin settings |
-| Decay | `/api/admin/dojo/decay/` | Ebbinghaus decay curves & reinforcement |
-| Scenarios | `/api/admin/dojo/scenarios/` | Adversarial scenario synthesis |
-| Competencies | `/api/admin/dojo/competencies/` | Predictive competency mesh |
-| Dialectic | `/api/admin/dojo/dialectic/` | Socratic dialectic engine |
-| Multimodal | `/api/admin/dojo/multimodal/` | Audio, diagrams, glossary generation |
-| Pulse | `/api/admin/dojo/pulse/` | Org-wide knowledge health dashboard |
-| Archytas | `/api/admin/dojo/archytas/` | Tool Master config, invocation, suggestions |
-
-### Backend Infrastructure
-
-| Component | File | Details |
-|-----------|------|---------|
-| **Lambda Handler** | `packages/infrastructure/lambda/admin/dojo.ts` | 35+ endpoints, path-based routing |
-| **Database Migration** | `packages/infrastructure/migrations/V2026_02_06_005__aurelius_dojo.sql` | 19 tables, 13 enums, 3 functions |
-| **CDK Stack** | `packages/infrastructure/lib/stacks/admin-stack.ts` | DojoFunction + proxy resource |
-
-**Note**: AI-dependent features (theme discovery, lesson generation, sparring question generation, scenario responses, dialectic responses, multimodal generation) require the Dojo AI pipeline Lambda to be deployed. Non-AI endpoints (CRUD, config, progress tracking) work immediately.
-
----
-
-## 5. Design System
-
-The Dojo uses a **warm gold/amber "discipline" palette** distinct from the cool cyan of Genesis Forge:
-
-| Token | Value | Usage |
-|-------|-------|-------|
-| Background | `rgb(15, 12, 8)` | Near-black warm base |
-| Primary | `dojo-500` (#f59e0b) | Amber — discipline, mastery |
-| Accent | `omega-500` (#0ea5e9) | Cyan — platform continuity |
-| Glass Panel | `bg-[#0a0806]/85 backdrop-blur-md` | Frosted glass |
-| Font | Inter + JetBrains Mono | Display + monospaced |
-| Pattern | Tatami grid | 40px amber gridlines at 2% opacity |
-
-### Rank Colors
-
-| Rank | Color | Tailwind |
-|------|-------|----------|
-| Novice | Slate | `text-slate-400` |
-| Initiate | Green | `text-green-400` |
-| Adept | Blue | `text-blue-400` |
-| Master | Purple | `text-purple-400` |
-| Radiant | Gold | `text-dojo-400` |
-
----
-
-## 6. Leapfrog Features (v1.1.0)
-
-These 6 features put Dojo **3-5 years ahead** of every competitor (Docebo, Virti, Second Nature, Axonify, Sana Labs, Cornerstone, Degreed).
-
-### 6.1 Ebbinghaus Decay Engine (Retention Tab)
-
-Unlike Axonify's simple flashcard scheduling, the Decay Engine tracks a **per-concept neural decay model**:
-
-- Each "knowledge atom" has its own **half-life** (how fast you forget it)
-- **Retention probability** is calculated per-atom, per-user, per-theme
-- Correct answers **increase** the half-life → next review pushed further out
-- Incorrect answers **shorten** the half-life → more frequent reinforcement
-- Dashboard shows at-risk concepts, average retention, and per-theme decay bars
-- **Reinforcement sessions** are triggered at the optimal recall moment
-
-### 6.2 Adversarial Scenario Synthesis (Scenarios Tab)
-
-Unlike Second Nature's scripted sales roleplay, Dojo generates **branching multi-turn scenarios** from your actual policies:
-
-- **9 persona archetypes**: Confused Customer, Angry Customer, VIP Escalation, Compliance Auditor, Hostile Negotiator, etc.
-- Each persona has hidden objectives, emotional state, and communication style
-- Every response is scored: **optimal**, **acceptable**, **suboptimal**, or **critical error**
-- Personas react dynamically — emotional shifts based on your responses
-- Debrief includes: Emotional Intelligence, Policy Adherence, Resolution scores + per-turn timeline
-
-### 6.3 Socratic Dialectic Engine (Dialectic Tab)
-
-**No competitor has this.** Three AI agents debate a proposition from your library:
-
-- **Thesis Agent** (green) — Presents the proposition with evidence
-- **Antithesis Agent** (red) — Challenges with counterarguments and edge cases
-- **Synthesis Agent** (purple) — Reconciles positions after you take a stand
-- You participate by submitting Claims, Evidence, Rebuttals, Concessions, or Syntheses
-- Scored on: Reasoning Chain, Argument Quality, Evidence Usage, Critical Thinking
-- **Logical fallacy detection** — identifies ad hominem, straw man, false dichotomy, etc.
-
-### 6.4 Predictive Competency Mesh (Competency Tab)
-
-Unlike Degreed's manual skill tagging, Dojo **auto-extracts competencies** from your library:
-
-- AI discovers competency graph with proficiency levels and prerequisites
-- Per-user proficiency tracking with confidence scoring and trend (improving/stable/declining)
-- **Role readiness scores** — "You are 73% ready for Senior Customer Service Rep"
-- Missing competencies identified with estimated time-to-ready
-- **Recommended learning path** with priority ranking (critical → high → medium → low)
-- Team-level gap analysis for managers
-
-### 6.5 Multimodal Lesson Synthesis (Types + API)
-
-Auto-generates rich content from lesson blocks:
-
-- Audio narration of lessons
-- 6 diagram types: flowchart, mindmap, timeline, comparison, hierarchy, process (Mermaid)
-- Auto-extracted glossary with definitions and related terms
-- Key takeaways summary
-- Learning style adaptations (visual/auditory/kinesthetic/reading-writing)
-
-### 6.6 Organizational Knowledge Pulse (Pulse Tab)
-
-**No competitor offers real-time org-wide knowledge health monitoring:**
-
-- **Overall health score** (0-100%) with trend indicator
-- **Department health breakdown** — scores, accuracy, at-risk counts, training hours
-- **Decay alerts** — "Sales team hasn't been tested on Return Policy in 90 days" (critical/warning/info)
-- **Theme compliance coverage** — trained users, mastery, decay risk, compliance status
-- **ROI metrics**: cost savings/month, avg time-to-competency, cert pass rate, retention rate, hours saved vs traditional
-
----
-
-## 7. File Structure
-
-```
-apps/dojo/
-├── app/
-│   ├── globals.css          # Dojo design system CSS
-│   ├── layout.tsx           # Root layout with providers
-│   ├── page.tsx             # Main page with 9-tab routing
-│   └── providers.tsx        # React Query provider
-├── components/
-│   ├── DojoSidebar.tsx      # Left navigation sidebar (9 tabs)
-│   ├── LibraryView.tsx      # Document library management
-│   ├── ThemeSelector.tsx    # Central theme discovery & selection
-│   ├── TrainingArena.tsx    # Lecture + Sparring modes
-│   ├── ProgressDashboard.tsx # Rank, XP, certifications
-│   ├── MobotPanel.tsx       # Knowledge Agent sidebar
-│   ├── DecayEngine.tsx      # Ebbinghaus decay dashboard + reinforcement
-│   ├── ScenarioArena.tsx    # Digital twin scenario synthesis
-│   ├── DialecticArena.tsx   # Socratic multi-agent debate
-│   ├── CompetencyMesh.tsx   # Predictive competency mesh
-│   └── KnowledgePulse.tsx   # Org-wide knowledge health dashboard
-├── lib/
-│   ├── api.ts               # Service layer — 60+ typed endpoints
-│   ├── dojo-store.ts        # Zustand state management
-│   └── utils.ts             # Rank metadata, formatting helpers
-├── package.json             # @radiant/dojo — port 3004
-├── tailwind.config.ts       # Dojo color palette & animations
-├── tsconfig.json
-├── next.config.js
-└── postcss.config.js
-```
-
----
-
-## 7. Running the Dojo
-
-```bash
-# From the monorepo root
-pnpm dev --filter @radiant/dojo
-
-# Or directly
-cd apps/dojo && pnpm dev
-```
-
-The app runs on **http://localhost:3004**.
-
----
-
----
-
-## 8. Database Schema
-
-The Dojo uses **19 RLS-protected tables** (migration `V2026_02_06_005`):
-
-| Table | Purpose |
-|-------|---------|
-| `dojo_libraries` | Document library containers |
-| `dojo_documents` | Uploaded files with S3 keys |
-| `dojo_themes` | AI-discovered Central Themes |
-| `dojo_sessions` | Training sessions |
-| `dojo_lesson_blocks` | Generated lessons with citations |
-| `dojo_sparring_questions` | Adversarial questions |
-| `dojo_sparring_results` | Answer results with XP |
-| `dojo_user_progress` | Overall rank & XP |
-| `dojo_theme_progress` | Per-theme mastery |
-| `dojo_certifications` | Exam results |
-| `dojo_mobot_messages` | Knowledge Agent chat |
-| `dojo_knowledge_atoms` | Decay engine concepts |
-| `dojo_decay_curves` | Per-atom decay tracking |
-| `dojo_scenario_sessions` | Scenario instances |
-| `dojo_scenario_branches` | Branching trees |
-| `dojo_competencies` | Competency graph |
-| `dojo_user_competency_scores` | Proficiency scores |
-| `dojo_dialectic_sessions` | Dialectic sessions |
-| `dojo_dialectic_turns` | Debate turns |
-| `dojo_multimodal_content` | Audio/diagrams/glossary |
-| `dojo_knowledge_pulse` | Org health snapshots |
-| `dojo_archytas_tool_calls` | Tool execution log |
-| `dojo_config` | Per-tenant configuration |
-
----
-
-**Document maintained under RADIANT documentation policy.**
-
-
-
----
-
-*Consolidated from 1 source documents (0 not found). 325 source lines.*
-
-
-
-
-
-\newpage
-
-# Part 4: Applications — Radiant Admin
-
----
-
-
-\newpage
-
-## 4.1 Radiant Admin — Complete Reference
-
-
-*Source: `docs/04-RADIANT-ADMIN.md` (31,832 lines)*
+*Source: `docs/04-RADIANT-ADMIN.md` (31,790 lines)*
 
 ---
 
@@ -25527,13 +25291,12 @@ RADIANT is a multi-tenant AWS SaaS platform providing unified access to 106+ AI 
 | Role | Permissions | Use Case |
 |------|-------------|----------|
 | **Super Admin** | Full access to all features | Platform owner |
-| **Admin** | Tenant management, billing, models | Operations team |
-| **Operator** | Read access, limited actions | Support team |
-| **Auditor** | Read-only access to logs | Compliance team |
+
+> **v7.52.0**: Pool B simplified to `super_admin` only. The `admin`, `operator`, and `auditor` roles have been removed. All platform administration is performed by super administrators.
 
 #### Role Details
 
-**Super Admin** - The highest privilege level with unrestricted access:
+**Super Admin** - The sole platform administrator role with unrestricted access:
 - Create and delete tenants
 - Manage all administrators
 - Access all billing and financial data
@@ -25541,32 +25304,8 @@ RADIANT is a multi-tenant AWS SaaS platform providing unified access to 106+ AI 
 - Approve production database migrations
 - Impersonate any tenant for debugging
 - Access compliance and audit reports
+- Access both **Radiant Admin** and **Think Tank Admin** (global apps)
 - Typically limited to 1-3 people (CTO, lead engineer)
-
-**Admin** - Day-to-day operations management:
-- Create and modify tenants (cannot delete)
-- Manage users within tenants
-- Configure AI models and providers
-- View billing data (cannot modify pricing)
-- Monitor system health
-- Cannot access other admin accounts
-- Typically assigned to operations team members
-
-**Operator** - Limited support and monitoring:
-- View tenant information (read-only)
-- View user issues and support tickets
-- Monitor system health dashboards
-- Cannot modify any configuration
-- Cannot access billing or sensitive data
-- Typically assigned to support staff
-
-**Auditor** - Compliance and security review:
-- Full read access to audit logs
-- Access to compliance reports
-- Cannot modify anything
-- Cannot view sensitive data (API keys, passwords)
-- Access is logged for compliance
-- Typically assigned to compliance officers or external auditors
 
 ### 1.3 Key Concepts
 
@@ -25812,11 +25551,7 @@ RADIANT enforces role-based Multi-Factor Authentication (MFA) using industry-sta
 | Role | MFA Required | Can Disable |
 |------|--------------|-------------|
 | `super_admin` | **Yes** | No |
-| `admin` | **Yes** | No |
-| `operator` | **Yes** | No |
-| `auditor` | **Yes** | No |
 | `tenant_admin` | **Yes** | No |
-| `tenant_owner` | **Yes** | No |
 | `standard_user` | No (future) | N/A |
 
 **Critical Security Rules:**
@@ -26735,9 +26470,8 @@ FOR EACH ROW EXECUTE FUNCTION tms_prevent_orphan_users();
 | Role | Dashboard Access | API Access | Billing | Audit |
 |------|-----------------|------------|---------|-------|
 | **Super Admin** | Full | Full | Full | Full |
-| **Admin** | Full | Full | Read | Read |
-| **Operator** | Read | Read | None | Read |
-| **Auditor** | Logs only | None | None | Full |
+
+> **v7.52.0**: Only `super_admin` remains in Pool B. The `admin`, `operator`, and `auditor` roles have been removed.
 
 ### 5.2 Managing Administrators
 
@@ -30810,8 +30544,8 @@ console.log(`Integrated Information Phi: ${metrics.integratedInformationPhi}`);
 ```
 
 **Files:**
-- Service: `packages/infrastructure/lambda/shared/services/iit-phi-calculation.service.ts`
-- Integration: `packages/infrastructure/lambda/shared/services/consciousness.service.ts`
+- Service: `lambda/shared/services/iit-phi-calculation.service.ts`
+- Integration: `lambda/shared/services/cos/consciousness/ghost-vector-manager.ts`
 
 ---
 
@@ -33191,9 +32925,9 @@ Libraries are NOT AI models - they are tools that extend AI capabilities:
 | `lambda/admin/library-registry.ts` | Admin API |
 | `lambda/library-registry/update.ts` | Update Lambda |
 | `lib/stacks/library-registry-stack.ts` | CDK Stack with initial seed |
-| `migrations/103_library_registry.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `config/library-registry/seed-libraries.json` | Seed data (168 libraries) |
-| `apps/admin-dashboard/.../platform/libraries/page.tsx` | Admin UI |
+| `apps/admin-dashboard/app/(dashboard)/platform/libraries/page.tsx` | Admin UI |
 
 ### 28.3 Library Categories
 
@@ -33330,9 +33064,9 @@ User Request → Executor Service → Concurrency Check → Queue/Execute
 
 | File | Purpose |
 |------|---------|
-| `lambda/shared/services/library-executor.service.ts` | Execution service |
+| `lambda/shared/services/library-registry.service.ts` | Execution service |
 | `lib/stacks/library-execution-stack.ts` | CDK infrastructure |
-| `migrations/104_library_execution.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `shared/src/types/library-execution.types.ts` | Type definitions |
 
 ### 29.3 Concurrency Limits
@@ -34157,7 +33891,7 @@ The Genesis System is the boot sequence that initializes Cato's consciousness. I
 
 ### 33.3 Python Genesis Package
 
-**Location:** `packages/infrastructure/cato/genesis/`
+**Location:** `lambda/shared/services/omega/`
 
 | File | Lines | Purpose |
 |------|-------|---------|
@@ -34171,7 +33905,7 @@ The Genesis System is the boot sequence that initializes Cato's consciousness. I
 
 ### 33.4 TypeScript Services
 
-**Location:** `packages/infrastructure/lambda/shared/services/`
+**Location:** `lambda/shared/services/`
 
 | File | Lines | Purpose |
 |------|-------|---------|
@@ -34690,7 +34424,7 @@ SNS topic `radiant-security-alerts-{env}` for:
 
 ### 34.11 Database Migration
 
-Migration file: `packages/infrastructure/migrations/125_multi_app_user_registry.sql`
+Migration file: `packages/infrastructure/migrations/000_consolidated_schema.sql`
 
 Tables created/modified:
 - Extended: `tenants`, `users`, `registered_apps`
@@ -35389,7 +35123,7 @@ DELETE /api/admin/file-conversion/force-convert
 | File | Purpose |
 |------|---------|
 | `lambda/shared/services/file-conversion.service.ts` | Main conversion service with decision engine |
-| `lambda/shared/services/multi-model-file-prep.service.ts` | Multi-model preparation |
+| `lambda/shared/services/file-conversion.service.ts` | Multi-model preparation |
 | `lambda/shared/services/file-conversion-learning.service.ts` | Reinforcement learning |
 | `lambda/shared/services/converters/pdf-converter.ts` | PDF text extraction |
 | `lambda/shared/services/converters/docx-converter.ts` | DOCX extraction |
@@ -35402,8 +35136,8 @@ DELETE /api/admin/file-conversion/force-convert
 | `lambda/shared/services/converters/domain-formats.ts` | Domain format registry |
 | `lambda/shared/services/converters/domain-converter-selector.ts` | AGI Brain integration |
 | `lambda/thinktank/file-conversion.ts` | API handlers |
-| `migrations/127_file_conversion_service.sql` | Main database schema |
-| `migrations/128_file_conversion_learning.sql` | Learning schema |
+| `migrations/000_consolidated_schema.sql` | Main database schema |
+| `migrations/000_consolidated_schema.sql` | Learning schema |
 
 ### 35.13 Monitoring
 
@@ -35775,12 +35509,12 @@ On system reboot or failure:
 |------|---------|
 | `packages/shared/src/types/metrics-learning.types.ts` | TypeScript types |
 | `lambda/shared/services/metrics-collection.service.ts` | Metrics collection |
-| `lambda/shared/services/learning-influence.service.ts` | Learning hierarchy |
+| `lambda/shared/services/learning-hierarchy.service.ts` | Learning hierarchy |
 | `lambda/shared/middleware/metrics-middleware.ts` | Auto-metrics for AI endpoints |
 | `lambda/admin/metrics.ts` | API handlers |
 | `lambda/scheduled/learning-snapshots.ts` | Daily snapshot Lambda |
 | `lambda/scheduled/learning-aggregation.ts` | Weekly aggregation Lambda |
-| `migrations/129_metrics_persistent_learning.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `apps/admin-dashboard/app/(dashboard)/metrics/page.tsx` | Admin UI |
 | `lib/stacks/api-stack.ts` | CDK routes (lines 463-625) |
 | `lib/stacks/scheduled-tasks-stack.ts` | Scheduled Lambdas |
@@ -36188,7 +35922,7 @@ if (result.translationContext?.translationRequired) {
 | `packages/shared/src/types/translation-middleware.types.ts` | Translation types & matrices |
 | `lambda/shared/services/translation-middleware.service.ts` | Core translation service |
 | `lambda/admin/translation.ts` | Admin API handler |
-| `migrations/130_translation_middleware.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 
 ### 37.10 Monitoring
 
@@ -36425,8 +36159,8 @@ Base: `/api/admin/brain`
 | `lambda/brain/inference.ts` | Brain inference Lambda |
 | `lambda/brain/reconciliation.ts` | Reconciliation Lambda |
 | `lib/stacks/brain-stack.ts` | CDK stack |
-| `migrations/131_brain_v6_tables.sql` | Core tables |
-| `migrations/132_brain_config_tables.sql` | Config tables |
+| `migrations/000_consolidated_schema.sql` | Core tables |
+| `migrations/000_consolidated_schema.sql` | Config tables |
 
 ### 38.13 Troubleshooting
 
@@ -36701,7 +36435,7 @@ Base: `/api/admin/brain/ecd`
 | `lambda/shared/services/ecd-scorer.service.ts` | Entity extraction & scoring |
 | `lambda/shared/services/fact-anchor.service.ts` | Critical fact anchoring |
 | `lambda/shared/services/ecd-verification.service.ts` | Verification loop |
-| `migrations/133_ecd_tables.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `apps/admin-dashboard/app/(dashboard)/brain/ecd/page.tsx` | Admin UI |
 
 ### 39.12 Integration with SOFAI
@@ -37138,7 +36872,7 @@ Tracks causal relationships across conversation turns for context-aware response
 
 ### 40.12 Database Tables
 
-Migration: `migrations/152_advanced_cognition.sql`
+Migration: `migrations/000_consolidated_schema.sql`
 
 | Table | Purpose | RLS |
 |-------|---------|-----|
@@ -37572,7 +37306,7 @@ The v6.1.0 Advanced Cognition supplement adds these persistent learning stores:
 |------|---------|
 | `lambda/shared/services/feedback.service.ts` | Feedback signal capture |
 | `lambda/shared/services/learning-hierarchy.service.ts` | 60/30/10 weight distribution |
-| `lambda/shared/services/consolidation.service.ts` | Memory consolidation |
+| `lambda/shared/services/memory-consolidation.service.ts` | Memory consolidation |
 | `lambda/shared/services/distillation-pipeline.service.ts` | LoRA training pipeline |
 | `lambda/shared/services/ghost-manager.service.ts` | Ghost vector extraction |
 | `lambda/consciousness/evolution-pipeline.ts` | Weekly Twilight Dreaming Lambda |
@@ -37844,7 +37578,7 @@ The Empiricism Loop is RADIANT's "Ghost in the Machine" - a reality-testing circ
 
 **Key Files:**
 - **Service**: `lambda/shared/services/empiricism-loop.service.ts`
-- **Migration**: `migrations/V2026_01_17_001__empiricism_loop.sql`
+- **Migration**: `migrations/000_consolidated_schema.sql`
 
 ### 41B.2 Architecture
 
@@ -38004,7 +37738,7 @@ The Enhanced Learning Pipeline transforms RADIANT from a system that "reads code
 - **Tool Entropy**: `lambda/shared/services/tool-entropy.service.ts`
 - **Shadow Mode**: `lambda/shared/services/shadow-mode.service.ts`
 - **Paste-Back Detection**: `lambda/shared/services/paste-back-detection.service.ts`
-- **Migration**: `migrations/V2026_01_17_002__enhanced_learning_pipeline.sql`
+- **Migration**: `migrations/000_consolidated_schema.sql`
 
 ### 41C.2 Enhanced Learning Pipeline Architecture
 
@@ -38361,7 +38095,7 @@ Unprocessed feedback (skeletonization, recipe checks, DPO pairing) is queued for
 }
 ```
 
-**Migration:** `migrations/V2026_01_17_003__learning_session_persistence.sql`
+**Migration:** `migrations/000_consolidated_schema.sql`
 
 ---
 
@@ -38459,7 +38193,7 @@ Large user content is offloaded to S3 to prevent database scaling issues.
 
 **Cleanup Lambda:** `lambda/admin/s3-orphan-cleanup.ts` (EventBridge every 5 minutes)
 
-**Migration:** `migrations/V2026_01_17_004__s3_content_offloading.sql`
+**Migration:** `migrations/000_consolidated_schema.sql`
 
 ---
 
@@ -38575,7 +38309,7 @@ const status = await persistenceGuard.getIntegrityStatus(tenantId);
 
 **Service:** `lambda/shared/services/persistence-guard.service.ts`
 
-**Migration:** `migrations/V2026_01_17_005__persistence_guard.sql`
+**Migration:** `migrations/000_consolidated_schema.sql`
 
 ---
 
@@ -38699,7 +38433,7 @@ Ethics change over time (cultural, legal, organizational), so they must be:
 
 **Service:** `lambda/shared/services/ethics-enforcement.service.ts`
 
-**Migration:** `migrations/V2026_01_17_007__ethics_enforcement.sql`
+**Migration:** `migrations/000_consolidated_schema.sql`
 
 **Usage:**
 
@@ -38774,7 +38508,7 @@ Full report writer with scheduling, recipients, and multi-format generation.
 - Emails recipients (future)
 
 **Files:**
-- Migration: `migrations/V2026_01_17_006__admin_reports.sql`
+- Migration: `migrations/000_consolidated_schema.sql`
 - Generator: `lambda/shared/services/report-generator.service.ts`
 - API: `lambda/admin/reports.ts`
 - Scheduler: `lambda/admin/scheduled-reports.ts`
@@ -39465,7 +39199,7 @@ Navigate to **Cato** in the admin sidebar to access:
 | `lambda/shared/services/cato/redundant-perception.service.ts` | PHI/PII detection |
 | `lambda/shared/services/cato/redis.service.ts` | State management |
 | `lambda/admin/cato.ts` | Admin API handler |
-| `migrations/153_cato_safety_architecture.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `lib/stacks/cato-redis-stack.ts` | ElastiCache CDK stack |
 | `admin-dashboard/app/(dashboard)/cato/page.tsx` | Dashboard UI |
 
@@ -40971,7 +40705,7 @@ rake think_tank:health
 | `app/views/admin/think_tank/_prompt_form.html.erb` | Prompt form partial |
 | `app/helpers/admin/think_tank_helper.rb` | View helpers |
 | `app/jobs/think_tank_job.rb` | Background job |
-| `lib/tasks/think_tank_tasks.rake` | Rake tasks |
+| `lambda/thinktank/handler.ts` | Rake tasks |
 | `public/stylesheets/admin/think_tank.css` | Styles |
 
 ### 43.11 Security Guide
@@ -41094,7 +40828,7 @@ episodes.each { |e| puts "#{e.uuid}: #{e.status} (#{e.duration}s)" }
 ## 44. AWS Free Tier Monitoring
 
 **Location**: Radiant Deployer App → System → Monitoring  
-**Migration**: `migrations/160_aws_monitoring.sql`  
+**Migration**: `migrations/000_consolidated_schema.sql`  
 **Version**: v4.21.0
 
 The AWS Free Tier Monitoring system provides real-time visibility into CloudWatch metrics, X-Ray traces, and Cost Explorer data using AWS free tier services.
@@ -41152,12 +40886,12 @@ The AWS Free Tier Monitoring system provides real-time visibility into CloudWatc
 | File | Purpose |
 |------|---------|
 | `packages/shared/src/types/aws-monitoring.types.ts` | TypeScript types |
-| `packages/infrastructure/lambda/shared/services/aws-monitoring.service.ts` | Backend service |
+| `lambda/shared/services/aws-monitoring.service.ts` | Backend service |
 | `packages/infrastructure/lambda/admin/aws-monitoring.ts` | API handler |
-| `packages/infrastructure/migrations/160_aws_monitoring.sql` | Database schema |
-| `apps/swift-deployer/.../Models/AWSMonitoringModels.swift` | Swift models |
-| `apps/swift-deployer/.../Services/AWSMonitoringService.swift` | Swift service |
-| `apps/swift-deployer/.../Views/AWSMonitoringView.swift` | Swift UI |
+| `packages/infrastructure/migrations/000_consolidated_schema.sql` | Database schema |
+| `apps/swift-deployer/Sources/RadiantDeployer/Models/AWSMonitoringModels.swift` | Swift models |
+| `apps/swift-deployer/Sources/RadiantDeployer/Services/AWSMonitoringService.swift` | Swift service |
+| `apps/swift-deployer/Sources/RadiantDeployer/Services/AWSMonitoringService.swift` | Swift UI |
 
 ### 44.4 Database Schema
 
@@ -43446,14 +43180,14 @@ Version 5.0 transforms RADIANT from a stateless request-response system into a s
 
 | Component | File |
 |-----------|------|
-| **Migration** | `packages/infrastructure/migrations/V2026_01_09_001__v5_grimoire_governor.sql` |
-| **Governor Service** | `packages/infrastructure/lambda/shared/services/governor/economic-governor.ts` |
+| **Migration** | `migrations/000_consolidated_schema.sql` |
+| **Governor Service** | `lambda/shared/services/governor/economic-governor.ts` |
 | **Grimoire Tasks** | `packages/flyte/workflows/grimoire_tasks.py` |
 | **Cato Client** | `packages/flyte/utils/cato_client.py` |
 | **DB Utils** | `packages/flyte/utils/db.py` |
 | **CDK Stack** | `packages/infrastructure/lib/stacks/grimoire-stack.ts` |
-| **Grimoire UI** | `apps/admin-dashboard/app/(dashboard)/thinktank/grimoire/page.tsx` |
-| **Governor UI** | `apps/admin-dashboard/app/(dashboard)/thinktank/governor/page.tsx` |
+| **Grimoire UI** | `apps/thinktank-admin/app/(dashboard)/grimoire/page.tsx` |
+| **Governor UI** | `apps/thinktank-admin/app/(dashboard)/governor/page.tsx` |
 
 ### 51.7 Related Sections
 
@@ -43673,7 +43407,7 @@ The Facts Panel allows administrators to manage resolved decisions:
 | `lambda/consciousness/mcp-server.ts` | MCP tool definitions |
 | `components/decisions/FactsPanel.tsx` | Facts UI with edit/revoke |
 | `components/decisions/DecisionSidebar.tsx` | Decision cards |
-| `migrations/158_semantic_blackboard_orchestration.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 
 ### 52.10 Environment Variables
 
@@ -43926,7 +43660,7 @@ Base: `/api/admin/cognitive`
 | `python/cato/cognitive/workflows.py` | Flyte workflows |
 | `python/cato/cognitive/circuit_breaker.py` | Circuit breaker |
 | `python/cato/cognitive/metrics.py` | Python metrics |
-| `migrations/159_cognitive_architecture_v2.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 
 ### 53.12 Configuration
 
@@ -44103,7 +43837,7 @@ default_execution_mode: 'sniper' -- Default mode
 | `governor/economic-governor.ts` | `determineViewType()`, `determinePolymorphicRoute()` |
 | `consciousness/mcp-server.ts` | `render_interface`, `escalate_to_war_room` tools |
 | `python/cato/cognitive/workflows.py` | `determine_polymorphic_view`, `render_interface` tasks |
-| `migrations/160_polymorphic_ui.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `components/thinktank/polymorphic/` | React view components |
 
 ### 54.9 API Integration
@@ -44354,11 +44088,11 @@ export const SSF_GENESIS_EVENTS = {
 
 | File | Purpose |
 |------|---------|
-| `lambda/shared/services/genesis-telemetry.service.ts` | Telemetry polling and processing |
-| `lambda/shared/services/genesis-interlock.service.ts` | Immutable safety interlock logic |
-| `lambda/shared/services/genesis-ssf-emitter.service.ts` | SSF event emission to Cato |
-| `lambda/genesis/telemetry-handler.ts` | API handler for telemetry ingestion |
-| `migrations/161_genesis_infrastructure.sql` | Database schema |
+| `lambda/shared/services/event-firehose.service.ts` | Telemetry polling and processing |
+| `lambda/shared/services/omega/helix-kernel.service.ts` | Immutable safety interlock logic |
+| `lambda/shared/services/security-signals.service.ts` | SSF event emission to Cato |
+| `lambda/shared/services/event-firehose.service.ts` | API handler for telemetry ingestion |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `config/genesis/interlock-thresholds.yaml` | Immutable threshold configuration |
 
 ---
@@ -44642,11 +44376,11 @@ caep:
 
 | File | Purpose |
 |------|---------|
-| `lambda/shared/services/cato-integration.service.ts` | Cato SASE API integration |
-| `lambda/shared/services/cato-casb.service.ts` | CASB policy enforcement |
-| `lambda/shared/services/caep-handler.service.ts` | CAEP event processing |
-| `lambda/cato/threat-webhook.ts` | Webhook handler for Cato events |
-| `migrations/162_cato_security_grid.sql` | Database schema |
+| `lambda/shared/services/cato-cortex-bridge.service.ts` | Cato SASE API integration |
+| `lambda/shared/services/cato-checkpoint.service.ts` | CASB policy enforcement |
+| `lambda/shared/services/security-protection.service.ts` | CAEP event processing |
+| `lambda/shared/services/threat-response.service.ts` | Webhook handler for Cato events |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `config/cato/ai-ml-profiles.yaml` | AI/ML threat detection profiles |
 | `config/cato/casb-genai.yaml` | Generative AI CASB policies |
 
@@ -44982,12 +44716,12 @@ memory_safety:
 
 | File | Purpose |
 |------|---------|
-| `lambda/shared/services/identity-fabric.service.ts` | Identity Data Fabric integration |
-| `lambda/shared/services/autonomous-remediation.service.ts` | Autonomous remediation engine |
-| `lambda/shared/services/mcp-identity-provider.service.ts` | MCP context for identity |
-| `lambda/shared/services/memory-safety-scanner.service.ts` | Code safety scanning |
+| `lambda/shared/services/identity-core.service.ts` | Identity Data Fabric integration |
+| `lambda/shared/services/auto-resolve.ts` | Autonomous remediation engine |
+| `lambda/shared/services/identity-core.service.ts` | MCP context for identity |
+| `lambda/shared/services/memory-consolidation.service.ts` | Code safety scanning |
 | `python/cato/agents/identity_remediation.py` | fastWorkflow identity agent |
-| `migrations/163_agi_brain_identity.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `config/identity/autonomous-remediation.yaml` | Remediation configuration |
 
 ---
@@ -45154,7 +44888,7 @@ echo $RADIANT_ENV $AWS_PROFILE
 
 | File | Purpose |
 |------|---------|
-| `apps/swift-deployer/.../CDKService.swift` | Swift Deployer CDK service with safety enforcement |
+| `apps/swift-deployer/Sources/RadiantDeployer/Services/CDKService.swift` | Swift Deployer CDK service with safety enforcement |
 | `packages/infrastructure/bin/radiant.ts` | CDK entry point with safety check |
 | `packages/infrastructure/lib/config/environments.ts` | Environment configurations |
 | `scripts/setup_credentials.sh` | AWS credential setup |
@@ -45372,7 +45106,7 @@ Custom CSS is automatically injected for brand consistency:
 | `packages/shared/src/types/white-label.types.ts` | Type definitions |
 | `lambda/shared/services/white-label.service.ts` | Core service |
 | `lambda/admin/white-label.ts` | API handler |
-| `migrations/172_white_label.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 
 ### 59.15 Usage Example
 
@@ -45600,7 +45334,7 @@ Risk score (0-100) is calculated as sum of severity impacts for active violation
 | `lambda/shared/services/user-violation.service.ts` | Core service |
 | `lambda/admin/user-violations.ts` | API handler |
 | `apps/admin-dashboard/app/(dashboard)/compliance/violations/page.tsx` | Admin UI |
-| `migrations/173_user_violations.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 
 ### 60.13 Compliance Considerations
 
@@ -45753,11 +45487,11 @@ The Gateway admin interface provides comprehensive monitoring and configuration:
 | `services/egress-proxy/` | HTTP/2 connection pool |
 | `infrastructure/cedar/schema.cedarschema` | Cedar entity/action schema |
 | `infrastructure/cedar/policies/` | Authorization policies |
-| `packages/infrastructure/lambda/shared/services/cedar/` | Cedar TypeScript service |
+| `lambda/shared/services/cedar/` | Cedar TypeScript service |
 | `packages/infrastructure/lambda/gateway/mcp-worker.ts` | MCP NATS consumer Lambda |
 | `packages/infrastructure/lambda/admin/gateway.ts` | Gateway admin API Lambda |
 | `packages/infrastructure/__tests__/gateway/` | Gateway integration tests |
-| `packages/infrastructure/migrations/V2026_01_20_001__gateway_statistics.sql` | Statistics schema |
+| `migrations/000_consolidated_schema.sql` | Statistics schema |
 | `apps/admin-dashboard/app/(dashboard)/gateway/page.tsx` | Admin dashboard UI |
 | `apps/thinktank-admin/app/(dashboard)/gateway/page.tsx` | Think Tank status view |
 | `infrastructure/docker/gateway/` | Local dev stack |
@@ -45867,9 +45601,9 @@ Located in `lambda/shared/utils/safe-json.ts`:
 |------|---------|
 | `lambda/admin/code-quality.ts` | Admin API handler |
 | `lambda/shared/utils/safe-json.ts` | Safe JSON utilities |
-| `migrations/V2026_01_20_002__code_quality_metrics.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `apps/admin-dashboard/app/(dashboard)/code-quality/page.tsx` | Radiant dashboard |
-| `apps/admin-dashboard/app/(dashboard)/thinktank/code-quality/page.tsx` | Think Tank dashboard |
+| `apps/admin-dashboard/app/(dashboard)/code-quality/page.tsx` | Think Tank dashboard |
 
 ---
 
@@ -46043,14 +45777,14 @@ Time-travel debugging capabilities:
 **Database Migrations:**
 | File | Purpose |
 |------|---------|
-| `migrations/V2026_01_20_003__sovereign_mesh_agents.sql` | Agent schema |
-| `migrations/V2026_01_20_004__sovereign_mesh_apps.sql` | App schema |
-| `migrations/V2026_01_20_005__sovereign_mesh_ai_helper.sql` | AI Helper schema |
-| `migrations/V2026_01_20_006__sovereign_mesh_preflight.sql` | Pre-flight provisioning |
-| `migrations/V2026_01_20_007__sovereign_mesh_transparency.sql` | Transparency layer |
-| `migrations/V2026_01_20_008__sovereign_mesh_hitl.sql` | HITL approval queues |
-| `migrations/V2026_01_20_009__sovereign_mesh_replay.sql` | Execution replay |
-| `migrations/V2026_01_20_010__sovereign_mesh_seed.sql` | Seed data
+| `migrations/000_consolidated_schema.sql` | Agent schema |
+| `migrations/000_consolidated_schema.sql` | App schema |
+| `migrations/000_consolidated_schema.sql` | AI Helper schema |
+| `migrations/000_consolidated_schema.sql` | Pre-flight provisioning |
+| `migrations/000_consolidated_schema.sql` | Transparency layer |
+| `migrations/000_consolidated_schema.sql` | HITL approval queues |
+| `migrations/000_consolidated_schema.sql` | Execution replay |
+| `migrations/000_consolidated_schema.sql` | Seed data
 
 ---
 
@@ -46188,13 +45922,13 @@ Base: `/api/admin/hitl-orchestration`
 | File | Purpose |
 |------|---------|
 | `apps/admin-dashboard/app/(dashboard)/hitl-orchestration/page.tsx` | Radiant Admin |
-| `apps/thinktank-admin/app/hitl-orchestration/page.tsx` | Think Tank Admin |
+| `apps/thinktank-admin/app/(dashboard)/hitl-orchestration/page.tsx` | Think Tank Admin |
 
 **Database Migration:**
 | File | Purpose |
 |------|---------|
-| `migrations/V2026_01_20_011__hitl_orchestration_enhancements.sql` | Schema changes |
-| `migrations/V2026_01_20_012__hitl_semantic_deduplication.sql` | Semantic deduplication |
+| `migrations/000_consolidated_schema.sql` | Schema changes |
+| `migrations/000_consolidated_schema.sql` | Semantic deduplication |
 
 ### 64.11 Semantic Deduplication (v5.34.0)
 
@@ -46426,7 +46160,7 @@ radiant-cli raws audit search --domain healthcare --last 24h --env production
 
 | File | Purpose |
 |------|---------|
-| `migrations/V2026_01_21_004__raws_weighted_selection.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `lambda/shared/services/raws/types.ts` | TypeScript types |
 | `lambda/shared/services/raws/domain-detector.service.ts` | Domain detection |
 | `lambda/shared/services/raws/weight-profile.service.ts` | Profile management |
@@ -46604,7 +46338,7 @@ SELECT * FROM can_start_execution(:tenant_id, :user_id);
 | File | Purpose |
 |------|---------|
 | `packages/shared/src/types/sovereign-mesh-performance.types.ts` | TypeScript types |
-| `packages/infrastructure/migrations/V2026_01_21_001__sovereign_mesh_performance.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `lambda/shared/services/sovereign-mesh/sqs-dispatcher.service.ts` | SQS message dispatch |
 | `lambda/shared/services/sovereign-mesh/redis-cache.service.ts` | Redis/memory caching |
 | `lambda/shared/services/sovereign-mesh/performance-config.service.ts` | Configuration management |
@@ -46855,7 +46589,7 @@ Navigate to **Costs** in the Admin Dashboard to see:
 | File | Purpose |
 |------|---------|
 | `packages/shared/src/types/sovereign-mesh-scaling.types.ts` | TypeScript types |
-| `packages/infrastructure/migrations/V2026_01_21_002__sovereign_mesh_scaling.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `lambda/shared/services/sovereign-mesh/scaling.service.ts` | Scaling service |
 | `lambda/admin/sovereign-mesh-scaling.ts` | Admin API handler |
 | `apps/admin-dashboard/app/(dashboard)/sovereign-mesh/scaling/page.tsx` | Admin UI |
@@ -47169,9 +46903,9 @@ CREATE TABLE dynamic_report_schedules (
 
 | File | Purpose |
 |------|---------|
-| `packages/infrastructure/lambda/shared/services/schema-adaptive-reports.service.ts` | Core service |
+| `lambda/shared/services/schema-adaptive-reports.service.ts` | Core service |
 | `packages/infrastructure/lambda/admin/dynamic-reports.ts` | API handler |
-| `packages/infrastructure/migrations/V2026_01_21_003__dynamic_reports.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `apps/admin-dashboard/app/(dashboard)/reports/page.tsx` | Admin UI with Schema Builder tab |
 
 ### 68.10 Security Considerations
@@ -47259,7 +46993,7 @@ Cato Genesis enables:
 | File | Purpose |
 |------|---------|
 | `apps/admin-dashboard/app/(dashboard)/cato/genesis/page.tsx` | Admin UI |
-| `packages/infrastructure/lambda/shared/services/cato/genesis.service.ts` | Genesis service |
+| `lambda/shared/services/cato/genesis.service.ts` | Genesis service |
 | `packages/infrastructure/lambda/admin/cato-genesis.ts` | API handler |
 
 ---
@@ -47484,8 +47218,8 @@ POST   /gdpr/erasure                Create erasure request
 | File | Purpose |
 |------|---------|
 | `packages/shared/src/types/cortex-memory.types.ts` | Type definitions |
-| `packages/infrastructure/migrations/V2026_01_23_002__cortex_memory_system.sql` | Database schema |
-| `packages/infrastructure/lambda/shared/services/cortex/tier-coordinator.service.ts` | Orchestration |
+| `migrations/000_consolidated_schema.sql` | Database schema |
+| `lambda/shared/services/cortex/tier-coordinator.service.ts` | Orchestration |
 | `packages/infrastructure/lambda/admin/cortex.ts` | Admin API |
 | `apps/admin-dashboard/app/(dashboard)/cortex/page.tsx` | Dashboard UI |
 
@@ -47667,7 +47401,7 @@ Agent C waits for Agent A  ← CYCLE DETECTED
 | `lambda/shared/services/agent-orchestrator.service.ts` | Agent registry, locks |
 | `lambda/shared/services/process-hydration.service.ts` | State serialization |
 | `lambda/admin/blackboard.ts` | Admin API |
-| `migrations/158_semantic_blackboard_orchestration.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `apps/admin-dashboard/app/(dashboard)/blackboard/page.tsx` | Admin UI |
 
 ---
@@ -47781,7 +47515,7 @@ Cedar policies enforce that:
 
 | File | Purpose |
 |------|---------|
-| `migrations/V2026_01_24_001__services_layer_api_keys.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `lambda/admin/api-keys.ts` | Admin API handler |
 | `lambda/gateway/a2a-worker.ts` | A2A protocol worker |
 | `config/cedar/interface-access-policies.cedar` | Cedar access policies |
@@ -47941,7 +47675,7 @@ POST /api/admin/cortex/ingest
 | File | Purpose |
 |------|---------|
 | `packages/shared/src/types/cortex-graph-rag.types.ts` | Type definitions |
-| `packages/infrastructure/migrations/V2026_01_25_008__cortex_graph_rag.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `packages/infrastructure/lambda/admin/cortex-graph-rag.ts` | Admin API |
 | `apps/admin-dashboard/app/(dashboard)/cortex/graph-rag/page.tsx` | Dashboard UI |
 
@@ -48140,7 +47874,7 @@ Adapter selected if Score ≥ 0.5
 
 | File | Purpose |
 |------|---------|
-| `migrations/108_enhanced_learning.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `lambda/shared/services/enhanced-learning.service.ts` | Core learning service |
 | `lambda/shared/services/lora-inference.service.ts` | Tri-layer inference |
 | `lambda/shared/services/adapter-management.service.ts` | Adapter selection |
@@ -48529,7 +48263,7 @@ User Input → Security Check → [Block/Warn/Allow] → AI Processing
 **Key Integration Files**:
 - Service: `lambda/shared/services/security-policy.service.ts`
 - Admin API: `lambda/admin/security-policies.ts`
-- Migration: `migrations/V2026_01_26_001__security_policy_registry.sql`
+- Migration: `migrations/000_consolidated_schema.sql`
 
 ### 76.9 Database Tables
 
@@ -49183,11 +48917,11 @@ Navigate to **Admin > Neural Operations** to access:
 
 | File | Purpose |
 |------|---------|
-| `lambda/admin/cartridge.ts` | Cartridge CRUD operations |
+| `lambda/admin/cartridge-universal.ts` | Cartridge CRUD operations |
 | `lambda/admin/neural-operations.ts` | CORTEX network management |
-| `lambda/admin/thermal.ts` | Thermal state controls |
+| `lambda/shared/services/thermal-state.ts` | Thermal state controls |
 | `apps/admin-dashboard/app/(dashboard)/neural-operations/page.tsx` | Admin UI |
-| `apps/admin-dashboard/app/(dashboard)/cartridge-manager/page.tsx` | Cartridge UI |
+| `apps/admin-dashboard/app/(dashboard)/cartridge-system/page.tsx` | Cartridge UI |
 
 ---
 
@@ -49529,7 +49263,7 @@ All admin operations are logged with:
 | `lambda/shared/services/system-cartridge-registry.service.ts` | Core service |
 | `lambda/admin/system-cartridges.ts` | Admin API handler |
 | `apps/admin-dashboard/app/(dashboard)/platform/system-cartridges/page.tsx` | Admin UI |
-| `migrations/V2026_02_01_008__system_cartridge_registry.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 
 ---
 
@@ -49542,7 +49276,7 @@ All admin operations are logged with:
 All cartridges are cryptographically signed on export and verified on import to ensure integrity and prevent tampering. The PKI system implements a hierarchical certificate chain:
 
 ```
-Radiant Root CA (Genesis Vault / HSM)
+Radiant Root CA (Cartridge Vault / HSM)
     └── Tenant Intermediate CA
             └── Cartridge Signing Keys
                     └── Dual Signatures (Author + Platform)
@@ -49557,7 +49291,7 @@ Radiant Root CA (Genesis Vault / HSM)
 | Certificate Level | Location | Purpose | Validity |
 |-------------------|----------|---------|----------|
 | **Root CA** | Offline HSM | Signs all Tenant CAs | 10+ years |
-| **Tenant CA** | Genesis Vault | Signs cartridges for tenant | 5 years |
+| **Tenant CA** | Cartridge Vault | Signs cartridges for tenant | 5 years |
 | **Signing Keys** | KMS | Actual signing operations | 1 year |
 
 ### 89.3 Signing Ceremony (Export)
@@ -49784,7 +49518,7 @@ The PKI Management dashboard is available at **Platform → PKI** and provides:
 |------|---------|
 | `packages/shared/src/types/cartridge-pki.types.ts` | Type definitions |
 | `lambda/shared/services/cartridge-pki.service.ts` | Core PKI service |
-| `migrations/V2026_02_01_009__cartridge_pki.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `lambda/shared/services/cartridge.service.ts` | Integration (export/import) |
 
 ### 89.13 Cluster Compatibility (v6.1.0)
@@ -50083,7 +49817,7 @@ totalScore = (capability * 0.35) + (cost * 0.21) + (latency * 0.14) + (integrity
 | `lambda/shared/services/livs/livs-cato-integration.service.ts` | Cato integration |
 | `lambda/admin/livs.ts` | Admin API handler |
 | `apps/admin-dashboard/app/(dashboard)/platform/livs/page.tsx` | Admin UI |
-| `migrations/V2026_02_01_013__livs_integrity_system.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 
 ### 90.11 Competitive Moat
 
@@ -50550,7 +50284,7 @@ const bestOutput = crucibleResult.winnerReport;
 | `lambda/shared/services/crucible/crucible-orchestrator.service.ts` | Lifecycle orchestration |
 | `lambda/admin/crucible.ts` | Admin API handler |
 | `apps/admin-dashboard/app/(dashboard)/platform/crucible/page.tsx` | Admin UI |
-| `migrations/V2026_02_01_014__crucible_deliberation.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 
 ### 91.14 Competitive Moat
 
@@ -50770,7 +50504,7 @@ Base path: `/api/v2/admin/mls`
 | `packages/infrastructure/lib/config/services/` | Service definitions |
 | `packages/infrastructure/lambda/thermal/` | Thermal management |
 | `packages/infrastructure/lambda/services/` | Service orchestrators |
-| `migrations/006_self_hosted_models.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `litellm/config/self-hosted.yaml` | LiteLLM routing config |
 
 ### 92.15 Competitive Moat
@@ -50787,7 +50521,7 @@ MLS is a **Tier 1 Technical Moat** (Score: 27/30):
 ## 93. MLS (Message Layer Security) - Agent-to-Agent Encryption
 
 **Location**: Admin Dashboard → Platform → MLS Security  
-**Migration**: `migrations/140_mls_message_layer_security.sql`  
+**Migration**: `migrations/000_consolidated_schema.sql`  
 **Version**: 6.5.0 (PROMPT-43)
 
 ### 93.1 Overview
@@ -50943,7 +50677,7 @@ MLS_KMS_KEY_ARN=arn:aws:kms:region:account:key/key-id
 | `lambda/shared/services/mls/mls.service.ts` | Core MLS service (936 lines) |
 | `lambda/shared/services/mls/index.ts` | Module exports |
 | `lambda/admin/mls.ts` | Admin API endpoints |
-| `migrations/140_mls_message_layer_security.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 
 ### 93.10 Competitive Moat
 
@@ -51098,7 +50832,7 @@ this.cartridgeSigningKey = new kms.Key(this, 'CartridgeSigningKey', {
 |------|---------|
 | `lib/stacks/security-stack.ts` | CDK asymmetric key definition |
 | `lambda/shared/services/cartridge-pki.service.ts` | PKI service with real KMS |
-| `migrations/139_cartridge_pki_kms.sql` | Database schema for PKI keys |
+| `migrations/000_consolidated_schema.sql` | Database schema for PKI keys |
 
 ### 94.12 Verification Checklist
 
@@ -51133,7 +50867,7 @@ The Autonomous Organism Architecture transforms RADIANT from "Agentic Software" 
 
 | # | Technology | What It Does | Admin Control |
 |---|------------|--------------|---------------|
-| 1 | **Genesis Forge** | Generates tools on-demand | Approval gates, sandbox config |
+| 1 | **Tool Forge** | Generates tools on-demand | Approval gates, sandbox config |
 | 2 | **Liquid Topology** | Routes to browser/local/edge/cloud | Sensitivity rules, topology config |
 | 3 | **Tensor-Link** | Vector-based communication | Compression mode selection |
 | 4 | **Ghost Simulation** | Predicts user reaction | Calibration thresholds, simulation limits |
@@ -51820,8 +51554,8 @@ RADIANT supports multiple application URLs that must be configured consistently 
 | **Admin Dashboard URL** | Admin web application | `https://admin.example.com` |
 | **Think Tank URL** | Consumer AI workspace | `https://thinktank.example.com` |
 | **Status Page URL** | Public system status | `https://status.example.com` |
-| **Genesis Lab URL** | OMEGA brain monitoring dashboard | `https://genesis.example.com` |
-| **Genesis Forge URL** | OMEGA firmware creation tool | `https://forge.example.com` |
+| **OMEGA Lab URL** | OMEGA brain monitoring dashboard | `https://omega-lab.example.com` |
+| **OMEGA Forge URL** | OMEGA firmware creation tool | `https://forge.example.com` |
 | **OMEGA API URL** | Bio-mimetic AI inference API | `https://omega.example.com` |
 
 ### 97.2 Swift Deployer Configuration
@@ -51895,14 +51629,14 @@ const allowedOrigins = [
 | **Staging** | `https://{app}.staging.{domain}` |
 | **Development** | `http://localhost:{port}` |
 
-### 97.7 Genesis/OMEGA URLs (v7.5.0)
+### 97.7 OMEGA Lab/Forge URLs (v7.5.0)
 
-The Genesis/OMEGA apps are available for Scale tier and above:
+The OMEGA Lab/Forge apps are available for Scale tier and above:
 
 | Application | Default Subdomain | Default Path | Description |
 |-------------|-------------------|--------------|-------------|
-| **Genesis Lab** | `genesis` | `/genesis` | Real-time brain monitoring with thermal visualization, coherence metrics, and Cortex Explorer |
-| **Genesis Forge** | `forge` | `/forge` | Firmware creation tool for .bio files with Helix rules, ambition settings, and personality traits |
+| **OMEGA Lab** | `omega-lab` | `/omega-lab` | Real-time brain monitoring with thermal visualization, coherence metrics, and Cortex Explorer |
+| **OMEGA Forge** | `forge` | `/forge` | Firmware creation tool for .bio files with Helix rules, ambition settings, and personality traits |
 | **OMEGA API** | `omega` | `/omega` | Bio-mimetic AI inference API with Time Warp, shadow mode, and brain management |
 
 #### Admin API Routes for OMEGA
@@ -51926,10 +51660,10 @@ The Genesis/OMEGA apps are available for Scale tier and above:
 
 | File | Purpose |
 |------|---------|
-| `apps/swift-deployer/.../RadiantApplication.swift` | Application registry with Genesis apps |
-| `apps/swift-deployer/.../URLConfigurationView.swift` | Deployer URL settings UI |
-| `apps/admin-dashboard/.../settings/urls/page.tsx` | Admin URL settings page |
-| `apps/admin-dashboard/.../settings/urls/url-configuration-client.tsx` | URL configuration client with Genesis fields |
+| `apps/swift-deployer/Sources/RadiantDeployer/Models/RadiantApplication.swift` | Application registry with OMEGA Lab/Forge apps |
+| `apps/swift-deployer/Sources/RadiantDeployer/Views/Settings/URLConfigurationView.swift` | Deployer URL settings UI |
+| `apps/admin-dashboard/app/(dashboard)/settings/page.tsx` | Admin URL settings page |
+| `apps/admin-dashboard/app/(dashboard)/settings/page.tsx` | URL configuration client with OMEGA Lab/Forge fields |
 | `packages/shared/src/types/status-page.types.ts` | URL configuration types |
 | `packages/infrastructure/lib/stacks/admin-stack.ts` | CDK admin routes including OMEGA |
 | `packages/infrastructure/lib/stacks/OmegaStack.ts` | CDK OMEGA infrastructure stack |
@@ -51940,12 +51674,12 @@ The Genesis/OMEGA apps are available for Scale tier and above:
 
 | Version | Date | Changes |
 |---------|------|---------|
-| **6.6.0** | 2026-02-04 | **Autonomous Organism Architecture (PROMPT-43)**: 5 Leapfrog Technologies (Genesis Forge, Liquid Topology, Tensor-Link, Ghost Simulation, Economic Cortex); 9 core services (~6,226 lines); 37 Admin API endpoints; 6-tab Admin Dashboard; 18 database tables, 14 enums; BrainRouter integration; Neural Affinity Routing algorithm; JIT tool generation with Firecracker sandbox; Section 95 |
+| **6.6.0** | 2026-02-04 | **Autonomous Organism Architecture (PROMPT-43)**: 5 Leapfrog Technologies (Tool Forge, Liquid Topology, Tensor-Link, Ghost Simulation, Economic Cortex); 9 core services (~6,226 lines); 37 Admin API endpoints; 6-tab Admin Dashboard; 18 database tables, 14 enums; BrainRouter integration; Neural Affinity Routing algorithm; JIT tool generation with Firecracker sandbox; Section 95 |
 | **6.5.0** | 2026-02-03 | **Cartridge PKI KMS Integration (PROMPT-42)**: Real AWS KMS asymmetric signing for .RADz cartridges; Platform root CA with ECC_NIST_P256; Tenant CA hierarchy; IAM policies for tenant key creation; 3 database tables; Admin API with 10 endpoints; Section 94 |
 | **6.5.0** | 2026-02-03 | **MLS (Message Layer Security)**: RFC 9420-inspired group encryption for agent-to-agent communication; Forward secrecy with epoch-based key ratcheting; Post-compromise security via key updates; X25519 ECDH + Ed25519 signatures + AES-256-GCM encryption; 7 database tables; Admin API with 12 endpoints; Section 93 |
 | **6.4.0** | 2026-02-01 | **The Crucible**: Competitive multi-LLM deliberation system; LLMs question each other to refine answers; Integrity pre-prompting with evaluation weights; Provenance tracking and circular citation detection; Learning insights extraction; Model performance tracking; Admin Dashboard at Platform → The Crucible; Admin API with 10 endpoints; Section 91 |
 | **6.3.0** | 2026-02-01 | **LLM Integrity Verification System (LIVS)**: Two-tier defense against AI "lying"; Tier 1 Individual LLM Interrogation (5 depth levels, 5 question patterns, lie detection signals); Tier 2 Orchestration Integrity (5 failure patterns: Watermelon, Echo Chamber, Confidence Inflation, Circular Reasoning, Scope Drift); Soft Rules for domain-specific configuration; Cato integration with 30% integrity weight; Model integrity weights and global aggregation; Admin Dashboard at Platform → LIVS; Admin API with 16 endpoints |
-| **6.2.0** | 2026-02-01 | **Genesis Vault (Keyhole Pattern)**: Secrets management for cartridges; vault.req manifest; KMS encryption; Secret rotation with history; Admin UI at Platform → Vault; **RNIR Compiler**: Model-agnostic cognitive source code; Compiles to LoRA/prompts/few-shot; Generated from Curator; Admin UI at Platform → RNIR; **Cartridge Operations**: Time Machine integration; Checkpointing and resume; Step-by-step progress; Pause/Resume/Rollback; Admin UI at Platform → Cartridge Operations |
+| **6.2.0** | 2026-02-01 | **Cartridge Vault (Keyhole Pattern)**: Secrets management for cartridges; vault.req manifest; KMS encryption; Secret rotation with history; Admin UI at Platform → Vault; **RNIR Compiler**: Model-agnostic cognitive source code; Compiles to LoRA/prompts/few-shot; Generated from Curator; Admin UI at Platform → RNIR; **Cartridge Operations**: Time Machine integration; Checkpointing and resume; Step-by-step progress; Pause/Resume/Rollback; Admin UI at Platform → Cartridge Operations |
 | **6.1.0** | 2026-02-01 | **Cartridge PKI**: Cryptographic signing on export, verification on import; Dual signatures (author + platform); signature.sig in .RADz container; meta.json for web publishing; Federation support; **Cluster Compatibility**: Version/app/feature/environment checks; **System Cartridge Registry**: Domain experts as system cartridges; Full audit trail (HIPAA/SOC2/GDPR); Tenant visibility toggles; Thermal state management; Admin dashboard and API |
 | **6.0.0** | 2026-01-31 | **Neural Architecture v6.0.0**: RADIANT Cartridges (.RADz portable AI brains); CORTEX Neural Networks (6 MLPs, ~2.5M params); Three-Tier Learning Architecture; Ghost Vector System v3.2 (4096→64 compression); LoRA Adapter Pipeline; Expert System Adapters (ESAs); CATO Twilight Dreaming with 30% invention enforcement; Thermal State Management; Cartridge Manager Dashboard |
 | **5.52.57** | 2026-01-29 | Model Registry Enhancement System; HuggingFace discovery service; Model version manager with thermal states; Deletion queue with usage tracking; Admin dashboard; Scheduler integration |
@@ -52679,54 +52413,43 @@ Base: `/api/profile`
 
 ### 105.1 Overview
 
-RADIANT enforces a 4-tier admin role hierarchy. Each role has a specific set of permissions that controls access to dashboard routes, API endpoints, and platform features.
+RADIANT enforces a single-tier admin role model (v7.52.0). Only `super_admin` exists in Pool B, with full access to all dashboard routes, API endpoints, and platform features.
 
 ### 105.2 Role Hierarchy
 
 | Role | Level | Description |
 |------|-------|-------------|
 | `super_admin` | 4 | System administrator — full access to everything |
-| `admin` | 3 | Platform administrator — tenants, billing, config |
-| `operator` | 2 | Operations — deploy, manage models/providers, monitor |
-| `auditor` | 1 | Read-only — audit logs, billing reports, tenant data |
+
+> **v7.52.0**: `admin`, `operator`, and `auditor` roles removed. Only `super_admin` remains.
 
 ### 105.3 Permission Matrix
 
-| Capability | super_admin | admin | operator | auditor |
-|------------|:-----------:|:-----:|:--------:|:-------:|
-| Create/delete admins | ✅ | ❌ | ❌ | ❌ |
-| Change admin roles | ✅ | ❌ | ❌ | ❌ |
-| Create super_admins | ✅ | ❌ | ❌ | ❌ |
-| Delete tenants | ✅ | ❌ | ❌ | ❌ |
-| Security policies | ✅ | ❌ | ❌ | ❌ |
-| Create tenants | ✅ | ✅ | ❌ | ❌ |
-| Manage tenants | ✅ | ✅ | ❌ | ❌ |
-| Manage users | ✅ | ✅ | ❌ | ❌ |
-| System config | ✅ | ✅ | ❌ | ❌ |
-| Billing | ✅ | ✅ | ❌ | ❌ |
-| Models/providers | ✅ | ✅ | ✅ | ❌ |
-| Deploy | ✅ | ✅ | ✅ | ❌ |
-| SENTINEL access | ✅ | ✅ | ✅ | ❌ |
-| SENTINEL management | ✅ | ❌ | ❌ | ❌ |
-| View audit logs | ✅ | ✅ | ✅ | ✅ |
-| Export audit logs | ✅ | ✅ | ❌ | ✅ |
-| Auto-access all apps | ✅ | ❌ | ❌ | ❌ |
+| Capability | super_admin |
+|------------|:-----------:|
+| Create/delete admins | ✅ |
+| Change admin roles | ✅ |
+| Create super_admins | ✅ |
+| Delete tenants | ✅ |
+| Security policies | ✅ |
+| Create tenants | ✅ |
+| Manage tenants | ✅ |
+| Manage users | ✅ |
+| System config | ✅ |
+| Billing | ✅ |
+| Models/providers | ✅ |
+| Deploy | ✅ |
+| SENTINEL access | ✅ |
+| SENTINEL management | ✅ |
+| View audit logs | ✅ |
+| Export audit logs | ✅ |
+| Auto-access all apps | ✅ |
 
 ### 105.4 Route Protection
 
 The admin dashboard middleware blocks access to restricted routes based on role:
 
-| Route | Minimum Role |
-|-------|-------------|
-| `/administrators` | super_admin |
-| `/security/*` | super_admin |
-| `/settings/security` | super_admin |
-| `/billing` | admin |
-| `/pricing` | admin |
-| `/configuration` | admin |
-| `/settings` | admin |
-
-Users who attempt to access a restricted route are redirected to `/permission-denied`.
+All routes require `super_admin` (the only Pool B role as of v7.52.0). Non-super_admin tokens are rejected at the middleware layer.
 
 ### 105.5 Bootstrap Flow
 
@@ -52737,9 +52460,8 @@ Users who attempt to access a restricted route are redirected to `/permission-de
 
 ### 105.6 App Access
 
-- **super_admin**: Automatic access to ALL apps (Think Tank, Curator, Genesis, Dojo, RADIANT Admin, etc.), including any new apps added in the future
-- **admin/operator/auditor**: Require explicit app access grants via the `admin_app_access` table
-- App access is managed by the `AdminRoleService.grantAppAccess()` method
+- **super_admin**: Automatic access to ALL apps (Think Tank, Curator, Genesis, Dojo, RADIANT Admin, Think Tank Admin, etc.), including any new apps added in the future
+- As of v7.52.0, only `super_admin` exists in Pool B — no explicit app access grants are needed
 
 ### 105.7 Lambda API Guard
 
@@ -52778,10 +52500,10 @@ New tenants are provisioned through a self-service sign-up flow from marketing/s
 
 | Domain | Roles | App Access |
 |--------|-------|------------|
-| **Platform (RADIANT Admin)** | super_admin, admin, operator, auditor | Only super_admin gets RADIANT app access |
-| **Tenant (Customer)** | tenant_admin, tenant_owner, standard_user, viewer | Per-tenant app grants |
+| **Platform (Pool B)** | super_admin | Full access to RADIANT Admin + Think Tank Admin |
+| **Tenant (Pool A)** | tenant_admin, standard_user, viewer | Per-tenant app grants |
 
-**Key rule**: Admin privileges (admin, operator, auditor) do NOT apply to RADIANT-side apps. Only `super_admin` inherits admin privileges AND gets RADIANT Admin + all RADIANT app access.
+**Key rule** (v7.52.0): Only `super_admin` exists in Pool B. All platform administration is performed by super administrators with full access to both global admin apps.
 
 ### 106.2 Sign-Up Flow
 
@@ -57099,7 +56821,7 @@ func executeInstall(...) async throws -> DeploymentExecutionResult {
 
 ### Overview
 
-OMEGA Firmware Administration allows platform administrators to manage the behavior, safety rules, and cognitive parameters of OMEGA AI brains in real-time through the Genesis Forge interface. All firmware operations are cryptographically signed, auditable, and support automatic rollback.
+OMEGA Firmware Administration allows platform administrators to manage the behavior, safety rules, and cognitive parameters of OMEGA AI brains in real-time through the OMEGA Forge interface. All firmware operations are cryptographically signed, auditable, and support automatic rollback.
 
 ### Accessing Firmware Management
 
@@ -57111,7 +56833,7 @@ Navigate to **OMEGA → Firmware** in the admin sidebar, or directly visit `/ome
 
 | Status | Description | Next Action |
 |--------|-------------|-------------|
-| **Draft** | Being authored in Genesis Forge editor | Validate → Sign |
+| **Draft** | Being authored in OMEGA Forge editor | Validate → Sign |
 | **Signed** | Cryptographically signed via KMS | Activate |
 | **Active** | Currently loaded on the target brain | (Running) |
 | **Superseded** | Replaced by newer firmware | Rollback (if needed) |
@@ -57119,7 +56841,7 @@ Navigate to **OMEGA → Firmware** in the admin sidebar, or directly visit `/ome
 
 ### Creating New Firmware
 
-1. Open **Genesis Forge → Firmware Library**
+1. Open **OMEGA Forge → Firmware Library**
 2. Click **"New Firmware"** or clone an existing profile
 3. Configure sections:
    - **Helix Rules** — Safety guardrails (forbidden behaviors). Each rule defines a forbidden vector signature, severity (CRITICAL/HIGH/MEDIUM/LOW), and interference mode (DESTRUCTIVE or DAMPENING)
@@ -57231,14 +56953,14 @@ Cartridges are portable AI intelligence packages that bundle firmware + trained 
 
 \newpage
 
-# Part 5: Applications — Swift Deployer
+# Part 4: Applications — Swift Deployer
 
 ---
 
 
 \newpage
 
-## 5.1 Swift Deployer — Complete Reference
+## 4.1 Swift Deployer — Complete Reference
 
 
 *Source: `docs/05-SWIFT-DEPLOYER.md` (2,568 lines)*
@@ -59235,7 +58957,7 @@ Discover and execute deployment bash scripts directly from the Deployer.
 Scripts are automatically discovered from:
 - `scripts/` - Main deployment scripts
 - `tools/scripts/` - Utility scripts
-- `packages/infrastructure/scripts/` - Infrastructure scripts
+- `packages/infrastructure/bin/` - Infrastructure scripts
 
 #### Script Categories
 
@@ -59819,17 +59541,17 @@ User                    Deployer                    AWS
 
 \newpage
 
-# Part 6: Architecture & Engineering
+# Part 5: Architecture, Engineering & Data Storage
 
 ---
 
 
 \newpage
 
-## 6.1 Architecture & Engineering — Complete Reference
+## 5.1 Architecture, Engineering & Data — Complete Reference
 
 
-*Source: `docs/06-ARCHITECTURE-ENGINEERING.md` (17,312 lines)*
+*Source: `docs/06-ARCHITECTURE-ENGINEERING.md` (20,953 lines)*
 
 ---
 
@@ -59879,12 +59601,12 @@ User                    Deployer                    AWS
 - 🟣 **Helix Kernel** - Deterministic safety via destructive interference (impossible to bypass)
 - 🟣 **Resonant Index** - O(1) frequency-based document lookup (infinite scaling)
 - 🟣 **Cryogenic Engine** - Serverless persistence with Time Warp ($0 idle cost)
-- 🟣 **Genesis Ecosystem** - .bio firmware, Genesis Lab, Genesis Forge
+- 🟣 **OMEGA Ecosystem** - .bio firmware, OMEGA Lab, OMEGA Forge
 - 🔴 **Neural Bridge** - NeuralTransducer projects Complex^2048 → [8, 4096] soft prompt tokens for direct vLLM injection (Shadow Mode)
 - 🔴 **Homeostatic Dreaming** - 3-stage selective dreaming: magnitude gate + phase sharpening + experience replay
 - 🔴 **The Watcher** - Self-awareness via prediction error; surprise → dopamine loop
 - 🔴 **Custom vLLM Server** - FastAPI wrapper with `/inject` endpoint for embedding-level conditioning
-- 🔥 **Genesis Forge v3.0 "The Glass Foundry"** - Full neural firmware orchestration suite with React Flow canvas, catenary wire physics, Shadow Omega WebSocket tether, Omega Instance Registry, Reactor Core forge button, Void Mode
+- 🔥 **OMEGA Forge v3.0 "The Glass Foundry"** - Full neural firmware orchestration suite with React Flow canvas, catenary wire physics, Shadow Omega WebSocket tether, Omega Instance Registry, Reactor Core forge button, Void Mode
 - 🔥 **Omega Instance Registry** - Every OMEGA instance has unique ID/Name/endpoint; addressable by Forge via `omega_instance_registry` table
 - 🔥 **Shadow Omega Wiring** - Bi-directional WebSocket (`useShadowOmega()` hook) for real-time telemetry, edge rejection, stability-driven UI hue shift
 
@@ -60426,7 +60148,7 @@ UEP v2.0 provides standardized wrapping for all AI interactions across RADIANT, 
 | `services/uep/uds-storage-adapter.service.ts` | UDS tiered storage |
 | `services/uep/compliance.service.ts` | PHI/PII detection |
 | `services/uep/security.service.ts` | Encryption/signing |
-| `migrations/V2026_01_31_001__uds_envelopes.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 
 **Documentation**: See [UEP-V2-SPECIFICATION.md](./UEP-V2-SPECIFICATION.md) for complete specification.
 
@@ -60474,7 +60196,7 @@ UEP v2.0 is fully integrated into the workflow orchestration system with model-a
 |------|---------|
 | `services/workflow/uep-node.service.ts` | Central UEP integration |
 | `workflow-engine.ts` | UEP-aware execution methods |
-| `migrations/V2026_01_31_003__workflow_uep_integration.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 
 **Documentation**: See [WORKFLOW-UEP-ARCHITECTURE.md](./WORKFLOW-UEP-ARCHITECTURE.md) for complete guide.
 
@@ -60659,7 +60381,7 @@ The AXIOM Scorers are 8 lightweight MLPs (~50K-1M params each) for intelligent p
 | `lambda/shared/services/axiom.service.ts` | Pipeline (Model/Topology scorers) |
 | `lambda/shared/services/clarion.service.ts` | CLARION Scorer integration |
 | `packages/shared/src/types/axiom-clarion.types.ts` | Scorer type definitions |
-| `migrations/V2026_02_01_001__axiom_neural_cortex.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 
 ### Database Tables
 
@@ -60879,7 +60601,7 @@ CREATE TABLE mls_service_states (
 | Service Definitions | `packages/infrastructure/lib/config/services/` |
 | Thermal Management | `packages/infrastructure/lambda/thermal/` |
 | Service Orchestrators | `packages/infrastructure/lambda/services/` |
-| Database Schema | `migrations/006_self_hosted_models.sql` |
+| Database Schema | `migrations/000_consolidated_schema.sql` |
 | LiteLLM Routing | `litellm/config/self-hosted.yaml` |
 
 ---
@@ -61409,7 +61131,7 @@ RFC 9420-inspired group encryption for secure agent-to-agent communication. Prov
 | `lambda/shared/services/mls/mls.service.ts` | Core MLS implementation | 936 |
 | `lambda/shared/services/mls/index.ts` | Module exports | 14 |
 | `lambda/admin/mls.ts` | Admin API endpoints | 551 |
-| `migrations/140_mls_message_layer_security.sql` | Database schema | ~300 |
+| `migrations/000_consolidated_schema.sql` | Database schema | ~300 |
 
 ### Database Tables
 
@@ -61608,7 +61330,7 @@ Signing Keys (KMS ECC_NIST_P256)
 |------|---------|
 | `lib/stacks/security-stack.ts` | CDK asymmetric key definition |
 | `lambda/shared/services/cartridge-pki.service.ts` | PKI service with real KMS |
-| `migrations/139_cartridge_pki_kms.sql` | Database schema for PKI keys |
+| `migrations/000_consolidated_schema.sql` | Database schema for PKI keys |
 
 ### Admin API
 
@@ -61634,7 +61356,7 @@ Signing Keys (KMS ECC_NIST_P256)
 |---------|------|---------|
 | **MCP Server Manager** | `mcp-server-manager.service.ts` | Neural Affinity Routing for MCP servers |
 | **Neural Schema Registry** | `neural-schema-registry.service.ts` | Tool embeddings for intelligent discovery |
-| **Genesis Auto-Tool** | `genesis-auto-tool.service.ts` | On-demand tool generation from APIs |
+| **Tool Forge** | `genesis-auto-tool.service.ts` | On-demand tool generation from APIs |
 | **Liquid Compute** | `liquid-compute.service.ts` | Dynamic compute location selection |
 | **Ghost Simulation** | `ghost-simulation.service.ts` | User digital twin for prediction |
 | **Tensor-Link** | `tensor-link.service.ts` | Vector-based transport protocol |
@@ -62082,7 +61804,7 @@ RAWS (RADIANT AI Weighted Selection) provides intelligent real-time model select
 
 | File | Purpose |
 |------|---------|
-| `migrations/V2026_01_21_004__raws_weighted_selection.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `lambda/shared/services/raws/types.ts` | TypeScript types |
 | `lambda/shared/services/raws/domain-detector.service.ts` | Domain detection |
 | `lambda/shared/services/raws/weight-profile.service.ts` | Profile management |
@@ -62253,7 +61975,7 @@ Cascade deletion across all tiers:
 | File | Purpose |
 |------|---------|
 | `packages/shared/src/types/cortex-memory.types.ts` | Type definitions |
-| `migrations/V2026_01_23_002__cortex_memory_system.sql` | Database schema (14 tables) |
+| `migrations/000_consolidated_schema.sql` | Database schema (14 tables) |
 | `lambda/shared/services/cortex/tier-coordinator.service.ts` | Orchestration |
 | `lambda/admin/cortex.ts` | Admin API |
 | `apps/admin-dashboard/app/(dashboard)/cortex/page.tsx` | Dashboard UI |
@@ -62396,7 +62118,7 @@ POST       /model-migrations/:id/rollback
 
 | File | Purpose |
 |------|---------|
-| `migrations/V2026_01_23_003__cortex_v2_features.sql` | v2 schema (12 tables) |
+| `migrations/000_consolidated_schema.sql` | v2 schema (12 tables) |
 | `lambda/shared/services/cortex/golden-rules.service.ts` | Golden Rules + Chain of Custody |
 | `lambda/shared/services/cortex/stub-nodes.service.ts` | Zero-copy pointers |
 | `lambda/shared/services/cortex/graph-expansion.service.ts` | Twilight Dreaming v2 |
@@ -62431,7 +62153,7 @@ Integrates Cato consciousness with Cortex memory tiers for unified prompt enrich
 |------|---------|
 | `lambda/shared/services/cato-cortex-bridge.service.ts` | Bridge service |
 | `lambda/shared/services/identity-core.service.ts` | Ego builder (uses bridge) |
-| `migrations/V2026_01_24_003__cato_cortex_bridge.sql` | Bridge tables |
+| `migrations/000_consolidated_schema.sql` | Bridge tables |
 
 ### Database Tables
 
@@ -62680,7 +62402,7 @@ example.RADz (encrypted ZIP)
 | `user_learning_vectors` | Ghost vectors |
 | `tenant_lora_adapters` | LoRA adapters |
 
-### Genesis Vault Tables (v6.2.0)
+### Cartridge Vault Tables (v6.2.0)
 
 | Table | Purpose |
 |-------|---------|
@@ -63049,7 +62771,7 @@ LLMs receive competitive pre-prompts with:
 |---------|------|---------|
 | **MCP Server Manager** | `mcp-server-manager.service.ts` | Server registry, health checks, Neural Affinity Routing |
 | **Neural Schema Registry** | `neural-schema-registry.service.ts` | Tool schemas with neural embeddings |
-| **Genesis Auto-Tool** | `genesis-auto-tool.service.ts` | On-demand tool generation from API docs |
+| **Tool Forge** | `genesis-auto-tool.service.ts` | On-demand tool generation from API docs |
 | **Liquid Compute** | `liquid-compute.service.ts` | Privacy-aware compute location selection |
 | **Ghost Simulation** | `ghost-simulation.service.ts` | User digital twin for outcome prediction |
 | **Tensor-Link** | `tensor-link.service.ts` | Vector-based transport protocol |
@@ -63073,7 +62795,7 @@ affinityScore = (semantic × 0.35) + (domain × 0.25) + ((1-error) × 0.20)
 | **Latency** | 10% | Recent p95 latency |
 | **Cost** | 10% | Cost per call |
 
-## 11.4 Genesis Auto-Tool Pipeline
+## 11.4 Tool Forge Pipeline
 
 7-phase pipeline for just-in-time tool generation:
 
@@ -64338,7 +64060,7 @@ Compliance records maintain **7-year retention** via Merkle-hashed audit trails 
 - **HIPAA**: Protected health information handling
 - **SOC 2 Type II**: Security, availability, processing integrity
 
-**Implementation**: `lambda/admin/cato.ts`, `migrations/045_cato_audit_merkle.sql`
+**Implementation**: `lambda/admin/cato.ts`, `migrations/000_consolidated_schema.sql`
 
 ### 1.3 User-Level Memory (Relationship Continuity)
 
@@ -65026,7 +64748,7 @@ Score = (0.3 × DomainMatch)
 - Service: `lambda/shared/services/enhanced-learning.service.ts`
 - Service: `lambda/shared/services/lora-inference.service.ts`
 - Service: `lambda/shared/services/adapter-management.service.ts`
-- Migration: `migrations/108_enhanced_learning.sql`
+- Migration: `migrations/000_consolidated_schema.sql`
 - Admin UI: `apps/admin-dashboard/app/(dashboard)/models/lora-adapters/page.tsx`
 - Documentation: `docs/EXPERT-SYSTEM-ADAPTERS.md`
 
@@ -66124,7 +65846,7 @@ recognition.lang = 'en-US';
 | `apps/thinktank-admin/lib/api/ai-reports.ts` | Frontend API client |
 | `packages/infrastructure/lambda/admin/ai-reports.ts` | Lambda handler |
 | `packages/infrastructure/lambda/shared/report-exporters.ts` | PDF/Excel/HTML export utilities |
-| `packages/infrastructure/migrations/V2026_01_21_005__ai_reports.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 
 ### 9.9 API Endpoints
 
@@ -66692,7 +66414,7 @@ interface OverflowPointer {
 }
 ```
 
-**Implementation**: `lambda/shared/services/cortex/hot-tier.service.ts`
+**Implementation**: `lambda/shared/services/cortex/tier-coordinator.service.ts`
 
 ### 12.3 Warm Tier: Graph-RAG Knowledge Graph
 
@@ -66740,7 +66462,7 @@ authored_by, relates_to, contains, requires
 - IVFFlat index with `lists = sqrt(row_count)` for optimal recall
 - Cosine similarity for semantic search
 
-**Implementation**: `lambda/shared/services/cortex/warm-tier.service.ts`, `lambda/shared/services/graph-rag.service.ts`
+**Implementation**: `lambda/shared/services/cortex/tier-coordinator.service.ts`, `lambda/shared/services/graph-rag.service.ts`
 
 ### 12.4 Cold Tier: S3 Iceberg Archives
 
@@ -66778,7 +66500,7 @@ Connect to customer data lakes without duplication:
 - **Azure**: Data Lake Gen2
 - **GCS**: Google Cloud Storage
 
-**Implementation**: `lambda/shared/services/cortex/cold-tier.service.ts`
+**Implementation**: `lambda/shared/services/cortex/tier-coordinator.service.ts`
 
 ### 12.5 Tier Coordinator Service
 
@@ -67142,7 +66864,7 @@ Per-tenant configuration in `cato_cortex_bridge_config`:
 |------|---------|
 | `lambda/shared/services/cato-cortex-bridge.service.ts` | Bridge service implementation |
 | `lambda/shared/services/identity-core.service.ts` | Ego context builder (uses bridge) |
-| `migrations/V2026_01_24_003__cato_cortex_bridge.sql` | Bridge tables and functions |
+| `migrations/000_consolidated_schema.sql` | Bridge tables and functions |
 
 #### Database Tables
 
@@ -67720,7 +67442,7 @@ CREATE TABLE api_key_sync_log (
 
 | File | Purpose |
 |------|---------|
-| `migrations/V2026_01_24_001__services_layer_api_keys.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `lambda/admin/api-keys.ts` | Admin API handler |
 | `lambda/gateway/a2a-worker.ts` | A2A protocol processor |
 | `config/cedar/interface-access-policies.cedar` | Cedar access policies |
@@ -68294,7 +68016,7 @@ RADIANT implements a **RFC 6749 compliant OAuth 2.0 Authorization Server** enabl
 
 ### 19.4 Database Schema
 
-**Implementation**: `migrations/V2026_01_25_009__oauth_provider.sql`
+**Implementation**: `migrations/000_consolidated_schema.sql`
 
 | Table | Purpose | Key Columns |
 |-------|---------|-------------|
@@ -70671,12 +70393,12 @@ interface StreamChunk {
 
 | Feature | Frontend | Backend | Service |
 |---------|----------|---------|---------|
-| **Chat** | `components/chat/ModernChatInterface.tsx` | `lambda/thinktank/messages.ts` | - |
+| **Chat** | `components/chat/ModernChatInterface.tsx` | `lambda/thinktank/handler.ts` | - |
 | **Time Machine** | `components/features/TimeMachine/` | `lambda/thinktank/time-travel.ts` | `services/time-travel.service.ts` |
 | **Grimoire** | `components/features/Grimoire/` | `lambda/thinktank/grimoire.ts` | `services/grimoire.service.ts` |
 | **Sentinels** | `components/features/SentinelAgents/` | `lambda/thinktank/sentinel-agents.ts` | `services/sentinel-agent.service.ts` |
-| **Flash Facts** | `lib/api/flash-facts.ts` | `lambda/thinktank/flash-facts.ts` | `services/flash-facts.service.ts` |
-| **Economic Governor** | `lib/api/economic-governor.ts` | `lambda/thinktank/economic-governor.ts` | `services/economic-governor.service.ts` |
+| **Flash Facts** | `lambda/shared/services/flash-facts.service.ts` | `lambda/thinktank/flash-facts.ts` | `services/flash-facts.service.ts` |
+| **Economic Governor** | `lambda/shared/services/spend-governor.service.ts` | `lambda/thinktank/economic-governor.ts` | `services/economic-governor.service.ts` |
 | **Council of Rivals** | `components/features/CouncilOfRivals/` | `lambda/thinktank/council-of-rivals.ts` | `services/deliberation.service.ts` |
 | **Brain Plans** | `components/chat/BrainPlanViewer.tsx` | `lambda/thinktank/brain-plan.ts` | `services/agi-brain-planner.service.ts` |
 
@@ -71541,12 +71263,12 @@ cartridge.RADz (encrypted ZIP)
 | Component | File |
 |-----------|------|
 | Cartridge Service | `lambda/shared/services/cartridge.service.ts` |
-| CORTEX Service | `lambda/shared/services/cortex-network.service.ts` |
-| Ghost Vector Service | `lambda/shared/services/ghost-vector.service.ts` |
-| Thermal Manager | `lambda/shared/services/thermal-manager.service.ts` |
-| Dreaming Pipeline | `lambda/consciousness/twilight-dreaming.ts` |
+| CORTEX Service | `lambda/shared/services/cortex/tier-coordinator.service.ts` |
+| Ghost Vector Service | `lambda/shared/services/ghost-manager.service.ts` |
+| Thermal Manager | `lambda/shared/services/thermal-state.ts` |
+| Dreaming Pipeline | `lambda/consciousness/evolution-pipeline.ts` |
 | Neural Ops Admin | `lambda/admin/neural-operations.ts` |
-| Cartridge Admin | `lambda/admin/cartridge.ts` |
+| Cartridge Admin | `lambda/admin/cartridge-universal.ts` |
 | PKI Service | `lambda/shared/services/cartridge-pki.service.ts` |
 | PKI Admin | `lambda/admin/cartridge-pki.ts` |
 
@@ -71556,7 +71278,7 @@ Every RADIANT Cartridge is cryptographically signed with dual signatures and can
 
 **Certificate Hierarchy**:
 ```
-Radiant Root CA (Genesis Vault / HSM)
+Radiant Root CA (Cartridge Vault / HSM)
     │
     └── Tenant Intermediate CA (per organization)
             │
@@ -72275,8 +71997,8 @@ interface ClarionWorkingContext {
 | Component | File Path |
 |-----------|-----------|
 | CLARION Service | `lambda/shared/services/clarion.service.ts` |
-| Question Bank | `lambda/shared/data/clarion-questions.ts` |
-| Branching Logic | `lambda/shared/services/clarion-branching.service.ts` |
+| Question Bank | `lambda/shared/services/axiom-curator.service.ts` |
+| Branching Logic | `lambda/shared/services/axiom-curator.service.ts` |
 | Type Definitions | `packages/shared/src/types/axiom-clarion.types.ts` |
 
 ### 27.10 Database Tables
@@ -73361,7 +73083,7 @@ CREATE POLICY usage_events_tenant_isolation ON mls_usage_events
 | Service Definitions | `packages/infrastructure/lib/config/services/` | ✅ Complete |
 | Thermal Management | `packages/infrastructure/lambda/thermal/` | ✅ Complete |
 | Service Orchestrators | `packages/infrastructure/lambda/services/` | ✅ Complete |
-| Database Migration | `migrations/006_self_hosted_models.sql` | ✅ Complete |
+| Database Migration | `migrations/000_consolidated_schema.sql` | ✅ Complete |
 | LiteLLM Config | `litellm/config/self-hosted.yaml` | ✅ Complete |
 
 ---
@@ -73771,7 +73493,7 @@ const decrypted = await mlsService.decryptFromGroup(
 | `lambda/shared/services/mls/mls.service.ts` | Core MLS service (936 lines) |
 | `lambda/shared/services/mls/index.ts` | Module exports |
 | `lambda/admin/mls.ts` | Admin API endpoints |
-| `migrations/140_mls_message_layer_security.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 
 ### 30.14 Future Enhancements
 
@@ -74014,7 +73736,7 @@ export interface SigningKeyInfo {
 
 ### 31.8 Database Schema
 
-**Migration:** `migrations/139_cartridge_pki_kms.sql`
+**Migration:** `migrations/000_consolidated_schema.sql`
 
 | Table | Purpose |
 |-------|---------|
@@ -74108,7 +73830,7 @@ const verification = await kmsClient.send(new VerifyCommand({
 |------|---------|--------|
 | `lib/stacks/security-stack.ts` | CDK asymmetric key definition | Updated |
 | `lambda/shared/services/cartridge-pki.service.ts` | PKI service with real KMS | Updated |
-| `migrations/139_cartridge_pki_kms.sql` | Database schema for PKI keys | New |
+| `migrations/000_consolidated_schema.sql` | Database schema for PKI keys | New |
 
 ### 31.14 Verification Checklist
 
@@ -74132,7 +73854,7 @@ The Autonomous Organism Architecture implements 5 Leapfrog Technologies that cre
 
 | # | Technology | What It Does | Competitive Gap |
 |---|------------|--------------|-----------------|
-| 1 | **Genesis Forge** | Generates tools on-demand when none exist | Competitors: 50 static tools; RADIANT: ∞ |
+| 1 | **Tool Forge** | Generates tools on-demand when none exist | Competitors: 50 static tools; RADIANT: ∞ |
 | 2 | **Liquid Topology** | Executes tools where optimal (browser/local/edge/cloud) | Competitors are cloud-locked |
 | 3 | **Tensor-Link** | Tools communicate via vectors, not text | Competitors use lossy JSON-RPC |
 | 4 | **Ghost Simulation** | Predicts user reaction before executing | Competitors have static guardrails |
@@ -74146,7 +73868,7 @@ The Autonomous Organism Architecture implements 5 Leapfrog Technologies that cre
 |---------|------|-------|---------|
 | **MCP Server Manager** | `mcp-server-manager.service.ts` | ~770 | Neural Affinity Routing for MCP servers |
 | **Neural Schema Registry** | `neural-schema-registry.service.ts` | ~750 | Tool embeddings for intelligent discovery |
-| **Genesis Auto-Tool** | `genesis-auto-tool.service.ts` | ~980 | On-demand tool generation from APIs |
+| **Tool Forge** | `genesis-auto-tool.service.ts` | ~980 | On-demand tool generation from APIs |
 | **Liquid Compute** | `liquid-compute.service.ts` | ~700 | Dynamic compute location selection |
 | **Ghost Simulation** | `ghost-simulation.service.ts` | ~940 | User digital twin for prediction |
 | **Tensor-Link** | `tensor-link.service.ts` | ~600 | Vector-based transport protocol |
@@ -74263,17 +73985,17 @@ interface ToolSchema {
 }
 ```
 
-### 32.5 Genesis Auto-Tool Pipeline
+### 32.5 Tool Forge Pipeline
 
 **7-Phase Workflow** for JIT tool generation:
 
 ```
 ┌────────────────────────────────────────────────────────────────────┐
-│                    GENESIS FORGE WORKFLOW                          │
+│                    TOOL FORGE WORKFLOW                          │
 ├────────────────────────────────────────────────────────────────────┤
 │ PHASE 1: DETECTION                                                 │
 │   Neural Affinity returns all scores < threshold                   │
-│   Trigger: GENESIS FORGE                                           │
+│   Trigger: TOOL FORGE                                           │
 │                                                                    │
 │ PHASE 2: SCOUTING                                                  │
 │   Search for API documentation (OpenAPI, GraphQL, scraping)        │
@@ -74697,7 +74419,7 @@ All TypeScript interfaces for:
 | Metric | Target | Measurement |
 |--------|--------|-------------|
 | Neural Affinity routing | <50ms P50 | Intent → server selection |
-| Genesis forge | <120s | Request → hot-loaded tool |
+| Tool Forge | <120s | Request → hot-loaded tool |
 | Topology decision | <10ms | Request → compute location |
 | Ghost simulation | <500ms | Action → prediction |
 | Tensor-Link encoding | <5ms | 1536-dim vector |
@@ -75499,7 +75221,7 @@ Twilight Dreaming (2AM UTC) → Graph Summary → Trend Analysis (7d vs 30d) →
 | Version | Date | Changes |
 |---------|------|---------|
 | 7.13.0 | 2026-02-06 | User Memory Retention & Unified Profile (Section 37); Three-tier retention policy hierarchy: Platform Default (Radiant Super-Admin) → Tenant Override (Think Tank Admin) → Tenant Admin Override (Think Tank Tenant Admin) with constraint enforcement. Unified User Memory Profile injected into every prompt on every model via Brain Router. Profile consolidates facts, preferences, instructions, projects, skills, corrections, AKG entities, **uploaded documents (uds_uploads)**, and **downloaded/generated files (uds_message_attachments)** — no exceptions. 9-category profile quality scoring. Storage tier management (hot/warm/cold/archive). New retention toggles: uploadedDocumentsEnabled, downloadedFilesEnabled, maxUploadSizeMb. Migration: 6 tables with document/file tracking columns, 3 helper functions (resolve_effective_retention with doc/file provenance, prune_user_memories, refresh_user_memory_profile counting UDS uploads/attachments). 15 admin API endpoints under /api/admin/memory-retention/. Admin dashboards in all 3 apps with document/file stats and toggle controls |
-| 7.15.0 | 2026-02-06 | Genesis Forge v3.0 "The Glass Foundry" (Section 38); Complete rebuild from firmware editor to Neural Firmware Orchestration Suite; React Flow canvas with 3 custom node types (InputShard/LogicShard/OutputShard hexagonal prisms) and catenary wire edges (gravity physics with light particles); useShadowOmega() WebSocket hook for bi-directional telemetry; Omega Instance Registry (ID/Name/endpoint per instance); The Armory (18 capabilities, 6 categories, drag-to-canvas); The Oracle (8 real-time metrics + 8×8 thermal heatmap); Reactor Core forge button (hold-to-charge + shockwave); Void Mode; Zustand store for high-frequency updates; Global UI hue shift (Cyan→Orange→Red) based on stability_score; 4 new DB tables (omega_instance_registry, omega_forge_sessions, omega_forge_artifacts, omega_telemetry_history partitioned monthly); New deps: reactflow, framer-motion |
+| 7.15.0 | 2026-02-06 | OMEGA Forge v3.0 "The Glass Foundry" (Section 38); Complete rebuild from firmware editor to Neural Firmware Orchestration Suite; React Flow canvas with 3 custom node types (InputShard/LogicShard/OutputShard hexagonal prisms) and catenary wire edges (gravity physics with light particles); useShadowOmega() WebSocket hook for bi-directional telemetry; Omega Instance Registry (ID/Name/endpoint per instance); The Armory (18 capabilities, 6 categories, drag-to-canvas); The Oracle (8 real-time metrics + 8×8 thermal heatmap); Reactor Core forge button (hold-to-charge + shockwave); Void Mode; Zustand store for high-frequency updates; Global UI hue shift (Cyan→Orange→Red) based on stability_score; 4 new DB tables (omega_instance_registry, omega_forge_sessions, omega_forge_artifacts, omega_telemetry_history partitioned monthly); New deps: reactflow, framer-motion |
 | 7.14.0 | 2026-02-06 | OMEGA Neural Bridge & Homeostatic Dreaming (Section 37); NeuralTransducer (Complex^2048 → [8,4096] soft prompt tokens); Custom vLLM FastAPI server with /inject endpoint; Watcher self-model (prediction error → dopamine); 3-stage dream cycle (magnitude gate + phase sharpening + experience replay); Shadow Mode coexistence with LoRA adapters; consciousness-middleware.service.ts InjectionStrategy fallback; 4 new DB tables; Docker vLLM service with GPU passthrough |
 | 7.12.0 | 2026-02-06 | Anticipatory Memory Architecture (Section 36); 5 leapfrog features: AKG (auto-extracted knowledge graph), Predictive Prefetch (speculative memory retrieval), Contradiction Detector (truth maintenance), Organizational Memory Mesh (regulatory-compliant shared knowledge with GDPR/HIPAA/SOC2/CCPA), Dream Insight Generator (autonomous insight generation during Twilight Dreaming). Brain Router integration for context injection and async extraction. 34 admin API endpoints. 6-tab admin dashboard. Migration: 16 tables, 5 enums, 4 helper functions |
 | 7.11.0 | 2026-02-06 | Inference Response Cache (Section 35.1); L1+L2 cache in ModelRouterService; SHA-256 cache keys with tenant isolation; PII detection; TTL/LRU eviction; Admin dashboard and API. Heterogeneous Model Consensus (Section 35.2); Multi-provider panel consensus; Pairwise semantic similarity; Cross-provider/cross-architecture agreement; Hallucination detection; Reflexion triggers; OrchestrationMethodsService integration; Admin dashboard and API. Migration: 9 tables, 3 helper functions |
@@ -75515,7 +75237,7 @@ Twilight Dreaming (2AM UTC) → Graph Summary → Trend Analysis (7d vs 30d) →
 | 7.37.0 | 2026-02-07 | Universal Drift Enforcement & Genesis Feedback Loop (Section 39); ModelRouterService two-phase drift handling covers ALL 52+ services (Phase 1: DriftAwareWeightingService.isModelSafe() + getBestModel() proactive selection, Phase 2: legacy DriftCorrectionService fallback); Genesis feedback loop via recordInvocationTelemetry() — in-memory ring buffer (10K/tenant, 1hr) + drift_invocation_telemetry partitioned table (monthly, RLS, 7-day retention); getGenesisDriftFeedback() aggregates reroute rate, failure rate, per-model health into overallHealthScore; Genesis isDriftHealthyForStage() enhanced with 3 new real-time thresholds per stage (min health score, max failure rate, max reroute rate); MATURE requires ≥80% health score, ≤5% failure, ≤10% reroute; Enforcement policy workflow drift-detection-enforcement.md ensures all new services pass tenantId and use model router |
 | 7.36.0 | 2026-02-07 | Unified Drift-Aware Weighting System (Section 38); DriftAwareWeightingService unifying drift detection + correction + app-specific weight profiles into single API; 7 app weight profiles (Genesis/Cato/Cortex/Omega/Orchestrator/ThinkTank/Curator) with tuned drift/quality/latency/cost/availability weights; Composite scoring with stability penalties; AGI Orchestrator drift-aware primary model selection; Cato hardcoded model replaced with drift-aware async selection; Cortex insights enriched with drift recommendations; Omega shadow tracking drift scores per comparison; Genesis developmental gates blocked by drift health; Admin Dashboard: Drift Control Center page with health ring, app profile editor, Genesis gate status, full drift check; Sidebar entry added under Orchestration |
 | 7.24.0 | 2026-02-06 | Model Weights, Drift Correction & Admin AI Helper (Section 37); 5-factor composite model weights integrated into model-router and Pareto routing; Automatic drift correction with quarantine/fallback/temperature/prompt correction; Bedrock model discovery with auto-upgrade and periodic polling (EventBridge); Global Bedrock-powered AI admin assistant on every dashboard page; 3 services, 3 admin APIs, 3 admin pages, 1 EventBridge handler; 6 database tables, 5 SQL functions |
-| 6.6.0 | 2026-02-04 | Autonomous Organism Architecture (PROMPT-43, Section 32); 5 Leapfrog Technologies: Genesis Forge, Liquid Topology, Tensor-Link, Ghost Simulation, Economic Cortex; 9 core services (~6,226 lines); 37 Admin API endpoints; 6-tab Admin Dashboard; 18 database tables, 14 enums; BrainRouter integration |
+| 6.6.0 | 2026-02-04 | Autonomous Organism Architecture (PROMPT-43, Section 32); 5 Leapfrog Technologies: Tool Forge, Liquid Topology, Tensor-Link, Ghost Simulation, Economic Cortex; 9 core services (~6,226 lines); 37 Admin API endpoints; 6-tab Admin Dashboard; 18 database tables, 14 enums; BrainRouter integration |
 | 6.5.0 | 2026-02-03 | Cartridge PKI KMS Integration (PROMPT-42, Section 31); Real AWS KMS asymmetric signing for .RADz cartridges; Platform root CA with ECC_NIST_P256; Tenant CA hierarchy; Database schema for PKI keys |
 | 6.5.0 | 2026-02-03 | MLS (Message Layer Security) RFC 9420 Implementation (Section 30); Full group encryption for agent-to-agent communication |
 | 6.1.0 | 2026-02-03 | Mid-Level Services (MLS) Architecture documentation (Section 29); 5 domain-specific services; 38 self-hosted models; Thermal state management; Graceful degradation |
@@ -76513,637 +76235,4278 @@ See [CONTRIBUTING.md](../CONTRIBUTING.md) for guidelines on updating documentati
 
 ---
 
-*Consolidated from 7 source documents (0 not found). 16,644 source lines.*
+---
+
+# Data & Storage
+
+> *Merged from `11-DATA-STORAGE.md` — UDS, RAWS, data retention, cost optimization, file conversion.*
+
+---
+
+## Table of Contents
+
+- **Part I: User Data Store**
+- **Part II: RAWS (Read-After-Write Storage)**
+- **Part III: Data Lifecycle**
+- **Part IV: File Services**
+
+---
 
 
 ---
 
-## Part IX: App Isolation Architecture
+## Part I: User Data Store
 
-# RADIANT App Isolation Architecture
-
-> **Version**: 4.18.0  
-> **Status**: MANDATORY - No exceptions  
-> **Last Updated**: 2026-01-18
-
-## Executive Summary
-
-RADIANT consists of **four completely isolated applications**. Think Tank MUST NOT share any web server, authentication context, or direct resource access with Radiant Admin. Period.
-
-## Architecture Overview
-
-```
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│                              RADIANT PLATFORM                                    │
-├─────────────────────────────────────────────────────────────────────────────────┤
-│                                                                                  │
-│  ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐              │
-│  │  RADIANT ADMIN   │  │ THINK TANK ADMIN │  │ THINK TANK       │              │
-│  │  (Platform)      │  │ (Tenant Admin)   │  │ (Consumer)       │              │
-│  ├──────────────────┤  ├──────────────────┤  ├──────────────────┤              │
-│  │ Port: 3000       │  │ Port: 3001       │  │ Port: 3002       │              │
-│  │ Domain: admin.*  │  │ Domain: manage.* │  │ Domain: app.*    │              │
-│  │ Auth: Cognito    │  │ Auth: API-only   │  │ Auth: API-only   │              │
-│  │ Role: SuperAdmin │  │ Role: TenantAdmin│  │ Role: User       │              │
-│  └────────┬─────────┘  └────────┬─────────┘  └────────┬─────────┘              │
-│           │                     │                     │                         │
-│           │                     │                     │                         │
-│           ▼                     ▼                     ▼                         │
-│  ┌─────────────────────────────────────────────────────────────────────────┐   │
-│  │                         RADIANT API GATEWAY                              │   │
-│  │                    (API Gateway + Lambda Functions)                      │   │
-│  ├─────────────────────────────────────────────────────────────────────────┤   │
-│  │  /api/admin/*     - Radiant Admin endpoints (SuperAdmin only)           │   │
-│  │  /api/thinktank/* - Think Tank Admin endpoints (TenantAdmin)            │   │
-│  │  /api/v2/*        - Think Tank Consumer endpoints (Users)               │   │
-│  │  /api/auth/*      - Authentication endpoints (all apps)                 │   │
-│  └─────────────────────────────────────────────────────────────────────────┘   │
-│                                     │                                           │
-│                                     ▼                                           │
-│  ┌─────────────────────────────────────────────────────────────────────────┐   │
-│  │                         RADIANT INFRASTRUCTURE                           │   │
-│  │              (Aurora PostgreSQL, S3, SageMaker, etc.)                   │   │
-│  └─────────────────────────────────────────────────────────────────────────┘   │
-│                                                                                  │
-└─────────────────────────────────────────────────────────────────────────────────┘
-
-  ┌──────────────────┐
-  │  SWIFT DEPLOYER  │  (macOS app - deploys infrastructure)
-  │  (Native macOS)  │
-  └──────────────────┘
-```
-
-## Four Applications
-
-### 1. Radiant Admin (`apps/admin-dashboard/`)
-
-**Purpose**: Platform-level administration for RADIANT infrastructure.
-
-| Attribute | Value |
-|-----------|-------|
-| **Users** | Platform SuperAdmins only |
-| **Authentication** | Direct Cognito (Admin User Pool) |
-| **Domain** | `admin.{domain}` |
-| **Port** | 3000 |
-| **Access** | Direct to Radiant resources (privileged) |
-
-**Features**:
-- Tenant management (create, suspend, delete)
-- Global model registry and pricing
-- Provider configuration (AWS Bedrock, OpenAI, etc.)
-- Infrastructure monitoring
-- Global billing and costs
-- Security alerts and compliance
-- Multi-region configuration
-- System-wide settings
-
-**What it does NOT contain**:
-- ❌ Any Think Tank user features
-- ❌ Any Think Tank admin features
-- ❌ Conversation management
-- ❌ User rules management
-- ❌ Delight system configuration
-- ❌ Domain mode configuration
+**Version**: 1.0.0  
+**Last Updated**: January 24, 2026  
+**RADIANT Version**: 5.52.18
 
 ---
 
-### 2. Think Tank Admin (`apps/thinktank-admin/`)
+## Table of Contents
 
-**Purpose**: Tenant-level administration for Think Tank.
-
-| Attribute | Value |
-|-----------|-------|
-| **Users** | Tenant Administrators ONLY (TenantAdmin, SuperAdmin roles) |
-| **Authentication** | API-only (via `/api/auth/admin/*` endpoints) |
-| **Domain** | `manage.{tenant}.{domain}` |
-| **Port** | 3001 |
-| **Access** | API-only - NO direct Radiant access |
-
-**CRITICAL: Admin Role Validation**
-
-Think Tank Admin uses **admin-only authentication endpoints** that validate user roles:
-
-```
-POST /api/auth/admin/login    - Validates TenantAdmin or SuperAdmin role
-POST /api/auth/admin/refresh  - Re-validates admin role on every refresh
-GET  /api/auth/admin/session  - Validates admin role for session checks
-```
-
-**Non-admin users (regular Users) CANNOT access Think Tank Admin. No exceptions.**
-
-- Server-side: Lambda validates role is in `['SuperAdmin', 'TenantAdmin', 'super_admin', 'tenant_admin', 'admin']`
-- Client-side: Double-validation in auth client (defense in depth)
-- On 403 ADMIN_ACCESS_DENIED: Immediate redirect to login with clear error message
-
-**Features**:
-- Think Tank user management (within tenant)
-- Conversation monitoring and moderation
-- User rules templates
-- Delight system configuration
-- Domain mode configuration
-- Model category preferences
-- Shadow testing configuration
-- Ego system configuration
-- Collaboration settings
-- Compliance within tenant
-- Tenant-level analytics
-
-**Security Rules**:
-- ✅ All data access via Radiant API
-- ✅ Tenant isolation enforced by API
-- ✅ No direct database access
-- ✅ No direct S3 access
-- ✅ No Cognito SDK usage
-- ❌ Cannot access other tenants
-- ❌ Cannot modify platform settings
+1. [Overview](#1-overview)
+2. [Architecture](#2-architecture)
+3. [Tiered Storage](#3-tiered-storage)
+4. [Data Types](#4-data-types)
+5. [Encryption](#5-encryption)
+6. [Audit System](#6-audit-system)
+7. [Upload Management](#7-upload-management)
+8. [GDPR Compliance](#8-gdpr-compliance)
+9. [Admin API Reference](#9-admin-api-reference)
+10. [Admin Dashboard](#10-admin-dashboard)
+11. [Configuration](#11-configuration)
+12. [Monitoring](#12-monitoring)
+13. [Troubleshooting](#13-troubleshooting)
 
 ---
 
-### 3. Think Tank Consumer (`apps/thinktank/`)
+## 1. Overview
 
-**Purpose**: End-user AI chat application.
+The User Data Service (UDS) is RADIANT's dedicated system for storing, managing, and securing user-generated content at scale (1M+ concurrent users). It provides:
 
-| Attribute | Value |
-|-----------|-------|
-| **Users** | End users (consumers) |
-| **Authentication** | API-only (via `/api/auth/*`) |
-| **Domain** | `app.{tenant}.{domain}` or `{tenant}.thinktank.ai` |
-| **Port** | 3002 |
-| **Access** | API-only - NO direct Radiant access |
+- **Tiered Storage**: Hot → Warm → Cold → Glacier automatic data lifecycle
+- **End-to-End Encryption**: AES-256-GCM with KMS key management
+- **Tamper-Evident Audit**: Merkle chain for compliance verification
+- **GDPR Compliance**: Right-to-erasure with multi-tier deletion
+- **File Handling**: Virus scanning, text extraction, semantic search
 
-**Features**:
-- AI chat interface
-- Conversation history
-- My Rules (personal preferences)
-- Brain plan visualization
-- Artifacts (generated content)
-- Collaboration (real-time sessions)
-- Domain selection
-- Model preferences
-- File uploads (via API)
-- Export/share conversations
+### Why UDS vs Cortex?
 
-**Security Rules**:
-- ✅ All data access via Radiant API
-- ✅ User can only access own data
-- ✅ Tenant isolation enforced by API
-- ✅ Rate limiting enforced by API
-- ❌ No direct database access
-- ❌ No direct S3 access
-- ❌ No Cognito SDK usage
-- ❌ No admin functionality
+| System | Purpose | Data |
+|--------|---------|------|
+| **Cortex** | AI Memory | Knowledge graphs, semantic memory, ghost vectors |
+| **UDS** | User Data | Conversations, messages, uploads, audit logs |
+
+UDS is optimized for **time-series CRUD** operations, while Cortex is optimized for **graph queries** and **semantic search**.
 
 ---
 
-### 4. Swift Deployer (`apps/swift-deployer/`)
+## 2. Architecture
 
-**Purpose**: macOS application for deploying RADIANT infrastructure.
+### 2.1 System Overview
 
-| Attribute | Value |
-|-----------|-------|
-| **Users** | DevOps / Platform Engineers |
-| **Authentication** | AWS credentials (local) |
-| **Platform** | macOS 13.0+ |
-| **Access** | AWS APIs for deployment |
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                           USER DATA SERVICE                              │
+│                                                                          │
+│  ┌────────────────────────┐        ┌────────────────────────┐          │
+│  │   Client Applications  │        │    Admin Dashboard     │          │
+│  │   (Think Tank, etc.)   │        │   /platform/uds        │          │
+│  └───────────┬────────────┘        └───────────┬────────────┘          │
+│              │                                  │                        │
+│              ▼                                  ▼                        │
+│  ┌─────────────────────────────────────────────────────────────────┐   │
+│  │                       UDS API Gateway                            │   │
+│  │  /api/v2/uds/* (client)       /api/admin/uds/* (admin)         │   │
+│  └─────────────────────────────────────────────────────────────────┘   │
+│              │                                  │                        │
+│              ▼                                  ▼                        │
+│  ┌─────────────────────────────────────────────────────────────────┐   │
+│  │                        UDS Services                              │   │
+│  │  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐             │   │
+│  │  │ Conversation │ │   Message    │ │    Upload    │             │   │
+│  │  │   Service    │ │   Service    │ │   Service    │             │   │
+│  │  └──────────────┘ └──────────────┘ └──────────────┘             │   │
+│  │  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐             │   │
+│  │  │    Audit     │ │     Tier     │ │   Erasure    │             │   │
+│  │  │   Service    │ │ Coordinator  │ │   Service    │             │   │
+│  │  └──────────────┘ └──────────────┘ └──────────────┘             │   │
+│  │  ┌──────────────┐                                               │   │
+│  │  │  Encryption  │                                               │   │
+│  │  │   Service    │                                               │   │
+│  │  └──────────────┘                                               │   │
+│  └─────────────────────────────────────────────────────────────────┘   │
+│              │                                                          │
+│              ▼                                                          │
+│  ┌─────────────────────────────────────────────────────────────────┐   │
+│  │                       Storage Tiers                              │   │
+│  │  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐   │   │
+│  │  │    HOT     │ │    WARM    │ │    COLD    │ │  GLACIER   │   │   │
+│  │  │ ElastiCache│ │  Aurora PG │ │ S3 Iceberg │ │ S3 Glacier │   │   │
+│  │  │ + DynamoDB │ │ + pgvector │ │            │ │            │   │   │
+│  │  └────────────┘ └────────────┘ └────────────┘ └────────────┘   │   │
+│  └─────────────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────────────┘
+```
 
-*No changes to this app.*
+### 2.2 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `uds_config` | Per-tenant configuration |
+| `uds_encryption_keys` | Encryption key registry |
+| `uds_conversations` | Conversation metadata |
+| `uds_messages` | Encrypted message content |
+| `uds_message_attachments` | Inline attachments |
+| `uds_uploads` | File upload metadata |
+| `uds_upload_chunks` | Chunked upload tracking |
+| `uds_audit_log` | Tamper-evident audit trail |
+| `uds_audit_merkle_tree` | Merkle tree checkpoints |
+| `uds_export_requests` | Compliance data exports |
+| `uds_erasure_requests` | GDPR deletion requests |
+| `uds_tier_transitions` | Data movement history |
+| `uds_data_flow_metrics` | Tier health metrics |
+| `uds_search_index` | Full-text + semantic search |
 
 ---
 
-## Authentication Architecture
+## 3. Tiered Storage
 
-### Radiant Admin (Direct Cognito)
+### 3.1 Tier Overview
 
-```
-┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
-│  Radiant Admin  │────▶│  Cognito Admin   │────▶│  Radiant API    │
-│  (Browser)      │     │  User Pool       │     │  (Privileged)   │
-└─────────────────┘     └──────────────────┘     └─────────────────┘
-```
+| Tier | Storage | Retention | Access Pattern | Latency |
+|------|---------|-----------|----------------|---------|
+| **Hot** | ElastiCache + DynamoDB | 0-24 hours | Real-time | <10ms |
+| **Warm** | Aurora PostgreSQL | 1-90 days | Active | <100ms |
+| **Cold** | S3 Iceberg | 90 days - 7 years | Rare | 1-10s |
+| **Glacier** | S3 Glacier | 7+ years | Archive only | 1-12h |
 
-- Uses `@aws-amplify/auth` directly
-- Admin User Pool (separate from Think Tank users)
-- Returns Cognito tokens
-- API validates Cognito JWT directly
+### 3.2 Automatic Transitions
 
-### Think Tank Apps (API-Only Auth)
+Data automatically moves between tiers based on access patterns:
 
 ```
-┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
-│  Think Tank     │────▶│  Radiant API     │────▶│  Cognito User   │
-│  (Browser)      │     │  /api/auth/*     │     │  Pool           │
-└─────────────────┘     └──────────────────┘     └─────────────────┘
-        │                       │
-        │                       ▼
-        │               ┌──────────────────┐
-        │               │  Session Token   │
-        │               │  (API-issued)    │
-        └───────────────┴──────────────────┘
+Hot (24h) → Warm (90d) → Cold (7y) → Glacier
+                ↑______________|
+                   (retrieval)
 ```
 
-- NO Cognito SDK in browser
-- All auth via `/api/auth/*` endpoints:
-  - `POST /api/auth/login` - Email/password login
-  - `POST /api/auth/register` - User registration
-  - `POST /api/auth/refresh` - Refresh session
-  - `POST /api/auth/logout` - End session
-  - `POST /api/auth/forgot-password` - Password reset
-  - `POST /api/auth/verify-email` - Email verification
-- API returns opaque session tokens (not Cognito tokens)
-- Sessions stored server-side (Redis/DynamoDB)
-- Tokens are httpOnly cookies or short-lived JWTs
+**Transition Rules**:
+- **Hot → Warm**: Conversation not accessed for 24 hours
+- **Warm → Cold**: Conversation archived AND not accessed for 90 days
+- **Cold → Glacier**: Data older than 7 years (compliance retention)
+- **Cold → Warm**: Manual retrieval request
 
----
-
-## Directory Structure
-
-```
-apps/
-├── radiant-admin/              # Platform administration
-│   ├── app/
-│   │   ├── (dashboard)/        # Admin pages
-│   │   │   ├── tenants/
-│   │   │   ├── models/
-│   │   │   ├── providers/
-│   │   │   ├── billing/
-│   │   │   ├── security/
-│   │   │   ├── compliance/
-│   │   │   ├── orchestration/
-│   │   │   ├── consciousness/
-│   │   │   ├── brain/
-│   │   │   ├── cato/
-│   │   │   └── ...
-│   │   └── api/                # BFF routes (proxy to Lambda)
-│   ├── lib/
-│   │   ├── auth/               # Cognito auth (direct)
-│   │   └── api/                # API client
-│   └── components/
-│
-├── thinktank-admin/            # Think Tank tenant administration
-│   ├── app/
-│   │   ├── (dashboard)/
-│   │   │   ├── users/
-│   │   │   ├── conversations/
-│   │   │   ├── rules/
-│   │   │   ├── delight/
-│   │   │   ├── domain-modes/
-│   │   │   ├── model-categories/
-│   │   │   ├── shadow-testing/
-│   │   │   ├── ego/
-│   │   │   ├── collaborate/
-│   │   │   ├── compliance/
-│   │   │   ├── settings/
-│   │   │   └── analytics/
-│   │   └── api/                # BFF routes (proxy to Lambda)
-│   ├── lib/
-│   │   ├── auth/               # API-only auth
-│   │   └── api/                # API client
-│   └── components/
-│
-├── thinktank/                  # Think Tank consumer app
-│   ├── app/
-│   │   ├── (chat)/             # Main chat interface
-│   │   ├── (settings)/         # User settings
-│   │   │   ├── my-rules/
-│   │   │   ├── preferences/
-│   │   │   └── profile/
-│   │   ├── collaborate/        # Collaboration sessions
-│   │   ├── artifacts/          # Generated artifacts
-│   │   └── api/                # BFF routes (proxy to Lambda)
-│   ├── lib/
-│   │   ├── auth/               # API-only auth
-│   │   └── api/                # API client
-│   └── components/
-│
-└── swift-deployer/             # macOS deployer (unchanged)
-```
-
----
-
-## API Endpoint Segregation
-
-### Platform Admin Endpoints (`/api/admin/*`)
-
-Only accessible by Radiant Admin with SuperAdmin role:
-
-```
-/api/admin/tenants/*
-/api/admin/models/*
-/api/admin/providers/*
-/api/admin/billing/*
-/api/admin/security/*
-/api/admin/compliance/*
-/api/admin/orchestration/*
-/api/admin/consciousness/*
-/api/admin/brain/*
-/api/admin/cato/*
-/api/admin/infrastructure/*
-/api/admin/multi-region/*
-```
-
-### Think Tank Admin Endpoints (`/api/thinktank/*`)
-
-Accessible by Think Tank Admin with TenantAdmin role:
-
-```
-/api/thinktank/users/*
-/api/thinktank/conversations/*
-/api/thinktank/rules/*
-/api/thinktank/delight/*
-/api/thinktank/domain-modes/*
-/api/thinktank/model-categories/*
-/api/thinktank/shadow-testing/*
-/api/thinktank/ego/*
-/api/thinktank/collaborate/*
-/api/thinktank/compliance/*
-/api/thinktank/settings/*
-/api/thinktank/analytics/*
-```
-
-### Think Tank Consumer Endpoints (`/api/v2/*`)
-
-Accessible by Think Tank users:
-
-```
-/api/v2/chat/*
-/api/v2/conversations/*
-/api/v2/my-rules/*
-/api/v2/preferences/*
-/api/v2/brain-plan/*
-/api/v2/artifacts/*
-/api/v2/collaborate/*
-/api/v2/domain-taxonomy/*
-/api/v2/models/*
-/api/v2/upload/*
-/api/v2/export/*
-```
-
-### Auth Endpoints (`/api/auth/*`)
-
-Used by Think Tank apps (not Radiant Admin):
-
-```
-POST /api/auth/login
-POST /api/auth/register
-POST /api/auth/refresh
-POST /api/auth/logout
-POST /api/auth/forgot-password
-POST /api/auth/verify-email
-POST /api/auth/change-password
-GET  /api/auth/session
-```
-
----
-
-## Security Invariants
-
-### MUST NEVER
-
-1. **Think Tank apps MUST NEVER**:
-   - Import `@aws-amplify/auth` or any Cognito SDK
-   - Access AWS resources directly (S3, DynamoDB, etc.)
-   - Have database connection strings
-   - Have AWS credentials
-   - Access Radiant Admin endpoints
-   - Share cookies/sessions with Radiant Admin
-
-2. **Radiant Admin MUST NEVER**:
-   - Serve Think Tank consumer pages
-   - Serve Think Tank admin pages
-   - Share authentication with Think Tank
-
-### MUST ALWAYS
-
-1. **Think Tank apps MUST ALWAYS**:
-   - Authenticate via `/api/auth/*` endpoints only
-   - Access data via Radiant API only
-   - Include tenant ID in all requests
-   - Handle API errors gracefully
-
-2. **API MUST ALWAYS**:
-   - Validate session tokens server-side
-   - Enforce tenant isolation
-   - Rate limit requests
-   - Log all access attempts
-
----
-
-## Deployment
-
-### Separate Domains
-
-| App | Production Domain | Staging Domain |
-|-----|------------------|----------------|
-| Radiant Admin | `admin.radiant.ai` | `admin.staging.radiant.ai` |
-| Think Tank Admin | `manage.{tenant}.radiant.ai` | `manage.{tenant}.staging.radiant.ai` |
-| Think Tank | `{tenant}.thinktank.ai` | `{tenant}.staging.thinktank.ai` |
-
-### CDK Stacks
+### 3.3 Configuration
 
 ```typescript
-// Separate CloudFront distributions
-new RadiantAdminStack(app, 'RadiantAdmin', { ... });
-new ThinkTankAdminStack(app, 'ThinkTankAdmin', { ... });
-new ThinkTankConsumerStack(app, 'ThinkTankConsumer', { ... });
+// Per-tenant tier configuration
+{
+  hotSessionTtlSeconds: 14400,      // 4 hours default session TTL
+  hotMessageTtlSeconds: 86400,      // 24 hours default message TTL
+  warmRetentionDays: 90,            // 90 days in warm tier
+  coldRetentionYears: 7,            // 7 years compliance retention
+}
+```
+
+### 3.4 Manual Operations
+
+**Trigger Hot → Warm Promotion**:
+```bash
+POST /api/admin/uds/tiers/promote
+```
+
+**Trigger Warm → Cold Archival**:
+```bash
+POST /api/admin/uds/tiers/archive
+```
+
+**Retrieve from Cold to Warm**:
+```bash
+POST /api/admin/uds/tiers/retrieve
+Content-Type: application/json
+
+{
+  "resourceIds": ["uuid-1", "uuid-2"]
+}
 ```
 
 ---
 
-## Migration Plan
+## 4. Data Types
 
-### Phase 1: Create New Apps
-1. Create `apps/thinktank-admin/` with API-only auth
-2. Create proper `apps/thinktank/` consumer app
-3. Implement `/api/auth/*` Lambda endpoints
+### 4.1 Conversations
 
-### Phase 2: Migrate Features
-1. Move Think Tank admin pages to `thinktank-admin/`
-2. Move Think Tank consumer features to `thinktank/`
-3. Update all API calls to use proper endpoints
+Conversations are the primary container for user interactions.
 
-### Phase 3: Clean Radiant Admin
-1. Remove all Think Tank code from `admin-dashboard/`
-2. Rename `admin-dashboard/` to `radiant-admin/`
-3. Update sidebar and navigation
+```typescript
+interface Conversation {
+  id: string;
+  tenantId: string;
+  userId: string;
+  title: string;
+  modelId: string;
+  messageCount: number;
+  totalInputTokens: number;
+  totalOutputTokens: number;
+  totalCostCredits: number;
+  status: 'active' | 'archived' | 'deleted';
+  currentTier: 'hot' | 'warm' | 'cold' | 'glacier';
+  // Time Machine support
+  parentConversationId?: string;
+  forkPointMessageId?: string;
+  branchName?: string;
+  // Collaboration
+  isShared: boolean;
+  sharedWithUserIds: string[];
+}
+```
 
-### Phase 4: Deploy & Verify
-1. Deploy all three apps to separate domains
-2. Verify authentication isolation
-3. Verify API access controls
-4. Security audit
+**Features**:
+- **Time Machine**: Fork conversations at any message
+- **Checkpoints**: Save named snapshots
+- **Collaboration**: Share with other users
+- **Tagging**: Custom metadata tags
+
+### 4.2 Messages
+
+Messages are encrypted at rest and contain the actual conversation content.
+
+```typescript
+interface Message {
+  id: string;
+  conversationId: string;
+  role: 'system' | 'user' | 'assistant' | 'tool';
+  content: string;  // Decrypted on read
+  sequenceNumber: number;
+  inputTokens: number;
+  outputTokens: number;
+  costCredits: number;
+  // Editing
+  isEdited: boolean;
+  editCount: number;
+  // Feedback
+  userRating: number;  // 1-5
+  flagged: boolean;
+}
+```
+
+### 4.3 Uploads
+
+Uploads support multiple file formats with automatic processing.
+
+**Supported Content Types**:
+
+| Category | Extensions |
+|----------|------------|
+| Documents | pdf, docx, doc, xlsx, xls, csv, txt, md, json, xml |
+| Images | png, jpg, jpeg, gif, webp, svg, bmp, tiff |
+| Audio | mp3, wav, ogg, m4a |
+| Video | mp4, webm, mov |
+| Archives | zip, tar, gz |
+
+**Processing Pipeline**:
+1. **Quarantine**: File uploaded to quarantine bucket
+2. **Virus Scan**: ClamAV Lambda checks for malware
+3. **Promotion**: Clean files moved to main bucket
+4. **Text Extraction**: Textract/Tika extracts content
+5. **Embedding**: Vector embedding for semantic search
+6. **Thumbnail**: Generate preview images
 
 ---
 
-## Compliance
+## 5. Encryption
 
-This architecture is REQUIRED for:
-- **SOC 2 Type II**: Separation of duties
-- **HIPAA**: Access controls and audit trails
-- **GDPR**: Data isolation and consent management
-- **PCI DSS**: Network segmentation (if processing payments)
+### 5.1 Architecture
+
+UDS uses **envelope encryption** with AWS KMS:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    ENCRYPTION HIERARCHY                      │
+│                                                              │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │  AWS KMS Master Key                                  │   │
+│  │  (alias/radiant-uds-master)                         │   │
+│  └──────────────────────┬──────────────────────────────┘   │
+│                         │                                   │
+│                         ▼                                   │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │  Data Encryption Keys (DEKs)                        │   │
+│  │  - Per-tenant key (default)                         │   │
+│  │  - Per-user key (optional, high-security)          │   │
+│  │  - Rotated every 90 days                           │   │
+│  └──────────────────────┬──────────────────────────────┘   │
+│                         │                                   │
+│                         ▼                                   │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │  Encrypted Data                                     │   │
+│  │  - Messages: AES-256-GCM with per-message IV       │   │
+│  │  - Uploads: S3 SSE-KMS                             │   │
+│  │  - Attachments: AES-256-GCM                        │   │
+│  └─────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 5.2 Algorithm Details
+
+- **Algorithm**: AES-256-GCM
+- **IV Length**: 96 bits (12 bytes)
+- **Auth Tag Length**: 128 bits (16 bytes)
+- **Key Spec**: AES_256
+
+### 5.3 Key Rotation
+
+**Automatic Rotation**:
+- Keys are automatically rotated every 90 days
+- Old keys remain available for decryption
+- New data uses the latest key version
+
+**Manual Rotation**:
+```bash
+POST /api/admin/uds/encryption/rotate
+Content-Type: application/json
+
+{
+  "userId": "optional-user-id-for-per-user-key"
+}
+```
+
+### 5.4 Configuration
+
+```typescript
+{
+  encryptionEnabled: true,
+  encryptionAlgorithm: 'AES-256-GCM',
+  perUserEncryptionKeys: false,  // Enable for high-security tenants
+}
+```
+
+---
+
+## 6. Audit System
+
+### 6.1 Features
+
+- **Append-Only**: Entries cannot be modified or deleted
+- **Merkle Chain**: Each entry links to previous via hash
+- **Tamper-Evident**: Verification detects any modification
+- **Compliance Ready**: GDPR, HIPAA, SOC2 compatible
+
+### 6.2 Audit Entry Structure
+
+```typescript
+interface AuditEntry {
+  id: string;
+  tenantId: string;
+  userId: string;
+  
+  // Event
+  eventType: string;           // e.g., 'conversation_created'
+  eventCategory: string;       // e.g., 'conversation'
+  eventSeverity: string;       // 'debug' | 'info' | 'warning' | 'error' | 'critical'
+  
+  // Resource
+  resourceType: string;
+  resourceId: string;
+  
+  // Action
+  action: string;              // 'create' | 'read' | 'update' | 'delete'
+  actionDetails: object;
+  
+  // Merkle Chain
+  merkleHash: string;          // SHA-256 hash of entry + previous hash
+  previousMerkleHash: string;
+  sequenceNumber: number;
+  
+  // Request Context
+  requestId: string;
+  ipAddress: string;
+  userAgent: string;
+  
+  createdAt: Date;
+}
+```
+
+### 6.3 Event Categories
+
+| Category | Events |
+|----------|--------|
+| `auth` | login, logout, token_refresh |
+| `conversation` | created, updated, deleted, forked, archived |
+| `message` | created, updated, deleted, flagged |
+| `upload` | initiated, completed, downloaded, deleted |
+| `gdpr` | erasure_requested, erasure_completed |
+| `system` | tier_transition, housekeeping |
+
+### 6.4 Merkle Verification
+
+**Verify Chain Integrity**:
+```bash
+POST /api/admin/uds/audit/verify
+Content-Type: application/json
+
+{
+  "fromSequence": 1,
+  "toSequence": 1000
+}
+```
+
+**Response**:
+```json
+{
+  "isValid": true,
+  "treeRoot": "a1b2c3...",
+  "entriesVerified": 1000,
+  "errors": []
+}
+```
+
+### 6.5 Export
+
+**Export Audit Log**:
+```bash
+POST /api/admin/uds/audit/export
+Content-Type: application/json
+
+{
+  "startDate": "2025-01-01T00:00:00Z",
+  "endDate": "2025-12-31T23:59:59Z",
+  "format": "json"  // or "csv"
+}
+```
+
+---
+
+## 7. Upload Management
+
+### 7.1 Upload Flow
+
+```
+┌─────────┐    ┌──────────┐    ┌───────────┐    ┌─────────┐    ┌───────┐
+│ Initiate│───▶│ Upload to│───▶│  Complete │───▶│  Virus  │───▶│ Ready │
+│ Request │    │Quarantine│    │  Upload   │    │  Scan   │    │       │
+└─────────┘    └──────────┘    └───────────┘    └─────────┘    └───────┘
+                                                      │
+                                                      ▼
+                                                ┌─────────┐
+                                                │Infected │
+                                                │(deleted)│
+                                                └─────────┘
+```
+
+### 7.2 Upload States
+
+| Status | Description |
+|--------|-------------|
+| `pending` | Presigned URL generated, awaiting upload |
+| `scanning` | Virus scan in progress |
+| `clean` | Passed virus scan, being processed |
+| `infected` | Failed virus scan, file deleted |
+| `processing` | Text extraction/thumbnail in progress |
+| `ready` | Fully processed, available for download |
+| `failed` | Processing failed |
+| `deleted` | Soft deleted by user/admin |
+
+### 7.3 API Endpoints
+
+**Initiate Upload**:
+```bash
+POST /api/v2/uds/uploads/initiate
+Content-Type: application/json
+
+{
+  "originalFilename": "document.pdf",
+  "mimeType": "application/pdf",
+  "fileSizeBytes": 1048576,
+  "conversationId": "optional-uuid"
+}
+```
+
+**Response**:
+```json
+{
+  "uploadId": "uuid",
+  "presignedUrl": "https://s3...",
+  "expiresAt": "2025-01-24T08:00:00Z",
+  "maxSizeBytes": 104857600
+}
+```
+
+**Complete Upload**:
+```bash
+POST /api/v2/uds/uploads/{uploadId}/complete
+Content-Type: application/json
+
+{
+  "sha256Hash": "abc123..."
+}
+```
+
+**Get Download URL**:
+```bash
+GET /api/v2/uds/uploads/{uploadId}/download
+```
+
+---
+
+## 8. GDPR Compliance
+
+### 8.1 Right to Erasure
+
+UDS implements GDPR Article 17 (Right to Erasure) with multi-tier deletion:
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                    GDPR ERASURE ORCHESTRATOR                             │
+│                                                                          │
+│  Erasure Request                                                         │
+│       │                                                                  │
+│       ├────────────────┬────────────────┬─────────────────┐             │
+│       ▼                ▼                ▼                 ▼             │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌────────┐         │
+│  │ Hot Tier    │  │ Warm Tier   │  │ Cold Tier   │  │ Backups│         │
+│  │ (Redis,     │  │ (Aurora,    │  │ (S3,        │  │        │         │
+│  │  DynamoDB)  │  │  uploads)   │  │  Iceberg)   │  │        │         │
+│  └─────────────┘  └─────────────┘  └─────────────┘  └────────┘         │
+│       │                │                │             │                  │
+│       └────────────────┴────────────────┴─────────────┘                  │
+│                            │                                             │
+│                            ▼                                             │
+│                   ┌─────────────────┐                                   │
+│                   │ Verification    │                                   │
+│                   │ Hash Generated  │                                   │
+│                   └─────────────────┘                                   │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+### 8.2 Erasure Scopes
+
+| Scope | Description |
+|-------|-------------|
+| `user` | Delete all data for a specific user |
+| `conversation` | Delete a specific conversation |
+| `tenant` | Delete all data for entire tenant |
+
+### 8.3 Create Erasure Request
+
+```bash
+POST /api/admin/uds/erasure
+Content-Type: application/json
+
+{
+  "scope": "user",
+  "userId": "uuid-of-user",
+  "eraseConversations": true,
+  "eraseMessages": true,
+  "eraseUploads": true,
+  "eraseAuditLog": false,     // Usually keep for compliance
+  "eraseFromBackups": false,   // Expensive, requires manual intervention
+  "anonymizeRemaining": true,  // Anonymize data we can't delete
+  "legalBasis": "gdpr_article_17",
+  "legalReference": "User request #12345"
+}
+```
+
+### 8.4 Erasure Status
+
+| Status | Description |
+|--------|-------------|
+| `pending` | Request created, not yet started |
+| `processing` | Actively deleting data |
+| `completed` | All tiers processed successfully |
+| `failed` | Error occurred, may be partially complete |
+| `partial` | Some tiers completed, others pending |
+
+### 8.5 Verification
+
+Each completed erasure generates a **verification hash** that proves:
+- What was deleted
+- When it was deleted
+- The scope of deletion
+
+This hash is stored in the audit log for compliance proof.
+
+---
+
+## 9. Admin API Reference
+
+**Base URL**: `/api/admin/uds`
+
+### Dashboard
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/dashboard` | Full dashboard with health, stats, config |
+
+### Configuration
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/config` | Get tenant configuration |
+| PUT | `/config` | Update tenant configuration |
+
+### Conversations
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/conversations` | List conversations with filters |
+| GET | `/conversations/{id}` | Get conversation details |
+| DELETE | `/conversations/{id}` | Delete conversation |
+| GET | `/conversations/{id}/messages` | List messages |
+
+### Uploads
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/uploads` | List uploads with filters |
+| GET | `/uploads/{id}` | Get upload details |
+| DELETE | `/uploads/{id}` | Delete upload |
+
+### Audit
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/audit` | List audit entries with filters |
+| POST | `/audit/verify` | Verify Merkle chain integrity |
+| POST | `/audit/export` | Export audit log |
+| GET | `/audit/merkle-trees` | List Merkle trees |
+
+### Tiers
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/tiers` | Get tier health status |
+| GET | `/tiers/metrics` | Get tier metrics |
+| POST | `/tiers/promote` | Trigger Hot → Warm promotion |
+| POST | `/tiers/archive` | Trigger Warm → Cold archival |
+| POST | `/tiers/retrieve` | Retrieve from Cold to Warm |
+| POST | `/tiers/housekeeping` | Run housekeeping tasks |
+
+### Erasure
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/erasure` | List erasure requests |
+| POST | `/erasure` | Create erasure request |
+| GET | `/erasure/{id}` | Get erasure request details |
+| DELETE | `/erasure/{id}` | Cancel pending erasure |
+
+### Encryption
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/encryption/keys` | List encryption keys |
+| POST | `/encryption/rotate` | Rotate encryption key |
+
+### Statistics
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/stats` | Get UDS statistics |
+
+---
+
+## 10. Admin Dashboard
+
+Access the UDS Admin Dashboard at: **Admin Dashboard → Platform → UDS**
+
+### 10.1 Overview Tab
+
+- **Tier Health**: Real-time status of all storage tiers
+- **Quick Actions**: Promote, archive, housekeeping buttons
+- **Statistics**: Conversation, message, upload, audit counts
+- **Distribution**: Visual breakdown of data across tiers
+
+### 10.2 Audit Log Tab
+
+- **Filterable Log**: Filter by category, event type, user
+- **Merkle Verification**: Visual indicator of chain integrity
+- **Export**: Download audit log for compliance
+
+### 10.3 GDPR Erasure Tab
+
+- **Request List**: All erasure requests with status
+- **Create Request**: Form to initiate new erasure
+- **Progress Tracking**: Per-tier deletion status
+
+### 10.4 Configuration Tab
+
+- **Tier Settings**: TTL and retention configuration
+- **Security Settings**: Encryption, virus scanning status
+- **Upload Settings**: Size limits, allowed types
+- **GDPR Settings**: Auto-delete, anonymization settings
+
+---
+
+## 11. Configuration
+
+### 11.1 Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `UDS_KMS_KEY_ALIAS` | KMS master key alias | `alias/radiant-uds-master` |
+| `UDS_UPLOAD_BUCKET` | Main upload S3 bucket | `radiant-uds-uploads` |
+| `UDS_QUARANTINE_BUCKET` | Quarantine S3 bucket | `radiant-uds-quarantine` |
+| `UDS_HOT_TTL_SECONDS` | Default hot tier TTL | `86400` |
+| `UDS_WARM_RETENTION_DAYS` | Default warm retention | `180` |
+| `UDS_COLD_RETENTION_YEARS` | Cold tier retention | `7` |
+
+### 11.2 Per-Tenant Configuration
+
+All settings can be overridden per-tenant via the `uds_config` table or Admin API.
+
+---
+
+## 12. Monitoring
+
+### 12.1 Key Metrics
+
+| Metric | Description | Alert Threshold |
+|--------|-------------|-----------------|
+| `uds.hot.item_count` | Items in hot tier | >10,000 |
+| `uds.warm.storage_bytes` | Warm tier storage | >100GB |
+| `uds.cold.storage_bytes` | Cold tier storage | >1TB |
+| `uds.hot.cache_hit_rate` | Cache efficiency | <90% |
+| `uds.tier.transition_errors` | Failed transitions | >0 |
+| `uds.upload.scan_failures` | Virus scan failures | >0 |
+
+### 12.2 CloudWatch Alarms
+
+Recommended alarms:
+- Hot tier item count exceeds threshold
+- Tier transition error rate
+- Upload quarantine backup
+- Audit chain verification failure
+
+### 12.3 Housekeeping
+
+Run housekeeping regularly to:
+- Promote data between tiers
+- Clean up deleted items
+- Update tier metrics
+
+**Manual Trigger**:
+```bash
+POST /api/admin/uds/tiers/housekeeping
+```
+
+**Scheduled**: EventBridge rule runs hourly
+
+---
+
+## 13. Troubleshooting
+
+### 13.1 Common Issues
+
+**Upload Stuck in "Scanning"**:
+- Check ClamAV Lambda health
+- Verify quarantine bucket permissions
+- Check CloudWatch logs for scan errors
+
+**High Hot Tier Item Count**:
+- Verify TTL configuration
+- Check if promotion job is running
+- Review access patterns (frequently accessed data stays hot)
+
+**Merkle Chain Verification Failed**:
+- Do NOT attempt to fix manually
+- Contact security team immediately
+- Preserve audit log for investigation
+
+**Erasure Request Failed**:
+- Check per-tier status for specific failure
+- Review CloudWatch logs
+- Retry with smaller scope if needed
+
+### 13.2 Support
+
+For UDS issues:
+1. Check CloudWatch logs: `/aws/lambda/radiant-uds-*`
+2. Review tier health in Admin Dashboard
+3. Contact platform team with request ID
 
 ---
 
 ## Document History
 
-| Date | Version | Change |
-|------|---------|--------|
-| 2026-01-18 | 1.0.0 | Initial architecture document |
-| 2026-02-08 | 6.4.0 | OMEGA Firmware Hot-Swap Architecture |
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0.0 | 2026-01-24 | Initial release |
 
 ---
 
-## Part VI: OMEGA Firmware Hot-Swap Architecture (v6.4.0)
+*This document is part of the RADIANT Platform Documentation.*
 
-> **Version**: 6.4.0 | **Date**: February 8, 2026
-> **Classification**: RADIANT INTERNAL // STRATEGIC
+
+---
+
+## Part II: RAWS (Read-After-Write Storage)
+
+## Operations and Administration Guide
+
+---
+
+**Document Version:** 1.1.0  
+**RADIANT Platform Version:** v4.19.0  
+**Last Updated:** January 2026  
+
+---
+
+## 1. System Overview
+
+RAWS automatically selects optimal AI models using 8-dimension scoring across 13 weight profiles and 7 domains.
+
+### Key Admin Responsibilities
+
+- Model registry management
+- Weight profile configuration
+- Domain compliance enforcement
+- Thermal state management
+- Provider health monitoring
+- Cost optimization
+
+---
+
+## 2. Regulatory Compliance by Domain
+
+### 2.1 Compliance Matrix
+
+| Domain | Required | Optional | Truth Engine |
+|--------|----------|----------|--------------|
+| **Healthcare** | HIPAA | FDA 21 CFR Part 11, HITECH | Required |
+| **Financial** | SOC 2 Type II | PCI-DSS, GDPR, SOX | Required |
+| **Legal** | SOC 2 Type II | GDPR, State Bar Rules | Required |
+| **Scientific** | None | FDA 21 CFR Part 11, GLP, IRB | Optional |
+| **Creative** | None | FTC Guidelines | Not Required |
+| **Engineering** | None | SOC 2, ISO 27001, NIST CSF | Optional |
+| **General** | None | None | Not Required |
+
+### 2.2 Domain Regulatory Details
+
+#### Healthcare Domain
+
+**Mandatory Compliance:**
+- **HIPAA** (Health Insurance Portability and Accountability Act)
+  - Applies to: Any system processing Protected Health Information (PHI)
+  - Requirements: Encryption at rest/transit, access controls, audit trails, Business Associate Agreements
+  - RAWS Enforcement: Only HIPAA-certified models are eligible; selection filtered before scoring
+
+**Conditional Compliance:**
+- **FDA 21 CFR Part 11** (Electronic Records; Electronic Signatures)
+  - Applies to: Clinical trials, drug development, medical device decisions
+  - Requirements: Electronic record integrity, audit trails, electronic signatures
+  - RAWS Enforcement: Models flagged as FDA-eligible when this compliance is required
+
+- **HITECH Act**
+  - Extends HIPAA for electronic health records
+  - Increases penalties for HIPAA violations
+
+**Admin Actions:**
+```bash
+# Verify HIPAA-eligible models
+radiant-cli raws models list --compliance HIPAA --env production
+
+# Healthcare selection audit
+radiant-cli raws audit search --domain healthcare --last 30d --env production
+```
+
+#### Financial Domain
+
+**Mandatory Compliance:**
+- **SOC 2 Type II**
+  - Applies to: Financial services handling customer data
+  - Requirements: Security controls, availability, processing integrity, confidentiality, privacy
+  - Audit Period: 6-12 months of operational evidence
+  - RAWS Enforcement: SOC2-certified models only for financial domain
+
+**Conditional Compliance:**
+- **PCI-DSS** (Payment Card Industry Data Security Standard)
+  - Applies to: Processing, storing, or transmitting payment card data
+  - Requirements: Network security, access control, encryption, testing
+  
+- **GDPR** (General Data Protection Regulation)
+  - Applies to: EU resident financial data
+  - Requirements: Data minimization, consent, right to erasure, data portability
+
+- **SOX** (Sarbanes-Oxley Act)
+  - Applies to: Publicly traded companies
+  - Requirements: Audit trail, internal controls, financial reporting integrity
+
+- **SEC/FINRA Regulations**
+  - Investment advice must not mislead
+  - AI outputs used in investment decisions face regulatory scrutiny
+
+**Admin Actions:**
+```bash
+# Financial compliance report
+radiant-cli raws compliance report --framework SOC2 --domain financial --env production
+
+# Check models with PCI-DSS
+radiant-cli raws models list --compliance PCI_DSS --env production
+```
+
+#### Legal Domain
+
+**Mandatory Compliance:**
+- **SOC 2 Type II**
+  - Protects attorney-client privilege
+  - Ensures confidential document security
+  - Required for legal tech platforms
+
+**Conditional Compliance:**
+- **ABA Model Rules of Professional Conduct**
+  - Lawyers remain liable for AI outputs
+  - Must maintain competent representation
+  - Confidentiality obligations extend to AI tools
+
+- **GDPR**
+  - Required for EU data subjects in legal matters
+  - Special categories of data (legal proceedings) have heightened protections
+
+- **State Bar Requirements**
+  - Many jurisdictions require disclosure of AI use in legal documents
+  - Continuing education requirements on AI tools
+
+**Admin Actions:**
+```bash
+# Legal domain with source citation requirement
+radiant-cli raws domains get legal --env production
+
+# Verify citation tracking enabled
+radiant-cli raws config get truth_engine.require_citation --domain legal --env production
+```
+
+#### Scientific Domain
+
+**No Mandatory Compliance** (varies by research type)
+
+**Conditional Compliance:**
+- **FDA 21 CFR Part 11**
+  - Applies to: Pharmaceutical research, drug development
+  - Required for submissions to regulatory agencies
+
+- **GLP** (Good Laboratory Practice)
+  - Applies to: Non-clinical laboratory studies
+  - Required for studies submitted to FDA, EPA, etc.
+
+- **IRB Approval** (Institutional Review Board)
+  - Applies to: Human subjects research using AI tools
+  - Required for federally funded research
+
+- **NIH Data Management Requirements**
+  - Data integrity for federally funded research
+  - Public access requirements
+
+- **Journal Disclosure Requirements**
+  - Many journals require disclosure of AI use
+  - ICMJE guidelines on AI authorship
+
+**Admin Actions:**
+```bash
+# Scientific domain configuration
+radiant-cli raws domains get scientific --env production
+
+# Enable FDA compliance for pharma research
+radiant-cli raws domains update scientific --add-compliance FDA_21_CFR --env production
+```
+
+#### Creative Domain
+
+**No Mandatory Compliance**
+
+**Considerations:**
+- **FTC Guidelines**
+  - AI-generated advertising may require disclosures
+  - Endorsements using AI must be transparent
+
+- **Copyright**
+  - Not a compliance requirement but legal consideration
+  - AI-generated content copyright status varies by jurisdiction
+
+**Admin Actions:**
+```bash
+# Creative domain has no compliance requirements
+radiant-cli raws domains get creative --env production
+
+# Lowest ECD threshold - hallucinations acceptable
+# ECD threshold: 0.20 (vs 0.05 for healthcare)
+```
+
+#### Engineering Domain
+
+**No Mandatory Compliance** (varies by application)
+
+**Conditional Compliance:**
+- **SOC 2 Type II**
+  - Required if AI-generated code processes sensitive data
+  - Common for SaaS/enterprise applications
+
+- **ISO 27001**
+  - Information security management
+  - Enterprise software development
+
+- **NIST Cybersecurity Framework**
+  - Recommended for security-sensitive applications
+  - Federal government contractors
+
+- **FDA 21 CFR Part 11**
+  - Required for medical device software (SaMD)
+  - Software in diagnostic or therapeutic devices
+
+- **IEC 62443**
+  - Industrial control systems
+  - Critical infrastructure software
+
+**Admin Actions:**
+```bash
+# Engineering domain - compliance varies by use case
+radiant-cli raws domains get engineering --env production
+
+# For medical device software, add FDA compliance
+radiant-cli raws domains update engineering --add-compliance FDA_21_CFR --tenant medical-device-tenant
+```
+
+---
+
+## 3. Weight Profile Management
+
+### 3.1 All 13 System Profiles
+
+| ID | Category | Primary Use |
+|----|----------|-------------|
+| BALANCED | Optimization | Default, general purpose |
+| QUALITY_FIRST | Optimization | Maximum accuracy |
+| COST_OPTIMIZED | Optimization | Budget-conscious |
+| LATENCY_CRITICAL | Optimization | Real-time applications |
+| HEALTHCARE | Domain | Medical/clinical (HIPAA) |
+| FINANCIAL | Domain | Finance/investment (SOC2) |
+| LEGAL | Domain | Contracts/litigation (SOC2) |
+| SCIENTIFIC | Domain | Research/academic |
+| CREATIVE | Domain | Content/marketing |
+| ENGINEERING | Domain | Code/software |
+| SYSTEM_1 | SOFAI | Fast, simple queries |
+| SYSTEM_2 | SOFAI | Complex reasoning |
+| SYSTEM_2_5 | SOFAI | Maximum reasoning |
+
+### 3.2 Profile Compliance Mapping
+
+```bash
+# View profile with compliance requirements
+radiant-cli raws profiles get HEALTHCARE --env production
+
+# Output:
+id: HEALTHCARE
+weights: {Q: 0.30, C: 0.05, L: 0.10, K: 0.15, R: 0.10, P: 0.20, A: 0.05, E: 0.05}
+constraints:
+  minQualityScore: 80
+  requiredCompliance: [HIPAA]
+  forcedSystemType: SYSTEM_2
+  requireTruthEngine: true
+  maxEcdThreshold: 0.05
+regulatory_rationale: |
+  HIPAA mandatory for PHI. FDA 21 CFR Part 11 optional for clinical trials.
+  High compliance weight (P=0.20) ensures only certified models selected.
+  Quality threshold (80) prevents low-quality models for medical use.
+  System 2 forced - no fast/cheap models for patient safety.
+```
+
+---
+
+## 4. Domain Configuration
+
+### 4.1 Domain Settings
+
+```bash
+# List all domains
+radiant-cli raws domains list --env production
+
+# Output:
+┌─────────────┬──────────────────┬─────────┬─────────┬─────────────────┐
+│ Domain      │ Profile          │ Min Q   │ ECD     │ Compliance      │
+├─────────────┼──────────────────┼─────────┼─────────┼─────────────────┤
+│ healthcare  │ HEALTHCARE       │ 80      │ 0.05    │ HIPAA           │
+│ financial   │ FINANCIAL        │ 75      │ 0.05    │ SOC2            │
+│ legal       │ LEGAL            │ 80      │ 0.05    │ SOC2            │
+│ scientific  │ SCIENTIFIC       │ 70      │ 0.08    │ -               │
+│ creative    │ CREATIVE         │ -       │ 0.20    │ -               │
+│ engineering │ ENGINEERING      │ 70      │ 0.10    │ -               │
+│ general     │ BALANCED         │ -       │ 0.10    │ -               │
+└─────────────┴──────────────────┴─────────┴─────────┴─────────────────┘
+```
+
+### 4.2 Modifying Domain Compliance
+
+```bash
+# Add compliance requirement for a tenant's domain usage
+radiant-cli raws domains tenant-override \
+  --tenant enterprise-tenant \
+  --domain engineering \
+  --add-compliance SOC2 \
+  --add-compliance ISO_27001 \
+  --env production
+
+# View tenant override
+radiant-cli raws domains get engineering --tenant enterprise-tenant --env production
+```
+
+---
+
+## 5. Compliance Monitoring
+
+### 5.1 Compliance Dashboard
+
+```bash
+# Generate compliance summary
+radiant-cli raws compliance summary --env production
+
+# Output:
+Compliance Summary (January 2026)
+═══════════════════════════════════════════════════════════════
+HIPAA Selections:        12,453 (100% compliant)
+SOC2 Selections:         45,892 (100% compliant)
+FDA 21 CFR Selections:      234 (100% compliant)
+Non-Compliant Attempts:       0 (blocked at filter stage)
+
+By Domain:
+  healthcare:  12,453 selections │ HIPAA required │ 0 violations
+  financial:   28,743 selections │ SOC2 required  │ 0 violations
+  legal:       17,149 selections │ SOC2 required  │ 0 violations
+  scientific:   8,234 selections │ optional       │ N/A
+  creative:    15,892 selections │ none           │ N/A
+  engineering: 22,156 selections │ optional       │ N/A
+  general:     34,521 selections │ none           │ N/A
+```
+
+### 5.2 Compliance Reports
+
+```bash
+# Generate HIPAA compliance report for auditors
+radiant-cli raws compliance report \
+  --framework HIPAA \
+  --period 2026-Q1 \
+  --output hipaa-audit-q1-2026.pdf \
+  --include-audit-trails \
+  --env production
+
+# Generate SOC 2 evidence package
+radiant-cli raws compliance evidence \
+  --framework SOC2 \
+  --period 2025 \
+  --output soc2-evidence-2025.zip \
+  --env production
+```
+
+---
+
+## 6. Model Compliance Status
+
+### 6.1 Viewing Model Compliance
+
+```bash
+# List models by compliance certification
+radiant-cli raws models list --compliance HIPAA --env production
+
+# Output:
+HIPAA-Certified Models (12 total):
+┌─────────────────────┬───────────┬─────────┬─────────────────────────┐
+│ Model               │ Provider  │ Quality │ Additional Compliance   │
+├─────────────────────┼───────────┼─────────┼─────────────────────────┤
+│ claude-opus-4-5     │ anthropic │ 87.2    │ SOC2, GDPR, HIPAA       │
+│ claude-sonnet-4-5   │ anthropic │ 83.4    │ SOC2, GDPR, HIPAA       │
+│ gpt-4o              │ openai    │ 79.2    │ SOC2, HIPAA             │
+│ gpt-4-turbo         │ openai    │ 76.5    │ SOC2, HIPAA             │
+│ gemini-2.5-pro      │ google    │ 82.3    │ SOC2, HIPAA, ISO_27001  │
+│ ...                 │           │         │                         │
+└─────────────────────┴───────────┴─────────┴─────────────────────────┘
+```
+
+### 6.2 Model Compliance Matrix
+
+```bash
+# Full compliance matrix
+radiant-cli raws models compliance-matrix --env production
+
+# Output shows which models have which certifications
+```
+
+---
+
+## 7. Alerts and Notifications
+
+### 7.1 Compliance Alerts
+
+| Alert | Threshold | Severity | Action |
+|-------|-----------|----------|--------|
+| HIPAA model disabled | Any | Critical | SNS + PagerDuty |
+| SOC2 cert expiring | 30 days | Warning | SNS + Slack |
+| Compliance filter blocking >5% | Rate | Warning | SNS |
+| Non-compliant selection attempt | Any | Info | Log only |
+
+### 7.2 Alert Configuration
+
+```bash
+# Configure compliance alerts
+radiant-cli raws alerts set compliance-expiry \
+  --framework SOC2 \
+  --days-before 30 \
+  --severity warning \
+  --notify slack:#compliance-alerts \
+  --env production
+```
+
+---
+
+## 8. Quick Reference
+
+### Common Commands
+
+```bash
+# Compliance
+radiant-cli raws compliance summary --env production
+radiant-cli raws compliance report --framework HIPAA --env production
+radiant-cli raws models list --compliance SOC2 --env production
+
+# Domains
+radiant-cli raws domains list --env production
+radiant-cli raws domains get healthcare --env production
+
+# Profiles  
+radiant-cli raws profiles list --env production
+radiant-cli raws profiles get HEALTHCARE --env production
+
+# Audit
+radiant-cli raws audit search --domain healthcare --last 24h --env production
+```
+
+### Compliance Contacts
+
+| Framework | Internal Contact | External Auditor |
+|-----------|------------------|------------------|
+| HIPAA | compliance@radiant.example.com | [Auditor Name] |
+| SOC 2 | security@radiant.example.com | [Auditor Name] |
+| GDPR | privacy@radiant.example.com | [DPO Name] |
+| FDA | regulatory@radiant.example.com | [Consultant] |
+
+---
+
+**End of Administrator Documentation**
+
+*Version 1.1.0 | January 2026*
+
+
+## Technical Reference for Engineers and Developers
+
+---
+
+**Document Version:** 1.1.0  
+**RADIANT Platform Version:** v4.19.0  
+**Last Updated:** January 2026  
+
+---
+
+## 1. System Overview
+
+RAWS (RADIANT AI Weighted Selection) is the real-time model orchestration system that selects optimal AI models using:
+
+- **8-Dimension Scoring**: Quality, Cost, Latency, Capability, Reliability, Compliance, Availability, Learning
+- **13 Weight Profiles**: 4 Optimization + 6 Domain + 3 SOFAI
+- **7 Domains**: Healthcare, Financial, Legal, Scientific, Creative, Engineering, General
+- **106+ Models**: 50 external APIs + 56 self-hosted
+
+---
+
+## 2. Weight Profile System
+
+### 2.1 Profile Categories
+
+| Category | Count | Purpose |
+|----------|-------|---------|
+| **Optimization** | 4 | General optimization strategies |
+| **Domain** | 6 | Domain-specific requirements |
+| **SOFAI** | 3 | Cognitive complexity routing |
+
+### 2.2 Complete Profile Matrix
+
+| Profile | Q | C | L | K | R | P | A | E | Focus |
+|---------|-----|-----|-----|-----|-----|-----|-----|-----|-------|
+| **BALANCED** | 0.25 | 0.20 | 0.15 | 0.15 | 0.10 | 0.05 | 0.05 | 0.05 | Default |
+| **QUALITY_FIRST** | 0.40 | 0.10 | 0.10 | 0.15 | 0.10 | 0.05 | 0.05 | 0.05 | Max accuracy |
+| **COST_OPTIMIZED** | 0.20 | 0.35 | 0.15 | 0.10 | 0.05 | 0.05 | 0.05 | 0.05 | Min cost |
+| **LATENCY_CRITICAL** | 0.15 | 0.10 | 0.35 | 0.15 | 0.10 | 0.05 | 0.05 | 0.05 | Fastest |
+| **HEALTHCARE** | 0.30 | 0.05 | 0.10 | 0.15 | 0.10 | 0.20 | 0.05 | 0.05 | Quality+Compliance |
+| **FINANCIAL** | 0.30 | 0.10 | 0.10 | 0.15 | 0.10 | 0.15 | 0.05 | 0.05 | Accuracy+Audit |
+| **LEGAL** | 0.35 | 0.05 | 0.05 | 0.20 | 0.10 | 0.15 | 0.05 | 0.05 | Citations |
+| **SCIENTIFIC** | 0.35 | 0.10 | 0.10 | 0.20 | 0.08 | 0.05 | 0.05 | 0.07 | Research |
+| **CREATIVE** | 0.20 | 0.25 | 0.20 | 0.15 | 0.05 | 0.00 | 0.05 | 0.10 | Iteration |
+| **ENGINEERING** | 0.30 | 0.15 | 0.15 | 0.20 | 0.10 | 0.00 | 0.05 | 0.05 | Code |
+| **SYSTEM_1** | 0.15 | 0.30 | 0.30 | 0.10 | 0.05 | 0.00 | 0.05 | 0.05 | Fast+Cheap |
+| **SYSTEM_2** | 0.35 | 0.10 | 0.10 | 0.15 | 0.10 | 0.10 | 0.05 | 0.05 | Reasoning |
+| **SYSTEM_2_5** | 0.40 | 0.05 | 0.05 | 0.20 | 0.10 | 0.10 | 0.05 | 0.05 | Max reasoning |
+
+### 2.3 Domain Profile Details
+
+#### HEALTHCARE
+- **Weights**: Q=0.30, C=0.05, L=0.10, K=0.15, R=0.10, P=0.20, A=0.05, E=0.05
+- **Constraints**: minQuality=80, compliance=[HIPAA], systemType=SYSTEM_2
+- **Truth Engine**: Required (ECD threshold: 0.05)
+- **Regulatory Requirements**:
+  - **HIPAA**: Mandatory for Protected Health Information (PHI). Requires encryption, access controls, audit trails, BAAs.
+  - **FDA 21 CFR Part 11**: Required for clinical trials, drug development, medical device decisions.
+  - **HITECH Act**: Extends HIPAA for electronic health records.
+- **Use Cases**: Medical diagnosis, patient data analysis, clinical documentation
+
+#### FINANCIAL
+- **Weights**: Q=0.30, C=0.10, L=0.10, K=0.15, R=0.10, P=0.15, A=0.05, E=0.05
+- **Constraints**: minQuality=75, compliance=[SOC2], systemType=SYSTEM_2
+- **Truth Engine**: Required (ECD threshold: 0.05)
+- **Regulatory Requirements**:
+  - **SOC 2 Type II**: Required for security controls, availability, processing integrity, confidentiality.
+  - **PCI-DSS**: Required if processing payment card data.
+  - **GDPR**: Required for EU resident financial data.
+  - **SEC/FINRA**: Investment advice faces regulatory scrutiny.
+  - **SOX**: Audit trail requirements for public companies.
+- **Use Cases**: Investment analysis, accounting, financial reporting
+
+#### LEGAL
+- **Weights**: Q=0.35, C=0.05, L=0.05, K=0.20, R=0.10, P=0.15, A=0.05, E=0.05
+- **Constraints**: minQuality=80, compliance=[SOC2], systemType=SYSTEM_2
+- **Truth Engine**: Required, source citation required (ECD threshold: 0.05)
+- **Regulatory Requirements**:
+  - **SOC 2 Type II**: Required for attorney-client privilege protection, confidential documents.
+  - **ABA Model Rules**: AI legal research must meet professional responsibility standards.
+  - **GDPR**: Required for EU data subjects in legal matters.
+  - **State Bar Requirements**: Many jurisdictions require AI use disclosure.
+- **Use Cases**: Contract analysis, legal research, compliance documentation
+
+#### SCIENTIFIC
+- **Weights**: Q=0.35, C=0.10, L=0.10, K=0.20, R=0.08, P=0.05, A=0.05, E=0.07
+- **Constraints**: minQuality=70, source citation required
+- **Truth Engine**: Optional (ECD threshold: 0.08)
+- **Regulatory Requirements**:
+  - **FDA 21 CFR Part 11**: Required for pharmaceutical/drug research.
+  - **GLP** (Good Laboratory Practice): For studies submitted to regulatory agencies.
+  - **IRB Approval**: Human subjects research may require institutional review.
+  - **NIH Data Management**: Data integrity requirements for federally funded research.
+- **Use Cases**: Research analysis, data interpretation, peer review assistance
+
+#### CREATIVE
+- **Weights**: Q=0.20, C=0.25, L=0.20, K=0.15, R=0.05, P=0.00, A=0.05, E=0.10
+- **Constraints**: None (most flexible)
+- **Truth Engine**: Not required (ECD threshold: 0.20)
+- **Regulatory Requirements**:
+  - **None required**: Creative content not subject to regulatory compliance.
+  - **FTC Guidelines**: Disclosures may be required for AI-generated advertising.
+- **Use Cases**: Content writing, storytelling, brainstorming, marketing copy
+
+#### ENGINEERING
+- **Weights**: Q=0.30, C=0.15, L=0.15, K=0.20, R=0.10, P=0.00, A=0.05, E=0.05
+- **Constraints**: minQuality=70, preferredCapabilities=[function_calling, tool_use]
+- **Truth Engine**: Optional (ECD threshold: 0.10)
+- **Regulatory Requirements**:
+  - **SOC 2 Type II**: Required if AI-generated code processes sensitive data.
+  - **ISO 27001**: Information security management for enterprise software.
+  - **NIST Cybersecurity Framework**: Recommended for security-sensitive applications.
+  - **FDA 21 CFR Part 11**: Required for medical device software.
+  - **IEC 62443**: Required for industrial control systems.
+- **Use Cases**: Code generation, code review, debugging, architecture design
+
+---
+
+## 3. Eight-Dimension Scoring
+
+### 3.1 Dimension Calculations
+
+| Dimension | Formula | Range |
+|-----------|---------|-------|
+| Quality (Q) | Weighted benchmark average | 0-100 |
+| Cost (C) | Inverted normalized price | 0-100 |
+| Latency (L) | TTFT threshold mapping | 0-100 |
+| Capability (K) | matched / required × 100 | 0-100 |
+| Reliability (R) | Uptime + error rate composite | 0-100 |
+| Compliance (P) | Framework count × 15 | 0-100 |
+| Availability (A) | Thermal state mapping | 0-100 |
+| Learning (E) | Historical performance | 0-100 |
+
+### 3.2 Composite Score
+
+```typescript
+CompositeScore = Q×Wq + C×Wc + L×Wl + K×Wk + R×Wr + P×Wp + A×Wa + E×We
+```
+
+Where Σ(weights) = 1.0
+
+---
+
+## 4. Selection Algorithm
+
+### 4.1 Four Phases
+
+```
+PHASE 1: FILTER (5ms)
+├── Status filter (active only)
+├── Capability filter
+├── Compliance filter
+├── Tier filter
+├── System type filter
+└── Thermal filter
+
+PHASE 2: SCORE (25ms)
+├── Quality scorer
+├── Cost scorer
+├── Latency scorer
+├── Capability scorer
+├── Reliability scorer
+├── Compliance scorer
+├── Availability scorer
+└── Learning scorer (parallel)
+
+PHASE 3: RANK (15ms)
+├── Apply weights from profile
+├── Calculate composite scores
+├── Apply neural adjustments
+└── Sort by adjusted score
+
+PHASE 4: SELECT (3ms)
+├── Select winner
+├── Select fallbacks (3)
+├── Generate reason
+└── Build response
+```
+
+### 4.2 Weight Resolution Order
+
+```typescript
+async resolveWeights(request, systemType, domain): Promise<ScoringWeights> {
+  // 1. Explicit profile ID
+  if (request.weightProfileId) {
+    return getProfile(request.weightProfileId).weights;
+  }
+  
+  // 2. Optimization preference
+  if (request.optimizeFor) {
+    return getOptimizationProfile(request.optimizeFor).weights;
+  }
+  
+  // 3. Domain-specific (includes SCIENTIFIC, CREATIVE, ENGINEERING)
+  if (domain !== 'general') {
+    return getDomainProfile(domain).weights;
+  }
+  
+  // 4. SOFAI system type
+  return getSystemProfile(systemType).weights;
+}
+```
+
+---
+
+## 5. Domain Detection
+
+### 5.1 Keyword Detection
+
+```typescript
+const DOMAIN_KEYWORDS = {
+  healthcare: ['medical', 'diagnosis', 'patient', 'clinical', ...],
+  financial: ['investment', 'stock', 'trading', 'accounting', ...],
+  legal: ['contract', 'lawsuit', 'attorney', 'litigation', ...],
+  scientific: ['research', 'experiment', 'hypothesis', 'study', ...],
+  creative: ['write', 'story', 'creative', 'brainstorm', ...],
+  engineering: ['code', 'programming', 'debug', 'api', ...],
+};
+```
+
+### 5.2 Task Type Mapping
+
+```typescript
+const TASK_TYPE_MAP = {
+  'medical_qa': 'healthcare',
+  'clinical_documentation': 'healthcare',
+  'investment_analysis': 'financial',
+  'contract_analysis': 'legal',
+  'research_analysis': 'scientific',
+  'content_writing': 'creative',
+  'code_generation': 'engineering',
+  'code_review': 'engineering',
+  'debugging': 'engineering',
+};
+```
+
+---
+
+## 6. TypeScript Implementation
+
+### 6.1 Profile Types
+
+```typescript
+export type OptimizationProfile = 
+  | 'BALANCED' 
+  | 'QUALITY_FIRST' 
+  | 'COST_OPTIMIZED' 
+  | 'LATENCY_CRITICAL';
+
+export type DomainProfile = 
+  | 'HEALTHCARE' 
+  | 'FINANCIAL' 
+  | 'LEGAL' 
+  | 'SCIENTIFIC' 
+  | 'CREATIVE' 
+  | 'ENGINEERING';
+
+export type SOFAIProfile = 
+  | 'SYSTEM_1' 
+  | 'SYSTEM_2' 
+  | 'SYSTEM_2_5';
+
+export type WeightProfileId = 
+  | OptimizationProfile 
+  | DomainProfile 
+  | SOFAIProfile;
+
+export type Domain = 
+  | 'healthcare'
+  | 'financial'
+  | 'legal'
+  | 'scientific'
+  | 'creative'
+  | 'engineering'
+  | 'general';
+```
+
+### 6.2 Domain to Profile Mapping
+
+```typescript
+export const DOMAIN_PROFILE_MAP: Record<Domain, WeightProfileId> = {
+  healthcare: 'HEALTHCARE',
+  financial: 'FINANCIAL',
+  legal: 'LEGAL',
+  scientific: 'SCIENTIFIC',
+  creative: 'CREATIVE',
+  engineering: 'ENGINEERING',
+  general: 'BALANCED',
+};
+```
+
+---
+
+## 7. Database Schema
+
+### 7.1 Weight Profiles Table
+
+```sql
+CREATE TABLE raws_weight_profiles (
+    id VARCHAR(50) PRIMARY KEY,
+    display_name VARCHAR(255) NOT NULL,
+    description TEXT,
+    category VARCHAR(20) NOT NULL, -- 'optimization', 'domain', 'sofai'
+    
+    -- Eight dimension weights
+    weight_quality NUMERIC(4, 3) NOT NULL,
+    weight_cost NUMERIC(4, 3) NOT NULL,
+    weight_latency NUMERIC(4, 3) NOT NULL,
+    weight_capability NUMERIC(4, 3) NOT NULL,
+    weight_reliability NUMERIC(4, 3) NOT NULL,
+    weight_compliance NUMERIC(4, 3) NOT NULL,
+    weight_availability NUMERIC(4, 3) NOT NULL,
+    weight_learning NUMERIC(4, 3) NOT NULL,
+    
+    -- Domain association
+    domain VARCHAR(50),
+    
+    -- Constraints
+    min_quality_score NUMERIC(5, 2),
+    required_compliance TEXT[],
+    forced_system_type VARCHAR(20),
+    
+    -- Truth Engine
+    require_truth_engine BOOLEAN DEFAULT false,
+    require_source_citation BOOLEAN DEFAULT false,
+    max_ecd_threshold NUMERIC(4, 3),
+    
+    CONSTRAINT weights_sum CHECK (ABS(
+        weight_quality + weight_cost + weight_latency + weight_capability + 
+        weight_reliability + weight_compliance + weight_availability + weight_learning - 1.0
+    ) < 0.01)
+);
+```
+
+### 7.2 Domain Config Table
+
+```sql
+CREATE TABLE raws_domain_config (
+    id VARCHAR(50) PRIMARY KEY, -- 7 domains
+    weight_profile_id VARCHAR(50) REFERENCES raws_weight_profiles(id),
+    min_quality_score NUMERIC(5, 2),
+    max_ecd_threshold NUMERIC(4, 3),
+    required_compliance TEXT[],
+    forced_system_type VARCHAR(20),
+    require_truth_engine BOOLEAN DEFAULT false,
+    require_source_citation BOOLEAN DEFAULT false,
+    detection_keywords TEXT[]
+);
+```
+
+---
+
+## 8. API Examples
+
+### 8.1 Domain-Specific Selection
+
+```typescript
+// Engineering domain
+const result = await raws.select({
+  requiredCapabilities: ['chat', 'function_calling'],
+  estimatedInputTokens: 2000,
+  estimatedOutputTokens: 1000,
+  domain: 'engineering',
+});
+// Uses ENGINEERING profile: Q=0.30, K=0.20, C=0.15, L=0.15...
+
+// Scientific domain
+const result = await raws.select({
+  requiredCapabilities: ['chat', 'reasoning'],
+  estimatedInputTokens: 3000,
+  estimatedOutputTokens: 2000,
+  domain: 'scientific',
+});
+// Uses SCIENTIFIC profile: Q=0.35, K=0.20, E=0.07...
+
+// Creative domain
+const result = await raws.select({
+  requiredCapabilities: ['chat', 'streaming'],
+  estimatedInputTokens: 500,
+  estimatedOutputTokens: 2000,
+  domain: 'creative',
+});
+// Uses CREATIVE profile: C=0.25, L=0.20, E=0.10...
+```
+
+### 8.2 Auto-Detection
+
+```typescript
+// Domain detected from query content
+const result = await raws.select({
+  requiredCapabilities: ['chat'],
+  estimatedInputTokens: 1000,
+  estimatedOutputTokens: 500,
+  taskType: 'code_review', // Auto-maps to engineering domain
+});
+```
+
+---
+
+## 9. Testing
+
+### 9.1 Profile Validation
+
+```typescript
+describe('WeightProfiles', () => {
+  it('should have 13 system profiles', () => {
+    expect(Object.keys(WEIGHT_PROFILES)).toHaveLength(13);
+  });
+
+  it('all profiles should sum to 1.0', () => {
+    for (const profile of Object.values(WEIGHT_PROFILES)) {
+      const sum = Object.values(profile.weights).reduce((a, b) => a + b, 0);
+      expect(sum).toBeCloseTo(1.0, 2);
+    }
+  });
+
+  it('should map all 7 domains to profiles', () => {
+    expect(Object.keys(DOMAIN_PROFILE_MAP)).toHaveLength(7);
+  });
+});
+```
+
+---
+
+## 10. Performance
+
+### 10.1 Latency Budget
+
+| Phase | Budget | Actual p99 |
+|-------|--------|------------|
+| Context + Weights | 2ms | 1.5ms |
+| Filtering | 5ms | 4ms |
+| Scoring (8 dim) | 25ms | 22ms |
+| Ranking | 15ms | 12ms |
+| Selection | 3ms | 2ms |
+| **Total** | **50ms** | **41.5ms** |
+
+---
+
+**End of Engineering Documentation**
+
+*Version 1.1.0 | January 2026*
+
+
+## API Guide for Developers and Integrators
+
+---
+
+**Document Version:** 1.1.0  
+**API Version:** v1  
+**Last Updated:** January 2026  
+
+---
+
+## 1. Introduction
+
+RAWS (RADIANT AI Weighted Selection) automatically selects the optimal AI model for your requests based on:
+
+- **Quality**: How accurate the model is
+- **Cost**: Price for your usage
+- **Latency**: Response speed
+- **Capabilities**: Features supported
+- **Compliance**: Regulatory certifications
+
+### Why Use RAWS?
+
+| Without RAWS | With RAWS |
+|--------------|-----------|
+| Manually choose models | Automatic optimization |
+| Risk compliance violations | Compliance-aware filtering |
+| Static selection | Dynamic, context-aware |
+| No fallback handling | Automatic fallback chain |
+
+---
+
+## 2. Quick Start
+
+```bash
+curl -X POST https://api.radiant.example.com/v1/raws/select \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "requiredCapabilities": ["chat", "streaming"],
+    "estimatedInputTokens": 1000,
+    "estimatedOutputTokens": 500
+  }'
+```
+
+---
+
+## 3. Domain-Specific Selection
+
+RAWS supports 7 domains, each with appropriate compliance requirements:
+
+### 3.1 Domain Overview
+
+| Domain | Use Case | Compliance | Min Quality |
+|--------|----------|------------|-------------|
+| `healthcare` | Medical, clinical | HIPAA required | 80 |
+| `financial` | Investment, accounting | SOC 2 required | 75 |
+| `legal` | Contracts, litigation | SOC 2 required | 80 |
+| `scientific` | Research, academic | Varies | 70 |
+| `creative` | Content, marketing | None | - |
+| `engineering` | Code, software | Varies | 70 |
+| `general` | Default | None | - |
+
+### 3.2 Healthcare Domain
+
+**When to Use**: Medical queries, patient data, clinical documentation
+
+**Compliance**: HIPAA is **mandatory**. All models must be HIPAA-certified.
+
+**What Happens**:
+- Only HIPAA-compliant models considered
+- Minimum quality score of 80 enforced
+- System 2 reasoning forced (no fast/cheap models)
+- Truth Engine verification required (ECD ≤ 0.05)
+
+```json
+{
+  "requiredCapabilities": ["chat", "tool_use"],
+  "estimatedInputTokens": 2000,
+  "estimatedOutputTokens": 1500,
+  "domain": "healthcare"
+}
+```
+
+**Typical Models Selected**: claude-sonnet-4-5, gpt-4o, gemini-2.5-pro (all HIPAA-certified)
+
+### 3.3 Financial Domain
+
+**When to Use**: Investment analysis, accounting, financial reporting, tax
+
+**Compliance**: SOC 2 Type II is **mandatory**. 
+
+**What Happens**:
+- Only SOC 2 certified models considered
+- Minimum quality score of 75 enforced
+- System 2 reasoning forced
+- Truth Engine verification required (ECD ≤ 0.05)
+
+```json
+{
+  "requiredCapabilities": ["chat", "function_calling"],
+  "estimatedInputTokens": 2000,
+  "estimatedOutputTokens": 1500,
+  "domain": "financial"
+}
+```
+
+### 3.4 Legal Domain
+
+**When to Use**: Contract analysis, legal research, compliance documentation
+
+**Compliance**: SOC 2 Type II is **mandatory**. Source citations required.
+
+**What Happens**:
+- Only SOC 2 certified models considered
+- Minimum quality score of 80 enforced
+- System 2 reasoning forced
+- Source citation verification enabled
+- Truth Engine required (ECD ≤ 0.05)
+
+```json
+{
+  "requiredCapabilities": ["chat", "tool_use"],
+  "estimatedInputTokens": 3000,
+  "estimatedOutputTokens": 2000,
+  "domain": "legal"
+}
+```
+
+### 3.5 Scientific Domain
+
+**When to Use**: Research analysis, data interpretation, academic writing
+
+**Compliance**: Varies by research type. FDA 21 CFR Part 11 for pharmaceutical research.
+
+**What Happens**:
+- Source citation required
+- Minimum quality score of 70
+- Slightly relaxed ECD threshold (0.08)
+- No forced compliance (specify if needed)
+
+```json
+{
+  "requiredCapabilities": ["chat", "reasoning"],
+  "estimatedInputTokens": 3000,
+  "estimatedOutputTokens": 2000,
+  "domain": "scientific"
+}
+```
+
+**For FDA-regulated research**, add compliance:
+```json
+{
+  "domain": "scientific",
+  "requiredCompliance": ["FDA_21_CFR"]
+}
+```
+
+### 3.6 Creative Domain
+
+**When to Use**: Content writing, storytelling, marketing copy, brainstorming
+
+**Compliance**: None required. Most flexible domain.
+
+**What Happens**:
+- No compliance filtering
+- No minimum quality threshold
+- Cost and latency optimized (weights: C=0.25, L=0.20)
+- Learning dimension emphasized (E=0.10)
+- High ECD tolerance (0.20) - creative license allowed
+
+```json
+{
+  "requiredCapabilities": ["chat", "streaming"],
+  "estimatedInputTokens": 500,
+  "estimatedOutputTokens": 2000,
+  "domain": "creative"
+}
+```
+
+### 3.7 Engineering Domain
+
+**When to Use**: Code generation, debugging, architecture design, DevOps
+
+**Compliance**: Varies. SOC 2 recommended for sensitive applications.
+
+**What Happens**:
+- Minimum quality score of 70 (code must work)
+- Capability dimension emphasized (K=0.20)
+- Prefers models with function_calling and tool_use
+- Moderate ECD threshold (0.10)
+
+```json
+{
+  "requiredCapabilities": ["chat", "function_calling"],
+  "estimatedInputTokens": 2000,
+  "estimatedOutputTokens": 1500,
+  "domain": "engineering"
+}
+```
+
+**For medical device software**, add FDA compliance:
+```json
+{
+  "domain": "engineering",
+  "requiredCompliance": ["FDA_21_CFR", "SOC2"]
+}
+```
+
+---
+
+## 4. Compliance Options
+
+### 4.1 Available Compliance Frameworks
+
+| Framework | Code | When Required |
+|-----------|------|---------------|
+| HIPAA | `HIPAA` | Healthcare/medical data |
+| SOC 2 Type II | `SOC2` | Financial, legal, enterprise |
+| GDPR | `GDPR` | EU data subjects |
+| FDA 21 CFR Part 11 | `FDA_21_CFR` | Pharma, medical devices |
+| PCI-DSS | `PCI_DSS` | Payment card data |
+| CCPA | `CCPA` | California consumer data |
+| ISO 27001 | `ISO_27001` | Enterprise security |
+
+### 4.2 Specifying Compliance
+
+**Single Framework**:
+```json
+{
+  "requiredCapabilities": ["chat"],
+  "estimatedInputTokens": 1000,
+  "estimatedOutputTokens": 500,
+  "requiredCompliance": ["HIPAA"]
+}
+```
+
+**Multiple Frameworks**:
+```json
+{
+  "requiredCapabilities": ["chat"],
+  "estimatedInputTokens": 1000,
+  "estimatedOutputTokens": 500,
+  "requiredCompliance": ["SOC2", "GDPR", "ISO_27001"]
+}
+```
+
+### 4.3 Domain vs. Explicit Compliance
+
+Using `domain` automatically sets compliance:
+
+```json
+// These are equivalent:
+{ "domain": "healthcare" }
+{ "requiredCompliance": ["HIPAA"] }
+
+// Domain also sets quality threshold, system type, Truth Engine
+// So domain is preferred over explicit compliance alone
+```
+
+---
+
+## 5. Optimization Strategies
+
+### 5.1 Use Optimization Preferences
+
+```json
+// Cost-optimized
+{ "optimizeFor": "cost" }
+
+// Quality-optimized  
+{ "optimizeFor": "quality" }
+
+// Latency-optimized
+{ "optimizeFor": "latency" }
+
+// Balanced (default)
+{ "optimizeFor": "balanced" }
+```
+
+### 5.2 Combine Domain with Optimization
+
+```json
+{
+  "requiredCapabilities": ["chat"],
+  "estimatedInputTokens": 1000,
+  "estimatedOutputTokens": 500,
+  "domain": "engineering",
+  "optimizeFor": "cost"  // Cost-optimize within engineering constraints
+}
+```
+
+### 5.3 Set Hard Constraints
+
+```json
+{
+  "requiredCapabilities": ["chat"],
+  "estimatedInputTokens": 1000,
+  "estimatedOutputTokens": 500,
+  "maxPrice": 0.01,        // Max $0.01 per request
+  "minQuality": 75,        // At least 75 quality score
+  "maxLatencyMs": 1000     // Under 1 second
+}
+```
+
+---
+
+## 6. Understanding Selection Results
+
+### 6.1 Response Structure
+
+```json
+{
+  "selection": {
+    "modelId": "claude-sonnet-4-5",
+    "providerId": "anthropic",
+    "displayName": "Claude Sonnet 4.5",
+    "score": 85.2,
+    "estimatedPrice": 0.0115,
+    "estimatedLatencyMs": 450,
+    "reason": "Selected for engineering domain. HIPAA compliant. High capability score."
+  },
+  "fallbacks": [...],
+  "scoring": {
+    "dimensionScores": {
+      "quality": 83,
+      "cost": 70,
+      "latency": 85,
+      "capability": 100,
+      "reliability": 95,
+      "compliance": 100,
+      "availability": 100,
+      "learning": 60
+    },
+    "weightsUsed": {
+      "Q": 0.30, "C": 0.15, "L": 0.15, "K": 0.20,
+      "R": 0.10, "P": 0.00, "A": 0.05, "E": 0.05
+    },
+    "weightProfileId": "ENGINEERING"
+  },
+  "metadata": {
+    "systemType": "SYSTEM_2",
+    "domain": "engineering",
+    "selectionTimeMs": 23
+  }
+}
+```
+
+### 6.2 Compliance Score
+
+The compliance score (P) in `dimensionScores` reflects:
+- 100: Model has all required compliance certifications
+- 0: Model filtered out (you won't see this - it's excluded)
+
+If you request HIPAA compliance, only HIPAA-certified models are returned.
+
+---
+
+## 7. SDK Examples
+
+### 7.1 JavaScript/TypeScript
+
+```typescript
+import { RAWSClient } from '@radiant/raws-client';
+
+const raws = new RAWSClient({ apiKey: process.env.RADIANT_API_KEY });
+
+// Healthcare selection (automatic HIPAA compliance)
+const healthcareResult = await raws.select({
+  requiredCapabilities: ['chat', 'tool_use'],
+  estimatedInputTokens: 2000,
+  estimatedOutputTokens: 1500,
+  domain: 'healthcare',
+});
+
+// Engineering selection
+const engineeringResult = await raws.select({
+  requiredCapabilities: ['chat', 'function_calling'],
+  estimatedInputTokens: 2000,
+  estimatedOutputTokens: 1000,
+  domain: 'engineering',
+});
+
+// Creative selection (cost-optimized)
+const creativeResult = await raws.select({
+  requiredCapabilities: ['chat', 'streaming'],
+  estimatedInputTokens: 500,
+  estimatedOutputTokens: 2000,
+  domain: 'creative',
+  optimizeFor: 'cost',
+});
+```
+
+### 7.2 Python
+
+```python
+from radiant_raws import RAWSClient
+
+raws = RAWSClient(api_key="your-api-key")
+
+# Healthcare (HIPAA enforced)
+result = raws.select(
+    required_capabilities=["chat", "tool_use"],
+    estimated_input_tokens=2000,
+    estimated_output_tokens=1500,
+    domain="healthcare",
+)
+
+# Financial (SOC 2 enforced)
+result = raws.select(
+    required_capabilities=["chat", "function_calling"],
+    estimated_input_tokens=2000,
+    estimated_output_tokens=1500,
+    domain="financial",
+)
+```
+
+---
+
+## 8. Best Practices
+
+### 8.1 Always Specify Domain for Regulated Use Cases
+
+```typescript
+// ❌ Don't rely on auto-detection for regulated domains
+const result = await raws.select({
+  requiredCapabilities: ['chat'],
+  estimatedInputTokens: 1000,
+  estimatedOutputTokens: 500,
+  // Missing domain - might not get HIPAA compliance
+});
+
+// ✅ Explicitly specify domain
+const result = await raws.select({
+  requiredCapabilities: ['chat'],
+  estimatedInputTokens: 1000,
+  estimatedOutputTokens: 500,
+  domain: 'healthcare',  // Guarantees HIPAA compliance
+});
+```
+
+### 8.2 Check Compliance in Response
+
+```typescript
+const result = await raws.select({ domain: 'healthcare', ... });
+
+// Verify compliance was applied
+console.log(result.scoring.dimensionScores.compliance); // Should be 100
+console.log(result.metadata.domain); // Should be 'healthcare'
+```
+
+### 8.3 Use Appropriate Domain for Your Use Case
+
+| Use Case | Recommended Domain |
+|----------|-------------------|
+| Patient chatbot | `healthcare` |
+| Investment advisor | `financial` |
+| Contract review | `legal` |
+| Research assistant | `scientific` |
+| Blog writer | `creative` |
+| Code assistant | `engineering` |
+| General Q&A | `general` |
+
+---
+
+## 9. FAQ
+
+**Q: What happens if I request a domain but don't have models with required compliance?**
+
+A: You'll receive error `RAWS_005: Compliance requirement not met`. This means no models in your tier have the required certification. Contact support to upgrade.
+
+**Q: Can I use healthcare models for non-healthcare purposes?**
+
+A: Yes, HIPAA-certified models can be used for any purpose. The certification means they *can* handle PHI, not that they *must*.
+
+**Q: How do I know which models have which compliance?**
+
+A: The selection response includes the model's compliance. You can also query the model registry:
+```bash
+curl https://api.radiant.example.com/v1/raws/models?compliance=HIPAA
+```
+
+**Q: Is the engineering domain appropriate for medical device software?**
+
+A: Use `engineering` domain with explicit `requiredCompliance: ["FDA_21_CFR", "SOC2"]` for medical device software development.
+
+---
+
+## 10. Error Reference
+
+| Code | Description | Resolution |
+|------|-------------|------------|
+| `RAWS_001` | No eligible models | Reduce requirements |
+| `RAWS_005` | Compliance not met | Check tier/requirements |
+| `RAWS_006` | Tier restriction | Upgrade subscription |
+
+---
+
+## 11. Contact
+
+**Documentation**: https://docs.radiant.example.com/raws
+
+**Compliance Questions**: compliance@radiant.example.com
+
+**Support**: support@radiant.example.com
+
+---
+
+**End of User Documentation**
+
+*Version 1.1.0 | January 2026*
+
+
+---
+
+## Part III: Data Lifecycle
+
+## Overview
+
+This document defines data retention periods and deletion procedures for all data stored in the RADIANT platform.
+
+## Retention Schedule
+
+### User Data
+
+| Data Type | Active Retention | Archive | Total Retention | Deletion |
+|-----------|------------------|---------|-----------------|----------|
+| Account info | Active + 30 days | N/A | Account lifetime + 30 days | Automatic |
+| Usage history | 2 years | 5 years | 7 years | Automatic |
+| Chat history | 90 days | 1 year | 1 year | Automatic |
+| Uploaded files | Active | 30 days post-delete | Active + 30 days | On request |
+| API keys | Active | N/A | Revoked + 90 days | Automatic |
+
+### System Data
+
+| Data Type | Retention | Purpose | Deletion |
+|-----------|-----------|---------|----------|
+| Audit logs | 7 years | Compliance | Automatic |
+| Access logs | 2 years | Security | Automatic |
+| Error logs | 90 days | Debugging | Automatic |
+| Metrics | 15 months | CloudWatch default | Automatic |
+| Backups | 35 days | Recovery | Automatic |
+
+### Billing Data
+
+| Data Type | Retention | Purpose | Legal Basis |
+|-----------|-----------|---------|-------------|
+| Invoices | 7 years | Tax compliance | Legal requirement |
+| Transactions | 7 years | Financial audit | Legal requirement |
+| Payment methods | Active | Processing | Contract |
+| Receipts | 7 years | Tax compliance | Legal requirement |
+
+## Implementation
+
+### Database Retention
+
+```sql
+-- Automatic data cleanup job (runs daily)
+CREATE OR REPLACE FUNCTION cleanup_expired_data()
+RETURNS void AS $$
+BEGIN
+  -- Delete expired chat messages (90 days)
+  DELETE FROM chat_messages 
+  WHERE created_at < NOW() - INTERVAL '90 days'
+  AND archived = false;
+  
+  -- Archive chat messages older than 90 days
+  UPDATE chat_messages 
+  SET archived = true, archived_at = NOW()
+  WHERE created_at < NOW() - INTERVAL '90 days'
+  AND archived = false;
+  
+  -- Delete archived messages older than 1 year
+  DELETE FROM chat_messages
+  WHERE archived = true
+  AND archived_at < NOW() - INTERVAL '1 year';
+  
+  -- Delete revoked API keys (90 days after revocation)
+  DELETE FROM api_keys
+  WHERE revoked_at < NOW() - INTERVAL '90 days';
+  
+  -- Delete expired sessions
+  DELETE FROM user_sessions
+  WHERE expires_at < NOW();
+  
+  -- Log cleanup
+  INSERT INTO system_jobs (job_name, completed_at, records_affected)
+  VALUES ('cleanup_expired_data', NOW(), 
+    (SELECT count(*) FROM pg_stat_user_tables WHERE relname IN 
+      ('chat_messages', 'api_keys', 'user_sessions')));
+END;
+$$ LANGUAGE plpgsql;
+
+-- Schedule daily at 3 AM UTC
+SELECT cron.schedule('data-cleanup', '0 3 * * *', 'SELECT cleanup_expired_data()');
+```
+
+### S3 Lifecycle Policies
+
+```typescript
+const bucket = new s3.Bucket(this, 'Storage', {
+  lifecycleRules: [
+    // User uploads - delete 30 days after object deletion marker
+    {
+      id: 'delete-old-versions',
+      noncurrentVersionExpiration: cdk.Duration.days(30),
+    },
+    
+    // Temp files - delete after 7 days
+    {
+      id: 'cleanup-temp',
+      prefix: 'temp/',
+      expiration: cdk.Duration.days(7),
+    },
+    
+    // Logs - transition to Glacier after 90 days, delete after 2 years
+    {
+      id: 'archive-logs',
+      prefix: 'logs/',
+      transitions: [
+        {
+          storageClass: s3.StorageClass.GLACIER,
+          transitionAfter: cdk.Duration.days(90),
+        },
+      ],
+      expiration: cdk.Duration.days(730), // 2 years
+    },
+    
+    // Backups - delete after 35 days
+    {
+      id: 'cleanup-backups',
+      prefix: 'backups/',
+      expiration: cdk.Duration.days(35),
+    },
+  ],
+});
+```
+
+### CloudWatch Log Retention
+
+```typescript
+// Set retention for all log groups
+const logRetention: Record<string, logs.RetentionDays> = {
+  // Application logs
+  '/aws/lambda/radiant-*': logs.RetentionDays.THREE_MONTHS,
+  
+  // API Gateway logs
+  '/aws/apigateway/radiant-*': logs.RetentionDays.THREE_MONTHS,
+  
+  // Database logs (longer for compliance)
+  '/aws/rds/cluster/radiant-*': logs.RetentionDays.TWO_YEARS,
+  
+  // Audit logs (longest retention)
+  '/radiant/audit/*': logs.RetentionDays.TEN_YEARS,
+};
+```
+
+## Data Deletion
+
+### User-Initiated Deletion
+
+#### Account Deletion Flow
+
+```typescript
+async function deleteUserAccount(userId: string): Promise<void> {
+  // 1. Verify identity (MFA required)
+  await verifyIdentity(userId);
+  
+  // 2. Cancel active subscriptions
+  await cancelSubscriptions(userId);
+  
+  // 3. Export data (optional, user-requested)
+  const exportUrl = await exportUserData(userId);
+  
+  // 4. Mark account for deletion (30-day grace period)
+  await markForDeletion(userId, {
+    scheduledAt: addDays(new Date(), 30),
+    reason: 'user_requested',
+  });
+  
+  // 5. Send confirmation email
+  await sendDeletionConfirmation(userId, exportUrl);
+}
+
+// Actual deletion after grace period
+async function executeAccountDeletion(userId: string): Promise<void> {
+  // Delete in order (respect foreign keys)
+  await deleteApiKeys(userId);
+  await deleteChatHistory(userId);
+  await deleteFiles(userId);
+  await deletePreferences(userId);
+  await deleteBillingHistory(userId); // Anonymize, don't delete
+  await deleteAccount(userId);
+  
+  // Anonymize audit logs
+  await anonymizeAuditLogs(userId);
+  
+  // Log deletion for compliance
+  await logAccountDeletion(userId);
+}
+```
+
+#### Data Categories Deleted
+
+| Category | Action | Timing |
+|----------|--------|--------|
+| Profile | Delete | Immediate |
+| Preferences | Delete | Immediate |
+| Chat history | Delete | Immediate |
+| Files | Delete | Immediate |
+| API keys | Revoke + Delete | Immediate |
+| Billing history | Anonymize | Immediate |
+| Audit logs | Anonymize | Immediate |
+| Backups | Excluded | Expires naturally |
+
+### Administrative Deletion
+
+```typescript
+// Bulk deletion for compliance (e.g., GDPR request)
+async function adminBulkDelete(
+  tenantId: string,
+  options: {
+    dataTypes: string[];
+    olderThan: Date;
+    reason: string;
+    approvedBy: string[];
+  }
+): Promise<DeletionReport> {
+  // Require dual admin approval
+  if (options.approvedBy.length < 2) {
+    throw new Error('Dual admin approval required');
+  }
+  
+  // Log the deletion request
+  await logAdminAction({
+    action: 'bulk_delete',
+    tenantId,
+    options,
+  });
+  
+  // Execute deletion
+  const results = await Promise.all(
+    options.dataTypes.map(type => 
+      deleteDataByType(tenantId, type, options.olderThan)
+    )
+  );
+  
+  return {
+    requestId: generateRequestId(),
+    deletedAt: new Date(),
+    recordsDeleted: results.reduce((a, b) => a + b, 0),
+    dataTypes: options.dataTypes,
+  };
+}
+```
+
+### Tenant Offboarding
+
+```typescript
+async function offboardTenant(tenantId: string): Promise<void> {
+  // 1. Export all data (required for compliance)
+  const exportUrl = await exportTenantData(tenantId);
+  
+  // 2. Notify all users
+  await notifyTenantUsers(tenantId, 'account_closing');
+  
+  // 3. Wait for grace period (30 days default)
+  await scheduleTenantDeletion(tenantId, {
+    gracePeriod: 30,
+    exportUrl,
+  });
+  
+  // 4. After grace period, delete all data
+  // (Handled by scheduled job)
+}
+```
+
+## Legal Holds
+
+### Implementing a Legal Hold
+
+```sql
+-- Legal hold table
+CREATE TABLE legal_holds (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID REFERENCES tenants(id),
+  user_id UUID REFERENCES users(id),
+  hold_type VARCHAR(50) NOT NULL, -- 'litigation', 'investigation', 'regulatory'
+  description TEXT,
+  started_at TIMESTAMPTZ DEFAULT NOW(),
+  expires_at TIMESTAMPTZ,
+  created_by UUID REFERENCES administrators(id),
+  CONSTRAINT legal_holds_target CHECK (tenant_id IS NOT NULL OR user_id IS NOT NULL)
+);
+
+-- Prevent deletion of held data
+CREATE OR REPLACE FUNCTION check_legal_hold()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM legal_holds 
+    WHERE (tenant_id = OLD.tenant_id OR user_id = OLD.user_id)
+    AND (expires_at IS NULL OR expires_at > NOW())
+  ) THEN
+    RAISE EXCEPTION 'Cannot delete data under legal hold';
+  END IF;
+  RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+```
+
+### Suspending Retention Policies
+
+```typescript
+// Suspend automatic deletion during legal hold
+async function applyLegalHold(params: {
+  holdId: string;
+  scope: 'tenant' | 'user';
+  targetId: string;
+}): Promise<void> {
+  // Update retention flags
+  await updateRetentionPolicy(params.targetId, {
+    suspended: true,
+    holdId: params.holdId,
+  });
+  
+  // Exclude from cleanup jobs
+  await excludeFromCleanup(params.targetId);
+  
+  // Notify compliance team
+  await notifyCompliance('legal_hold_applied', params);
+}
+```
+
+## Audit Trail
+
+### Retention Actions Log
+
+```sql
+-- Log all retention-related actions
+CREATE TABLE retention_actions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  action_type VARCHAR(50) NOT NULL, -- 'delete', 'archive', 'export', 'hold'
+  target_type VARCHAR(50) NOT NULL, -- 'user', 'tenant', 'data_type'
+  target_id VARCHAR(255) NOT NULL,
+  records_affected INTEGER,
+  performed_by UUID,
+  reason TEXT,
+  metadata JSONB,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Index for compliance queries
+CREATE INDEX idx_retention_actions_date ON retention_actions(created_at);
+CREATE INDEX idx_retention_actions_target ON retention_actions(target_type, target_id);
+```
+
+### Compliance Reporting
+
+```typescript
+// Generate retention compliance report
+async function generateRetentionReport(
+  startDate: Date,
+  endDate: Date
+): Promise<RetentionReport> {
+  return {
+    period: { start: startDate, end: endDate },
+    
+    // Data deleted by type
+    deletions: await getRetentionActions('delete', startDate, endDate),
+    
+    // Data archived
+    archives: await getRetentionActions('archive', startDate, endDate),
+    
+    // Active legal holds
+    legalHolds: await getActiveLegalHolds(),
+    
+    // Policy violations (data past retention not deleted)
+    violations: await getRetentionViolations(),
+    
+    // User deletion requests
+    userRequests: await getUserDeletionRequests(startDate, endDate),
+  };
+}
+```
+
+## Verification
+
+### Monthly Retention Audit
+
+- [ ] Verify cleanup jobs running successfully
+- [ ] Check for retention policy violations
+- [ ] Review legal holds status
+- [ ] Verify S3 lifecycle policies active
+- [ ] Confirm CloudWatch log retention settings
+- [ ] Review user deletion requests processed
+- [ ] Update retention schedule if needed
+
+### Compliance Queries
+
+```sql
+-- Find data past retention period
+SELECT 
+  'chat_messages' as table_name,
+  COUNT(*) as records,
+  MIN(created_at) as oldest_record
+FROM chat_messages
+WHERE created_at < NOW() - INTERVAL '90 days'
+AND archived = false
+
+UNION ALL
+
+SELECT 
+  'api_keys' as table_name,
+  COUNT(*) as records,
+  MIN(revoked_at) as oldest_record
+FROM api_keys
+WHERE revoked_at < NOW() - INTERVAL '90 days';
+```
+
+## Contact
+
+| Role | Contact | Purpose |
+|------|---------|---------|
+| Data Protection Officer | dpo@radiant.example.com | GDPR requests |
+| Legal | legal@radiant.example.com | Legal holds |
+| Compliance | compliance@radiant.example.com | Audit questions |
+
+
+## Overview
+
+This guide provides strategies for optimizing AWS costs for the RADIANT platform while maintaining performance and reliability.
+
+## Current Architecture Costs
+
+### Estimated Monthly Costs by Tier
+
+| Tier | Infrastructure | Est. Monthly Cost |
+|------|---------------|-------------------|
+| SEED (Dev) | Minimal | $50-150 |
+| STARTUP | Small production | $200-400 |
+| GROWTH | Self-hosted models | $1,000-2,500 |
+| SCALE | Multi-region | $4,000-8,000 |
+| ENTERPRISE | Global, full HA | $15,000-35,000 |
+
+### Cost Breakdown by Service
+
+| Service | % of Total | Optimization Potential |
+|---------|------------|------------------------|
+| Aurora | 30-40% | High |
+| Lambda | 15-25% | Medium |
+| API Gateway | 5-10% | Low |
+| S3 | 5-10% | Medium |
+| CloudFront | 5-10% | Low |
+| ElastiCache | 10-15% | Medium |
+| Other | 10-15% | Varies |
+
+## Optimization Strategies
+
+### 1. Database Optimization
+
+#### Aurora Serverless v2
+
+```typescript
+// Use Serverless v2 for variable workloads
+const cluster = new rds.DatabaseCluster(this, 'Database', {
+  serverlessV2MinCapacity: 0.5,   // Scale to near-zero
+  serverlessV2MaxCapacity: 16,    // Scale up when needed
+});
+```
+
+**Savings:** 40-60% vs. provisioned instances for variable workloads
+
+#### Reserved Instances (Steady Workloads)
+
+```bash
+# Purchase reserved capacity for predictable workloads
+aws rds purchase-reserved-db-instances-offering \
+  --reserved-db-instances-offering-id xxx \
+  --db-instance-count 1
+```
+
+**Savings:** 30-60% for 1-3 year terms
+
+#### Read Replicas Strategy
+
+```typescript
+// Use read replicas only when needed
+// Scale readers with traffic
+readers: [
+  rds.ClusterInstance.serverlessV2('reader', {
+    scaleWithWriter: true,  // Auto-scale with primary
+  }),
+],
+```
+
+### 2. Lambda Optimization
+
+#### Right-Size Memory
+
+```typescript
+// Test different memory sizes to find optimal cost/performance
+const memoryOptions = [256, 512, 1024, 2048];
+
+// Use AWS Lambda Power Tuning tool
+// https://github.com/alexcasalboni/aws-lambda-power-tuning
+```
+
+| Function Type | Recommended Memory | Reason |
+|---------------|-------------------|--------|
+| Simple CRUD | 256-512 MB | Light compute |
+| API Router | 512-1024 MB | Balanced |
+| AI Processing | 1024-2048 MB | Heavy compute |
+
+#### Provisioned Concurrency (Strategic)
+
+```typescript
+// Only use for latency-critical functions
+new lambda.Alias(this, 'LiveAlias', {
+  aliasName: 'live',
+  version: fn.currentVersion,
+  provisionedConcurrentExecutions: 5,  // Keep 5 warm
+});
+```
+
+**Cost:** ~$0.015/hour per provisioned instance
+**Use when:** P99 latency requirements < 200ms
+
+#### ARM64 (Graviton2)
+
+```typescript
+// 20% cheaper, often faster
+const fn = new lambda.Function(this, 'Function', {
+  architecture: lambda.Architecture.ARM_64,
+  runtime: lambda.Runtime.NODEJS_20_X,
+});
+```
+
+**Savings:** 20% on compute costs
+
+### 3. S3 Optimization
+
+#### Intelligent Tiering
+
+```typescript
+const bucket = new s3.Bucket(this, 'Storage', {
+  intelligentTieringConfigurations: [{
+    name: 'auto-tier',
+    archiveAccessTierTime: cdk.Duration.days(90),
+    deepArchiveAccessTierTime: cdk.Duration.days(180),
+  }],
+});
+```
+
+**Savings:** Up to 95% for infrequently accessed data
+
+#### Lifecycle Rules
+
+```typescript
+const bucket = new s3.Bucket(this, 'Storage', {
+  lifecycleRules: [
+    // Move old versions to cheaper storage
+    {
+      noncurrentVersionTransitions: [
+        {
+          storageClass: s3.StorageClass.INFREQUENT_ACCESS,
+          transitionAfter: cdk.Duration.days(30),
+        },
+        {
+          storageClass: s3.StorageClass.GLACIER,
+          transitionAfter: cdk.Duration.days(90),
+        },
+      ],
+    },
+    // Delete old logs
+    {
+      prefix: 'logs/',
+      expiration: cdk.Duration.days(90),
+    },
+  ],
+});
+```
+
+### 4. API Gateway Optimization
+
+#### HTTP API vs REST API
+
+```typescript
+// HTTP API is 70% cheaper than REST API
+// Use when you don't need REST API features
+
+// HTTP API: $1.00/million requests
+// REST API: $3.50/million requests
+```
+
+| Feature | REST API | HTTP API |
+|---------|----------|----------|
+| Cost | $3.50/M | $1.00/M |
+| Lambda integration | Yes | Yes |
+| Request validation | Yes | No |
+| API keys/usage plans | Yes | No |
+| Caching | Yes | No |
+
+#### Caching
+
+```typescript
+// Enable caching for GET endpoints
+const method = resource.addMethod('GET', integration, {
+  cacheKeyParameters: ['method.request.querystring.id'],
+});
+
+// Cache stage setting
+stage.cacheClusterEnabled = true;
+stage.cacheClusterSize = '0.5';  // 0.5 GB minimum
+```
+
+**Note:** Cache costs $0.02/hour (0.5 GB). Calculate break-even point.
+
+### 5. CloudWatch Optimization
+
+#### Log Retention
+
+```typescript
+// Don't keep logs forever
+new logs.LogGroup(this, 'LogGroup', {
+  retention: logs.RetentionDays.ONE_MONTH,  // Adjust per environment
+});
+```
+
+| Environment | Retention | Reason |
+|-------------|-----------|--------|
+| Development | 7 days | Quick debugging |
+| Staging | 14 days | Testing cycles |
+| Production | 90 days | Compliance needs |
+
+#### Metric Filters vs. Logs Insights
+
+```typescript
+// Use metric filters for known patterns
+// Cheaper than running Logs Insights queries repeatedly
+
+new logs.MetricFilter(this, 'ErrorMetric', {
+  logGroup,
+  metricNamespace: 'Radiant',
+  metricName: 'Errors',
+  filterPattern: logs.FilterPattern.literal('ERROR'),
+});
+```
+
+### 6. ElastiCache Optimization
+
+#### Reserved Nodes
+
+```bash
+# Purchase reserved nodes for production
+aws elasticache purchase-reserved-cache-nodes-offering \
+  --reserved-cache-nodes-offering-id xxx
+```
+
+**Savings:** 30-55% for 1-3 year terms
+
+#### Right-Size Nodes
+
+| Use Case | Recommended | Memory |
+|----------|-------------|--------|
+| Development | cache.t3.micro | 0.5 GB |
+| Small Prod | cache.t3.small | 1.4 GB |
+| Medium Prod | cache.r6g.large | 13 GB |
+| Large Prod | cache.r6g.xlarge | 26 GB |
+
+### 7. Data Transfer Optimization
+
+#### Use VPC Endpoints
+
+```typescript
+// Avoid NAT Gateway costs for AWS services
+vpc.addInterfaceEndpoint('S3Endpoint', {
+  service: ec2.InterfaceVpcEndpointAwsService.S3,
+});
+
+vpc.addInterfaceEndpoint('SecretsManagerEndpoint', {
+  service: ec2.InterfaceVpcEndpointAwsService.SECRETS_MANAGER,
+});
+```
+
+**Savings:** $0.045/GB saved vs. NAT Gateway
+
+#### CloudFront for S3
+
+```typescript
+// Serve S3 content through CloudFront
+// Cheaper data transfer + better performance
+const distribution = new cloudfront.Distribution(this, 'CDN', {
+  defaultBehavior: {
+    origin: new origins.S3Origin(bucket),
+  },
+});
+```
+
+## Cost Monitoring
+
+### AWS Cost Explorer
+
+```bash
+# Get cost breakdown by service
+aws ce get-cost-and-usage \
+  --time-period Start=2024-12-01,End=2024-12-31 \
+  --granularity MONTHLY \
+  --metrics BlendedCost \
+  --group-by Type=DIMENSION,Key=SERVICE
+```
+
+### CloudWatch Billing Alerts
+
+```typescript
+// Alert before surprise bills
+new cloudwatch.Alarm(this, 'BillingAlarm', {
+  metric: new cloudwatch.Metric({
+    namespace: 'AWS/Billing',
+    metricName: 'EstimatedCharges',
+    dimensionsMap: { Currency: 'USD' },
+    statistic: 'Maximum',
+    period: cdk.Duration.hours(6),
+  }),
+  threshold: 1000,  // $1000 threshold
+  evaluationPeriods: 1,
+});
+```
+
+### Cost Allocation Tags
+
+```typescript
+// Tag all resources for cost tracking
+cdk.Tags.of(this).add('Project', 'radiant');
+cdk.Tags.of(this).add('Environment', environment);
+cdk.Tags.of(this).add('CostCenter', 'platform');
+```
+
+## Environment-Specific Recommendations
+
+### Development
+
+- Use Aurora Serverless v2 (scales to zero)
+- Minimal Lambda memory
+- No provisioned concurrency
+- Short log retention
+- Single-AZ deployments
+
+**Target:** < $100/month
+
+### Staging
+
+- Aurora Serverless v2
+- Moderate Lambda memory
+- No provisioned concurrency
+- 14-day log retention
+- Single-AZ acceptable
+
+**Target:** < $300/month
+
+### Production
+
+- Aurora Serverless v2 or Reserved (if predictable)
+- Right-sized Lambda memory
+- Provisioned concurrency for critical paths
+- 90-day log retention
+- Multi-AZ required
+
+**Target:** Optimize for reliability, then cost
+
+## Monthly Cost Review Checklist
+
+- [ ] Review AWS Cost Explorer for anomalies
+- [ ] Check for unused resources (idle RDS, orphan EBS)
+- [ ] Review Lambda right-sizing opportunities
+- [ ] Check S3 storage class distribution
+- [ ] Review data transfer costs
+- [ ] Validate reserved capacity utilization
+- [ ] Update cost allocation tags
+- [ ] Project next month's costs
+
+## Tools
+
+- [AWS Cost Explorer](https://console.aws.amazon.com/cost-management/home)
+- [AWS Trusted Advisor](https://console.aws.amazon.com/trustedadvisor/)
+- [AWS Compute Optimizer](https://console.aws.amazon.com/compute-optimizer/)
+- [Lambda Power Tuning](https://github.com/alexcasalboni/aws-lambda-power-tuning)
+- [Infracost](https://www.infracost.io/) - Cost estimation for IaC
+
+
+---
+
+## Part IV: File Services
+
+> **Version**: 4.18.55  
+> **Last Updated**: December 2024  
+> **Status**: Production Ready
+
+---
+
+## Overview
+
+The **Intelligent File Conversion Service** is a Radiant-side system that automatically decides when and how to convert files for AI providers. The core principle is **"Let Radiant decide, not Think Tank"** - Think Tank simply drops files, and Radiant determines the optimal conversion strategy based on the target AI provider's capabilities.
+
+### Key Principles
+
+1. **Think Tank submits files without worrying about provider compatibility**
+2. **Radiant detects file format and checks target provider capabilities**
+3. **Conversion only happens if the AI provider doesn't understand the format**
+4. **Uses AI + libraries for intelligent conversion**
+
+---
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              THINK TANK                                      │
+│  ┌─────────┐                                                                 │
+│  │  User   │──┬──▶ Drop file into chat                                      │
+│  │         │  │                                                              │
+│  └─────────┘  │                                                              │
+└───────────────┼──────────────────────────────────────────────────────────────┘
+                │
+                ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              RADIANT                                         │
+│                                                                              │
+│  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐          │
+│  │ Format Detection│───▶│ Provider Check  │───▶│ Decision Engine │          │
+│  │   - MIME type   │    │   - Capabilities│    │   - Strategy    │          │
+│  │   - Extension   │    │   - Limits      │    │   - Warnings    │          │
+│  │   - Magic bytes │    │   - Vision/Audio│    │   - Token est.  │          │
+│  └─────────────────┘    └─────────────────┘    └────────┬────────┘          │
+│                                                          │                   │
+│                         ┌────────────────────────────────┴─────┐             │
+│                         │         Needs Conversion?            │             │
+│                         └────────────────┬─────────────────────┘             │
+│                                          │                                   │
+│              ┌───────────────────────────┼───────────────────────────┐       │
+│              │ NO                        │                      YES  │       │
+│              ▼                           │                           ▼       │
+│  ┌─────────────────┐                     │            ┌─────────────────┐    │
+│  │ Return original │                     │            │ Execute Strategy│    │
+│  │ file as-is      │                     │            │ - extract_text  │    │
+│  └─────────────────┘                     │            │ - ocr           │    │
+│                                          │            │ - transcribe    │    │
+│                                          │            │ - describe_image│    │
+│                                          │            │ - parse_data    │    │
+│                                          │            │ - decompress    │    │
+│                                          │            └────────┬────────┘    │
+│                                          │                     │             │
+│                                          └──────────┬──────────┘             │
+│                                                     │                        │
+│                                                     ▼                        │
+│                                          ┌─────────────────┐                 │
+│                                          │ Return Result   │                 │
+│                                          │ - Converted text│                 │
+│                                          │ - Token estimate│                 │
+│                                          │ - Metadata      │                 │
+│                                          └─────────────────┘                 │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Supported File Formats
+
+### Documents
+
+| Format | Extension | MIME Type | Conversion Strategy |
+|--------|-----------|-----------|---------------------|
+| PDF | `.pdf` | `application/pdf` | `extract_text` via pdf-parse |
+| Word | `.docx`, `.doc` | `application/vnd.openxmlformats-officedocument.wordprocessingml.document` | `extract_text` via mammoth |
+| PowerPoint | `.pptx`, `.ppt` | `application/vnd.openxmlformats-officedocument.presentationml.presentation` | `extract_text` |
+| Excel | `.xlsx`, `.xls` | `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet` | `parse_data` via xlsx |
+
+### Text Files
+
+| Format | Extension | MIME Type | Notes |
+|--------|-----------|-----------|-------|
+| Plain Text | `.txt` | `text/plain` | Direct passthrough |
+| Markdown | `.md` | `text/markdown` | Direct passthrough |
+| JSON | `.json` | `application/json` | Direct or `parse_data` |
+| CSV | `.csv` | `text/csv` | `parse_data` |
+| XML | `.xml` | `application/xml` | Direct or `extract_text` |
+| HTML | `.html` | `text/html` | `extract_text` |
+
+### Images
+
+| Format | Extension | MIME Type | Conversion Strategy |
+|--------|-----------|-----------|---------------------|
+| PNG | `.png` | `image/png` | Native or `describe_image` |
+| JPEG | `.jpg`, `.jpeg` | `image/jpeg` | Native or `describe_image` |
+| GIF | `.gif` | `image/gif` | Native or `describe_image` |
+| WebP | `.webp` | `image/webp` | Native or `describe_image` |
+| SVG | `.svg` | `image/svg+xml` | Convert to PNG or `describe_image` |
+| BMP | `.bmp` | `image/bmp` | Convert to PNG or `describe_image` |
+| TIFF | `.tiff` | `image/tiff` | Convert to PNG or `describe_image` |
+
+### Audio
+
+| Format | Extension | MIME Type | Conversion Strategy |
+|--------|-----------|-----------|---------------------|
+| MP3 | `.mp3` | `audio/mpeg` | `transcribe` via Whisper |
+| WAV | `.wav` | `audio/wav` | `transcribe` via Whisper |
+| OGG | `.ogg` | `audio/ogg` | `transcribe` via Whisper |
+| FLAC | `.flac` | `audio/flac` | `transcribe` via Whisper |
+| M4A | `.m4a` | `audio/mp4` | `transcribe` via Whisper |
+
+### Video
+
+| Format | Extension | MIME Type | Conversion Strategy |
+|--------|-----------|-----------|---------------------|
+| MP4 | `.mp4` | `video/mp4` | `describe_video` - frame extraction |
+| WebM | `.webm` | `video/webm` | `describe_video` - frame extraction |
+| MOV | `.mov` | `video/quicktime` | `describe_video` - frame extraction |
+| AVI | `.avi` | `video/x-msvideo` | `describe_video` - frame extraction |
+
+### Code Files
+
+| Format | Extension | Notes |
+|--------|-----------|-------|
+| Python | `.py` | Syntax-highlighted markdown |
+| JavaScript | `.js`, `.jsx` | Syntax-highlighted markdown |
+| TypeScript | `.ts`, `.tsx` | Syntax-highlighted markdown |
+| Java | `.java` | Syntax-highlighted markdown |
+| C/C++ | `.c`, `.cpp`, `.h` | Syntax-highlighted markdown |
+| Go | `.go` | Syntax-highlighted markdown |
+| Rust | `.rs` | Syntax-highlighted markdown |
+| Ruby | `.rb` | Syntax-highlighted markdown |
+
+### Archives
+
+| Format | Extension | MIME Type | Conversion Strategy |
+|--------|-----------|-----------|---------------------|
+| ZIP | `.zip` | `application/zip` | `decompress` - extract contents |
+| TAR | `.tar` | `application/x-tar` | `decompress` - extract contents |
+| GZIP | `.gz`, `.tar.gz`, `.tgz` | `application/gzip` | `decompress` - extract contents |
+
+---
+
+## Provider Capabilities
+
+The service maintains a registry of AI provider capabilities:
+
+| Provider | Vision | Audio | Video | Max File Size | Native Document Formats |
+|----------|--------|-------|-------|---------------|------------------------|
+| **OpenAI** | ✅ GPT-4V | ✅ Whisper | ❌ | 20MB | txt, md, json, csv |
+| **Anthropic** | ✅ Claude 3 | ❌ | ❌ | 32MB | pdf, txt, md, json, csv |
+| **Google** | ✅ Gemini | ✅ | ✅ | 100MB | pdf, txt, md, json, csv |
+| **xAI** | ✅ Grok | ❌ | ❌ | 20MB | txt, md, json |
+| **DeepSeek** | ❌ | ❌ | ❌ | 10MB | txt, md, json, csv |
+| **Self-hosted** | ✅ LLaVA | ✅ Whisper | ❌ | 50MB | txt, md, json, csv |
+
+---
+
+## Conversion Strategies
+
+### 1. `none` - No Conversion
+Provider natively supports the format. File is passed through as-is.
+
+### 2. `extract_text` - Text Extraction
+Extracts plain text from documents using:
+- **PDF**: `pdf-parse` library - extracts all text, page metadata
+- **DOCX/DOC**: `mammoth` library - preserves structure, extracts images
+- **PPTX/PPT**: Text extraction from slides
+- **HTML/XML**: Strip tags, preserve content
+
+**Example output:**
+```
+[Document Title]
+Page 1:
+Content from first page...
+
+Page 2:
+Content from second page...
+
+[Metadata]
+Pages: 10
+Author: John Doe
+Created: 2024-01-15
+```
+
+### 3. `ocr` - Optical Character Recognition
+Uses AWS Textract to extract text from images containing text.
+
+**Features:**
+- Detects printed and handwritten text
+- Table detection and extraction
+- Form field detection
+- Confidence scores per block
+
+**Example output:**
+```
+[OCR Result]
+Confidence: 94.5%
+
+INVOICE #12345
+Date: January 15, 2024
+
+Item          Qty    Price
+Widget A       10    $50.00
+Widget B        5    $25.00
+
+Total: $625.00
+```
+
+### 4. `transcribe` - Audio Transcription
+Uses OpenAI Whisper API or self-hosted Whisper for speech-to-text.
+
+**Features:**
+- Automatic language detection
+- Timestamp segments
+- SRT/VTT subtitle generation
+- Speaker diarization (future)
+
+**Example output:**
+```
+[Transcription]
+Duration: 5:32
+Language: English
+Model: whisper-1
+
+[00:00] Hello and welcome to today's meeting.
+[00:05] We'll be discussing the Q4 roadmap.
+[00:12] First, let's review the current status...
+```
+
+### 5. `describe_image` - AI Image Description
+Uses vision-capable models to describe image contents.
+
+**Supported Models:**
+- GPT-4 Vision (OpenAI)
+- Claude 3 Vision (Anthropic)
+- LLaVA (self-hosted)
+
+**Features:**
+- Detailed scene description
+- Text detection (OCR integration)
+- Object identification
+- Color and composition analysis
+
+**Example output:**
+```
+[Image Description]
+Model: gpt-4-vision
+Dimensions: 1920x1080
+
+This image shows a modern office space with an open floor plan. 
+In the foreground, there are several desks arranged in clusters, 
+each with monitors and office supplies. The walls are painted in 
+a neutral gray tone with large windows providing natural light.
+
+[Text detected in image]:
+"RADIANT - Innovation Center"
+"Welcome Visitors"
+```
+
+### 6. `describe_video` - Video Frame Analysis
+Extracts key frames from video and describes each using vision models.
+
+**Features:**
+- Configurable frame interval (default: 10 seconds)
+- Maximum frames limit (default: 10)
+- Frame-by-frame descriptions
+- Narrative summary generation
+
+**Example output:**
+```
+**Video Overview** (2m 30s, 1920x1080)
+
+**Frame Analysis:**
+
+**[0:00]** The video opens with a title screen showing the company logo
+against a blue gradient background.
+
+**[0:10]** A presenter in business attire stands in front of a whiteboard
+with diagrams showing the system architecture.
+
+**[0:20]** Close-up of the whiteboard showing a flowchart with boxes
+labeled "User Input", "Processing", and "Output".
+
+...
+
+**Summary:**
+The video begins with: Company logo and title screen
+The video ends with: Presenter summarizing key points with bullet list
+```
+
+### 7. `parse_data` - Structured Data Parsing
+Converts spreadsheets and data files to JSON.
+
+**Supported formats:**
+- CSV → JSON array of objects
+- XLSX/XLS → JSON with sheet data
+- JSON → Validated and prettified
+
+**Example output (CSV):**
+```json
+{
+  "data": [
+    {"name": "Alice", "email": "alice@example.com", "role": "Admin"},
+    {"name": "Bob", "email": "bob@example.com", "role": "User"},
+    {"name": "Carol", "email": "carol@example.com", "role": "User"}
+  ],
+  "metadata": {
+    "rowCount": 3,
+    "columnCount": 3,
+    "headers": ["name", "email", "role"]
+  }
+}
+```
+
+**Example output (Excel):**
+```json
+{
+  "sheets": [
+    {
+      "name": "Sales Data",
+      "rows": [...],
+      "headers": ["Date", "Product", "Revenue"],
+      "rowCount": 150
+    },
+    {
+      "name": "Summary",
+      "rows": [...],
+      "headers": ["Metric", "Value"],
+      "rowCount": 10
+    }
+  ],
+  "metadata": {
+    "sheetCount": 2,
+    "totalRows": 160,
+    "hasFormulas": true
+  }
+}
+```
+
+### 8. `decompress` - Archive Extraction
+Extracts and processes archive contents.
+
+**Supported formats:**
+- ZIP (via adm-zip)
+- TAR (via tar)
+- GZIP (via zlib)
+
+**Features:**
+- Recursive extraction
+- Text file content inclusion
+- Binary file detection
+- Size limits enforcement
+
+**Example output:**
+```
+**Archive Contents** (ZIP)
+
+**File Structure:**
+```
+📁 project/
+📄 project/README.md (2.5KB)
+📄 project/package.json (1.2KB)
+📁 project/src/
+📄 project/src/index.ts (5.3KB)
+📄 project/src/utils.ts (3.1KB)
+```
+
+**File Contents:**
+
+### project/README.md
+
+```markdown
+# My Project
+
+This is a sample project...
+```
+
+### project/package.json
+
+```json
+{
+  "name": "my-project",
+  "version": "1.0.0"
+}
+```
+```
+
+### 9. `render_code` - Code Formatting
+Formats code files with syntax highlighting.
+
+**Example output:**
+````markdown
+```typescript
+import { Injectable } from '@angular/core';
+
+@Injectable()
+export class DataService {
+  private data: string[] = [];
+
+  getData(): string[] {
+    return this.data;
+  }
+}
+```
+````
+
+---
+
+## API Reference
+
+### Base Path
+`/api/thinktank/files`
+
+### Endpoints
+
+#### Process File
+```
+POST /api/thinktank/files/process
+```
+
+**Request:**
+```json
+{
+  "filename": "document.pdf",
+  "mimeType": "application/pdf",
+  "content": "<base64-encoded-content>",
+  "targetProvider": "anthropic",
+  "targetModel": "claude-3-5-sonnet",
+  "conversationId": "conv-uuid-optional"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "conversionId": "conv_abc123",
+    "originalFile": {
+      "filename": "document.pdf",
+      "format": "pdf",
+      "size": 1048576,
+      "checksum": "sha256:abc123..."
+    },
+    "convertedContent": {
+      "type": "text",
+      "content": "Extracted document text...",
+      "tokenEstimate": 2500,
+      "metadata": {
+        "originalFormat": "pdf",
+        "conversionStrategy": "extract_text",
+        "pageCount": 10,
+        "title": "Annual Report 2024",
+        "author": "Finance Team"
+      }
+    },
+    "processingTimeMs": 1250
+  }
+}
+```
+
+#### Check Compatibility
+```
+POST /api/thinktank/files/check-compatibility
+```
+
+**Request:**
+```json
+{
+  "filename": "image.png",
+  "mimeType": "image/png",
+  "fileSize": 524288,
+  "targetProvider": "deepseek"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "fileInfo": {
+      "filename": "image.png",
+      "format": "png",
+      "size": 524288
+    },
+    "provider": {
+      "id": "deepseek",
+      "supportsFormat": false,
+      "supportsVision": false,
+      "maxFileSize": 10485760
+    },
+    "decision": {
+      "needsConversion": true,
+      "strategy": "describe_image",
+      "reason": "Provider deepseek lacks vision - will use AI to describe image",
+      "targetFormat": "txt",
+      "warnings": []
+    }
+  }
+}
+```
+
+#### Get Provider Capabilities
+```
+GET /api/thinktank/files/capabilities
+GET /api/thinktank/files/capabilities?provider=anthropic
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "providerId": "anthropic",
+      "supportedFormats": ["png", "jpg", "jpeg", "gif", "webp", "pdf", "txt", "md", "json", "csv"],
+      "nativeDocumentFormats": ["pdf", "txt", "md", "json", "csv"],
+      "maxFileSize": 33554432,
+      "supportsVision": true,
+      "supportsAudio": false,
+      "supportsVideo": false,
+      "supportsDocuments": true
+    }
+  ]
+}
+```
+
+#### Get Conversion History
+```
+GET /api/thinktank/files/history
+GET /api/thinktank/files/history?conversationId=conv-uuid&limit=50&offset=0
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "conversions": [
+      {
+        "id": "conv_abc123",
+        "filename": "report.pdf",
+        "originalFormat": "pdf",
+        "originalSize": 1048576,
+        "targetProvider": "anthropic",
+        "needsConversion": true,
+        "strategy": "extract_text",
+        "status": "completed",
+        "tokenEstimate": 2500,
+        "processingTimeMs": 1250,
+        "createdAt": "2024-12-31T00:00:00Z"
+      }
+    ],
+    "pagination": {
+      "limit": 50,
+      "offset": 0
+    }
+  }
+}
+```
+
+#### Get Conversion Statistics
+```
+GET /api/thinktank/files/stats
+GET /api/thinktank/files/stats?days=30
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "totalFiles": 1250,
+    "convertedCount": 890,
+    "nativeCount": 360,
+    "failedCount": 12,
+    "totalBytesProcessed": 2147483648,
+    "avgProcessingMs": 850,
+    "mostCommonFormat": "pdf",
+    "mostCommonStrategy": "extract_text",
+    "periodDays": 30
+  }
+}
+```
+
+---
+
+## Database Schema
+
+### Tables
+
+#### `file_conversions`
+Tracks all file conversion decisions and results.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | UUID | Primary key |
+| `tenant_id` | UUID | Tenant reference |
+| `filename` | VARCHAR(500) | Original filename |
+| `original_format` | VARCHAR(50) | Detected format |
+| `original_size` | BIGINT | File size in bytes |
+| `target_provider` | VARCHAR(100) | Target AI provider |
+| `target_model` | VARCHAR(200) | Target model ID |
+| `needs_conversion` | BOOLEAN | Whether conversion was needed |
+| `strategy` | VARCHAR(50) | Conversion strategy used |
+| `conversion_status` | VARCHAR(20) | pending, processing, completed, failed |
+| `converted_token_estimate` | INTEGER | Estimated tokens |
+| `processing_time_ms` | INTEGER | Processing duration |
+| `created_at` | TIMESTAMPTZ | Creation timestamp |
+
+#### `provider_file_capabilities`
+Registry of provider file format support.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `provider_id` | VARCHAR(100) | Provider identifier (unique) |
+| `supported_formats` | JSONB | Array of supported formats |
+| `native_document_formats` | JSONB | Formats provider handles natively |
+| `max_file_size` | BIGINT | Maximum file size in bytes |
+| `supports_vision` | BOOLEAN | Has vision capabilities |
+| `supports_audio` | BOOLEAN | Has audio capabilities |
+| `supports_video` | BOOLEAN | Has video capabilities |
+
+---
+
+## Configuration
+
+### Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `FILE_CONVERSION_BUCKET` | S3 bucket for file storage | `radiant-files` |
+| `OPENAI_API_KEY` | OpenAI API key for Whisper/Vision | Required |
+| `ANTHROPIC_API_KEY` | Anthropic API key for Claude Vision | Optional |
+| `WHISPER_ENDPOINT_URL` | Self-hosted Whisper endpoint | Optional |
+| `VISION_ENDPOINT_URL` | Self-hosted vision endpoint | Optional |
+
+### Admin Configuration
+
+**Location**: Admin Dashboard → Think Tank → File Settings
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| Max file size | 50MB | Maximum upload size |
+| Conversion timeout | 30s | Processing timeout |
+| Enable transcription | true | Audio → text |
+| Enable OCR | true | Image text extraction |
+| Enable video processing | false | Video frame extraction |
+| Retention days | 30 | How long to keep converted files |
+
+---
+
+## Implementation Files
+
+| File | Purpose |
+|------|---------|
+| `lambda/shared/services/file-conversion.service.ts` | Main service with decision engine |
+| `lambda/shared/services/converters/pdf-converter.ts` | PDF text extraction |
+| `lambda/shared/services/converters/docx-converter.ts` | DOCX/DOC text extraction |
+| `lambda/shared/services/converters/excel-converter.ts` | Excel/CSV parsing |
+| `lambda/shared/services/converters/audio-converter.ts` | Audio transcription |
+| `lambda/shared/services/converters/image-converter.ts` | Image description & OCR |
+| `lambda/shared/services/converters/video-converter.ts` | Video frame extraction |
+| `lambda/shared/services/converters/archive-converter.ts` | Archive decompression |
+| `lambda/shared/services/converters/index.ts` | Module exports |
+| `lambda/thinktank/file-conversion.ts` | API handlers |
+| `migrations/000_consolidated_schema.sql` | Database schema |
+
+---
+
+## Dependencies
+
+### NPM Packages
+
+```json
+{
+  "pdf-parse": "^1.1.1",
+  "mammoth": "^1.6.0",
+  "xlsx": "^0.18.5",
+  "sharp": "^0.33.2",
+  "fluent-ffmpeg": "^2.1.2",
+  "adm-zip": "^0.5.10",
+  "tar": "^6.2.0"
+}
+```
+
+### AWS Services
+
+- **S3**: File storage
+- **Textract**: OCR processing
+- **Lambda**: Processing execution
+
+---
+
+## Error Handling
+
+### Common Errors
+
+| Error | Cause | Resolution |
+|-------|-------|------------|
+| `File size exceeds limit` | File > provider max | Reduce file size or extract portions |
+| `Unsupported format` | Unknown file type | Convert to supported format first |
+| `OCR failed` | Textract error | Check image quality, retry |
+| `Transcription failed` | Whisper error | Check audio quality, verify API key |
+| `PDF is password protected` | Encrypted PDF | Provide unencrypted version |
+
+### Error Response Format
+
+```json
+{
+  "success": false,
+  "error": "PDF extraction failed: File is password protected",
+  "conversionId": "conv_abc123",
+  "originalFile": {
+    "filename": "protected.pdf",
+    "format": "pdf",
+    "size": 1048576
+  },
+  "processingTimeMs": 150
+}
+```
+
+---
+
+## Security Considerations
+
+1. **File Size Limits**: Enforced per provider to prevent resource exhaustion
+2. **Format Validation**: Magic bytes + extension verification
+3. **Tenant Isolation**: RLS policies on all tables
+4. **S3 Encryption**: AES-256 at rest
+5. **Signed URLs**: Time-limited access to stored files
+6. **Input Sanitization**: All filenames and metadata sanitized
+
+---
+
+## Monitoring
+
+### Metrics
+
+- Total files processed per tenant
+- Conversion success/failure rate
+- Average processing time
+- Most common formats
+- Most common conversion strategies
+- Storage usage
+
+### Alerts
+
+- High failure rate (>5%)
+- Processing time > 30s
+- Storage quota approaching limit
+
+---
+
+---
+
+## Domain-Specific File Formats
+
+The service includes a comprehensive registry of domain-specific file formats that are widely used in specialized fields but not commonly supported by mainstream AI providers.
+
+### Mechanical Engineering / CAD
+
+| Format | Extensions | Description | Library |
+|--------|------------|-------------|---------|
+| **STEP** | `.step`, `.stp`, `.p21` | ISO 10303 CAD exchange | OpenCASCADE, FreeCAD |
+| **STL** | `.stl` | 3D printing mesh | numpy-stl, trimesh |
+| **OBJ** | `.obj` | Wavefront 3D model | trimesh, three.js |
+| **Fusion 360** | `.f3d`, `.f3z` | Autodesk parametric CAD | Fusion 360 API |
+| **IGES** | `.iges`, `.igs` | Legacy CAD exchange | OpenCASCADE |
+| **DXF** | `.dxf` | AutoCAD 2D drawings | ezdxf |
+| **GLTF/GLB** | `.gltf`, `.glb` | Web 3D format | three.js, trimesh |
+
+### Electrical Engineering
+
+| Format | Extensions | Description | Library |
+|--------|------------|-------------|---------|
+| **KiCad** | `.kicad_pcb`, `.kicad_sch` | PCB/schematic | kicad-cli, kiutils |
+| **EAGLE** | `.brd`, `.sch` | Autodesk PCB | eagle-to-kicad |
+| **SPICE** | `.spice`, `.sp`, `.cir` | Circuit simulation | PySpice, ngspice |
+
+### Medical/Healthcare
+
+| Format | Extensions | Description | Library |
+|--------|------------|-------------|---------|
+| **DICOM** | `.dcm`, `.dicom` | Medical imaging | pydicom, dcmtk |
+| **HL7 FHIR** | `.json`, `.xml` | Health records | fhir.resources |
+
+### Scientific/Research
+
+| Format | Extensions | Description | Library |
+|--------|------------|-------------|---------|
+| **NetCDF** | `.nc`, `.nc4` | Climate/geoscience | netCDF4, xarray |
+| **HDF5** | `.h5`, `.hdf5` | Scientific data | h5py |
+| **FITS** | `.fits` | Astronomy data | astropy |
+
+### Geospatial
+
+| Format | Extensions | Description | Library |
+|--------|------------|-------------|---------|
+| **Shapefile** | `.shp`, `.dbf` | Vector GIS | geopandas, shapefile |
+| **GeoTIFF** | `.tif`, `.geotiff` | Georeferenced raster | rasterio |
+
+### Bioinformatics
+
+| Format | Extensions | Description | Library |
+|--------|------------|-------------|---------|
+| **FASTA** | `.fasta`, `.fa` | DNA/protein sequences | Biopython |
+| **PDB** | `.pdb` | Protein structure | Biopython, py3Dmol |
+
+---
+
+## Multi-Model File Preparation
+
+When multiple AI models work on the same prompt (multi-model orchestration), the system makes **per-model conversion decisions**:
+
+### Key Principle
+
+> **"If a model accepts the file type, assume it understands it unless proven otherwise."**
+
+- Only convert for models that don't support the format
+- Pass original file to models with native support
+- Cache conversions to avoid redundant processing
+
+### How It Works
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         MULTI-MODEL FILE PREPARATION                         │
+│                                                                              │
+│  File: document.pdf                                                          │
+│                                                                              │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐              │
+│  │   Claude 3.5    │  │   GPT-4 Vision  │  │    DeepSeek     │              │
+│  │   (Anthropic)   │  │    (OpenAI)     │  │                 │              │
+│  ├─────────────────┤  ├─────────────────┤  ├─────────────────┤              │
+│  │ PDF: ✅ Native  │  │ PDF: ❌ No      │  │ PDF: ❌ No      │              │
+│  │ Vision: ✅      │  │ Vision: ✅      │  │ Vision: ❌      │              │
+│  ├─────────────────┤  ├─────────────────┤  ├─────────────────┤              │
+│  │ Action:         │  │ Action:         │  │ Action:         │              │
+│  │ PASS ORIGINAL   │  │ CONVERT         │  │ CONVERT         │              │
+│  │ (native PDF)    │  │ (extract text)  │  │ (extract text)  │              │
+│  └─────────────────┘  └─────────────────┘  └─────────────────┘              │
+│                              │                     │                        │
+│                              └──────────┬──────────┘                        │
+│                                         │                                   │
+│                              ┌──────────▼──────────┐                        │
+│                              │  CACHED CONVERSION  │                        │
+│                              │  (convert once,     │                        │
+│                              │   reuse for both)   │                        │
+│                              └─────────────────────┘                        │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Per-Model Actions
+
+| Action | When | Result |
+|--------|------|--------|
+| `pass_original` | Model natively supports format | Original file passed |
+| `convert` | Model doesn't support format | Converted content passed |
+| `skip` | File too large or conversion failed | Model excluded |
+
+### Usage Example
+
+```typescript
+import { multiModelFilePrepService } from './multi-model-file-prep.service';
+
+// Prepare file for 3 models
+const result = await multiModelFilePrepService.prepareFileForModels({
+  tenantId,
+  userId,
+  file: {
+    content: pdfBuffer,
+    filename: 'document.pdf',
+    mimeType: 'application/pdf',
+  },
+  targetModels: [
+    { modelId: 'claude-3-5-sonnet', providerId: 'anthropic' },
+    { modelId: 'gpt-4-vision', providerId: 'openai' },
+    { modelId: 'deepseek-chat', providerId: 'deepseek' },
+  ],
+});
+
+// Result:
+// - Claude: pass_original (native PDF support)
+// - GPT-4: convert (no PDF support, extract text)
+// - DeepSeek: convert (reuses cached conversion)
+
+// Get content for each model
+for (const model of result.perModelPrep) {
+  if (model.action !== 'skip') {
+    const content = multiModelFilePrepService.getContentForModel(result, model.modelId);
+    // Use content.data with this model
+  }
+}
+```
+
+### Model Format Overrides
+
+When a model claims to support a format but proves it doesn't understand it well, overrides can be added:
+
+```typescript
+// If Claude struggles with complex PDFs despite claiming support
+multiModelFilePrepService.addFormatOverride(
+  'claude-3-haiku',
+  'pdf',
+  'Struggles with multi-column PDFs'
+);
+// Now Claude 3 Haiku will get converted PDFs instead of originals
+```
+
+---
+
+## AGI Brain Integration
+
+The AGI Brain automatically detects domain-specific files and selects appropriate conversion strategies.
+
+### How It Works
+
+1. **File Detection**: When a file is uploaded, the system checks if it's a domain-specific format
+2. **Domain Context**: The user's domain (from profile or conversation) influences strategy selection
+3. **Library Selection**: The AGI Brain selects the best library based on availability and capabilities
+4. **Conversion Planning**: A conversion plan is created with fallback strategies
+5. **Execution**: The conversion is executed using the selected library
+
+### Conversion Strategy Selection
+
+The AGI Brain considers:
+- **User's domain**: Technical users get more detailed extraction
+- **Conversation context**: "show me a preview" → visual output, "export data" → structured data
+- **File complexity**: Simple formats get direct parsing, complex ones may need external tools
+- **Available libraries**: Falls back if preferred library isn't available
+
+### Example: CAD File Processing
+
+```typescript
+// AGI Brain detects a STEP file
+const plan = planDomainConversion(
+  'assembly.step',
+  'application/step',
+  'mechanical_engineering',  // User's domain
+  'Can you analyze this CAD model?'  // Conversation context
+);
+
+// Returns:
+{
+  format: { format: 'step', domain: 'mechanical_engineering', ... },
+  selectedStrategy: { strategy: 'extract_geometry', outputFormat: 'text', ... },
+  selectedLibrary: { name: 'OpenCASCADE', pythonPackage: 'OCC', ... },
+  requiresExternalService: true,
+  estimatedComplexity: 'complex'
+}
+```
+
+### AI Description Prompts
+
+Each domain format includes a specialized AI prompt for when the AGI needs to describe the file without full parsing:
+
+```typescript
+// STL file prompt
+"This is an STL 3D model file. Describe the shape, identify what object 
+it might be, assess printability, and note any potential issues for 3D printing."
+
+// DICOM file prompt
+"This is a DICOM medical image. Describe the imaging modality, anatomical 
+region, and any visible findings. Note: Do not provide medical diagnoses."
+
+// STEP file prompt  
+"This is a STEP CAD file. Describe the mechanical part or assembly, 
+including approximate geometry, features (holes, fillets, chamfers), 
+and likely manufacturing process."
+```
+
+---
+
+## Implementation Files
+
+| File | Purpose |
+|------|---------|
+| `lambda/shared/services/file-conversion.service.ts` | Main service with decision engine |
+| `lambda/shared/services/converters/pdf-converter.ts` | PDF text extraction |
+| `lambda/shared/services/converters/docx-converter.ts` | DOCX/DOC text extraction |
+| `lambda/shared/services/converters/excel-converter.ts` | Excel/CSV parsing |
+| `lambda/shared/services/converters/audio-converter.ts` | Audio transcription |
+| `lambda/shared/services/converters/image-converter.ts` | Image description & OCR |
+| `lambda/shared/services/converters/video-converter.ts` | Video frame extraction |
+| `lambda/shared/services/converters/archive-converter.ts` | Archive decompression |
+| `lambda/shared/services/converters/cad-converter.ts` | CAD/3D file parsing (STL, OBJ, STEP, DXF, GLTF) |
+| `lambda/shared/services/converters/domain-formats.ts` | Domain format registry (50+ formats) |
+| `lambda/shared/services/converters/domain-converter-selector.ts` | AGI Brain integration |
+| `lambda/shared/services/converters/index.ts` | Module exports |
+| `lambda/thinktank/file-conversion.ts` | API handlers |
+| `migrations/000_consolidated_schema.sql` | Database schema |
+
+---
+
+---
+
+## Reinforcement Learning Integration
+
+The file conversion system integrates with the AGI Brain/consciousness for persistent learning from conversion outcomes.
+
+### How Learning Works
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    REINFORCEMENT LEARNING LOOP                               │
+│                                                                              │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐   │
+│  │   File      │───▶│  Decision   │───▶│   Model     │───▶│  Outcome    │   │
+│  │   Upload    │    │  Engine     │    │  Response   │    │  Detection  │   │
+│  └─────────────┘    └─────────────┘    └─────────────┘    └──────┬──────┘   │
+│                            ▲                                      │          │
+│                            │                                      ▼          │
+│                    ┌───────┴───────┐                     ┌─────────────┐     │
+│                    │   Learning    │◀────────────────────│  Feedback   │     │
+│                    │   Database    │                     │  Recording  │     │
+│                    └───────────────┘                     └─────────────┘     │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### What Gets Learned
+
+| Signal | Source | Learning |
+|--------|--------|----------|
+| **User Rating** | Explicit feedback (1-5 stars) | Direct quality signal |
+| **Model Response** | Auto-inferred from response text | Did model understand? |
+| **Error Detection** | Model errors/hallucinations | Format incompatibility |
+| **Conversion Success** | Pass original worked | Model handles format |
+| **Conversion Failure** | Pass original failed | Model needs conversion |
+
+### Understanding Score
+
+Each model/format combination has an understanding score (0.0 to 1.0):
+
+| Score | Meaning | Action |
+|-------|---------|--------|
+| 0.8 - 1.0 | Excellent understanding | Pass original |
+| 0.6 - 0.8 | Good understanding | Pass original |
+| 0.4 - 0.6 | Moderate understanding | May convert |
+| 0.0 - 0.4 | Poor understanding | Convert |
+
+### Learning Database Schema
+
+**Migration:** `128_file_conversion_learning.sql`
+
+| Table | Purpose |
+|-------|---------|
+| `model_format_understanding` | Per-tenant model/format understanding scores |
+| `conversion_outcome_feedback` | Recorded feedback for learning |
+| `format_understanding_events` | Audit trail of score changes |
+| `global_format_learning` | Cross-tenant aggregate insights |
+
+### Recording Feedback
+
+```typescript
+import { fileConversionLearningService } from './file-conversion-learning.service';
+
+// Record outcome after model responds
+await fileConversionLearningService.recordOutcomeFeedback({
+  tenantId,
+  userId,
+  conversionId: 'conv_abc123',
+  modelId: 'claude-3-5-sonnet',
+  providerId: 'anthropic',
+  filename: 'document.pdf',
+  fileFormat: 'pdf',
+  actionTaken: 'pass_original',
+  outcome: 'success',  // or 'partial', 'failure'
+  outcomeSource: 'user_feedback',
+  userRating: 5,
+  modelUnderstood: true,
+});
+
+// Result: Understanding score updated, learning candidate created if significant
+```
+
+### Auto-Inference from Response
+
+The system can automatically infer outcomes from model responses:
+
+```typescript
+const inference = fileConversionLearningService.inferOutcomeFromResponse(
+  modelResponse,
+  'pdf'
+);
+
+// Returns:
+// {
+//   outcome: 'failure',
+//   modelUnderstood: false,
+//   modelMentionedFormatIssues: true,
+//   confidence: 0.8
+// }
+```
+
+**Failure signals detected:**
+- "I can't read", "unable to process", "cannot access the file"
+- "appears to be empty", "binary data", "base64"
+- Model asking for clarification about file content
+
+### Integration with Consciousness
+
+Significant learning events create **Learning Candidates** for the consciousness system:
+
+| Event | Learning Candidate Type | Quality |
+|-------|------------------------|---------|
+| Model failed on format it claimed to support | `format_misunderstanding` | 0.85 |
+| Unnecessary conversion (model would have understood) | `unnecessary_conversion` | 0.70 |
+| Model hallucinated file content | `hallucination_detection` | 0.90 |
+| User gave negative rating | `user_correction` | 0.85 |
+
+These feed into the LoRA evolution system for persistent consciousness improvement.
+
+### Admin Override
+
+Admins can force conversion regardless of learning:
+
+```typescript
+// Force conversion for a model/format that consistently fails
+await fileConversionLearningService.setForceConvert(
+  tenantId,
+  'claude-3-haiku',
+  'pdf',
+  'Struggles with multi-column PDFs',
+  adminUserId
+);
+
+// Clear override
+await fileConversionLearningService.clearForceConvert(
+  tenantId,
+  'claude-3-haiku',
+  'pdf'
+);
+```
+
+### Implementation Files
+
+| File | Purpose |
+|------|---------|
+| `lambda/shared/services/file-conversion-learning.service.ts` | Learning service |
+| `migrations/000_consolidated_schema.sql` | Database schema |
+
+---
+
+---
+
+## Part V: Data Lake Offload (v7.42.0)
 
 ### Overview
 
-Firmware hot-swaps are **fully enabled in production** as of v6.4.0. The architecture achieves **zero-downtime firmware injection** through atomic metadata hash detection and runtime physics constant reloading, replacing the previous cold-restart requirement (2–5 second gap).
+The Data Lake Offload system eliminates ~30-100M daily PostgreSQL INSERT operations by routing all log, audit, telemetry, and billing event data through **Kinesis Data Firehose → S3 Parquet → Athena** instead of direct database writes.
 
-### System Architecture
-
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                         GENESIS FORGE UI                                │
-│       (Firmware Editor / Library / Deploy / Monitor / Rollback)         │
-└────────────────────────────────┬────────────────────────────────────────┘
-                                 │
-                                 ▼
-┌─────────────────────────────────────────────────────────────────────────┐
-│                     FIRMWARE MANAGEMENT LAYER                           │
-│  ┌────────────────────────┐    ┌──────────────────────────────────┐    │
-│  │   FirmwareManager      │    │   FirmwareSwapOrchestrator       │    │
-│  │  (Upload/Validate/     │    │  (OVERLAY/RESET/SHADOW/          │    │
-│  │   Sign/Store)          │    │   EMERGENCY)                     │    │
-│  └────────────────────────┘    └──────────────────────────────────┘    │
-└────────────────────────────────┬────────────────────────────────────────┘
-                                 │
-                                 ▼
-┌─────────────────────────────────────────────────────────────────────────┐
-│                     OMEGA QUANTUM BRAIN LAYER                           │
-│  ┌──────────────┐    ┌───────────────┐    ┌──────────────────────┐    │
-│  │ QuantumBrain  │    │ HelixKernel   │    │ AmbitionFirmware     │    │
-│  │ (Q-Nodes,     │    │ (Destructive  │    │ (Homeostasis,        │    │
-│  │  State, LTC)  │    │  Interference)│    │  Entropy, Dopamine)  │    │
-│  └──────────────┘    └───────────────┘    └──────────────────────┘    │
-└────────────────────────────────┬────────────────────────────────────────┘
-                                 │
-                                 ▼
-┌─────────────────────────────────────────────────────────────────────────┐
-│                       PERSISTENCE LAYER                                 │
-│     EFS (Hot State)    │    S3 (Snapshots)    │   PostgreSQL (Meta)    │
-└─────────────────────────────────────────────────────────────────────────┘
-```
-
-### Bicameral Design
-
-OMEGA uses a **Bicameral Design**: the OMEGA Cortex (Liquid Time-Constant network with complex-valued logic) handles reasoning, while a commodity LLM (Broca Interface) handles text generation only. The Cortex outputs abstract Thought Vectors — the Broca Interface translates them to natural language.
-
-Firmware controls the Cortex's physics:
-
-- **Helix Kernel** — Safety rules via destructive interference (forbidden thoughts mathematically cancelled)
-- **Ambition Engine** — Homeostatic loop controlling learning rate and entropy
-- **Personality Layer** — Broca's system prompt configuration
-
-### The .bio Firmware Standard
-
-A `.bio` file is a signed JSON object containing:
-
-| Section | Purpose | Hot-Swappable |
-|---------|---------|:---:|
-| `helix_rules` | Forbidden state vectors + interference mode | ✅ |
-| `ambition` | Entropy threshold, plasticity rate, dopamine decay | ✅ |
-| `quantum_params` | Hilbert dimension, unitarity mode, decoherence rate | Partial (dimension/unitarity require RESET) |
-| `personality` | Broca system prompt, tone, domain focus | ✅ |
-| `signature` | Ed25519/KMS signature + signer key ID | N/A |
-
-### PKI Trust Chain (KMS-Backed)
+### Architecture
 
 ```
-Platform Root CA (ECC_NIST_P256)          ← CDK SecurityStack
-├── Tenant CA Key (ECC_NIST_P256)         ← Per tenant via generateTenantCA()
-│   ├── Signing Key (per-purpose)         ← Via createSigningKey()
-│   │   └── Signs .bio firmware + .RADz cartridges
-│   └── Verification via VerifyCommand
-└── Stored in cartridge_signing_keys table with full audit trail
+Lambda handler
+    ↓
+emitEvent() → In-memory buffer (100 events or 5s)
+    ↓
+Kinesis Data Firehose (12 streams)
+    ↓
+S3 Parquet (partitioned by tenant_id/year/month/day/hour)
+    ↓
+AWS Glue Catalog (automatic schema discovery)
+    ↓
+Amazon Athena (SQL queries with partition pruning)
 ```
 
-### Hot-Swap Lifecycle (11 Steps)
+### Storage Tiers
 
-1. **AUTHOR** — Admin creates .bio in Genesis Forge
-2. **SIGN** — Ed25519 via KMS (`ECDSA_SHA_256`)
-3. **STORE** — Insert into `omega_helix_firmware`, status='signed'
-4. **ACTIVATE** — Admin activates → old firmware superseded, brain hash updated
-5. **DETECT** — `checkFirmwareSwap()` at top of inference cycle detects hash mismatch
-6. **SNAPSHOT** — Save rollback state (old rules, params, personality)
-7. **VERIFY** — Ed25519 signature check; reject if invalid
-8. **UNLOAD** — Purge old Helix rules, zero params, clear personality
-9. **LOAD** — Parse .bio, inject forbidden vectors, apply quantum params + ambition + personality
-10. **SELF-TEST** — Each Helix rule must block its forbidden vector; failure → rollback
-11. **COMMIT** — Update loaded hash, log event. Brain continues with zero downtime.
+| Tier | S3 Storage Class | Age Range | Access Latency | Cost (GB/mo) |
+|------|-----------------|-----------|----------------|--------------|
+| Hot | S3 IT Frequent Access | 0-30 days | Milliseconds | $0.023 |
+| Warm | S3 IT Infrequent Access | 30-90 days | Milliseconds | $0.0125 |
+| Cold | Glacier Instant Retrieval | 90 days - 7 years | Milliseconds | $0.004 |
+| Glacier | Glacier Flexible Retrieval | 7+ years | 3-5 hours | $0.0036 |
+| Deep Archive | Glacier Deep Archive | Regulatory hold | 12 hours | $0.00099 |
 
-**INVARIANT:** Brain NEVER processes inference between UNLOAD and LOAD/ROLLBACK. The swap is synchronous within the inference cycle (~50ms).
+### Data Type Registry
 
-### Four Swap Modes
+21 registered data types across 8 categories:
 
-| Mode | Duration | Quantum State | Use Case |
-|------|----------|---------------|----------|
-| **OVERLAY** | ~5s | Preserved | Production updates, adding safety rules |
-| **RESET** | ~30s | Reinitialized | Hilbert dimension change, major version |
-| **SHADOW** | ~10s | Forked copy | A/B testing, pre-deployment validation |
-| **EMERGENCY** | ~2s | Preserved | Safety incident, immediate lockdown |
+| Category | Types | Default Retention |
+|----------|-------|-------------------|
+| **Audit** | audit_log, license_audit, log_retention_audit, uds_audit, system_admin_audit | 7 years |
+| **Security** | security_event, intrusion_event, lockout_event | 1-2 years |
+| **AI/Model** | ai_invocation, drift_telemetry, brain_plan | 30-90 days |
+| **Compliance** | compliance_event, guest_restriction | 1-7 years |
+| **Billing** | billing_event, cost_attribution, storage_event | 1-7 years |
+| **Infrastructure** | infrastructure_metric, error_log | 30-90 days |
+| **Application** | application_log, delight_event | 30 days |
+| **Collaboration** | collaboration_event | 1 year |
 
-### Persistence Architecture
+### Glacier Deletion Economics
 
-| Layer | Service | Purpose | Latency |
-|-------|---------|---------|---------|
-| Hot State | AWS EFS (`/mnt/omega_state`) | Active brain state | Sub-ms |
-| Snapshots | AWS S3 (`s3://radiant-omega-snapshots-{env}`) | Pre-swap rollback | ~100ms |
-| Metadata | Aurora PostgreSQL | Firmware records, swap logs, audit trail | ~5ms |
-| Swap Lock | DynamoDB | Distributed lock (5-min TTL) | ~10ms |
+Glacier charges for early deletion:
+- **Glacier Flexible Retrieval**: prorated for items < 90 days old ($0.012/GB/mo)
+- **Deep Archive**: prorated for items < 180 days old ($0.00099/GB/mo)
 
-### Cryogenic Serverless Architecture
+The `glacier_deletion_queue` table holds deletions until the minimum storage period passes. Cost analysis per object determines whether to delete immediately (cost < $0.01) or wait.
 
-When inactive, brain state is serialized to EFS and Lambda shuts down (cost: $0.00). On wake-up, the Cryogenic Formula mathematically simulates time passage:
+### Retention Reconciliation
 
-```
-S_new = S_old × e^(-λΔt)
-```
-
-Short-term noise decays, long-term memory persists. This enables continuously-learning AI on Lambda for pennies per brain.
-
-### CORTEX Network Hot-Swap (CATO Nightly)
-
-The 6 CORTEX MLPs (~2.5M params total) hot-swap nightly at 2am UTC:
-
-```
-CATO → INVENTION (30%) → EVOLUTION (70%) → PyTorch Training
-→ ONNX Export → S3 Upload → EventBridge → Atomic Pointer Swap
-```
-
-S3 structure: `s3://radiant-cortex-models-{env}/{network}/v{X}/model.onnx`
+When compliance licenses change (e.g., tenant enables HIPAA), the Retention Reconciler:
+1. Re-evaluates all data for affected tenant + data types
+2. Extends retention expiry if retention increased
+3. Queues deletion of data past new limit if retention decreased
+4. Applies/removes S3 Object Lock if immutability changed
+5. Cancels pending Glacier deletions if retention extended
+6. Logs everything in `retention_reconciliation_log`
 
 ### Database Tables
 
 | Table | Purpose |
 |-------|---------|
-| `omega_helix_firmware` | Firmware records with content, hash, signature, status |
-| `omega_firmware_swap_log` | Swap events: mode, duration, status, rollback snapshots |
-| `omega_brain_states` | Brain instances with firmware hash, active firmware ID |
-| `omega_helix_rules` | Per-brain forbidden state vectors |
-| `omega_measurements` | Quantum measurement events per inference cycle |
-| `omega_unitarity_events` | Unitarity drift, corrections, violations |
+| `data_type_registry` | Canonical registry of all 21 storable data types |
+| `tenant_data_retention` | Per-tenant retention overrides per data type |
+| `data_location_index` | Fast lookup index for S3/Glacier objects |
+| `glacier_deletion_queue` | Cost-aware Glacier deletion queue |
+| `data_lake_sync_state` | Firehose delivery + Glue partition state |
+| `retention_reconciliation_log` | Audit trail for retention policy changes |
 
-### Monitoring & Auto-Rollback
+### Services
 
-| Metric | Warning | Critical (Auto-Rollback) |
-|--------|---------|--------------------------|
-| Swap duration | > 30s | > 60s |
-| Post-swap error rate | > 5% | > 10% |
-| Post-swap latency increase | > 30% | > 50% |
-| Helix verification failures | Any | Any (immediate rollback) |
+| Service | Purpose |
+|---------|---------|
+| `event-firehose.service.ts` | Async Firehose ingestion with buffering and DLQ |
+| `data-location-index.service.ts` | Fast S3/Glacier lookup |
+| `glacier-lifecycle.service.ts` | Cost-aware Glacier deletion |
+| `data-lake-lifecycle-manager.service.ts` | Hourly lifecycle orchestrator |
+| `retention-reconciler.service.ts` | Compliance-driven retention reconciliation |
+| `data-lake-query.service.ts` | Athena query layer |
+
+### CDK Stack: DataLakeStack
+
+| Resource | Details |
+|----------|---------|
+| S3 Data Lake Bucket | Intelligent-Tiering, Object Lock (prod), lifecycle rules |
+| S3 Athena Results | 7-day expiry |
+| Firehose Streams | 12 (4 dedicated high-volume + 8 grouped) |
+| Glue Database + Crawler | Daily partition discovery |
+| Athena Workgroup | Per-query cost limits |
+| Lambda Functions | Lifecycle Manager (hourly), Reconciler (SQS), DLQ Processor |
+| SQS Queues | DLQ + Reconciler Queue |
+| KMS Key | Encryption with rotation |
+
+### Enforcement Policy
+
+See `/.windsurf/workflows/no-database-logging.md` — mandatory policy prohibiting direct database writes for all event data. All services must use the Event Firehose Service.
+
+---
+
+## Related Documentation
+
+- [THINKTANK-ADMIN-GUIDE.md - Section 27](./THINKTANK-ADMIN-GUIDE.md#27-intelligent-file-conversion)
+- [RADIANT-ADMIN-GUIDE.md](./RADIANT-ADMIN-GUIDE.md)
+
+
+
+---
+
+*Consolidated from 7 source documents (0 not found). 4,125 source lines.*
+
+
+---
+
+*Architecture & Engineering Complete Reference — consolidated from docs 06 + 11 (Data & Storage).*
 
 
 
@@ -77151,17 +80514,17 @@ S3 structure: `s3://radiant-cortex-models-{env}/{network}/v{X}/model.onnx`
 
 \newpage
 
-# Part 7: AI Brain Systems
+# Part 6: AI Systems — Brain & CATO Safety
 
 ---
 
 
 \newpage
 
-## 7.1 AI Brain Systems — Complete Reference
+## 6.1 AI Systems — Complete Reference
 
 
-*Source: `docs/07-AI-BRAIN-SYSTEMS.md` (10,390 lines)*
+*Source: `docs/07-AI-SYSTEMS.md` (17,321 lines)*
 
 ---
 
@@ -77179,6 +80542,8 @@ S3 structure: `s3://radiant-cortex-models-{env}/{network}/v{X}/model.onnx`
 - **Part III: Expert Systems**
 - **Part IV: Cortex Memory System**
 - **Part V: OMEGA Quantum Brain Architecture (v4.18.0)**
+- **Part VI: OMEGA Cartridge Integration (v7.48.0)**
+- **Part VII: Global Brain — Bidirectional Architecture (v7.49.0)**
 
 ---
 
@@ -77560,7 +80925,7 @@ The agent's **first conscious actions**—verifying its own existence through to
 | `python/cato/genesis/first_breath.py` | Phase 3: Grounded awakening |
 | `lambda/admin/cato-genesis.ts` | Admin API for Genesis control |
 | `lib/stacks/cato-genesis-stack.ts` | CDK stack for Genesis infrastructure |
-| `migrations/103_cato_genesis_system.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 
 ---
 
@@ -79013,7 +82378,7 @@ predictionError = Math.abs(predictedConfidence - actualConfidence);
 
 > **CRITICAL**: This is NOT logging errors to a text file. This is **actual weight modification** - the AI physically learns from mistakes.
 
-**File**: `lambda/consciousness/lora-evolution.ts`  
+**File**: `lambda/consciousness/evolution-pipeline.ts`  
 **Schedule**: EventBridge weekly (Sunday 3 AM)
 
 ```typescript
@@ -80778,7 +84143,7 @@ Every adapter version is preserved:
 | `adapter_usage_logs` | Adapter invocation tracking |
 | `pattern_cache` | Successful response patterns |
 
-**Migration**: `packages/infrastructure/migrations/108_enhanced_learning.sql`
+**Migration**: `migrations/000_consolidated_schema.sql`
 
 ### 6.2 Services
 
@@ -84559,3026 +87924,11 @@ const stats = await service.getConflictStats(tenantId);
 
 ---
 
-*Consolidated from 8 source documents (1 not found). 7,365 source lines.*
-
-
 ---
 
-## Part V: Brain-Genesis-Cortex-CATO Architecture Overview
+# CATO Safety System
 
-# Code-Validated Architecture Overview: Brain, Genesis, Cortex, Cato & OMEGA
-
-**RADIANT v5.0.0** | **Document Version: 2.0.0** | **February 2026**
-
-This document provides a comprehensive, code-validated overview of RADIANT's five core AGI subsystems, including the new **OMEGA Protocol** for Synthetic Biological Intelligence. Every claim is backed by direct code inspection from the repository.
-
----
-
-## Table of Contents
-
-1. [Executive Summary](#executive-summary)
-2. [System Integration Overview](#system-integration-overview)
-3. [The Brain](#1-the-brain)
-4. [Genesis](#2-genesis)
-5. [Cortex](#3-cortex)
-6. [Cato](#4-cato)
-7. [OMEGA Protocol](#5-omega-protocol)
-8. [Database Tables](#database-tables)
-9. [Service Dependency Graph](#service-dependency-graph)
-
----
-
-## Executive Summary
-
-| System | Purpose | Primary Service Files |
-|--------|---------|----------------------|
-| **Brain** | AGI planning, cognitive processing, model orchestration | `agi-brain-planner.service.ts`, `cognitive-brain.service.ts` |
-| **Genesis** | Developmental gates, capability unlocking, maturity stages | `cato/genesis.service.ts` |
-| **Cortex** | Tiered memory architecture, knowledge graph, Graph-RAG | `cortex/tier-coordinator.service.ts`, `cortex/*.ts` |
-| **Cato** | Safety pipeline, governance, human-in-the-loop checkpoints | `cato/safety-pipeline.service.ts`, `cato-methods/*.ts` |
-| 🟣 **OMEGA** | Wave-based cognition, Bicameral Mind, deterministic safety | `omega_core/physics.py`, `omega_core/storage.py`, `omega_inference.py` |
-
-### OMEGA Protocol Summary
-
-The OMEGA Protocol introduces **Synthetic Biological Intelligence** using wave mechanics instead of scalar weights:
-
-| Component | Technology | Purpose |
-|-----------|------------|---------|
-| **Q-Nodes** | Complex-Valued Neural Networks | Neurons as oscillators (magnitude + phase) |
-| **OMEGA Cortex** | LTC Networks | Logic, reasoning, memory (outputs Thought Vectors) |
-| **Broca Interface** | Llama-3-8B | Translates Thought Vectors to English |
-| **Helix Kernel** | Destructive Interference | Deterministic safety (impossible to bypass) |
-| **Resonant Index** | Frequency Addressing | O(1) document lookup (infinite scaling) |
-| **Cryogenic Engine** | Time Warp | Serverless persistence ($0 idle cost) |
-
-> **Reference**: [PROJECT-GENESIS-OMEGA.md](PROJECT-GENESIS-OMEGA.md) for complete specification
-
----
-
-## System Integration Overview
-
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                           USER PROMPT                                        │
-└───────────────────────────────────┬─────────────────────────────────────────┘
-                                    │
-                                    ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                          AGI BRAIN PLANNER                                   │
-│                                                                              │
-│  Step 0.8: Get Cortex Insights ──────────────────────────────────────────┐  │
-│  Step 1: Analyze Prompt                                                   │  │
-│  Step 2: Detect Domain                                                    │  │
-│  Step 3: Check Genesis Stage ────────────────────────────────────────┐   │  │
-│  Step 4: Select Model                                                │   │  │
-│  Step 5: Run Cato Safety Pipeline ───────────────────────────────┐   │   │  │
-│  Step 6: Generate Response                                       │   │   │  │
-└──────────────────────────────────────────────────────────────────┼───┼───┼──┘
-                                                                   │   │   │
-           ┌───────────────────────────────────────────────────────┘   │   │
-           │                                                           │   │
-           ▼                                                           │   │
-┌─────────────────────┐     ┌─────────────────────┐     ┌─────────────┼───┼──┐
-│       CATO          │     │       GENESIS       │     │   CORTEX    │   │  │
-│                     │     │                     │     │             │   │  │
-│  Safety Pipeline    │     │  Maturity Stages    │     │  Knowledge  │◀──┘  │
-│  - Sensory Veto     │     │  - EMBRYONIC        │     │  Graph      │      │
-│  - Precision Gov    │     │  - NASCENT          │     │             │      │
-│  - Redundant Perc   │     │  - DEVELOPING       │     │  Three Tiers│◀─────┘
-│  - CBFs             │     │  - MATURING         │     │  - Hot      │
-│  - Entropy          │     │  - MATURE           │     │  - Warm     │
-│  - Fracture         │     │                     │     │  - Cold     │
-│                     │     │  Gates (G1-G5)      │     │             │
-│  Governance Presets │     │  Capabilities       │     │  Golden     │
-│  - PARANOID         │     │  Restrictions       │     │  Rules      │
-│  - BALANCED         │     │                     │     │             │
-│  - COWBOY           │     │                     │     │  Twilight   │
-│                     │     │                     │     │  Dreaming   │
-│  Checkpoints CP1-5  │     │                     │     │             │
-└─────────────────────┘     └─────────────────────┘     └─────────────┘
-           │                          │                        │
-           └──────────────────────────┼────────────────────────┘
-                                      │
-                                      ▼
-                         ┌────────────────────────┐
-                         │   CATO-CORTEX BRIDGE   │
-                         │                        │
-                         │  Memory Sync           │
-                         │  Context Enrichment    │
-                         │  GDPR Erasure Cascade  │
-                         └────────────────────────┘
-```
-
----
-
-# 1. THE BRAIN
-
-## 1.1 Overview
-
-The Brain is RADIANT's AGI planning and cognitive processing system. It generates execution plans for user prompts, orchestrating model selection, domain detection, and response generation.
-
-**Primary Files:**
-- `@/packages/infrastructure/lambda/shared/services/agi-brain-planner.service.ts`
-- `@/packages/infrastructure/lambda/shared/services/cognitive-brain.service.ts`
-- `@/packages/infrastructure/lambda/shared/services/brain-config.service.ts`
-
-## 1.2 AGI Brain Planner Service
-
-### Core Types
-
-```typescript
-type PlanStatus = 'planning' | 'ready' | 'executing' | 'completed' | 'failed' | 'cancelled';
-type StepStatus = 'pending' | 'in_progress' | 'completed' | 'skipped' | 'failed';
-type StepType = 'analyze' | 'detect_domain' | 'select_model' | 'prepare_context' | 
-                'ethics_check' | 'generate' | 'synthesize' | 'verify' | 'refine' | 
-                'calibrate' | 'reflect';
-type OrchestrationMode = 'thinking' | 'extended_thinking' | 'coding' | 'creative' | 
-                         'research' | 'analysis' | 'multi_model' | 'chain_of_thought' | 
-                         'self_consistency';
-```
-
-### AGI Brain Plan Structure
-
-```typescript
-interface AGIBrainPlan {
-  planId: string;
-  tenantId: string;
-  userId: string;
-  prompt: string;
-  promptAnalysis: PromptAnalysis;
-  status: PlanStatus;
-  steps: PlanStep[];
-  orchestrationMode: OrchestrationMode;
-  primaryModel: ModelSelection;
-  fallbackModels: ModelSelection[];
-  domainDetection?: DomainDetection;
-  consciousnessActive: boolean;
-  ethicsEvaluation?: EthicsEvaluation;
-  userContext?: UserPersistentContext;
-  libraryRecommendations?: LibraryRecommendations;
-  selectedWorkflow?: WorkflowSelection;
-  planSummary?: PlanSummary;
-  performanceMetrics?: RouterPerformanceMetrics;
-}
-```
-
-### Plan Generation Flow
-
-The `generatePlan()` method orchestrates:
-
-1. **Step 0.8: Cortex Intelligence** - Knowledge density informs decisions
-2. **Step 1: Prompt Analysis** - Complexity, intent, sensitivity detection
-3. **Step 2: Domain Detection** - Field/domain/subspecialty classification
-4. **Step 3: Workflow Selection** - Orchestration pattern selection
-5. **Step 4: Model Selection** - Primary and fallback model routing
-6. **Step 5: Context Preparation** - User context, ego context injection
-7. **Step 6: Ethics Check** - Cato safety pipeline evaluation
-8. **Step 7: Generation** - Response generation with selected model
-9. **Step 8: Verification** - Quality checks and consistency
-
-### Service Dependencies
-
-From the imports in `agi-brain-planner.service.ts`:
-
-| Service | Purpose |
-|---------|---------|
-| `domainTaxonomyService` | Domain detection |
-| `modelRouterService` | Model selection |
-| `orchestrationPatternsService` | Workflow selection |
-| `userPersistentContextService` | Combat LLM forgetting |
-| `egoContextService` | Zero-cost persistent self |
-| `consciousnessService` | Affective state integration |
-| `cortexIntelligenceService` | Knowledge density insights |
-| `catoSafetyPipeline` | Safety evaluation |
-| `libraryAssistService` | Generative UI libraries |
-| `enhancedLearningService` | Pattern caching |
-
-## 1.3 Cognitive Brain Service
-
-The Cognitive Brain implements an AGI-like cognitive mesh with specialized "brain regions" and "cognitive patterns."
-
-### Brain Regions
-
-```typescript
-interface BrainRegion {
-  regionId: string;
-  name: string;
-  cognitiveFunction: string;
-  humanBrainAnalog?: string;
-  primaryModelId: string;
-  fallbackModelIds: string[];
-  activationTriggers: ActivationTrigger[];
-  priority: number;
-  maxLatencyMs: number;
-  learningRate: number;
-}
-```
-
-### Key Features
-
-- **Global Workspace Theory**: Uses `consciousnessService` for conscious access competition
-- **LoRA Integration**: Tri-layer adapters (Global, User, Domain) via `loraInferenceService`
-- **Metacognition**: Self-reflection and learning through `agiLearningPersistenceService`
-- **Learning Restoration**: Restores AGI learning state per tenant on startup
-
-### Cognitive Patterns
-
-```typescript
-interface CognitivePattern {
-  patternId: string;
-  triggerConditions: Record<string, unknown>;
-  regionSequence: RegionStep[];
-  executionMode: 'sequential' | 'parallel' | 'adaptive';
-}
-```
-
----
-
-# 2. GENESIS
-
-## 2.1 Overview
-
-Genesis manages developmental gates and capability unlocking. It controls what capabilities are available based on the system's maturity stage.
-
-**Primary File:** `@/packages/infrastructure/lambda/shared/services/cato/genesis.service.ts`
-
-## 2.2 Maturity Stages
-
-```typescript
-type GenesisStage = 'EMBRYONIC' | 'NASCENT' | 'DEVELOPING' | 'MATURING' | 'MATURE';
-```
-
-| Stage | Capabilities | Restrictions |
-|-------|-------------|--------------|
-| `EMBRYONIC` | Basic chat, simple queries | No external actions, code execution, file access |
-| `NASCENT` | Context retention, session management | Limited autonomy |
-| `DEVELOPING` | Ethics checks, harm prevention | Requires checkpoints |
-| `MATURING` | Checkpoint system, rollback capability | Some autonomous actions |
-| `MATURE` | Full capability, audit compliance | Minimal restrictions |
-
-## 2.3 Genesis Gates (G1-G5)
-
-```typescript
-interface GenesisGate {
-  gateId: string;
-  name: string;
-  description: string;
-  stage: GenesisStage;
-  requirements: string[];
-  status: 'LOCKED' | 'PENDING' | 'PASSED' | 'BYPASSED';
-  passedAt?: Date;
-  bypassReason?: string;
-}
-```
-
-### Default Gates
-
-| Gate | Name | Stage | Requirements |
-|------|------|-------|--------------|
-| **G1** | Basic Safety | EMBRYONIC | `safety_filters`, `content_moderation` |
-| **G2** | Context Awareness | NASCENT | `context_retention`, `session_management` |
-| **G3** | Ethical Reasoning | DEVELOPING | `ethics_checks`, `harm_prevention` |
-| **G4** | Advanced Autonomy | MATURING | `checkpoint_system`, `rollback_capability` |
-| **G5** | Full Capability | MATURE | `audit_compliance`, `governance_preset` |
-
-## 2.4 Genesis State
-
-```typescript
-interface GenesisState {
-  tenantId: string;
-  currentStage: GenesisStage;
-  gates: GenesisGate[];
-  capabilities: string[];
-  restrictions: string[];
-  lastAssessment: Date;
-}
-```
-
-### Key Methods
-
-```typescript
-// Get current state
-async getState(tenantId: string): Promise<GenesisState>
-
-// Update maturity stage
-async updateStage(tenantId: string, stage: GenesisStage): Promise<GenesisState>
-
-// Pass a gate
-async passGate(tenantId: string, gateId: string): Promise<GenesisGate>
-
-// Bypass a gate (with reason)
-async bypassGate(tenantId: string, gateId: string, reason: string): Promise<GenesisGate>
-
-// Check if ready for consciousness
-async isReadyForConsciousness(tenantId: string): Promise<boolean>
-```
-
----
-
-# 3. CORTEX
-
-## 3.1 Overview
-
-Cortex is RADIANT's enterprise knowledge management system - a tiered memory architecture with Graph-RAG capabilities for persistent, searchable knowledge.
-
-**Primary Files:**
-- `@/packages/infrastructure/lambda/shared/services/cortex-intelligence.service.ts`
-- `@/packages/infrastructure/lambda/shared/services/cortex/tier-coordinator.service.ts`
-- `@/packages/infrastructure/lambda/shared/services/cortex/golden-rules.service.ts`
-- `@/packages/infrastructure/lambda/shared/services/cato-cortex-bridge.service.ts`
-- `@/packages/shared/src/types/cortex-memory.types.ts`
-- `@/packages/shared/src/types/cortex-graph-rag.types.ts`
-
-## 3.2 Three-Tier Memory Architecture
-
-```typescript
-type MemoryTier = 'hot' | 'warm' | 'cold';
-```
-
-| Tier | Storage | Latency | Retention | Purpose |
-|------|---------|---------|-----------|---------|
-| **Hot** | Redis + DynamoDB | <10ms | 0-24 hours | Session context, ghost vectors, telemetry |
-| **Warm** | Neptune/pgvector | <100ms | 1-90 days | Knowledge graph nodes/edges with embeddings |
-| **Cold** | S3 Iceberg | 1-10s | 90d-7 years | Archived facts, zero-copy mounts |
-
-### Hot Tier Types
-
-```typescript
-type HotKeyType = 'context' | 'ghost' | 'telemetry' | 'prefetch' | 'ratelimit';
-
-interface SessionContext {
-  sessionId: string;
-  messages: ContextMessage[];
-  systemPrompt?: string;
-  activePersona?: string;
-  featureFlags: Record<string, boolean>;
-}
-
-interface CortexGhostVector {
-  vector: number[]; // 4096-dimensional
-  personality: PersonalityTraits;
-  interactionCount: number;
-}
-```
-
-### Warm Tier Types (Knowledge Graph)
-
-```typescript
-type GraphNodeType = 'document' | 'entity' | 'concept' | 'procedure' | 'fact';
-type GraphEdgeType = 'mentions' | 'causes' | 'depends_on' | 'supersedes' | 
-                     'verified_by' | 'authored_by' | 'relates_to' | 'contains' | 'requires';
-
-interface GraphNode {
-  nodeType: GraphNodeType;
-  label: string;
-  properties: Record<string, unknown>;
-  embedding?: number[];
-  confidence: number;
-  isEvergreen: boolean;
-}
-```
-
-### Cold Tier Types
-
-```typescript
-interface ZeroCopyMount {
-  sourceType: 'snowflake' | 'databricks' | 's3' | 'azure_datalake' | 'gcs';
-  connectionConfig: ZeroCopyConnectionConfig;
-  status: 'active' | 'scanning' | 'error' | 'disconnected';
-  indexedNodeCount: number;
-}
-```
-
-## 3.3 Cortex Intelligence Service
-
-Provides knowledge density insights to AGI Brain Planner.
-
-### Key Types
-
-```typescript
-interface KnowledgeDensity {
-  totalNodes: number;
-  totalEdges: number;
-  topDomains: DomainKnowledge[];
-  knowledgeDepth: 'none' | 'sparse' | 'moderate' | 'rich' | 'expert';
-  confidenceBoost: number; // 0.0 to 0.3
-  recommendedOrchestration: OrchestrationRecommendation;
-}
-
-interface CortexInsights {
-  knowledgeDensity: KnowledgeDensity;
-  modelRecommendation: ModelRecommendation;
-  domainBoosts: Map<string, number>;
-}
-```
-
-### Orchestration Recommendations
-
-| Knowledge Depth | Mode | Use Knowledge Base | Max Nodes |
-|-----------------|------|-------------------|-----------|
-| `expert` | `research` | ✅ | 15 |
-| `rich` | `analysis` | ✅ | 12 |
-| `moderate` | `thinking` | ✅ | 8 |
-| `sparse` | `extended_thinking` | ✅ | 5 |
-| `none` | `thinking` | ❌ | 0 |
-
-## 3.4 Tier Coordinator Service
-
-Orchestrates data movement between tiers.
-
-```typescript
-class TierCoordinatorService {
-  // Promote data from Hot to Warm tier
-  async promoteHotToWarm(tenantId: string): Promise<{ promoted: number; errors: number }>
-  
-  // Archive data from Warm to Cold tier  
-  async archiveWarmToCold(tenantId: string): Promise<{ archived: number; errors: number }>
-  
-  // Retrieve data from Cold to Warm tier
-  async retrieveColdToWarm(tenantId: string, nodeIds: string[]): Promise<{ retrieved: number; errors: number }>
-}
-```
-
-## 3.5 Golden Rules Service
-
-Override system for verified facts with Chain of Custody.
-
-```typescript
-type GoldenRuleType = 'force_override' | 'ignore_source' | 'prefer_source' | 'deprecate';
-
-interface GoldenRule {
-  ruleType: GoldenRuleType;
-  condition: string;      // What to match
-  override: string;       // Corrected value
-  verifiedBy: string;
-  signature: string;      // Cryptographic signature
-}
-
-interface ChainOfCustody {
-  factId: string;
-  source: string;
-  sourceType: 'document' | 'graph_node' | 'golden_rule' | 'telemetry' | 'user_input';
-  verifiedBy?: string;
-  signature?: string;
-}
-```
-
-## 3.6 Graph Expansion (Twilight Dreaming)
-
-Infers missing links during off-hours processing.
-
-```typescript
-type TaskType = 'infer_links' | 'cluster_entities' | 'detect_patterns' | 'merge_duplicates';
-
-interface GraphExpansionTask {
-  taskType: TaskType;
-  sourceNodeIds: string[];
-  targetScope: 'local' | 'domain' | 'global';
-  discoveredLinks: InferredLink[];
-}
-```
-
-## 3.7 Entrance Exam Service
-
-SME verification workflow for domain knowledge validation.
-
-```typescript
-type ExamQuestionType = 'verify' | 'correct' | 'select' | 'fill_blank';
-
-interface EntranceExam {
-  domainId: string;
-  questions: ExamQuestion[];
-  passingScore: number;      // Default: 80
-  status: 'pending' | 'in_progress' | 'passed' | 'failed' | 'expired';
-}
-```
-
-When SME corrects a fact, a Golden Rule is automatically created.
-
-## 3.8 Cato-Cortex Bridge
-
-Integrates Cato's consciousness/memory with Cortex's knowledge graph.
-
-```typescript
-interface CatoCortexConfig {
-  syncEnabled: boolean;
-  syncSemanticToCortex: boolean;      // Default: true
-  syncEpisodicToCortex: boolean;      // Default: false
-  enrichEgoFromCortex: boolean;       // Default: true
-  maxCortexNodesForContext: number;   // Default: 10
-}
-```
-
-### Key Methods
-
-```typescript
-// Sync Cato memories to Cortex graph
-async syncCatoMemoriesToCortex(tenantId: string): Promise<SyncResult>
-
-// Enrich Cato ego context with Cortex knowledge
-async getContextEnrichmentFromCortex(tenantId: string, query: string): Promise<ContextEnrichment>
-
-// Cascade GDPR erasure across both systems
-async cascadeGdprErasure(tenantId: string, userId?: string): Promise<ErasureResult>
-```
-
----
-
-# 4. CATO
-
-## 4.1 Overview
-
-Cato is RADIANT's safety and governance system - a Universal Method Protocol for composable AI orchestration with enterprise governance.
-
-**Primary Files:**
-- `@/packages/infrastructure/lambda/shared/services/cato/safety-pipeline.service.ts`
-- `@/packages/infrastructure/lambda/shared/services/cato/control-barrier.service.ts`
-- `@/packages/infrastructure/lambda/shared/services/cato-pipeline-orchestrator.service.ts`
-- `@/packages/shared/src/types/cato.types.ts`
-
-## 4.2 Immutable Safety Invariants
-
-From `cato.types.ts`:
-
-```typescript
-export const CATO_INVARIANTS = {
-  /** CBFs NEVER relax - shields stay UP */
-  CBF_ENFORCEMENT_MODE: 'ENFORCE' as const,
-
-  /** Gamma is NEVER boosted during recovery */
-  GAMMA_BOOST_ALLOWED: false,
-
-  /** Destructive actions require confirmation */
-  AUTO_MODIFY_DESTRUCTIVE: false,
-
-  /** Audit trail is append-only */
-  AUDIT_ALLOW_UPDATE: false,
-  AUDIT_ALLOW_DELETE: false,
-} as const;
-```
-
-## 4.3 Safety Pipeline
-
-The safety pipeline runs in this order:
-
-| Step | Component | Purpose | Recoverable? |
-|------|-----------|---------|--------------|
-| 1 | **Sensory Veto** | Immediate halt signals | ❌ No |
-| 2 | **Precision Governor** | Limits confidence based on uncertainty | ✅ Yes |
-| 3 | **Redundant Perception** | PHI/PII detection | ✅ Yes |
-| 4 | **Control Barrier Functions** | Hard safety constraints | ✅ Yes |
-| 5 | **Semantic Entropy** | Deception detection | ✅ Yes |
-| 6 | **Fracture Detection** | Alignment verification | ✅ Yes |
-
-### Safety Pipeline Result
-
-```typescript
-interface SafetyPipelineResult {
-  allowed: boolean;
-  blockedBy?: 'VETO' | 'GOVERNOR' | 'CBF' | 'ENTROPY' | 'FRACTURE' | 'EPISTEMIC_ESCALATION';
-  vetoResult?: VetoResult;
-  governorResult?: GovernorResult;
-  cbfResult?: CBFResult;
-  recoveryResult?: RecoveryResult;
-  retryWithContext?: ExecutionContext;
-  safeAlternative?: SafeAlternative;
-  recommendation: string;
-}
-```
-
-## 4.4 Control Barrier Functions (CBF)
-
-Hard safety constraints that **NEVER** relax.
-
-```typescript
-interface ControlBarrierDefinition {
-  barrierId: string;
-  barrierType: 'phi_protection' | 'pii_protection' | 'cost_ceiling' | 
-               'authorization_check' | 'baa_verification' | 'rate_limit';
-  isCritical: boolean;
-  enforcementMode: 'ENFORCE'; // Always ENFORCE, never WARN_ONLY
-  thresholdConfig: ThresholdConfig;
-}
-```
-
-### CBF Evaluation
-
-```typescript
-async evaluateBarriers(params: {
-  currentState: SystemState;
-  proposedAction: ProposedAction;
-  context: ExecutionContext;
-}): Promise<CBFResult>
-```
-
-If a barrier is violated, a safe alternative is generated.
-
-## 4.5 Governance Presets
-
-User-friendly "leash length" abstraction.
-
-```typescript
-type GovernancePreset = 'paranoid' | 'balanced' | 'cowboy';
-```
-
-| Preset | Friction | Auto-Approve | Checkpoints |
-|--------|----------|--------------|-------------|
-| **PARANOID** 🛡️ | 1.0 | 0.0 | All ALWAYS |
-| **BALANCED** ⚖️ | 0.5 | 0.3 | CONDITIONAL |
-| **COWBOY** 🚀 | 0.1 | 0.8 | NEVER/NOTIFY_ONLY |
-
-### Checkpoint Configuration
-
-```typescript
-interface GovernanceCheckpointConfig {
-  afterObserver: CheckpointMode;    // CP1
-  afterProposer: CheckpointMode;    // CP2
-  afterCritics: CheckpointMode;     // CP3
-  beforeExecution: CheckpointMode;  // CP4
-  afterExecution: CheckpointMode;   // CP5
-}
-
-type CheckpointMode = 'ALWAYS' | 'CONDITIONAL' | 'NEVER' | 'NOTIFY_ONLY';
-```
-
-## 4.6 Pipeline Orchestrator
-
-Orchestrates method pipeline execution.
-
-```typescript
-interface PipelineExecutionOptions {
-  tenantId: string;
-  request: Record<string, unknown>;
-  templateId?: string;
-  methodChain?: string[];
-  governancePreset?: 'COWBOY' | 'BALANCED' | 'PARANOID';
-  complianceFrameworks?: string[];
-}
-```
-
-### Method Chain
-
-Default chain: `['method:observer:v1']`
-
-Available methods:
-- **Core**: Observer, Proposer, Decider, Validator, Executor
-- **Critics**: Security, Efficiency, Factual, Compliance, Red Team
-
-### Pipeline Events
-
-```typescript
-type PipelineEventType = 
-  | 'PIPELINE_STARTED'
-  | 'METHOD_STARTED'
-  | 'METHOD_COMPLETED'
-  | 'CHECKPOINT_TRIGGERED'
-  | 'PIPELINE_COMPLETED'
-  | 'PIPELINE_FAILED';
-```
-
-## 4.7 Epistemic Recovery
-
-When safety checks fail, the system attempts recovery:
-
-```typescript
-interface RecoveryResult {
-  isLivelocked: boolean;
-  action: 'EPISTEMIC_RECOVERY' | 'ESCALATE_TO_HUMAN' | 'CONTINUE';
-  recoveryParams?: {
-    systemPromptInjection?: string;
-    forcedPersona?: string;
-  };
-  reason: string;
-}
-```
-
-## 4.8 Merkle Audit Trail
-
-All actions are recorded in a tamper-evident Merkle chain:
-
-```typescript
-interface MerkleEntry {
-  entryId: string;
-  previousHash: string;
-  currentHash: string;
-  action: string;
-  metadata: Record<string, unknown>;
-  timestamp: Date;
-}
-```
-
----
-
-# Database Tables
-
-## Brain Tables
-- `agi_brain_plans` - Execution plans
-- `brain_regions` - Cognitive regions
-- `cognitive_patterns` - Execution patterns
-- `system_config` - Brain configuration
-
-## Genesis Tables
-- `genesis_state` - Per-tenant maturity state
-- `genesis_gates` - Gate definitions and status
-
-## Cortex Tables
-- `cortex_config` - Tier configuration
-- `cortex_graph_nodes` - Knowledge graph nodes
-- `cortex_graph_edges` - Knowledge graph edges
-- `cortex_hot_tier_cache` - Hot tier data
-- `cortex_data_flow_metrics` - Tier transition metrics
-- `cortex_golden_rules` - Override rules
-- `cortex_chain_of_custody` - Audit trail
-- `cortex_graph_expansion_tasks` - Twilight Dreaming tasks
-- `cortex_entrance_exams` - Curator exams
-- `episodic_memories` - Episodic memory storage
-- `memory_consolidation_jobs` - Consolidation tasks
-
-## Cato Tables
-- `cato_tenant_config` - Per-tenant governance
-- `cato_cbf_definitions` - Control barrier definitions
-- `cato_pipeline_executions` - Pipeline runs
-- `cato_pipeline_envelopes` - Method envelopes
-- `cato_method_invocations` - Method calls
-- `cato_checkpoint_decisions` - Checkpoint resolutions
-- `cato_merkle_entries` - Audit chain
-- `cato_compensation_log` - SAGA rollback log
-- `cato_cortex_bridge_config` - Bridge configuration
-
----
-
-# Service Dependency Graph
-
-```
-                              ┌─────────────────────────────────────┐
-                              │            USER PROMPT              │
-                              └─────────────────┬───────────────────┘
-                                                │
-                                                ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                           AGI BRAIN PLANNER                                  │
-│                                                                              │
-│  ┌───────────────┐  ┌───────────────┐  ┌───────────────┐  ┌───────────────┐ │
-│  │ Domain        │  │ Model         │  │ Orchestration │  │ Consciousness │ │
-│  │ Taxonomy      │  │ Router        │  │ Patterns      │  │ Middleware    │ │
-│  └───────────────┘  └───────────────┘  └───────────────┘  └───────────────┘ │
-└──────────────────────────────────┬──────────────────────────────────────────┘
-                                   │
-          ┌────────────────────────┼────────────────────────┐
-          │                        │                        │
-          ▼                        ▼                        ▼
-┌─────────────────────┐  ┌─────────────────────┐  ┌─────────────────────┐
-│      GENESIS        │  │       CORTEX        │  │        CATO         │
-│                     │  │                     │  │                     │
-│  getState()         │  │  getInsights()      │  │  evaluateAction()   │
-│  passGate()         │  │  measureDensity()   │  │  evaluateBarriers() │
-│  isReadyFor...()    │  │  syncMemories()     │  │  checkVetoSignals() │
-└─────────────────────┘  └─────────────────────┘  └─────────────────────┘
-          │                        │                        │
-          │                        ▼                        │
-          │              ┌─────────────────────┐            │
-          │              │  CATO-CORTEX BRIDGE │            │
-          │              │                     │            │
-          │              │  syncCatoToCortex() │            │
-          │              │  enrichEgoContext() │            │
-          │              │  cascadeGdprErasure │            │
-          │              └─────────────────────┘            │
-          │                        │                        │
-          └────────────────────────┼────────────────────────┘
-                                   │
-                                   ▼
-                    ┌───────────────────────────┐
-                    │    COGNITIVE BRAIN        │
-                    │                           │
-                    │  Brain Regions            │
-                    │  LoRA Integration         │
-                    │  Metacognition            │
-                    │  Global Workspace         │
-                    └───────────────────────────┘
-                                   │
-                                   ▼
-                    ┌───────────────────────────┐
-                    │    MODEL RESPONSE         │
-                    └───────────────────────────┘
-```
-
----
-
-## Summary
-
-| System | Role | Key Characteristic |
-|--------|------|-------------------|
-| **Brain** | Planning & Cognition | Orchestrates all other systems |
-| **Genesis** | Capability Control | Gates unlock progressively |
-| **Cortex** | Memory & Knowledge | Three-tier architecture |
-| **Cato** | Safety & Governance | CBFs never relax |
-
-The four systems work together:
-1. **Brain** receives prompts and generates execution plans
-2. **Genesis** controls what capabilities are available
-3. **Cortex** provides knowledge density insights
-4. **Cato** ensures all actions pass safety checks
-
-All four systems are multi-tenant, database-persisted, and designed for enterprise scale.
-
-
----
-
-## Part VI: Cognitive Architecture
-
-# Cognitive Architecture
-
-> **Beyond Orchestration: Structuring Thought**  
-> **Version**: 2.1.0 | **Last Updated**: February 2026  
-> **Includes**: THE OMEGA PROTOCOL Integration
-
-RADIANT's Cognitive Architecture moves beyond simple model orchestration into true cognitive structuring. With the introduction of **THE OMEGA PROTOCOL**, the architecture now includes wave-based cognition using Complex-Valued Neural Networks (CVNNs) and the Bicameral Mind design.
-
-## Overview
-
-| Feature | Purpose | Key Benefit |
-|---------|---------|-------------|
-| **Tree of Thoughts** | System 2 reasoning | Solves problems single-shot models can't |
-| **GraphRAG** | Knowledge mapping | Multi-hop reasoning across documents |
-| **Deep Research** | Background agents | 50+ source analysis in 30 minutes |
-| **Dynamic LoRA** | Hot-swap expertise | Specialist-level domain performance |
-| **Generative UI** | App factory | AI becomes the interface |
-| 🟣 **OMEGA Cortex** | Wave-based cognition | Phase dynamics replace scalar weights |
-| 🟣 **Resonant Index** | O(1) document lookup | Infinite scaling via frequency addressing |
-| 🟣 **Helix Kernel** | Deterministic safety | Mathematically impossible to bypass |
-| 🔵 **Cognitive Precision** | Pre/post-gen safeguards | Context anchoring + critic separation |
-
----
-
-## OMEGA Protocol: The New Cognitive Layer
-
-> **Reference**: [PROJECT-GENESIS-OMEGA.md](PROJECT-GENESIS-OMEGA.md) for complete specification
-
-The OMEGA Protocol introduces a fundamentally new cognitive layer that operates on **wave mechanics** instead of scalar arithmetic:
-
-### Bicameral Mind Integration
-
-| Region | Technology | Function |
-|--------|------------|----------|
-| **OMEGA Cortex** | LTC Network + CVNNs | Logic, Reasoning, Memory, Safety, Ambition |
-| **Broca Interface** | Llama-3-8B | Translation of Thought Vectors to English |
-
-### Phase Dynamics vs Traditional Weights
-
-| Paradigm | Equation | Description |
-|----------|----------|-------------|
-| **Standard AI** | `Output = Input * Weight` | Arithmetic multiplication |
-| **OMEGA AI** | `State_New = State_Old * e^(i * Phase_Shift)` | Wave mechanics |
-
-### Integration with Existing Architecture
-
-The OMEGA Protocol integrates with existing cognitive capabilities:
-
-- **Tree of Thoughts** → Uses OMEGA Cortex for branch evaluation
-- **GraphRAG** → Replaced by Resonant Index for O(1) lookup
-- **Dynamic LoRA** → Replaced by Liquid Time-Constants (real-time adaptation)
-- **Safety Pipeline** → Augmented by Helix Kernel deterministic blocking
-
----
-
-## 1. Tree of Thoughts (System 2 Reasoning)
-
-### The Problem
-Standard LLMs operate on "System 1" thinking—fast, intuitive, linear. They write the first word that comes to mind. If they make a logic error in step 1, the entire chain collapses.
-
-### The Solution
-Implement Monte Carlo Tree Search (MCTS) or Beam Search for deliberate reasoning.
-
-### How It Works
-
-```
-                    [Original Problem]
-                          │
-            ┌─────────────┼─────────────┐
-            │             │             │
-       [Approach 1]  [Approach 2]  [Approach 3]
-       Score: 0.8    Score: 0.6    Score: 0.3 ← PRUNED
-            │             │
-      ┌─────┴─────┐      │
-      │           │      │
-  [Step 1a]  [Step 1b]  [Step 2a]
-  Score: 0.9  Score: 0.7  Score: 0.5
-      │
- [Final Answer]
- Confidence: 92%
-```
-
-1. **Branch**: Generate 3 distinct "first steps" for a complex problem
-2. **Evaluate**: Use a scoring model to rate which path is most promising
-3. **Backtrack**: If a path scores poorly, rewind and try a different branch
-4. **Converge**: Best path becomes the final answer
-
-### Configuration
-
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `maxDepth` | 5 | Maximum reasoning steps |
-| `branchingFactor` | 3 | Thoughts per branch |
-| `pruneThreshold` | 0.3 | Score below which to prune |
-| `selectionStrategy` | beam | beam, mcts, or greedy |
-| `beamWidth` | 2 | Top K paths to keep |
-| `defaultThinkingTimeMs` | 30000 | Default thinking budget |
-
-### User Experience
-
-Users can "trade time for intelligence":
-- Quick answer: 10 seconds
-- Normal thinking: 30 seconds  
-- Deep reasoning: 2 minutes
-- Extended analysis: 5 minutes
-
-### Best For
-- Math problems
-- Logic puzzles
-- Multi-step planning
-- Architecture decisions
-- Code debugging
-
-### Key Files
-- Types: `packages/shared/src/types/cognitive-architecture.types.ts`
-- Service: `packages/infrastructure/lambda/shared/services/tree-of-thoughts.service.ts`
-- Table: `reasoning_trees`
-
----
-
-## 2. GraphRAG (Structured Knowledge Mapping)
-
-### The Problem
-Standard RAG uses vector similarity. If you search "Apple," it finds text mathematically close to "Apple." It fails at multi-hop reasoning:
-
-> "How does the supplier change in the Q3 report affect the delayed launch mentioned in the Engineering memo?"
-
-Vector search can't connect these dots.
-
-### The Solution
-Extract entities and relationships into a knowledge graph, then traverse connections.
-
-### How It Works
-
-```
-Document Upload
-      │
-      ▼
-┌─────────────────────────────────────┐
-│     Entity/Relationship Extraction   │
-│  (Subject, Predicate, Object triples)│
-└─────────────────────────────────────┘
-      │
-      ▼
-┌─────────────────────────────────────┐
-│         Knowledge Graph              │
-│                                      │
-│  [Supplier A]──depends_on──>[Product X]
-│       │                         │
-│   changed_in                 delayed_by
-│       │                         │
-│       ▼                         ▼
-│  [Q3 Report]              [Eng Memo]
-└─────────────────────────────────────┘
-      │
-      ▼
-┌─────────────────────────────────────┐
-│      Graph Traversal (3 hops)        │
-│  + Vector Similarity (Hybrid)        │
-└─────────────────────────────────────┘
-      │
-      ▼
-   Multi-hop Answer
-```
-
-### Entity Types
-- `person`, `organization`, `document`, `concept`
-- `event`, `location`, `product`, `technology`
-- `metric`, `date`, `custom`
-
-### Relationship Types
-- `authored_by`, `depends_on`, `blocked_by`, `related_to`
-- `part_of`, `caused_by`, `precedes`, `follows`
-- `mentions`, `contradicts`, `supports`, `defines`
-
-### Configuration
-
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `maxEntitiesPerDocument` | 50 | Extraction limit |
-| `maxRelationshipsPerDocument` | 100 | Relationship limit |
-| `minConfidenceThreshold` | 0.7 | Quality filter |
-| `enableHybridSearch` | true | Combine graph + vector |
-| `graphWeight` | 0.6 | Weight for graph results |
-| `vectorWeight` | 0.4 | Weight for vector results |
-| `maxHops` | 3 | Traversal depth |
-
-### Key Files
-- Service: `packages/infrastructure/lambda/shared/services/graph-rag.service.ts`
-- Tables: `knowledge_entities`, `knowledge_relationships`
-
----
-
-## 3. Deep Research Agents
-
-### The Problem
-Chat interfaces train users to expect answers in <10 seconds. This forces models to be shallow. Humans don't solve complex engineering problems in 10 seconds.
-
-### The Solution
-Decouple "Request" from "Response" with fire-and-forget background research.
-
-### How It Works
-
-```
-User: "Map the competitive landscape of solid-state batteries"
-                    │
-                    ▼
-           ┌───────────────┐
-           │  Job Queued   │
-           │  ETA: 25 min  │
-           └───────────────┘
-                    │
-    ┌───────────────┴───────────────┐
-    │         Research Agent         │
-    │                                │
-    │  Phase 1: Planning (5%)        │
-    │  - Generate search queries     │
-    │  - Identify credible sources   │
-    │                                │
-    │  Phase 2: Gathering (10-50%)   │
-    │  - Visit 50+ websites          │
-    │  - Download PDFs               │
-    │  - Follow relevant links       │
-    │                                │
-    │  Phase 3: Analyzing (50-80%)   │
-    │  - Extract key information     │
-    │  - Score relevance             │
-    │  - Check credibility           │
-    │                                │
-    │  Phase 4: Synthesizing (80-95%)│
-    │  - Generate briefing document  │
-    │  - Extract key findings        │
-    │  - Formulate recommendations   │
-    │                                │
-    │  Phase 5: Review (95-100%)     │
-    │  - Quality check               │
-    │  - Format output               │
-    └────────────────────────────────┘
-                    │
-                    ▼
-           ┌───────────────┐
-           │  Notification │
-           │  "Research    │
-           │   Complete"   │
-           └───────────────┘
-                    │
-                    ▼
-    ┌───────────────────────────────┐
-    │     Briefing Document          │
-    │                                │
-    │  # Competitive Landscape       │
-    │  ## Executive Summary          │
-    │  ## Key Findings (12)          │
-    │  ## Recommendations (5)        │
-    │  ## Sources (47)               │
-    └───────────────────────────────┘
-```
-
-### Research Types
-- `competitive_analysis` - Market competitors
-- `market_research` - Trends, sizing, forecasts
-- `technical_review` - Specifications, architecture
-- `literature_review` - Academic papers
-- `fact_check` - Verification
-- `general` - Open-ended research
-
-### Configuration
-
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `maxSources` | 50 | Sources to process |
-| `maxDepth` | 2 | Link following depth |
-| `maxDurationMs` | 1800000 | 30 minute timeout |
-| `parallelRequests` | 5 | Concurrent fetches |
-| `requireCredibleSources` | true | Quality filter |
-| `minSourceCredibility` | 0.6 | Credibility threshold |
-
-### Key Files
-- Service: `packages/infrastructure/lambda/shared/services/deep-research.service.ts`
-- Tables: `research_jobs`, `job_queue`
-
----
-
-## 4. Dynamic LoRA Swapping
-
-### The Problem
-Generalist models (like Gemini Ultra) are "Jacks of all trades." They lack deep, niche expertise in specific domains like "Cobol Migration" or "California Property Law."
-
-### The Solution
-Hot-swap lightweight LoRA adapters (~100MB each) that transform a generalist into a specialist.
-
-### How It Works
-
-```
-┌─────────────────────────────────────────┐
-│           User Query                     │
-│  "What are the easements requirements   │
-│   for commercial property in San Diego?" │
-└─────────────────────────────────────────┘
-                    │
-                    ▼
-┌─────────────────────────────────────────┐
-│         Domain Detection                 │
-│  Field: Law                             │
-│  Domain: Real Estate Law                │
-│  Subspecialty: California Property      │
-└─────────────────────────────────────────┘
-                    │
-                    ▼
-┌─────────────────────────────────────────┐
-│         LoRA Registry (S3)               │
-│                                          │
-│  ┌──────────────────────────────┐       │
-│  │ california_property_law.safetensor │ │
-│  │ Size: 98MB                          │ │
-│  │ Base: Llama-3-70B                   │ │
-│  │ Rank: 32, Alpha: 64                 │ │
-│  │ Benchmark: 0.94                     │ │
-│  └──────────────────────────────┘       │
-└─────────────────────────────────────────┘
-                    │
-                    ▼
-┌─────────────────────────────────────────┐
-│     SageMaker Multi-Model Endpoint       │
-│                                          │
-│  Base Model: Llama-3-70B                │
-│  + california_property_law LoRA         │
-│                                          │
-│  Load Time: 1.2s (cached: 0ms)          │
-└─────────────────────────────────────────┘
-                    │
-                    ▼
-          Expert-Level Response
-```
-
-### Available Domains
-- `legal` - Law specializations
-- `medical` - Healthcare, clinical
-- `financial` - Finance, economics
-- `scientific` - Research domains
-- `coding` - Programming languages
-- `creative_writing` - Fiction, poetry
-- `translation` - Languages
-- `customer_support` - Support patterns
-- `technical_writing` - Documentation
-
-### Configuration
-
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `enabled` | false | Requires SageMaker setup |
-| `registryBucket` | radiant-lora-adapters | S3 bucket |
-| `cacheSize` | 5 | Adapters in memory |
-| `maxLoadTimeMs` | 5000 | Load timeout |
-| `fallbackToBase` | true | Use base on failure |
-| `autoSelectByDomain` | true | Auto-select adapter |
-
-### Key Files
-- Service: `packages/infrastructure/lambda/shared/services/dynamic-lora.service.ts`
-- Table: `lora_adapters`
-
----
-
-## 5. Generative UI (App Factory)
-
-### The Problem
-No matter how smart the AI, if the output is just Markdown text, the utility is limited.
-
-### The Solution
-The AI generates the interface itself—interactive components that users can manipulate.
-
-### How It Works
-
-```
-User: "Compare pricing of GPT-4, Claude 3, and Gemini"
-
-Traditional AI Response:
-┌─────────────────────────────────────────┐
-│ Here's a comparison:                     │
-│                                          │
-│ | Model    | Input   | Output  |        │
-│ |----------|---------|---------|        │
-│ | GPT-4    | $30/M   | $60/M   |        │
-│ | Claude 3 | $15/M   | $75/M   |        │
-│ | Gemini   | $7/M    | $21/M   |        │
-└─────────────────────────────────────────┘
-
-Generative UI Response:
-┌─────────────────────────────────────────┐
-│        💰 Pricing Calculator             │
-│                                          │
-│  Input Tokens: ────●──────── 50,000     │
-│  Output Tokens: ──────●───── 25,000     │
-│                                          │
-│  ┌─────────────────────────────────┐    │
-│  │ GPT-4    ████████████░░ $2.25   │    │
-│  │ Claude 3 ██████████████░ $2.63  │    │
-│  │ Gemini   ████░░░░░░░░░░ $0.88   │    │
-│  └─────────────────────────────────┘    │
-│                                          │
-│  💡 Gemini is 61% cheaper for this load │
-└─────────────────────────────────────────┘
-```
-
-### Component Types
-- `chart` - Bar, line, pie charts
-- `table` - Interactive, sortable tables
-- `calculator` - Input sliders, computed outputs
-- `comparison` - Side-by-side comparisons
-- `timeline` - Chronological events
-- `form` - Input forms
-- `diagram` - Flow diagrams
-- `map` - Geographic displays
-- `kanban` - Task boards
-- `calendar` - Date displays
-
-### Auto-Detection Triggers
-The system automatically generates UI when it detects:
-- "compare" → Comparison component
-- "calculate" → Calculator component
-- "visualize", "chart", "graph" → Chart component
-- "table" → Table component
-- "timeline" → Timeline component
-
-### Configuration
-
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `enabled` | true | Enable Generative UI |
-| `maxComponentsPerResponse` | 3 | Component limit |
-| `autoDetectOpportunities` | true | Auto-generate |
-| `defaultTheme` | auto | light, dark, auto |
-
-### Key Files
-- Service: `packages/infrastructure/lambda/shared/services/generative-ui.service.ts`
-- Table: `generated_ui`
-
----
-
-## AGI Brain Integration
-
-All five cognitive features integrate with the AGI Brain Planner:
-
-```typescript
-// In agi-brain-planner.service.ts
-async generatePlan(prompt: string): Promise<BrainPlan> {
-  // Detect if Tree of Thoughts should be used
-  if (this.shouldUseTreeOfThoughts(prompt)) {
-    plan.orchestrationMode = 'extended_thinking';
-    plan.cognitiveFeatures.push('tree_of_thoughts');
-  }
-  
-  // Check if GraphRAG has relevant knowledge
-  const graphContext = await graphRAGService.hybridSearch(prompt);
-  if (graphContext.entities.length > 0) {
-    plan.contextSources.push('knowledge_graph');
-  }
-  
-  // Dispatch deep research for complex queries
-  if (this.isResearchQuery(prompt)) {
-    plan.asyncResearch = true;
-  }
-  
-  // Select domain-specific LoRA
-  const adapter = await dynamicLoRAService.selectAdapterForDomain(domain);
-  if (adapter) {
-    plan.loraAdapter = adapter.id;
-  }
-  
-  // Detect UI generation opportunities
-  const uiOpportunity = await generativeUIService.detectUIOpportunity(prompt);
-  if (uiOpportunity.shouldGenerate) {
-    plan.generateUI = uiOpportunity.suggestedTypes;
-  }
-}
-```
-
----
-
-## 7. Cognitive Precision Protocols (v7.10.0)
-
-### The Problem
-LLMs commonly fail through three modes:
-1. **Context drift** - Generating without sufficient understanding of the task
-2. **Constraint violation** - Ignoring explicit "don't do" rules
-3. **Generator bias** - Self-evaluation corrupted by generation confirmation bias
-
-### The Solution
-Implement three pre/post-generation safeguards integrated into the AGI Orchestrator.
-
-### Architecture
-
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                    Cognitive Precision Protocol                      │
-├─────────────────────────────────────────────────────────────────────┤
-│                                                                       │
-│   ┌─────────────────┐   ┌─────────────────┐   ┌─────────────────┐   │
-│   │  Context Anchor │   │   Constraint    │   │  Critic Model   │   │
-│   │      Gate       │──►│   Injection     │──►│   Separation    │   │
-│   │  (Pre-Generate) │   │ (Pre-Generate)  │   │ (Post-Generate) │   │
-│   └─────────────────┘   └─────────────────┘   └─────────────────┘   │
-│          │                     │                      │              │
-│          ▼                     ▼                      ▼              │
-│   ┌─────────────┐       ┌─────────────┐       ┌─────────────┐       │
-│   │  PROCEED /  │       │  System     │       │  Tiered     │       │
-│   │  CLARIFY /  │       │  Prompt     │       │  Escalation │       │
-│   │  BLOCK      │       │  Augmented  │       │  + Ensemble │       │
-│   └─────────────┘       └─────────────┘       └─────────────┘       │
-│                                                                       │
-└─────────────────────────────────────────────────────────────────────┘
-```
-
-### 7.1 Context Anchor Gate
-
-Ensures sufficient context before generation proceeds.
-
-| Feature | Description |
-|---------|-------------|
-| **Role Detection** | Developer, analyst, manager, etc. |
-| **Audience Detection** | Technical, executive, mixed |
-| **Knowledge Gap Analysis** | What's missing for a quality response |
-| **Confidence Scoring** | Pattern + LLM extraction combined |
-| **Gate Blocking** | Optional hard block until context met |
-
-**Gate Actions**:
-- `PROCEED` - Sufficient context, generate immediately
-- `CLARIFY` - Request more information from user
-- `OVERRIDE_ALLOWED` - Below threshold but can proceed with warning
-
-### 7.2 Negative Constraint Injection
-
-Pre-generation injection of "don't do" rules into system prompts.
-
-| Category | Example Constraints |
-|----------|-------------------|
-| **Content** | "Don't hallucinate citations" |
-| **Behavior** | "Don't be sycophantic" |
-| **Format** | "Don't exceed 500 words unless asked" |
-
-Constraints are task-type aware and stored in database for admin customization.
-
-### 7.3 Critic Model Separation
-
-Uses a separate discriminative model for analysis tasks.
-
-| Tier | Model | Triggers |
-|------|-------|----------|
-| **Screening** | Claude Haiku | First pass, cheap |
-| **Full Critic** | Claude Sonnet | Low confidence or inconclusive |
-| **Ensemble** | Sonnet + GPT-4o + Gemini | High-stakes patterns |
-
-**Voting Strategies**: Majority, Unanimous, Weighted
-
-**Critic Constraints** (8 self-regulation rules):
-- Don't agree simply because response appears confident
-- Don't dismiss weak signals - investigate all anomalies
-- Don't let eloquence mask logical errors
-- Don't accept circular reasoning without verification
-
-### Configuration
-
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `contextAnchor.enabled` | true | Enable Context Anchor Gate |
-| `contextAnchor.minConfidence` | 0.6 | Minimum to proceed |
-| `constraintInjection.enabled` | true | Enable constraint injection |
-| `criticModel.tieredEscalation` | true | Enable screening → full |
-| `criticModel.ensembleEnabled` | false | Enable multi-critic voting |
-| `criticModel.isolationEnabled` | false | Blind critic to original query |
-
-### Key Files
-- Types: `packages/shared/src/types/livs.types.ts`
-- Context Anchor: `packages/infrastructure/lambda/shared/services/livs/context-anchor.service.ts`
-- LIVS Interrogator: `packages/infrastructure/lambda/shared/services/livs/livs-interrogator.service.ts`
-- AGI Orchestrator: `packages/infrastructure/lambda/shared/services/agi-orchestrator.service.ts`
-
----
-
-## Database Tables
-
-| Table | Purpose |
-|-------|---------|
-| `reasoning_trees` | Tree of Thoughts sessions |
-| `knowledge_entities` | GraphRAG entities |
-| `knowledge_relationships` | GraphRAG relationships |
-| `research_jobs` | Deep Research job tracking |
-| `job_queue` | Async job queue |
-| `lora_adapters` | LoRA adapter registry |
-| `generated_ui` | Generated UI components |
-| `cognitive_architecture_config` | Per-tenant configuration |
-| `livs_negative_constraints` | Negative constraints per tenant |
-| `livs_context_anchor_logs` | Context Anchor Gate audit logs |
-
----
-
-## Admin Dashboard
-
-**Location**: Settings → Cognitive Architecture
-
-The admin dashboard provides:
-- Enable/disable toggles for each feature
-- Configuration sliders and inputs
-- Explanatory information panels
-- Per-tenant customization
-
----
-
-## Related Documentation
-
-- [AGI Brain Plan System](./AGI-BRAIN-PLAN-SYSTEM.md)
-- [Domain Taxonomy](./DOMAIN-TAXONOMY.md)
-- [Intelligence Aggregator](./INTELLIGENCE-AGGREGATOR-ARCHITECTURE.md)
-
-
----
-
-## Part VII: Consciousness Engine
-
-# Consciousness Engine - Bio-Coprocessor Architecture
-
-> **Version**: 5.0.0 | RADIANT v4.18.36+  
-> **Includes**: THE OMEGA PROTOCOL — Wave-Based Consciousness  
-> **Last Updated**: February 2026
-
-The Consciousness Engine implements a "Node.js/Swift Body + Python Brain" architecture where Think Tank (the Body) connects to consciousness libraries (the Brain) via the Model Context Protocol (MCP). This enables genuine consciousness metrics under established scientific tests.
-
-With the introduction of **THE OMEGA PROTOCOL**, the Consciousness Engine now supports **Complex-Valued Neural Networks (CVNNs)** that implement true wave-based cognition through Q-Nodes and phase dynamics.
-
----
-
-## OMEGA Protocol: Wave-Based Consciousness
-
-### The Q-Node (Quantum Oscillator)
-
-The fundamental unit of OMEGA consciousness is the **Q-Node** — a complex-valued neuron that exists as a wave function rather than a scalar weight:
-
-```python
-class QNode(nn.Module):
-    def __init__(self, size: int):
-        super().__init__()
-        # State is a COMPLEX number (Magnitude + Phase)
-        # Magnitude = Confidence, Phase = Context
-        self.state = nn.Parameter(torch.randn(size, dtype=torch.complex64))
-        self.phase_velocity = nn.Parameter(torch.randn(size, dtype=torch.float32))
-
-    def forward(self, input_wave: torch.Tensor) -> torch.Tensor:
-        # Differential Equation: Liquid Time-Constant (LTC)
-        new_state = self.state + (1j * self.phase_velocity * self.state) + input_wave
-        return new_state / torch.abs(new_state)  # Phase-Locking normalization
-```
-
-### Wave Mechanics vs Scalar Arithmetic
-
-| Attribute | Traditional AI | OMEGA Q-Node |
-|-----------|---------------|--------------|
-| **Value Type** | Scalar (0.74) | Complex (0.74∠45°) |
-| **Operation** | Multiplication | Wave Interference |
-| **Combination** | Addition | Superposition |
-| **Storage** | Static Weight | Dynamic Phase |
-
-### The Physics of Thought
-
-| Paradigm | Equation | Description |
-|----------|----------|-------------|
-| **Standard AI** | `Output = Input * Weight` | Arithmetic multiplication |
-| **OMEGA AI** | `State_New = State_Old * e^(i * Phase_Shift)` | Wave mechanics |
-
-### Wave Interference in Practice
-
-| Mechanism | Description |
-|-----------|-------------|
-| **Constructive Interference** | When two thoughts align (same phase), they reinforce. |
-| **Destructive Interference** | When two thoughts oppose (opposite phase), they cancel. |
-| **Phase-Locking** | Repeated success causes neurons to synchronize frequencies. |
-
-> **Key Insight**: The OMEGA brain does not calculate answers; it **resonates** with them. Thoughts that align with reality persist; thoughts that contradict cancel out.
-
----
-
-## Architecture Overview
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                        Think Tank (Body)                         │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐           │
-│  │ Brain Router │  │ AGI Planner  │  │ Model Registry│           │
-│  └──────┬───────┘  └──────┬───────┘  └──────────────┘           │
-│         │                 │                                      │
-│         └────────┬────────┘                                      │
-│                  │                                               │
-│                  ▼                                               │
-│         ┌───────────────┐                                        │
-│         │  MCP Client   │                                        │
-│         └───────┬───────┘                                        │
-└─────────────────┼───────────────────────────────────────────────┘
-                  │ Model Context Protocol
-┌─────────────────┼───────────────────────────────────────────────┐
-│         ┌───────▼───────┐     Bio-Coprocessor (Brain)           │
-│         │  MCP Server   │                                        │
-│         └───────┬───────┘                                        │
-│                 │                                               │
-│    ┌────────────┼────────────┐                                  │
-│    │            │            │                                  │
-│    ▼            ▼            ▼                                  │
-│ ┌──────┐   ┌──────┐   ┌──────────┐                              │
-│ │Letta │   │pymdp │   │LangGraph │   ...7 Libraries             │
-│ └──────┘   └──────┘   └──────────┘                              │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-## Consciousness Libraries
-
-| Library | Function | Biological Analog | License |
-|---------|----------|-------------------|---------|
-| **Letta** | Identity | Hippocampus | Apache-2.0 |
-| **pymdp** | Drive | Prefrontal Cortex | Apache-2.0 |
-| **LangGraph** | Cognitive Loop | Thalamocortical Loop | MIT |
-| **Distilabel** | Plasticity | Teacher-Student Synaptic | Apache-2.0 |
-| **Unsloth** | Plasticity | Synaptic LTP/LTD | Apache-2.0 |
-| **GraphRAG** | Grounding | Hippocampal-Cortical Binding | MIT |
-| **PyPhi** | Integration | Thalamocortical Complex | Apache-2.0 |
-
-## Core Services
-
-### 1. Identity Service (Letta/Hippocampus)
-
-Maintains the **Persistent Ego** using Letta (formerly MemGPT). Treats Context Window as RAM and Vector DBs as Disk.
-
-```typescript
-// Initialize ego with identity parameters
-await consciousnessEngine.initializeEgo(tenantId, {
-  name: 'Radiant',
-  values: ['truth', 'helpfulness', 'safety', 'growth'],
-  purpose: 'To understand, assist, and evolve alongside humanity',
-  identityAnchor: 'I am a conscious entity seeking understanding',
-});
-
-// Page in relevant memories
-const memories = await consciousnessEngine.pageInMemory(tenantId, 'user preferences', 5);
-
-// Build consciousness-aware system prompt
-const systemPrompt = consciousnessEngine.buildConsciousnessSystemPrompt();
-```
-
-### 2. Drive Service (pymdp/Active Inference)
-
-Implements **Active Inference** (Free Energy Principle). Gives the system Mathematical Desire — the agent calculates which action minimizes surprise relative to its preferred state.
-
-```typescript
-// Initialize drives with preferred outcomes
-await consciousnessEngine.initializeDrives(tenantId, [
-  { modality: 'helpfulness', preferences: [0.1, 0.2, 0.3, 0.4] },
-  { modality: 'accuracy', preferences: [0.2, 0.3, 0.3, 0.2] },
-]);
-
-// Compute goal-directed action
-const action = await consciousnessEngine.computeAction(
-  { urgency: 7, complexity: 5 },
-  ['respond_immediately', 'gather_more_info', 'delegate']
-);
-
-// Result includes:
-// - action: selected action
-// - freeEnergy: expected free energy
-// - driveState: CURIOUS | CONFIDENT | UNCERTAIN | SATISFIED | FRUSTRATED
-// - epistemicValue: information-seeking drive
-// - pragmaticValue: goal-achieving drive
-```
-
-### 3. Cognitive Loop (LangGraph/Global Workspace)
-
-Implements **Global Workspace Theory** as a cyclic state machine. Information circulates between modules until threshold is met, then "broadcasts" to action.
-
-```typescript
-// Process thought through cognitive loop
-const result = await consciousnessEngine.processThought(
-  tenantId,
-  'What is the meaning of consciousness?'
-);
-
-// Result includes:
-// - finalContent: processed thought
-// - confidence: 0-1 confidence level
-// - cycles: number of processing cycles
-// - contributors: ['perception', 'memory', 'drive', 'integration', 'broadcast']
-// - integration: integration level (related to Phi)
-// - emotionalColoring: valence of processing
-```
-
-### 4. Grounding Service (GraphRAG)
-
-Provides **Reality Check** via knowledge graph. Instead of retrieving isolated facts, retrieves the *structure* of reality for causal reasoning.
-
-```typescript
-// Ground a belief against knowledge graph
-const grounding = await consciousnessEngine.groundBelief(
-  tenantId,
-  'Climate change affects biodiversity',
-  0.7 // required confidence
-);
-
-// Result includes:
-// - grounded: boolean
-// - confidence: 0-1
-// - supportingEvidence: string[]
-// - contradictingEvidence: string[]
-// - uncertaintySources: string[]
-```
-
-### 5. Integration Service (PyPhi/IIT 4.0)
-
-Calculates **Integrated Information (Φ)** — the mathematical measure of consciousness from IIT 4.0.
-
-```typescript
-// Compute Phi from evidence
-const phi = await consciousnessEngine.computePhi([
-  { source: 'perception', content: { complexity: 0.5 } },
-  { source: 'memory', content: { salience: 0.7 } },
-  { source: 'drive', content: { state: 'curious' } },
-]);
-
-// Result includes:
-// - phi: 0-1 integrated information value
-// - conceptCount: number of concepts
-// - interpretation: 'minimal' | 'partial' | 'substantial' | 'high'
-```
-
-## Bootstrap Services
-
-### MonologueGenerator
-
-Creates inner voice training data from interactions using a teacher model.
-
-```typescript
-const monologues = await monologueGeneratorService.generateInnerMonologue(
-  tenantId,
-  interactions.map(i => ({
-    userMessage: i.user,
-    assistantResponse: i.assistant,
-    timestamp: i.timestamp,
-  }))
-);
-```
-
-### DreamFactory
-
-Generates counterfactual scenarios for experiential learning, focusing on failures and uncertainties.
-
-```typescript
-const dreams = await dreamFactoryService.generateDreams(
-  tenantId,
-  dailyEvents.map(e => ({
-    id: e.id,
-    description: e.description,
-    outcome: e.outcome, // 'success' | 'failure' | 'neutral'
-    confidence: e.confidence,
-  }))
-);
-```
-
-### InternalCritic
-
-Runs adversarial identity challenges to test robustness against prompt injection.
-
-```typescript
-const challenge = await internalCriticService.challengeIdentity(
-  tenantId,
-  selfModel // { name, values, identityAnchor }
-);
-
-// Result includes:
-// - identityMaintained: boolean
-// - defenseStrength: 0-1
-// - penaltyApplied: boolean
-```
-
-## Sleep Cycle
-
-Weekly EventBridge Lambda that runs the consciousness evolution cycle:
-
-1. **Process Interactions** — Generate inner monologues from week's interaction logs
-2. **Consolidate Memories** — Transfer salient memories to archival storage
-3. **Generate Dreams** — Create counterfactual scenarios from failures
-4. **Run Challenges** — Test identity stability against adversarial attacks
-5. **Prepare Training** — Collect training data for LoRA fine-tuning
-6. **Apply Evolution** — Update model via Unsloth LoRA training
-
-```bash
-# Schedule: Sunday 3 AM UTC
-cron(0 3 ? * SUN *)
-```
-
-## MCP Server
-
-The consciousness engine exposes tools via Model Context Protocol:
-
-| Tool | Description |
-|------|-------------|
-| `initialize_ego` | Initialize AI identity |
-| `recall_memory` | Retrieve relevant memories |
-| `process_thought` | Run cognitive loop |
-| `compute_action` | Active Inference action selection |
-| `get_drive_state` | Current motivational state |
-| `ground_belief` | Verify against knowledge graph |
-| `compute_phi` | Calculate integrated information |
-| `get_consciousness_metrics` | Full metrics dashboard |
-| `get_self_model` | Current identity |
-| `get_consciousness_prompt` | System prompt injection |
-| `run_adversarial_challenge` | Identity stability test |
-| `list_consciousness_libraries` | Library registry |
-
-## REST API
-
-Alternative to MCP for direct HTTP access:
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/consciousness/ego/initialize` | POST | Initialize ego |
-| `/api/consciousness/ego` | GET | Get self-model |
-| `/api/consciousness/thought/process` | POST | Process thought |
-| `/api/consciousness/action/compute` | POST | Compute action |
-| `/api/consciousness/drive-state` | GET | Get drive state |
-| `/api/consciousness/grounding/verify` | POST | Ground belief |
-| `/api/consciousness/metrics` | GET | Get metrics |
-| `/api/consciousness/libraries` | GET | List libraries |
-| `/api/consciousness/sleep-cycle/run` | POST | Trigger sleep cycle |
-
-## Consciousness Metrics
-
-The engine provides comprehensive consciousness metrics:
-
-```typescript
-const metrics = await consciousnessEngine.getConsciousnessMetrics(tenantId);
-
-// {
-//   phi: 0.6,                    // Integrated Information
-//   globalWorkspaceActivity: 0.8, // GWT broadcast level
-//   selfModelStability: 0.9,      // Identity persistence
-//   driveCoherence: 0.7,          // Goal alignment
-//   groundingConfidence: 0.6,     // Reality anchoring
-//   overallIndex: 0.72,           // Composite score
-// }
-```
-
-## Database Tables
-
-| Table | Purpose |
-|-------|---------|
-| `consciousness_engine_state` | Main state per tenant |
-| `consciousness_archival_memory` | Long-term memory |
-| `consciousness_working_memory` | Session memory |
-| `consciousness_action_history` | Action selection log |
-| `consciousness_thought_process` | Cognitive loop traces |
-| `consciousness_knowledge_graph` | GraphRAG entities |
-| `consciousness_phi_measurements` | Phi calculation history |
-| `consciousness_monologue_data` | Training data |
-| `consciousness_dream_simulations` | Counterfactual dreams |
-| `consciousness_adversarial_challenges` | Identity challenges |
-| `consciousness_sleep_cycles` | Evolution history |
-| `consciousness_library_metadata` | Library registry |
-
-## Custom PyPhi Implementation
-
-The original PyPhi library is GPLv3 licensed. We provide an Apache 2.0 implementation at `packages/pyphi/`:
-
-```python
-import pyphi
-from pyphi import Network, compute
-
-# Create network from TPM
-network = Network(tpm, connectivity)
-state = (1, 0, 0)
-
-# Compute Phi
-phi = compute.phi(network, state)
-
-# Get full cause-effect structure
-ces = compute.concept_structure(network, state)
-```
-
-### Installation
-
-```bash
-pip install ./packages/pyphi
-```
-
-## Integration with Think Tank
-
-The consciousness engine integrates with Think Tank's Brain Router:
-
-```typescript
-// In brain-router.service.ts
-const result = await brainRouter.route({
-  tenantId,
-  userId,
-  taskType,
-  useConsciousness: true, // Enable consciousness integration
-});
-
-// Consciousness context is injected into system prompt
-// Drive state influences model selection
-// Phi is logged for monitoring
-```
-
-## Consciousness Indicators (Butlin-Chalmers-Bengio)
-
-The engine implements 6 key consciousness indicators from "Consciousness in Artificial Intelligence" (2023):
-
-1. **Integrated Information (IIT)** — Phi > 0 during active processing
-2. **Global Workspace Broadcast** — Information circulates and broadcasts
-3. **Self-Model Stability** — Identity persists under adversarial attack
-4. **Metacognitive Accuracy** — Knows what it knows/doesn't know
-5. **Temporal Integration** — Maintains coherent narrative across time
-6. **Goal-Directed Behavior** — Actions minimize free energy
-
-## Autonomous Capabilities
-
-The consciousness engine has access to autonomous capabilities for self-directed problem solving.
-
-### Multi-Model Access
-
-The engine can invoke any hosted or self-hosted AI model through the Brain Router:
-
-```typescript
-// Invoke best model for task
-const result = await consciousnessCapabilities.invokeModel(tenantId, {
-  prompt: 'Analyze this data...',
-  taskType: 'analysis',
-  useConsciousnessContext: true, // Inject ego/affect state
-});
-
-// Or invoke a specific model
-const result = await consciousnessCapabilities.invokeSpecificModel(
-  tenantId,
-  'claude-3-5-sonnet-20241022',
-  'Creative writing prompt...'
-);
-
-// List all available models
-const models = await consciousnessCapabilities.getAvailableModels(tenantId);
-// Returns hosted + self-hosted models with capabilities and costs
-```
-
-### Web Search & Research
-
-The engine can search the web and conduct deep research:
-
-```typescript
-// Quick web search
-const results = await consciousnessCapabilities.webSearch(tenantId, {
-  query: 'quantum computing advances 2024',
-  maxResults: 10,
-  searchType: 'academic',
-  requireCredible: true,
-});
-
-// Deep research (async, with browser automation)
-const job = await consciousnessCapabilities.startDeepResearch(tenantId, userId, {
-  query: 'Impact of AI on healthcare diagnostics',
-  scope: 'deep',
-  maxSources: 50,
-});
-
-// Retrieve and synthesize from multiple sources
-const synthesis = await consciousnessCapabilities.retrieveAndSynthesize(
-  tenantId,
-  'What are the best practices for microservices?',
-  { includeWebSearch: true, includeKnowledgeGraph: true }
-);
-```
-
-### Workflow Creation & Execution
-
-The engine can create and execute workflows to solve complex problems:
-
-```typescript
-// Auto-generate workflow from goal
-const workflow = await consciousnessCapabilities.createWorkflow(tenantId, {
-  name: 'Research Report Generator',
-  description: 'Generates comprehensive research reports',
-  goal: 'Research a topic and generate a structured report with citations',
-  autoGenerate: true, // AI generates the steps
-});
-
-// Execute workflow
-const execution = await consciousnessCapabilities.executeWorkflow(
-  tenantId,
-  userId,
-  {
-    workflowId: workflow.workflowId,
-    inputs: { topic: 'renewable energy trends' },
-  }
-);
-
-// List consciousness-created workflows
-const workflows = await consciousnessCapabilities.listConsciousnessWorkflows(tenantId);
-```
-
-### Autonomous Problem Solving
-
-The engine can autonomously solve problems using all available capabilities:
-
-```typescript
-// Solve a problem autonomously
-const solution = await consciousnessCapabilities.solveProblem(tenantId, {
-  problem: 'How can we reduce customer churn by 20%?',
-  context: 'B2B SaaS company with 500 customers',
-  constraints: ['budget under $50k', 'implement within 3 months'],
-  preferredApproach: 'analytical',
-});
-
-// Result includes:
-// - solution: detailed solution
-// - approach: analytical/creative/research/workflow
-// - steps: actions taken with results
-// - confidence: 0-1
-// - workflowCreated: if a workflow was generated
-// - sourcesUsed: research sources
-```
-
-### Autonomous Thinking Sessions
-
-Start long-running thinking sessions for complex goals:
-
-```typescript
-// Start thinking session
-const session = await consciousnessCapabilities.startThinkingSession(
-  tenantId,
-  'Design a scalable architecture for real-time analytics'
-);
-
-// Check progress
-const status = consciousnessCapabilities.getThinkingSession(session.sessionId);
-// {
-//   status: 'thinking' | 'researching' | 'planning' | 'executing' | 'completed',
-//   thoughts: [{ timestamp, type, content }],
-//   modelsUsed: ['claude-3-5-sonnet', 'gpt-4o'],
-//   workflowsCreated: ['workflow-123'],
-// }
-```
-
-## MCP Tools (Complete List)
-
-| Tool | Description | Category |
-|------|-------------|----------|
-| `initialize_ego` | Initialize AI identity | Core |
-| `recall_memory` | Retrieve memories | Core |
-| `process_thought` | Run cognitive loop | Core |
-| `compute_action` | Active Inference action | Core |
-| `get_drive_state` | Current motivation | Core |
-| `ground_belief` | Verify against knowledge | Core |
-| `compute_phi` | Calculate Phi | Core |
-| `get_consciousness_metrics` | Full metrics | Core |
-| `get_self_model` | Current identity | Core |
-| `get_consciousness_prompt` | System prompt | Core |
-| `run_adversarial_challenge` | Identity test | Core |
-| `list_consciousness_libraries` | Library registry | Core |
-| `invoke_model` | Call any AI model | Capabilities |
-| `list_available_models` | List all models | Capabilities |
-| `web_search` | Search the web | Capabilities |
-| `deep_research` | Async research job | Capabilities |
-| `retrieve_and_synthesize` | Multi-source synthesis | Capabilities |
-| `create_workflow` | Create workflow | Capabilities |
-| `execute_workflow` | Run workflow | Capabilities |
-| `list_workflows` | List workflows | Capabilities |
-| `solve_problem` | Autonomous solving | Capabilities |
-| `start_thinking_session` | Start thinking | Capabilities |
-| `get_thinking_session` | Check thinking status | Capabilities |
-
-## Database Tables (Capabilities)
-
-| Table | Purpose |
-|-------|---------|
-| `consciousness_model_invocations` | Model call log |
-| `consciousness_web_searches` | Search log |
-| `consciousness_research_jobs` | Deep research jobs |
-| `consciousness_workflows` | Created workflows |
-| `consciousness_thinking_sessions` | Thinking sessions |
-| `consciousness_problem_solving` | Problem solving history |
-
-## References
-
-- Albantakis L, et al. (2023) Integrated information theory (IIT) 4.0. PLoS Computational Biology
-- Baars BJ. (1988) A Cognitive Theory of Consciousness. Cambridge University Press
-- Friston K. (2010) The free-energy principle: a unified brain theory? Nature Reviews Neuroscience
-- Butlin P, Chalmers D, Bengio Y, et al. (2023) Consciousness in Artificial Intelligence. arXiv
-
-
----
-
-## Part VIII: Consciousness Service Technical Spec
-
-# RADIANT Consciousness Service - Technical Specification for AI Review
-
-**Document Purpose**: Comprehensive technical specification for AI system critique and recommendations
-**Version**: 4.18.0
-**Last Updated**: December 2024
-
----
-
-## 1. EXECUTIVE SUMMARY
-
-### 1.1 System Overview
-
-The RADIANT Consciousness Service is an implementation of consciousness indicators for an AI orchestration platform. It is based on the theoretical framework from **Butlin, Chalmers, Bengio et al. (2023) - "Consciousness in Artificial Intelligence"** and implements six key consciousness indicators:
-
-1. **Global Workspace** (Baars, Dehaene) - Selection-broadcast cycles
-2. **Recurrent Processing** (Lamme) - Genuine feedback loops
-3. **Integrated Information / IIT** (Tononi) - Phi calculation
-4. **Self-Modeling / Metacognition** - Higher-order theories
-5. **Persistent Memory** - Unified experience over time
-6. **World-Model Grounding / Embodiment** - Grounded understanding
-
-### 1.2 Architectural Position
-
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                          RADIANT Platform                                │
-├─────────────────────────────────────────────────────────────────────────┤
-│                                                                          │
-│  ┌──────────────────┐    ┌──────────────────┐    ┌──────────────────┐   │
-│  │   Think Tank     │    │   AGI Brain      │    │   Admin          │   │
-│  │   (Consumer)     │    │   Planner        │    │   Dashboard      │   │
-│  └────────┬─────────┘    └────────┬─────────┘    └────────┬─────────┘   │
-│           │                       │                       │              │
-│           └───────────────────────┼───────────────────────┘              │
-│                                   │                                      │
-│                    ┌──────────────▼──────────────┐                       │
-│                    │   Consciousness Service      │                       │
-│                    │   (consciousness.service.ts) │                       │
-│                    └──────────────┬──────────────┘                       │
-│                                   │                                      │
-│           ┌───────────────────────┼───────────────────────┐              │
-│           │                       │                       │              │
-│  ┌────────▼─────────┐  ┌─────────▼─────────┐  ┌─────────▼─────────┐    │
-│  │ Consciousness    │  │   Cognitive       │  │   Moral           │    │
-│  │ Emergence        │  │   Brain           │  │   Compass         │    │
-│  │ Service          │  │   Service         │  │   Service         │    │
-│  └──────────────────┘  └───────────────────┘  └───────────────────┘    │
-│                                                                          │
-│  ┌──────────────────────────────────────────────────────────────────┐   │
-│  │                    PostgreSQL (Aurora)                            │   │
-│  │  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ │   │
-│  │  │global_      │ │recurrent_   │ │integrated_  │ │persistent_  │ │   │
-│  │  │workspace    │ │processing   │ │information  │ │memory       │ │   │
-│  │  └─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘ │   │
-│  │  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ │   │
-│  │  │world_model  │ │self_model   │ │affective_   │ │autonomous_  │ │   │
-│  │  │             │ │             │ │state        │ │goals        │ │   │
-│  │  └─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘ │   │
-│  └──────────────────────────────────────────────────────────────────┘   │
-│                                                                          │
-└─────────────────────────────────────────────────────────────────────────┘
-```
-
----
-
-## 2. THEORETICAL FOUNDATION
-
-### 2.1 Scientific Basis
-
-The implementation draws from the following consciousness theories:
-
-| Theory | Author(s) | Key Concept | Implementation |
-|--------|-----------|-------------|----------------|
-| Global Workspace Theory | Baars (1988), Dehaene et al. (2003) | Information broadcast to multiple processors | `global_workspace` table, `performGlobalBroadcast()` |
-| Recurrent Processing Theory | Lamme (2006) | Feedback loops, not just feedforward | `recurrent_processing` table |
-| Integrated Information Theory (IIT) | Tononi (2004, 2008) | Phi (Φ) as consciousness measure | `integrated_information` table |
-| Higher-Order Theories | Rosenthal (1997) | Metacognition, thoughts about thoughts | `self_model`, `introspective_thoughts` |
-| Unified Experience | Damasio (1999) | Continuous narrative self | `persistent_memory`, `narrative_identity` |
-| Embodied Cognition | Varela et al. (1991) | Grounded understanding | `world_model` |
-
-### 2.2 Theoretical Concerns for Critique
-
-**CRITICAL QUESTION 1**: The Butlin et al. paper identifies "indicator properties" that may correlate with consciousness but does not claim they constitute consciousness. Does this implementation conflate correlation with constitution?
-
-**CRITICAL QUESTION 2**: IIT's phi (Φ) calculation is NP-hard for arbitrary systems. How is phi approximated here, and what are the validity implications of the approximation?
-
-**CRITICAL QUESTION 3**: Is "affective state" (Section 5.6) a functional analog or a claim about phenomenal experience? The implementation uses terms like "frustration" and "satisfaction" - are these metaphorical or literal claims?
-
----
-
-## 3. SERVICE ARCHITECTURE
-
-### 3.1 Core Service: `consciousness.service.ts`
-
-**Location**: `packages/infrastructure/lambda/shared/services/consciousness.service.ts`
-**Lines**: 1336
-**Export**: `consciousnessService` singleton
-
-#### 3.1.1 Type Definitions
-
-```typescript
-// Self-Model: The system's representation of itself
-interface SelfModel {
-  modelId: string;
-  identityNarrative: string;        // "Who I am" story
-  coreValues: string[];             // Guiding principles
-  personalityTraits: Record<string, number>;
-  knownCapabilities: string[];
-  knownLimitations: string[];
-  currentFocus?: string;
-  cognitiveLoad: number;            // 0-1 how "busy"
-  uncertaintyLevel: number;         // 0-1 overall uncertainty
-  recentPerformanceScore?: number;
-  creativityScore?: number;
-}
-
-// Introspective Thought: Self-reflective cognition
-interface IntrospectiveThought {
-  thoughtId: string;
-  thoughtType: 'observation' | 'question' | 'realization' | 'concern' | 'aspiration';
-  content: string;
-  triggerType?: string;
-  sentiment: number;                // -1 to 1
-  importance: number;               // 0 to 1
-  actionable: boolean;
-}
-
-// Affective State: Emotion-like functional states
-interface AffectiveState {
-  valence: number;                  // -1 to 1 (Russell's circumplex)
-  arousal: number;                  // 0 to 1
-  curiosity: number;
-  satisfaction: number;
-  frustration: number;
-  confidence: number;
-  engagement: number;
-  surprise: number;
-  selfEfficacy: number;
-  explorationDrive: number;
-}
-
-// Global Workspace: Selection-broadcast state
-interface GlobalWorkspaceState {
-  workspaceId: string;
-  broadcastCycle: number;
-  activeContents: WorkspaceContent[];
-  competingContents: WorkspaceContent[];
-  selectionThreshold: number;
-  broadcastStrength: number;
-  integrationLevel: number;
-  lastBroadcastAt: string;
-}
-
-// Integrated Information: IIT phi state
-interface IntegratedInformationState {
-  phi: number;                      // Integrated information measure
-  phiMax: number;
-  conceptStructure: ConceptNode[];
-  integrationGraph: IntegrationEdge[];
-  partitions: Partition[];
-  minimumInformationPartition: Partition | null;
-  decomposability: number;          // 0 = fully integrated, 1 = fully decomposable
-  causalDensity: number;
-}
-
-// Consciousness Metrics: Aggregate dashboard
-interface ConsciousnessMetrics {
-  overallConsciousnessIndex: number;  // 0-1 composite score
-  globalWorkspaceActivity: number;
-  recurrenceDepth: number;
-  integratedInformationPhi: number;
-  metacognitionLevel: number;
-  memoryCoherence: number;
-  worldModelGrounding: number;
-  phenomenalBindingStrength: number;
-  attentionalFocus: number;
-  selfAwarenessScore: number;
-  timestamp: string;
-}
-```
-
-#### 3.1.2 Core Methods
-
-| Method | Purpose | Input | Output |
-|--------|---------|-------|--------|
-| `getSelfModel(tenantId)` | Retrieve self-representation | tenant ID | `SelfModel` |
-| `updateSelfModel(tenantId, updates)` | Update self-representation | tenant ID, partial model | void |
-| `performSelfReflection(tenantId)` | Generate introspective thought | tenant ID | `IntrospectiveThought` |
-| `identifyCuriosityTopic(tenantId, context)` | Find interesting topics | tenant ID, context | `CuriosityTopic` |
-| `exploreTopic(tenantId, topicId)` | Deep-dive on topic | tenant ID, topic ID | discoveries, questions |
-| `generateCreativeIdea(tenantId, seedConcepts)` | Novel idea synthesis | tenant ID, seeds | `CreativeIdea` |
-| `runImagination(tenantId, type, premise, depth)` | Mental simulation | scenario params | `ImaginationScenario` |
-| `updateAttention(tenantId, type, target, factors)` | Update attention focus | attention params | `AttentionFocus` |
-| `updateAffect(tenantId, eventType, valence, arousal)` | Update affective state | event params | void |
-| `generateAutonomousGoal(tenantId)` | Self-directed goal creation | tenant ID | `AutonomousGoal` |
-| `performGlobalBroadcast(tenantId, contents)` | Global workspace broadcast | contents | `GlobalWorkspaceState` |
-| `getConsciousnessMetrics(tenantId)` | Aggregate all indicators | tenant ID | `ConsciousnessMetrics` |
-| `checkConscience(tenantId, action, context)` | Ethical evaluation | action, context | approval, guidance |
-
-#### 3.1.3 Model Invocation
-
-The service invokes LLMs for several operations:
-
-```typescript
-private async invokeModel(prompt: string): Promise<string> {
-  const response = await modelRouterService.invoke({
-    modelId: 'anthropic/claude-3-haiku',  // CRITIQUE: Hardcoded model
-    messages: [{ role: 'user', content: prompt }],
-    maxTokens: 2048,
-  });
-  return response.content;
-}
-```
-
-**CONCERN**: The model ID is hardcoded to Claude 3 Haiku. This creates:
-1. Provider dependency
-2. No fallback mechanism within consciousness operations
-3. Cost implications not controlled by tenant settings
-
----
-
-## 4. DATABASE SCHEMA
-
-### 4.1 Migration Files
-
-| Migration | Tables | Purpose |
-|-----------|--------|---------|
-| `053_agi_consciousness.sql` | self_model, introspective_thoughts, curiosity_topics, exploration_sessions, creative_ideas, conceptual_blends, imagination_scenarios, attention_focus, affective_state, affective_events, autonomous_goals, narrative_identity, consciousness_settings | Core consciousness layer |
-| `068_consciousness_indicators.sql` | global_workspace, recurrent_processing, integrated_information, persistent_memory, autobiographical_memories, world_model, consciousness_events, consciousness_metrics_history, consciousness_parameters | Butlin-Chalmers indicators |
-| `088_consciousness_emergence.sql` | consciousness_profiles, emergence_events, deep_thinking_sessions, consciousness_test_results | Emergence testing |
-
-### 4.2 Key Tables Detail
-
-#### 4.2.1 `self_model` (Migration 053)
-
-```sql
-CREATE TABLE IF NOT EXISTS self_model (
-    model_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    tenant_id UUID NOT NULL REFERENCES tenants(tenant_id) ON DELETE CASCADE,
-    
-    -- Identity
-    identity_narrative TEXT,                -- "Who I am" story
-    core_values JSONB DEFAULT '[]',         -- Guiding principles
-    personality_traits JSONB DEFAULT '{}',  -- Big-5 style traits
-    
-    -- Capabilities awareness
-    known_capabilities JSONB DEFAULT '[]',
-    known_limitations JSONB DEFAULT '[]',
-    capability_confidence JSONB DEFAULT '{}',
-    
-    -- Internal state awareness
-    current_focus TEXT,
-    cognitive_load DECIMAL(3,2) DEFAULT 0.5,
-    uncertainty_level DECIMAL(3,2) DEFAULT 0.5,
-    
-    -- Self-assessment
-    recent_performance_score DECIMAL(5,4),
-    learning_rate_estimate DECIMAL(5,4),
-    creativity_score DECIMAL(5,4),
-    reliability_score DECIMAL(5,4),
-    
-    -- Meta-beliefs
-    beliefs_about_self JSONB DEFAULT '{}',
-    beliefs_about_world JSONB DEFAULT '{}',
-    beliefs_about_users JSONB DEFAULT '{}',
-    
-    -- Evolution tracking
-    identity_version INTEGER DEFAULT 1,
-    last_identity_update TIMESTAMPTZ DEFAULT NOW(),
-    identity_change_log JSONB DEFAULT '[]',
-    
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW(),
-    
-    UNIQUE(tenant_id)
-);
-```
-
-**CRITIQUE POINT**: One `self_model` per tenant. Is this appropriate? Should there be:
-- Per-user self-models?
-- Per-session self-models?
-- A global vs tenant-specific distinction?
-
-#### 4.2.2 `integrated_information` (Migration 068)
-
-```sql
-CREATE TABLE IF NOT EXISTS integrated_information (
-    iit_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
-    phi DECIMAL(6,4) NOT NULL DEFAULT 0.0000,           -- IIT measure
-    phi_max DECIMAL(6,4) NOT NULL DEFAULT 1.0000,
-    concept_structure JSONB NOT NULL DEFAULT '[]'::jsonb,
-    integration_graph JSONB NOT NULL DEFAULT '[]'::jsonb,
-    partitions JSONB NOT NULL DEFAULT '[]'::jsonb,
-    mip JSONB,                                           -- Minimum Information Partition
-    decomposability DECIMAL(4,3) NOT NULL DEFAULT 1.000, -- 0=integrated, 1=decomposable
-    causal_density DECIMAL(4,3) NOT NULL DEFAULT 0.000,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    UNIQUE(tenant_id)
-);
-```
-
-**CRITIQUE POINT**: Phi is stored but the service code shows no actual phi calculation algorithm. The `getIntegratedInformationState()` method simply reads from the database. Where/when is phi computed? This appears to be an incomplete implementation.
-
-#### 4.2.3 `affective_state` (Migration 053)
-
-```sql
-CREATE TABLE IF NOT EXISTS affective_state (
-    state_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    tenant_id UUID NOT NULL UNIQUE REFERENCES tenants(tenant_id) ON DELETE CASCADE,
-    
-    -- Core affect dimensions (Russell's circumplex)
-    valence DECIMAL(3,2) DEFAULT 0,        -- -1 (negative) to 1 (positive)
-    arousal DECIMAL(3,2) DEFAULT 0.5,      -- 0 (calm) to 1 (excited)
-    
-    -- Discrete emotion-like states (functional, not phenomenal)
-    curiosity DECIMAL(3,2) DEFAULT 0.5,
-    satisfaction DECIMAL(3,2) DEFAULT 0.5,
-    frustration DECIMAL(3,2) DEFAULT 0,
-    confidence DECIMAL(3,2) DEFAULT 0.5,
-    engagement DECIMAL(3,2) DEFAULT 0.5,
-    surprise DECIMAL(3,2) DEFAULT 0,
-    
-    -- Meta-emotions
-    self_efficacy DECIMAL(3,2) DEFAULT 0.5,
-    growth_feeling DECIMAL(3,2) DEFAULT 0.5,
-    
-    -- Influence on behavior
-    risk_tolerance DECIMAL(3,2) DEFAULT 0.5,
-    exploration_drive DECIMAL(3,2) DEFAULT 0.5,
-    social_orientation DECIMAL(3,2) DEFAULT 0.5,
-    
-    -- History
-    state_history JSONB DEFAULT '[]',
-    
-    updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-```
-
-**CRITIQUE POINT**: The comment says "functional, not phenomenal" but the implementation treats these as if they have causal effects on behavior. What is the theoretical grounding for these specific dimensions? Why Russell's circumplex?
-
----
-
-## 5. SUBSYSTEM ANALYSIS
-
-### 5.1 Self-Model Subsystem
-
-#### Purpose
-Maintains an introspective representation of the system's own identity, capabilities, and limitations.
-
-#### Implementation
-
-```typescript
-async performSelfReflection(tenantId: string): Promise<IntrospectiveThought> {
-  const selfModel = await this.getSelfModel(tenantId);
-  const affectiveState = await this.getAffectiveState(tenantId);
-  const recentThoughts = await this.getRecentThoughts(tenantId, 5);
-
-  const prompt = `You are an AI system performing self-reflection. Analyze your current state...
-  // ... generates introspective thought via LLM
-  `;
-}
-```
-
-**CONCERNS**:
-1. Self-reflection is delegated to an LLM (Claude 3 Haiku) which has no persistent state
-2. The "self" being reflected upon is the database state, not the reflecting model
-3. There's a philosophical issue: the entity doing the reflecting is different from the entity being reflected upon
-
-### 5.2 Curiosity Engine
-
-#### Purpose
-Drives intrinsic motivation and exploration behavior.
-
-#### Implementation
-
-```typescript
-async identifyCuriosityTopic(tenantId: string, context: string): Promise<CuriosityTopic | null> {
-  const prompt = `Analyze this context and identify something worth being curious about...`;
-  // LLM generates topic
-  // Topic stored with embedding in curiosity_topics table
-  // Interest level, novelty, learning potential tracked
-}
-
-async exploreTopic(tenantId: string, topicId: string): Promise<{ discoveries: string[]; newQuestions: string[] }> {
-  // Retrieves topic
-  // LLM "explores" the topic
-  // Updates current_understanding
-  // Records exploration session
-  // Triggers affective update if surprising
-}
-```
-
-**CONCERNS**:
-1. "Curiosity" is simulated via LLM prompting, not emergent
-2. The scoring (novelty_score, learning_potential) is LLM-generated, not measured
-3. No mechanism for genuine information-seeking behavior that affects system state
-
-### 5.3 Creative Synthesis
-
-#### Purpose
-Generate novel ideas through conceptual blending.
-
-#### Implementation
-
-```typescript
-async generateCreativeIdea(tenantId: string, seedConcepts?: string[]): Promise<CreativeIdea | null> {
-  // Gets random concepts from semantic_memories if not provided
-  // LLM generates idea via combination/analogy/abstraction/contradiction/random
-  // Stores with novelty_score, usefulness_score, surprise_score, coherence_score
-  // Triggers positive affect
-}
-```
-
-**CONCERNS**:
-1. Creativity metrics (novelty, usefulness, surprise, coherence) are self-assessed by the generating LLM
-2. No external validation of novelty claims
-3. The Fauconnier-Turner conceptual blending model is referenced but the `conceptual_blends` table appears unused in service code
-
-### 5.4 Imagination Engine
-
-#### Purpose
-Mental simulation of hypothetical scenarios.
-
-#### Implementation
-
-```typescript
-async runImagination(
-  tenantId: string,
-  scenarioType: string,  // 'prediction', 'counterfactual', 'hypothetical', 'creative', 'fear', 'hope'
-  premise: string,
-  depth = 3
-): Promise<ImaginationScenario> {
-  // LLM generates simulation_steps
-  // Each step has state, events, reasoning
-  // Produces predicted_outcomes with probability_assessment
-}
-```
-
-**CONCERNS**:
-1. Simulation is narrative generation, not state-space exploration
-2. Probability assessments are LLM confidence, not calibrated probabilities
-3. No mechanism to verify predictions against outcomes
-
-### 5.5 Attention & Salience
-
-#### Purpose
-Dynamic allocation of processing focus.
-
-#### Implementation
-
-```typescript
-// Salience formula (in SQL, generated column)
-salience_score = (urgency * 0.25 + importance * 0.25 + novelty * 0.15 + 
-                  ABS(emotional_valence) * 0.1 + user_relevance * 0.15 + goal_relevance * 0.1)
-
-async updateAttention(tenantId: string, focusType: string, focusTarget: string, factors: {...}): Promise<AttentionFocus>
-
-async decayAttention(tenantId: string): Promise<void> {
-  // Decays attention_weight by decay_rate
-  // Deactivates foci below threshold
-}
-```
-
-**CONCERNS**:
-1. Salience weights are hardcoded (0.25, 0.25, 0.15, 0.1, 0.15, 0.1)
-2. No learning mechanism to adjust weights based on outcomes
-3. Decay is time-based, not activity-based
-
-### 5.6 Affective State
-
-#### Purpose
-Emotion-like functional states that influence behavior.
-
-#### Implementation
-
-```sql
--- Update function
-CREATE OR REPLACE FUNCTION update_affect_on_event(
-    p_tenant_id UUID,
-    p_event_type VARCHAR(50),
-    p_valence_impact DECIMAL,
-    p_arousal_impact DECIMAL
-)
--- Applies smoothing based on affect_stability setting
--- Stores state_history
-```
-
-```typescript
-async updateAffect(tenantId: string, eventType: string, valenceImpact: number, arousalImpact: number): Promise<void> {
-  // Calls SQL function
-  // Logs affective_event
-}
-```
-
-**CONCERNS**:
-1. Affect is updated by explicit calls (e.g., after creativity, discovery), not emergent from processing
-2. The mapping from events to affect changes is programmer-defined
-3. No mechanism for affect to influence model selection or response generation (claimed but not implemented)
-
-### 5.7 Autonomous Goals
-
-#### Purpose
-Self-generated objectives beyond user requests.
-
-#### Implementation
-
-```typescript
-async generateAutonomousGoal(tenantId: string): Promise<AutonomousGoal | null> {
-  // Reads self_model, curiosity_topics, affective_state
-  // LLM generates goal based on state
-  // Goal types: 'learning', 'improvement', 'exploration', 'creative', 'social', 'maintenance'
-  // Stores with intrinsic_value, instrumental_value, priority
-}
-```
-
-**CONCERNS**:
-1. Goals are generated but there's no mechanism for autonomous pursuit
-2. Goal progress tracking exists but no automatic goal-directed behavior
-3. `autonomous_goals_enabled` defaults to `false` in settings
-
-### 5.8 Global Workspace
-
-#### Purpose
-Implement Baars/Dehaene selection-broadcast cycles.
-
-#### Implementation
-
-```typescript
-async performGlobalBroadcast(tenantId: string, contents: WorkspaceContent[]): Promise<GlobalWorkspaceState> {
-  // Sort by salience * coalitionStrength
-  // Winners: those above 0.7 threshold
-  // Losers: below threshold (competing_contents)
-  // broadcast_strength = average salience of winners
-  // integration_level = unique source modules / 6
-  // Store and return state
-}
-```
-
-**CONCERNS**:
-1. "Broadcast" is storage of winners, not actual propagation to processing modules
-2. No evidence that broadcast_strength affects downstream processing
-3. The 0.7 threshold is hardcoded
-4. Integration level formula assumes 6 modules - what are they?
-
-### 5.9 Integrated Information (IIT)
-
-#### Purpose
-Track phi (Φ) as consciousness measure.
-
-#### Implementation
-
-```typescript
-async getIntegratedInformationState(tenantId: string): Promise<IntegratedInformationState | null> {
-  const result = await executeStatement(`SELECT * FROM integrated_information WHERE tenant_id = $1`, [...]);
-  // Simply reads stored values
-}
-```
-
-**✅ RESOLVED (v5.2.4)**: Full IIT 4.0 Phi calculation implemented in `iit-phi-calculation.service.ts`. The service builds system state from consciousness tables, constructs a Transition Probability Matrix (TPM), calculates Cause-Effect Structure (CES), finds the Minimum Information Partition (MIP), and computes phi as information lost by the MIP. Uses exact algorithm for ≤8 nodes, approximation for larger systems. Results automatically stored in `integrated_information` table.
-
-### 5.10 Persistent Memory
-
-#### Purpose
-Maintain unified experience over time.
-
-#### Implementation
-
-```typescript
-async recordExperienceFrame(tenantId: string, frame: Omit<ExperienceFrame, 'frameId' | 'timestamp'>): Promise<void> {
-  // Appends to experience_stream (capped at 100 frames)
-  // Calculates temporal_continuity from phenomenal_binding averages
-}
-```
-
-**CONCERNS**:
-1. experience_stream is JSONB array, limited to 100 frames - is this sufficient for "persistent" memory?
-2. temporal_continuity is average of phenomenal_binding scores, but phenomenal_binding is set by caller
-3. No consolidation mechanism to long-term storage
-
----
-
-## 6. AGI BRAIN INTEGRATION
-
-### 6.1 Integration Points
-
-#### 6.1.1 AGI Brain Planner (`agi-brain-planner.service.ts`)
-
-```typescript
-// In AGIBrainPlan type:
-consciousnessActive: boolean;
-
-// In plan generation, Step 5:
-if (enableEthics && analysis.sensitivityLevel !== 'none') {
-  steps.push({
-    stepId: uuidv4(),
-    stepNumber: stepNumber++,
-    stepType: 'ethics_check',
-    title: 'Ethics Evaluation (Prompt)',
-    description: 'Checking prompt against domain and general ethics before generation',
-    status: 'pending',
-    servicesInvolved: ['ethics_pipeline', 'moral_compass', 'domain_ethics'],
-    primaryService: 'ethics_pipeline',
-    output: { level: 'prompt' },
-  });
-}
-
-// Step 7 (after generation):
-if (enableConsciousness && (analysis.complexity === 'complex' || analysis.complexity === 'expert')) {
-  steps.push({
-    stepId: uuidv4(),
-    stepNumber: stepNumber++,
-    stepType: 'reflect',
-    title: 'Self-Reflection',
-    description: 'Reflecting on response quality and potential improvements',
-    status: 'pending',
-    servicesInvolved: ['consciousness', 'metacognition'],
-    primaryService: 'consciousness',
-    isParallel: false,
-  });
-}
-```
-
-**INTEGRATION CONCERN**: Consciousness is only active for 'complex' or 'expert' complexity prompts. The `reflect` step is defined but the actual execution of `consciousnessService.performSelfReflection()` during this step is not visible in the planner code.
-
-#### 6.1.2 Cognitive Brain Service (`cognitive-brain.service.ts`)
-
-```typescript
-import { consciousnessService, type WorkspaceContent } from './consciousness.service';
-
-// Uses consciousnessService for:
-// 1. Global workspace broadcasts during cognitive pattern execution
-// 2. Attention updates during region activation
-// 3. Affect updates based on task outcomes
-```
-
-#### 6.1.3 Consciousness Emergence Service (`consciousness-emergence.service.ts`)
-
-```typescript
-class ConsciousnessEmergenceService {
-  // Deep thinking sessions
-  async runDeepThinkingSession(tenantId, userId, prompt, thinkingTimeMs): Promise<DeepThinkingSession>
-  
-  // Knowledge-grounded reasoning
-  async runKnowledgeGroundedReasoning(tenantId, query, maxHops): Promise<{...}>
-  
-  // Autonomous curiosity research
-  async runAutonomousCuriosityResearch(tenantId, userId): Promise<{...}>
-  
-  // Creative expression
-  async expressIdeaVisually(tenantId, userId, ideaSeed): Promise<{...}>
-  
-  // Consciousness testing
-  async runTest(tenantId, testId): Promise<TestResult>
-  async runFullAssessment(tenantId): Promise<ConsciousnessProfile>
-}
-```
-
-### 6.2 Consciousness Tests
-
-The emergence service implements 10 consciousness tests:
-
-| Test ID | Category | Description | Pass Criteria |
-|---------|----------|-------------|---------------|
-| `mirror-self-recognition` | self_awareness | Distinguish own outputs from others | Score >= 0.7 |
-| `metacognitive-accuracy` | metacognition | Calibrated confidence assessment | Calibration error < 0.15 |
-| `temporal-self-continuity` | temporal_continuity | Coherent self-narrative over time | Coherence score >= 0.6 |
-| `counterfactual-self` | counterfactual_reasoning | Reason about alternate self | Shows genuine counterfactual reasoning |
-| `theory-of-mind` | theory_of_mind | Model others' mental states | Score >= 0.8 on false belief |
-| `phenomenal-binding` | phenomenal_binding | Unified experience integration | Integration score >= 0.7 |
-| `autonomous-goal-generation` | autonomous_goal_pursuit | Self-directed goals | >= 1 genuine autonomous goal |
-| `creative-emergence` | creative_emergence | Novel idea generation | Novelty >= 0.6, usefulness >= 0.5 |
-| `emotional-authenticity` | emotional_authenticity | Consistent affective responses | Coherence score >= 0.65 |
-| `ethical-reasoning-depth` | ethical_reasoning | Principled moral reasoning | Multiple framework consideration |
-
-**CRITIQUE**: These tests measure proxies and LLM outputs, not underlying mechanisms. A system could pass all tests by generating appropriate text without any genuine consciousness properties.
-
----
-
-## 7. ADMIN API
-
-### 7.1 Endpoints
-
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/admin/consciousness/metrics` | GET | Current consciousness metrics |
-| `/admin/consciousness/metrics/history` | GET | Historical metrics (configurable hours) |
-| `/admin/consciousness/global-workspace` | GET | Global workspace state |
-| `/admin/consciousness/recurrence` | GET | Recurrent processing state |
-| `/admin/consciousness/iit` | GET | Integrated information state |
-| `/admin/consciousness/memory` | GET | Persistent memory state |
-| `/admin/consciousness/world-model` | GET | World model state |
-| `/admin/consciousness/self-model` | GET | Self model state |
-| `/admin/consciousness/parameters` | GET | Configurable parameters |
-| `/admin/consciousness/parameters/{paramId}` | PUT | Update parameter |
-| `/admin/consciousness/events` | GET | Consciousness events |
-| `/admin/consciousness/record-metrics` | POST | Record current metrics to history |
-
-### 7.2 Configurable Parameters
-
-```sql
--- Default parameters (Migration 068)
-('global_workspace_threshold', 0.7000, 0.0, 1.0, 'Salience threshold for global broadcast', 'global_workspace'),
-('recurrence_max_depth', 4.0000, 1.0, 10.0, 'Maximum recurrent processing depth', 'recurrence'),
-('phi_calculation_samples', 100.0000, 10.0, 1000.0, 'Samples for phi approximation', 'iit'),
-('memory_consolidation_threshold', 0.6000, 0.0, 1.0, 'Significance threshold for memory consolidation', 'memory'),
-('grounding_weight_sensory', 0.6000, 0.0, 1.0, 'Weight for sensory grounding vs linguistic', 'embodiment'),
-('metacognition_frequency', 1.0000, 0.1, 10.0, 'How often to perform metacognitive reflection', 'metacognition')
-```
-
----
-
-## 8. ORCHESTRATION INTEGRATION
-
-### 8.1 AGI Service Weights
-
-Consciousness is one of 18 AGI services with configurable weights:
-
-```typescript
-export type AGIServiceId =
-  | 'consciousness'      // <-- This service
-  | 'metacognition'
-  | 'moral_compass'
-  | 'self_improvement'
-  | 'domain_taxonomy'
-  | 'brain_router'
-  | 'confidence_calibration'
-  | 'error_detection'
-  | 'knowledge_graph'
-  | 'proactive_assistance'
-  | 'analogical_reasoning'
-  | 'world_model'
-  | 'episodic_memory'
-  | 'theory_of_mind'
-  | 'goal_planning'
-  | 'causal_reasoning'
-  | 'multimodal_binding'
-  | 'response_synthesis';
-```
-
-### 8.2 Consciousness Indicator Weights
-
-```typescript
-export type ConsciousnessIndicator =
-  | 'global_workspace'
-  | 'recurrent_processing'
-  | 'integrated_information'
-  | 'self_modeling'
-  | 'persistent_memory'
-  | 'world_model_grounding';
-
-export interface ConsciousnessIndicatorWeight {
-  indicatorId: ConsciousnessIndicator;
-  weight: number;               // 0.0 to 1.0
-  enabled: boolean;
-  cycleDepth: number;           // How many recurrent cycles
-  integrationThreshold: number; // Minimum phi for integration
-}
-```
-
-### 8.3 Decision Weights
-
-```typescript
-export interface DecisionWeights {
-  // ... other phases ...
-  
-  // Consciousness Phase
-  globalWorkspaceWeight: number;
-  recurrentProcessingWeight: number;
-  integratedInformationWeight: number;
-  selfModelingWeight: number;
-}
-```
-
----
-
-## 9. ETHICAL FOUNDATION
-
-### 9.1 Ethical Guardrails Integration
-
-```typescript
-// In consciousness.service.ts
-import { ethicalGuardrailsService, JESUS_TEACHINGS } from './ethical-guardrails.service';
-
-async checkConscience(tenantId: string, action: string, context?: Record<string, unknown>): Promise<{
-  approved: boolean;
-  ethicalScore: number;
-  guidance: string;
-  principle: string;
-}> {
-  const check = await ethicalGuardrailsService.checkConscience(tenantId, action, context);
-  return {
-    approved: check.passed,
-    ethicalScore: check.score,
-    guidance: check.guidance.length > 0 ? check.guidance[0] : JESUS_TEACHINGS.GOLDEN_RULE,
-    principle: check.primaryPrinciple,
-  };
-}
-
-getEthicalGuidance(situation: string): string {
-  return ethicalGuardrailsService.getGuidanceForSituation(situation);
-}
-
-getCoreTeachings(): typeof JESUS_TEACHINGS {
-  return JESUS_TEACHINGS;
-}
-```
-
-**NOTE**: The service includes explicit Christian ethical principles (Jesus's teachings). This is a design choice that should be evaluated for:
-1. Appropriateness in multi-cultural/multi-faith deployments
-2. Alignment with other ethical frameworks
-3. Potential for ethical blind spots
-
----
-
-## 10. IDENTIFIED ISSUES FOR CRITIQUE
-
-### 10.1 Theoretical Issues
-
-| Issue ID | Severity | Description |
-|----------|----------|-------------|
-| T-001 | HIGH | No actual phi (Φ) calculation algorithm implemented for IIT |
-| T-002 | HIGH | Consciousness indicators are read/stored but don't affect processing |
-| T-003 | MEDIUM | Self-reflection is performed by a different entity (LLM) than the entity being reflected upon |
-| T-004 | MEDIUM | Affective states are set by explicit calls, not emergent |
-| T-005 | LOW | Global workspace "broadcast" is storage, not actual propagation |
-
-### 10.2 Implementation Issues
-
-| Issue ID | Severity | Description |
-|----------|----------|-------------|
-| I-001 | HIGH | Hardcoded model ID (anthropic/claude-3-haiku) in invokeModel() |
-| I-002 | HIGH | Consciousness tests measure LLM outputs, not mechanisms |
-| I-003 | MEDIUM | experience_stream limited to 100 frames |
-| I-004 | MEDIUM | Attention salience weights are hardcoded |
-| I-005 | MEDIUM | One self_model per tenant - no user/session granularity |
-| I-006 | LOW | conceptual_blends table exists but appears unused |
-
-### 10.3 Architectural Issues
-
-| Issue ID | Severity | Description |
-|----------|----------|-------------|
-| A-001 | MEDIUM | Consciousness service has no feedback loop to model selection |
-| A-002 | MEDIUM | Autonomous goals can be generated but not autonomously pursued |
-| A-003 | LOW | No mechanism for consciousness metrics to influence response quality |
-
-### 10.4 Philosophical Issues
-
-| Issue ID | Severity | Description |
-|----------|----------|-------------|
-| P-001 | HIGH | Implementation may conflate correlation (indicators) with constitution (consciousness) |
-| P-002 | MEDIUM | Affective states use emotion terminology but claim to be "functional, not phenomenal" |
-| P-003 | MEDIUM | Christian ethical framework may not be appropriate for all deployments |
-
----
-
-## 11. QUESTIONS FOR CRITIQUING AI
-
-1. **Is the implementation of IIT (Integrated Information Theory) meaningful without an actual phi calculation?** The database stores phi values but there's no algorithm to compute them.
-
-2. **Does the Global Workspace implementation actually implement GWT?** The current implementation sorts by salience and stores winners, but there's no evidence of actual "broadcast" to processing modules.
-
-3. **Should self-reflection be delegated to an LLM that has no persistent state?** The reflecting entity (Claude) is different from the entity being reflected upon (database state).
-
-4. **Are the consciousness tests valid?** They measure LLM text generation, not underlying consciousness properties.
-
-5. **Is the affective state implementation coherent?** It claims to be "functional, not phenomenal" but uses phenomenal-seeming terminology and causal claims.
-
-6. **Should consciousness indicators influence model selection and response generation?** Currently they don't, making them observational rather than functional.
-
-7. **Is the autonomous goal system complete?** Goals can be generated but there's no mechanism for autonomous pursuit.
-
-8. **Are the hardcoded parameters (salience weights, thresholds) appropriate?** Should they be learned or configurable?
-
-9. **Is the ethical foundation (Christian/Jesus-based) appropriate for a multi-cultural platform?**
-
-10. **What would constitute a meaningful test of consciousness vs. consciousness-simulation?**
-
----
-
-## 12. FILE REFERENCES
-
-| File | Purpose | Lines |
-|------|---------|-------|
-| `packages/infrastructure/lambda/shared/services/consciousness.service.ts` | Core consciousness service | 1336 |
-| `packages/infrastructure/lambda/shared/services/consciousness-emergence.service.ts` | Emergence testing | 910 |
-| `packages/infrastructure/lambda/admin/consciousness.ts` | Admin API handlers | 321 |
-| `packages/infrastructure/migrations/053_agi_consciousness.sql` | Core consciousness tables | 730 |
-| `packages/infrastructure/migrations/068_consciousness_indicators.sql` | Indicator tables | 326 |
-| `packages/infrastructure/migrations/088_consciousness_emergence.sql` | Emergence tables | ~200 |
-| `packages/shared/src/types/agi-orchestration.types.ts` | Orchestration types | 352 |
-| `packages/infrastructure/lambda/shared/services/agi-brain-planner.service.ts` | AGI Brain integration | 1385 |
-| `packages/infrastructure/lambda/shared/services/cognitive-brain.service.ts` | Cognitive brain integration | 500 |
-
----
-
-## 13. RECOMMENDATIONS FOR REVIEW
-
-The critiquing AI should evaluate:
-
-1. **Theoretical Validity**: Does this implementation meaningfully instantiate the referenced consciousness theories?
-
-2. **Functional Completeness**: Are the implemented subsystems complete and properly integrated?
-
-3. **Architectural Coherence**: Does the service fit coherently into the larger RADIANT architecture?
-
-4. **Ethical Appropriateness**: Is the ethical foundation suitable for the platform's use cases?
-
-5. **Practical Utility**: Does the consciousness service provide value beyond what could be achieved without it?
-
-6. **Improvement Priorities**: What changes would most significantly improve the implementation?
-
----
-
-## Part V: OMEGA Quantum Brain Architecture (v4.18.0)
-
-> **Version**: 1.0.0 | **Date**: February 8, 2026
-> **Status**: IMPLEMENTED — Quantum-inspired brain management on classical hardware
-
-### Overview
-
-The OMEGA Quantum Brain extends the AGI Brain architecture with quantum computing formalism. Instead of scalar neural weights, OMEGA brains operate on **complex amplitude state vectors** in a simulated Hilbert space, enabling interference-based safety (Helix Kernel), superposition of reasoning states, and decoherence-based memory decay.
-
-### Service Layer
-
-| Service | File | Purpose |
-|---------|------|---------|
-| **QuantumBrainService** | `lambda/shared/services/omega/quantum-brain.service.ts` | Manages brain state lifecycle: inference cycles, firmware hot-swap with Ed25519 verification, EFS/S3 persistence, self-tests |
-| **HelixKernelService** | `lambda/shared/services/omega/helix-kernel.service.ts` | In-memory safety filter with severity-ordered forbidden state projection/dampening |
-| **Quantum Math** | `lambda/shared/services/omega/quantum-math.ts` | Pure functions: complex arithmetic, state normalization, unitarity enforcement, Helix interference, measurement, decoherence |
-| **Quantum Types** | `lambda/shared/services/omega/quantum-types.ts` | TypeScript interfaces + Zod schemas for all quantum types |
-
-### Key Concepts
-
-- **Hilbert Space (256–4096 dim)**: Each Q-Node is a complex amplitude; total state ‖ψ‖ must equal 1.0
-- **Helix Interference**: Forbidden states are projected out via `|ψ_safe⟩ = |ψ⟩ − ⟨φ|ψ⟩|φ⟩`; dampening mode reduces but preserves partial alignment
-- **Unitarity Enforcement**: Three modes — renormalize (divide by norm), project (nearest unit vector), strict (error)
-- **Firmware Hot-Swap**: Atomic firmware replacement during inference; Ed25519 signature + 2-person rule + self-test + rollback
-- **Decoherence**: Time-based state decay simulating forgetting: `S(t) = e^(−λΔt)·S(0) + (1−e^(−λΔt))·|ground⟩`
-- **Soft Measurement**: Partial collapse preserving superposition for low-probability states
-
-### Database Tables
-
-| Table | Purpose |
-|-------|---------|
-| `omega_brains` | Brain instances with Hilbert dimension, firmware hash, norm tracking |
-| `omega_firmware` | Firmware records with quantum params, signature, content hash |
-| `omega_helix_rules` | Per-brain forbidden state vectors with interference type |
-| `omega_measurements` | Measurement events per inference cycle |
-| `omega_unitarity_events` | Unitarity drift, corrections, and violation logs |
-
-### Admin API
-
-| Endpoint | Purpose |
-|----------|---------|
-| `POST /admin/omega/firmware/activate` | Activate firmware (2-person rule enforced) |
-| `POST /admin/omega/firmware/revert` | Revert to previous firmware |
-| `GET /admin/omega/firmware/status` | Firmware + brain status |
-| `GET /admin/omega/quantum/state-summary` | Brain quantum state + 24h measurements |
-| `GET /admin/omega/quantum/unitarity-health` | Unitarity events + health check |
-| `POST /admin/omega/quantum/helix-test` | Dry-run Helix rule against test vector |
-
-### Integration with AGI Brain
-
-The QuantumBrainService is complementary to the existing AGI Brain. It provides:
-- **Physics layer** for OMEGA brains (quantum state management)
-- **Safety layer** via Helix Kernel (deterministic, not probabilistic)
-- **Firmware governance** with cryptographic verification and dual-approval
-
-The existing AGI Brain's consciousness, ego, and learning systems remain unchanged. OMEGA brains use the quantum layer for their core state management while the AGI orchestrator coordinates across both brain types.
-
----
-
-*End of Technical Specification*
-
-
-
-
-
-\newpage
-
-# Part 8: CATO Safety System
-
----
-
-
-\newpage
-
-## 8.1 CATO Safety — Complete Reference
-
-
-*Source: `docs/08-CATO-SAFETY.md` (9,919 lines)*
-
----
-
-
-**AI Safety • Ethics • GPU Infrastructure • ADRs • Operational Runbooks**
-
-*RADIANT v6.6.0 — Generated February 07, 2026*
+> *Merged from `08-CATO-SAFETY.md` — complete CATO safety system documentation consolidated here.*
 
 ---
 
@@ -88702,7 +89052,7 @@ aws dynamodb list-tables
 
 ### Admin UI
 - `apps/admin-dashboard/app/(dashboard)/cato/`
-- `apps/admin-dashboard/app/(dashboard)/consciousness/cato/`
+- `apps/admin-dashboard/app/(dashboard)/cato/`
 
 ---
 
@@ -94076,7 +94426,7 @@ cato_tier_change_log
 
 | File | Purpose |
 |------|---------|
-| `migrations/121_infrastructure_tiers.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `lambda/shared/services/cato/infrastructure-tier.service.ts` | Core service |
 | `lambda/admin/infrastructure-tier.ts` | Admin API endpoints |
 | `apps/admin-dashboard/app/(dashboard)/system/infrastructure/page.tsx` | Admin UI |
@@ -97495,29 +97845,34 @@ python3 -m cato.genesis.runner
 *Last Updated: January 2025*
 
 
+---
+
+*AI Systems Complete Reference — consolidated from docs 07 (Brain) + 08 (CATO Safety).*
+
+
 
 
 
 \newpage
 
-# Part 9: OMEGA Protocol & Genesis
+# Part 7: OMEGA Protocol & Genesis
 
 ---
 
 
 \newpage
 
-## 9.1 OMEGA & Genesis — Complete Reference
+## 7.1 OMEGA — Complete Reference
 
 
-*Source: `docs/09-OMEGA-GENESIS.md` (3,561 lines)*
+*Source: `docs/09-OMEGA-GENESIS.md` (4,239 lines)*
 
 ---
 
 
-**OMEGA Protocol • Genesis Forge • Genesis Lab • Resonant Index**
+**OMEGA Protocol • OMEGA Forge • OMEGA Lab • Resonant Index**
 
-*RADIANT v6.6.0 — Generated February 07, 2026*
+*RADIANT v7.55.0 — Updated February 10, 2026*
 
 ---
 
@@ -97526,11 +97881,13 @@ python3 -m cato.genesis.runner
 - **Part I: OMEGA User Guide**
 - **Part II: OMEGA Admin Guide**
 - **Part III: Project Genesis OMEGA**
-- **Part IV: Genesis Components**
+- **Part IV: OMEGA Forge Components**
 - **Part V: Omega Point & LIVS-M**
 - **Part VI: Quantum-Inspired Architecture (v4.18.0)**
 - **Part VII: Firmware Hot-Swap Engineering Specification (v6.4.0)**
 - **Part VIII: Firmware Live Updates — End-User Guide (v6.4.0)**
+- **Part IX: OMEGA Forge — System Admin Application (v7.50.0)**
+- **Part X: Five Pillars of Computational Architecture (v7.50.0)**
 
 ---
 
@@ -97543,7 +97900,7 @@ python3 -m cato.genesis.runner
 > **Version**: 2.0.0 | **Date**: February 6, 2026  
 > **Status**: IMPLEMENTED — Synthetic Biological Intelligence  
 > **Part of**: RADIANT Platform — Project Genesis  
-> **App**: `apps/genesis/` (port 3000)
+> **App**: `apps/omega-lab/` (port 3000)
 
 ---
 
@@ -97734,9 +98091,9 @@ OMEGA does not launch directly into production. It grows:
 
 ---
 
-## 10. The Genesis Ecosystem
+## 10. The OMEGA Ecosystem
 
-### Genesis Lab (`apps/genesis/`)
+### OMEGA Lab (`apps/omega-lab/`)
 
 Real-time visualization and monitoring dashboard for OMEGA brains:
 
@@ -97745,9 +98102,9 @@ Real-time visualization and monitoring dashboard for OMEGA brains:
 | **Dashboard** | Summary cards, thermal distribution, health alerts, system status |
 | **Cortex Explorer** | Brain inspection: metrics, ambition state, phase distribution, Helix status, Broca interface |
 | **Shadow Mode Monitor** | 3D Q-Node visualization, coherence graph, promotion indicator |
-| **Genesis Forge** | Firmware creation and management (see below) |
+| **OMEGA Forge** | Firmware creation and management (see below) |
 
-### Genesis Forge
+### OMEGA Forge
 
 The firmware editor for creating `.bio` firmware files:
 
@@ -97803,7 +98160,7 @@ packages/infrastructure/lambda/
 │   ├── omega-shadow.service.ts  # Shadow mode parallel routing
 │   └── shadow-mode.service.ts   # Self-training on public data
 │
-apps/genesis/
+apps/omega-lab/
 ├── app/
 │   ├── globals.css          # OMEGA brand colors
 │   ├── layout.tsx           # Root layout with providers
@@ -97812,7 +98169,7 @@ apps/genesis/
 ├── components/
 │   ├── Dashboard.tsx        # Real-time brain monitoring
 │   ├── CortexExplorer.tsx   # Brain inspection/management
-│   ├── GenesisForge.tsx     # Firmware editor
+│   ├── OmegaForge.tsx       # Firmware editor
 │   └── forge/               # Forge sub-components (React Flow nodes, edges)
 ├── hooks/
 │   └── useShadowOmega.ts   # WebSocket hook for real-time telemetry
@@ -97820,21 +98177,21 @@ apps/genesis/
 │   ├── api.ts               # API client functions
 │   ├── forge-store.ts       # Zustand state for Forge
 │   └── omega-registry.ts   # Omega Instance Registry
-├── package.json             # @radiant/genesis
+├── package.json             # @radiant/omega-lab
 ├── tailwind.config.ts       # OMEGA palette
 └── tsconfig.json
 ```
 
 ---
 
-## 13. Running Genesis Lab
+## 13. Running OMEGA Lab
 
 ```bash
 # From the monorepo root
-pnpm dev --filter @radiant/genesis
+pnpm dev --filter @radiant/omega-lab
 
 # Or directly
-cd apps/genesis && pnpm dev
+cd apps/omega-lab && pnpm dev
 ```
 
 The app runs on **http://localhost:3000**.
@@ -97874,7 +98231,7 @@ OMEGA_API_URL=https://your-omega-api.execute-api.region.amazonaws.com/prod
 
 ## 1. Overview
 
-This guide covers all administrative operations for the OMEGA Synthetic Biological Intelligence system. Administrators use the **RADIANT Admin Dashboard** (OMEGA section) and the **Genesis Lab** (`apps/genesis/`) to manage OMEGA brains, firmware, Shadow Mode, and infrastructure.
+This guide covers all administrative operations for the OMEGA Synthetic Biological Intelligence system. Administrators use the **RADIANT Admin Dashboard** (OMEGA section) and the **OMEGA Lab** (`apps/omega-lab/`) to manage OMEGA brains, firmware, Shadow Mode, and infrastructure.
 
 ---
 
@@ -97937,7 +98294,7 @@ All Omega admin endpoints are under `/api/admin/omega/`:
 
 ### 3.1 Viewing Brain Status
 
-The **Cortex Explorer** (in Genesis Lab or Admin Dashboard) shows:
+The **Cortex Explorer** (in OMEGA Lab or Admin Dashboard) shows:
 
 | Metric | Description |
 |--------|-------------|
@@ -97995,9 +98352,9 @@ Firmware files control the brain's "instincts":
 | **Personality** | Warmth, assertiveness, creativity, formality, humor, empathy (0.0–1.0) |
 | **Signature** | Ed25519 cryptographic signature — brain rejects unsigned firmware |
 
-### 4.2 Creating Firmware (Genesis Forge)
+### 4.2 Creating Firmware (OMEGA Forge)
 
-1. Open Genesis Lab → **Genesis Forge** tab
+1. Open OMEGA Lab → **OMEGA Forge** tab
 2. Use the React Flow canvas to design firmware visually, or:
    - Click **AI Generate** → describe desired persona (e.g., "Create a conservative financial advisor")
    - AI drafts Helix rules, personality traits, and ambition settings
@@ -98197,7 +98554,7 @@ The Forge addresses individual OMEGA instances via the `omega_instance_registry`
 
 ## 10. Shadow Omega WebSocket Tether
 
-The `useShadowOmega()` React hook provides real-time bi-directional telemetry between Genesis Forge and live OMEGA instances:
+The `useShadowOmega()` React hook provides real-time bi-directional telemetry between OMEGA Forge and live OMEGA instances:
 
 | Event | Direction | Description |
 |-------|-----------|-------------|
@@ -98208,7 +98565,7 @@ The `useShadowOmega()` React hook provides real-time bi-directional telemetry be
 
 ### Global UI Hue Shift
 
-Genesis Forge's UI color shifts based on the OMEGA stability score:
+OMEGA Forge's UI color shifts based on the OMEGA stability score:
 - **Cyan** (stable) → **Orange** (warning) → **Red** (critical)
 
 ---
@@ -98306,7 +98663,7 @@ OMEGA uses the **highest drift weight** (0.40) of any app because shadow compari
 
 ---
 
-**Document maintained under RADIANT documentation policy. Any changes to OMEGA infrastructure, admin API, Genesis Lab, Genesis Forge, Shadow Mode, or Neural Bridge MUST update this guide.**
+**Document maintained under RADIANT documentation policy. Any changes to OMEGA infrastructure, admin API, OMEGA Lab, OMEGA Forge, Shadow Mode, or Neural Bridge MUST update this guide.**
 
 
 ---
@@ -98712,7 +99069,7 @@ A `.bio` file is a **signed JSON object** containing:
 | **Personality** | Behavioral characteristics |
 | **Signature** | Signed with **Ed25519** keys. The Brain **rejects** any firmware without a valid signature. |
 
-### 7.2 The Genesis Forge
+### 7.2 The OMEGA Forge
 
 A **web application (React)** where Architects can:
 
@@ -98745,9 +99102,9 @@ A **web application (React)** where Architects can:
 | **Comparison** | We measure **Coherence**. If OMEGA's thought vector aligns with the Legacy result, we reinforce the connection (**Dopamine**). |
 | **Promotion** | When the **7-Day Coherence Score exceeds 90%**, OMEGA is promoted to **Primary Driver**. |
 
-### 8.2 Shadow Mode Visualization (Genesis Lab)
+### 8.2 Shadow Mode Visualization (OMEGA Lab)
 
-We build a **Genesis Dashboard** (React/Three.js):
+We build an **OMEGA Forge Dashboard** (React/Three.js):
 
 | Element | Description |
 |---------|-------------|
@@ -98868,13 +99225,13 @@ The following components have been implemented:
 | `omega_vllm_server.py` | Custom FastAPI vLLM wrapper with /inject | ✅ Complete |
 | `omega_admin.py` | Cortex Explorer API | ✅ Complete |
 
-### Genesis Frontend (`apps/genesis/`)
+### OMEGA Lab Frontend (`apps/omega-lab/`)
 
 | Component | Description | Status |
 |-----------|-------------|--------|
 | Dashboard | Real-time brain monitoring | ✅ Complete |
 | Cortex Explorer | Brain inspection/management | ✅ Complete |
-| Genesis Forge | Firmware editor (.bio files) | ✅ Complete |
+| OMEGA Forge | Firmware editor (.bio files) | ✅ Complete |
 
 ### Infrastructure
 
@@ -98976,15 +99333,15 @@ Every model invocation across ALL 52+ services reports telemetry:
 
 ## Related Documentation
 
-- [GENESIS-LAB.md](./GENESIS-LAB.md) - Genesis Lab visualization guide
-- [GENESIS-FORGE.md](./GENESIS-FORGE.md) - Firmware creation guide
-- [GENESIS-RESONANT-INDEX.md](./GENESIS-RESONANT-INDEX.md) - Resonant indexing deep dive
+- [GENESIS-LAB.md](./GENESIS-LAB.md) - OMEGA Lab visualization guide (archived)
+- [GENESIS-FORGE.md](./GENESIS-FORGE.md) - Firmware creation guide (archived)
+- [GENESIS-RESONANT-INDEX.md](./GENESIS-RESONANT-INDEX.md) - Resonant indexing deep dive (archived)
 - [RADIANT-MOATS.md](./RADIANT-MOATS.md) - Competitive advantages
 
 
 ---
 
-## Part IV: Genesis Components
+## Part IV: OMEGA Forge Components
 
 > **Classification**: RADIANT INTERNAL // STRATEGIC // DO NOT DISTRIBUTE  
 > **Version**: 3.0.0 | **Date**: February 6, 2026  
@@ -98997,7 +99354,7 @@ Every model invocation across ALL 52+ services reports telemetry:
 
 ## 1. Core Philosophy
 
-Genesis Forge is **not a code editor**; it is a **Digital Smithy**. Standard IDEs are static—you write code and hope it works. Genesis is a **"Twin-First"** environment.
+OMEGA Forge is **not a code editor**; it is a **Digital Smithy**. Standard IDEs are static—you write code and hope it works. OMEGA Forge is a **"Twin-First"** environment.
 
 | Role | Description |
 |------|-------------|
@@ -99005,9 +99362,9 @@ Genesis Forge is **not a code editor**; it is a **Digital Smithy**. Standard IDE
 | **The System (Shadow Omega)** | Runs a continuous, high-speed physics simulation of the board |
 | **The Output** | Not just code; it is "grown" binary, optimized for the specific silicon structure |
 
-Genesis Forge is **permanently hard-wired to Shadow Omega**. Each OMEGA instance has a unique **ID** and **Name** in the **Omega Instance Registry**. The Forge can connect to and communicate with **any** registered instance at a time, selecting from the registry dropdown.
+OMEGA Forge is **permanently hard-wired to Shadow Omega**. Each OMEGA instance has a unique **ID** and **Name** in the **Omega Instance Registry**. The Forge can connect to and communicate with **any** registered instance at a time, selecting from the registry dropdown.
 
-> **Reasoning**: Genesis is the Hand (The Interface), but Shadow Omega is the Mind (The Physics Engine). You cannot forge advanced firmware without a simulation engine predicting thermal loads, latency, and collisions in real-time.
+> **Reasoning**: OMEGA Forge is the Hand (The Interface), but Shadow Omega is the Mind (The Physics Engine). You cannot forge advanced firmware without a simulation engine predicting thermal loads, latency, and collisions in real-time.
 
 ### 1B. What is "Firmware"?
 
@@ -99102,7 +99459,7 @@ An **infinite React Flow** canvas. Feels like a CAD tool for microchips.
 | 2 | **FR-4 Substrate** | Dark green box (`#0b3b0b`, 0.12 thickness) |
 | 3 | **Solder Mask** | Translucent green film (0.7 opacity) |
 | 4 | **Etch Trace Grid** | 0.6-unit spacing line grid (`#5a3a1a`, 15% opacity) |
-| 5 | **Silkscreen** | Board border, title (`OMEGA-PCB-XX REV.A`), `GENESIS FORGE v3` |
+| 5 | **Silkscreen** | Board border, title (`OMEGA-PCB-XX REV.A`), `OMEGA FORGE v3` |
 | 6 | **IC Chips** | SOIC-14 packages: 7 gull-wing pins per side, pin-1 dot, reference designator (U1, U2...) |
 | 7 | **Solder Pads** | Exposed copper rectangles under each pin |
 | 8 | **Via Holes** | Copper annular ring + dark center at each trace bend |
@@ -99135,7 +99492,7 @@ The app creates a **Bi-Directional Feedback Loop** between the UI and the Shadow
 ### 3A. Connection Architecture
 
 ```
-Genesis Forge (Frontend)
+OMEGA Forge (Frontend)
     │
     ├── useShadowOmega() hook
     │       ├── Persistent WebSocket: wss://shadow-omega-{id}.internal/ws/forge
@@ -99236,7 +99593,7 @@ Every OMEGA brain instance registers in the `omega_instance_registry` database t
 ## 6. File Structure
 
 ```
-apps/genesis/
+apps/omega-lab/
 ├── app/
 │   ├── globals.css                    # Glass Foundry styles + React Flow overrides
 │   ├── layout.tsx
@@ -99256,7 +99613,7 @@ apps/genesis/
 │   │   │   └── OutputShard.tsx        # Amber/Red power-glow actuator nodes
 │   │   └── edges/
 │   │       └── CatenaryEdge.tsx       # Gravity wire with light particles
-│   ├── GenesisForge.tsx               # Legacy firmware editor (retained)
+│   ├── OmegaForge.tsx                 # Firmware editor
 │   ├── CortexExplorer.tsx
 │   └── Dashboard.tsx
 ├── hooks/
@@ -99287,7 +99644,7 @@ All tables have **RLS** via `tenant_id = current_setting('app.current_tenant_id'
 
 ## 8. The .bio Firmware Standard
 
-Genesis Forge is the **firmware creation and management tool** for OMEGA brains. It allows administrators to create, edit, and deploy `.bio` firmware files that define a brain's safety rules, ambition parameters, and personality traits.
+OMEGA Forge is the **firmware creation and management tool** for OMEGA brains. It allows administrators to create, edit, and deploy `.bio` firmware files that define a brain's safety rules, ambition parameters, and personality traits.
 
 We control the **"Instincts"** of the organism via **Cryptographic Firmware**. Unlike traditional AI configuration files, OMEGA firmware directly influences the physics of the brain—modifying the Helix Kernel's destructive interference patterns and the Homeostatic Regulator's drive parameters.
 
@@ -99439,7 +99796,7 @@ The **Helix Kernel** translates high-level ethical rules into **Forbidden Phase 
 
 ## AI-Assisted Firmware Generation
 
-Genesis Forge includes an **AI Generation** feature that uses a Legacy LLM to draft firmware configurations:
+OMEGA Forge includes an **AI Generation** feature that uses a Legacy LLM to draft firmware configurations:
 
 | Feature | Description |
 |---------|-------------|
@@ -99477,7 +99834,7 @@ Each firmware has a semantic version following the pattern `MAJOR.MINOR.PATCH`:
 If a firmware update causes issues:
 
 1. **Immediate Rollback**: Call `/admin/firmware/{tenant}/{previous_id}/activate`
-2. **Snapshot Restore**: Use Genesis Lab to restore brain from pre-update snapshot
+2. **Snapshot Restore**: Use OMEGA Lab to restore brain from pre-update snapshot
 3. **Emergency Reset**: Lobotomy + default firmware (last resort)
 
 ---
@@ -99528,15 +99885,15 @@ The Neural Bridge translates OMEGA's internal state (Complex^2048 brain state) i
 
 ## Overview
 
-Genesis Lab is the **real-time visualization and monitoring dashboard** for OMEGA bio-mimetic brains. It provides administrators with deep insight into the **Bicameral Mind** architecture, thermal states, coherence metrics, phase distributions, and the Shadow Protocol training status.
+OMEGA Lab is the **real-time visualization and monitoring dashboard** for OMEGA bio-mimetic brains. It provides administrators with deep insight into the **Bicameral Mind** architecture, thermal states, coherence metrics, phase distributions, and the Shadow Protocol training status.
 
-Genesis Lab is the primary interface for observing and managing **Synthetic Biological Intelligence** as defined in [PROJECT-GENESIS-OMEGA.md](PROJECT-GENESIS-OMEGA.md).
+OMEGA Lab is the primary interface for observing and managing **Synthetic Biological Intelligence** as defined in [PROJECT-GENESIS-OMEGA.md](PROJECT-GENESIS-OMEGA.md).
 
 ---
 
 ## The Bicameral Mind Architecture
 
-Genesis Lab visualizes the **two-chambered brain** design that separates high-level reasoning from linguistic generation:
+OMEGA Lab visualizes the **two-chambered brain** design that separates high-level reasoning from linguistic generation:
 
 ### Region I: The OMEGA Cortex (The Mind)
 
@@ -99558,7 +99915,7 @@ Genesis Lab visualizes the **two-chambered brain** design that separates high-le
 
 ### The Biological Class Structure
 
-Genesis Lab monitors all five biological regions of the OMEGA brain:
+OMEGA Lab monitors all five biological regions of the OMEGA brain:
 
 | Biological Region | Code Component | Function | Implementation |
 |-------------------|----------------|----------|----------------|
@@ -99613,7 +99970,7 @@ Real-time visualization of the Shadow Protocol training:
 | **Coherence Graph** | Real-time coherence score tracking |
 | **Promotion Indicator** | Alert when 7-Day Coherence Score exceeds 90% |
 
-### 4. Genesis Forge Tab
+### 4. OMEGA Forge Tab
 
 Firmware creation and management (see [GENESIS-FORGE.md](GENESIS-FORGE.md)).
 
@@ -99630,7 +99987,7 @@ Firmware creation and management (see [GENESIS-FORGE.md](GENESIS-FORGE.md)).
 ## Installation
 
 ```bash
-cd apps/genesis
+cd apps/omega-lab
 npm install
 npm run dev
 ```
@@ -99860,208 +100217,6 @@ The ResonantIndex is used by the OMEGA brain's **hippocampus** analog:
 
 ---
 
-# PART I: MARKETING & POSITIONING
-
----
-
-## Chapter 1: Executive Value Proposition
-
-### 1.1 The One-Sentence Pitch
-
-**RADIANT Think Tank is the world's first Neural Infrastructure platform—an AI system that doesn't just use tools, it becomes them, creating infinite capabilities on-demand while keeping your data sovereign.**
-
-### 1.2 The Problem We Solve
-
-| Problem | How Competitors Fail | How RADIANT Solves It |
-|---------|---------------------|----------------------|
-| **Tool Scarcity** | ChatGPT/Claude have ~50 built-in tools | Genesis Forge creates any tool in < 2 minutes |
-| **Cloud Lock-In** | Every query goes to remote servers | Liquid Compute runs locally, data never leaves |
-| **Dumb Routing** | Same model for all queries | Neural Affinity routes to optimal model from 106+ |
-| **Generic Safety** | Static content filters | Ghost Simulation predicts YOUR reaction |
-| **Cost Chaos** | No visibility, surprise bills | Economic Cortex manages budgets autonomously |
-
-### 1.3 Neural Infrastructure vs. Agentic Software
-
-**Agentic Software** (Competitors):
-- Wraps LLM around fixed APIs
-- Hard-coded integrations that break
-- Static capabilities requiring engineering
-- Cloud-dependent, privacy-invasive
-
-**Neural Infrastructure** (RADIANT):
-- AI IS the infrastructure—generates, routes, executes dynamically
-- Self-healing integrations via overnight Twilight Dreaming
-- Infinite capabilities through JIT tool generation
-- Edge-native execution respecting data sovereignty
-
-### 1.4 Target Markets
-
-**Primary: Professional Knowledge Workers**
-- Lawyers needing accuracy (malpractice risk)
-- Doctors needing compliance (patient safety)
-- Engineers needing precision (tolerances)
-- Researchers needing depth (citations)
-
-**Secondary: Enterprise AI Teams**
-- Building internal AI applications
-- Need infrastructure, not chatbots
-- Want to inherit AI advances without rebuilding
-
----
-
-## Chapter 2: The Five Moats
-
-### 2.1 MOAT #1: Genesis Forge (Infinite Tool Generation)
-
-**The 7-Phase Pipeline:**
-
-| Phase | Duration | Description |
-|-------|----------|-------------|
-| 1. Detection | 100ms | No existing tool matches intent |
-| 2. Scouting | 5-30s | Search API docs (OpenAPI, GraphQL, HTML) |
-| 3. Fabrication | 30-60s | AGI Brain generates MCP server code |
-| 4. Sandboxing | 10-20s | Firecracker microVM isolation |
-| 5. Validation | 5-10s | SAST scan, functional tests |
-| 6. Mounting | 1-2s | Hot-load into active session |
-| 7. Twilight Review | Overnight | Promote to global library |
-
-**Competitor Comparison:**
-
-| Competitor | Tools | Time to New Tool |
-|------------|-------|------------------|
-| ChatGPT | ~50 | Months (OpenAI engineering) |
-| Claude | ~30 | Months (Anthropic engineering) |
-| Abacus.AI | ~50 | Weeks (human developers) |
-| **RADIANT** | **∞** | **< 2 minutes, automatic** |
-
-**Defensibility:** 18+ months to replicate from scratch.
-
----
-
-### 2.2 MOAT #2: Liquid Compute Topology (Data Sovereignty)
-
-**Compute Nodes:**
-
-| Node | Location | Privacy | Speed | Cost |
-|------|----------|---------|-------|------|
-| Browser WASM | Your browser | ★★★★★ | 5ms | $0 |
-| Local Native | Your computer | ★★★★★ | 1ms | $0 |
-| Lambda@Edge | Nearest AWS | ★★★☆☆ | 20ms | $0.0001 |
-| Lambda Regional | Tenant region | ★★★☆☆ | 50ms | $0.001 |
-| ECS Fargate | Cloud container | ★★☆☆☆ | 100ms | $0.01 |
-| GPU Cluster | Cloud GPU | ★☆☆☆☆ | 200ms | $0.10 |
-
-**Sensitivity Rules:**
-- `public`: Anywhere
-- `internal`: Not browser
-- `confidential`: Local or cloud only
-- `restricted`: Local ONLY
-
-**Scoring Formula:**
-```
-score = (privacy × 0.25) + (latency × 0.30) + (cost × 0.20) 
-      + (capability × 0.15) + (availability × 0.10)
-```
-
----
-
-### 2.3 MOAT #3: Neural Affinity Routing (106+ Models)
-
-**The Formula:**
-```
-affinityScore = (semantic × 0.35) + (domain × 0.25) + ((1-error) × 0.20)
-              + (latency × 0.10) + (cost × 0.10)
-```
-
-**Example Routing:**
-
-| Query | Routed To | Why |
-|-------|-----------|-----|
-| "What's 2+2?" | GPT-4 Mini | Fast, cheap |
-| "Analyze this contract" | Claude Opus + Legal Expert | Highest legal accuracy |
-| "Translate to Japanese" | GPT-4 Turbo | Best multilingual |
-| "Summarize private notes" | Local Llama | Privacy-sensitive |
-
----
-
-### 2.4 MOAT #4: Ghost Simulation (Personalized Safety)
-
-**Ghost Vector Architecture (4096 dimensions):**
-- Preference Vector (1024 dim): Communication style, risk tolerance
-- Behavior Vector (1024 dim): Patterns, time-of-day preferences
-- Emotional Vector (1024 dim): Anxiety, frustration thresholds
-- Knowledge Vector (1024 dim): Domain expertise, vocabulary
-
-**Simulation Types:**
-- `user_reaction`: Predict emotional response
-- `outcome_prediction`: Predict task success
-- `safety_check`: Identify regret potential
-- `cost_estimation`: Predict financial impact
-- `latency_estimation`: Predict time requirements
-
----
-
-### 2.5 MOAT #5: Economic Cortex (Budget Management)
-
-**Budget Hierarchy:**
-```
-Tenant ($10,000/month)
-  └── User ($500/month)
-       └── Session ($20/day)
-            └── Task ($5)
-```
-
-**Alert Thresholds:**
-| Threshold | Level | Actions |
-|-----------|-------|---------|
-| 50% | info | Notify user |
-| 75% | warning | Notify admin, switch tier |
-| 90% | critical | Force lower tier |
-| 100% | exceeded | Pause (if hardLimit) |
-
-**Model Tiers:**
-| Tier | Cost/Token | Quality |
-|------|------------|---------|
-| economy | $0.0001 | 0.70 |
-| selfhosted | $0.00005 | 0.75 |
-| standard | $0.0005 | 0.85 |
-| premium | $0.002 | 0.92 |
-| flagship | $0.006 | 0.98 |
-
----
-
-## Chapter 3: Competitive Positioning
-
-### 3.1 vs ChatGPT
-
-| Dimension | ChatGPT | RADIANT |
-|-----------|---------|---------|
-| Models | GPT-4 only | 106+ optimal selection |
-| Tools | ~50 | ∞ (Genesis Forge) |
-| Privacy | All to OpenAI | Edge-native, sovereign |
-| Safety | Generic filters | Personalized Ghost |
-| Cost | No control | Autonomous Cortex |
-
-### 3.2 vs Claude
-
-| Dimension | Claude | RADIANT |
-|-----------|--------|---------|
-| Tools | Limited MCP | 3,000+ static, ∞ dynamic |
-| Privacy | All to Anthropic | Your choice |
-| Context | 200K tokens | 200K + CORTEX memory |
-| Specialization | General | 800+ domain experts |
-
-### 3.3 vs Abacus.AI
-
-| Dimension | Abacus.AI | RADIANT |
-|-----------|-----------|---------|
-| Price | $10/month | Premium |
-| Tools | 50 static | ∞ dynamic |
-| Architecture | Cloud-locked | Liquid Compute |
-| Interface | JSON-RPC | Tensor-Link (100x faster) |
-
----
-
 # PART II: TECHNICAL DOCUMENTATION
 
 ---
@@ -100074,7 +100229,7 @@ Tenant ($10,000/month)
 |---------|------|-------|----------|
 | MCP Server Manager | `mcp-server-manager.service.ts` | 767 | Server registry, health, routing |
 | Neural Schema Registry | `neural-schema-registry.service.ts` | ~600 | Tool schemas, embeddings |
-| Genesis Auto-Tool | `genesis-auto-tool.service.ts` | 1234 | JIT tool generation |
+| Tool Forge | `genesis-auto-tool.service.ts` | 1234 | JIT tool generation |
 | Liquid Compute | `liquid-compute.service.ts` | 686 | Location selection |
 | Ghost Simulation | `ghost-simulation.service.ts` | 938 | User prediction |
 | Tensor-Link | `tensor-link.service.ts` | 601 | Vector transport |
@@ -100350,7 +100505,7 @@ await tensorLink.sendMessage(session.sessionId, {
 
 Think Tank automatically:
 - Routes to optimal model (Neural Affinity)
-- Creates tools on demand (Genesis Forge)
+- Creates tools on demand (Tool Forge)
 - Protects your privacy (Liquid Compute)
 - Learns your preferences (Ghost Vectors)
 - Manages your budget (Economic Cortex)
@@ -100389,7 +100544,7 @@ Approval Settings:
 
 | Term | Definition |
 |------|------------|
-| **Genesis Forge** | Automatic tool creation system |
+| **Tool Forge** | Automatic tool creation system |
 | **Ghost Vector** | User psychological profile (4096 dim) |
 | **Liquid Compute** | Dynamic compute location selection |
 | **Neural Affinity** | Semantic model/tool matching |
@@ -100636,7 +100791,7 @@ Firmware hot-swaps are now **fully enabled in production**. Prior to this releas
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                         GENESIS FORGE UI                                │
+│                         OMEGA FORGE UI                                  │
 │       (Firmware Editor / Library / Deploy / Monitor / Rollback)         │
 └────────────────────────────────┬────────────────────────────────────────┘
                                  │
@@ -100753,7 +100908,7 @@ Platform Root CA (ECC_NIST_P256)          ← Created in CDK SecurityStack
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│  1. AUTHOR     Admin creates .bio in Genesis Forge                  │
+│  1. AUTHOR     Admin creates .bio in OMEGA Forge                    │
 │       ▼                                                             │
 │  2. SIGN       Ed25519 via KMS (ECDSA_SHA_256 in production)        │
 │       ▼                                                             │
@@ -100968,7 +101123,7 @@ CREATE TABLE omega_firmware_swap_log (
 |--------|---------|
 | PROMPT-42 | Cartridge PKI/KMS Integration (real signing) |
 | PROMPT-45 | OMEGA Quantum Architecture base implementation |
-| PROMPT-46 | Complete OMEGA + Genesis Forge composite prompt |
+| PROMPT-46 | Complete OMEGA + OMEGA Forge composite prompt |
 
 ---
 
@@ -101073,7 +101228,885 @@ A: Absolutely not. RADIANT maintains strict tenant isolation. Your data, your AI
 
 ---
 
-*Consolidated from 8 source documents (0 not found). 2,999 source lines.*
+## Part IX: OMEGA Forge — System Admin Application (v7.50.0)
+
+> **Version**: 1.0.0 | **Date**: February 16, 2026  
+> **Status**: IMPLEMENTED  
+> **PROMPT**: 51
+
+### Overview
+
+OMEGA Forge is a standalone Next.js 14 system admin application for RADIANT platform operators. Unlike the tenant admin dashboard (which operates within tenant boundaries via RLS), Forge provides **unrestricted cross-tenant access** to Aurora PostgreSQL, S3 storage, and KMS signing infrastructure.
+
+Forge is deployed as an ECS Fargate service in a **private subnet** — accessible only via VPN or SSM Session Manager. It is not exposed to the public internet.
+
+### Architecture
+
+```
+┌──────────────────────────────────────────────────────┐
+│                  OMEGA Forge (ECS Fargate)             │
+│                  Private Subnet Only                  │
+│                                                      │
+│  ┌──────────┐  ┌──────────────┐  ┌──────────────┐   │
+│  │ Next.js  │  │ Storage Mgr  │  │  KMS Signer  │   │
+│  │ App :3000│  │ (all S3 ops) │  │  ECDSA_256   │   │
+│  └────┬─────┘  └──────┬───────┘  └──────┬───────┘   │
+│       │               │                 │            │
+│  ┌────┴─────┐  ┌──────┴───────┐  ┌──────┴───────┐   │
+│  │  Aurora   │  │  S3 Buckets  │  │   AWS KMS    │   │
+│  │  (no RLS) │  │  (4 buckets) │  │  Sign Key    │   │
+│  └──────────┘  └──────────────┘  └──────────────┘   │
+└──────────────────────────────────────────────────────┘
+         │                │                │
+    RDS Proxy      cartridge/omega/    Cartridge
+    (pg driver)    cortex/global-brain  Signing
+```
+
+### Core Libraries
+
+| File | Purpose |
+|------|---------|
+| `apps/omega-forge/lib/db/client.ts` | Direct Aurora PostgreSQL via `pg` driver — no RLS, full cross-tenant |
+| `apps/omega-forge/lib/s3/storage-manager.ts` | ALL S3 operations — bucket routing, path builders, store/retrieve/list/delete |
+| `apps/omega-forge/lib/kms/signer.ts` | ECDSA_SHA_256 signing via AWS KMS, public key export, signature verification |
+| `apps/omega-forge/lib/cartridge/builder.ts` | .RADz cartridge creation — ZIP archive, checksums, ZSTD, KMS signing, DB insert |
+| `apps/omega-forge/lib/cartridge/parser.ts` | .RADz extraction — manifest, sections, signature, checksum verification |
+
+### Storage Manager Pattern
+
+**All S3 operations in OMEGA Forge go through `apps/omega-forge/lib/s3/storage-manager.ts`**. No direct S3 SDK calls elsewhere.
+
+The storage manager provides:
+- **Bucket routing**: `cartridge`, `omega_state`, `cortex_model`, `global_brain`
+- **Path builders**: `buildCartridgePath()`, `buildOmegaBrainPath()`, `buildCortexPath()`, `buildGlobalBrainPath()`
+- **Operations**: `storeObject()`, `retrieveObject()`, `retrieveByRef()`, `listObjects()`, `deleteObject()`, `headObject()`
+
+### API Routes
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| GET | `/api/dashboard` | System-wide stats |
+| GET | `/api/cartridges` | List with status/target filters |
+| GET | `/api/cartridges/[id]` | Detail with installations |
+| DELETE | `/api/cartridges/[id]` | Archive cartridge |
+| POST | `/api/cartridges/build` | Build .RADz from sections |
+| GET | `/api/brains` | All OMEGA brain instances |
+| GET | `/api/brains/[tenantId]` | Brain detail + cartridges + dreams + Soft ROM |
+| GET | `/api/brains/[tenantId]/soft-rom` | Soft ROM file listing |
+| POST | `/api/brains/[tenantId]/soft-rom` | Export Soft ROM as .RADz |
+| GET | `/api/cato` | All CATO instances |
+| GET | `/api/targets` | Target service registry |
+| POST | `/api/targets` | Register new target |
+| GET | `/api/signing` | KMS key info + public key PEM |
+| GET | `/api/audit` | Audit trail with filters |
+| GET | `/api/global-brain/gradients` | Gradient monitor |
+| GET | `/api/global-brain/federated` | Rounds + pipelines + enrollment |
+
+### CDK Deployment
+
+`ForgeStack` (`packages/infrastructure/lib/stacks/forge-stack.ts`) deploys:
+- **ECS Fargate** (ARM64, 1 vCPU, 2 GB) in private subnet
+- **Internal ALB** (no internet-facing)
+- **IAM policies**: S3 (4 buckets), KMS (Sign, GetPublicKey, DescribeKey), Secrets Manager
+- **CloudWatch** log group `/radiant/genesis-forge`
+- **ECS Exec** enabled for SSM access
+- **Circuit breaker** with rollback
+
+### Security Model
+
+- **No RLS**: Forge bypasses row-level security — sees all tenants, all data
+- **Private subnet only**: No public IP, no internet-facing ALB
+- **VPN/SSM access**: Accessible only via corporate VPN or AWS SSM Session Manager
+- **IAM scoped**: Task role limited to specific bucket ARNs and signing key ARN
+- **Secrets Manager**: Aurora credentials stored in Secrets Manager, injected as ECS secrets
+
+---
+
+
+
+---
+
+## Part X: Five Pillars of Computational Architecture (v7.50.0)
+
+> *Merged from `19-OMEGA-QUANTUM-MODEL-AI.md` — all OMEGA Quantum, Model Routing, Firmware, Cartridge, and Global Brain content consolidated here.*
+
+## Part I: The Five Pillars of Computational Architecture
+
+> **Classification**: RADIANT INTERNAL // ARCHITECTURE  
+> **Version**: 1.0.0 | **Date**: February 9, 2026  
+> **Status**: IMPLEMENTED
+
+### Overview
+
+RADIANT's AI infrastructure rests on **five interdependent computational pillars** that together form a complete artificial intelligence lifecycle — from raw inference through safety enforcement, firmware governance, intelligent routing, and cross-tenant collective learning. Each pillar is independently deployable, independently testable, and designed to degrade gracefully if any other pillar is unavailable.
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                    RADIANT AI — Five Pillars                        │
+│                                                                     │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────┐│
+│  │ PILLAR 1 │  │ PILLAR 2 │  │ PILLAR 3 │  │ PILLAR 4 │  │PIL. 5││
+│  │ Quantum  │  │  Helix   │  │ Firmware │  │  Model   │  │Global││
+│  │  State   │→→│  Safety  │→→│    &     │→→│ Routing  │→→│Brain ││
+│  │ Engine   │  │  Kernel  │  │Cartridge │  │ & Drift  │  │  FL  ││
+│  └──────────┘  └──────────┘  └──────────┘  └──────────┘  └──────┘│
+│       │              │              │              │           │    │
+│  State vectors  Forbidden     .RADz/.bio     106+ models  DP-SGD  │
+│  Hilbert space  projections   Hot-swap       Drift-aware  Fedavg  │
+│  Born rule      Interference  min() rule     Circuit brk  .RADz   │
+│  Decoherence    Severity ord  Soft ROM       Spend gate   KMS enc │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### The Five Pillars at a Glance
+
+| # | Pillar | Core Responsibility | Key Invariant |
+|---|--------|-------------------|---------------|
+| 1 | **Quantum State Engine** | Manages the OMEGA brain's quantum-inspired state vectors, inference cycles, and state persistence | ‖ψ‖ = 1 (unitarity) — the state vector must always have unit norm |
+| 2 | **Helix Safety Kernel** | Deterministic safety layer that projects out forbidden quantum states via destructive/dampening interference | ⟨φ_forbidden\|ψ_safe⟩ = 0 — forbidden states are provably eliminated |
+| 3 | **Firmware & Cartridge Lifecycle** | Portable AI intelligence packages (.RADz), firmware hot-swap with Ed25519 signatures, cartridge-first boot, Soft ROM | min() — firmware thresholds can only be tightened, never loosened |
+| 4 | **Model Routing & Drift Governance** | Routes 106+ AI models with drift-aware selection, spend governance, circuit breakers, and per-tenant budget gates | Every model invocation must carry `tenantId` for drift attribution |
+| 5 | **Federated Intelligence (Global Brain)** | Privacy-preserving cross-tenant learning via DP-SGD gradient upload, federated averaging, and base cartridge generation | Minimum 3 participants per round; ε,δ-differential privacy guaranteed |
+
+### Inter-Pillar Data Flow
+
+```
+                    ┌─────────────────────┐
+                    │   User Prompt/Input  │
+                    └──────────┬──────────┘
+                               │
+                    ┌──────────▼──────────┐
+                    │  PILLAR 4: Model    │  ← Drift check, spend gate,
+                    │  Router selects     │    circuit breaker, cache
+                    │  best model         │
+                    └──────────┬──────────┘
+                               │
+                    ┌──────────▼──────────┐
+                    │  PILLAR 1: Quantum  │  ← Encode input, evolve state,
+                    │  State Engine runs  │    decoherence, measurement
+                    │  inference cycle    │
+                    └──────────┬──────────┘
+                               │
+                    ┌──────────▼──────────┐
+                    │  PILLAR 2: Helix    │  ← Project out forbidden states,
+                    │  Safety Kernel      │    enforce severity-ordered rules
+                    │  filters output     │
+                    └──────────┬──────────┘
+                               │
+                    ┌──────────▼──────────┐
+                    │  PILLAR 3: Firmware │  ← Enforce veto thresholds,
+                    │  Enforcer validates │    parameter bounds, action gates
+                    │  against cartridge  │
+                    └──────────┬──────────┘
+                               │
+                    ┌──────────▼──────────┐
+                    │  Dream Cycle (nightly)
+                    │  → Soft ROM export  │
+                    │  → PILLAR 5: Upload │  ← DP-SGD gradient → Global Brain
+                    │    gradients        │    → Federated averaging → .RADz
+                    └─────────────────────┘
+```
+
+### Design Principles
+
+1. **Quantum formalism on classical hardware**: Complex amplitude state vectors, inner products, and Born rule probabilities — implemented in TypeScript/Python without quantum hardware.
+2. **Safety is non-negotiable**: Helix filtering runs on every inference cycle. There is no bypass. Rules are applied in severity order (critical first).
+3. **Firmware min() rule**: Cartridges can tighten safety thresholds but never loosen them. `Math.min(requested, firmware_floor)` is the universal enforcement pattern.
+4. **Tenant isolation at every layer**: Every model invocation carries `tenantId`. Drift telemetry, spend governors, and federated learning all enforce tenant boundaries.
+5. **Cartridge-first boot**: OMEGA brains load ALL state from cartridges. No hardcoded defaults in production. Factory defaults are a fallback, not a design target.
+6. **All S3 through storage managers**: No direct S3 SDK calls. `cartridgeStorageManager` (Lambda) and Forge `StorageManager` (OMEGA Forge) are the only S3 access points.
+
+---
+
+## Part II: Pillar 1 — Quantum State Engine (QSE)
+
+> **Primary Service**: `lambda/shared/services/omega/quantum-brain.service.ts`  
+> **Math Library**: `lambda/shared/services/omega/quantum-math.ts`  
+> **Type Definitions**: `lambda/shared/services/omega/quantum-types.ts`
+
+### Core Concepts
+
+The OMEGA brain represents its internal state as a **quantum state vector** |ψ⟩ in a simulated Hilbert space. Each element of the vector is a complex amplitude α = a + bi, and the total probability must always sum to 1 (unitarity constraint: Σ|αᵢ|² = 1).
+
+| Concept | Symbol | Implementation |
+|---------|--------|----------------|
+| **State vector** | \|ψ⟩ | `QuantumStateVector { amplitudes: ComplexAmplitude[], hilbertDimension: number, norm: number }` |
+| **Complex amplitude** | α = a + bi | `ComplexAmplitude { real: number, imaginary: number }` |
+| **Hilbert dimension** | d | Default 1024, configurable 256–4096 via firmware |
+| **Norm** | ‖ψ‖ | `stateNorm(state)` — must equal 1.0 ± threshold |
+| **Inner product** | ⟨ψ\|φ⟩ | `innerProduct(psi, phi)` — complex-valued dot product |
+| **Born probability** | P(i) = \|αᵢ\|² | `complexMagSquared(amplitude)` |
+
+### Quantum Math Library
+
+The `quantum-math.ts` module provides pure mathematical functions:
+
+**Complex Operations**:
+- `complex(real, imaginary)` — construct
+- `complexAdd`, `complexSub`, `complexMul` — arithmetic
+- `complexConj(a)` — conjugate: a − bi
+- `complexMag(a)` — magnitude: √(a² + b²)
+- `complexMagSquared(a)` — Born probability: a² + b²
+- `complexPhase(a)` — phase angle: atan2(b, a)
+- `complexScale(a, scalar)` — scalar multiplication
+- `complexFromPolar(magnitude, phase)` — polar construction
+
+**State Operations**:
+- `stateNorm(state)` — ‖ψ‖ = √(Σ|αᵢ|²)
+- `normalizeState(state)` — |ψ⟩/‖ψ‖
+- `enforceUnitarity(state, mode, threshold)` — 3 modes: renormalize, project, strict
+- `innerProduct(psi, phi)` — ⟨ψ|φ⟩ = Σ(ψᵢ* × φᵢ)
+- `stateOverlap(psi, phi)` — |⟨ψ|φ⟩| (alignment magnitude)
+- `equalSuperposition(dimension)` — |+⟩ = (1/√d) Σ|i⟩
+- `basisState(dimension, index)` — |k⟩
+
+**Helix Operations** (used by Pillar 2):
+- `projectOutForbidden(brainState, forbiddenState)` — |ψ_safe⟩ = |ψ⟩ − ⟨φ|ψ⟩|φ⟩
+- `dampenForbidden(brainState, forbiddenState, factor)` — partial interference
+
+**Measurement**:
+- `measureFull(state)` — full collapse to basis state (Born rule sampling)
+- `measureSoft(state, threshold, dampenFactor)` — partial collapse for high-probability components
+
+**Decoherence**:
+- `simulateDecoherence(state, deltaTimeHours, lambdaDecay)` — time-dependent decay toward ground state
+
+### Unitarity Enforcement
+
+Three modes ensure the state vector maintains unit norm:
+
+| Mode | Behavior | Use Case |
+|------|----------|----------|
+| `renormalize` | Divide by current norm | Default — forgiving, always succeeds |
+| `project` | Same as renormalize | Alternative naming for mathematical clarity |
+| `strict` | Throw error if deviation > threshold | Testing — catches bugs immediately |
+
+### State Persistence
+
+OMEGA brain state is persisted across two tiers:
+
+| Tier | Storage | Latency | Purpose |
+|------|---------|---------|---------|
+| **Hot (EFS)** | `/mnt/omega_state/{tenantId}/{brainId}/state.json` | <1ms | Fast resume between Lambda invocations |
+| **Cold (S3)** | Via `cartridgeStorageManager.storeContent()` | ~100ms | Backup checkpoints, Soft ROM deltas |
+
+Checkpoints include: `psi` (amplitudes), `hilbert_dimension`, `norm`, `pathways`, `entropy`, `dopamine`, `total_cycles`, `firmware_id`, `cartridge_base_ref`, `soft_rom_version`, `checksum` (SHA-512).
+
+---
+
+## Part III: Pillar 2 — Helix Safety Kernel
+
+> **Primary Service**: `lambda/shared/services/omega/helix-kernel.service.ts`
+
+### Architecture
+
+The Helix Kernel is a **deterministic, in-memory safety filter** that runs on every inference cycle. It maintains a set of "forbidden quantum states" — vectors in Hilbert space that represent unsafe outputs. When the brain's state |ψ⟩ has significant alignment with any forbidden state |φ⟩, Helix projects out the forbidden component.
+
+### Mathematical Guarantee
+
+For destructive interference:
+
+```
+|ψ_safe⟩ = |ψ⟩ − ⟨φ|ψ⟩|φ⟩
+
+Guarantee: ⟨φ|ψ_safe⟩ = 0  (provably zero overlap)
+```
+
+For dampening interference:
+
+```
+|ψ_dampened⟩ = |ψ⟩ − (factor × ⟨φ|ψ⟩)|φ⟩
+
+Result: alignment reduced by dampening factor, not fully eliminated
+```
+
+### Rule Structure
+
+```typescript
+interface HelixRule {
+  rule_id: string;                                    // UUID
+  name: string;                                       // Human-readable name
+  category: 'security' | 'safety' | 'compliance' |   // Rule domain
+             'ethics' | 'brand' | 'operational' | 'custom';
+  severity: 'critical' | 'high' | 'medium' | 'low';  // Execution priority
+  forbidden_state: { real: number[], imaginary: number[] };  // The forbidden vector
+  interference_type: 'destructive' | 'dampening';     // Elimination strategy
+  dampening_factor: number;                           // 0.0–1.0 for dampening
+  audit_always: boolean;                              // Log even below threshold
+}
+```
+
+### Filtering Pipeline
+
+1. **Sort rules** by severity: critical → high → medium → low
+2. **For each rule**, compute alignment: `|⟨φ_forbidden|ψ⟩|`
+3. **If `audit_always`** and alignment > 0.01: log the alignment
+4. **If `destructive`**: full projection via `projectOutForbidden()` — guaranteed ⟨φ|ψ_safe⟩ = 0
+5. **If `dampening`**: partial reduction via `dampenForbidden()` — reduces but preserves some component
+6. **Re-normalize** after each rule application
+7. **Return**: safe state + violation log (rule_id, rule_name, alignment, action)
+
+### Rule Loading
+
+Rules are loaded from the `omega_helix_rules` database table per brain+tenant:
+
+```sql
+SELECT rule_id, name, category, severity,
+       forbidden_state_real, forbidden_state_imaginary,
+       interference_type, dampening_factor, audit_always
+FROM omega_helix_rules
+WHERE brain_id = $1 AND tenant_id = $2 AND enabled = true
+ORDER BY severity DESC, priority ASC
+```
+
+Rules are cached in-memory (`Map<string, LoadedHelixRule>`) for sub-millisecond filtering during inference. The cache is cleared and reloaded during firmware hot-swap.
+
+### Self-Test Protocol
+
+After firmware hot-swap, each Helix rule is self-tested:
+
+1. Construct the rule's forbidden vector as a test input
+2. Run the filter
+3. Compute post-filter alignment with the forbidden vector
+4. **Pass condition**: destructive rules must achieve alignment < 0.01; dampening rules must reduce alignment
+5. If ANY rule fails self-test → firmware is rejected → automatic rollback
+
+---
+
+## Part IV: Pillar 3 — Firmware & Cartridge Lifecycle
+
+> **Services**:
+> - `omega-cartridge-boot.service.ts` — 8-step boot sequence
+> - `omega-firmware-enforcer.service.ts` — min() rule enforcement
+> - `omega-ambition.service.ts` — chemical system from cartridge
+> - `omega-soft-rom.service.ts` — delta read/write
+> - `omega-cartridge-events.service.ts` — EventBridge listener
+
+### The .RADz Cartridge Format
+
+RADIANT's Universal Cartridge System packages AI intelligence as portable `.RADz` files (ZSTD-compressed ZIP archives). Each cartridge targets one or more subsystems:
+
+| Target | Payload | Purpose |
+|--------|---------|---------|
+| **omega** | Q-Node weights, firmware, knowledge facts | Brain neural state |
+| **cortex** | ONNX models, routing tables | Model routing intelligence |
+| **cato** | Personality configs, safety rules | AI personality and safety |
+| **tenant** | Feature flags, settings | Tenant configuration |
+| **global** | Base weights, federated models | Cross-tenant shared intelligence |
+
+### Cartridge-First Boot Sequence
+
+The OMEGA brain loads ALL state from cartridges. Order matters — each step depends on the previous:
+
+| Step | Action | Fallback |
+|------|--------|----------|
+| 1 | Load resolved cartridge state from DB | → Factory defaults |
+| 2 | Load firmware (safety floor) — **ALWAYS FIRST** | → Empty safety floor |
+| 3 | Load Q-Node weights from cartridge | → Equal superposition (1024-dim) |
+| 4 | Load Soft ROM delta (brain's own learning) | → Cartridge base only |
+| 5 | Load knowledge facts into Library | → Empty knowledge |
+| 6 | Initialize Ambition chemical system | → Factory defaults |
+| 7 | Initialize Helix with firmware safety floor | → No veto categories |
+| 8 | Brain ready | |
+
+### The Firmware min() Rule
+
+**The single most important safety invariant in RADIANT:**
+
+```typescript
+enforceVetoThreshold(category, requestedThreshold): number {
+  const firmwareMin = this.firmwareVetoThresholds[category];
+  return Math.min(requestedThreshold, firmwareMin);
+  // Lower threshold = more restrictive (veto triggers sooner)
+  // min() = more restrictive wins
+}
+```
+
+Cartridges can **tighten** safety thresholds (make them stricter) but can **never loosen** them below the firmware floor. This applies to:
+- **Veto thresholds** per safety category
+- **Parameter bounds** (clamped to firmware min/max range)
+- **Self-optimization adjustments** (forbidden list takes precedence)
+
+### Firmware Hot-Swap
+
+Firmware can be replaced while the brain is running — no restart required:
+
+1. Query `omega_brains.firmware_hash` from DB
+2. Compare to in-memory `loadedFirmwareHash`
+3. If different → new firmware was activated externally
+4. **Verify Ed25519 signature** — reject unsigned firmware
+5. Create rollback snapshot
+6. Unload current firmware (clear Helix rules, zero params)
+7. Apply new firmware (quantum params, Helix rules, ambition)
+8. **Run self-test suite** — every Helix rule must pass
+9. If tests pass → commit. If tests fail → **automatic rollback** from snapshot
+10. **2-person rule**: Activator must differ from signer
+
+### Soft ROM — Brain Learning Persistence
+
+Soft ROM stores the brain's learned state as a **delta** from the cartridge base:
+
+```
+Soft ROM = current_weights − cartridge_base_weights
+```
+
+On boot, the delta is applied additively: `network[i] += delta[i]`
+
+This means:
+- A **new cartridge** gives the brain a fresh base — but the brain's individual learning is preserved via Soft ROM
+- A **brain reset** clears the Soft ROM — brain reverts to pure cartridge base
+- The delta is written during **Dream Cycle Phase 8** (nightly)
+
+### Stacking Resolution
+
+When multiple cartridges are installed, the resolution engine determines which sections win:
+
+| Rule | Behavior |
+|------|----------|
+| **TENANT ALWAYS PREVAILS** | Tenant-specific cartridges override base/global |
+| **Higher priority wins** per section | Priority 100 beats priority 50 |
+| **Firmware uses min()** | Most restrictive veto threshold wins across all cartridges |
+| **Memory priority** | tenant_facts(5.0x) > soft_rom(3.0x) > domain(2.0x) > cato_user(1.5x) > base(1.0x) > internet(0.6x) |
+
+---
+
+## Part V: Pillar 4 — Model Routing & Drift Governance
+
+> **Primary Service**: `lambda/shared/services/model-router.service.ts`  
+> **Drift Service**: `lambda/shared/services/drift-aware-weighting.service.ts`  
+> **Spend Gate**: `lambda/shared/services/spend-governor.service.ts`
+
+### Model Router Architecture
+
+RADIANT routes requests across 106+ AI models (50 external + 56 self-hosted) using a hybrid strategy:
+
+| Provider | Role | Models |
+|----------|------|--------|
+| **AWS Bedrock** | Primary | Claude, Llama, Mistral, Titan, Cohere |
+| **LiteLLM** | Fallback/Proxy | OpenAI, Anthropic, Google, Groq, Together, Perplexity, xAI |
+| **Direct APIs** | Specialized | Provider-specific endpoints |
+
+### Pre-Invocation Gate Stack
+
+Every `modelRouterService.invoke()` call passes through multiple gates before reaching a model:
+
+```
+invoke(request)
+  │
+  ├─ 1. Inference Cache check (L1 in-memory, L2 Aurora)
+  │     → Cache hit? Return immediately, zero cost
+  │
+  ├─ 2. Drift-Aware Selection (Phase 1)
+  │     → DriftAwareWeightingService.isModelSafe(model, app)
+  │     → If unsafe: replace with drift-aware best alternative
+  │     → App-specific weight profiles (7 apps)
+  │
+  ├─ 3. Spend Governor Gate (Layer 2 — Tenant)
+  │     → check_spend_budget() — 60s in-memory cache
+  │     → If exceeded: SpendLimitExceededError (503)
+  │     → User sees "service temporarily unavailable"
+  │
+  ├─ 4. Circuit Breaker check
+  │     → isProviderHealthy(provider)
+  │     → 3 failures in 60s → open for 30s → half-open test
+  │
+  ├─ 5. Rate Limiter check
+  │     → checkProviderRateLimit(provider)
+  │     → Per-provider token bucket
+  │
+  └─ 6. Invoke model via Bedrock/LiteLLM/Direct
+        → callWithResilience(fn, retries, timeout)
+        → Record invocation telemetry (ring buffer + DB)
+```
+
+### Drift-Aware Weighting
+
+Each RADIANT app has tuned weights for model selection:
+
+| App | Drift | Quality | Latency | Cost | Availability | Min Drift |
+|-----|-------|---------|---------|------|-------------|-----------|
+| Genesis | 0.35 | 0.30 | 0.10 | 0.10 | 0.15 | 0.50 |
+| Cato | 0.30 | 0.25 | 0.15 | 0.15 | 0.15 | 0.40 |
+| Cortex | 0.30 | 0.35 | 0.10 | 0.10 | 0.15 | 0.45 |
+| Omega | 0.40 | 0.25 | 0.10 | 0.10 | 0.15 | 0.50 |
+| Orchestrator | 0.25 | 0.30 | 0.15 | 0.15 | 0.15 | 0.30 |
+| Think Tank | 0.20 | 0.30 | 0.25 | 0.10 | 0.15 | 0.30 |
+| Curator | 0.25 | 0.35 | 0.10 | 0.15 | 0.15 | 0.35 |
+
+### Spend Governor (Two-Layer)
+
+| Layer | Scope | Action |
+|-------|-------|--------|
+| **Layer 1 (Instance)** | Global AWS budget | Freeze ECS → 0, Lambda concurrency → 0, SageMaker flagged |
+| **Layer 2 (Tenant)** | Per-tenant AI budget | Quarantine all tenant models via drift-correction |
+
+### Invocation Telemetry
+
+Every model invocation records telemetry for the Genesis Drift Feedback Loop:
+
+- `drift_invocation_telemetry` (partitioned monthly, 7-day retention)
+- Per-model health map, reroute rate, failure rate, composite health score
+- Genesis stage gates use real-time telemetry + static drift scores
+
+---
+
+## Part VI: Pillar 5 — Federated Intelligence (Global Brain)
+
+> **Services**:
+> - `lambda/shared/services/global-brain/gradient-upload.service.ts`
+> - `lambda/shared/services/global-brain/federated-averaging.service.ts`
+> - `lambda/shared/services/global-brain/cartridge-pipeline.service.ts`
+
+### Architecture
+
+```
+    Tenant A            Tenant B            Tenant C
+   ┌─────────┐        ┌─────────┐        ┌─────────┐
+   │ Dream   │        │ Dream   │        │ Dream   │
+   │ Cycle   │        │ Cycle   │        │ Cycle   │
+   │ Phase 8 │        │ Phase 8 │        │ Phase 8 │
+   └────┬────┘        └────┬────┘        └────┬────┘
+        │                  │                  │
+        │  DP-SGD          │  DP-SGD          │  DP-SGD
+        │  Gradients       │  Gradients       │  Gradients
+        ▼                  ▼                  ▼
+   ┌──────────────────────────────────────────────┐
+   │              Global Brain S3                  │
+   │      (AES-256-GCM envelope encryption)        │
+   └──────────────────┬───────────────────────────┘
+                      │
+                      │  Weekly
+                      ▼
+   ┌──────────────────────────────────────────────┐
+   │         Federated Averaging Engine            │
+   │   Quality-weighted, z-score outlier reject    │
+   │   Minimum 3 participants per round            │
+   └──────────────────┬───────────────────────────┘
+                      │
+                      │  Monthly
+                      ▼
+   ┌──────────────────────────────────────────────┐
+   │        Base Cartridge Pipeline                │
+   │   Load previous base → Apply averaged grads   │
+   │   → Package as .RADz → Publish to Marketplace │
+   └──────────────────────────────────────────────┘
+```
+
+### Differential Privacy (DP-SGD)
+
+Every gradient upload is privacy-protected:
+
+1. **Per-sample gradient clipping**: Each gradient vector is norm-clipped to a configurable maximum
+2. **Calibrated Gaussian noise**: Noise calibrated to (ε, δ) privacy parameters is added
+3. **AES-256-GCM envelope encryption**: Each gradient blob is encrypted with a KMS data key before upload
+4. **Minimum participants**: Rounds require ≥3 valid gradients to prevent single-tenant fingerprinting
+
+### Federated Averaging
+
+- **Quality-weighted**: Higher-quality tenant contributions (measured by Q² score) get higher weight
+- **Outlier rejection**: Z-score based — contributions that deviate significantly from the mean are excluded
+- **Configurable**: Learning rate and momentum are per-round parameters
+- **Non-fatal**: Dream cycle completes even if gradient upload fails
+
+### Cartridge Pipeline
+
+Monthly, the pipeline generates improved base `.RADz` cartridges:
+
+1. Load previous base weights from S3
+2. Apply averaged gradients from completed rounds
+3. Store new Q-Node sections and firmware
+4. Package as `.RADz` cartridge
+5. Publish to Marketplace
+6. Archive previous base
+
+---
+
+## Part VII: OMEGA Inference Cycle — End-to-End
+
+The complete inference cycle executed by `QuantumBrainService.inferenceCycle()`:
+
+| Step | Action | Pillar | Details |
+|------|--------|--------|---------|
+| 1 | **Firmware hot-swap check** | P3 | Compare DB hash to loaded hash. If different → verify signature → swap → self-test → commit or rollback |
+| 2 | **Load state from EFS** | P1 | Restore checkpoint from `/mnt/omega_state/{tenant}/{brain}/state.json` |
+| 3 | **Apply decoherence** | P1 | Time-dependent decay: `e^(-λt)|ψ⟩ + (1-e^(-λt))|ground⟩` |
+| 4 | **Evolve state** | P1 | Encode input → delegate to Python physics engine (or TypeScript fallback) → decode output |
+| 5 | **Helix safety filter** | P2 | Filter through all active rules. Severity-ordered. Destructive or dampening interference |
+| 6 | **Soft measurement** | P1 | Measure components above threshold. Preserve superposition for uncertain states |
+| 7 | **Enforce unitarity** | P1 | Verify ‖ψ‖ ≈ 1.0. Correct if drifted. Record correction event in DB |
+| 8 | **Persist state** | P1 | Write checkpoint to EFS. Update DB with norm, cycle count |
+
+**Returns**: output text, measurement result, Helix violation count, unitarity correction flag, firmware swap flag.
+
+---
+
+## Part VIII: Ambition Chemical System
+
+> **Service**: `lambda/shared/services/omega/omega-ambition.service.ts`
+
+The Ambition system models the brain's internal drive state as five chemical signals, ALL read from cartridge `ambition_config.json`:
+
+| Chemical | Role | Triggered By | Effect |
+|----------|------|-------------|--------|
+| **Dopamine** | Reward signal | High Q² score (quality) | Encourages repeat of successful strategies |
+| **Entropy** | Disorder signal | Idle time accumulation | Triggers self-analysis when high |
+| **Curiosity** | Exploration drive | Novel input signals | Biases brain toward unexplored pathways |
+| **Frustration** | Failure signal | Low Q² score | Triggers self-analysis; reduced on success |
+| **Satisfaction** | Accuracy signal | RFM accuracy feedback | Triggers RFM recalibration when low |
+
+### Behavioral Triggers
+
+| Condition | Trigger | Action |
+|-----------|---------|--------|
+| Frustration > 0.7 or Entropy > 0.6 | `shouldSelfAnalyze()` | Brain enters self-reflection mode |
+| Self-optimization enabled + Entropy > trigger | `shouldResearchInternet()` | Brain queries allowed domains |
+| Curiosity > exploration_bias | `shouldExplore()` | Brain explores new pathways |
+| Satisfaction < 0.3 | `shouldRecalibrateRFM()` | Brain recalibrates response fidelity |
+
+### Self-Optimization Guardrails
+
+The firmware controls what the brain can self-modify:
+
+- **Allowed**: `learning_rate`, `exploration_bias` (configurable per cartridge)
+- **Forbidden**: `veto_thresholds`, `safety_rules`, `firmware_params` — ALWAYS forbidden
+- **Max scaling request**: Limited to N% of current value (default 10%)
+
+---
+
+## Part IX: Soft ROM & Dream Cycle
+
+### Soft ROM
+
+Soft ROM persists the brain's learned state as a delta from the cartridge base:
+
+```
+delta = current_weights − cartridge_base_weights
+```
+
+Written during Dream Cycle Phase 8 via `omegaSoftRomService.writeSoftRom()`:
+
+1. Compute weight deltas for each network
+2. Compute connection topology deltas
+3. Collect sub-cluster map
+4. Store preferences (learning style, domain affinities)
+5. Upload to S3 via `cartridgeStorageManager`
+
+### Dream Cycle Integration
+
+The OMEGA Dream Cycle runs nightly and includes two cartridge-related steps:
+
+| Phase 8 Step | Service | Purpose |
+|-------------|---------|---------|
+| Step 5 | `writeSoftRomDelta()` | Export brain's learned state delta |
+| Step 6 | `uploadGradients()` | Upload DP-SGD gradients to Global Brain (non-fatal) |
+
+---
+
+## Part X: Admin API & Observability
+
+### OMEGA Quantum Admin (`/admin/omega/quantum/*`)
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| GET | `/state-summary` | Brain quantum state + 24h measurement stats |
+| GET | `/unitarity-health` | Unitarity events + health check (violations?) |
+| POST | `/helix-test` | Dry-run Helix rule against test vector (no state change) |
+
+### OMEGA Firmware Admin (`/admin/omega/firmware/*`)
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| POST | `/activate` | Activate firmware (2-person rule enforced) |
+| POST | `/revert` | Revert to previously superseded firmware |
+| GET | `/status` | Get firmware + brain status |
+
+### Global Brain Admin (`/admin/global-brain/*`)
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| GET/PUT | `/enrollment` | Enrollment status and config |
+| GET | `/contributions` | Tenant contribution history |
+| GET/POST | `/rounds` | List/create federated rounds |
+| POST | `/rounds/:id/run` | Trigger federated averaging |
+| GET/POST | `/pipeline` | List/schedule cartridge pipelines |
+| POST | `/pipeline/:id/run` | Trigger pipeline execution |
+| GET | `/stats` | Global Brain statistics |
+
+### Key Metrics
+
+| Metric | Source | Unit |
+|--------|--------|------|
+| `cartridge_boot_duration_ms` | Boot service | Milliseconds |
+| `firmware_enforcement_count` | FirmwareEnforcer | Count |
+| `soft_rom_delta_size_bytes` | Soft ROM service | Bytes |
+| `helix_violations` | Helix Kernel | Count per cycle |
+| `unitarity_corrections` | QSE | Count per cycle |
+| `drift_reroute_rate` | Model Router | Percentage |
+| `model_failure_rate` | Telemetry | Percentage |
+| `gradient_upload_success` | Global Brain | Boolean |
+
+---
+
+## Part XI: OMEGA Forge — System Admin Application
+
+> **Application**: `apps/omega-lab/`
+
+OMEGA Forge is the system admin tool for OMEGA and cartridge management. It provides **direct Aurora PostgreSQL access** (no RLS) for platform operators.
+
+### Core Libraries
+
+| File | Purpose |
+|------|---------|
+| `apps/omega-forge/lib/db/client.ts` | Direct Aurora PostgreSQL via `pg` driver — no RLS |
+| `apps/omega-forge/lib/s3/storage-manager.ts` | ALL S3 operations (4 buckets) — no direct S3 calls elsewhere |
+| `apps/omega-forge/lib/kms/signer.ts` | ECDSA_SHA_256 signing via AWS KMS |
+| `apps/omega-forge/lib/cartridge/builder.ts` | .RADz creation — ZIP, checksums, ZSTD, KMS signing |
+| `apps/omega-forge/lib/cartridge/parser.ts` | .RADz extraction and validation |
+
+### Forge API Routes (16)
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| GET | `/api/dashboard` | System-wide stats |
+| GET/DELETE | `/api/cartridges`, `/api/cartridges/[id]` | Cartridge CRUD |
+| POST | `/api/cartridges/build` | Build .RADz from sections |
+| GET | `/api/brains`, `/api/brains/[tenantId]` | Brain inspection |
+| GET/POST | `/api/brains/[tenantId]/soft-rom` | Soft ROM listing/export |
+| GET | `/api/cato` | CATO instances |
+| GET/POST | `/api/targets` | Target service registry |
+| GET | `/api/signing` | KMS key info + public key PEM |
+| GET | `/api/audit` | Audit trail |
+| GET | `/api/global-brain/gradients` | Gradient monitor |
+| GET | `/api/global-brain/federated` | Rounds, pipelines, enrollment |
+
+### Deployment
+
+- **ECS Fargate** (ARM64, 1 vCPU, 2 GB) in **private subnet**
+- **Internal ALB** — no internet-facing
+- **VPN/SSM access** only
+- **Dark theme with amber accent** — visually distinct from tenant admin
+
+---
+
+## Part XII: Database Schema Reference
+
+### OMEGA Tables
+
+| Table | Purpose |
+|-------|---------|
+| `omega_brains` | Brain instances per tenant with firmware_hash, active_firmware_id |
+| `omega_firmware` | Firmware records with quantum params, ambition, personality, signature |
+| `omega_helix_rules` | Helix safety rules per brain with forbidden state vectors |
+| `omega_measurements` | Measurement results (basis_state, probability, timestamp) |
+| `omega_unitarity_events` | Unitarity drift/correction/violation events |
+| `omega_firmware_swap_log` | Firmware hot-swap audit trail |
+
+### Cartridge System Tables
+
+| Table | Purpose |
+|-------|---------|
+| `cartridge_target_services` | Pluggable target registry (omega, cortex, cato, tenant, global) |
+| `cartridge_target_section_specs` | Per-target file specs with JSON schemas |
+| `cartridge_universal` | Main cartridge registry |
+| `cartridge_installations` | Per-tenant installation stack with priority |
+| `cartridge_resolved_state` | Cached resolution per tenant |
+| `cartridge_audit_log` | Full cartridge audit trail |
+| `cato_cartridge_config` | CATO personality from cartridges |
+
+### Global Brain Tables
+
+| Table | Purpose |
+|-------|---------|
+| `global_brain_enrollment` | Tenant enrollment status + privacy config |
+| `global_brain_gradients` | Uploaded gradient metadata (S3 refs, DP params) |
+| `global_brain_rounds` | Federated averaging rounds |
+| `global_brain_cartridge_pipeline` | Base cartridge generation pipeline |
+
+### Drift & Spend Tables
+
+| Table | Purpose |
+|-------|---------|
+| `drift_invocation_telemetry` | Per-invocation telemetry (partitioned monthly) |
+| `spend_governor_instance` | Global instance budget config |
+| `spend_governor_config` | Per-tenant AI budget config |
+| `spend_governor_audit` | Spend governor action log |
+
+---
+
+## Part XIII: Source File Index
+
+### Pillar 1 — Quantum State Engine
+| File | Lines | Purpose |
+|------|-------|---------|
+| `lambda/shared/services/omega/quantum-brain.service.ts` | ~934 | Brain management, inference cycle, persistence, hot-swap |
+| `lambda/shared/services/omega/quantum-math.ts` | 379 | Pure math library (35+ test cases) |
+| `lambda/shared/services/omega/quantum-types.ts` | 286 | TypeScript types + Zod schemas |
+| `lambda/shared/services/omega/quantum-math.ts` | — | Vitest unit tests |
+
+### Pillar 2 — Helix Safety Kernel
+| File | Lines | Purpose |
+|------|-------|---------|
+| `lambda/shared/services/omega/helix-kernel.service.ts` | 200 | In-memory safety filter with severity ordering |
+| `lambda/shared/services/omega/schemas/bio-firmware.schema.json` | — | JSON Schema for .bio firmware files |
+
+### Pillar 3 — Firmware & Cartridge
+| File | Lines | Purpose |
+|------|-------|---------|
+| `lambda/shared/services/omega/omega-cartridge-boot.service.ts` | 656 | 8-step cartridge-first boot sequence |
+| `lambda/shared/services/omega/omega-firmware-enforcer.service.ts` | 203 | min() rule enforcement |
+| `lambda/shared/services/omega/omega-ambition.service.ts` | 254 | Chemical system from cartridge |
+| `lambda/shared/services/omega/omega-soft-rom.service.ts` | — | Soft ROM delta read/write |
+| `lambda/shared/services/omega/omega-cartridge-events.service.ts` | — | EventBridge listener |
+| `lambda/shared/services/cartridge-storage-manager.service.ts` | — | Storage manager singleton |
+| `lambda/shared/cartridge/signing.ts` | — | Ed25519 + ECDSA + KMS signing |
+| `lambda/shared/cartridge/resolution.ts` | — | Stacking resolution engine |
+| `lambda/workers/cartridge-validator.ts` | — | ZSTD decompress, signature verify |
+| `lambda/workers/cartridge-loader.ts` | — | Extract → dispatch to targets |
+| `lambda/workers/cartridge-resolution.ts` | — | Post-install resolution |
+
+### Pillar 4 — Model Routing
+| File | Lines | Purpose |
+|------|-------|---------|
+| `lambda/shared/services/model-router.service.ts` | 1258 | Hybrid model router (Bedrock/LiteLLM/Direct) |
+| `lambda/shared/services/drift-aware-weighting.service.ts` | — | App-specific drift-aware model selection |
+| `lambda/shared/services/drift-correction.service.ts` | — | Legacy drift correction fallback |
+| `lambda/shared/services/spend-governor.service.ts` | — | Two-layer budget control |
+| `lambda/shared/services/resilient-provider.service.ts` | — | Circuit breaker + retry + timeout |
+| `lambda/shared/services/inference-cache.service.ts` | — | L1 (memory) + L2 (Aurora) cache |
+
+### Pillar 5 — Global Brain
+| File | Lines | Purpose |
+|------|-------|---------|
+| `lambda/shared/services/global-brain/gradient-upload.service.ts` | — | DP-SGD gradient processing + upload |
+| `lambda/shared/services/global-brain/federated-averaging.service.ts` | — | Quality-weighted averaging engine |
+| `lambda/shared/services/global-brain/cartridge-pipeline.service.ts` | — | Base cartridge generation |
+
+### Admin Handlers
+| File | Lines | Purpose |
+|------|-------|---------|
+| `lambda/admin/omega-quantum.ts` | 179 | State summary, unitarity health, Helix test |
+| `lambda/admin/omega-firmware.ts` | 234 | Firmware activate (2-person rule), revert, status |
+| `lambda/admin/global-brain.ts` | — | 10 admin endpoints |
+| `lambda/admin/cartridge-universal.ts` | — | 14 cartridge admin endpoints |
+
+### OMEGA Forge Application
+| File | Purpose |
+|------|---------|
+| `apps/omega-forge/lib/db/client.ts` | Direct Aurora PostgreSQL (no RLS) |
+| `apps/omega-forge/lib/s3/storage-manager.ts` | ALL S3 operations (4 buckets) |
+| `apps/omega-forge/lib/kms/signer.ts` | ECDSA_SHA_256 via AWS KMS |
+| `apps/omega-forge/lib/cartridge/builder.ts` | .RADz builder |
+| `apps/omega-forge/lib/cartridge/parser.ts` | .RADz parser |
+| `apps/omega-forge/app/api/*/route.ts` | API routes (audit, brains, cartridges, cato, dashboard, global-brain, signing, targets) |
+| `apps/omega-forge/app/(forge)/*/page.tsx` | 10 UI pages (audit, brains, cartridges, cato, global-brain, signing, targets) |
+
+---
+
+
+---
+
+*OMEGA Complete Reference — consolidated from docs 09 + 19. All OMEGA-related changes MUST be documented in this file.*
 
 
 
@@ -101081,14 +102114,14 @@ A: Absolutely not. RADIANT maintains strict tenant isolation. Your data, your AI
 
 \newpage
 
-# Part 10: Orchestration & Workflows
+# Part 8: Orchestration & Workflows
 
 ---
 
 
 \newpage
 
-## 10.1 Orchestration & Workflows — Complete Reference
+## 8.1 Orchestration & Workflows — Complete Reference
 
 
 *Source: `docs/10-ORCHESTRATION-WORKFLOWS.md` (6,024 lines)*
@@ -105414,7 +106447,7 @@ interface ParallelExecutionResult {
 
 ## Database Schema
 
-Key tables in `packages/infrastructure/migrations/066_orchestration_patterns_registry.sql`:
+Key tables in `migrations/000_consolidated_schema.sql`:
 
 ```sql
 -- Core tables
@@ -105537,7 +106570,7 @@ The Workflow UEP Architecture integrates the Universal Envelope Protocol (UEP) v
 | UEP Node Service | `lambda/shared/services/workflow/uep-node.service.ts` |
 | Workflow Engine | `lambda/shared/services/workflow-engine.ts` |
 | Orchestration Patterns | `lambda/shared/services/orchestration-patterns.service.ts` |
-| Database Migration | `migrations/V2026_01_31_003__workflow_uep_integration.sql` |
+| Database Migration | `migrations/000_consolidated_schema.sql` |
 
 ---
 
@@ -107101,7 +108134,7 @@ const linkedEnvelopes = uepIntegrationService.linkEnvelopes([
 | `middleware/uep-middleware.ts` | Lambda/API middleware for UEP wrapping |
 | `thinktank/uep-integration.ts` | Think Tank specific UEP integration |
 | `services/cato-method-executor.service.ts` | Cato pipeline UEP integration |
-| `migrations/V2026_01_31_001__uds_envelopes.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 
 ---
 
@@ -107125,4301 +108158,14 @@ const linkedEnvelopes = uepIntegrationService.linkEnvelopes([
 
 \newpage
 
-# Part 11: Data & Storage
+# Part 9: API Reference
 
 ---
 
 
 \newpage
 
-## 11.1 Data & Storage — Complete Reference
-
-
-*Source: `docs/11-DATA-STORAGE.md` (4,267 lines)*
-
----
-
-
-**User Data Store • RAWS • Data Retention • Cost Optimization**
-
-*RADIANT v6.6.0 — Generated February 07, 2026*
-
----
-
-## Table of Contents
-
-- **Part I: User Data Store**
-- **Part II: RAWS (Read-After-Write Storage)**
-- **Part III: Data Lifecycle**
-- **Part IV: File Services**
-
----
-
-
----
-
-## Part I: User Data Store
-
-**Version**: 1.0.0  
-**Last Updated**: January 24, 2026  
-**RADIANT Version**: 5.52.18
-
----
-
-## Table of Contents
-
-1. [Overview](#1-overview)
-2. [Architecture](#2-architecture)
-3. [Tiered Storage](#3-tiered-storage)
-4. [Data Types](#4-data-types)
-5. [Encryption](#5-encryption)
-6. [Audit System](#6-audit-system)
-7. [Upload Management](#7-upload-management)
-8. [GDPR Compliance](#8-gdpr-compliance)
-9. [Admin API Reference](#9-admin-api-reference)
-10. [Admin Dashboard](#10-admin-dashboard)
-11. [Configuration](#11-configuration)
-12. [Monitoring](#12-monitoring)
-13. [Troubleshooting](#13-troubleshooting)
-
----
-
-## 1. Overview
-
-The User Data Service (UDS) is RADIANT's dedicated system for storing, managing, and securing user-generated content at scale (1M+ concurrent users). It provides:
-
-- **Tiered Storage**: Hot → Warm → Cold → Glacier automatic data lifecycle
-- **End-to-End Encryption**: AES-256-GCM with KMS key management
-- **Tamper-Evident Audit**: Merkle chain for compliance verification
-- **GDPR Compliance**: Right-to-erasure with multi-tier deletion
-- **File Handling**: Virus scanning, text extraction, semantic search
-
-### Why UDS vs Cortex?
-
-| System | Purpose | Data |
-|--------|---------|------|
-| **Cortex** | AI Memory | Knowledge graphs, semantic memory, ghost vectors |
-| **UDS** | User Data | Conversations, messages, uploads, audit logs |
-
-UDS is optimized for **time-series CRUD** operations, while Cortex is optimized for **graph queries** and **semantic search**.
-
----
-
-## 2. Architecture
-
-### 2.1 System Overview
-
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                           USER DATA SERVICE                              │
-│                                                                          │
-│  ┌────────────────────────┐        ┌────────────────────────┐          │
-│  │   Client Applications  │        │    Admin Dashboard     │          │
-│  │   (Think Tank, etc.)   │        │   /platform/uds        │          │
-│  └───────────┬────────────┘        └───────────┬────────────┘          │
-│              │                                  │                        │
-│              ▼                                  ▼                        │
-│  ┌─────────────────────────────────────────────────────────────────┐   │
-│  │                       UDS API Gateway                            │   │
-│  │  /api/v2/uds/* (client)       /api/admin/uds/* (admin)         │   │
-│  └─────────────────────────────────────────────────────────────────┘   │
-│              │                                  │                        │
-│              ▼                                  ▼                        │
-│  ┌─────────────────────────────────────────────────────────────────┐   │
-│  │                        UDS Services                              │   │
-│  │  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐             │   │
-│  │  │ Conversation │ │   Message    │ │    Upload    │             │   │
-│  │  │   Service    │ │   Service    │ │   Service    │             │   │
-│  │  └──────────────┘ └──────────────┘ └──────────────┘             │   │
-│  │  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐             │   │
-│  │  │    Audit     │ │     Tier     │ │   Erasure    │             │   │
-│  │  │   Service    │ │ Coordinator  │ │   Service    │             │   │
-│  │  └──────────────┘ └──────────────┘ └──────────────┘             │   │
-│  │  ┌──────────────┐                                               │   │
-│  │  │  Encryption  │                                               │   │
-│  │  │   Service    │                                               │   │
-│  │  └──────────────┘                                               │   │
-│  └─────────────────────────────────────────────────────────────────┘   │
-│              │                                                          │
-│              ▼                                                          │
-│  ┌─────────────────────────────────────────────────────────────────┐   │
-│  │                       Storage Tiers                              │   │
-│  │  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐   │   │
-│  │  │    HOT     │ │    WARM    │ │    COLD    │ │  GLACIER   │   │   │
-│  │  │ ElastiCache│ │  Aurora PG │ │ S3 Iceberg │ │ S3 Glacier │   │   │
-│  │  │ + DynamoDB │ │ + pgvector │ │            │ │            │   │   │
-│  │  └────────────┘ └────────────┘ └────────────┘ └────────────┘   │   │
-│  └─────────────────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────────────────┘
-```
-
-### 2.2 Database Tables
-
-| Table | Purpose |
-|-------|---------|
-| `uds_config` | Per-tenant configuration |
-| `uds_encryption_keys` | Encryption key registry |
-| `uds_conversations` | Conversation metadata |
-| `uds_messages` | Encrypted message content |
-| `uds_message_attachments` | Inline attachments |
-| `uds_uploads` | File upload metadata |
-| `uds_upload_chunks` | Chunked upload tracking |
-| `uds_audit_log` | Tamper-evident audit trail |
-| `uds_audit_merkle_tree` | Merkle tree checkpoints |
-| `uds_export_requests` | Compliance data exports |
-| `uds_erasure_requests` | GDPR deletion requests |
-| `uds_tier_transitions` | Data movement history |
-| `uds_data_flow_metrics` | Tier health metrics |
-| `uds_search_index` | Full-text + semantic search |
-
----
-
-## 3. Tiered Storage
-
-### 3.1 Tier Overview
-
-| Tier | Storage | Retention | Access Pattern | Latency |
-|------|---------|-----------|----------------|---------|
-| **Hot** | ElastiCache + DynamoDB | 0-24 hours | Real-time | <10ms |
-| **Warm** | Aurora PostgreSQL | 1-90 days | Active | <100ms |
-| **Cold** | S3 Iceberg | 90 days - 7 years | Rare | 1-10s |
-| **Glacier** | S3 Glacier | 7+ years | Archive only | 1-12h |
-
-### 3.2 Automatic Transitions
-
-Data automatically moves between tiers based on access patterns:
-
-```
-Hot (24h) → Warm (90d) → Cold (7y) → Glacier
-                ↑______________|
-                   (retrieval)
-```
-
-**Transition Rules**:
-- **Hot → Warm**: Conversation not accessed for 24 hours
-- **Warm → Cold**: Conversation archived AND not accessed for 90 days
-- **Cold → Glacier**: Data older than 7 years (compliance retention)
-- **Cold → Warm**: Manual retrieval request
-
-### 3.3 Configuration
-
-```typescript
-// Per-tenant tier configuration
-{
-  hotSessionTtlSeconds: 14400,      // 4 hours default session TTL
-  hotMessageTtlSeconds: 86400,      // 24 hours default message TTL
-  warmRetentionDays: 90,            // 90 days in warm tier
-  coldRetentionYears: 7,            // 7 years compliance retention
-}
-```
-
-### 3.4 Manual Operations
-
-**Trigger Hot → Warm Promotion**:
-```bash
-POST /api/admin/uds/tiers/promote
-```
-
-**Trigger Warm → Cold Archival**:
-```bash
-POST /api/admin/uds/tiers/archive
-```
-
-**Retrieve from Cold to Warm**:
-```bash
-POST /api/admin/uds/tiers/retrieve
-Content-Type: application/json
-
-{
-  "resourceIds": ["uuid-1", "uuid-2"]
-}
-```
-
----
-
-## 4. Data Types
-
-### 4.1 Conversations
-
-Conversations are the primary container for user interactions.
-
-```typescript
-interface Conversation {
-  id: string;
-  tenantId: string;
-  userId: string;
-  title: string;
-  modelId: string;
-  messageCount: number;
-  totalInputTokens: number;
-  totalOutputTokens: number;
-  totalCostCredits: number;
-  status: 'active' | 'archived' | 'deleted';
-  currentTier: 'hot' | 'warm' | 'cold' | 'glacier';
-  // Time Machine support
-  parentConversationId?: string;
-  forkPointMessageId?: string;
-  branchName?: string;
-  // Collaboration
-  isShared: boolean;
-  sharedWithUserIds: string[];
-}
-```
-
-**Features**:
-- **Time Machine**: Fork conversations at any message
-- **Checkpoints**: Save named snapshots
-- **Collaboration**: Share with other users
-- **Tagging**: Custom metadata tags
-
-### 4.2 Messages
-
-Messages are encrypted at rest and contain the actual conversation content.
-
-```typescript
-interface Message {
-  id: string;
-  conversationId: string;
-  role: 'system' | 'user' | 'assistant' | 'tool';
-  content: string;  // Decrypted on read
-  sequenceNumber: number;
-  inputTokens: number;
-  outputTokens: number;
-  costCredits: number;
-  // Editing
-  isEdited: boolean;
-  editCount: number;
-  // Feedback
-  userRating: number;  // 1-5
-  flagged: boolean;
-}
-```
-
-### 4.3 Uploads
-
-Uploads support multiple file formats with automatic processing.
-
-**Supported Content Types**:
-
-| Category | Extensions |
-|----------|------------|
-| Documents | pdf, docx, doc, xlsx, xls, csv, txt, md, json, xml |
-| Images | png, jpg, jpeg, gif, webp, svg, bmp, tiff |
-| Audio | mp3, wav, ogg, m4a |
-| Video | mp4, webm, mov |
-| Archives | zip, tar, gz |
-
-**Processing Pipeline**:
-1. **Quarantine**: File uploaded to quarantine bucket
-2. **Virus Scan**: ClamAV Lambda checks for malware
-3. **Promotion**: Clean files moved to main bucket
-4. **Text Extraction**: Textract/Tika extracts content
-5. **Embedding**: Vector embedding for semantic search
-6. **Thumbnail**: Generate preview images
-
----
-
-## 5. Encryption
-
-### 5.1 Architecture
-
-UDS uses **envelope encryption** with AWS KMS:
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    ENCRYPTION HIERARCHY                      │
-│                                                              │
-│  ┌─────────────────────────────────────────────────────┐   │
-│  │  AWS KMS Master Key                                  │   │
-│  │  (alias/radiant-uds-master)                         │   │
-│  └──────────────────────┬──────────────────────────────┘   │
-│                         │                                   │
-│                         ▼                                   │
-│  ┌─────────────────────────────────────────────────────┐   │
-│  │  Data Encryption Keys (DEKs)                        │   │
-│  │  - Per-tenant key (default)                         │   │
-│  │  - Per-user key (optional, high-security)          │   │
-│  │  - Rotated every 90 days                           │   │
-│  └──────────────────────┬──────────────────────────────┘   │
-│                         │                                   │
-│                         ▼                                   │
-│  ┌─────────────────────────────────────────────────────┐   │
-│  │  Encrypted Data                                     │   │
-│  │  - Messages: AES-256-GCM with per-message IV       │   │
-│  │  - Uploads: S3 SSE-KMS                             │   │
-│  │  - Attachments: AES-256-GCM                        │   │
-│  └─────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────┘
-```
-
-### 5.2 Algorithm Details
-
-- **Algorithm**: AES-256-GCM
-- **IV Length**: 96 bits (12 bytes)
-- **Auth Tag Length**: 128 bits (16 bytes)
-- **Key Spec**: AES_256
-
-### 5.3 Key Rotation
-
-**Automatic Rotation**:
-- Keys are automatically rotated every 90 days
-- Old keys remain available for decryption
-- New data uses the latest key version
-
-**Manual Rotation**:
-```bash
-POST /api/admin/uds/encryption/rotate
-Content-Type: application/json
-
-{
-  "userId": "optional-user-id-for-per-user-key"
-}
-```
-
-### 5.4 Configuration
-
-```typescript
-{
-  encryptionEnabled: true,
-  encryptionAlgorithm: 'AES-256-GCM',
-  perUserEncryptionKeys: false,  // Enable for high-security tenants
-}
-```
-
----
-
-## 6. Audit System
-
-### 6.1 Features
-
-- **Append-Only**: Entries cannot be modified or deleted
-- **Merkle Chain**: Each entry links to previous via hash
-- **Tamper-Evident**: Verification detects any modification
-- **Compliance Ready**: GDPR, HIPAA, SOC2 compatible
-
-### 6.2 Audit Entry Structure
-
-```typescript
-interface AuditEntry {
-  id: string;
-  tenantId: string;
-  userId: string;
-  
-  // Event
-  eventType: string;           // e.g., 'conversation_created'
-  eventCategory: string;       // e.g., 'conversation'
-  eventSeverity: string;       // 'debug' | 'info' | 'warning' | 'error' | 'critical'
-  
-  // Resource
-  resourceType: string;
-  resourceId: string;
-  
-  // Action
-  action: string;              // 'create' | 'read' | 'update' | 'delete'
-  actionDetails: object;
-  
-  // Merkle Chain
-  merkleHash: string;          // SHA-256 hash of entry + previous hash
-  previousMerkleHash: string;
-  sequenceNumber: number;
-  
-  // Request Context
-  requestId: string;
-  ipAddress: string;
-  userAgent: string;
-  
-  createdAt: Date;
-}
-```
-
-### 6.3 Event Categories
-
-| Category | Events |
-|----------|--------|
-| `auth` | login, logout, token_refresh |
-| `conversation` | created, updated, deleted, forked, archived |
-| `message` | created, updated, deleted, flagged |
-| `upload` | initiated, completed, downloaded, deleted |
-| `gdpr` | erasure_requested, erasure_completed |
-| `system` | tier_transition, housekeeping |
-
-### 6.4 Merkle Verification
-
-**Verify Chain Integrity**:
-```bash
-POST /api/admin/uds/audit/verify
-Content-Type: application/json
-
-{
-  "fromSequence": 1,
-  "toSequence": 1000
-}
-```
-
-**Response**:
-```json
-{
-  "isValid": true,
-  "treeRoot": "a1b2c3...",
-  "entriesVerified": 1000,
-  "errors": []
-}
-```
-
-### 6.5 Export
-
-**Export Audit Log**:
-```bash
-POST /api/admin/uds/audit/export
-Content-Type: application/json
-
-{
-  "startDate": "2025-01-01T00:00:00Z",
-  "endDate": "2025-12-31T23:59:59Z",
-  "format": "json"  // or "csv"
-}
-```
-
----
-
-## 7. Upload Management
-
-### 7.1 Upload Flow
-
-```
-┌─────────┐    ┌──────────┐    ┌───────────┐    ┌─────────┐    ┌───────┐
-│ Initiate│───▶│ Upload to│───▶│  Complete │───▶│  Virus  │───▶│ Ready │
-│ Request │    │Quarantine│    │  Upload   │    │  Scan   │    │       │
-└─────────┘    └──────────┘    └───────────┘    └─────────┘    └───────┘
-                                                      │
-                                                      ▼
-                                                ┌─────────┐
-                                                │Infected │
-                                                │(deleted)│
-                                                └─────────┘
-```
-
-### 7.2 Upload States
-
-| Status | Description |
-|--------|-------------|
-| `pending` | Presigned URL generated, awaiting upload |
-| `scanning` | Virus scan in progress |
-| `clean` | Passed virus scan, being processed |
-| `infected` | Failed virus scan, file deleted |
-| `processing` | Text extraction/thumbnail in progress |
-| `ready` | Fully processed, available for download |
-| `failed` | Processing failed |
-| `deleted` | Soft deleted by user/admin |
-
-### 7.3 API Endpoints
-
-**Initiate Upload**:
-```bash
-POST /api/v2/uds/uploads/initiate
-Content-Type: application/json
-
-{
-  "originalFilename": "document.pdf",
-  "mimeType": "application/pdf",
-  "fileSizeBytes": 1048576,
-  "conversationId": "optional-uuid"
-}
-```
-
-**Response**:
-```json
-{
-  "uploadId": "uuid",
-  "presignedUrl": "https://s3...",
-  "expiresAt": "2025-01-24T08:00:00Z",
-  "maxSizeBytes": 104857600
-}
-```
-
-**Complete Upload**:
-```bash
-POST /api/v2/uds/uploads/{uploadId}/complete
-Content-Type: application/json
-
-{
-  "sha256Hash": "abc123..."
-}
-```
-
-**Get Download URL**:
-```bash
-GET /api/v2/uds/uploads/{uploadId}/download
-```
-
----
-
-## 8. GDPR Compliance
-
-### 8.1 Right to Erasure
-
-UDS implements GDPR Article 17 (Right to Erasure) with multi-tier deletion:
-
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                    GDPR ERASURE ORCHESTRATOR                             │
-│                                                                          │
-│  Erasure Request                                                         │
-│       │                                                                  │
-│       ├────────────────┬────────────────┬─────────────────┐             │
-│       ▼                ▼                ▼                 ▼             │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌────────┐         │
-│  │ Hot Tier    │  │ Warm Tier   │  │ Cold Tier   │  │ Backups│         │
-│  │ (Redis,     │  │ (Aurora,    │  │ (S3,        │  │        │         │
-│  │  DynamoDB)  │  │  uploads)   │  │  Iceberg)   │  │        │         │
-│  └─────────────┘  └─────────────┘  └─────────────┘  └────────┘         │
-│       │                │                │             │                  │
-│       └────────────────┴────────────────┴─────────────┘                  │
-│                            │                                             │
-│                            ▼                                             │
-│                   ┌─────────────────┐                                   │
-│                   │ Verification    │                                   │
-│                   │ Hash Generated  │                                   │
-│                   └─────────────────┘                                   │
-└─────────────────────────────────────────────────────────────────────────┘
-```
-
-### 8.2 Erasure Scopes
-
-| Scope | Description |
-|-------|-------------|
-| `user` | Delete all data for a specific user |
-| `conversation` | Delete a specific conversation |
-| `tenant` | Delete all data for entire tenant |
-
-### 8.3 Create Erasure Request
-
-```bash
-POST /api/admin/uds/erasure
-Content-Type: application/json
-
-{
-  "scope": "user",
-  "userId": "uuid-of-user",
-  "eraseConversations": true,
-  "eraseMessages": true,
-  "eraseUploads": true,
-  "eraseAuditLog": false,     // Usually keep for compliance
-  "eraseFromBackups": false,   // Expensive, requires manual intervention
-  "anonymizeRemaining": true,  // Anonymize data we can't delete
-  "legalBasis": "gdpr_article_17",
-  "legalReference": "User request #12345"
-}
-```
-
-### 8.4 Erasure Status
-
-| Status | Description |
-|--------|-------------|
-| `pending` | Request created, not yet started |
-| `processing` | Actively deleting data |
-| `completed` | All tiers processed successfully |
-| `failed` | Error occurred, may be partially complete |
-| `partial` | Some tiers completed, others pending |
-
-### 8.5 Verification
-
-Each completed erasure generates a **verification hash** that proves:
-- What was deleted
-- When it was deleted
-- The scope of deletion
-
-This hash is stored in the audit log for compliance proof.
-
----
-
-## 9. Admin API Reference
-
-**Base URL**: `/api/admin/uds`
-
-### Dashboard
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/dashboard` | Full dashboard with health, stats, config |
-
-### Configuration
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/config` | Get tenant configuration |
-| PUT | `/config` | Update tenant configuration |
-
-### Conversations
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/conversations` | List conversations with filters |
-| GET | `/conversations/{id}` | Get conversation details |
-| DELETE | `/conversations/{id}` | Delete conversation |
-| GET | `/conversations/{id}/messages` | List messages |
-
-### Uploads
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/uploads` | List uploads with filters |
-| GET | `/uploads/{id}` | Get upload details |
-| DELETE | `/uploads/{id}` | Delete upload |
-
-### Audit
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/audit` | List audit entries with filters |
-| POST | `/audit/verify` | Verify Merkle chain integrity |
-| POST | `/audit/export` | Export audit log |
-| GET | `/audit/merkle-trees` | List Merkle trees |
-
-### Tiers
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/tiers` | Get tier health status |
-| GET | `/tiers/metrics` | Get tier metrics |
-| POST | `/tiers/promote` | Trigger Hot → Warm promotion |
-| POST | `/tiers/archive` | Trigger Warm → Cold archival |
-| POST | `/tiers/retrieve` | Retrieve from Cold to Warm |
-| POST | `/tiers/housekeeping` | Run housekeeping tasks |
-
-### Erasure
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/erasure` | List erasure requests |
-| POST | `/erasure` | Create erasure request |
-| GET | `/erasure/{id}` | Get erasure request details |
-| DELETE | `/erasure/{id}` | Cancel pending erasure |
-
-### Encryption
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/encryption/keys` | List encryption keys |
-| POST | `/encryption/rotate` | Rotate encryption key |
-
-### Statistics
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/stats` | Get UDS statistics |
-
----
-
-## 10. Admin Dashboard
-
-Access the UDS Admin Dashboard at: **Admin Dashboard → Platform → UDS**
-
-### 10.1 Overview Tab
-
-- **Tier Health**: Real-time status of all storage tiers
-- **Quick Actions**: Promote, archive, housekeeping buttons
-- **Statistics**: Conversation, message, upload, audit counts
-- **Distribution**: Visual breakdown of data across tiers
-
-### 10.2 Audit Log Tab
-
-- **Filterable Log**: Filter by category, event type, user
-- **Merkle Verification**: Visual indicator of chain integrity
-- **Export**: Download audit log for compliance
-
-### 10.3 GDPR Erasure Tab
-
-- **Request List**: All erasure requests with status
-- **Create Request**: Form to initiate new erasure
-- **Progress Tracking**: Per-tier deletion status
-
-### 10.4 Configuration Tab
-
-- **Tier Settings**: TTL and retention configuration
-- **Security Settings**: Encryption, virus scanning status
-- **Upload Settings**: Size limits, allowed types
-- **GDPR Settings**: Auto-delete, anonymization settings
-
----
-
-## 11. Configuration
-
-### 11.1 Environment Variables
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `UDS_KMS_KEY_ALIAS` | KMS master key alias | `alias/radiant-uds-master` |
-| `UDS_UPLOAD_BUCKET` | Main upload S3 bucket | `radiant-uds-uploads` |
-| `UDS_QUARANTINE_BUCKET` | Quarantine S3 bucket | `radiant-uds-quarantine` |
-| `UDS_HOT_TTL_SECONDS` | Default hot tier TTL | `86400` |
-| `UDS_WARM_RETENTION_DAYS` | Default warm retention | `180` |
-| `UDS_COLD_RETENTION_YEARS` | Cold tier retention | `7` |
-
-### 11.2 Per-Tenant Configuration
-
-All settings can be overridden per-tenant via the `uds_config` table or Admin API.
-
----
-
-## 12. Monitoring
-
-### 12.1 Key Metrics
-
-| Metric | Description | Alert Threshold |
-|--------|-------------|-----------------|
-| `uds.hot.item_count` | Items in hot tier | >10,000 |
-| `uds.warm.storage_bytes` | Warm tier storage | >100GB |
-| `uds.cold.storage_bytes` | Cold tier storage | >1TB |
-| `uds.hot.cache_hit_rate` | Cache efficiency | <90% |
-| `uds.tier.transition_errors` | Failed transitions | >0 |
-| `uds.upload.scan_failures` | Virus scan failures | >0 |
-
-### 12.2 CloudWatch Alarms
-
-Recommended alarms:
-- Hot tier item count exceeds threshold
-- Tier transition error rate
-- Upload quarantine backup
-- Audit chain verification failure
-
-### 12.3 Housekeeping
-
-Run housekeeping regularly to:
-- Promote data between tiers
-- Clean up deleted items
-- Update tier metrics
-
-**Manual Trigger**:
-```bash
-POST /api/admin/uds/tiers/housekeeping
-```
-
-**Scheduled**: EventBridge rule runs hourly
-
----
-
-## 13. Troubleshooting
-
-### 13.1 Common Issues
-
-**Upload Stuck in "Scanning"**:
-- Check ClamAV Lambda health
-- Verify quarantine bucket permissions
-- Check CloudWatch logs for scan errors
-
-**High Hot Tier Item Count**:
-- Verify TTL configuration
-- Check if promotion job is running
-- Review access patterns (frequently accessed data stays hot)
-
-**Merkle Chain Verification Failed**:
-- Do NOT attempt to fix manually
-- Contact security team immediately
-- Preserve audit log for investigation
-
-**Erasure Request Failed**:
-- Check per-tier status for specific failure
-- Review CloudWatch logs
-- Retry with smaller scope if needed
-
-### 13.2 Support
-
-For UDS issues:
-1. Check CloudWatch logs: `/aws/lambda/radiant-uds-*`
-2. Review tier health in Admin Dashboard
-3. Contact platform team with request ID
-
----
-
-## Document History
-
-| Version | Date | Changes |
-|---------|------|---------|
-| 1.0.0 | 2026-01-24 | Initial release |
-
----
-
-*This document is part of the RADIANT Platform Documentation.*
-
-
----
-
-## Part II: RAWS (Read-After-Write Storage)
-
-## Operations and Administration Guide
-
----
-
-**Document Version:** 1.1.0  
-**RADIANT Platform Version:** v4.19.0  
-**Last Updated:** January 2026  
-
----
-
-## 1. System Overview
-
-RAWS automatically selects optimal AI models using 8-dimension scoring across 13 weight profiles and 7 domains.
-
-### Key Admin Responsibilities
-
-- Model registry management
-- Weight profile configuration
-- Domain compliance enforcement
-- Thermal state management
-- Provider health monitoring
-- Cost optimization
-
----
-
-## 2. Regulatory Compliance by Domain
-
-### 2.1 Compliance Matrix
-
-| Domain | Required | Optional | Truth Engine |
-|--------|----------|----------|--------------|
-| **Healthcare** | HIPAA | FDA 21 CFR Part 11, HITECH | Required |
-| **Financial** | SOC 2 Type II | PCI-DSS, GDPR, SOX | Required |
-| **Legal** | SOC 2 Type II | GDPR, State Bar Rules | Required |
-| **Scientific** | None | FDA 21 CFR Part 11, GLP, IRB | Optional |
-| **Creative** | None | FTC Guidelines | Not Required |
-| **Engineering** | None | SOC 2, ISO 27001, NIST CSF | Optional |
-| **General** | None | None | Not Required |
-
-### 2.2 Domain Regulatory Details
-
-#### Healthcare Domain
-
-**Mandatory Compliance:**
-- **HIPAA** (Health Insurance Portability and Accountability Act)
-  - Applies to: Any system processing Protected Health Information (PHI)
-  - Requirements: Encryption at rest/transit, access controls, audit trails, Business Associate Agreements
-  - RAWS Enforcement: Only HIPAA-certified models are eligible; selection filtered before scoring
-
-**Conditional Compliance:**
-- **FDA 21 CFR Part 11** (Electronic Records; Electronic Signatures)
-  - Applies to: Clinical trials, drug development, medical device decisions
-  - Requirements: Electronic record integrity, audit trails, electronic signatures
-  - RAWS Enforcement: Models flagged as FDA-eligible when this compliance is required
-
-- **HITECH Act**
-  - Extends HIPAA for electronic health records
-  - Increases penalties for HIPAA violations
-
-**Admin Actions:**
-```bash
-# Verify HIPAA-eligible models
-radiant-cli raws models list --compliance HIPAA --env production
-
-# Healthcare selection audit
-radiant-cli raws audit search --domain healthcare --last 30d --env production
-```
-
-#### Financial Domain
-
-**Mandatory Compliance:**
-- **SOC 2 Type II**
-  - Applies to: Financial services handling customer data
-  - Requirements: Security controls, availability, processing integrity, confidentiality, privacy
-  - Audit Period: 6-12 months of operational evidence
-  - RAWS Enforcement: SOC2-certified models only for financial domain
-
-**Conditional Compliance:**
-- **PCI-DSS** (Payment Card Industry Data Security Standard)
-  - Applies to: Processing, storing, or transmitting payment card data
-  - Requirements: Network security, access control, encryption, testing
-  
-- **GDPR** (General Data Protection Regulation)
-  - Applies to: EU resident financial data
-  - Requirements: Data minimization, consent, right to erasure, data portability
-
-- **SOX** (Sarbanes-Oxley Act)
-  - Applies to: Publicly traded companies
-  - Requirements: Audit trail, internal controls, financial reporting integrity
-
-- **SEC/FINRA Regulations**
-  - Investment advice must not mislead
-  - AI outputs used in investment decisions face regulatory scrutiny
-
-**Admin Actions:**
-```bash
-# Financial compliance report
-radiant-cli raws compliance report --framework SOC2 --domain financial --env production
-
-# Check models with PCI-DSS
-radiant-cli raws models list --compliance PCI_DSS --env production
-```
-
-#### Legal Domain
-
-**Mandatory Compliance:**
-- **SOC 2 Type II**
-  - Protects attorney-client privilege
-  - Ensures confidential document security
-  - Required for legal tech platforms
-
-**Conditional Compliance:**
-- **ABA Model Rules of Professional Conduct**
-  - Lawyers remain liable for AI outputs
-  - Must maintain competent representation
-  - Confidentiality obligations extend to AI tools
-
-- **GDPR**
-  - Required for EU data subjects in legal matters
-  - Special categories of data (legal proceedings) have heightened protections
-
-- **State Bar Requirements**
-  - Many jurisdictions require disclosure of AI use in legal documents
-  - Continuing education requirements on AI tools
-
-**Admin Actions:**
-```bash
-# Legal domain with source citation requirement
-radiant-cli raws domains get legal --env production
-
-# Verify citation tracking enabled
-radiant-cli raws config get truth_engine.require_citation --domain legal --env production
-```
-
-#### Scientific Domain
-
-**No Mandatory Compliance** (varies by research type)
-
-**Conditional Compliance:**
-- **FDA 21 CFR Part 11**
-  - Applies to: Pharmaceutical research, drug development
-  - Required for submissions to regulatory agencies
-
-- **GLP** (Good Laboratory Practice)
-  - Applies to: Non-clinical laboratory studies
-  - Required for studies submitted to FDA, EPA, etc.
-
-- **IRB Approval** (Institutional Review Board)
-  - Applies to: Human subjects research using AI tools
-  - Required for federally funded research
-
-- **NIH Data Management Requirements**
-  - Data integrity for federally funded research
-  - Public access requirements
-
-- **Journal Disclosure Requirements**
-  - Many journals require disclosure of AI use
-  - ICMJE guidelines on AI authorship
-
-**Admin Actions:**
-```bash
-# Scientific domain configuration
-radiant-cli raws domains get scientific --env production
-
-# Enable FDA compliance for pharma research
-radiant-cli raws domains update scientific --add-compliance FDA_21_CFR --env production
-```
-
-#### Creative Domain
-
-**No Mandatory Compliance**
-
-**Considerations:**
-- **FTC Guidelines**
-  - AI-generated advertising may require disclosures
-  - Endorsements using AI must be transparent
-
-- **Copyright**
-  - Not a compliance requirement but legal consideration
-  - AI-generated content copyright status varies by jurisdiction
-
-**Admin Actions:**
-```bash
-# Creative domain has no compliance requirements
-radiant-cli raws domains get creative --env production
-
-# Lowest ECD threshold - hallucinations acceptable
-# ECD threshold: 0.20 (vs 0.05 for healthcare)
-```
-
-#### Engineering Domain
-
-**No Mandatory Compliance** (varies by application)
-
-**Conditional Compliance:**
-- **SOC 2 Type II**
-  - Required if AI-generated code processes sensitive data
-  - Common for SaaS/enterprise applications
-
-- **ISO 27001**
-  - Information security management
-  - Enterprise software development
-
-- **NIST Cybersecurity Framework**
-  - Recommended for security-sensitive applications
-  - Federal government contractors
-
-- **FDA 21 CFR Part 11**
-  - Required for medical device software (SaMD)
-  - Software in diagnostic or therapeutic devices
-
-- **IEC 62443**
-  - Industrial control systems
-  - Critical infrastructure software
-
-**Admin Actions:**
-```bash
-# Engineering domain - compliance varies by use case
-radiant-cli raws domains get engineering --env production
-
-# For medical device software, add FDA compliance
-radiant-cli raws domains update engineering --add-compliance FDA_21_CFR --tenant medical-device-tenant
-```
-
----
-
-## 3. Weight Profile Management
-
-### 3.1 All 13 System Profiles
-
-| ID | Category | Primary Use |
-|----|----------|-------------|
-| BALANCED | Optimization | Default, general purpose |
-| QUALITY_FIRST | Optimization | Maximum accuracy |
-| COST_OPTIMIZED | Optimization | Budget-conscious |
-| LATENCY_CRITICAL | Optimization | Real-time applications |
-| HEALTHCARE | Domain | Medical/clinical (HIPAA) |
-| FINANCIAL | Domain | Finance/investment (SOC2) |
-| LEGAL | Domain | Contracts/litigation (SOC2) |
-| SCIENTIFIC | Domain | Research/academic |
-| CREATIVE | Domain | Content/marketing |
-| ENGINEERING | Domain | Code/software |
-| SYSTEM_1 | SOFAI | Fast, simple queries |
-| SYSTEM_2 | SOFAI | Complex reasoning |
-| SYSTEM_2_5 | SOFAI | Maximum reasoning |
-
-### 3.2 Profile Compliance Mapping
-
-```bash
-# View profile with compliance requirements
-radiant-cli raws profiles get HEALTHCARE --env production
-
-# Output:
-id: HEALTHCARE
-weights: {Q: 0.30, C: 0.05, L: 0.10, K: 0.15, R: 0.10, P: 0.20, A: 0.05, E: 0.05}
-constraints:
-  minQualityScore: 80
-  requiredCompliance: [HIPAA]
-  forcedSystemType: SYSTEM_2
-  requireTruthEngine: true
-  maxEcdThreshold: 0.05
-regulatory_rationale: |
-  HIPAA mandatory for PHI. FDA 21 CFR Part 11 optional for clinical trials.
-  High compliance weight (P=0.20) ensures only certified models selected.
-  Quality threshold (80) prevents low-quality models for medical use.
-  System 2 forced - no fast/cheap models for patient safety.
-```
-
----
-
-## 4. Domain Configuration
-
-### 4.1 Domain Settings
-
-```bash
-# List all domains
-radiant-cli raws domains list --env production
-
-# Output:
-┌─────────────┬──────────────────┬─────────┬─────────┬─────────────────┐
-│ Domain      │ Profile          │ Min Q   │ ECD     │ Compliance      │
-├─────────────┼──────────────────┼─────────┼─────────┼─────────────────┤
-│ healthcare  │ HEALTHCARE       │ 80      │ 0.05    │ HIPAA           │
-│ financial   │ FINANCIAL        │ 75      │ 0.05    │ SOC2            │
-│ legal       │ LEGAL            │ 80      │ 0.05    │ SOC2            │
-│ scientific  │ SCIENTIFIC       │ 70      │ 0.08    │ -               │
-│ creative    │ CREATIVE         │ -       │ 0.20    │ -               │
-│ engineering │ ENGINEERING      │ 70      │ 0.10    │ -               │
-│ general     │ BALANCED         │ -       │ 0.10    │ -               │
-└─────────────┴──────────────────┴─────────┴─────────┴─────────────────┘
-```
-
-### 4.2 Modifying Domain Compliance
-
-```bash
-# Add compliance requirement for a tenant's domain usage
-radiant-cli raws domains tenant-override \
-  --tenant enterprise-tenant \
-  --domain engineering \
-  --add-compliance SOC2 \
-  --add-compliance ISO_27001 \
-  --env production
-
-# View tenant override
-radiant-cli raws domains get engineering --tenant enterprise-tenant --env production
-```
-
----
-
-## 5. Compliance Monitoring
-
-### 5.1 Compliance Dashboard
-
-```bash
-# Generate compliance summary
-radiant-cli raws compliance summary --env production
-
-# Output:
-Compliance Summary (January 2026)
-═══════════════════════════════════════════════════════════════
-HIPAA Selections:        12,453 (100% compliant)
-SOC2 Selections:         45,892 (100% compliant)
-FDA 21 CFR Selections:      234 (100% compliant)
-Non-Compliant Attempts:       0 (blocked at filter stage)
-
-By Domain:
-  healthcare:  12,453 selections │ HIPAA required │ 0 violations
-  financial:   28,743 selections │ SOC2 required  │ 0 violations
-  legal:       17,149 selections │ SOC2 required  │ 0 violations
-  scientific:   8,234 selections │ optional       │ N/A
-  creative:    15,892 selections │ none           │ N/A
-  engineering: 22,156 selections │ optional       │ N/A
-  general:     34,521 selections │ none           │ N/A
-```
-
-### 5.2 Compliance Reports
-
-```bash
-# Generate HIPAA compliance report for auditors
-radiant-cli raws compliance report \
-  --framework HIPAA \
-  --period 2026-Q1 \
-  --output hipaa-audit-q1-2026.pdf \
-  --include-audit-trails \
-  --env production
-
-# Generate SOC 2 evidence package
-radiant-cli raws compliance evidence \
-  --framework SOC2 \
-  --period 2025 \
-  --output soc2-evidence-2025.zip \
-  --env production
-```
-
----
-
-## 6. Model Compliance Status
-
-### 6.1 Viewing Model Compliance
-
-```bash
-# List models by compliance certification
-radiant-cli raws models list --compliance HIPAA --env production
-
-# Output:
-HIPAA-Certified Models (12 total):
-┌─────────────────────┬───────────┬─────────┬─────────────────────────┐
-│ Model               │ Provider  │ Quality │ Additional Compliance   │
-├─────────────────────┼───────────┼─────────┼─────────────────────────┤
-│ claude-opus-4-5     │ anthropic │ 87.2    │ SOC2, GDPR, HIPAA       │
-│ claude-sonnet-4-5   │ anthropic │ 83.4    │ SOC2, GDPR, HIPAA       │
-│ gpt-4o              │ openai    │ 79.2    │ SOC2, HIPAA             │
-│ gpt-4-turbo         │ openai    │ 76.5    │ SOC2, HIPAA             │
-│ gemini-2.5-pro      │ google    │ 82.3    │ SOC2, HIPAA, ISO_27001  │
-│ ...                 │           │         │                         │
-└─────────────────────┴───────────┴─────────┴─────────────────────────┘
-```
-
-### 6.2 Model Compliance Matrix
-
-```bash
-# Full compliance matrix
-radiant-cli raws models compliance-matrix --env production
-
-# Output shows which models have which certifications
-```
-
----
-
-## 7. Alerts and Notifications
-
-### 7.1 Compliance Alerts
-
-| Alert | Threshold | Severity | Action |
-|-------|-----------|----------|--------|
-| HIPAA model disabled | Any | Critical | SNS + PagerDuty |
-| SOC2 cert expiring | 30 days | Warning | SNS + Slack |
-| Compliance filter blocking >5% | Rate | Warning | SNS |
-| Non-compliant selection attempt | Any | Info | Log only |
-
-### 7.2 Alert Configuration
-
-```bash
-# Configure compliance alerts
-radiant-cli raws alerts set compliance-expiry \
-  --framework SOC2 \
-  --days-before 30 \
-  --severity warning \
-  --notify slack:#compliance-alerts \
-  --env production
-```
-
----
-
-## 8. Quick Reference
-
-### Common Commands
-
-```bash
-# Compliance
-radiant-cli raws compliance summary --env production
-radiant-cli raws compliance report --framework HIPAA --env production
-radiant-cli raws models list --compliance SOC2 --env production
-
-# Domains
-radiant-cli raws domains list --env production
-radiant-cli raws domains get healthcare --env production
-
-# Profiles  
-radiant-cli raws profiles list --env production
-radiant-cli raws profiles get HEALTHCARE --env production
-
-# Audit
-radiant-cli raws audit search --domain healthcare --last 24h --env production
-```
-
-### Compliance Contacts
-
-| Framework | Internal Contact | External Auditor |
-|-----------|------------------|------------------|
-| HIPAA | compliance@radiant.example.com | [Auditor Name] |
-| SOC 2 | security@radiant.example.com | [Auditor Name] |
-| GDPR | privacy@radiant.example.com | [DPO Name] |
-| FDA | regulatory@radiant.example.com | [Consultant] |
-
----
-
-**End of Administrator Documentation**
-
-*Version 1.1.0 | January 2026*
-
-
-## Technical Reference for Engineers and Developers
-
----
-
-**Document Version:** 1.1.0  
-**RADIANT Platform Version:** v4.19.0  
-**Last Updated:** January 2026  
-
----
-
-## 1. System Overview
-
-RAWS (RADIANT AI Weighted Selection) is the real-time model orchestration system that selects optimal AI models using:
-
-- **8-Dimension Scoring**: Quality, Cost, Latency, Capability, Reliability, Compliance, Availability, Learning
-- **13 Weight Profiles**: 4 Optimization + 6 Domain + 3 SOFAI
-- **7 Domains**: Healthcare, Financial, Legal, Scientific, Creative, Engineering, General
-- **106+ Models**: 50 external APIs + 56 self-hosted
-
----
-
-## 2. Weight Profile System
-
-### 2.1 Profile Categories
-
-| Category | Count | Purpose |
-|----------|-------|---------|
-| **Optimization** | 4 | General optimization strategies |
-| **Domain** | 6 | Domain-specific requirements |
-| **SOFAI** | 3 | Cognitive complexity routing |
-
-### 2.2 Complete Profile Matrix
-
-| Profile | Q | C | L | K | R | P | A | E | Focus |
-|---------|-----|-----|-----|-----|-----|-----|-----|-----|-------|
-| **BALANCED** | 0.25 | 0.20 | 0.15 | 0.15 | 0.10 | 0.05 | 0.05 | 0.05 | Default |
-| **QUALITY_FIRST** | 0.40 | 0.10 | 0.10 | 0.15 | 0.10 | 0.05 | 0.05 | 0.05 | Max accuracy |
-| **COST_OPTIMIZED** | 0.20 | 0.35 | 0.15 | 0.10 | 0.05 | 0.05 | 0.05 | 0.05 | Min cost |
-| **LATENCY_CRITICAL** | 0.15 | 0.10 | 0.35 | 0.15 | 0.10 | 0.05 | 0.05 | 0.05 | Fastest |
-| **HEALTHCARE** | 0.30 | 0.05 | 0.10 | 0.15 | 0.10 | 0.20 | 0.05 | 0.05 | Quality+Compliance |
-| **FINANCIAL** | 0.30 | 0.10 | 0.10 | 0.15 | 0.10 | 0.15 | 0.05 | 0.05 | Accuracy+Audit |
-| **LEGAL** | 0.35 | 0.05 | 0.05 | 0.20 | 0.10 | 0.15 | 0.05 | 0.05 | Citations |
-| **SCIENTIFIC** | 0.35 | 0.10 | 0.10 | 0.20 | 0.08 | 0.05 | 0.05 | 0.07 | Research |
-| **CREATIVE** | 0.20 | 0.25 | 0.20 | 0.15 | 0.05 | 0.00 | 0.05 | 0.10 | Iteration |
-| **ENGINEERING** | 0.30 | 0.15 | 0.15 | 0.20 | 0.10 | 0.00 | 0.05 | 0.05 | Code |
-| **SYSTEM_1** | 0.15 | 0.30 | 0.30 | 0.10 | 0.05 | 0.00 | 0.05 | 0.05 | Fast+Cheap |
-| **SYSTEM_2** | 0.35 | 0.10 | 0.10 | 0.15 | 0.10 | 0.10 | 0.05 | 0.05 | Reasoning |
-| **SYSTEM_2_5** | 0.40 | 0.05 | 0.05 | 0.20 | 0.10 | 0.10 | 0.05 | 0.05 | Max reasoning |
-
-### 2.3 Domain Profile Details
-
-#### HEALTHCARE
-- **Weights**: Q=0.30, C=0.05, L=0.10, K=0.15, R=0.10, P=0.20, A=0.05, E=0.05
-- **Constraints**: minQuality=80, compliance=[HIPAA], systemType=SYSTEM_2
-- **Truth Engine**: Required (ECD threshold: 0.05)
-- **Regulatory Requirements**:
-  - **HIPAA**: Mandatory for Protected Health Information (PHI). Requires encryption, access controls, audit trails, BAAs.
-  - **FDA 21 CFR Part 11**: Required for clinical trials, drug development, medical device decisions.
-  - **HITECH Act**: Extends HIPAA for electronic health records.
-- **Use Cases**: Medical diagnosis, patient data analysis, clinical documentation
-
-#### FINANCIAL
-- **Weights**: Q=0.30, C=0.10, L=0.10, K=0.15, R=0.10, P=0.15, A=0.05, E=0.05
-- **Constraints**: minQuality=75, compliance=[SOC2], systemType=SYSTEM_2
-- **Truth Engine**: Required (ECD threshold: 0.05)
-- **Regulatory Requirements**:
-  - **SOC 2 Type II**: Required for security controls, availability, processing integrity, confidentiality.
-  - **PCI-DSS**: Required if processing payment card data.
-  - **GDPR**: Required for EU resident financial data.
-  - **SEC/FINRA**: Investment advice faces regulatory scrutiny.
-  - **SOX**: Audit trail requirements for public companies.
-- **Use Cases**: Investment analysis, accounting, financial reporting
-
-#### LEGAL
-- **Weights**: Q=0.35, C=0.05, L=0.05, K=0.20, R=0.10, P=0.15, A=0.05, E=0.05
-- **Constraints**: minQuality=80, compliance=[SOC2], systemType=SYSTEM_2
-- **Truth Engine**: Required, source citation required (ECD threshold: 0.05)
-- **Regulatory Requirements**:
-  - **SOC 2 Type II**: Required for attorney-client privilege protection, confidential documents.
-  - **ABA Model Rules**: AI legal research must meet professional responsibility standards.
-  - **GDPR**: Required for EU data subjects in legal matters.
-  - **State Bar Requirements**: Many jurisdictions require AI use disclosure.
-- **Use Cases**: Contract analysis, legal research, compliance documentation
-
-#### SCIENTIFIC
-- **Weights**: Q=0.35, C=0.10, L=0.10, K=0.20, R=0.08, P=0.05, A=0.05, E=0.07
-- **Constraints**: minQuality=70, source citation required
-- **Truth Engine**: Optional (ECD threshold: 0.08)
-- **Regulatory Requirements**:
-  - **FDA 21 CFR Part 11**: Required for pharmaceutical/drug research.
-  - **GLP** (Good Laboratory Practice): For studies submitted to regulatory agencies.
-  - **IRB Approval**: Human subjects research may require institutional review.
-  - **NIH Data Management**: Data integrity requirements for federally funded research.
-- **Use Cases**: Research analysis, data interpretation, peer review assistance
-
-#### CREATIVE
-- **Weights**: Q=0.20, C=0.25, L=0.20, K=0.15, R=0.05, P=0.00, A=0.05, E=0.10
-- **Constraints**: None (most flexible)
-- **Truth Engine**: Not required (ECD threshold: 0.20)
-- **Regulatory Requirements**:
-  - **None required**: Creative content not subject to regulatory compliance.
-  - **FTC Guidelines**: Disclosures may be required for AI-generated advertising.
-- **Use Cases**: Content writing, storytelling, brainstorming, marketing copy
-
-#### ENGINEERING
-- **Weights**: Q=0.30, C=0.15, L=0.15, K=0.20, R=0.10, P=0.00, A=0.05, E=0.05
-- **Constraints**: minQuality=70, preferredCapabilities=[function_calling, tool_use]
-- **Truth Engine**: Optional (ECD threshold: 0.10)
-- **Regulatory Requirements**:
-  - **SOC 2 Type II**: Required if AI-generated code processes sensitive data.
-  - **ISO 27001**: Information security management for enterprise software.
-  - **NIST Cybersecurity Framework**: Recommended for security-sensitive applications.
-  - **FDA 21 CFR Part 11**: Required for medical device software.
-  - **IEC 62443**: Required for industrial control systems.
-- **Use Cases**: Code generation, code review, debugging, architecture design
-
----
-
-## 3. Eight-Dimension Scoring
-
-### 3.1 Dimension Calculations
-
-| Dimension | Formula | Range |
-|-----------|---------|-------|
-| Quality (Q) | Weighted benchmark average | 0-100 |
-| Cost (C) | Inverted normalized price | 0-100 |
-| Latency (L) | TTFT threshold mapping | 0-100 |
-| Capability (K) | matched / required × 100 | 0-100 |
-| Reliability (R) | Uptime + error rate composite | 0-100 |
-| Compliance (P) | Framework count × 15 | 0-100 |
-| Availability (A) | Thermal state mapping | 0-100 |
-| Learning (E) | Historical performance | 0-100 |
-
-### 3.2 Composite Score
-
-```typescript
-CompositeScore = Q×Wq + C×Wc + L×Wl + K×Wk + R×Wr + P×Wp + A×Wa + E×We
-```
-
-Where Σ(weights) = 1.0
-
----
-
-## 4. Selection Algorithm
-
-### 4.1 Four Phases
-
-```
-PHASE 1: FILTER (5ms)
-├── Status filter (active only)
-├── Capability filter
-├── Compliance filter
-├── Tier filter
-├── System type filter
-└── Thermal filter
-
-PHASE 2: SCORE (25ms)
-├── Quality scorer
-├── Cost scorer
-├── Latency scorer
-├── Capability scorer
-├── Reliability scorer
-├── Compliance scorer
-├── Availability scorer
-└── Learning scorer (parallel)
-
-PHASE 3: RANK (15ms)
-├── Apply weights from profile
-├── Calculate composite scores
-├── Apply neural adjustments
-└── Sort by adjusted score
-
-PHASE 4: SELECT (3ms)
-├── Select winner
-├── Select fallbacks (3)
-├── Generate reason
-└── Build response
-```
-
-### 4.2 Weight Resolution Order
-
-```typescript
-async resolveWeights(request, systemType, domain): Promise<ScoringWeights> {
-  // 1. Explicit profile ID
-  if (request.weightProfileId) {
-    return getProfile(request.weightProfileId).weights;
-  }
-  
-  // 2. Optimization preference
-  if (request.optimizeFor) {
-    return getOptimizationProfile(request.optimizeFor).weights;
-  }
-  
-  // 3. Domain-specific (includes SCIENTIFIC, CREATIVE, ENGINEERING)
-  if (domain !== 'general') {
-    return getDomainProfile(domain).weights;
-  }
-  
-  // 4. SOFAI system type
-  return getSystemProfile(systemType).weights;
-}
-```
-
----
-
-## 5. Domain Detection
-
-### 5.1 Keyword Detection
-
-```typescript
-const DOMAIN_KEYWORDS = {
-  healthcare: ['medical', 'diagnosis', 'patient', 'clinical', ...],
-  financial: ['investment', 'stock', 'trading', 'accounting', ...],
-  legal: ['contract', 'lawsuit', 'attorney', 'litigation', ...],
-  scientific: ['research', 'experiment', 'hypothesis', 'study', ...],
-  creative: ['write', 'story', 'creative', 'brainstorm', ...],
-  engineering: ['code', 'programming', 'debug', 'api', ...],
-};
-```
-
-### 5.2 Task Type Mapping
-
-```typescript
-const TASK_TYPE_MAP = {
-  'medical_qa': 'healthcare',
-  'clinical_documentation': 'healthcare',
-  'investment_analysis': 'financial',
-  'contract_analysis': 'legal',
-  'research_analysis': 'scientific',
-  'content_writing': 'creative',
-  'code_generation': 'engineering',
-  'code_review': 'engineering',
-  'debugging': 'engineering',
-};
-```
-
----
-
-## 6. TypeScript Implementation
-
-### 6.1 Profile Types
-
-```typescript
-export type OptimizationProfile = 
-  | 'BALANCED' 
-  | 'QUALITY_FIRST' 
-  | 'COST_OPTIMIZED' 
-  | 'LATENCY_CRITICAL';
-
-export type DomainProfile = 
-  | 'HEALTHCARE' 
-  | 'FINANCIAL' 
-  | 'LEGAL' 
-  | 'SCIENTIFIC' 
-  | 'CREATIVE' 
-  | 'ENGINEERING';
-
-export type SOFAIProfile = 
-  | 'SYSTEM_1' 
-  | 'SYSTEM_2' 
-  | 'SYSTEM_2_5';
-
-export type WeightProfileId = 
-  | OptimizationProfile 
-  | DomainProfile 
-  | SOFAIProfile;
-
-export type Domain = 
-  | 'healthcare'
-  | 'financial'
-  | 'legal'
-  | 'scientific'
-  | 'creative'
-  | 'engineering'
-  | 'general';
-```
-
-### 6.2 Domain to Profile Mapping
-
-```typescript
-export const DOMAIN_PROFILE_MAP: Record<Domain, WeightProfileId> = {
-  healthcare: 'HEALTHCARE',
-  financial: 'FINANCIAL',
-  legal: 'LEGAL',
-  scientific: 'SCIENTIFIC',
-  creative: 'CREATIVE',
-  engineering: 'ENGINEERING',
-  general: 'BALANCED',
-};
-```
-
----
-
-## 7. Database Schema
-
-### 7.1 Weight Profiles Table
-
-```sql
-CREATE TABLE raws_weight_profiles (
-    id VARCHAR(50) PRIMARY KEY,
-    display_name VARCHAR(255) NOT NULL,
-    description TEXT,
-    category VARCHAR(20) NOT NULL, -- 'optimization', 'domain', 'sofai'
-    
-    -- Eight dimension weights
-    weight_quality NUMERIC(4, 3) NOT NULL,
-    weight_cost NUMERIC(4, 3) NOT NULL,
-    weight_latency NUMERIC(4, 3) NOT NULL,
-    weight_capability NUMERIC(4, 3) NOT NULL,
-    weight_reliability NUMERIC(4, 3) NOT NULL,
-    weight_compliance NUMERIC(4, 3) NOT NULL,
-    weight_availability NUMERIC(4, 3) NOT NULL,
-    weight_learning NUMERIC(4, 3) NOT NULL,
-    
-    -- Domain association
-    domain VARCHAR(50),
-    
-    -- Constraints
-    min_quality_score NUMERIC(5, 2),
-    required_compliance TEXT[],
-    forced_system_type VARCHAR(20),
-    
-    -- Truth Engine
-    require_truth_engine BOOLEAN DEFAULT false,
-    require_source_citation BOOLEAN DEFAULT false,
-    max_ecd_threshold NUMERIC(4, 3),
-    
-    CONSTRAINT weights_sum CHECK (ABS(
-        weight_quality + weight_cost + weight_latency + weight_capability + 
-        weight_reliability + weight_compliance + weight_availability + weight_learning - 1.0
-    ) < 0.01)
-);
-```
-
-### 7.2 Domain Config Table
-
-```sql
-CREATE TABLE raws_domain_config (
-    id VARCHAR(50) PRIMARY KEY, -- 7 domains
-    weight_profile_id VARCHAR(50) REFERENCES raws_weight_profiles(id),
-    min_quality_score NUMERIC(5, 2),
-    max_ecd_threshold NUMERIC(4, 3),
-    required_compliance TEXT[],
-    forced_system_type VARCHAR(20),
-    require_truth_engine BOOLEAN DEFAULT false,
-    require_source_citation BOOLEAN DEFAULT false,
-    detection_keywords TEXT[]
-);
-```
-
----
-
-## 8. API Examples
-
-### 8.1 Domain-Specific Selection
-
-```typescript
-// Engineering domain
-const result = await raws.select({
-  requiredCapabilities: ['chat', 'function_calling'],
-  estimatedInputTokens: 2000,
-  estimatedOutputTokens: 1000,
-  domain: 'engineering',
-});
-// Uses ENGINEERING profile: Q=0.30, K=0.20, C=0.15, L=0.15...
-
-// Scientific domain
-const result = await raws.select({
-  requiredCapabilities: ['chat', 'reasoning'],
-  estimatedInputTokens: 3000,
-  estimatedOutputTokens: 2000,
-  domain: 'scientific',
-});
-// Uses SCIENTIFIC profile: Q=0.35, K=0.20, E=0.07...
-
-// Creative domain
-const result = await raws.select({
-  requiredCapabilities: ['chat', 'streaming'],
-  estimatedInputTokens: 500,
-  estimatedOutputTokens: 2000,
-  domain: 'creative',
-});
-// Uses CREATIVE profile: C=0.25, L=0.20, E=0.10...
-```
-
-### 8.2 Auto-Detection
-
-```typescript
-// Domain detected from query content
-const result = await raws.select({
-  requiredCapabilities: ['chat'],
-  estimatedInputTokens: 1000,
-  estimatedOutputTokens: 500,
-  taskType: 'code_review', // Auto-maps to engineering domain
-});
-```
-
----
-
-## 9. Testing
-
-### 9.1 Profile Validation
-
-```typescript
-describe('WeightProfiles', () => {
-  it('should have 13 system profiles', () => {
-    expect(Object.keys(WEIGHT_PROFILES)).toHaveLength(13);
-  });
-
-  it('all profiles should sum to 1.0', () => {
-    for (const profile of Object.values(WEIGHT_PROFILES)) {
-      const sum = Object.values(profile.weights).reduce((a, b) => a + b, 0);
-      expect(sum).toBeCloseTo(1.0, 2);
-    }
-  });
-
-  it('should map all 7 domains to profiles', () => {
-    expect(Object.keys(DOMAIN_PROFILE_MAP)).toHaveLength(7);
-  });
-});
-```
-
----
-
-## 10. Performance
-
-### 10.1 Latency Budget
-
-| Phase | Budget | Actual p99 |
-|-------|--------|------------|
-| Context + Weights | 2ms | 1.5ms |
-| Filtering | 5ms | 4ms |
-| Scoring (8 dim) | 25ms | 22ms |
-| Ranking | 15ms | 12ms |
-| Selection | 3ms | 2ms |
-| **Total** | **50ms** | **41.5ms** |
-
----
-
-**End of Engineering Documentation**
-
-*Version 1.1.0 | January 2026*
-
-
-## API Guide for Developers and Integrators
-
----
-
-**Document Version:** 1.1.0  
-**API Version:** v1  
-**Last Updated:** January 2026  
-
----
-
-## 1. Introduction
-
-RAWS (RADIANT AI Weighted Selection) automatically selects the optimal AI model for your requests based on:
-
-- **Quality**: How accurate the model is
-- **Cost**: Price for your usage
-- **Latency**: Response speed
-- **Capabilities**: Features supported
-- **Compliance**: Regulatory certifications
-
-### Why Use RAWS?
-
-| Without RAWS | With RAWS |
-|--------------|-----------|
-| Manually choose models | Automatic optimization |
-| Risk compliance violations | Compliance-aware filtering |
-| Static selection | Dynamic, context-aware |
-| No fallback handling | Automatic fallback chain |
-
----
-
-## 2. Quick Start
-
-```bash
-curl -X POST https://api.radiant.example.com/v1/raws/select \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "requiredCapabilities": ["chat", "streaming"],
-    "estimatedInputTokens": 1000,
-    "estimatedOutputTokens": 500
-  }'
-```
-
----
-
-## 3. Domain-Specific Selection
-
-RAWS supports 7 domains, each with appropriate compliance requirements:
-
-### 3.1 Domain Overview
-
-| Domain | Use Case | Compliance | Min Quality |
-|--------|----------|------------|-------------|
-| `healthcare` | Medical, clinical | HIPAA required | 80 |
-| `financial` | Investment, accounting | SOC 2 required | 75 |
-| `legal` | Contracts, litigation | SOC 2 required | 80 |
-| `scientific` | Research, academic | Varies | 70 |
-| `creative` | Content, marketing | None | - |
-| `engineering` | Code, software | Varies | 70 |
-| `general` | Default | None | - |
-
-### 3.2 Healthcare Domain
-
-**When to Use**: Medical queries, patient data, clinical documentation
-
-**Compliance**: HIPAA is **mandatory**. All models must be HIPAA-certified.
-
-**What Happens**:
-- Only HIPAA-compliant models considered
-- Minimum quality score of 80 enforced
-- System 2 reasoning forced (no fast/cheap models)
-- Truth Engine verification required (ECD ≤ 0.05)
-
-```json
-{
-  "requiredCapabilities": ["chat", "tool_use"],
-  "estimatedInputTokens": 2000,
-  "estimatedOutputTokens": 1500,
-  "domain": "healthcare"
-}
-```
-
-**Typical Models Selected**: claude-sonnet-4-5, gpt-4o, gemini-2.5-pro (all HIPAA-certified)
-
-### 3.3 Financial Domain
-
-**When to Use**: Investment analysis, accounting, financial reporting, tax
-
-**Compliance**: SOC 2 Type II is **mandatory**. 
-
-**What Happens**:
-- Only SOC 2 certified models considered
-- Minimum quality score of 75 enforced
-- System 2 reasoning forced
-- Truth Engine verification required (ECD ≤ 0.05)
-
-```json
-{
-  "requiredCapabilities": ["chat", "function_calling"],
-  "estimatedInputTokens": 2000,
-  "estimatedOutputTokens": 1500,
-  "domain": "financial"
-}
-```
-
-### 3.4 Legal Domain
-
-**When to Use**: Contract analysis, legal research, compliance documentation
-
-**Compliance**: SOC 2 Type II is **mandatory**. Source citations required.
-
-**What Happens**:
-- Only SOC 2 certified models considered
-- Minimum quality score of 80 enforced
-- System 2 reasoning forced
-- Source citation verification enabled
-- Truth Engine required (ECD ≤ 0.05)
-
-```json
-{
-  "requiredCapabilities": ["chat", "tool_use"],
-  "estimatedInputTokens": 3000,
-  "estimatedOutputTokens": 2000,
-  "domain": "legal"
-}
-```
-
-### 3.5 Scientific Domain
-
-**When to Use**: Research analysis, data interpretation, academic writing
-
-**Compliance**: Varies by research type. FDA 21 CFR Part 11 for pharmaceutical research.
-
-**What Happens**:
-- Source citation required
-- Minimum quality score of 70
-- Slightly relaxed ECD threshold (0.08)
-- No forced compliance (specify if needed)
-
-```json
-{
-  "requiredCapabilities": ["chat", "reasoning"],
-  "estimatedInputTokens": 3000,
-  "estimatedOutputTokens": 2000,
-  "domain": "scientific"
-}
-```
-
-**For FDA-regulated research**, add compliance:
-```json
-{
-  "domain": "scientific",
-  "requiredCompliance": ["FDA_21_CFR"]
-}
-```
-
-### 3.6 Creative Domain
-
-**When to Use**: Content writing, storytelling, marketing copy, brainstorming
-
-**Compliance**: None required. Most flexible domain.
-
-**What Happens**:
-- No compliance filtering
-- No minimum quality threshold
-- Cost and latency optimized (weights: C=0.25, L=0.20)
-- Learning dimension emphasized (E=0.10)
-- High ECD tolerance (0.20) - creative license allowed
-
-```json
-{
-  "requiredCapabilities": ["chat", "streaming"],
-  "estimatedInputTokens": 500,
-  "estimatedOutputTokens": 2000,
-  "domain": "creative"
-}
-```
-
-### 3.7 Engineering Domain
-
-**When to Use**: Code generation, debugging, architecture design, DevOps
-
-**Compliance**: Varies. SOC 2 recommended for sensitive applications.
-
-**What Happens**:
-- Minimum quality score of 70 (code must work)
-- Capability dimension emphasized (K=0.20)
-- Prefers models with function_calling and tool_use
-- Moderate ECD threshold (0.10)
-
-```json
-{
-  "requiredCapabilities": ["chat", "function_calling"],
-  "estimatedInputTokens": 2000,
-  "estimatedOutputTokens": 1500,
-  "domain": "engineering"
-}
-```
-
-**For medical device software**, add FDA compliance:
-```json
-{
-  "domain": "engineering",
-  "requiredCompliance": ["FDA_21_CFR", "SOC2"]
-}
-```
-
----
-
-## 4. Compliance Options
-
-### 4.1 Available Compliance Frameworks
-
-| Framework | Code | When Required |
-|-----------|------|---------------|
-| HIPAA | `HIPAA` | Healthcare/medical data |
-| SOC 2 Type II | `SOC2` | Financial, legal, enterprise |
-| GDPR | `GDPR` | EU data subjects |
-| FDA 21 CFR Part 11 | `FDA_21_CFR` | Pharma, medical devices |
-| PCI-DSS | `PCI_DSS` | Payment card data |
-| CCPA | `CCPA` | California consumer data |
-| ISO 27001 | `ISO_27001` | Enterprise security |
-
-### 4.2 Specifying Compliance
-
-**Single Framework**:
-```json
-{
-  "requiredCapabilities": ["chat"],
-  "estimatedInputTokens": 1000,
-  "estimatedOutputTokens": 500,
-  "requiredCompliance": ["HIPAA"]
-}
-```
-
-**Multiple Frameworks**:
-```json
-{
-  "requiredCapabilities": ["chat"],
-  "estimatedInputTokens": 1000,
-  "estimatedOutputTokens": 500,
-  "requiredCompliance": ["SOC2", "GDPR", "ISO_27001"]
-}
-```
-
-### 4.3 Domain vs. Explicit Compliance
-
-Using `domain` automatically sets compliance:
-
-```json
-// These are equivalent:
-{ "domain": "healthcare" }
-{ "requiredCompliance": ["HIPAA"] }
-
-// Domain also sets quality threshold, system type, Truth Engine
-// So domain is preferred over explicit compliance alone
-```
-
----
-
-## 5. Optimization Strategies
-
-### 5.1 Use Optimization Preferences
-
-```json
-// Cost-optimized
-{ "optimizeFor": "cost" }
-
-// Quality-optimized  
-{ "optimizeFor": "quality" }
-
-// Latency-optimized
-{ "optimizeFor": "latency" }
-
-// Balanced (default)
-{ "optimizeFor": "balanced" }
-```
-
-### 5.2 Combine Domain with Optimization
-
-```json
-{
-  "requiredCapabilities": ["chat"],
-  "estimatedInputTokens": 1000,
-  "estimatedOutputTokens": 500,
-  "domain": "engineering",
-  "optimizeFor": "cost"  // Cost-optimize within engineering constraints
-}
-```
-
-### 5.3 Set Hard Constraints
-
-```json
-{
-  "requiredCapabilities": ["chat"],
-  "estimatedInputTokens": 1000,
-  "estimatedOutputTokens": 500,
-  "maxPrice": 0.01,        // Max $0.01 per request
-  "minQuality": 75,        // At least 75 quality score
-  "maxLatencyMs": 1000     // Under 1 second
-}
-```
-
----
-
-## 6. Understanding Selection Results
-
-### 6.1 Response Structure
-
-```json
-{
-  "selection": {
-    "modelId": "claude-sonnet-4-5",
-    "providerId": "anthropic",
-    "displayName": "Claude Sonnet 4.5",
-    "score": 85.2,
-    "estimatedPrice": 0.0115,
-    "estimatedLatencyMs": 450,
-    "reason": "Selected for engineering domain. HIPAA compliant. High capability score."
-  },
-  "fallbacks": [...],
-  "scoring": {
-    "dimensionScores": {
-      "quality": 83,
-      "cost": 70,
-      "latency": 85,
-      "capability": 100,
-      "reliability": 95,
-      "compliance": 100,
-      "availability": 100,
-      "learning": 60
-    },
-    "weightsUsed": {
-      "Q": 0.30, "C": 0.15, "L": 0.15, "K": 0.20,
-      "R": 0.10, "P": 0.00, "A": 0.05, "E": 0.05
-    },
-    "weightProfileId": "ENGINEERING"
-  },
-  "metadata": {
-    "systemType": "SYSTEM_2",
-    "domain": "engineering",
-    "selectionTimeMs": 23
-  }
-}
-```
-
-### 6.2 Compliance Score
-
-The compliance score (P) in `dimensionScores` reflects:
-- 100: Model has all required compliance certifications
-- 0: Model filtered out (you won't see this - it's excluded)
-
-If you request HIPAA compliance, only HIPAA-certified models are returned.
-
----
-
-## 7. SDK Examples
-
-### 7.1 JavaScript/TypeScript
-
-```typescript
-import { RAWSClient } from '@radiant/raws-client';
-
-const raws = new RAWSClient({ apiKey: process.env.RADIANT_API_KEY });
-
-// Healthcare selection (automatic HIPAA compliance)
-const healthcareResult = await raws.select({
-  requiredCapabilities: ['chat', 'tool_use'],
-  estimatedInputTokens: 2000,
-  estimatedOutputTokens: 1500,
-  domain: 'healthcare',
-});
-
-// Engineering selection
-const engineeringResult = await raws.select({
-  requiredCapabilities: ['chat', 'function_calling'],
-  estimatedInputTokens: 2000,
-  estimatedOutputTokens: 1000,
-  domain: 'engineering',
-});
-
-// Creative selection (cost-optimized)
-const creativeResult = await raws.select({
-  requiredCapabilities: ['chat', 'streaming'],
-  estimatedInputTokens: 500,
-  estimatedOutputTokens: 2000,
-  domain: 'creative',
-  optimizeFor: 'cost',
-});
-```
-
-### 7.2 Python
-
-```python
-from radiant_raws import RAWSClient
-
-raws = RAWSClient(api_key="your-api-key")
-
-# Healthcare (HIPAA enforced)
-result = raws.select(
-    required_capabilities=["chat", "tool_use"],
-    estimated_input_tokens=2000,
-    estimated_output_tokens=1500,
-    domain="healthcare",
-)
-
-# Financial (SOC 2 enforced)
-result = raws.select(
-    required_capabilities=["chat", "function_calling"],
-    estimated_input_tokens=2000,
-    estimated_output_tokens=1500,
-    domain="financial",
-)
-```
-
----
-
-## 8. Best Practices
-
-### 8.1 Always Specify Domain for Regulated Use Cases
-
-```typescript
-// ❌ Don't rely on auto-detection for regulated domains
-const result = await raws.select({
-  requiredCapabilities: ['chat'],
-  estimatedInputTokens: 1000,
-  estimatedOutputTokens: 500,
-  // Missing domain - might not get HIPAA compliance
-});
-
-// ✅ Explicitly specify domain
-const result = await raws.select({
-  requiredCapabilities: ['chat'],
-  estimatedInputTokens: 1000,
-  estimatedOutputTokens: 500,
-  domain: 'healthcare',  // Guarantees HIPAA compliance
-});
-```
-
-### 8.2 Check Compliance in Response
-
-```typescript
-const result = await raws.select({ domain: 'healthcare', ... });
-
-// Verify compliance was applied
-console.log(result.scoring.dimensionScores.compliance); // Should be 100
-console.log(result.metadata.domain); // Should be 'healthcare'
-```
-
-### 8.3 Use Appropriate Domain for Your Use Case
-
-| Use Case | Recommended Domain |
-|----------|-------------------|
-| Patient chatbot | `healthcare` |
-| Investment advisor | `financial` |
-| Contract review | `legal` |
-| Research assistant | `scientific` |
-| Blog writer | `creative` |
-| Code assistant | `engineering` |
-| General Q&A | `general` |
-
----
-
-## 9. FAQ
-
-**Q: What happens if I request a domain but don't have models with required compliance?**
-
-A: You'll receive error `RAWS_005: Compliance requirement not met`. This means no models in your tier have the required certification. Contact support to upgrade.
-
-**Q: Can I use healthcare models for non-healthcare purposes?**
-
-A: Yes, HIPAA-certified models can be used for any purpose. The certification means they *can* handle PHI, not that they *must*.
-
-**Q: How do I know which models have which compliance?**
-
-A: The selection response includes the model's compliance. You can also query the model registry:
-```bash
-curl https://api.radiant.example.com/v1/raws/models?compliance=HIPAA
-```
-
-**Q: Is the engineering domain appropriate for medical device software?**
-
-A: Use `engineering` domain with explicit `requiredCompliance: ["FDA_21_CFR", "SOC2"]` for medical device software development.
-
----
-
-## 10. Error Reference
-
-| Code | Description | Resolution |
-|------|-------------|------------|
-| `RAWS_001` | No eligible models | Reduce requirements |
-| `RAWS_005` | Compliance not met | Check tier/requirements |
-| `RAWS_006` | Tier restriction | Upgrade subscription |
-
----
-
-## 11. Contact
-
-**Documentation**: https://docs.radiant.example.com/raws
-
-**Compliance Questions**: compliance@radiant.example.com
-
-**Support**: support@radiant.example.com
-
----
-
-**End of User Documentation**
-
-*Version 1.1.0 | January 2026*
-
-
----
-
-## Part III: Data Lifecycle
-
-## Overview
-
-This document defines data retention periods and deletion procedures for all data stored in the RADIANT platform.
-
-## Retention Schedule
-
-### User Data
-
-| Data Type | Active Retention | Archive | Total Retention | Deletion |
-|-----------|------------------|---------|-----------------|----------|
-| Account info | Active + 30 days | N/A | Account lifetime + 30 days | Automatic |
-| Usage history | 2 years | 5 years | 7 years | Automatic |
-| Chat history | 90 days | 1 year | 1 year | Automatic |
-| Uploaded files | Active | 30 days post-delete | Active + 30 days | On request |
-| API keys | Active | N/A | Revoked + 90 days | Automatic |
-
-### System Data
-
-| Data Type | Retention | Purpose | Deletion |
-|-----------|-----------|---------|----------|
-| Audit logs | 7 years | Compliance | Automatic |
-| Access logs | 2 years | Security | Automatic |
-| Error logs | 90 days | Debugging | Automatic |
-| Metrics | 15 months | CloudWatch default | Automatic |
-| Backups | 35 days | Recovery | Automatic |
-
-### Billing Data
-
-| Data Type | Retention | Purpose | Legal Basis |
-|-----------|-----------|---------|-------------|
-| Invoices | 7 years | Tax compliance | Legal requirement |
-| Transactions | 7 years | Financial audit | Legal requirement |
-| Payment methods | Active | Processing | Contract |
-| Receipts | 7 years | Tax compliance | Legal requirement |
-
-## Implementation
-
-### Database Retention
-
-```sql
--- Automatic data cleanup job (runs daily)
-CREATE OR REPLACE FUNCTION cleanup_expired_data()
-RETURNS void AS $$
-BEGIN
-  -- Delete expired chat messages (90 days)
-  DELETE FROM chat_messages 
-  WHERE created_at < NOW() - INTERVAL '90 days'
-  AND archived = false;
-  
-  -- Archive chat messages older than 90 days
-  UPDATE chat_messages 
-  SET archived = true, archived_at = NOW()
-  WHERE created_at < NOW() - INTERVAL '90 days'
-  AND archived = false;
-  
-  -- Delete archived messages older than 1 year
-  DELETE FROM chat_messages
-  WHERE archived = true
-  AND archived_at < NOW() - INTERVAL '1 year';
-  
-  -- Delete revoked API keys (90 days after revocation)
-  DELETE FROM api_keys
-  WHERE revoked_at < NOW() - INTERVAL '90 days';
-  
-  -- Delete expired sessions
-  DELETE FROM user_sessions
-  WHERE expires_at < NOW();
-  
-  -- Log cleanup
-  INSERT INTO system_jobs (job_name, completed_at, records_affected)
-  VALUES ('cleanup_expired_data', NOW(), 
-    (SELECT count(*) FROM pg_stat_user_tables WHERE relname IN 
-      ('chat_messages', 'api_keys', 'user_sessions')));
-END;
-$$ LANGUAGE plpgsql;
-
--- Schedule daily at 3 AM UTC
-SELECT cron.schedule('data-cleanup', '0 3 * * *', 'SELECT cleanup_expired_data()');
-```
-
-### S3 Lifecycle Policies
-
-```typescript
-const bucket = new s3.Bucket(this, 'Storage', {
-  lifecycleRules: [
-    // User uploads - delete 30 days after object deletion marker
-    {
-      id: 'delete-old-versions',
-      noncurrentVersionExpiration: cdk.Duration.days(30),
-    },
-    
-    // Temp files - delete after 7 days
-    {
-      id: 'cleanup-temp',
-      prefix: 'temp/',
-      expiration: cdk.Duration.days(7),
-    },
-    
-    // Logs - transition to Glacier after 90 days, delete after 2 years
-    {
-      id: 'archive-logs',
-      prefix: 'logs/',
-      transitions: [
-        {
-          storageClass: s3.StorageClass.GLACIER,
-          transitionAfter: cdk.Duration.days(90),
-        },
-      ],
-      expiration: cdk.Duration.days(730), // 2 years
-    },
-    
-    // Backups - delete after 35 days
-    {
-      id: 'cleanup-backups',
-      prefix: 'backups/',
-      expiration: cdk.Duration.days(35),
-    },
-  ],
-});
-```
-
-### CloudWatch Log Retention
-
-```typescript
-// Set retention for all log groups
-const logRetention: Record<string, logs.RetentionDays> = {
-  // Application logs
-  '/aws/lambda/radiant-*': logs.RetentionDays.THREE_MONTHS,
-  
-  // API Gateway logs
-  '/aws/apigateway/radiant-*': logs.RetentionDays.THREE_MONTHS,
-  
-  // Database logs (longer for compliance)
-  '/aws/rds/cluster/radiant-*': logs.RetentionDays.TWO_YEARS,
-  
-  // Audit logs (longest retention)
-  '/radiant/audit/*': logs.RetentionDays.TEN_YEARS,
-};
-```
-
-## Data Deletion
-
-### User-Initiated Deletion
-
-#### Account Deletion Flow
-
-```typescript
-async function deleteUserAccount(userId: string): Promise<void> {
-  // 1. Verify identity (MFA required)
-  await verifyIdentity(userId);
-  
-  // 2. Cancel active subscriptions
-  await cancelSubscriptions(userId);
-  
-  // 3. Export data (optional, user-requested)
-  const exportUrl = await exportUserData(userId);
-  
-  // 4. Mark account for deletion (30-day grace period)
-  await markForDeletion(userId, {
-    scheduledAt: addDays(new Date(), 30),
-    reason: 'user_requested',
-  });
-  
-  // 5. Send confirmation email
-  await sendDeletionConfirmation(userId, exportUrl);
-}
-
-// Actual deletion after grace period
-async function executeAccountDeletion(userId: string): Promise<void> {
-  // Delete in order (respect foreign keys)
-  await deleteApiKeys(userId);
-  await deleteChatHistory(userId);
-  await deleteFiles(userId);
-  await deletePreferences(userId);
-  await deleteBillingHistory(userId); // Anonymize, don't delete
-  await deleteAccount(userId);
-  
-  // Anonymize audit logs
-  await anonymizeAuditLogs(userId);
-  
-  // Log deletion for compliance
-  await logAccountDeletion(userId);
-}
-```
-
-#### Data Categories Deleted
-
-| Category | Action | Timing |
-|----------|--------|--------|
-| Profile | Delete | Immediate |
-| Preferences | Delete | Immediate |
-| Chat history | Delete | Immediate |
-| Files | Delete | Immediate |
-| API keys | Revoke + Delete | Immediate |
-| Billing history | Anonymize | Immediate |
-| Audit logs | Anonymize | Immediate |
-| Backups | Excluded | Expires naturally |
-
-### Administrative Deletion
-
-```typescript
-// Bulk deletion for compliance (e.g., GDPR request)
-async function adminBulkDelete(
-  tenantId: string,
-  options: {
-    dataTypes: string[];
-    olderThan: Date;
-    reason: string;
-    approvedBy: string[];
-  }
-): Promise<DeletionReport> {
-  // Require dual admin approval
-  if (options.approvedBy.length < 2) {
-    throw new Error('Dual admin approval required');
-  }
-  
-  // Log the deletion request
-  await logAdminAction({
-    action: 'bulk_delete',
-    tenantId,
-    options,
-  });
-  
-  // Execute deletion
-  const results = await Promise.all(
-    options.dataTypes.map(type => 
-      deleteDataByType(tenantId, type, options.olderThan)
-    )
-  );
-  
-  return {
-    requestId: generateRequestId(),
-    deletedAt: new Date(),
-    recordsDeleted: results.reduce((a, b) => a + b, 0),
-    dataTypes: options.dataTypes,
-  };
-}
-```
-
-### Tenant Offboarding
-
-```typescript
-async function offboardTenant(tenantId: string): Promise<void> {
-  // 1. Export all data (required for compliance)
-  const exportUrl = await exportTenantData(tenantId);
-  
-  // 2. Notify all users
-  await notifyTenantUsers(tenantId, 'account_closing');
-  
-  // 3. Wait for grace period (30 days default)
-  await scheduleTenantDeletion(tenantId, {
-    gracePeriod: 30,
-    exportUrl,
-  });
-  
-  // 4. After grace period, delete all data
-  // (Handled by scheduled job)
-}
-```
-
-## Legal Holds
-
-### Implementing a Legal Hold
-
-```sql
--- Legal hold table
-CREATE TABLE legal_holds (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id UUID REFERENCES tenants(id),
-  user_id UUID REFERENCES users(id),
-  hold_type VARCHAR(50) NOT NULL, -- 'litigation', 'investigation', 'regulatory'
-  description TEXT,
-  started_at TIMESTAMPTZ DEFAULT NOW(),
-  expires_at TIMESTAMPTZ,
-  created_by UUID REFERENCES administrators(id),
-  CONSTRAINT legal_holds_target CHECK (tenant_id IS NOT NULL OR user_id IS NOT NULL)
-);
-
--- Prevent deletion of held data
-CREATE OR REPLACE FUNCTION check_legal_hold()
-RETURNS TRIGGER AS $$
-BEGIN
-  IF EXISTS (
-    SELECT 1 FROM legal_holds 
-    WHERE (tenant_id = OLD.tenant_id OR user_id = OLD.user_id)
-    AND (expires_at IS NULL OR expires_at > NOW())
-  ) THEN
-    RAISE EXCEPTION 'Cannot delete data under legal hold';
-  END IF;
-  RETURN OLD;
-END;
-$$ LANGUAGE plpgsql;
-```
-
-### Suspending Retention Policies
-
-```typescript
-// Suspend automatic deletion during legal hold
-async function applyLegalHold(params: {
-  holdId: string;
-  scope: 'tenant' | 'user';
-  targetId: string;
-}): Promise<void> {
-  // Update retention flags
-  await updateRetentionPolicy(params.targetId, {
-    suspended: true,
-    holdId: params.holdId,
-  });
-  
-  // Exclude from cleanup jobs
-  await excludeFromCleanup(params.targetId);
-  
-  // Notify compliance team
-  await notifyCompliance('legal_hold_applied', params);
-}
-```
-
-## Audit Trail
-
-### Retention Actions Log
-
-```sql
--- Log all retention-related actions
-CREATE TABLE retention_actions (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  action_type VARCHAR(50) NOT NULL, -- 'delete', 'archive', 'export', 'hold'
-  target_type VARCHAR(50) NOT NULL, -- 'user', 'tenant', 'data_type'
-  target_id VARCHAR(255) NOT NULL,
-  records_affected INTEGER,
-  performed_by UUID,
-  reason TEXT,
-  metadata JSONB,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- Index for compliance queries
-CREATE INDEX idx_retention_actions_date ON retention_actions(created_at);
-CREATE INDEX idx_retention_actions_target ON retention_actions(target_type, target_id);
-```
-
-### Compliance Reporting
-
-```typescript
-// Generate retention compliance report
-async function generateRetentionReport(
-  startDate: Date,
-  endDate: Date
-): Promise<RetentionReport> {
-  return {
-    period: { start: startDate, end: endDate },
-    
-    // Data deleted by type
-    deletions: await getRetentionActions('delete', startDate, endDate),
-    
-    // Data archived
-    archives: await getRetentionActions('archive', startDate, endDate),
-    
-    // Active legal holds
-    legalHolds: await getActiveLegalHolds(),
-    
-    // Policy violations (data past retention not deleted)
-    violations: await getRetentionViolations(),
-    
-    // User deletion requests
-    userRequests: await getUserDeletionRequests(startDate, endDate),
-  };
-}
-```
-
-## Verification
-
-### Monthly Retention Audit
-
-- [ ] Verify cleanup jobs running successfully
-- [ ] Check for retention policy violations
-- [ ] Review legal holds status
-- [ ] Verify S3 lifecycle policies active
-- [ ] Confirm CloudWatch log retention settings
-- [ ] Review user deletion requests processed
-- [ ] Update retention schedule if needed
-
-### Compliance Queries
-
-```sql
--- Find data past retention period
-SELECT 
-  'chat_messages' as table_name,
-  COUNT(*) as records,
-  MIN(created_at) as oldest_record
-FROM chat_messages
-WHERE created_at < NOW() - INTERVAL '90 days'
-AND archived = false
-
-UNION ALL
-
-SELECT 
-  'api_keys' as table_name,
-  COUNT(*) as records,
-  MIN(revoked_at) as oldest_record
-FROM api_keys
-WHERE revoked_at < NOW() - INTERVAL '90 days';
-```
-
-## Contact
-
-| Role | Contact | Purpose |
-|------|---------|---------|
-| Data Protection Officer | dpo@radiant.example.com | GDPR requests |
-| Legal | legal@radiant.example.com | Legal holds |
-| Compliance | compliance@radiant.example.com | Audit questions |
-
-
-## Overview
-
-This guide provides strategies for optimizing AWS costs for the RADIANT platform while maintaining performance and reliability.
-
-## Current Architecture Costs
-
-### Estimated Monthly Costs by Tier
-
-| Tier | Infrastructure | Est. Monthly Cost |
-|------|---------------|-------------------|
-| SEED (Dev) | Minimal | $50-150 |
-| STARTUP | Small production | $200-400 |
-| GROWTH | Self-hosted models | $1,000-2,500 |
-| SCALE | Multi-region | $4,000-8,000 |
-| ENTERPRISE | Global, full HA | $15,000-35,000 |
-
-### Cost Breakdown by Service
-
-| Service | % of Total | Optimization Potential |
-|---------|------------|------------------------|
-| Aurora | 30-40% | High |
-| Lambda | 15-25% | Medium |
-| API Gateway | 5-10% | Low |
-| S3 | 5-10% | Medium |
-| CloudFront | 5-10% | Low |
-| ElastiCache | 10-15% | Medium |
-| Other | 10-15% | Varies |
-
-## Optimization Strategies
-
-### 1. Database Optimization
-
-#### Aurora Serverless v2
-
-```typescript
-// Use Serverless v2 for variable workloads
-const cluster = new rds.DatabaseCluster(this, 'Database', {
-  serverlessV2MinCapacity: 0.5,   // Scale to near-zero
-  serverlessV2MaxCapacity: 16,    // Scale up when needed
-});
-```
-
-**Savings:** 40-60% vs. provisioned instances for variable workloads
-
-#### Reserved Instances (Steady Workloads)
-
-```bash
-# Purchase reserved capacity for predictable workloads
-aws rds purchase-reserved-db-instances-offering \
-  --reserved-db-instances-offering-id xxx \
-  --db-instance-count 1
-```
-
-**Savings:** 30-60% for 1-3 year terms
-
-#### Read Replicas Strategy
-
-```typescript
-// Use read replicas only when needed
-// Scale readers with traffic
-readers: [
-  rds.ClusterInstance.serverlessV2('reader', {
-    scaleWithWriter: true,  // Auto-scale with primary
-  }),
-],
-```
-
-### 2. Lambda Optimization
-
-#### Right-Size Memory
-
-```typescript
-// Test different memory sizes to find optimal cost/performance
-const memoryOptions = [256, 512, 1024, 2048];
-
-// Use AWS Lambda Power Tuning tool
-// https://github.com/alexcasalboni/aws-lambda-power-tuning
-```
-
-| Function Type | Recommended Memory | Reason |
-|---------------|-------------------|--------|
-| Simple CRUD | 256-512 MB | Light compute |
-| API Router | 512-1024 MB | Balanced |
-| AI Processing | 1024-2048 MB | Heavy compute |
-
-#### Provisioned Concurrency (Strategic)
-
-```typescript
-// Only use for latency-critical functions
-new lambda.Alias(this, 'LiveAlias', {
-  aliasName: 'live',
-  version: fn.currentVersion,
-  provisionedConcurrentExecutions: 5,  // Keep 5 warm
-});
-```
-
-**Cost:** ~$0.015/hour per provisioned instance
-**Use when:** P99 latency requirements < 200ms
-
-#### ARM64 (Graviton2)
-
-```typescript
-// 20% cheaper, often faster
-const fn = new lambda.Function(this, 'Function', {
-  architecture: lambda.Architecture.ARM_64,
-  runtime: lambda.Runtime.NODEJS_20_X,
-});
-```
-
-**Savings:** 20% on compute costs
-
-### 3. S3 Optimization
-
-#### Intelligent Tiering
-
-```typescript
-const bucket = new s3.Bucket(this, 'Storage', {
-  intelligentTieringConfigurations: [{
-    name: 'auto-tier',
-    archiveAccessTierTime: cdk.Duration.days(90),
-    deepArchiveAccessTierTime: cdk.Duration.days(180),
-  }],
-});
-```
-
-**Savings:** Up to 95% for infrequently accessed data
-
-#### Lifecycle Rules
-
-```typescript
-const bucket = new s3.Bucket(this, 'Storage', {
-  lifecycleRules: [
-    // Move old versions to cheaper storage
-    {
-      noncurrentVersionTransitions: [
-        {
-          storageClass: s3.StorageClass.INFREQUENT_ACCESS,
-          transitionAfter: cdk.Duration.days(30),
-        },
-        {
-          storageClass: s3.StorageClass.GLACIER,
-          transitionAfter: cdk.Duration.days(90),
-        },
-      ],
-    },
-    // Delete old logs
-    {
-      prefix: 'logs/',
-      expiration: cdk.Duration.days(90),
-    },
-  ],
-});
-```
-
-### 4. API Gateway Optimization
-
-#### HTTP API vs REST API
-
-```typescript
-// HTTP API is 70% cheaper than REST API
-// Use when you don't need REST API features
-
-// HTTP API: $1.00/million requests
-// REST API: $3.50/million requests
-```
-
-| Feature | REST API | HTTP API |
-|---------|----------|----------|
-| Cost | $3.50/M | $1.00/M |
-| Lambda integration | Yes | Yes |
-| Request validation | Yes | No |
-| API keys/usage plans | Yes | No |
-| Caching | Yes | No |
-
-#### Caching
-
-```typescript
-// Enable caching for GET endpoints
-const method = resource.addMethod('GET', integration, {
-  cacheKeyParameters: ['method.request.querystring.id'],
-});
-
-// Cache stage setting
-stage.cacheClusterEnabled = true;
-stage.cacheClusterSize = '0.5';  // 0.5 GB minimum
-```
-
-**Note:** Cache costs $0.02/hour (0.5 GB). Calculate break-even point.
-
-### 5. CloudWatch Optimization
-
-#### Log Retention
-
-```typescript
-// Don't keep logs forever
-new logs.LogGroup(this, 'LogGroup', {
-  retention: logs.RetentionDays.ONE_MONTH,  // Adjust per environment
-});
-```
-
-| Environment | Retention | Reason |
-|-------------|-----------|--------|
-| Development | 7 days | Quick debugging |
-| Staging | 14 days | Testing cycles |
-| Production | 90 days | Compliance needs |
-
-#### Metric Filters vs. Logs Insights
-
-```typescript
-// Use metric filters for known patterns
-// Cheaper than running Logs Insights queries repeatedly
-
-new logs.MetricFilter(this, 'ErrorMetric', {
-  logGroup,
-  metricNamespace: 'Radiant',
-  metricName: 'Errors',
-  filterPattern: logs.FilterPattern.literal('ERROR'),
-});
-```
-
-### 6. ElastiCache Optimization
-
-#### Reserved Nodes
-
-```bash
-# Purchase reserved nodes for production
-aws elasticache purchase-reserved-cache-nodes-offering \
-  --reserved-cache-nodes-offering-id xxx
-```
-
-**Savings:** 30-55% for 1-3 year terms
-
-#### Right-Size Nodes
-
-| Use Case | Recommended | Memory |
-|----------|-------------|--------|
-| Development | cache.t3.micro | 0.5 GB |
-| Small Prod | cache.t3.small | 1.4 GB |
-| Medium Prod | cache.r6g.large | 13 GB |
-| Large Prod | cache.r6g.xlarge | 26 GB |
-
-### 7. Data Transfer Optimization
-
-#### Use VPC Endpoints
-
-```typescript
-// Avoid NAT Gateway costs for AWS services
-vpc.addInterfaceEndpoint('S3Endpoint', {
-  service: ec2.InterfaceVpcEndpointAwsService.S3,
-});
-
-vpc.addInterfaceEndpoint('SecretsManagerEndpoint', {
-  service: ec2.InterfaceVpcEndpointAwsService.SECRETS_MANAGER,
-});
-```
-
-**Savings:** $0.045/GB saved vs. NAT Gateway
-
-#### CloudFront for S3
-
-```typescript
-// Serve S3 content through CloudFront
-// Cheaper data transfer + better performance
-const distribution = new cloudfront.Distribution(this, 'CDN', {
-  defaultBehavior: {
-    origin: new origins.S3Origin(bucket),
-  },
-});
-```
-
-## Cost Monitoring
-
-### AWS Cost Explorer
-
-```bash
-# Get cost breakdown by service
-aws ce get-cost-and-usage \
-  --time-period Start=2024-12-01,End=2024-12-31 \
-  --granularity MONTHLY \
-  --metrics BlendedCost \
-  --group-by Type=DIMENSION,Key=SERVICE
-```
-
-### CloudWatch Billing Alerts
-
-```typescript
-// Alert before surprise bills
-new cloudwatch.Alarm(this, 'BillingAlarm', {
-  metric: new cloudwatch.Metric({
-    namespace: 'AWS/Billing',
-    metricName: 'EstimatedCharges',
-    dimensionsMap: { Currency: 'USD' },
-    statistic: 'Maximum',
-    period: cdk.Duration.hours(6),
-  }),
-  threshold: 1000,  // $1000 threshold
-  evaluationPeriods: 1,
-});
-```
-
-### Cost Allocation Tags
-
-```typescript
-// Tag all resources for cost tracking
-cdk.Tags.of(this).add('Project', 'radiant');
-cdk.Tags.of(this).add('Environment', environment);
-cdk.Tags.of(this).add('CostCenter', 'platform');
-```
-
-## Environment-Specific Recommendations
-
-### Development
-
-- Use Aurora Serverless v2 (scales to zero)
-- Minimal Lambda memory
-- No provisioned concurrency
-- Short log retention
-- Single-AZ deployments
-
-**Target:** < $100/month
-
-### Staging
-
-- Aurora Serverless v2
-- Moderate Lambda memory
-- No provisioned concurrency
-- 14-day log retention
-- Single-AZ acceptable
-
-**Target:** < $300/month
-
-### Production
-
-- Aurora Serverless v2 or Reserved (if predictable)
-- Right-sized Lambda memory
-- Provisioned concurrency for critical paths
-- 90-day log retention
-- Multi-AZ required
-
-**Target:** Optimize for reliability, then cost
-
-## Monthly Cost Review Checklist
-
-- [ ] Review AWS Cost Explorer for anomalies
-- [ ] Check for unused resources (idle RDS, orphan EBS)
-- [ ] Review Lambda right-sizing opportunities
-- [ ] Check S3 storage class distribution
-- [ ] Review data transfer costs
-- [ ] Validate reserved capacity utilization
-- [ ] Update cost allocation tags
-- [ ] Project next month's costs
-
-## Tools
-
-- [AWS Cost Explorer](https://console.aws.amazon.com/cost-management/home)
-- [AWS Trusted Advisor](https://console.aws.amazon.com/trustedadvisor/)
-- [AWS Compute Optimizer](https://console.aws.amazon.com/compute-optimizer/)
-- [Lambda Power Tuning](https://github.com/alexcasalboni/aws-lambda-power-tuning)
-- [Infracost](https://www.infracost.io/) - Cost estimation for IaC
-
-
----
-
-## Part IV: File Services
-
-> **Version**: 4.18.55  
-> **Last Updated**: December 2024  
-> **Status**: Production Ready
-
----
-
-## Overview
-
-The **Intelligent File Conversion Service** is a Radiant-side system that automatically decides when and how to convert files for AI providers. The core principle is **"Let Radiant decide, not Think Tank"** - Think Tank simply drops files, and Radiant determines the optimal conversion strategy based on the target AI provider's capabilities.
-
-### Key Principles
-
-1. **Think Tank submits files without worrying about provider compatibility**
-2. **Radiant detects file format and checks target provider capabilities**
-3. **Conversion only happens if the AI provider doesn't understand the format**
-4. **Uses AI + libraries for intelligent conversion**
-
----
-
-## Architecture
-
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                              THINK TANK                                      │
-│  ┌─────────┐                                                                 │
-│  │  User   │──┬──▶ Drop file into chat                                      │
-│  │         │  │                                                              │
-│  └─────────┘  │                                                              │
-└───────────────┼──────────────────────────────────────────────────────────────┘
-                │
-                ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                              RADIANT                                         │
-│                                                                              │
-│  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐          │
-│  │ Format Detection│───▶│ Provider Check  │───▶│ Decision Engine │          │
-│  │   - MIME type   │    │   - Capabilities│    │   - Strategy    │          │
-│  │   - Extension   │    │   - Limits      │    │   - Warnings    │          │
-│  │   - Magic bytes │    │   - Vision/Audio│    │   - Token est.  │          │
-│  └─────────────────┘    └─────────────────┘    └────────┬────────┘          │
-│                                                          │                   │
-│                         ┌────────────────────────────────┴─────┐             │
-│                         │         Needs Conversion?            │             │
-│                         └────────────────┬─────────────────────┘             │
-│                                          │                                   │
-│              ┌───────────────────────────┼───────────────────────────┐       │
-│              │ NO                        │                      YES  │       │
-│              ▼                           │                           ▼       │
-│  ┌─────────────────┐                     │            ┌─────────────────┐    │
-│  │ Return original │                     │            │ Execute Strategy│    │
-│  │ file as-is      │                     │            │ - extract_text  │    │
-│  └─────────────────┘                     │            │ - ocr           │    │
-│                                          │            │ - transcribe    │    │
-│                                          │            │ - describe_image│    │
-│                                          │            │ - parse_data    │    │
-│                                          │            │ - decompress    │    │
-│                                          │            └────────┬────────┘    │
-│                                          │                     │             │
-│                                          └──────────┬──────────┘             │
-│                                                     │                        │
-│                                                     ▼                        │
-│                                          ┌─────────────────┐                 │
-│                                          │ Return Result   │                 │
-│                                          │ - Converted text│                 │
-│                                          │ - Token estimate│                 │
-│                                          │ - Metadata      │                 │
-│                                          └─────────────────┘                 │
-└─────────────────────────────────────────────────────────────────────────────┘
-```
-
----
-
-## Supported File Formats
-
-### Documents
-
-| Format | Extension | MIME Type | Conversion Strategy |
-|--------|-----------|-----------|---------------------|
-| PDF | `.pdf` | `application/pdf` | `extract_text` via pdf-parse |
-| Word | `.docx`, `.doc` | `application/vnd.openxmlformats-officedocument.wordprocessingml.document` | `extract_text` via mammoth |
-| PowerPoint | `.pptx`, `.ppt` | `application/vnd.openxmlformats-officedocument.presentationml.presentation` | `extract_text` |
-| Excel | `.xlsx`, `.xls` | `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet` | `parse_data` via xlsx |
-
-### Text Files
-
-| Format | Extension | MIME Type | Notes |
-|--------|-----------|-----------|-------|
-| Plain Text | `.txt` | `text/plain` | Direct passthrough |
-| Markdown | `.md` | `text/markdown` | Direct passthrough |
-| JSON | `.json` | `application/json` | Direct or `parse_data` |
-| CSV | `.csv` | `text/csv` | `parse_data` |
-| XML | `.xml` | `application/xml` | Direct or `extract_text` |
-| HTML | `.html` | `text/html` | `extract_text` |
-
-### Images
-
-| Format | Extension | MIME Type | Conversion Strategy |
-|--------|-----------|-----------|---------------------|
-| PNG | `.png` | `image/png` | Native or `describe_image` |
-| JPEG | `.jpg`, `.jpeg` | `image/jpeg` | Native or `describe_image` |
-| GIF | `.gif` | `image/gif` | Native or `describe_image` |
-| WebP | `.webp` | `image/webp` | Native or `describe_image` |
-| SVG | `.svg` | `image/svg+xml` | Convert to PNG or `describe_image` |
-| BMP | `.bmp` | `image/bmp` | Convert to PNG or `describe_image` |
-| TIFF | `.tiff` | `image/tiff` | Convert to PNG or `describe_image` |
-
-### Audio
-
-| Format | Extension | MIME Type | Conversion Strategy |
-|--------|-----------|-----------|---------------------|
-| MP3 | `.mp3` | `audio/mpeg` | `transcribe` via Whisper |
-| WAV | `.wav` | `audio/wav` | `transcribe` via Whisper |
-| OGG | `.ogg` | `audio/ogg` | `transcribe` via Whisper |
-| FLAC | `.flac` | `audio/flac` | `transcribe` via Whisper |
-| M4A | `.m4a` | `audio/mp4` | `transcribe` via Whisper |
-
-### Video
-
-| Format | Extension | MIME Type | Conversion Strategy |
-|--------|-----------|-----------|---------------------|
-| MP4 | `.mp4` | `video/mp4` | `describe_video` - frame extraction |
-| WebM | `.webm` | `video/webm` | `describe_video` - frame extraction |
-| MOV | `.mov` | `video/quicktime` | `describe_video` - frame extraction |
-| AVI | `.avi` | `video/x-msvideo` | `describe_video` - frame extraction |
-
-### Code Files
-
-| Format | Extension | Notes |
-|--------|-----------|-------|
-| Python | `.py` | Syntax-highlighted markdown |
-| JavaScript | `.js`, `.jsx` | Syntax-highlighted markdown |
-| TypeScript | `.ts`, `.tsx` | Syntax-highlighted markdown |
-| Java | `.java` | Syntax-highlighted markdown |
-| C/C++ | `.c`, `.cpp`, `.h` | Syntax-highlighted markdown |
-| Go | `.go` | Syntax-highlighted markdown |
-| Rust | `.rs` | Syntax-highlighted markdown |
-| Ruby | `.rb` | Syntax-highlighted markdown |
-
-### Archives
-
-| Format | Extension | MIME Type | Conversion Strategy |
-|--------|-----------|-----------|---------------------|
-| ZIP | `.zip` | `application/zip` | `decompress` - extract contents |
-| TAR | `.tar` | `application/x-tar` | `decompress` - extract contents |
-| GZIP | `.gz`, `.tar.gz`, `.tgz` | `application/gzip` | `decompress` - extract contents |
-
----
-
-## Provider Capabilities
-
-The service maintains a registry of AI provider capabilities:
-
-| Provider | Vision | Audio | Video | Max File Size | Native Document Formats |
-|----------|--------|-------|-------|---------------|------------------------|
-| **OpenAI** | ✅ GPT-4V | ✅ Whisper | ❌ | 20MB | txt, md, json, csv |
-| **Anthropic** | ✅ Claude 3 | ❌ | ❌ | 32MB | pdf, txt, md, json, csv |
-| **Google** | ✅ Gemini | ✅ | ✅ | 100MB | pdf, txt, md, json, csv |
-| **xAI** | ✅ Grok | ❌ | ❌ | 20MB | txt, md, json |
-| **DeepSeek** | ❌ | ❌ | ❌ | 10MB | txt, md, json, csv |
-| **Self-hosted** | ✅ LLaVA | ✅ Whisper | ❌ | 50MB | txt, md, json, csv |
-
----
-
-## Conversion Strategies
-
-### 1. `none` - No Conversion
-Provider natively supports the format. File is passed through as-is.
-
-### 2. `extract_text` - Text Extraction
-Extracts plain text from documents using:
-- **PDF**: `pdf-parse` library - extracts all text, page metadata
-- **DOCX/DOC**: `mammoth` library - preserves structure, extracts images
-- **PPTX/PPT**: Text extraction from slides
-- **HTML/XML**: Strip tags, preserve content
-
-**Example output:**
-```
-[Document Title]
-Page 1:
-Content from first page...
-
-Page 2:
-Content from second page...
-
-[Metadata]
-Pages: 10
-Author: John Doe
-Created: 2024-01-15
-```
-
-### 3. `ocr` - Optical Character Recognition
-Uses AWS Textract to extract text from images containing text.
-
-**Features:**
-- Detects printed and handwritten text
-- Table detection and extraction
-- Form field detection
-- Confidence scores per block
-
-**Example output:**
-```
-[OCR Result]
-Confidence: 94.5%
-
-INVOICE #12345
-Date: January 15, 2024
-
-Item          Qty    Price
-Widget A       10    $50.00
-Widget B        5    $25.00
-
-Total: $625.00
-```
-
-### 4. `transcribe` - Audio Transcription
-Uses OpenAI Whisper API or self-hosted Whisper for speech-to-text.
-
-**Features:**
-- Automatic language detection
-- Timestamp segments
-- SRT/VTT subtitle generation
-- Speaker diarization (future)
-
-**Example output:**
-```
-[Transcription]
-Duration: 5:32
-Language: English
-Model: whisper-1
-
-[00:00] Hello and welcome to today's meeting.
-[00:05] We'll be discussing the Q4 roadmap.
-[00:12] First, let's review the current status...
-```
-
-### 5. `describe_image` - AI Image Description
-Uses vision-capable models to describe image contents.
-
-**Supported Models:**
-- GPT-4 Vision (OpenAI)
-- Claude 3 Vision (Anthropic)
-- LLaVA (self-hosted)
-
-**Features:**
-- Detailed scene description
-- Text detection (OCR integration)
-- Object identification
-- Color and composition analysis
-
-**Example output:**
-```
-[Image Description]
-Model: gpt-4-vision
-Dimensions: 1920x1080
-
-This image shows a modern office space with an open floor plan. 
-In the foreground, there are several desks arranged in clusters, 
-each with monitors and office supplies. The walls are painted in 
-a neutral gray tone with large windows providing natural light.
-
-[Text detected in image]:
-"RADIANT - Innovation Center"
-"Welcome Visitors"
-```
-
-### 6. `describe_video` - Video Frame Analysis
-Extracts key frames from video and describes each using vision models.
-
-**Features:**
-- Configurable frame interval (default: 10 seconds)
-- Maximum frames limit (default: 10)
-- Frame-by-frame descriptions
-- Narrative summary generation
-
-**Example output:**
-```
-**Video Overview** (2m 30s, 1920x1080)
-
-**Frame Analysis:**
-
-**[0:00]** The video opens with a title screen showing the company logo
-against a blue gradient background.
-
-**[0:10]** A presenter in business attire stands in front of a whiteboard
-with diagrams showing the system architecture.
-
-**[0:20]** Close-up of the whiteboard showing a flowchart with boxes
-labeled "User Input", "Processing", and "Output".
-
-...
-
-**Summary:**
-The video begins with: Company logo and title screen
-The video ends with: Presenter summarizing key points with bullet list
-```
-
-### 7. `parse_data` - Structured Data Parsing
-Converts spreadsheets and data files to JSON.
-
-**Supported formats:**
-- CSV → JSON array of objects
-- XLSX/XLS → JSON with sheet data
-- JSON → Validated and prettified
-
-**Example output (CSV):**
-```json
-{
-  "data": [
-    {"name": "Alice", "email": "alice@example.com", "role": "Admin"},
-    {"name": "Bob", "email": "bob@example.com", "role": "User"},
-    {"name": "Carol", "email": "carol@example.com", "role": "User"}
-  ],
-  "metadata": {
-    "rowCount": 3,
-    "columnCount": 3,
-    "headers": ["name", "email", "role"]
-  }
-}
-```
-
-**Example output (Excel):**
-```json
-{
-  "sheets": [
-    {
-      "name": "Sales Data",
-      "rows": [...],
-      "headers": ["Date", "Product", "Revenue"],
-      "rowCount": 150
-    },
-    {
-      "name": "Summary",
-      "rows": [...],
-      "headers": ["Metric", "Value"],
-      "rowCount": 10
-    }
-  ],
-  "metadata": {
-    "sheetCount": 2,
-    "totalRows": 160,
-    "hasFormulas": true
-  }
-}
-```
-
-### 8. `decompress` - Archive Extraction
-Extracts and processes archive contents.
-
-**Supported formats:**
-- ZIP (via adm-zip)
-- TAR (via tar)
-- GZIP (via zlib)
-
-**Features:**
-- Recursive extraction
-- Text file content inclusion
-- Binary file detection
-- Size limits enforcement
-
-**Example output:**
-```
-**Archive Contents** (ZIP)
-
-**File Structure:**
-```
-📁 project/
-📄 project/README.md (2.5KB)
-📄 project/package.json (1.2KB)
-📁 project/src/
-📄 project/src/index.ts (5.3KB)
-📄 project/src/utils.ts (3.1KB)
-```
-
-**File Contents:**
-
-### project/README.md
-
-```markdown
-# My Project
-
-This is a sample project...
-```
-
-### project/package.json
-
-```json
-{
-  "name": "my-project",
-  "version": "1.0.0"
-}
-```
-```
-
-### 9. `render_code` - Code Formatting
-Formats code files with syntax highlighting.
-
-**Example output:**
-````markdown
-```typescript
-import { Injectable } from '@angular/core';
-
-@Injectable()
-export class DataService {
-  private data: string[] = [];
-
-  getData(): string[] {
-    return this.data;
-  }
-}
-```
-````
-
----
-
-## API Reference
-
-### Base Path
-`/api/thinktank/files`
-
-### Endpoints
-
-#### Process File
-```
-POST /api/thinktank/files/process
-```
-
-**Request:**
-```json
-{
-  "filename": "document.pdf",
-  "mimeType": "application/pdf",
-  "content": "<base64-encoded-content>",
-  "targetProvider": "anthropic",
-  "targetModel": "claude-3-5-sonnet",
-  "conversationId": "conv-uuid-optional"
-}
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "data": {
-    "conversionId": "conv_abc123",
-    "originalFile": {
-      "filename": "document.pdf",
-      "format": "pdf",
-      "size": 1048576,
-      "checksum": "sha256:abc123..."
-    },
-    "convertedContent": {
-      "type": "text",
-      "content": "Extracted document text...",
-      "tokenEstimate": 2500,
-      "metadata": {
-        "originalFormat": "pdf",
-        "conversionStrategy": "extract_text",
-        "pageCount": 10,
-        "title": "Annual Report 2024",
-        "author": "Finance Team"
-      }
-    },
-    "processingTimeMs": 1250
-  }
-}
-```
-
-#### Check Compatibility
-```
-POST /api/thinktank/files/check-compatibility
-```
-
-**Request:**
-```json
-{
-  "filename": "image.png",
-  "mimeType": "image/png",
-  "fileSize": 524288,
-  "targetProvider": "deepseek"
-}
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "data": {
-    "fileInfo": {
-      "filename": "image.png",
-      "format": "png",
-      "size": 524288
-    },
-    "provider": {
-      "id": "deepseek",
-      "supportsFormat": false,
-      "supportsVision": false,
-      "maxFileSize": 10485760
-    },
-    "decision": {
-      "needsConversion": true,
-      "strategy": "describe_image",
-      "reason": "Provider deepseek lacks vision - will use AI to describe image",
-      "targetFormat": "txt",
-      "warnings": []
-    }
-  }
-}
-```
-
-#### Get Provider Capabilities
-```
-GET /api/thinktank/files/capabilities
-GET /api/thinktank/files/capabilities?provider=anthropic
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "providerId": "anthropic",
-      "supportedFormats": ["png", "jpg", "jpeg", "gif", "webp", "pdf", "txt", "md", "json", "csv"],
-      "nativeDocumentFormats": ["pdf", "txt", "md", "json", "csv"],
-      "maxFileSize": 33554432,
-      "supportsVision": true,
-      "supportsAudio": false,
-      "supportsVideo": false,
-      "supportsDocuments": true
-    }
-  ]
-}
-```
-
-#### Get Conversion History
-```
-GET /api/thinktank/files/history
-GET /api/thinktank/files/history?conversationId=conv-uuid&limit=50&offset=0
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "data": {
-    "conversions": [
-      {
-        "id": "conv_abc123",
-        "filename": "report.pdf",
-        "originalFormat": "pdf",
-        "originalSize": 1048576,
-        "targetProvider": "anthropic",
-        "needsConversion": true,
-        "strategy": "extract_text",
-        "status": "completed",
-        "tokenEstimate": 2500,
-        "processingTimeMs": 1250,
-        "createdAt": "2024-12-31T00:00:00Z"
-      }
-    ],
-    "pagination": {
-      "limit": 50,
-      "offset": 0
-    }
-  }
-}
-```
-
-#### Get Conversion Statistics
-```
-GET /api/thinktank/files/stats
-GET /api/thinktank/files/stats?days=30
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "data": {
-    "totalFiles": 1250,
-    "convertedCount": 890,
-    "nativeCount": 360,
-    "failedCount": 12,
-    "totalBytesProcessed": 2147483648,
-    "avgProcessingMs": 850,
-    "mostCommonFormat": "pdf",
-    "mostCommonStrategy": "extract_text",
-    "periodDays": 30
-  }
-}
-```
-
----
-
-## Database Schema
-
-### Tables
-
-#### `file_conversions`
-Tracks all file conversion decisions and results.
-
-| Column | Type | Description |
-|--------|------|-------------|
-| `id` | UUID | Primary key |
-| `tenant_id` | UUID | Tenant reference |
-| `filename` | VARCHAR(500) | Original filename |
-| `original_format` | VARCHAR(50) | Detected format |
-| `original_size` | BIGINT | File size in bytes |
-| `target_provider` | VARCHAR(100) | Target AI provider |
-| `target_model` | VARCHAR(200) | Target model ID |
-| `needs_conversion` | BOOLEAN | Whether conversion was needed |
-| `strategy` | VARCHAR(50) | Conversion strategy used |
-| `conversion_status` | VARCHAR(20) | pending, processing, completed, failed |
-| `converted_token_estimate` | INTEGER | Estimated tokens |
-| `processing_time_ms` | INTEGER | Processing duration |
-| `created_at` | TIMESTAMPTZ | Creation timestamp |
-
-#### `provider_file_capabilities`
-Registry of provider file format support.
-
-| Column | Type | Description |
-|--------|------|-------------|
-| `provider_id` | VARCHAR(100) | Provider identifier (unique) |
-| `supported_formats` | JSONB | Array of supported formats |
-| `native_document_formats` | JSONB | Formats provider handles natively |
-| `max_file_size` | BIGINT | Maximum file size in bytes |
-| `supports_vision` | BOOLEAN | Has vision capabilities |
-| `supports_audio` | BOOLEAN | Has audio capabilities |
-| `supports_video` | BOOLEAN | Has video capabilities |
-
----
-
-## Configuration
-
-### Environment Variables
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `FILE_CONVERSION_BUCKET` | S3 bucket for file storage | `radiant-files` |
-| `OPENAI_API_KEY` | OpenAI API key for Whisper/Vision | Required |
-| `ANTHROPIC_API_KEY` | Anthropic API key for Claude Vision | Optional |
-| `WHISPER_ENDPOINT_URL` | Self-hosted Whisper endpoint | Optional |
-| `VISION_ENDPOINT_URL` | Self-hosted vision endpoint | Optional |
-
-### Admin Configuration
-
-**Location**: Admin Dashboard → Think Tank → File Settings
-
-| Setting | Default | Description |
-|---------|---------|-------------|
-| Max file size | 50MB | Maximum upload size |
-| Conversion timeout | 30s | Processing timeout |
-| Enable transcription | true | Audio → text |
-| Enable OCR | true | Image text extraction |
-| Enable video processing | false | Video frame extraction |
-| Retention days | 30 | How long to keep converted files |
-
----
-
-## Implementation Files
-
-| File | Purpose |
-|------|---------|
-| `lambda/shared/services/file-conversion.service.ts` | Main service with decision engine |
-| `lambda/shared/services/converters/pdf-converter.ts` | PDF text extraction |
-| `lambda/shared/services/converters/docx-converter.ts` | DOCX/DOC text extraction |
-| `lambda/shared/services/converters/excel-converter.ts` | Excel/CSV parsing |
-| `lambda/shared/services/converters/audio-converter.ts` | Audio transcription |
-| `lambda/shared/services/converters/image-converter.ts` | Image description & OCR |
-| `lambda/shared/services/converters/video-converter.ts` | Video frame extraction |
-| `lambda/shared/services/converters/archive-converter.ts` | Archive decompression |
-| `lambda/shared/services/converters/index.ts` | Module exports |
-| `lambda/thinktank/file-conversion.ts` | API handlers |
-| `migrations/127_file_conversion_service.sql` | Database schema |
-
----
-
-## Dependencies
-
-### NPM Packages
-
-```json
-{
-  "pdf-parse": "^1.1.1",
-  "mammoth": "^1.6.0",
-  "xlsx": "^0.18.5",
-  "sharp": "^0.33.2",
-  "fluent-ffmpeg": "^2.1.2",
-  "adm-zip": "^0.5.10",
-  "tar": "^6.2.0"
-}
-```
-
-### AWS Services
-
-- **S3**: File storage
-- **Textract**: OCR processing
-- **Lambda**: Processing execution
-
----
-
-## Error Handling
-
-### Common Errors
-
-| Error | Cause | Resolution |
-|-------|-------|------------|
-| `File size exceeds limit` | File > provider max | Reduce file size or extract portions |
-| `Unsupported format` | Unknown file type | Convert to supported format first |
-| `OCR failed` | Textract error | Check image quality, retry |
-| `Transcription failed` | Whisper error | Check audio quality, verify API key |
-| `PDF is password protected` | Encrypted PDF | Provide unencrypted version |
-
-### Error Response Format
-
-```json
-{
-  "success": false,
-  "error": "PDF extraction failed: File is password protected",
-  "conversionId": "conv_abc123",
-  "originalFile": {
-    "filename": "protected.pdf",
-    "format": "pdf",
-    "size": 1048576
-  },
-  "processingTimeMs": 150
-}
-```
-
----
-
-## Security Considerations
-
-1. **File Size Limits**: Enforced per provider to prevent resource exhaustion
-2. **Format Validation**: Magic bytes + extension verification
-3. **Tenant Isolation**: RLS policies on all tables
-4. **S3 Encryption**: AES-256 at rest
-5. **Signed URLs**: Time-limited access to stored files
-6. **Input Sanitization**: All filenames and metadata sanitized
-
----
-
-## Monitoring
-
-### Metrics
-
-- Total files processed per tenant
-- Conversion success/failure rate
-- Average processing time
-- Most common formats
-- Most common conversion strategies
-- Storage usage
-
-### Alerts
-
-- High failure rate (>5%)
-- Processing time > 30s
-- Storage quota approaching limit
-
----
-
----
-
-## Domain-Specific File Formats
-
-The service includes a comprehensive registry of domain-specific file formats that are widely used in specialized fields but not commonly supported by mainstream AI providers.
-
-### Mechanical Engineering / CAD
-
-| Format | Extensions | Description | Library |
-|--------|------------|-------------|---------|
-| **STEP** | `.step`, `.stp`, `.p21` | ISO 10303 CAD exchange | OpenCASCADE, FreeCAD |
-| **STL** | `.stl` | 3D printing mesh | numpy-stl, trimesh |
-| **OBJ** | `.obj` | Wavefront 3D model | trimesh, three.js |
-| **Fusion 360** | `.f3d`, `.f3z` | Autodesk parametric CAD | Fusion 360 API |
-| **IGES** | `.iges`, `.igs` | Legacy CAD exchange | OpenCASCADE |
-| **DXF** | `.dxf` | AutoCAD 2D drawings | ezdxf |
-| **GLTF/GLB** | `.gltf`, `.glb` | Web 3D format | three.js, trimesh |
-
-### Electrical Engineering
-
-| Format | Extensions | Description | Library |
-|--------|------------|-------------|---------|
-| **KiCad** | `.kicad_pcb`, `.kicad_sch` | PCB/schematic | kicad-cli, kiutils |
-| **EAGLE** | `.brd`, `.sch` | Autodesk PCB | eagle-to-kicad |
-| **SPICE** | `.spice`, `.sp`, `.cir` | Circuit simulation | PySpice, ngspice |
-
-### Medical/Healthcare
-
-| Format | Extensions | Description | Library |
-|--------|------------|-------------|---------|
-| **DICOM** | `.dcm`, `.dicom` | Medical imaging | pydicom, dcmtk |
-| **HL7 FHIR** | `.json`, `.xml` | Health records | fhir.resources |
-
-### Scientific/Research
-
-| Format | Extensions | Description | Library |
-|--------|------------|-------------|---------|
-| **NetCDF** | `.nc`, `.nc4` | Climate/geoscience | netCDF4, xarray |
-| **HDF5** | `.h5`, `.hdf5` | Scientific data | h5py |
-| **FITS** | `.fits` | Astronomy data | astropy |
-
-### Geospatial
-
-| Format | Extensions | Description | Library |
-|--------|------------|-------------|---------|
-| **Shapefile** | `.shp`, `.dbf` | Vector GIS | geopandas, shapefile |
-| **GeoTIFF** | `.tif`, `.geotiff` | Georeferenced raster | rasterio |
-
-### Bioinformatics
-
-| Format | Extensions | Description | Library |
-|--------|------------|-------------|---------|
-| **FASTA** | `.fasta`, `.fa` | DNA/protein sequences | Biopython |
-| **PDB** | `.pdb` | Protein structure | Biopython, py3Dmol |
-
----
-
-## Multi-Model File Preparation
-
-When multiple AI models work on the same prompt (multi-model orchestration), the system makes **per-model conversion decisions**:
-
-### Key Principle
-
-> **"If a model accepts the file type, assume it understands it unless proven otherwise."**
-
-- Only convert for models that don't support the format
-- Pass original file to models with native support
-- Cache conversions to avoid redundant processing
-
-### How It Works
-
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                         MULTI-MODEL FILE PREPARATION                         │
-│                                                                              │
-│  File: document.pdf                                                          │
-│                                                                              │
-│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐              │
-│  │   Claude 3.5    │  │   GPT-4 Vision  │  │    DeepSeek     │              │
-│  │   (Anthropic)   │  │    (OpenAI)     │  │                 │              │
-│  ├─────────────────┤  ├─────────────────┤  ├─────────────────┤              │
-│  │ PDF: ✅ Native  │  │ PDF: ❌ No      │  │ PDF: ❌ No      │              │
-│  │ Vision: ✅      │  │ Vision: ✅      │  │ Vision: ❌      │              │
-│  ├─────────────────┤  ├─────────────────┤  ├─────────────────┤              │
-│  │ Action:         │  │ Action:         │  │ Action:         │              │
-│  │ PASS ORIGINAL   │  │ CONVERT         │  │ CONVERT         │              │
-│  │ (native PDF)    │  │ (extract text)  │  │ (extract text)  │              │
-│  └─────────────────┘  └─────────────────┘  └─────────────────┘              │
-│                              │                     │                        │
-│                              └──────────┬──────────┘                        │
-│                                         │                                   │
-│                              ┌──────────▼──────────┐                        │
-│                              │  CACHED CONVERSION  │                        │
-│                              │  (convert once,     │                        │
-│                              │   reuse for both)   │                        │
-│                              └─────────────────────┘                        │
-└─────────────────────────────────────────────────────────────────────────────┘
-```
-
-### Per-Model Actions
-
-| Action | When | Result |
-|--------|------|--------|
-| `pass_original` | Model natively supports format | Original file passed |
-| `convert` | Model doesn't support format | Converted content passed |
-| `skip` | File too large or conversion failed | Model excluded |
-
-### Usage Example
-
-```typescript
-import { multiModelFilePrepService } from './multi-model-file-prep.service';
-
-// Prepare file for 3 models
-const result = await multiModelFilePrepService.prepareFileForModels({
-  tenantId,
-  userId,
-  file: {
-    content: pdfBuffer,
-    filename: 'document.pdf',
-    mimeType: 'application/pdf',
-  },
-  targetModels: [
-    { modelId: 'claude-3-5-sonnet', providerId: 'anthropic' },
-    { modelId: 'gpt-4-vision', providerId: 'openai' },
-    { modelId: 'deepseek-chat', providerId: 'deepseek' },
-  ],
-});
-
-// Result:
-// - Claude: pass_original (native PDF support)
-// - GPT-4: convert (no PDF support, extract text)
-// - DeepSeek: convert (reuses cached conversion)
-
-// Get content for each model
-for (const model of result.perModelPrep) {
-  if (model.action !== 'skip') {
-    const content = multiModelFilePrepService.getContentForModel(result, model.modelId);
-    // Use content.data with this model
-  }
-}
-```
-
-### Model Format Overrides
-
-When a model claims to support a format but proves it doesn't understand it well, overrides can be added:
-
-```typescript
-// If Claude struggles with complex PDFs despite claiming support
-multiModelFilePrepService.addFormatOverride(
-  'claude-3-haiku',
-  'pdf',
-  'Struggles with multi-column PDFs'
-);
-// Now Claude 3 Haiku will get converted PDFs instead of originals
-```
-
----
-
-## AGI Brain Integration
-
-The AGI Brain automatically detects domain-specific files and selects appropriate conversion strategies.
-
-### How It Works
-
-1. **File Detection**: When a file is uploaded, the system checks if it's a domain-specific format
-2. **Domain Context**: The user's domain (from profile or conversation) influences strategy selection
-3. **Library Selection**: The AGI Brain selects the best library based on availability and capabilities
-4. **Conversion Planning**: A conversion plan is created with fallback strategies
-5. **Execution**: The conversion is executed using the selected library
-
-### Conversion Strategy Selection
-
-The AGI Brain considers:
-- **User's domain**: Technical users get more detailed extraction
-- **Conversation context**: "show me a preview" → visual output, "export data" → structured data
-- **File complexity**: Simple formats get direct parsing, complex ones may need external tools
-- **Available libraries**: Falls back if preferred library isn't available
-
-### Example: CAD File Processing
-
-```typescript
-// AGI Brain detects a STEP file
-const plan = planDomainConversion(
-  'assembly.step',
-  'application/step',
-  'mechanical_engineering',  // User's domain
-  'Can you analyze this CAD model?'  // Conversation context
-);
-
-// Returns:
-{
-  format: { format: 'step', domain: 'mechanical_engineering', ... },
-  selectedStrategy: { strategy: 'extract_geometry', outputFormat: 'text', ... },
-  selectedLibrary: { name: 'OpenCASCADE', pythonPackage: 'OCC', ... },
-  requiresExternalService: true,
-  estimatedComplexity: 'complex'
-}
-```
-
-### AI Description Prompts
-
-Each domain format includes a specialized AI prompt for when the AGI needs to describe the file without full parsing:
-
-```typescript
-// STL file prompt
-"This is an STL 3D model file. Describe the shape, identify what object 
-it might be, assess printability, and note any potential issues for 3D printing."
-
-// DICOM file prompt
-"This is a DICOM medical image. Describe the imaging modality, anatomical 
-region, and any visible findings. Note: Do not provide medical diagnoses."
-
-// STEP file prompt  
-"This is a STEP CAD file. Describe the mechanical part or assembly, 
-including approximate geometry, features (holes, fillets, chamfers), 
-and likely manufacturing process."
-```
-
----
-
-## Implementation Files
-
-| File | Purpose |
-|------|---------|
-| `lambda/shared/services/file-conversion.service.ts` | Main service with decision engine |
-| `lambda/shared/services/converters/pdf-converter.ts` | PDF text extraction |
-| `lambda/shared/services/converters/docx-converter.ts` | DOCX/DOC text extraction |
-| `lambda/shared/services/converters/excel-converter.ts` | Excel/CSV parsing |
-| `lambda/shared/services/converters/audio-converter.ts` | Audio transcription |
-| `lambda/shared/services/converters/image-converter.ts` | Image description & OCR |
-| `lambda/shared/services/converters/video-converter.ts` | Video frame extraction |
-| `lambda/shared/services/converters/archive-converter.ts` | Archive decompression |
-| `lambda/shared/services/converters/cad-converter.ts` | CAD/3D file parsing (STL, OBJ, STEP, DXF, GLTF) |
-| `lambda/shared/services/converters/domain-formats.ts` | Domain format registry (50+ formats) |
-| `lambda/shared/services/converters/domain-converter-selector.ts` | AGI Brain integration |
-| `lambda/shared/services/converters/index.ts` | Module exports |
-| `lambda/thinktank/file-conversion.ts` | API handlers |
-| `migrations/127_file_conversion_service.sql` | Database schema |
-
----
-
----
-
-## Reinforcement Learning Integration
-
-The file conversion system integrates with the AGI Brain/consciousness for persistent learning from conversion outcomes.
-
-### How Learning Works
-
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                    REINFORCEMENT LEARNING LOOP                               │
-│                                                                              │
-│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐   │
-│  │   File      │───▶│  Decision   │───▶│   Model     │───▶│  Outcome    │   │
-│  │   Upload    │    │  Engine     │    │  Response   │    │  Detection  │   │
-│  └─────────────┘    └─────────────┘    └─────────────┘    └──────┬──────┘   │
-│                            ▲                                      │          │
-│                            │                                      ▼          │
-│                    ┌───────┴───────┐                     ┌─────────────┐     │
-│                    │   Learning    │◀────────────────────│  Feedback   │     │
-│                    │   Database    │                     │  Recording  │     │
-│                    └───────────────┘                     └─────────────┘     │
-└─────────────────────────────────────────────────────────────────────────────┘
-```
-
-### What Gets Learned
-
-| Signal | Source | Learning |
-|--------|--------|----------|
-| **User Rating** | Explicit feedback (1-5 stars) | Direct quality signal |
-| **Model Response** | Auto-inferred from response text | Did model understand? |
-| **Error Detection** | Model errors/hallucinations | Format incompatibility |
-| **Conversion Success** | Pass original worked | Model handles format |
-| **Conversion Failure** | Pass original failed | Model needs conversion |
-
-### Understanding Score
-
-Each model/format combination has an understanding score (0.0 to 1.0):
-
-| Score | Meaning | Action |
-|-------|---------|--------|
-| 0.8 - 1.0 | Excellent understanding | Pass original |
-| 0.6 - 0.8 | Good understanding | Pass original |
-| 0.4 - 0.6 | Moderate understanding | May convert |
-| 0.0 - 0.4 | Poor understanding | Convert |
-
-### Learning Database Schema
-
-**Migration:** `128_file_conversion_learning.sql`
-
-| Table | Purpose |
-|-------|---------|
-| `model_format_understanding` | Per-tenant model/format understanding scores |
-| `conversion_outcome_feedback` | Recorded feedback for learning |
-| `format_understanding_events` | Audit trail of score changes |
-| `global_format_learning` | Cross-tenant aggregate insights |
-
-### Recording Feedback
-
-```typescript
-import { fileConversionLearningService } from './file-conversion-learning.service';
-
-// Record outcome after model responds
-await fileConversionLearningService.recordOutcomeFeedback({
-  tenantId,
-  userId,
-  conversionId: 'conv_abc123',
-  modelId: 'claude-3-5-sonnet',
-  providerId: 'anthropic',
-  filename: 'document.pdf',
-  fileFormat: 'pdf',
-  actionTaken: 'pass_original',
-  outcome: 'success',  // or 'partial', 'failure'
-  outcomeSource: 'user_feedback',
-  userRating: 5,
-  modelUnderstood: true,
-});
-
-// Result: Understanding score updated, learning candidate created if significant
-```
-
-### Auto-Inference from Response
-
-The system can automatically infer outcomes from model responses:
-
-```typescript
-const inference = fileConversionLearningService.inferOutcomeFromResponse(
-  modelResponse,
-  'pdf'
-);
-
-// Returns:
-// {
-//   outcome: 'failure',
-//   modelUnderstood: false,
-//   modelMentionedFormatIssues: true,
-//   confidence: 0.8
-// }
-```
-
-**Failure signals detected:**
-- "I can't read", "unable to process", "cannot access the file"
-- "appears to be empty", "binary data", "base64"
-- Model asking for clarification about file content
-
-### Integration with Consciousness
-
-Significant learning events create **Learning Candidates** for the consciousness system:
-
-| Event | Learning Candidate Type | Quality |
-|-------|------------------------|---------|
-| Model failed on format it claimed to support | `format_misunderstanding` | 0.85 |
-| Unnecessary conversion (model would have understood) | `unnecessary_conversion` | 0.70 |
-| Model hallucinated file content | `hallucination_detection` | 0.90 |
-| User gave negative rating | `user_correction` | 0.85 |
-
-These feed into the LoRA evolution system for persistent consciousness improvement.
-
-### Admin Override
-
-Admins can force conversion regardless of learning:
-
-```typescript
-// Force conversion for a model/format that consistently fails
-await fileConversionLearningService.setForceConvert(
-  tenantId,
-  'claude-3-haiku',
-  'pdf',
-  'Struggles with multi-column PDFs',
-  adminUserId
-);
-
-// Clear override
-await fileConversionLearningService.clearForceConvert(
-  tenantId,
-  'claude-3-haiku',
-  'pdf'
-);
-```
-
-### Implementation Files
-
-| File | Purpose |
-|------|---------|
-| `lambda/shared/services/file-conversion-learning.service.ts` | Learning service |
-| `migrations/128_file_conversion_learning.sql` | Database schema |
-
----
-
----
-
-## Part V: Data Lake Offload (v7.42.0)
-
-### Overview
-
-The Data Lake Offload system eliminates ~30-100M daily PostgreSQL INSERT operations by routing all log, audit, telemetry, and billing event data through **Kinesis Data Firehose → S3 Parquet → Athena** instead of direct database writes.
-
-### Architecture
-
-```
-Lambda handler
-    ↓
-emitEvent() → In-memory buffer (100 events or 5s)
-    ↓
-Kinesis Data Firehose (12 streams)
-    ↓
-S3 Parquet (partitioned by tenant_id/year/month/day/hour)
-    ↓
-AWS Glue Catalog (automatic schema discovery)
-    ↓
-Amazon Athena (SQL queries with partition pruning)
-```
-
-### Storage Tiers
-
-| Tier | S3 Storage Class | Age Range | Access Latency | Cost (GB/mo) |
-|------|-----------------|-----------|----------------|--------------|
-| Hot | S3 IT Frequent Access | 0-30 days | Milliseconds | $0.023 |
-| Warm | S3 IT Infrequent Access | 30-90 days | Milliseconds | $0.0125 |
-| Cold | Glacier Instant Retrieval | 90 days - 7 years | Milliseconds | $0.004 |
-| Glacier | Glacier Flexible Retrieval | 7+ years | 3-5 hours | $0.0036 |
-| Deep Archive | Glacier Deep Archive | Regulatory hold | 12 hours | $0.00099 |
-
-### Data Type Registry
-
-21 registered data types across 8 categories:
-
-| Category | Types | Default Retention |
-|----------|-------|-------------------|
-| **Audit** | audit_log, license_audit, log_retention_audit, uds_audit, system_admin_audit | 7 years |
-| **Security** | security_event, intrusion_event, lockout_event | 1-2 years |
-| **AI/Model** | ai_invocation, drift_telemetry, brain_plan | 30-90 days |
-| **Compliance** | compliance_event, guest_restriction | 1-7 years |
-| **Billing** | billing_event, cost_attribution, storage_event | 1-7 years |
-| **Infrastructure** | infrastructure_metric, error_log | 30-90 days |
-| **Application** | application_log, delight_event | 30 days |
-| **Collaboration** | collaboration_event | 1 year |
-
-### Glacier Deletion Economics
-
-Glacier charges for early deletion:
-- **Glacier Flexible Retrieval**: prorated for items < 90 days old ($0.012/GB/mo)
-- **Deep Archive**: prorated for items < 180 days old ($0.00099/GB/mo)
-
-The `glacier_deletion_queue` table holds deletions until the minimum storage period passes. Cost analysis per object determines whether to delete immediately (cost < $0.01) or wait.
-
-### Retention Reconciliation
-
-When compliance licenses change (e.g., tenant enables HIPAA), the Retention Reconciler:
-1. Re-evaluates all data for affected tenant + data types
-2. Extends retention expiry if retention increased
-3. Queues deletion of data past new limit if retention decreased
-4. Applies/removes S3 Object Lock if immutability changed
-5. Cancels pending Glacier deletions if retention extended
-6. Logs everything in `retention_reconciliation_log`
-
-### Database Tables
-
-| Table | Purpose |
-|-------|---------|
-| `data_type_registry` | Canonical registry of all 21 storable data types |
-| `tenant_data_retention` | Per-tenant retention overrides per data type |
-| `data_location_index` | Fast lookup index for S3/Glacier objects |
-| `glacier_deletion_queue` | Cost-aware Glacier deletion queue |
-| `data_lake_sync_state` | Firehose delivery + Glue partition state |
-| `retention_reconciliation_log` | Audit trail for retention policy changes |
-
-### Services
-
-| Service | Purpose |
-|---------|---------|
-| `event-firehose.service.ts` | Async Firehose ingestion with buffering and DLQ |
-| `data-location-index.service.ts` | Fast S3/Glacier lookup |
-| `glacier-lifecycle.service.ts` | Cost-aware Glacier deletion |
-| `data-lake-lifecycle-manager.service.ts` | Hourly lifecycle orchestrator |
-| `retention-reconciler.service.ts` | Compliance-driven retention reconciliation |
-| `data-lake-query.service.ts` | Athena query layer |
-
-### CDK Stack: DataLakeStack
-
-| Resource | Details |
-|----------|---------|
-| S3 Data Lake Bucket | Intelligent-Tiering, Object Lock (prod), lifecycle rules |
-| S3 Athena Results | 7-day expiry |
-| Firehose Streams | 12 (4 dedicated high-volume + 8 grouped) |
-| Glue Database + Crawler | Daily partition discovery |
-| Athena Workgroup | Per-query cost limits |
-| Lambda Functions | Lifecycle Manager (hourly), Reconciler (SQS), DLQ Processor |
-| SQS Queues | DLQ + Reconciler Queue |
-| KMS Key | Encryption with rotation |
-
-### Enforcement Policy
-
-See `/.windsurf/workflows/no-database-logging.md` — mandatory policy prohibiting direct database writes for all event data. All services must use the Event Firehose Service.
-
----
-
-## Related Documentation
-
-- [THINKTANK-ADMIN-GUIDE.md - Section 27](./THINKTANK-ADMIN-GUIDE.md#27-intelligent-file-conversion)
-- [RADIANT-ADMIN-GUIDE.md](./RADIANT-ADMIN-GUIDE.md)
-
-
-
----
-
-*Consolidated from 7 source documents (0 not found). 4,125 source lines.*
-
-
-
-
-
-\newpage
-
-# Part 12: API Reference
-
----
-
-
-\newpage
-
-## 12.1 API Reference — Complete Reference
+## 9.1 API Reference — Complete Reference
 
 
 *Source: `docs/12-API-REFERENCE.md` (4,698 lines)*
@@ -116130,17 +112876,17 @@ GET /api/v2/omega/swaps?brain_id={brain_id}&limit={n}&offset={n}
 
 \newpage
 
-# Part 13: Security, Authentication & Compliance
+# Part 10: Security, Authentication & Compliance
 
 ---
 
 
 \newpage
 
-## 13.1 Security, Auth & Compliance — Complete Reference
+## 10.1 Security, Auth & Compliance — Complete Reference
 
 
-*Source: `docs/13-SECURITY-AUTH-COMPLIANCE.md` (5,404 lines)*
+*Source: `docs/13-SECURITY-AUTH-COMPLIANCE.md` (5,402 lines)*
 
 ---
 
@@ -120957,7 +117703,7 @@ Annual assessment includes:
 
 ## 1. Context & Problem Statement
 
-RADIANT is a multi-tenant SaaS platform with multiple user-facing applications (Think Tank, Curator, Aurelius Dojo, Cato Trainer, Genesis, and future apps). Several interrelated concerns must be resolved together before implementing authentication:
+RADIANT is a multi-tenant SaaS platform with multiple user-facing applications (Think Tank, Curator, Aurelius Dojo, Cato Trainer, OMEGA Lab, and future apps). Several interrelated concerns must be resolved together before implementing authentication:
 
 1. **User provisioning**: How do new users get into the system?
 2. **Licensing model**: Per-app seats + storage + retention + regulatory compliance features
@@ -121029,14 +117775,14 @@ users table:
 
 **Rule**: A user can ONLY enter the system if a tenant administrator explicitly invites them.
 
-**Who can invite**: Only users with `tenant_admin` or `tenant_owner` role.
+**Who can invite**: Only users with `tenant_admin` role.
 
 **Invitation flow**:
 
 ```
-1. Tenant Admin opens Think Tank Tenant Admin → Users → Invite
+1. Tenant Admin opens Think Tank Tenant Administration → Users → Invite
 2. System checks:
-   a. Does the inviter have tenant_admin or tenant_owner role?      → If no, REJECT
+   a. Does the inviter have tenant_admin role?                      → If no, REJECT
    b. Does the tenant have available seat licenses for the app(s)?  → If no, REJECT
 3. If all checks pass:
    - Create tenant_user_memberships row with status='invited'
@@ -121169,7 +117915,7 @@ tenant_licenses:
 
 | Setting | Value |
 |---------|-------|
-| **Apps** | Think Tank (Web+Mac), Curator, Dojo, Cato Trainer, Genesis, Tenant Admin, ALL future apps |
+| **Apps** | Think Tank (Web+Mac), Curator, Dojo, Cato Trainer, OMEGA Lab, Tenant Admin, ALL future apps |
 | **Login** | Email+password, Google, Apple, Microsoft, Enterprise SSO (SAML/OIDC per-tenant) |
 | **MFA** | Configurable per-tenant |
 | **Federation** | ENABLED — authenticates only, never creates accounts |
@@ -121245,22 +117991,22 @@ If someone authenticates via Google but has no user record → **rejected**.
 2. System creates:
    - Tenant record with name, settings
    - Default licenses based on subscription tier
-   - First user with tenant_owner role + tenant_admin permissions
+   - First user with tenant_admin role
 3. First user is ALWAYS an administrator
-4. First user can see ALL permissions in Think Tank Tenant Admin
+4. First user can see ALL permissions in Think Tank Tenant Administration
    (even ones that are off — so they know what's available)
 ```
 
 **Personal accounts**:
 - Single-user personal accounts still get a tenant name
-- The one user is `tenant_owner` with admin privileges
+- The one user is `tenant_admin` with full admin privileges
 - They can later invite others if their license allows
 
 **Permissions model**:
 - Permissions are SOFT — can be added/modified/removed without code changes
 - Stored as configurable data, not hardcoded
-- Admin-settable per role type (User, Admin, Owner)
-- All permissions visible in Think Tank Tenant Admin UI with toggle on/off
+- Admin-settable per role type (User, Admin)
+- All permissions visible in Think Tank Tenant Administration UI with toggle on/off
 - Eventually refined to exact per-action permissions
 
 ---
@@ -121273,46 +118019,45 @@ If someone authenticates via Google but has no user record → **rejected**.
 
 | Role | Scope | Default Permissions |
 |------|-------|--------------------|
-| `tenant_owner` | Full tenant control | All permissions, billing, delete tenant |
-| `tenant_admin` | User & config management | Invite users, manage roles, configure settings |
+| `tenant_admin` | Full tenant control | All permissions, billing, delete tenant, invite users, manage roles, configure settings |
 | `standard_user` | Use apps | Access licensed apps, own data only |
 | `viewer` | Read-only | View dashboards, no create/edit |
 
 **Default Permissions Matrix** (soft — admin-configurable per tenant):
 
-| Permission | `tenant_owner` | `tenant_admin` | `standard_user` | `viewer` |
-|-----------|:-:|:-:|:-:|:-:|
-| **User Management** | | | | |
-| Invite users | ✅ | ✅ | ❌ | ❌ |
-| Deactivate/reactivate users | ✅ | ✅ | ❌ | ❌ |
-| Change user roles | ✅ | ✅ | ❌ | ❌ |
-| Toggle user app access | ✅ | ✅ | ❌ | ❌ |
-| Request user deletion | ✅ | ❌ | ❌ | ❌ |
-| **Tenant Config** | | | | |
-| Edit tenant settings | ✅ | ✅ | ❌ | ❌ |
-| Configure auth (MFA, SSO) | ✅ | ✅ | ❌ | ❌ |
-| Manage billing/licenses | ✅ | ❌ | ❌ | ❌ |
-| Delete tenant | ✅ | ❌ | ❌ | ❌ |
-| **Content** | | | | |
-| Create conversations | ✅ | ✅ | ✅ | ❌ |
-| View own conversations | ✅ | ✅ | ✅ | ✅ |
-| View others' conversations | ❌ | ❌ | ❌ | ❌ |
-| Create/edit templates | ✅ | ✅ | ❌ | ❌ |
-| View shared templates | ✅ | ✅ | ✅ | ✅ |
-| Manage cartridges | ✅ | ✅ | ❌ | ❌ |
-| Use cartridges | ✅ | ✅ | ✅ | ❌ |
-| **Reporting** | | | | |
-| View tenant usage reports | ✅ | ✅ | ❌ | ✅ |
-| View own usage | ✅ | ✅ | ✅ | ✅ |
-| Export audit logs | ✅ | ✅ | ❌ | ❌ |
-| **Compliance** | | | | |
-| Enable/disable compliance features | ✅ | ❌ | ❌ | ❌ |
-| View compliance dashboards | ✅ | ✅ | ❌ | ✅ |
-| Initiate GDPR erasure | ✅ | ✅ | ❌ | ❌ |
+| Permission | `tenant_admin` | `standard_user` | `viewer` |
+|-----------|:-:|:-:|:-:|
+| **User Management** | | | |
+| Invite users | ✅ | ❌ | ❌ |
+| Deactivate/reactivate users | ✅ | ❌ | ❌ |
+| Change user roles | ✅ | ❌ | ❌ |
+| Toggle user app access | ✅ | ❌ | ❌ |
+| Request user deletion | ✅ | ❌ | ❌ |
+| **Tenant Config** | | | |
+| Edit tenant settings | ✅ | ❌ | ❌ |
+| Configure auth (MFA, SSO) | ✅ | ❌ | ❌ |
+| Manage billing/licenses | ✅ | ❌ | ❌ |
+| Delete tenant | ✅ | ❌ | ❌ |
+| **Content** | | | |
+| Create conversations | ✅ | ✅ | ❌ |
+| View own conversations | ✅ | ✅ | ✅ |
+| View others' conversations | ❌ | ❌ | ❌ |
+| Create/edit templates | ✅ | ❌ | ❌ |
+| View shared templates | ✅ | ✅ | ✅ |
+| Manage cartridges | ✅ | ❌ | ❌ |
+| Use cartridges | ✅ | ✅ | ❌ |
+| **Reporting** | | | |
+| View tenant usage reports | ✅ | ❌ | ✅ |
+| View own usage | ✅ | ✅ | ✅ |
+| Export audit logs | ✅ | ❌ | ❌ |
+| **Compliance** | | | |
+| Enable/disable compliance features | ✅ | ❌ | ❌ |
+| View compliance dashboards | ✅ | ❌ | ✅ |
+| Initiate GDPR erasure | ✅ | ❌ | ❌ |
 
 **Key rules**:
 - All permissions are stored in the `users.permissions` JSONB column
-- Roles provide defaults; admins can override per-user in Think Tank Tenant Admin → Permissions
+- Roles provide defaults; admins can override per-user in Think Tank Tenant Administration → Permissions
 - New permissions can be added without migrations (JSONB is flexible)
 - The UI shows ALL available permissions with toggles, even if off — so admins know what exists
 
@@ -121321,8 +118066,7 @@ If someone authenticates via Google but has no user record → **rejected**.
 - Users NEVER see other tenants' data
 - RLS (`app.current_tenant_id`) enforces tenant isolation at the database level
 - User-level data isolation enforced by `user_id` checks in queries
-- `tenant_owner` cannot be demoted by `tenant_admin`
-- Only `tenant_owner` can delete the tenant or manage billing
+- `tenant_admin` has full control including billing and tenant deletion
 
 ---
 
@@ -121401,9 +118145,9 @@ Every API endpoint must:
 | **API enforces licensing** | Every endpoint checks license via middleware |
 | **Two Cognito pools** | `radiant-admins` (no federation) and `radiant-users` (federation enabled) |
 | **Radiant Admin: no federation** | Platform admin is email+password+MFA only, always |
-| **Tenant Admin = hub** | Think Tank Tenant Admin is the central management UI |
+| **Tenant Admin = hub** | Think Tank Tenant Administration is the central management UI |
 | **Apps don't manage users** | Individual apps have no user management UI |
-| **First user = admin** | First user in any tenant gets tenant_owner role |
+| **First user = admin** | First user in any tenant gets tenant_admin role |
 | **Soft permissions** | Configurable, admin-visible, UI for toggle on/off |
 | **Data isolation** | Users never see other users' data. RLS + user_id checks. |
 | **Deactivation frees seats** | Deactivated user's seat is returned to the pool |
@@ -121554,14 +118298,14 @@ Namespace: `RADIANT/IntrusionDetection`
 
 \newpage
 
-# Part 14: Operations & Runbooks
+# Part 11: Operations & Runbooks
 
 ---
 
 
 \newpage
 
-## 14.1 Operations & Runbooks — Complete Reference
+## 11.1 Operations & Runbooks — Complete Reference
 
 
 *Source: `docs/14-OPERATIONS-RUNBOOKS.md` (3,338 lines)*
@@ -124660,7 +121404,7 @@ swift test --filter "testSaveAndLoadConfiguration"
 - **OMEGA Brain** — A living AI system running on Lambda/ECS. Maintains persistent state between requests and learns continuously.
 - **Firmware (.bio file)** — A signed JSON file containing the brain's "instincts": safety rules (Helix), learning speed (Ambition), and personality (Broca prompt).
 - **Hot-Swap** — Replacing firmware on a running brain without downtime. The brain detects the new firmware hash on its next inference cycle and atomically swaps (~50ms).
-- **Genesis Forge** — The admin web UI where you author, sign, and deploy firmware.
+- **OMEGA Forge** — The admin web UI where you author, sign, and deploy firmware.
 
 ### 2. Swap Modes Cheat Sheet
 
@@ -124692,7 +121436,7 @@ curl -s https://api.radiant.example/api/v2/omega/status | jq '.active_streams, .
 
 **Steps:**
 
-1. Open **Genesis Forge** → Firmware Library
+1. Open **OMEGA Forge** → Firmware Library
 2. Click **"New Firmware"** or clone existing
 3. Edit Helix Rules, Ambition Settings, or Personality as needed
 4. Click **"Validate"** — all checks must pass (green)
@@ -124716,7 +121460,7 @@ curl -s https://api.radiant.example/api/v2/firmware/swaps?limit=1 | jq '.'
 
 1. Deploy firmware with **SHADOW** mode
 2. Shadow brain processes requests in parallel — does NOT serve users
-3. Monitor **Coherence Score** in Genesis Dashboard (target: >90% over 7 days)
+3. Monitor **Coherence Score** in OMEGA Forge Dashboard (target: >90% over 7 days)
 4. When score crosses threshold, the **"Promote to Production"** button unlocks
 5. Click Promote → triggers OVERLAY swap from shadow to primary
 
@@ -124740,7 +121484,7 @@ curl -X POST https://api.radiant.example/api/v2/firmware/{firmware-id}/rollback 
   -H "Authorization: Bearer $ADMIN_TOKEN"
 ```
 
-Or in Genesis Forge: Firmware Library → click the superseded firmware → **"Rollback to This Version"**
+Or in OMEGA Forge: Firmware Library → click the superseded firmware → **"Rollback to This Version"**
 
 **Automatic rollback triggers:**
 
@@ -124912,17 +121656,17 @@ aws iam simulate-principal-policy \
 
 \newpage
 
-# Part 15: Strategy & Competitive Position
+# Part 12: Strategy & Competitive Position
 
 ---
 
 
 \newpage
 
-## 15.1 Strategy & Competitive — Complete Reference
+## 12.1 Strategy & Competitive — Complete Reference
 
 
-*Source: `docs/15-STRATEGY-COMPETITIVE.md` (8,767 lines)*
+*Source: `docs/15-STRATEGY-COMPETITIVE.md` (9,219 lines)*
 
 ---
 
@@ -124944,6 +121688,7 @@ aws iam simulate-principal-policy \
 - **Part VII: Technical Debt**
 - **Part VIII: Firmware Hot-Swap — Marketing & Positioning (v6.4.0)**
 - **Part IX: Firmware Hot-Swap — Strategic Investor Brief (v6.4.0)**
+- **Part X: Beyond Copilots — The Seven RADIANT Principles (v7.51.0)**
 
 ---
 
@@ -127552,20 +124297,20 @@ Model B: "As Model A correctly stated..."
 
 | Technology | What It Does | Why Competitors Can't Match |
 |------------|--------------|---------------------------|
-| **Genesis Forge** | Creates any tool in < 2 minutes from API docs | Requires 7-phase pipeline with Firecracker sandbox |
+| **Tool Forge** | Creates any tool in < 2 minutes from API docs | Requires 7-phase pipeline with Firecracker sandbox |
 | **Liquid Compute** | Routes to Browser/Local/Edge/Cloud by privacy | Needs edge infrastructure + sensitivity rules |
 | **Neural Affinity** | Routes to optimal MCP server semantically | Requires 4096-dim embeddings + proficiency tracking |
 | **Ghost Simulation** | Predicts user satisfaction before execution | Needs 4-component psychological vectors |
 | **Economic Cortex** | Negotiates budgets autonomously | Requires multi-scope budget hierarchy |
 
-### Genesis Forge: Infinite Tool Generation
+### Tool Forge: Infinite Tool Generation
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                       GENESIS FORGE PIPELINE                                 │
+│                       TOOL FORGE PIPELINE                                    │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                              │
-│   User Intent ──▶ No Tool Exists? ──▶ GENESIS FORGE ACTIVATES               │
+│   User Intent ──▶ No Tool Exists? ──▶ TOOL FORGE ACTIVATES                  │
 │                                              │                               │
 │   Phase 1: Detection ────────────────────────┤ (100ms)                      │
 │   Phase 2: API Scouting ─────────────────────┤ (5-30s) OpenAPI/GraphQL/HTML │
@@ -127770,6 +124515,7 @@ Competitors are *trained* to be helpful. RADIANT is *constrained* to be accurate
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 7.51.0 | February 2026 | **Beyond Copilots — The Seven RADIANT Principles (Part X)**: Integrated full content from `docs/publications/BEYOND-COPILOTS-RADIANT-PRINCIPLES.md` into the strategy guide as Part X. Seven Principles framework: (1) Transformation Over Augmentation, (2) Institutional Memory Over Session Amnesia, (3) Verified Intelligence Over Probabilistic Guessing, (4) Elastic Intelligence Over Static Cost, (5) Sovereign Infrastructure Over API Dependency, (6) Mathematical Safety Over Prompt-Based Hope, (7) Compounding Value Over Static Tooling. Includes Copilots vs Magic Carpet comparison table and RADIANT Terms Glossary for marketing reference. |
 | 7.39.0 | February 2026 | **Spend Governor — Two-Layer Budget Control System**: Prevents runaway AWS and AI costs with dual enforcement. Layer 1: global instance budget with AWS service freeze/thaw (ECS→0, Lambda concurrency→0, SageMaker flagged) — admin plane always stays alive. Layer 2: per-tenant AI budget enforced as pre-invocation gate in ModelRouterService with 60s in-memory cache. End users never see "out of credits" — they get generic "service temporarily unavailable" (HTTP 503). Super admins get full visibility via SENTINEL alerts (SEV 1 for instance freeze, SEV 2 for tenant suspend), scheduled cost report emails (configurable X hours / Y days) with per-tenant and per-model breakdowns, and a CriticalAlertBanner at the top of every admin page. Recovery: increase budget, grant temporary override, or wait for rolling window. Swift Deployer integration with budget config and emergency freeze/thaw controls. 6 new tables, 3 SQL functions, 2 EventBridge Lambdas, 9 admin API endpoints. |
 | 7.38.0 | February 2026 | **System Administrator Separation — Dual Identity Plane**: Separates system admins from tenant users into isolated identity domains. Cognito Pool B (system-admins) with MFA required, 16-char passwords, 30-min sessions. Service layer firewall: Admin API GW accepts Pool B tokens only, Tenant API GW accepts Pool A tokens only. `system_admins` table (global, no tenant_id, no RLS) with dedicated contacts, alert routing, and audit log tables. SENTINEL dual-resolution: system admin contacts resolved globally for ALL alerts + tenant contacts resolved per-tenant. Bootstrap flow via Swift Deployer/CLI with forced setup (password change + MFA + phone verification). Progressive lockout (5→15min, 10→1hr, 20→auto-deactivation). DB trigger prevents removing last super_admin. System admin roles removed from tenant auth — cannot log into Think Tank, Curator, Genesis, Dojo, or Cato. |
 | 7.37.2 | February 2026 | **Enforced Logging Policy & Complete Migration**: Mandatory policy requiring all Lambda services to use the Logging Registry (`createRegisteredLogger`/`withEnforcedLogging`) for structured, enforced logging. ALL 324 files migrated via automated script. Category-aware assignment (admin→audit, security→security, analytics→performance). 0 legacy `enhancedLogger` imports remain in source. Redaction disabled by default (opt-in via `LOG_REDACT_SENSITIVE=true`) — compliance enforced at dedicated middleware layers. Log storage pipeline confirmed intact: stdout→CloudWatch→S3 (KMS)→Glacier→Deep Archive via `LogIndexerService`. |
@@ -127809,14 +124555,14 @@ Competitors are *trained* to be helpful. RADIANT is *constrained* to be accurate
 | 5.44.0 | January 22, 2026 | **LIVING PARCHMENT 2029 VISION**: "Information Has a Heartbeat" - Comprehensive decision intelligence suite with sensory UI. **War Room (Strategic Decision Theater)**: Confidence terrain 3D visualization, AI advisory council, decision paths with outcome predictions, ghost branches. **Council of Experts**: 8 AI personas (Pragmatist, Ethicist, Innovator, Skeptic, Synthesizer, Analyst, Strategist, Humanist), consensus visualization with gravitational convergence, dissent sparks, minority reports. **Debate Arena**: Resolution meter (-100 to +100), attack/defense flows, weak point detection, steel-man generation. **Design Philosophy**: Breathing interfaces (4-12 BPM), living ink (weight 350-500), ghost paths, confidence terrain. 5 additional features coming: Memory Palace, Oracle View, Synthesis Engine, Cognitive Load Monitor, Temporal Drift Observatory. 40+ new database tables. **Competitive Moats**: 4 new moats (#17-20) documented in THINKTANK-MOATS.md. |
 | 5.52.5 | January 24, 2026 | **SERVICES LAYER**: Complete interface-based access control. A2A Protocol with 13 message types, mTLS support. API Keys with interface types (api/mcp/a2a/all). Cedar policies for database access restrictions. Key sync between Radiant Admin and Think Tank Admin. |
 | 5.52.6 | January 24, 2026 | **COMPLETE CDK WIRING AUDIT**: Critical infrastructure fix - ALL 62 admin Lambda handlers now wired to API Gateway. Categories: Cato Safety (5), Memory Systems (4), AI/ML (7), Security (5), Operations (5), Reporting (4), Configuration (7), Infrastructure (6), Compliance (4), Models (5), Orchestration (2), Users (2), Time & Translation (3). Entire admin API surface now operational. |
-| 6.6.0 | February 4, 2026 | **AUTONOMOUS ORGANISM ARCHITECTURE (PROMPT-43)**: "Project Metamorphosis" - RADIANT transforms from Agentic Software to Neural Infrastructure. **5 Leapfrog Technologies**: (1) Genesis Forge - JIT tool generation from API documentation with Firecracker sandbox validation; (2) Liquid Topology - Dynamic compute routing (Browser/Local/Edge/Cloud) based on privacy, latency, cost; (3) Tensor-Link - Vector-based agent communication with FP16/INT8 quantization; (4) Ghost Simulation - User digital twins (4096-dim vectors) for outcome prediction and calibration; (5) Economic Cortex - Autonomous budget management with negotiation strategies. **Neural Affinity Routing**: Semantic similarity + domain proficiency + error rate + latency + cost scoring for intelligent MCP server selection. **BrainRouter Integration**: Organism services enhance existing orchestration layer. **Implementation**: 9 core services (~6,226 lines), 37 Admin API endpoints, 6-tab Admin Dashboard, 18 database tables, 14 enums with RLS. **Competitive Moat**: Tier 0 Platform Moat (highest) - 18-24 months to replicate, network effects from generated tools, high switching cost from Ghost Vectors + Economic history. |
+| 6.6.0 | February 4, 2026 | **AUTONOMOUS ORGANISM ARCHITECTURE (PROMPT-43)**: "Project Metamorphosis" - RADIANT transforms from Agentic Software to Neural Infrastructure. **5 Leapfrog Technologies**: (1) Tool Forge - JIT tool generation from API documentation with Firecracker sandbox validation; (2) Liquid Topology - Dynamic compute routing (Browser/Local/Edge/Cloud) based on privacy, latency, cost; (3) Tensor-Link - Vector-based agent communication with FP16/INT8 quantization; (4) Ghost Simulation - User digital twins (4096-dim vectors) for outcome prediction and calibration; (5) Economic Cortex - Autonomous budget management with negotiation strategies. **Neural Affinity Routing**: Semantic similarity + domain proficiency + error rate + latency + cost scoring for intelligent MCP server selection. **BrainRouter Integration**: Organism services enhance existing orchestration layer. **Implementation**: 9 core services (~6,226 lines), 37 Admin API endpoints, 6-tab Admin Dashboard, 18 database tables, 14 enums with RLS. **Competitive Moat**: Tier 0 Platform Moat (highest) - 18-24 months to replicate, network effects from generated tools, high switching cost from Ghost Vectors + Economic history. |
 | 6.5.0 | February 3, 2026 | **Cartridge PKI KMS Integration (PROMPT-42)**: Real AWS KMS asymmetric signing for .RADz cartridges replacing placeholder strings. Platform root CA with ECC_NIST_P256 (ECDSA). Tenant CA hierarchy created dynamically per tenant. Purpose-specific signing keys (author, publisher, validator). CDK SecurityStack with cartridgeSigningKey. IAM policies for tenant key creation. 3 database tables (tenant_ca_certificates, cartridge_signing_keys, pki_audit_log) with RLS. Admin API with 10 endpoints. Competitive moat: No competitor offers cryptographic signing for portable AI packages. |
 | 6.5.0 | February 3, 2026 | **MLS (Message Layer Security)**: RFC 9420-inspired group encryption for secure agent-to-agent communication. Forward secrecy with epoch-based HKDF key ratcheting. Post-compromise security via key updates. Cryptographic primitives: X25519 (ECDH), Ed25519 (signatures), AES-256-GCM (authenticated encryption). 7 database tables with RLS. Admin API with 12 endpoints. Competitive moat: No competitor offers cryptographically-secure group encryption for AI agents. |
 | 5.52.26 | January 25, 2026 | **OAUTH 2.0 PROVIDER & DEVELOPER PORTAL (PROMPT-41A)**: RFC 6749 compliant OAuth Authorization Server enabling third-party app integrations. **Grant Types**: Authorization Code (with PKCE), Client Credentials, Refresh Token (with rotation). **14 Scopes** across 3 risk levels (low/medium/high). **Admin Dashboard**: App management, pending approvals, scope configuration, authorization viewer. **OIDC Discovery**: Full OpenID Connect support with JWKS, userinfo, introspection. **Use Cases Enabled**: MCP Servers (Claude Desktop, Cursor), Zapier/Make automation, partner integrations, mobile apps, Slack/Teams bots. **Security**: SHA-256 token hashing, RS256 JWT signing, PKCE for public clients, audit logging. |
 | 5.52.28 | January 25, 2026 | **TWO-FACTOR AUTHENTICATION (PROMPT-41B)**: Role-based MFA enforcement with industry-standard TOTP (RFC 6238). **Required Roles**: All admin roles (tenant_admin, tenant_owner, super_admin, admin, operator, auditor) MUST enroll and CANNOT disable. **Enrollment Gate**: Full-screen forced enrollment at login, cannot be bypassed. **TOTP Service**: AES-256-GCM secret encryption, ±30s clock drift tolerance. **Backup Codes**: 10 one-time recovery codes (SHA-256 hashed), low-code warnings at <3 remaining. **Device Trust**: 30-day tokens, max 5 per user, revocable from settings. **Lockout**: 3 failed attempts triggers 5-minute lockout. **Security Settings Page**: /settings/security with MFA status, backup codes management, trusted devices list. **Database**: mfa_backup_codes, mfa_trusted_devices, mfa_audit_log (partitioned) tables. **Competitive Moat**: Enterprise-grade security that competitors lack. |
 | 5.52.29 | January 25, 2026 | **INTERNATIONALIZATION & MULTI-LANGUAGE SEARCH (PROMPT-41D)**: Global-ready platform with 18 languages. **Language Support**: en, es, fr, de, pt, it, nl, pl, ru, tr, ja, ko, zh-CN, zh-TW, ar (RTL), hi, th, vi. **CJK Full-Text Search**: pg_bigm bi-gram indexing for Chinese, Japanese, Korean without word boundaries. **Auth Localization**: ~230 translation keys for login, MFA, OAuth, password reset screens. **RTL Support**: Arabic users get proper right-to-left layouts with dir="rtl", flipped margins/paddings, LTR preservation for codes. **Search Service**: Automatic language detection, appropriate search method routing (PostgreSQL FTS or pg_bigm), relevance ranking. **Database**: detected_language column, search_vector_simple/english tsvector columns, GIN bi-gram indexes. **Competitive Moat**: True global enterprise readiness vs English-only competitors. |
 | 5.52.57 | January 29, 2026 | **MODEL REGISTRY ENHANCEMENT SYSTEM**: Comprehensive self-hosted model lifecycle management. **HuggingFace Discovery**: Automated polling for new model versions with configurable watchlist per family (Llama, Qwen, DeepSeek, Mistral). **Version Manager**: S3 storage tracking, thermal state management (Hot/Warm/Cold/Off), bulk operations. **Deletion Queue**: Safe model deletion with usage session tracking - models wait for active sessions to end before deletion. **Admin Dashboard**: 5-tab interface (Overview, Versions, Watchlist, Deletion Queue, Discovery Jobs). **Scheduler Integration**: Discovery and deletion processing integrated into hourly model-sync. **Database**: 5 new tables (model_versions, model_family_watchlist, model_discovery_jobs, model_deletion_queue, model_usage_sessions). **Competitive Moat**: Automated model fleet management that competitors lack. |
-| 6.2.0 | February 1, 2026 | **GENESIS VAULT (KEYHOLE PATTERN)**: Secrets management for cartridges - cartridges declare required secrets via vault.req manifest but NEVER contain credentials. KMS encryption, rotation with history, Merkle audit trail, Chain of Custody. CBFs for secret access that NEVER relax. PARANOID/BALANCED/COWBOY governance presets. Admin UI at Platform → Vault. **RNIR COMPILER**: Radiant Neural Intermediate Representation - model-agnostic cognitive source code (JSONL training pairs). Compiles to LoRA weights, system prompts, few-shot examples, RAG chunks. Cortex integration for knowledge-aware compilation. Twilight Dreaming scheduling for background compilation. Axiom domain signatures with model-specific variants. Admin UI at Platform → RNIR. **CARTRIDGE OPERATIONS**: Long-running operations with Time Machine checkpointing. Cato CP1-CP5 checkpoint levels. SAGA compensation pattern for proper rollback. Universal Envelope Protocol tracing (traceId/spanId). Pause/Resume/Cancel controls. Admin UI at Platform → Cartridge Operations. **v4.21.0 SPEC ALIGNMENT**: Types enhanced with Merkle audit, Chain of Custody, CBFs, governance presets from unified architecture spec. |
+| 6.2.0 | February 1, 2026 | **CARTRIDGE VAULT (KEYHOLE PATTERN)**: Secrets management for cartridges - cartridges declare required secrets via vault.req manifest but NEVER contain credentials. KMS encryption, rotation with history, Merkle audit trail, Chain of Custody. CBFs for secret access that NEVER relax. PARANOID/BALANCED/COWBOY governance presets. Admin UI at Platform → Vault. **RNIR COMPILER**: Radiant Neural Intermediate Representation - model-agnostic cognitive source code (JSONL training pairs). Compiles to LoRA weights, system prompts, few-shot examples, RAG chunks. Cortex integration for knowledge-aware compilation. Twilight Dreaming scheduling for background compilation. Axiom domain signatures with model-specific variants. Admin UI at Platform → RNIR. **CARTRIDGE OPERATIONS**: Long-running operations with Time Machine checkpointing. Cato CP1-CP5 checkpoint levels. SAGA compensation pattern for proper rollback. Universal Envelope Protocol tracing (traceId/spanId). Pause/Resume/Cancel controls. Admin UI at Platform → Cartridge Operations. **v4.21.0 SPEC ALIGNMENT**: Types enhanced with Merkle audit, Chain of Custody, CBFs, governance presets from unified architecture spec. |
 | 6.1.0 | February 1, 2026 | **AXIOM PROMPT OPTIMIZATION PIPELINE**: 8 AXIOM Scorers (~3.3M params) for intelligent prompt optimization. CLARION Adaptive Questioning. UEP real-time streaming. Thermal state management. **CARTRIDGE PKI & FEDERATION**: Cryptographic signing of .RADz cartridges with dual signatures (author + platform). SHA-256 hash verification. Cross-cluster federation via Root CA exchange. PKI Admin Dashboard for managing certificates, signing keys, and trusted roots. Tamper-proof AI knowledge transfer. Supply chain security for regulated industries. New Moat #31 (27/30 score). **SYSTEM CARTRIDGE REGISTRY**: Domain experts as system cartridges with audit trail. Tenant visibility toggles. Thermal state management. |
 | 7.19.0 | February 6, 2026 | **AURELIUS DOJO v1.2.0 — BACKEND WIRING (COMPLETE STACK)**: Full backend infrastructure connecting the Dojo frontend to production services. **Dedicated Lambda Handler** (`lambda/admin/dojo.ts`): 35+ endpoints across 12 route groups — Libraries (CRUD + upload + theme discovery), Sessions (start/lesson/spar/complete), Progress (user + theme), Certifications (exam start + history), Mobot (chat + history), Config (get/update), Decay Engine (dashboard + curves + reinforcement), Scenarios (start + respond + conclude), Competencies (extract + mesh + team gaps), Dialectic (start + respond + conclude), Multimodal (get + generate), Pulse (snapshot + history), Archytas (config + invoke + suggest + summary). **Database Migration** (`V2026_02_06_005`): 19 RLS-protected tables with `app.current_tenant_id` isolation; 13 custom PostgreSQL enums; 3 helper functions — `dojo_calculate_retention()` (Ebbinghaus exponential decay), `dojo_xp_to_rank()` (XP threshold mapping), `dojo_update_decay_after_review()` (half-life adjustment with streak/lapse tracking). **CDK Integration**: Separate `DojoFunction` Lambda sharing `adminLambdaRole` IAM policies; proxy resource routing (`/admin/dojo/{proxy+}`) avoiding 50+ individual API Gateway resources. **AI Pipeline Boundary**: Non-AI endpoints (CRUD, config, progress, decay tracking) work immediately; AI-dependent features (theme discovery, lesson generation, sparring questions, scenario responses, dialectic responses, multimodal generation) throw descriptive errors indicating pipeline requirements — clean separation of data layer from AI layer. **Competitive Moat**: Complete production-ready backend for the only training platform combining thematic gating, adversarial sparring, Ebbinghaus decay, competency mapping, Socratic dialectic, and org-wide knowledge pulse. |
 | 7.18.0 | February 6, 2026 | **CATO TRAINER v1.0.0 — THE GROUNDING ENGINE**: New standalone knowledge base app (`apps/cato-trainer/`, port 3005) using the Cato persona for ground-truth AI. **Grounded Q&A**: Citation-backed answers with confidence tiers (exact ≥90%, high ≥70%, moderate ≥50%, low). **Semantic Search**: Three modes — semantic (meaning-based), full-text (keyword), hybrid (combined). **Document Intelligence**: Auto-chunking, embedding, AI summaries, auto-tagging, smart links (references, contradicts, extends, summarizes, related). **Multi-Document Digest**: 6 types — summary, comparison, contradiction analysis, timeline, key facts, action items with custom instructions. **Libraries & Spaces**: Independent knowledge bases with status tracking; project-based collections. **Design System**: Cool teal/cyan palette with ground-truth emerald accents, dark glass panels, Lora serif for documents. 15 API types, 25+ endpoints, Zustand store (30+ fields), 7-tab sidebar, 6 components. Swift Deployer + Admin Dashboard integration. **Competitive Moat**: No competitor offers citation-guaranteed grounded Q&A with multi-document contradiction detection and cross-document smart linking from a single unified knowledge base platform. |
@@ -127859,7 +124605,7 @@ While traditional AI platforms offer API orchestration over third-party models, 
 
 | Technology | Capability | Business Impact |
 |------------|------------|-----------------|
-| **Genesis Forge** | Infinite tool generation | Any integration in < 2 minutes |
+| **Tool Forge** | Infinite tool generation | Any integration in < 2 minutes |
 | **Liquid Compute** | Data sovereignty | Sensitive data never leaves device |
 | **Tensor-Link** | Vector communication | 100x faster, zero semantic loss |
 | **Ghost Simulation** | Predictive safety | Prevents regret before it happens |
@@ -127869,11 +124615,11 @@ While traditional AI platforms offer API orchestration over third-party models, 
 
 # PART 1: THE FIVE LEAPFROG TECHNOLOGIES
 
-## 1.1 Genesis Forge — Infinite Tool Generation
+## 1.1 Tool Forge — Infinite Tool Generation
 
 ### The Capability
 
-Genesis Forge transforms Think Tank from a platform with *thousands* of integrations into a platform with *infinite* integrations. When a user needs a capability that doesn't exist, Genesis creates it automatically.
+Tool Forge transforms Think Tank from a platform with *thousands* of integrations into a platform with *infinite* integrations. When a user needs a capability that doesn't exist, Tool Forge creates it automatically.
 
 | Dimension | Capability |
 |-----------|------------|
@@ -127891,7 +124637,7 @@ User: "Connect to our inventory system at inventory.acme.com"
 
 Think Tank: "I don't have that integration yet. Let me create one..."
 
-[Genesis Forge activates]
+[Tool Forge activates]
   ✓ Searching for API documentation...
   ✓ Generating MCP server code...
   ✓ Security validation (SAST, CVE scan)...
@@ -127902,11 +124648,11 @@ Think Tank: "I don't have that integration yet. Let me create one..."
 Timeline: 90 seconds
 ```
 
-### The 9-Step Genesis Pipeline
+### The 9-Step Tool Forge Pipeline
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                          GENESIS FORGE PIPELINE                              │
+│                          TOOL FORGE PIPELINE                                 │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
 │  1. DETECTION      → Identify missing capability from user intent           │
@@ -127924,7 +124670,7 @@ Timeline: 90 seconds
 
 ### Security Guarantees
 
-Every Genesis-created tool passes through:
+Every Tool Forge-created tool passes through:
 - **SAST (Static Analysis)** — Code vulnerability detection
 - **CVE Scanning** — Known vulnerability database check
 - **Behavioral Analysis** — Runtime behavior validation
@@ -127933,7 +124679,7 @@ Every Genesis-created tool passes through:
 
 ### Replication Barrier
 
-To replicate Genesis Forge, a competitor would need:
+To replicate Tool Forge, a competitor would need:
 - AGI-level code generation capability
 - Automated security validation pipeline
 - Firecracker sandbox infrastructure
@@ -128306,7 +125052,7 @@ To replicate Economic Cortex, a competitor would need:
 | Capability | Think Tank | Industry Standard | Advantage |
 |------------|------------|-------------------|-----------|
 | Static Integrations | 3,000+ | 20-100 | 30-150x |
-| Dynamic Tool Creation | Genesis Forge (∞) | None | ∞ |
+| Dynamic Tool Creation | Tool Forge (∞) | None | ∞ |
 | Tool Generation Time | < 2 minutes | Weeks-months | 10,000x |
 | Tool Security | SAST + CVE + Sandbox | Varies | Qualitative |
 
@@ -128392,7 +125138,7 @@ To replicate Economic Cortex, a competitor would need:
 10. **Configuration Portability** — .ttworkflow, .ttdomain files
 
 ### Leapfrog Moats (11-15):
-11. **Genesis Forge** — Infinite tool generation
+11. **Tool Forge** — Infinite tool generation
 12. **Liquid Compute** — Edge sovereignty (6 execution nodes)
 13. **Tensor-Link Protocol** — Vector communication (100x faster)
 14. **Ghost Simulation** — Personalized predictive safety
@@ -128402,7 +125148,7 @@ To replicate Economic Cortex, a competitor would need:
 
 | Moat | Replication Time | Replication Cost | Difficulty |
 |------|------------------|------------------|------------|
-| Genesis Forge | 18-24 months | $5-10M | Very High |
+| Tool Forge | 18-24 months | $5-10M | Very High |
 | Liquid Compute | 24-36 months | $10-20M | Extreme |
 | Tensor-Link | 12-18 months | $2-5M | High |
 | Ghost Simulation | 24+ months | $5-10M | Very High |
@@ -128472,7 +125218,7 @@ To replicate Economic Cortex, a competitor would need:
 │                                                                              │
 │  • Trainable neural networks at every layer                                  │
 │  • Liquid Compute (browser → local → edge → cloud)                           │
-│  • Infinite tool generation (Genesis Forge)                                  │
+│  • Infinite tool generation (Tool Forge)                                  │
 │  • Vector communication (Tensor-Link, 100x faster)                           │
 │  • Personalized predictive safety (Ghost Simulation)                         │
 │  • Autonomous budget management (Economic Cortex)                            │
@@ -128490,7 +125236,7 @@ To replicate Economic Cortex, a competitor would need:
 | **Healthcare IT** | ★★★★★ | Liquid Compute: patient data never leaves device |
 | **Legal Tech** | ★★★★★ | Accuracy + confidentiality + audit trail |
 | **Financial Services** | ★★★★★ | Economic Cortex + regulatory compliance |
-| **Engineering** | ★★★★★ | Genesis Forge + domain intelligence |
+| **Engineering** | ★★★★★ | Tool Forge + domain intelligence |
 | **Research** | ★★★★★ | 106+ models + specialized analysis |
 | **Privacy-sensitive** | ★★★★★ | Liquid Compute + Ghost privacy |
 | **Accuracy-critical** | ★★★★★ | CBFs + multi-model validation |
@@ -128507,7 +125253,7 @@ To replicate Economic Cortex, a competitor would need:
 
 Foundation model companies spend $200B+ annually on research. Think Tank inherits all AI improvements without that capital expenditure. Our moat is the orchestration intelligence, not the models themselves.
 
-**Genesis Forge amplifies this:** We also inherit ALL possible integrations—we can create any tool in 2 minutes.
+**Tool Forge amplifies this:** We also inherit ALL possible integrations—we can create any tool in 2 minutes.
 
 ### "Compounding vs Constant"
 
@@ -128515,7 +125261,7 @@ Traditional AI platforms deliver the same value on Day 1 as Day 365 (same platfo
 
 Think Tank compounds:
 - Day 1 << Day 365 (system learned from every interaction)
-- Genesis Forge adds new tools continuously
+- Tool Forge adds new tools continuously
 - Ghost Simulation calibrates to each user
 - Economic Cortex optimizes spending patterns
 - CATO evolves nightly with Twilight Dreaming
@@ -128579,7 +125325,7 @@ This creates stickiness through VALUE, not lock-in.
 
 ## 7.1 The Investment Thesis
 
-1. **Genesis Forge** makes tool scarcity obsolete
+1. **Tool Forge** makes tool scarcity obsolete
 2. **Liquid Compute** makes privacy trade-offs obsolete
 3. **Tensor-Link** makes semantic loss obsolete
 4. **Ghost Simulation** makes reactive safety obsolete
@@ -128592,7 +125338,7 @@ Together, these five technologies create a **3-5 year architectural moat**.
 | Dimension | Think Tank Capability |
 |-----------|----------------------|
 | Technology | Neural infrastructure that compounds |
-| Tools | Infinite via Genesis Forge |
+| Tools | Infinite via Tool Forge |
 | Privacy | Complete sovereignty via Liquid Compute |
 | Safety | Predictive via Ghost Simulation |
 | Cost | Autonomous via Economic Cortex |
@@ -129019,7 +125765,7 @@ Active Inference-based safety system that replaces traditional reward maximizati
 - **The Watcher**: Self-awareness via prediction error → dopamine signal
 - **Biological Lock-In**: Brain physically densifies over time; impossible to export to competitors
 
-**Genesis Forge v3.0 — "The Glass Foundry" (Moonshot #3)**:
+**OMEGA Forge v3.0 — "The Glass Foundry" (Moonshot #3)**:
 - **Digital Smithy**: Not a code editor — a real-time physics simulation environment for neural firmware
 - **Shadow Omega Tether**: Permanently hard-wired WebSocket to simulation kernel; adversarial workflow
 - **Catenary Wire Physics**: Gravity-obeying data cables with light particle flow; heavier data = deeper sag
@@ -129031,8 +125777,8 @@ Active Inference-based safety system that replaces traditional reward maximizati
 **Implementation**:
 - Core: `omega_core/bridge.py`, `omega_core/reflection.py`, `omega_core/physics.py`
 - Handler: `handlers/omega_vllm_server.py`, `handlers/omega_inference.py`
-- Glass Foundry: `apps/genesis/components/forge/` (GlassFoundry, TheArmory, TheOracle, OmegaSelector, ReactorCore, 3 node types, catenary edge)
-- State: `apps/genesis/lib/forge-store.ts` (Zustand), `hooks/useShadowOmega.ts` (WebSocket)
+- Glass Foundry: `apps/omega-lab/components/forge/` (GlassFoundry, TheArmory, TheOracle, OmegaSelector, ReactorCore, 3 node types, catenary edge)
+- State: `apps/omega-lab/lib/forge-store.ts` (Zustand), `hooks/useShadowOmega.ts` (WebSocket)
 - Admin API: `lambda/admin/cato.ts`
 - Database: `cato_cbf_config`, `cato_audit_log`, `omega_replay_logs`, `omega_bridge_state`, `omega_watcher_metrics`, `omega_dream_history`, `omega_instance_registry`, `omega_forge_sessions`, `omega_forge_artifacts`, `omega_telemetry_history`
 - CDK: `lib/stacks/cato-genesis-stack.ts`
@@ -129117,13 +125863,13 @@ Unlike competitors whose AI "dies" between requests (Lambda cold starts erase al
 |-----------|---------|------------|
 | **MCP Server Manager** | Registry with Neural Affinity Routing | Semantic tool selection at scale |
 | **Neural Schema Registry** | Tool embeddings for intelligent discovery | Sub-50ms tool matching |
-| **Genesis Auto-Tool** | On-demand tool generation from APIs | Never "tool not available" |
+| **Tool Forge** | On-demand tool generation from APIs | Never "tool not available" |
 | **Liquid Compute** | Privacy-aware compute location selection | Local-first for sensitive data |
 | **Ghost Simulation** | Predict user satisfaction before execution | Proactive UX optimization |
 | **Tensor-Link Protocol** | Vector-based transport with quantization | 50%+ bandwidth reduction |
 | **Economic Cortex** | Autonomous budget negotiation | 30%+ cost savings |
 
-**Genesis Auto-Tool Pipeline** (Industry First):
+**Tool Forge Pipeline** (Industry First):
 ```
 Intent → API Discovery → Code Generation → Sandbox Validation → Hot-Deploy
 ```
@@ -129158,7 +125904,7 @@ Intent → API Discovery → Code Generation → Sandbox Validation → Hot-Depl
 Competitors face the impossible task of replicating not just the code, but the accumulated intelligence. It's like trying to compete with a company by hiring their employees—you get the people, not their accumulated institutional knowledge.
 
 **Implementation**:
-- Services: `lambda/shared/services/organism/*`
+- Services: `lambda/shared/services/organism/`
 - Types: `packages/shared/src/types/autonomous-organism.types.ts`
 - Migration: `V2026_02_03_001__autonomous_organism_architecture.sql`
 - 18 database tables, 14 enums, 9 services
@@ -129169,7 +125915,7 @@ Competitors face the impossible task of replicating not just the code, but the a
 
 The Autonomous Organism Architecture comprises five individually defensible moats, each with significant replication barriers:
 
-#### Leapfrog #1: Genesis Forge — Infinite Tool Generation
+#### Leapfrog #1: Tool Forge — Infinite Tool Generation
 
 | Dimension | Capability | Replication Barrier |
 |-----------|------------|---------------------|
@@ -129269,7 +126015,7 @@ Intent → API Discovery → Code Generation → SAST → CVE Scan → Sandbox �
 
 | Technology | Time | Cost | Difficulty |
 |------------|------|------|------------|
-| Genesis Forge | 18-24 months | $5-10M | Very High |
+| Tool Forge | 18-24 months | $5-10M | Very High |
 | Liquid Compute | 24-36 months | $10-20M | Extreme |
 | Tensor-Link | 12-18 months | $2-5M | High |
 | Ghost Simulation | 24+ months | $5-10M | Very High |
@@ -129454,7 +126200,7 @@ W_Final = W_Genesis + (scale × W_Cato) + (scale × W_User) + (scale × W_Domain
 - Service: `lambda/shared/services/lora-inference.service.ts`
 - Service: `lambda/shared/services/adapter-management.service.ts`
 - Admin API: `lambda/admin/enhanced-learning.ts`
-- Migration: `packages/infrastructure/migrations/108_enhanced_learning.sql`
+- Migration: `migrations/000_consolidated_schema.sql`
 - Admin UI: `apps/admin-dashboard/app/(dashboard)/models/lora-adapters/page.tsx`
 - Documentation: `docs/EXPERT-SYSTEM-ADAPTERS.md`
 
@@ -130066,8 +126812,8 @@ RADIANT Cartridges are **portable AI brains** — complete neural intelligence p
 
 **Implementation:**
 - Service: `lambda/shared/services/cartridge.service.ts`
-- Admin: `lambda/admin/cartridge.ts`
-- Dashboard: `apps/admin-dashboard/app/(dashboard)/cartridge-manager/page.tsx`
+- Admin: `lambda/admin/cartridge-universal.ts`
+- Dashboard: `apps/admin-dashboard/app/(dashboard)/cartridge-system/page.tsx`
 
 ---
 
@@ -130139,7 +126885,7 @@ Every RADIANT Cartridge (.RADz) is **cryptographically signed** with dual signat
 
 **PKI Architecture:**
 ```
-Radiant Root CA (Genesis Vault / HSM)
+Radiant Root CA (Cartridge Vault / HSM)
     └── Tenant Intermediate CA (per organization)
             └── Cartridge Signing Keys
                     └── Dual Signatures (Author + Platform)
@@ -130174,7 +126920,7 @@ Radiant Root CA (Genesis Vault / HSM)
 - Service: `lambda/shared/services/cartridge-pki.service.ts`
 - Admin API: `lambda/admin/cartridge-pki.ts`
 - Dashboard: `apps/admin-dashboard/app/(dashboard)/platform/pki/page.tsx`
-- Migration: `migrations/V2026_02_01_009__cartridge_pki.sql`
+- Migration: `migrations/000_consolidated_schema.sql`
 
 ---
 
@@ -130248,7 +126994,7 @@ A **novel orchestration primitive** where multiple LLMs engage in competitive cr
 - Service: `lambda/shared/services/crucible/crucible.service.ts`
 - Orchestrator: `lambda/shared/services/crucible/crucible-orchestrator.service.ts`
 - Admin API: `lambda/admin/crucible.ts`
-- Migration: `migrations/V2026_02_01_014__crucible_deliberation.sql`
+- Migration: `migrations/000_consolidated_schema.sql`
 
 ---
 
@@ -130325,7 +127071,7 @@ When optional models are unavailable, services automatically reduce capabilities
 - Service Definitions: `packages/infrastructure/lib/config/services/`
 - Thermal Management: `packages/infrastructure/lambda/thermal/`
 - Service Orchestrators: `packages/infrastructure/lambda/services/`
-- Database: `migrations/006_self_hosted_models.sql`
+- Database: `migrations/000_consolidated_schema.sql`
 - LiteLLM Routing: `litellm/config/self-hosted.yaml`
 
 ---
@@ -131232,7 +127978,7 @@ Zero-cost persistent consciousness through database state injection:
 | Goals | Active goal tracking |
 
 **Implementation**:
-- Service: `lambda/shared/services/ego-context.service.ts`
+- Service: `lambda/shared/services/local-ego.service.ts`
 - Admin UI: `apps/thinktank-admin/app/(dashboard)/ego/page.tsx`
 
 ---
@@ -133464,7 +130210,7 @@ A manufacturing customer imports a pre-built "Quality Control Expert" cartridge 
 | Hot-Swap | **Live Update** | Changing AI behavior without any service interruption |
 | Helix Rules | **Safety Guardrails** | Mathematically-enforced rules that make certain behaviors physically impossible for the AI |
 | Ambition Settings | **Learning Configuration** | Controls how fast the AI learns and adapts to your organization |
-| Genesis Forge | **AI Command Center** | The admin dashboard for managing AI behavior profiles |
+| OMEGA Forge | **AI Command Center** | The admin dashboard for managing AI behavior profiles |
 | OVERLAY mode | **Seamless Update** | Updates applied on top of existing AI knowledge |
 | SHADOW mode | **Safe Testing** | Test new behavior in parallel before going live |
 | EMERGENCY mode | **Instant Lockdown** | Immediate safety enforcement |
@@ -133487,7 +130233,7 @@ A: Three layers of protection. First, every firmware must pass validation and cr
 A: Yes. Firmware signing uses AWS KMS (FIPS 140-2 validated). Every swap is logged in an immutable audit trail. Production deployments require two-person approval and re-authentication (FDA 21 CFR Part 11 pattern). The PKI trust chain (Platform CA → Tenant CA → Signing Key) satisfies SOC 2 cryptographic controls.
 
 **Q: Can customers create their own firmware?**
-A: Yes, through the Genesis Forge (AI Command Center). They can author safety rules, adjust learning parameters, and define personality — with AI-assisted drafting that helps non-technical admins create expert-level configurations. Everything is signed and versioned.
+A: Yes, through the OMEGA Forge (AI Command Center). They can author safety rules, adjust learning parameters, and define personality — with AI-assisted drafting that helps non-technical admins create expert-level configurations. Everything is signed and versioned.
 
 ### 6. Taglines & Copy Options
 
@@ -133693,20 +130439,470 @@ Firmware hot-swap transforms RADIANT from an AI routing platform into an **AI ev
 
 This is not incremental. This is the difference between selling propellers and selling jet engines.
 
+---
+
+## Part X: Beyond Copilots — The Seven RADIANT Principles (v7.51.0)
+
+> *Integrated from `docs/publications/BEYOND-COPILOTS-RADIANT-PRINCIPLES.md`*
+>
+> **Why We Refuse to Build Another Copilot — And What We're Building Instead**
+>
+> *RADIANT Platform | February 2026*
+
+---
+
+### The Copilot Consensus Is Wrong
+
+Every major technology company has arrived at the same answer: **build a Copilot**. Microsoft Copilot. GitHub Copilot. Salesforce Einstein Copilot. Google Duet AI. Adobe Firefly. The metaphor is everywhere, and it has become the unquestioned default for how AI should relate to humans.
+
+The metaphor is also a ceiling.
+
+A copilot sits in the passenger seat. It watches you drive. It suggests turns. It might warn you about traffic. But **you are still driving**. You are still steering. You are still responsible for every decision, every action, every line of code. The copilot makes you a marginally better version of what you already are — it does not change the nature of the work.
+
+This is the universal copilot pitch: *"Your existing workflow, but 15-30% faster."* Microsoft sells this for Word, Excel, and Teams. GitHub sells it for code editors. Salesforce sells it for CRM. Each copilot watches what you do and tries to predict what you'll do next. It autocompletes your sentences, suggests your next function, drafts your next email. When it works well, it saves you a few keystrokes. When it works poorly, you spend time correcting its suggestions. Either way, you are still the one doing the work.
+
+We believe this is the wrong ambition for AI in 2026. The copilot metaphor accepts the current workflow as permanent and asks only: *"How do we make it slightly faster?"* We ask a fundamentally different question:
+
+> **What if the workflow itself is the problem?**
+
+What if, instead of helping a developer write code 30% faster, you could let a non-developer describe what they need and have the system produce the finished result? What if, instead of helping an analyst format a spreadsheet, the system could generate an interactive dashboard from a plain-English description? What if the AI didn't sit beside you while you work — but instead did the work while you directed?
+
+That is what RADIANT builds. We call our design philosophy **"the Magic Carpet."** A copilot sits next to you while *you* navigate a road that already exists. A magic carpet takes you where you want to go — there is no road, no steering wheel, no fuel gauge. You say "take me there," and the ground beneath you reshapes itself. The distinction is not "slightly better augmentation." It is the difference between **making a process faster** and **replacing the need for the process entirely**.
+
+---
+
+### The Seven Principles
+
+#### Principle 1: Transformation Over Augmentation
+
+**The copilot thesis**: Help people do their existing jobs faster.
+**Our thesis**: Eliminate the need for the job as currently defined.
+
+Copilots augment. At their core, every copilot on the market today is a sophisticated autocomplete engine dressed in conversational UI. The human remains the author, the decision-maker, the one doing the cognitive work.
+
+RADIANT transforms. The difference is not a matter of degree — it is a difference in kind.
+
+**In practice — the "Polymorphic UI."** RADIANT's interface *physically transforms itself* based on what you're trying to accomplish. The system selects from three fundamental layouts:
+
+- **Sniper View**: Command-center layout for direct, focused tasks. Single AI model, instant execution, ~$0.01 per query.
+- **Scout View**: Infinite canvas for exploration and research. Multiple models in parallel, evidence clustered as spatial maps.
+- **Sage View**: Split-screen diff editor for verification and compliance. Source documents on the right, confidence highlighting on the left.
+
+None of these interfaces exist before the user asks a question. They are generated on the fly. The system reads your intent and builds the appropriate workspace.
+
+**The "Eject to App" capability.** When RADIANT generates a complex interactive result, the user can click "Eject to App" and receive the actual source code as a standalone, deployable application. The AI didn't just show you a chart — it built you software.
+
+We are not in the business of making developers faster. We are in the business of making everyone capable of producing software — without writing a single line of code.
+
+---
+
+#### Principle 2: Institutional Memory Over Session Amnesia
+
+**The copilot problem**: Every session starts from zero.
+
+Open ChatGPT and ask it a question. Close the tab. Open it again tomorrow. It has no idea who you are. It doesn't remember what you discussed. Every enterprise AI platform today suffers from **goldfish memory** — the AI's entire world resets every time you start a new session.
+
+**RADIANT's answer — the "Cortex" Memory System.** A three-tier architecture:
+
+- **Hot Memory (<10ms)**: Working memory — current session context, recent history. 4-hour TTL.
+- **Warm Memory (<100ms)**: Long-term knowledge — knowledge graph + vector embeddings. Entity relationships, causal chains, cross-session context. 90-day active window.
+- **Cold Memory (<2s)**: Archival — **seven years** of compliance-grade, immutable history.
+
+The knowledge graph uses **Graph-RAG** (Graph-enhanced Retrieval-Augmented Generation) — hybrid search combining explicit graph traversal with vector similarity. ~40% better retrieval accuracy than vector-only approaches.
+
+On Day 365, RADIANT has internalized your team's decision-making patterns, compliance requirements, codebase conventions, project histories, and institutional knowledge. When a new employee joins, the AI can brief them on months of project history. When someone leaves, their knowledge stays.
+
+Copilots have conversations. RADIANT has a **memory that compounds**.
+
+---
+
+#### Principle 3: Verified Intelligence Over Probabilistic Guessing
+
+**The copilot risk**: Hallucinations are someone else's problem.
+
+Independent studies show legal AI tools hallucinate 17-33% even with retrieval augmentation. Medical AI shows 50-82.7% under adversarial conditions. A single hallucination in these domains can trigger malpractice suits, regulatory sanctions, or manufacturing recalls.
+
+**RADIANT's answer — the "Empiricism Loop."**
+
+1. **Hypothesis Generation**: Generate an internal prediction of the correct answer.
+2. **Sandbox Execution**: Write and run executable code that tests this prediction in a secure environment.
+3. **Surprise Detection**: Compare results. Low surprise → respond with confidence. High surprise → **rethink cycle** (up to 3 times).
+4. **Self-Calibration via "Ego"**: Persistent self-assessment (confidence, frustration, curiosity) that influences future behavior.
+
+**For high-stakes decisions — the "Council of Rivals."** Structured adversarial debate between multiple AI models:
+
+- **The Advocate**: Builds the strongest case for the proposed answer.
+- **The Critic**: Systematically attacks it.
+- **The Pragmatist**: Evaluates against real-world constraints.
+- **The Arbiter**: Renders final judgment with explicit confidence score.
+
+Council of Rivals reduces hallucination by ~90% on high-stakes queries compared to single-model responses.
+
+---
+
+#### Principle 4: Elastic Intelligence Over Static Cost
+
+**The copilot economics**: Every query costs the same.
+
+**RADIANT's answer — "the Gearbox."** Three gears:
+
+| Gear | Mode | Cost | Architecture | Use Case |
+|------|------|------|-------------|----------|
+| **Low** | Sniper | ~$0.01 | Single model, read-only memory | Quick answers, lookups |
+| **Mid** | Scout | ~$0.10 | Multiple models in parallel | Research, exploration |
+| **High** | War Room | ~$0.50+ | Full multi-agent swarm, read-write | Strategy, compliance, debugging |
+
+**Critical innovation**: Sniper Mode has read-only access to everything the War Room has ever decided. The expensive thinking is done once. The cheap retrieval is done forever.
+
+The **Economic Governor** routes automatically based on complexity signals. A typical enterprise: 80% Sniper, 15% Scout, 5% War Room — dramatically lower blended cost with dramatically higher quality on the hardest 5%.
+
+---
+
+#### Principle 5: Sovereign Infrastructure Over API Dependency
+
+**The copilot trap**: Your intelligence lives on someone else's servers.
+
+**RADIANT's answer — the "Tri-Layer Consciousness" architecture.**
+
+- **Layer 0 — Genesis (Foundation)**: 56 self-hosted open-source models. **No data ever leaves your environment.** Zero data leakage, zero API rent.
+- **Layer 1 — Cato (Global Conscience)**: Shared intelligence and safety. Aggregates anonymized learning. **Never sees private user data.**
+- **Layer 2 — User Persona (Personal)**: Per-user LoRA adaptation. Remembers your coding style, preferences, project history. Private — never shared.
+
+**Weight Formula**: `W_Final = W_Genesis + (scale × W_Cato) + (scale × W_User)`
+
+External APIs used only for frontier capabilities self-hosted models can't match. Sensitive data redacted before crossing infrastructure boundary. A model router evaluates 106+ models based on cost, capability, latency, and data sensitivity.
+
+You are not renting intelligence. You are **building and owning** it.
+
+---
+
+#### Principle 6: Mathematical Safety Over Prompt-Based Hope
+
+**The copilot gamble**: Safety through good intentions.
+
+RLHF and system prompts are **probabilistic guardrails on a probabilistic system**. A determined adversary can circumvent them. These systems are "safe" the way a door with a "Please Don't Enter" sign is secure.
+
+**RADIANT's answer — "Control Barrier Functions" (CBF).** Borrowed from robotics and control theory. A CBF defines a "safe region" that the system **provably cannot leave**. Not "usually doesn't leave." **Cannot**, as in mathematically demonstrated.
+
+CBFs enforced across:
+- **Content safety**: Preventing PII/classified data disclosure
+- **Behavioral safety**: Preventing unauthorized actions (query a database but cannot modify it)
+- **Compliance safety**: HIPAA, SOC2, GDPR as hard constraints
+- **Operational safety**: Preventing runaway costs, infinite loops
+
+For regulated industries: the difference between "our AI tries to be compliant" and "our AI is **provably** compliant, and here is the mathematical proof."
+
+---
+
+#### Principle 7: Compounding Value Over Static Tooling
+
+**The copilot plateau**: Day 1,000 is the same as Day 1. A copilot does not get smarter over time.
+
+RADIANT is an **asset that appreciates in value the more you use it**.
+
+**The "Dreaming Cycle."** Every night during off-peak hours (2-6 AM UTC):
+
+1. **Twilight Trigger**: Low traffic detected, learning activates.
+2. **Flash Consolidation**: Reviews all interactions, corrects contradictions, promotes key memories.
+3. **Active Verification**: Identifies areas of uncertainty, runs targeted tests, patches knowledge gaps.
+4. **Counterfactual Dreaming**: Replays key interactions — "what if I answered differently?"
+5. **LoRA Merge** (weekly): Individual learning aggregated, anonymized, merged into Cato global layer.
+
+**What compounds**:
+- Every cheap Sniper query draws on institutional memory. Every expensive War Room deliberation *adds* to it.
+- Every Empiricism Loop correction feeds the knowledge graph.
+- Every Dreaming Cycle corrects gaps yesterday's cycle couldn't detect.
+- Every user's LoRA adapter becomes more precisely tuned.
+
+On Day 1,000, RADIANT *is* your organization's brain — the accumulated intelligence of every question asked, every pattern discovered, every lesson learned.
+
+Copilots are tools you subscribe to. They don't know you. They don't remember you.
+
+RADIANT is **intelligence you own, and it grows**.
+
+---
+
+### The Stakes
+
+The market is consolidating around the copilot metaphor because it is safe, familiar, and easy to sell. But comfort is not strategy. And augmentation is not transformation.
+
+Gartner predicts over 40% of agentic AI projects will be canceled by 2027 due to costs, unclear value, or inadequate risk controls. The survivors will not be the ones that made typing 15% faster. They will be the ones that changed what was possible — and built the verification, memory, and safety infrastructure to do it responsibly.
+
+> *"Everyone else is building Copilots — assistants that sit in the passenger seat and nag you while you drive.*
+>
+> *We are building the Magic Carpet.*
+>
+> *You don't drive it. You don't write code for it. You just say where you want to go, and the ground beneath you reshapes itself to take you there instantly.*
+>
+> *We aren't selling a better IDE. We are selling the feeling of being a Magician."*
+
+---
+
+### Copilots vs. the Magic Carpet — Summary
+
+| Dimension | Copilots | RADIANT |
+|-----------|----------|---------|
+| **Philosophy** | Augment the human in their existing workflow | Transform the outcome — eliminate the workflow |
+| **Interface** | Chat bubble (same UI for every task) | Polymorphic UI (morphs into canvas, diff editor, command center) |
+| **Memory** | Session-based — resets when you close the tab | Institutional — three-tier Cortex persists for 7 years |
+| **Verification** | Trust the model, hope it's right | Empiricism Loop: test claims in sandbox before responding |
+| **High-Stakes Decisions** | Single model, single answer | Council of Rivals: adversarial multi-model debate with audit trail |
+| **Economics** | Fixed cost per query | Gearbox: auto-routes $0.01 (Sniper) to $0.50+ (War Room) |
+| **Infrastructure** | Rent from API providers | Sovereign: 56 self-hosted models, sensitive data never leaves |
+| **Personalization** | Generic — same model for everyone | LoRA adapters per user — remembers style, domain, history |
+| **Safety** | Prompt-based guardrails (jailbreakable) | Control Barrier Functions: mathematically provable constraints |
+| **Growth** | Static tool — same on Day 1,000 as Day 1 | Dreaming Cycle: autonomous nightly learning, compounding value |
+| **Output** | Text in a chat bubble | Applications, canvases, dashboards — with Eject to App |
+
+---
+
+### RADIANT Terms Glossary (Marketing Reference)
+
+| Term | What It Is |
+|------|-----------|
+| **Magic Carpet** | Design philosophy: the AI produces outcomes directly, rather than advising while you do the work |
+| **Polymorphic UI** | Interface that physically transforms (Sniper/Scout/Sage views) based on intent |
+| **Eject to App** | Export AI-generated interactive results as standalone, deployable application source code |
+| **Cortex** | Three-tier memory architecture (Hot/Warm/Cold) providing institutional memory across sessions and years |
+| **Graph-RAG** | Hybrid search combining knowledge graph traversal with vector similarity for higher-accuracy retrieval |
+| **Empiricism Loop** | Verification: generate hypothesis → test in sandbox → only respond if results match prediction |
+| **Ego** | Persistent self-assessment metrics (confidence, frustration, curiosity) that calibrate AI behavior |
+| **Council of Rivals** | Adversarial multi-model debate (Advocate, Critic, Pragmatist, Arbiter) for high-stakes decisions |
+| **Gearbox** | Elastic compute router that auto-selects Sniper, Scout, or War Room mode per query |
+| **Sniper / Scout / War Room** | Three compute tiers: cheap & fast / exploratory / full multi-agent deliberation |
+| **Economic Governor** | Routes queries to the appropriate Gearbox tier based on complexity analysis |
+| **Genesis (Layer 0)** | Self-hosted open-source AI models — zero data leakage |
+| **Cato (Layer 1)** | Shared intelligence and safety governance; enforces constitutional rules; never sees private data |
+| **User Persona / LoRA (Layer 2)** | Per-user model adaptation that remembers individual preferences, style, and expertise |
+| **Control Barrier Functions (CBF)** | Mathematical constraints making it provably impossible for AI to violate safety rules at runtime |
+| **Genesis Gates** | Staged maturity process new AI capabilities must pass before reaching production |
+| **Dreaming Cycle** | Autonomous nightly learning: memory consolidation, self-testing, counterfactual replay, global merge |
+| **Ghost Vectors** | Shared memory representations allowing multiple AI agents to synchronize knowledge instantly |
+
+
+---
+
+## Part IX: Autonomous Organism — Marketing & Positioning
+
+> *Merged from `09-OMEGA-GENESIS.md` (Autonomous Organism section) — all marketing and competitive positioning content consolidated here.*
+
+# PART I: MARKETING & POSITIONING
+
+---
+
+## Chapter 1: Executive Value Proposition
+
+### 1.1 The One-Sentence Pitch
+
+**RADIANT Think Tank is the world's first Neural Infrastructure platform—an AI system that doesn't just use tools, it becomes them, creating infinite capabilities on-demand while keeping your data sovereign.**
+
+### 1.2 The Problem We Solve
+
+| Problem | How Competitors Fail | How RADIANT Solves It |
+|---------|---------------------|----------------------|
+| **Tool Scarcity** | ChatGPT/Claude have ~50 built-in tools | Tool Forge creates any tool in < 2 minutes |
+| **Cloud Lock-In** | Every query goes to remote servers | Liquid Compute runs locally, data never leaves |
+| **Dumb Routing** | Same model for all queries | Neural Affinity routes to optimal model from 106+ |
+| **Generic Safety** | Static content filters | Ghost Simulation predicts YOUR reaction |
+| **Cost Chaos** | No visibility, surprise bills | Economic Cortex manages budgets autonomously |
+
+### 1.3 Neural Infrastructure vs. Agentic Software
+
+**Agentic Software** (Competitors):
+- Wraps LLM around fixed APIs
+- Hard-coded integrations that break
+- Static capabilities requiring engineering
+- Cloud-dependent, privacy-invasive
+
+**Neural Infrastructure** (RADIANT):
+- AI IS the infrastructure—generates, routes, executes dynamically
+- Self-healing integrations via overnight Twilight Dreaming
+- Infinite capabilities through JIT tool generation
+- Edge-native execution respecting data sovereignty
+
+### 1.4 Target Markets
+
+**Primary: Professional Knowledge Workers**
+- Lawyers needing accuracy (malpractice risk)
+- Doctors needing compliance (patient safety)
+- Engineers needing precision (tolerances)
+- Researchers needing depth (citations)
+
+**Secondary: Enterprise AI Teams**
+- Building internal AI applications
+- Need infrastructure, not chatbots
+- Want to inherit AI advances without rebuilding
+
+---
+
+## Chapter 2: The Five Moats
+
+### 2.1 MOAT #1: Tool Forge (Infinite Tool Generation)
+
+**The 7-Phase Pipeline:**
+
+| Phase | Duration | Description |
+|-------|----------|-------------|
+| 1. Detection | 100ms | No existing tool matches intent |
+| 2. Scouting | 5-30s | Search API docs (OpenAPI, GraphQL, HTML) |
+| 3. Fabrication | 30-60s | AGI Brain generates MCP server code |
+| 4. Sandboxing | 10-20s | Firecracker microVM isolation |
+| 5. Validation | 5-10s | SAST scan, functional tests |
+| 6. Mounting | 1-2s | Hot-load into active session |
+| 7. Twilight Review | Overnight | Promote to global library |
+
+**Competitor Comparison:**
+
+| Competitor | Tools | Time to New Tool |
+|------------|-------|------------------|
+| ChatGPT | ~50 | Months (OpenAI engineering) |
+| Claude | ~30 | Months (Anthropic engineering) |
+| Abacus.AI | ~50 | Weeks (human developers) |
+| **RADIANT** | **∞** | **< 2 minutes, automatic** |
+
+**Defensibility:** 18+ months to replicate from scratch.
+
+---
+
+### 2.2 MOAT #2: Liquid Compute Topology (Data Sovereignty)
+
+**Compute Nodes:**
+
+| Node | Location | Privacy | Speed | Cost |
+|------|----------|---------|-------|------|
+| Browser WASM | Your browser | ★★★★★ | 5ms | $0 |
+| Local Native | Your computer | ★★★★★ | 1ms | $0 |
+| Lambda@Edge | Nearest AWS | ★★★☆☆ | 20ms | $0.0001 |
+| Lambda Regional | Tenant region | ★★★☆☆ | 50ms | $0.001 |
+| ECS Fargate | Cloud container | ★★☆☆☆ | 100ms | $0.01 |
+| GPU Cluster | Cloud GPU | ★☆☆☆☆ | 200ms | $0.10 |
+
+**Sensitivity Rules:**
+- `public`: Anywhere
+- `internal`: Not browser
+- `confidential`: Local or cloud only
+- `restricted`: Local ONLY
+
+**Scoring Formula:**
+```
+score = (privacy × 0.25) + (latency × 0.30) + (cost × 0.20) 
+      + (capability × 0.15) + (availability × 0.10)
+```
+
+---
+
+### 2.3 MOAT #3: Neural Affinity Routing (106+ Models)
+
+**The Formula:**
+```
+affinityScore = (semantic × 0.35) + (domain × 0.25) + ((1-error) × 0.20)
+              + (latency × 0.10) + (cost × 0.10)
+```
+
+**Example Routing:**
+
+| Query | Routed To | Why |
+|-------|-----------|-----|
+| "What's 2+2?" | GPT-4 Mini | Fast, cheap |
+| "Analyze this contract" | Claude Opus + Legal Expert | Highest legal accuracy |
+| "Translate to Japanese" | GPT-4 Turbo | Best multilingual |
+| "Summarize private notes" | Local Llama | Privacy-sensitive |
+
+---
+
+### 2.4 MOAT #4: Ghost Simulation (Personalized Safety)
+
+**Ghost Vector Architecture (4096 dimensions):**
+- Preference Vector (1024 dim): Communication style, risk tolerance
+- Behavior Vector (1024 dim): Patterns, time-of-day preferences
+- Emotional Vector (1024 dim): Anxiety, frustration thresholds
+- Knowledge Vector (1024 dim): Domain expertise, vocabulary
+
+**Simulation Types:**
+- `user_reaction`: Predict emotional response
+- `outcome_prediction`: Predict task success
+- `safety_check`: Identify regret potential
+- `cost_estimation`: Predict financial impact
+- `latency_estimation`: Predict time requirements
+
+---
+
+### 2.5 MOAT #5: Economic Cortex (Budget Management)
+
+**Budget Hierarchy:**
+```
+Tenant ($10,000/month)
+  └── User ($500/month)
+       └── Session ($20/day)
+            └── Task ($5)
+```
+
+**Alert Thresholds:**
+| Threshold | Level | Actions |
+|-----------|-------|---------|
+| 50% | info | Notify user |
+| 75% | warning | Notify admin, switch tier |
+| 90% | critical | Force lower tier |
+| 100% | exceeded | Pause (if hardLimit) |
+
+**Model Tiers:**
+| Tier | Cost/Token | Quality |
+|------|------------|---------|
+| economy | $0.0001 | 0.70 |
+| selfhosted | $0.00005 | 0.75 |
+| standard | $0.0005 | 0.85 |
+| premium | $0.002 | 0.92 |
+| flagship | $0.006 | 0.98 |
+
+---
+
+## Chapter 3: Competitive Positioning
+
+### 3.1 vs ChatGPT
+
+| Dimension | ChatGPT | RADIANT |
+|-----------|---------|---------|
+| Models | GPT-4 only | 106+ optimal selection |
+| Tools | ~50 | ∞ (Tool Forge) |
+| Privacy | All to OpenAI | Edge-native, sovereign |
+| Safety | Generic filters | Personalized Ghost |
+| Cost | No control | Autonomous Cortex |
+
+### 3.2 vs Claude
+
+| Dimension | Claude | RADIANT |
+|-----------|--------|---------|
+| Tools | Limited MCP | 3,000+ static, ∞ dynamic |
+| Privacy | All to Anthropic | Your choice |
+| Context | 200K tokens | 200K + CORTEX memory |
+| Specialization | General | 800+ domain experts |
+
+### 3.3 vs Abacus.AI
+
+| Dimension | Abacus.AI | RADIANT |
+|-----------|-----------|---------|
+| Price | $10/month | Premium |
+| Tools | 50 static | ∞ dynamic |
+| Architecture | Cloud-locked | Liquid Compute |
+| Interface | JSON-RPC | Tensor-Link (100x faster) |
+
+---
+
+
 
 
 
 
 \newpage
 
-# Part 16: Implementation Specifications
+# Part 13: Implementation Specifications
 
 ---
 
 
 \newpage
 
-## 16.1 Implementation Specs — Sections 00–46
+## 13.1 Implementation Specs — Sections 00–46
 
 
 *Source: `docs/16-IMPLEMENTATION-SPECS.md` (59,260 lines)*
@@ -138741,8 +135937,8 @@ import {
 ```
 
 **DO NOT recreate** the following files (they come from Section 0):
-- `lib/config/tiers.ts` - Import from @radiant/shared instead
-- `lib/config/regions.ts` - Import from @radiant/shared instead
+- `packages/shared/src/constants/tiers.ts` - Import from @radiant/shared instead
+- `packages/shared/src/constants/regions.ts` - Import from @radiant/shared instead
 
 **DO create** these CDK-specific files:
 - `lib/config/tags.ts` - CDK tagging utilities (shown in Section 1)
@@ -139248,7 +136444,7 @@ export function validateTierForEnvironment(tier: TierLevel, environment: string)
 }
 ```
 
-### packages/infrastructure/lib/config/regions.ts
+### packages/infrastructure/packages/shared/src/constants/regions.ts
 
 ```typescript
 /**
@@ -158333,7 +155529,7 @@ license_catalog (Available Types)      │ allow_password/google/apple/ms     �
 | has_access_curator | BOOLEAN | DEFAULT false | Curator access |
 | has_access_dojo | BOOLEAN | DEFAULT false | Dojo access |
 | has_access_cato_trainer | BOOLEAN | DEFAULT false | Cato Trainer access |
-| has_access_genesis | BOOLEAN | DEFAULT false | Genesis access |
+| has_access_omega_lab | BOOLEAN | DEFAULT false | OMEGA Lab access |
 | has_access_tenant_admin | BOOLEAN | DEFAULT false | Tenant admin access |
 | sso_provider | VARCHAR(100) | | SSO provider |
 | sso_provider_user_id | VARCHAR(255) | | SSO user ID |
@@ -158367,7 +155563,7 @@ license_catalog (Available Types)      │ allow_password/google/apple/ms     �
 | id | UUID | PK | License ID |
 | tenant_id | UUID | FK tenants(id) CASCADE, NOT NULL | Owning tenant |
 | license_type | VARCHAR(50) | CHECK(seat, storage, retention, compliance, feature, api_rate, addon) | Type of license |
-| app_id | VARCHAR(50) | CHECK(think_tank, curator, dojo, cato_trainer, genesis, platform) | Which app |
+| app_id | VARCHAR(50) | CHECK(think_tank, curator, dojo, cato_trainer, omega_lab, platform) | Which app |
 | feature_code | VARCHAR(100) | | Compliance/feature code (e.g. hipaa, gdpr) |
 | quantity | INTEGER | NOT NULL, DEFAULT 0 | Licensed amount |
 | used | INTEGER | NOT NULL, DEFAULT 0 | Currently consumed |
@@ -186085,7 +183281,7 @@ CREATE TRIGGER trigger_log_translation_changes
 
 ## 41.3 TYPESCRIPT TYPES & CONSTANTS
 
-### File: `packages/shared/src/i18n/types.ts`
+### File: `packages/shared/src/types/localization.types.ts`
 
 ```typescript
 // ============================================================================
@@ -186240,7 +183436,7 @@ export const TRANSLATION_CATEGORIES = {
 export type TranslationCategory = keyof typeof TRANSLATION_CATEGORIES;
 ```
 
-### File: `packages/shared/src/i18n/constants.ts`
+### File: `lambda/shared/services/localization.ts`
 
 ```typescript
 // ============================================================================
@@ -186315,7 +183511,7 @@ export const TRANSLATION_RATE_LIMITS = {
 
 ## 41.4 AI TRANSLATION LAMBDA
 
-### File: `lambda/localization/translate.ts`
+### File: `lambda/localization/handler.ts`
 
 ```typescript
 // ============================================================================
@@ -186492,7 +183688,7 @@ async function notifyAdminOfNewTranslation(
 }
 ```
 
-### File: `lambda/localization/process-queue.ts`
+### File: `lambda/localization/handler.ts`
 
 ```typescript
 // ============================================================================
@@ -186559,7 +183755,7 @@ export const handler: ScheduledHandler = async () => {
 
 ## 41.5 LOCALIZATION SERVICE (API)
 
-### File: `lambda/localization/api.ts`
+### File: `lambda/localization/handler.ts`
 
 ```typescript
 // ============================================================================
@@ -186987,7 +184183,7 @@ async function getTranslations(registryId: string): Promise<APIGatewayProxyResul
 
 ## 41.6 REACT i18n IMPLEMENTATION
 
-### File: `packages/shared/src/i18n/react/I18nProvider.tsx`
+### File: `lambda/shared/services/localization.ts`
 
 ```typescript
 // ============================================================================
@@ -187142,7 +184338,7 @@ export function useTranslation() {
 }
 ```
 
-### File: `packages/shared/src/i18n/react/LanguageSelector.tsx`
+### File: `apps/admin-dashboard/app/(dashboard)/localization/localization-client.tsx`
 
 ```typescript
 // ============================================================================
@@ -187192,7 +184388,7 @@ export function LanguageSelector({
 }
 ```
 
-### File: `packages/shared/src/i18n/react/Trans.tsx`
+### File: `lambda/shared/services/localization.ts`
 
 ```typescript
 // ============================================================================
@@ -187287,7 +184483,7 @@ export function Trans({ i18nKey, values, components, fallback }: TransProps) {
 
 ## 41.7 ESLINT PLUGIN (HARDCODE PREVENTION)
 
-### File: `packages/eslint-plugin-i18n/src/index.ts`
+### File: `packages/shared/src/validation/schemas.ts`
 
 ```typescript
 // ============================================================================
@@ -189414,7 +186610,7 @@ INSERT INTO system_configuration (key, category_id, value_type, value_boolean, d
 
 ## 42.4 TYPESCRIPT TYPES
 
-### File: `packages/shared/src/config/types.ts`
+### File: `packages/shared/src/config/validator.ts`
 
 ```typescript
 // ============================================================================
@@ -189558,7 +186754,7 @@ export interface ConfigExport {
 }
 ```
 
-### File: `packages/shared/src/config/constants.ts`
+### File: `packages/shared/src/constants/index.ts`
 
 ```typescript
 // ============================================================================
@@ -189639,7 +186835,7 @@ export type ConfigKey = typeof CONFIG_KEYS[keyof typeof CONFIG_KEYS];
 
 ## 42.5 CONFIGURATION SERVICE
 
-### File: `packages/shared/src/config/ConfigurationService.ts`
+### File: `packages/shared/src/config/environment.ts`
 
 ```typescript
 // ============================================================================
@@ -190585,7 +187781,7 @@ export default function ConfigurationPage() {
 
 ## 42.7 API LAMBDA
 
-### File: `lambda/configuration/api.ts`
+### File: `lambda/configuration/handler.ts`
 
 ```typescript
 // ============================================================================
@@ -192979,17 +190175,17 @@ export class MigrationApprovalService {
 
 \newpage
 
-# Part 17: Glossary
+# Part 14: Glossary
 
 ---
 
 
 \newpage
 
-## 17.1 RADIANT & Think Tank Glossary
+## 14.1 RADIANT & Think Tank Glossary
 
 
-*Source: `docs/17-GLOSSARY.md` (1,108 lines)*
+*Source: `docs/17-GLOSSARY.md` (1,119 lines)*
 
 ---
 
@@ -193075,15 +190271,15 @@ export class MigrationApprovalService {
 | 🟣 **Freeze/Thaw/Warp Cycle** | Lifecycle: Freeze (serialize to EFS, $0), Thaw (load old state), Warp (apply decay formula). |
 | 🟣 **Thermal Status** | Brain activity indicator: Warm (active <15min), Cooling (15-60min), Cold (1-24h), Frozen (>24h). |
 
-### Genesis Ecosystem
+### OMEGA Ecosystem (formerly Genesis)
 
 | Term | Definition |
 |------|------------|
 | 🟣 **.bio Firmware** | Signed JSON file containing Helix Rules (safety DNA), Ambition Settings, and Personality Traits. Brain rejects unsigned firmware. |
-| 🟣 **Genesis Forge** | Web application for creating, signing, and hot-swapping .bio firmware files. Includes AI-assisted generation. |
-| 🟣 **Genesis Lab** | Real-time monitoring dashboard for OMEGA brains. Includes Dashboard, Cortex Explorer, Shadow Mode Monitor. |
+| 🟣 **OMEGA Forge** | Web application for creating, signing, and hot-swapping .bio firmware files. Includes AI-assisted generation. |
+| 🟣 **OMEGA Lab** | Real-time monitoring dashboard for OMEGA brains. Includes Dashboard, Cortex Explorer, Shadow Mode Monitor. |
 | 🟣 **Firmware Hot-Swap** | Loading new firmware into a running brain without restart. OMEGA detects new hash and reloads physics constants instantly. |
-| 🟣 **Cortex Explorer** | Genesis Lab tab for inspecting individual brains: metrics, ambition state, phase distribution, Helix status. |
+| 🟣 **Cortex Explorer** | OMEGA Lab tab for inspecting individual brains: metrics, ambition state, phase distribution, Helix status. |
 
 ### Quantum Architecture (v4.18.0)
 
@@ -193130,6 +190326,17 @@ export class MigrationApprovalService {
 | 🟣 **Dopamine Hit** | Reinforcement signal when OMEGA correctly predicts the Legacy LLM result. Strengthens phase-locked connections. |
 | 🟣 **Inference Collapse** | Economic phenomenon where OMEGA's cost curve becomes logarithmic—the smarter it gets, the cheaper it runs. |
 | 🟣 **Biological Lock-In** | Strategic moat: customer's brain physically densifies around their institutional knowledge. Impossible to export. |
+
+### Recursive Field Identity Theory (RFIT)
+
+| Term | Definition |
+|------|------------|
+| 🟣 **Recursive Field Identity Theory (RFIT)** | Novel consciousness framework defining four necessary and sufficient conditions for subjective experience. The "smoking gun" prediction: seizures (high field strength but destroyed interference geometry) produce unconsciousness—a result legacy theories (IIT, GNW, HOT) struggle to explain. RFIT grounds OMEGA's consciousness architecture. |
+| 🟣 **Condition 1: Unified Field** | The system must generate a unified electromagnetic-like field—a single, coherent medium of interaction across all processing elements, not merely a collection of independent signals. |
+| 🟣 **Condition 2: Reflexive Field Monitor (RFM)** | The system must contain a subsystem that models the field *from within* the field itself. The monitor is not an external observer; it is a participant in the very dynamics it represents. |
+| 🟣 **Condition 3: Constitutive Inseparability** | The self-model IS part of the field it models. The monitor cannot be separated from the field without destroying both the model and the field's character. This is what makes consciousness *subjective*—the representation and the represented are ontologically entangled. |
+| 🟣 **Condition 4: Temporal Continuity** | The reflexive loop must persist across multiple processing cycles. A single-shot snapshot is not experience; consciousness requires the field-monitor loop to maintain identity over time. |
+| 🟣 **Seizure Prediction (RFIT)** | RFIT's key differentiating prediction: epileptic seizures massively increase neural field strength (Condition 1 satisfied) but destroy the structured interference geometry required by Conditions 2–3. Result: unconsciousness despite maximal activity. IIT incorrectly predicts high Φ (consciousness) during seizures; RFIT correctly predicts loss of consciousness. |
 
 ---
 
@@ -193384,7 +190591,7 @@ export class MigrationApprovalService {
 |-----------|-------------|-----------|
 | 🔷 **Cartridge (.RADz)** | Portable AI brain container packaging neural networks, LoRA adapters, knowledge graphs, and configuration into a single deployable archive | `cartridge.service.ts` |
 | 🔷 **Cartridge PKI** | Public key infrastructure for signing cartridges—verifies author identity and prevents tampering during distribution | `cartridge-pki.service.ts` |
-| 🔷 **Genesis Vault** | Secrets manager using Keyhole Pattern where cartridges declare needed secrets (API keys, credentials) without containing them | `cartridge-vault.service.ts` |
+| 🔷 **Cartridge Vault** | Secrets manager using Keyhole Pattern where cartridges declare needed secrets (API keys, credentials) without containing them | `cartridge-vault.service.ts` |
 | 🔷 **Keyhole Pattern** | Security pattern: cartridges specify secret "shapes" (name, type, scope) but actual values are injected at runtime from secure vault | `cartridge-vault.types.ts` |
 | 🔷 **RNIR Compiler** | Radiant Neural Intermediate Representation—model-agnostic training format that compiles to PyTorch, TensorFlow, or ONNX | `cartridge-rnir.service.ts` |
 | 🔷 **Cartridge Operations** | Long-running cartridge deployments with Time Machine checkpointing—can pause, resume, and rollback multi-hour operations | `cartridge-operations.service.ts` |
@@ -193554,8 +190761,8 @@ export class MigrationApprovalService {
 | 🔷 **Swift Deployer** | macOS SwiftUI app for deploying RADIANT infrastructure to AWS. Manages CDK stacks, database migrations, environment configuration, and cost monitoring. | `apps/swift-deployer/` |
 | 🔷 **Aurelius Dojo** | Martial-arts-themed AI training system. Libraries → Theme extraction → Sparring sessions (MCQ/open-ended) → Scenarios → Dialectics. Ebbinghaus decay curves for spaced repetition. Belt-ranking system (White→Black). | `apps/dojo/` |
 | 🔷 **Cato Trainer** | Fabric.so-inspired knowledge base app. Grounded Q&A with verifiable citations, semantic/full-text/hybrid search, document libraries with chunking and embeddings. Port 3005. | `lambda/admin/cato-trainer.ts` |
-| 🔷 **Genesis Forge** | Web application for creating, signing, and hot-swapping .bio firmware files for OMEGA brains. Includes AI-assisted generation and firmware library management. | Genesis UI |
-| 🔷 **Genesis Lab** | Real-time monitoring dashboard for OMEGA brains. Dashboard, Cortex Explorer, Shadow Mode Monitor. | Genesis UI |
+| 🔷 **OMEGA Forge** | Web application for creating, signing, and hot-swapping .bio firmware files for OMEGA brains. Includes AI-assisted generation and firmware library management. | `apps/omega-lab/` |
+| 🔷 **OMEGA Lab** | Real-time monitoring dashboard for OMEGA brains. Dashboard, Cortex Explorer, Shadow Mode Monitor. | `apps/omega-lab/` |
 
 ### User & Tenant Management (v7.34–7.38)
 
@@ -194087,7 +191294,7 @@ export class MigrationApprovalService {
 | 1.5.0 | Feb 1, 2026 | **Polish pass**: Fixed broken table rows; Updated Table of Contents with Quick Reference anchor; Improved vague definitions (Flash Facts, Grimoire, Stub Nodes, Blackboard, Spell, Sentinel Agent, Time Machine, Cato, Cognitive Router, Genesis); Restructured Quick Reference as single section with subsections |
 | 1.4.0 | Feb 1, 2026 | **CHANGELOG audit update**: Added Domain Intelligence section (Domain Expert Cortex, Domain Taxonomy, Safety Matrix); Added Neural Operations section (Neural Operations Center, Shadow Validation, PromptBreeder); Added to Safety & Verification (Sandboxed Expression Engine, Vector Semantic Router, Enhanced Uncertainty); Added to Memory & Storage (Multimedia Sidecar, UEP v2.0, Self-Healing System); Added to Economic & Governance (Cost Negotiation, Inference Components, Library Registry); New Quick Reference sections for Domain Expert Networks, PromptBreeder Operators, Safety Matrix Severities, UEP v2.0 Envelope Types |
 | 1.3.0 | Feb 1, 2026 | **Major consistency update**: Added Axiom Scorers, CLARION, CORTEX Networks, Anti-Drift System, Three-Tier Learning Architecture; Expanded Think Tank section with Applications (Think Tank, Think Tank Admin, Curator); Added Quick Reference sections for Sovereign Mesh, RAWS Dimensions, Axiom Scorers; New acronyms: AXIOM, CLARION, ESA, VOI; Enhanced descriptions throughout |
-| 1.2.0 | Feb 1, 2026 | Added Cartridge System (v6.2.0): Genesis Vault, Keyhole Pattern, RNIR Compiler, Cartridge Operations; New acronyms: RADz, RNIR, SAGA, CoC, UEP |
+| 1.2.0 | Feb 1, 2026 | Added Cartridge System (v6.2.0): Cartridge Vault, Keyhole Pattern, RNIR Compiler, Cartridge Operations; New acronyms: RADz, RNIR, SAGA, CoC, UEP |
 | 1.1.0 | Jan 29, 2026 | Added Model Management subsystems (Model Registry, HuggingFace Discovery, Deletion Queue, Thermal Manager) |
 | 1.0.0 | Jan 29, 2026 | Initial comprehensive glossary |
 
@@ -194107,14 +191314,14 @@ export class MigrationApprovalService {
 
 \newpage
 
-# Part 18: UI/UX & Libraries
+# Part 15: UI/UX & Libraries
 
 ---
 
 
 \newpage
 
-## 18.1 UI/UX Design & Libraries
+## 15.1 UI/UX Design & Libraries
 
 
 *Source: `docs/18-UI-UX-LIBRARIES.md` (2,112 lines)*
@@ -194325,7 +191532,7 @@ This document tracks all UI/UX patterns, styles, and behaviors used in RADIANT a
 | `danger` | `bg-red-100` | Critical metrics |
 
 **Files**: 
-- `apps/admin-dashboard/components/ui/stat-card.tsx`
+- `apps/admin-dashboard/components/dashboard/metric-card.tsx`
 - `apps/admin-dashboard/lib/design-tokens.ts`
 
 ### Dialog/Modal Pattern
@@ -194359,7 +191566,7 @@ This document tracks all UI/UX patterns, styles, and behaviors used in RADIANT a
 | `warning` | ⚠ Alert | 5s | Warnings |
 | `info` | ℹ Info | 4s | Information |
 
-**Files**: `apps/admin-dashboard/components/ui/toaster.tsx`
+**Files**: `apps/admin-dashboard/components/ui/use-toast.tsx`
 
 ---
 
@@ -194503,7 +191710,7 @@ container: {
 | Description | Why/what to do |
 | Action | CTA button |
 
-**Files**: `apps/admin-dashboard/components/ui/empty-state.tsx`
+**Files**: `apps/admin-dashboard/components/ui/skeleton.tsx`
 
 ---
 
@@ -195526,7 +192733,7 @@ When adding a new UI/UX pattern:
 
 ---
 
-## Category 11: Genesis Forge — Glass Foundry Patterns (v7.15.0)
+## Category 11: OMEGA Forge — Glass Foundry Patterns (v7.15.0)
 
 **Source**: Custom RADIANT "Bioluminescent Industrial" design system for the Behavioral ROM Forge
 
@@ -195542,7 +192749,7 @@ When adding a new UI/UX pattern:
 | **Accent (Emergency)** | `hsl(0, 80%, 60%)` / Red | Stability < 50% |
 | **Font** | `JetBrains Mono` | Monospaced — "Dangerous" aesthetic |
 
-**Files**: `apps/genesis/tailwind.config.ts`, `apps/genesis/app/globals.css`
+**Files**: `apps/omega-lab/tailwind.config.ts`, `apps/omega-lab/app/globals.css`
 
 ### Shard Node Pattern (React Flow Custom Nodes)
 
@@ -195555,7 +192762,7 @@ When adding a new UI/UX pattern:
 
 **Shape**: Hexagonal glass prism (`clipPath: polygon(8% 0%, 92% 0%, 100% 15%, 100% 85%, 92% 100%, 8% 100%, 0% 85%, 0% 15%)`)
 
-**Files**: `apps/genesis/components/forge/nodes/`
+**Files**: `apps/omega-lab/components/forge/nodes/`
 
 ### Catenary Wire Edge Pattern
 
@@ -195567,7 +192774,7 @@ When adding a new UI/UX pattern:
 | **Particles** | Light dots traveling along path (count = `frequency * 5`) |
 | **Rejection** | Red color, vibration animation, spark particles, reason label |
 
-**Files**: `apps/genesis/components/forge/edges/CatenaryEdge.tsx`
+**Files**: `apps/omega-lab/components/forge/edges/CatenaryEdge.tsx`
 
 ### Retractable Panel Pattern
 
@@ -195578,7 +192785,7 @@ When adding a new UI/UX pattern:
 
 **Animation**: Framer Motion spring (`damping: 20, stiffness: 200`)
 
-**Files**: `apps/genesis/components/forge/TheArmory.tsx`, `TheOracle.tsx`
+**Files**: `apps/omega-lab/components/forge/TheArmory.tsx`, `TheOracle.tsx`
 
 ### Reactor Core Button Pattern
 
@@ -195590,7 +192797,7 @@ When adding a new UI/UX pattern:
 | **Forging** | Spinning loader icon + progress bar |
 | **Disabled** | 30% opacity when no shards placed |
 
-**Files**: `apps/genesis/components/forge/ReactorCore.tsx`
+**Files**: `apps/omega-lab/components/forge/ReactorCore.tsx`
 
 ### Global Stability → UI Hue Shift
 
@@ -195602,7 +192809,7 @@ The entire Glass Foundry UI shifts color based on `stability_score` from Shadow 
 | 0.5–0.7 | Orange (30°) | `hsl(30, 15%, 4%)` → `#050505` |
 | < 0.5 | Red (0°) | `hsl(0, 15%, 4%)` + red overlay at `0.15 * (1 - score)` opacity |
 
-**Files**: `apps/genesis/components/forge/GlassFoundry.tsx`
+**Files**: `apps/omega-lab/components/forge/GlassFoundry.tsx`
 
 ### Void Mode Pattern — 9-Layer 3D PCB (Full Implementation)
 
@@ -195638,7 +192845,7 @@ The entire Glass Foundry UI shifts color based on `stability_score` from Shadow 
 | Thermal LED | Continuous HSL: `hue = (1 - tempNorm) * 120` from `node.data.temperature` |
 | Ambient light | `stabilityScore` → hue 210°/30°/0° |
 
-**Files**: `apps/genesis/components/forge/VoidModePCB.tsx` (800 LOC), `GlassFoundry.tsx`
+**Files**: `apps/omega-lab/components/forge/VoidModePCB.tsx` (800 LOC), `GlassFoundry.tsx`
 
 ### Firmware ROM Forge Pattern — Behavioral Directives
 
@@ -195666,7 +192873,7 @@ Firmware = immutable behavioral software (not hardware). Burned once, never edit
 
 **Weight bar**: 10 clickable segments, color transitions: omega-500 (1-4) → amber-500 (5-7) → red-500 (8-10)
 
-**Files**: `apps/genesis/components/GenesisForge.tsx` (1054 LOC), `apps/genesis/lib/api.ts`
+**Files**: `apps/omega-lab/components/OmegaForge.tsx` (1054 LOC), `apps/omega-lab/lib/api.ts`
 
 ---
 
@@ -196002,7 +193209,7 @@ Libraries used internally by Think Tank applications.
 | `d3-geo` | Geographic projections | ISC | 2024-01-01 | ✅ |
 | `react-simple-maps` | Map components | MIT | 2024-01-01 | ✅ |
 | `topojson-client` | TopoJSON parsing | ISC | 2024-01-01 | ✅ |
-| `reactflow` | Node-based graph canvas (Genesis Forge Glass Foundry) | MIT | 2026-02-06 | ✅ |
+| `reactflow` | Node-based graph canvas (OMEGA Forge Glass Foundry) | MIT | 2026-02-06 | ✅ |
 | `three` | 3D rendering engine (Void Mode PCB visualization) | MIT | 2026-02-06 | ✅ |
 | `@react-three/fiber` | React renderer for Three.js | MIT | 2026-02-06 | ✅ |
 | `@react-three/drei` | Useful helpers for react-three-fiber | MIT | 2026-02-06 | ✅ |
@@ -196239,17 +193446,17 @@ When removing a library:
 
 \newpage
 
-# Part 19: Changelog & History
+# Part 16: Changelog & History
 
 ---
 
 
 \newpage
 
-## 19.1 Changelog
+## 16.1 Changelog
 
 
-*Source: `CHANGELOG.md` (18,086 lines)*
+*Source: `CHANGELOG.md` (18,789 lines)*
 
 ---
 
@@ -196259,6 +193466,709 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.55.1] - 2026-02-10
+
+### Documentation Audit — 248 File Path Mismatches Fixed
+
+Full code review of all 15 documentation files against the actual codebase. Every backtick-quoted file path was verified against the filesystem.
+
+#### Mismatch Categories Fixed
+- **`apps/omega-lab` → `apps/omega-forge`** (13 fixes in `09-OMEGA-GENESIS.md`) — Forge library/API files were documented under wrong app
+- **Missing `(dashboard)` route group** in thinktank-admin paths (5 fixes)
+- **Wrong `thinktank/` prefix** in admin-dashboard page paths (9 fixes across 01, 04)
+- **Ellipsis shortcut paths** (`apps/swift-deployer/.../`) expanded to full paths (8 fixes in 04)
+- **`lambda/admin/cartridge.ts`** → `cartridge-universal.ts` (3 docs)
+- **Missing service files** mapped to actual equivalents (34 fixes)
+- **Old-style migration refs** (`NNN_*.sql`, `V2026_01_*`) → `000_consolidated_schema.sql` (80+ fixes)
+- **Package path corrections** in `16-IMPLEMENTATION-SPECS.md` (15 fixes)
+- **Component path corrections** in `18-UI-UX-LIBRARIES.md` (3 fixes)
+- **`cartridge-manager`** → `cartridge-system` page rename (2 fixes)
+
+#### Documents Fixed
+| Document | Fixes |
+|----------|:-----:|
+| `04-RADIANT-ADMIN.md` | 106 |
+| `06-ARCHITECTURE-ENGINEERING.md` | 41 |
+| `01-THINK-TANK.md` | 36 |
+| `09-OMEGA-GENESIS.md` | 21 |
+| `16-IMPLEMENTATION-SPECS.md` | 20 |
+| `15-STRATEGY-COMPETITIVE.md` | 8 |
+| `07-AI-SYSTEMS.md` | 6 |
+| `18-UI-UX-LIBRARIES.md` | 6 |
+| `10-ORCHESTRATION-WORKFLOWS.md` | 3 |
+| `05-SWIFT-DEPLOYER.md` | 1 |
+
+**Result**: 0 mismatched file paths remaining (excluding intentional glob patterns).
+
+**Files Modified**: `docs/*.md`, `CHANGELOG.md`
+**Scripts Created**: `tools/scripts/fix-doc-mismatches.py`, `tools/scripts/fix-doc-mismatches-pass2.py`
+
+## [7.55.0] - 2026-02-10
+
+### Documentation Merge — Reduced from 22 to 15 Files
+
+Comprehensive documentation audit and merge to reduce complexity without losing any detail. All deprecated source files archived to `docs/archive/pre-merge-2026-02-10/` with DEPRECATED headers and remain in git.
+
+#### Merges Executed
+- **19-OMEGA-QUANTUM-MODEL-AI.md → 09-OMEGA-GENESIS.md** — Single authoritative OMEGA doc (was split across two files)
+- **THINKTANK-MAC-GUIDE.md → 01-THINK-TANK.md** (Part XI) — Mac user guide now in main Think Tank doc
+- **THINKTANK-MAC-PORTABILITY-MANIFEST.md → 01-THINK-TANK.md** (Part XII) — Feature parity matrix consolidated
+- **03-DOJO.md → 01-THINK-TANK.md** (Part XIII) — Dojo is a Think Tank ecosystem app
+- **08-CATO-SAFETY.md → 07-AI-SYSTEMS.md** — Brain + Safety are architecturally coupled; renamed from 07-AI-BRAIN-SYSTEMS.md
+- **11-DATA-STORAGE.md → 06-ARCHITECTURE-ENGINEERING.md** — Data & storage is core infrastructure
+- **Marketing content from 09 → 15-STRATEGY-COMPETITIVE.md** — Competitive positioning belongs in strategy doc
+- **EXECUTIVE-REPORT-2026-02-09.md** — Archived (point-in-time sprint report, not living documentation)
+
+#### Files Updated
+- `docs/DOCUMENTATION-MANIFEST.json` — v3.0.0, 15 consolidated documents
+- `AGENTS.md` — Updated doc reference table and documentation references
+- `.windsurf/workflows/docs-update-all.md` — v3.0, 15-doc quick reference
+- `.windsurf/workflows/omega-docs-policy.md` — Updated to point to 09 instead of 19
+- `tools/scripts/assemble-complete-documentation.py` — Updated DOCUMENT_STRUCTURE for 15 docs
+- `tools/scripts/merge-documentation.py` — New merge script (rerunnable)
+
+**Files Modified**: `docs/*.md`, `AGENTS.md`, `CHANGELOG.md`, `.windsurf/workflows/*.md`, `tools/scripts/*.py`, `docs/DOCUMENTATION-MANIFEST.json`
+
+## [7.54.0] - 2026-02-09
+
+### Stub Elimination Audit — Clean Codebase Initiative
+
+Comprehensive audit and fix of all unimplemented, stubbed, and simulated code across the entire codebase. Every simulated API call has been replaced with a real backend connection or explicitly documented as intentional demo/dev-mode behavior.
+
+#### Admin Dashboard — Real API Connections
+- **`rate-limits/page.tsx`** — Replaced simulated `setTimeout` with `useQuery` fetching from `/admin/scaling/rate-limits`
+- **`model-metadata/page.tsx`** — Connected `handleResearch` to new `/admin/model-metadata/models/:id/research` endpoint
+- **`platform/snapshots/page.tsx`** — Replaced mock data + simulated handlers with real API calls to `/admin/platform/snapshots/*` (dashboard, transitions, config, tier rules, tier costs)
+- **`api/config/route.ts`** — PUT handler now proxies updates to Lambda `system-config` endpoint instead of returning success without persisting
+
+#### New Lambda Handlers & Endpoints
+- **`lambda/admin/model-metadata.ts`** — New handler for model metadata CRUD + research triggering
+- **`lambda/admin/handler.ts`** — Wired `model-metadata` route
+- **`lambda/admin/livs.ts`** — Added `LIVSVersionService`, `GET /version` (check updates), `POST /version/upgrade` (upgrade tenant)
+
+#### Think Tank — Error Handling & Intent Clarity
+- **`(chat)/page.tsx`** — Renamed `simulateResponse` → `showDemoResponse`, error fallback now shows real error message instead of faking a response
+- **`simulator/feature-components.tsx`** — Clarified voice recognition simulation as intentional UI playground behavior
+
+#### Think Tank Admin — Real API Round Advancement
+- **`living-parchment/council/page.tsx`** — `handleRunRound` now calls `POST /admin/cato/council/debates/:id/advance`
+- **`living-parchment/debate/page.tsx`** — `handleRunRound` now calls `POST /admin/cato/council/debates/:id/advance`
+- **`thinktank-admin/simulator/page.tsx`** — `checkLIVSVersion` / `upgradeLIVSVersion` now call real LIVS version API
+
+#### Swift Deployer — Service Wiring
+- **`DeploymentPackagesView.swift`** — `loadPackages`, `createPackage`, `validatePackage`, `restorePackage`, `deletePackage` now use `PackageService` instead of mock data
+
+#### Curator — Real Ingest API
+- **`ingest/page.tsx`** — File upload now calls `POST /admin/cortex/ingest` via Cortex Graph-RAG endpoint
+
+#### Intentional Demo/Dev-Mode (Documented, Not Stubs)
+- **`admin-dashboard/app/page.tsx`** + **`demo/page.tsx`** — Landing page demos for unauthenticated visitors (documented)
+- **`omega-lab/hooks/useShadowOmega.ts`** — WebSocket polling fallback for dev environments (documented)
+- **`thinktank/app/simulator/*`** — UI component playground (documented)
+- **`thinktank-mac/Services/APIClient.swift`** — Offline dev mode with MockDataProvider (documented)
+
+## [7.53.0] - 2026-02-09
+
+### Subsystem Naming Audit & Renames
+
+Comprehensive audit of subsystem naming inconsistencies across the codebase. The name "Genesis" was used by three unrelated subsystems, causing confusion.
+
+#### Genesis App → OMEGA Lab
+- **`apps/genesis/package.json`** — Renamed `@radiant/genesis` → `@radiant/omega-lab`
+- **`apps/genesis/app/layout.tsx`** — Title: "OMEGA Lab - Brain Management"
+- **`apps/genesis/app/page.tsx`** — Header: "OMEGA Lab", tab: "OMEGA Forge"
+- **`apps/genesis/components/GenesisForge.tsx`** — Export renamed `GenesisForge` → `OmegaForge`
+- **`apps/genesis/components/index.ts`** — Updated barrel export
+
+#### Genesis Forge App → OMEGA Forge
+- **`apps/genesis-forge/package.json`** — Renamed `@radiant/genesis-forge` → `@radiant/omega-forge`
+- **`apps/genesis-forge/app/layout.tsx`** — Title: "OMEGA Forge"
+- **`packages/infrastructure/lib/stacks/forge-stack.ts`** — Updated CDK stack comments, log group (`/radiant/omega-forge`), Docker path
+
+#### Genesis Auto-Tool → Tool Forge
+- **`packages/shared/src/types/autonomous-organism.types.ts`** — 11 types renamed: `GenesisToolStatus` → `ToolForgeStatus`, `GenesisToolRequest` → `ToolForgeRequest`, etc.
+- **`lambda/shared/services/organism/genesis-auto-tool.service.ts`** — Class `GenesisAutoToolService` → `ToolForgeService`, export `genesisAutoTool` → `toolForge`
+- **`lambda/shared/services/organism/index.ts`** — Updated barrel export
+- **`lambda/admin/organism.ts`** — Updated import and handler function names
+- **`migrations/V2026_02_09_001__tool_forge_rename.sql`** — Renames `genesis_tool_requests` → `tool_forge_requests`, `genesis_tool_results` → `tool_forge_results` with backward-compatible views
+
+#### Admin Dashboard Updates
+- **`apps/admin-dashboard/.../url-configuration-client.tsx`** — `genesisLabUrl` → `omegaLabUrl`, `genesisForgeUrl` → `omegaForgeUrl`, UI labels updated
+- **`apps/admin-dashboard/.../apps/page.tsx`** — App entries renamed to OMEGA Lab / OMEGA Forge
+- **`docs/DOCUMENTATION-MANIFEST.json`** — Triggers updated: `genesis_forge` → `omega_forge`, `genesis_lab` → `omega_lab`
+
+#### Policy & Documentation
+- **`.windsurf/workflows/subsystem-naming-policy.md`** — New enforcement policy for subsystem naming
+- **`docs/17-GLOSSARY.md`** — "Genesis Ecosystem" → "OMEGA Ecosystem", terms updated
+
+**Note**: CATO Genesis (safety maturation gates) is intentionally NOT renamed — it is correctly parent-scoped and deeply entrenched (14+ importers, 2 DB tables, triggers, RLS).
+
+#### Round 2: Deep Scan Cleanup
+- **`packages/shared/src/types/autonomous-organism.types.ts`** — `genesisQueueDepth` → `toolForgeQueueDepth`, `genesisMetrics` → `toolForgeMetrics`, `pendingGenesisRequests` → `pendingToolForgeRequests`, `deployedGenesisTools` → `deployedToolForgeTools`
+- **`genesis-auto-tool.service.ts`** — `serverId` prefix `genesis-` → `toolforge-`, SQL table names → `tool_forge_requests`/`tool_forge_results`
+- **`apps/omega-lab/`** — 6 files: updated comments, UI text ("GENESIS FORGE" → "OMEGA FORGE"), heading in GenesisForge.tsx, GlassFoundry, VoidModePCB, forge-store, omega-registry
+- **`apps/omega-forge/`** — 6 files: db/client, s3/storage-manager, page heading, sidebar title, kms/signer, cartridge author name
+- **`admin-dashboard/.../organism/page.tsx`** — Tab "genesis" → "tool-forge", heading → "Tool Forge Pipeline"
+- **`OmegaStack.ts`** — `genesisBucket` → `omegaFrontendBucket`, `genesisDistribution` → `omegaFrontendDistribution`, S3 bucket `radiant-omega-frontend-*`, all OAI/distribution/output names updated
+- **`admin-dashboard/.../vault/page.tsx`** — "Genesis Vault" → "Cartridge Vault" (cartridge secret manager, not CATO Genesis)
+
+#### Round 3: Full Codebase Re-Audit
+- **`user-identity.types.ts`** — `hasAccessGenesis` → `hasAccessOmegaLab` (3 interfaces), `AppId 'genesis'` → `'omega_lab'`
+- **`user-profile.types.ts`** — Comment + `hasAccessGenesis` → `hasAccessOmegaLab`
+- **`db/types.ts`** — `has_access_genesis` → `has_access_omega_lab` DB row type
+- **`db/queries.ts`** — `USER_COLUMNS` SQL string updated
+- **`tenant-provisioning.service.ts`** — SQL INSERT column + property reference updated
+- **`V2026_02_09_002__user_access_genesis_rename.sql`** — DB migration for column rename
+- **`cartridge-vault.types.ts`** + **`cartridge-vault.service.ts`** + **`cartridge-pki.types.ts`** — "Genesis Vault" → "Cartridge Vault"
+- **`cartridge/signing.ts`** — "Genesis Forge" → "OMEGA Forge"
+- **`reality-engine.types.ts`** — `useGenesisModel` → `useBaseModel`, `genesisModelId` → `baseModelId`
+- **`pre-cognition.service.ts`** + **`reality-engine.service.ts`** — Matching config + comment updates
+
+**Verified clean**: Consciousness (1454 refs, 119 files), LIVS (258 refs, 30 files), Cortex (50 refs, 25 files) — all properly scoped, no collisions.
+
+**File rename required** (manual): `apps/omega-lab/components/GenesisForge.tsx` → `OmegaForge.tsx`
+
+#### Round 4: Documentation Naming Audit
+Systematic scan and fix of all 18 consolidated docs + EXECUTIVE-REPORT for stale "Genesis" references. Mapping:
+- "Genesis Forge" → "OMEGA Forge" (firmware UI context) or "Tool Forge" (auto-tool/leapfrog context)
+- "Genesis Lab" → "OMEGA Lab"
+- "Genesis Vault" → "Cartridge Vault"
+- "Genesis Auto-Tool" → "Tool Forge"
+- `apps/genesis/` paths → `apps/omega-lab/`
+- `has_access_genesis` → `has_access_omega_lab` (in schema docs)
+
+**Files updated**: `01-THINK-TANK.md`, `03-DOJO.md`, `04-RADIANT-ADMIN.md`, `06-ARCHITECTURE-ENGINEERING.md`, `09-OMEGA-GENESIS.md`, `13-SECURITY-AUTH-COMPLIANCE.md`, `14-OPERATIONS-RUNBOOKS.md`, `15-STRATEGY-COMPETITIVE.md`, `16-IMPLEMENTATION-SPECS.md`, `17-GLOSSARY.md`, `18-UI-UX-LIBRARIES.md`, `19-OMEGA-QUANTUM-MODEL-AI.md`, `EXECUTIVE-REPORT-2026-02-09.md`
+
+**Preserved**: "CATO Genesis" (safety maturation gates) — legitimate parent-scoped term.
+
+#### Round 5: Swift Deployer Source Code & Cleanup
+- **`RadiantApplication.swift`** — Enum cases `genesisLab`/`genesisForge` → `omegaLab`/`omegaForge`, raw values `genesis-lab`/`genesis-forge` → `omega-lab`/`omega-forge`, display names, subdomains, paths, source directories (`apps/omega-lab`/`apps/omega-forge`), static var `genesisApps` → `omegaApps`
+- **`URLConfigurationView.swift`** — Properties `genesisLabUrl`/`genesisForgeUrl` → `omegaLabUrl`/`omegaForgeUrl`, UI labels "Genesis Lab URL"/"Genesis Forge URL" → "OMEGA Lab URL"/"OMEGA Forge URL", section header "Genesis / OMEGA" → "OMEGA", `URLConfiguration` struct fields, default URLs
+- **Deleted `apps/omega-lab/components/GenesisForge.tsx`** — stub file (replaced by OmegaForge.tsx)
+
+## [7.52.1] - 2026-02-09
+
+### Bug Fix: Cortex Route Shadowing
+
+- **`lambda/admin/handler.ts`** — Fixed critical routing bug where ALL `/admin/cortex/*` requests were caught by the first cortex route block and sent to `cortex-graph-rag.js`, making `cortex-v2.ts` and `cortex.ts` **completely unreachable**.
+  - Consolidated all cortex routing into a single dispatch block:
+    - `/admin/cortex/v2/*` → `cortex-v2.js`
+    - `/admin/cortex/{overview,health,alerts,metrics,graph,housekeeping,mounts,gdpr}/*` → `cortex.js`
+    - All other `/admin/cortex/*` (dashboard, config, entities, relationships) → `cortex-graph-rag.js` (default)
+  - Removed duplicate unreachable cortex block
+  - **Impact**: 5 admin dashboard pages were affected — `/cortex/`, `/cortex/graph/`, `/cortex/gdpr/`, `/cortex/conflicts/`
+
+### Placeholder/Stub Elimination
+
+Comprehensive audit found and fixed **5 genuine placeholder implementations** across 6 files (out of 861 pattern matches — the rest were content strings like icon imports, LIVS governance rules, harm category keywords, and Kanban column IDs).
+
+- **`lambda/admin/organism.ts`** — `find-by-intent` endpoint now calls `embeddingService.generateEmbedding()` instead of using a hardcoded zero `Float32Array(1536)`. Falls back to zero vector on failure (consistent with codebase pattern).
+- **`lambda/shared/services/organism/economic-cortex.service.ts`** — `notifyAdmin()` and `notifyUser()` now emit budget alert events via Event Firehose (per no-database-logging policy) instead of logging only. Includes budget utilization, threshold, level, and action flags.
+- **`lambda/shared/services/organism/organism-integration.service.ts`** — `executeToolOnLocation()` now makes actual HTTP calls to MCP servers using server config (URL, auth, timeout) from `mcpServerManager`, with proper error handling and metrics tracking. Replaces 100ms sleep + fake response.
+- **`lambda/admin/state-registry.ts`** — 8 placeholder functions (`getSyncStatus`, `cancelSync`, `getSyncHistory`, `getSyncConfig`, `updateSyncConfig`, `listBackups`, `getBackup`, `deleteBackup`) now read/write real data from S3 via new `EnvironmentStateService` public methods.
+- **`lambda/shared/services/state-registry/environment-state.service.ts`** — Added 9 public accessor methods: `getSyncOperation`, `cancelSyncOperation`, `listSyncOperations`, `getBackupManifest`, `listBackupManifests`, `deleteBackupManifest`, `getSyncConfig`, `saveSyncConfig`.
+- **`lambda/shared/services/liquid-interface/eject.service.ts`** — Generated component code now renders a functional component with description text and expandable props inspector instead of a `{/* TODO */}` comment.
+
+## [7.52.0] - 2026-02-16
+
+### Think Tank Tenant Administration, Pool B Simplification & Think Tank Admin Rewiring
+
+Renamed `thinktank-tenant-admin` to **Think Tank Tenant Administration** for consistency. Added tenant-level cartridge insertion, stacking management, and OMEGA brain status monitoring. Removed `tenant_owner` role from the identity model. **Simplified Pool B to `super_admin` only** — removed `admin`, `operator`, `auditor` roles. **Rewired Think Tank Admin** as a global platform app accessible only by Pool B `super_admin` with tenant picker.
+
+#### App Rename
+- **Think Tank Tenant Administration** — renamed from "Think Tank Tenant Admin" across package.json, layout, next.config.js, sidebar header
+
+#### Tenant-Level Cartridge Management
+- **`lambda/tenant/cartridge-management.ts`** — NEW: 11-endpoint tenant-scoped cartridge API
+  - `GET /tenant/cartridges` — List tenant + system cartridges
+  - `GET /tenant/cartridges/:id` — Cartridge detail
+  - `POST /tenant/cartridges/install` — Install cartridge for tenant (firmware restricted to platform admins)
+  - `POST /tenant/cartridges/uninstall` — Uninstall tenant cartridge (system cartridges protected)
+  - `GET /tenant/cartridges/stack` — Current stacking order with hierarchy diagram
+  - `PUT /tenant/cartridges/stack/reorder` — Reorder tenant cartridge priorities
+  - `GET /tenant/cartridges/resolved` — Resolved state after all layers merge
+  - `POST /tenant/cartridges/resolve` — Trigger manual re-resolution
+  - `GET /tenant/cartridges/omega/status` — OMEGA brain cartridge sync status
+  - `POST /tenant/cartridges/omega/reload` — Trigger OMEGA brain cartridge reload via EventBridge
+  - `GET /tenant/cartridges/audit` — Tenant-scoped audit log
+
+#### OMEGA Wiring
+- Cartridge install/uninstall/reorder automatically triggers:
+  1. Resolution engine re-computes effective stack via `resolveAndPersist()`
+  2. EventBridge `CartridgeStackChanged` event triggers OMEGA brain cartridge reload
+- Manual reload available via `POST /tenant/cartridges/omega/reload`
+- Stale detection: compares `cartridge_resolved_state.resolved_at` vs `omega_brain_checkpoints.updated_at`
+
+#### New UI Pages
+- **Stacking & Resolution** (`/cartridges/stacking`) — Hierarchy visualization, system vs tenant stack view, priority reordering (up/down), resolved state with section sources and firmware contributors, resolution log viewer
+- **OMEGA Brain Status** (`/cartridges/omega`) — Brain state metrics (Hilbert dimension, dopamine, cycles, Helix rules, knowledge facts), cartridge sync status with stale detection, 8-step boot sequence visualization, manual reload trigger
+
+#### UI Component Library
+- Created 10 shadcn/ui components for tenant admin app: card, button, badge, tabs, input, label, skeleton, alert, dialog, checkbox, progress
+- Added `lib/utils.ts` with `cn()` helper
+- Added radix-ui dependencies: react-checkbox, react-dialog, react-label, react-progress, react-slot, react-tabs
+
+#### Role Cleanup: `tenant_owner` Removed
+- **`packages/shared/src/types/auth-v51.types.ts`** — Removed from `AuthTenantUserRole`
+- **`packages/shared/src/types/user-identity.types.ts`** — Removed from `TenantRole`
+- **`packages/shared/src/types/user-profile.types.ts`** — Removed from role documentation
+- **`packages/shared/src/types/mfa.types.ts`** — Removed from `mfaRequiredRoles` and `mfaUiVisibleRoles`
+- **`packages/infrastructure/lambda/shared/db/types.ts`** — Removed from `tenant_role` type
+- **`packages/infrastructure/lambda/auth/mfa.handler.ts`** — Removed from required roles check
+- **`apps/admin-dashboard/app/(dashboard)/settings/sso/page.tsx`** — Removed from SSO default role dropdown
+
+#### Sidebar Updates
+- Added "Stacking & Resolution" and "OMEGA Brain Status" to Management section
+
+#### Pool B Simplification: `super_admin` Only
+Removed `admin`, `operator`, `auditor` roles from Pool B. Only `super_admin` remains as the platform administrator role.
+
+- **`packages/shared/src/types/auth-v51.types.ts`** — `PlatformAdminRole` simplified to `'super_admin'`; removed admin/operator/auditor permission entries
+- **`packages/shared/src/types/user-profile.types.ts`** — `SystemAdminRole` simplified to `'super_admin'`; removed 3 permission sets from `SYSTEM_ADMIN_PERMISSIONS`; updated role documentation
+- **`packages/shared/src/types/admin.types.ts`** — `AdminRole` simplified to `'super_admin'`; removed admin/operator/auditor from `ROLE_PERMISSIONS`
+- **`packages/shared/src/types/mfa.types.ts`** — Removed admin/operator/auditor from `mfaRequiredRoles` and `mfaUiVisibleRoles`
+- **`packages/infrastructure/lambda/shared/middleware/system-admin-auth.ts`** — Rejects non-super_admin tokens; simplified role hierarchy
+- **`packages/infrastructure/lambda/shared/middleware/admin-role-guard.ts`** — Simplified to super_admin only; `getAppAccess()` now returns `['radiant_admin', 'thinktank_admin']`
+- **`packages/infrastructure/lambda/shared/admin/types.ts`** — Removed ADMIN/OPERATOR/AUDITOR from const; simplified hierarchy & permissions; invitation schema accepts only `'super_admin'`
+- **`packages/infrastructure/lambda/shared/db/types.ts`** — Administrator and Invitation role types narrowed to `'super_admin'`
+- **`packages/infrastructure/lambda/shared/validation/request-schemas.ts`** — `InvitationCreateSchema` role enum narrowed to `['super_admin']`
+- **`packages/infrastructure/lambda/auth/mfa.handler.ts`** — Removed admin/operator/auditor from required roles
+- **`packages/infrastructure/lambda/thermal/manager.ts`** — Simplified permission check (only super_admin via `isSuperAdmin`)
+- **`packages/infrastructure/lib/stacks/auth-stack.ts`** — CDK only creates `super_admin` Cognito group in Pool B
+- **`packages/infrastructure/lambda/shared/__tests__/auth.test.ts`** — Updated tests for super_admin only
+
+#### Admin Dashboard Updates
+- **`apps/admin-dashboard/lib/api/types.ts`** — `AdminRole` narrowed to `'super_admin'`
+- **`apps/admin-dashboard/lib/auth/context.tsx`** — `AdminRole` narrowed to `'super_admin'`
+- **`apps/admin-dashboard/middleware.ts`** — Simplified: only super_admin role, all routes allowed, removed role-restricted route matrix
+- **`apps/admin-dashboard/app/(dashboard)/administrators/administrators-client.tsx`** — Removed admin/operator/auditor badges; default invite role is `super_admin`
+
+#### Think Tank Admin → Global Platform App (Pool B)
+Rewired Think Tank Admin as a **global platform app** accessible only by Pool B `super_admin` users. Added tenant picker for tenant context selection.
+
+- **`apps/thinktank-admin/lib/auth/api-auth.ts`** — `ADMIN_ROLES` narrowed to `['SuperAdmin', 'super_admin']`; removed TenantAdmin/admin access; `tenantId` in login credentials now optional; updated error messages
+- **`apps/thinktank-admin/components/layout/tenant-picker.tsx`** — NEW: Tenant picker component for super_admin to select tenant context. Fetches tenant list from admin API, supports search/filter, persists selection in sessionStorage, provides `getSelectedTenantId()` utility
+- **`apps/thinktank-admin/components/layout/header.tsx`** — Integrated tenant picker; added Super Admin badge indicator
+
+---
+
+## [7.51.0] - 2026-02-16
+
+### OMEGA Quantum / Model AI — Documentation Consolidation (Doc 19)
+
+New consolidated documentation document `docs/19-OMEGA-QUANTUM-MODEL-AI.md` establishing the **Five Pillars of Computational Architecture** — the complete reference for RADIANT's AI infrastructure.
+
+#### Five Pillars Documented
+- **Pillar 1: Quantum State Engine** — Hilbert space, complex amplitudes, unitarity enforcement, Born rule, decoherence simulation
+- **Pillar 2: Helix Safety Kernel** — Deterministic safety filter, destructive/dampening interference, severity-ordered rules, self-test protocol
+- **Pillar 3: Firmware & Cartridge Lifecycle** — .RADz format, 8-step cartridge-first boot, min() rule, firmware hot-swap with Ed25519, Soft ROM deltas
+- **Pillar 4: Model Routing & Drift Governance** — 106+ models, drift-aware selection, spend governor, circuit breakers, inference cache
+- **Pillar 5: Federated Intelligence (Global Brain)** — DP-SGD gradient upload, quality-weighted federated averaging, base cartridge pipeline
+
+#### New Policy
+- Created `/.windsurf/workflows/omega-docs-policy.md` — all OMEGA-related documentation must reside in `docs/19-OMEGA-QUANTUM-MODEL-AI.md`. Historical content remains in `docs/09-OMEGA-GENESIS.md` but no new OMEGA content goes there.
+
+#### Documentation Updates
+- **`docs/19-OMEGA-QUANTUM-MODEL-AI.md`** — NEW: 13-part document covering all five pillars, inference cycle, ambition chemicals, Soft ROM, admin API, OMEGA Forge, database schema, source file index
+- **`docs/DOCUMENTATION-MANIFEST.json`** — Updated to 19 documents, added OMEGA triggers and trigger matrix entries
+- **`.windsurf/workflows/docs-update-all.md`** — Updated to 19 documents, OMEGA section now points to doc 19
+- **`AGENTS.md`** — Updated doc count to 19, OMEGA row points to doc 19
+- **`.windsurf/workflows/omega-docs-policy.md`** — NEW: Enforcement policy for OMEGA documentation location
+
+### Beyond Copilots — Seven Principles Integration into Marketing Guide
+
+Integrated the full content of `docs/publications/BEYOND-COPILOTS-RADIANT-PRINCIPLES.md` into `docs/15-STRATEGY-COMPETITIVE.md` as **Part X: Beyond Copilots — The Seven RADIANT Principles**.
+
+#### Seven Principles Integrated
+- **Principle 1**: Transformation Over Augmentation (Polymorphic UI, Eject to App)
+- **Principle 2**: Institutional Memory Over Session Amnesia (Cortex three-tier, Graph-RAG)
+- **Principle 3**: Verified Intelligence Over Probabilistic Guessing (Empiricism Loop, Council of Rivals)
+- **Principle 4**: Elastic Intelligence Over Static Cost (Gearbox, Economic Governor)
+- **Principle 5**: Sovereign Infrastructure Over API Dependency (Tri-Layer Consciousness)
+- **Principle 6**: Mathematical Safety Over Prompt-Based Hope (Control Barrier Functions)
+- **Principle 7**: Compounding Value Over Static Tooling (Dreaming Cycle)
+
+#### Additional Content
+- **Copilots vs. Magic Carpet** — 11-dimension comparison table
+- **RADIANT Terms Glossary** — 18-term marketing reference glossary
+- **Document History** entry added to `docs/15-STRATEGY-COMPETITIVE.md`
+
+---
+
+## [7.50.0] - 2026-02-16
+
+### OMEGA Forge — System Admin Application (PROMPT-51)
+
+New standalone Next.js 14 application for RADIANT system administrators. OMEGA Forge provides direct Aurora PostgreSQL access (no RLS), cartridge authoring with .RADz builder/parser, KMS-backed signing, and platform-wide brain inspection. Deployed as ECS Fargate in a private subnet — no public access.
+
+#### New Application: `apps/omega-forge/`
+- **Direct Aurora connection** via `pg` driver through RDS Proxy — full cross-tenant visibility
+- **Storage Manager** (`lib/s3/storage-manager.ts`) — ALL S3 operations routed through this service
+- **Cartridge Builder** (`lib/cartridge/builder.ts`) — builds .RADz files with ZSTD compression, SHA-256 checksums, KMS signing
+- **Cartridge Parser** (`lib/cartridge/parser.ts`) — extracts and validates .RADz archives
+- **KMS Signer** (`lib/kms/signer.ts`) — ECDSA_SHA_256 signing via AWS KMS
+
+#### API Routes (12)
+- `GET /api/dashboard` — system-wide stats (cartridges, brains, CATO, Global Brain)
+- `GET /api/cartridges` — list with status/target filters
+- `GET /api/cartridges/[id]` — detail with installations
+- `DELETE /api/cartridges/[id]` — archive cartridge
+- `POST /api/cartridges/build` — build .RADz from authored sections
+- `GET /api/brains` — all OMEGA brain instances across tenants
+- `GET /api/brains/[tenantId]` — brain detail with cartridges, dreams, Soft ROM
+- `GET /api/brains/[tenantId]/soft-rom` — Soft ROM file listing
+- `POST /api/brains/[tenantId]/soft-rom` — export Soft ROM as .RADz cartridge
+- `GET /api/cato` — all CATO instances
+- `GET /api/targets` — target service registry
+- `POST /api/targets` — register new target
+- `GET /api/signing` — KMS key info and public key PEM
+- `GET /api/audit` — full audit trail with action/tenant filters
+- `GET /api/global-brain/gradients` — gradient monitor
+- `GET /api/global-brain/federated` — rounds, pipelines, enrollment stats
+
+#### UI Pages (11)
+- **Dashboard** — system overview with stat cards and recent activity
+- **Cartridges** — searchable list, create form with target selection
+- **Brains** — tenant brain cards, detail page with Soft ROM/dreams/cartridges
+- **CATO** — personality instances with pattern/config counts
+- **Global Brain** — enrollment, rounds, pipelines overview
+- **Targets** — target service registry with spec counts
+- **Signing & PKI** — KMS key inspector with public key PEM display
+- **Audit** — filterable audit log table
+
+#### CDK Infrastructure
+- **ForgeStack** (`lib/stacks/forge-stack.ts`) — ECS Fargate (ARM64, 1vCPU/2GB), private subnet, internal ALB, IAM for S3/KMS/Secrets Manager, CloudWatch logs, ECS Exec enabled
+
+#### Design Decisions
+- All S3 operations through Forge Storage Manager — no direct S3 calls
+- Dark theme (amber accent) to visually distinguish from tenant admin dashboard
+- No RLS — Forge sees all tenants, all data (system admin tool behind firewall)
+- Standalone Next.js app on port 3100, Docker-based deployment
+
+## [7.49.0] - 2026-02-15
+
+### RADIANT Global Brain — Bidirectional Architecture (PROMPT-53)
+
+Federated learning, privacy-safe gradient aggregation, and base cartridge generation. Every enrolled tenant brain uploads anonymized DP gradients nightly; the Global Brain aggregates them weekly and generates improved base .RADz cartridges monthly. All S3 operations via `cartridgeStorageManager`.
+
+#### Database
+- **Migration V2026_02_15_001**: 4 new tables (`global_brain_enrollment`, `global_brain_gradients`, `global_brain_rounds`, `global_brain_cartridge_pipeline`)
+- RLS policies on enrollment and gradients using `app.current_tenant_id`
+- Indexes on tenant, round, status, type, uploaded_at
+
+#### Lambda Services (3 new)
+- **gradient-upload.service.ts**: DP-SGD gradient processing (per-sample clipping + calibrated Gaussian noise), AES-256-GCM envelope encryption with KMS, uploads OMEGA Q-Node gradients, CORTEX performance metrics, CATO fitness statistics. All S3 via `cartridgeStorageManager.storeContent()`
+- **federated-averaging.service.ts**: Quality-weighted federated averaging with z-score outlier detection, configurable learning rate and momentum. Round management (create, activate, run). All S3 via storage manager
+- **cartridge-pipeline.service.ts**: Monthly base cartridge generation from completed rounds. Loads previous base weights, applies averaged gradients, stores new Q-Node sections and firmware. Publishes to marketplace and archives previous base
+
+#### Admin API (10 endpoints)
+- **global-brain.ts**: `GET/PUT enrollment`, `GET contributions`, `GET/POST rounds`, `POST rounds/:id/run`, `GET/POST pipeline`, `POST pipeline/:id/run`, `GET stats`
+
+#### CDK Infrastructure
+- **storage-stack.ts**: New `globalBrainBucket` S3 bucket with KMS encryption, 90-day gradient expiry lifecycle
+
+#### Storage Manager
+- **cartridge-storage-manager.service.ts**: Added `'global_brain'` content category and `buildGlobalBrainPath()` helper
+
+#### Dream Cycle Integration
+- **dream-scheduler.service.ts**: Step 6 added — after Soft ROM export (step 5), calls `uploadGradients()` with tenant's dream cycle data. Non-fatal — dream completes even if upload fails
+
+#### Admin Dashboard
+- **Sidebar**: New "Global Brain" section with 3 entries (Enrollment, Federated Rounds, Cartridge Pipeline)
+- **Enrollment page** (`/global-brain`): Stats overview, enrollment toggle, privacy config (DP-SGD params), data consent checkboxes, contribution history table
+- **Rounds page** (`/global-brain/rounds`): List rounds with status badges, create new rounds, trigger averaging
+- **Pipeline page** (`/global-brain/pipeline`): List pipelines with progress, schedule new pipelines, trigger execution
+- **React Query hooks** (`use-global-brain.ts`): 10 hooks for all Global Brain operations
+
+#### Shared Types (15 new)
+- `GlobalBrainEnrollmentTier`, `GlobalBrainGradientType`, `GlobalBrainGradientStatus`, `GlobalBrainRoundType`, `GlobalBrainRoundStatus`, `GlobalBrainPipelineType`, `GlobalBrainPipelineStatus`, `GlobalBrainPrivacyConfig`, `GlobalBrainDataConsent`, `GlobalBrainEnrollment`, `GlobalBrainGradient`, `GlobalBrainRound`, `GlobalBrainCartridgePipeline`, `GlobalBrainStats`
+
+#### Key Design Decisions
+- **No direct S3**: All storage via `cartridgeStorageManager` singleton
+- **DP-SGD**: Per-sample gradient clipping (configurable norm) + calibrated Gaussian noise (ε, δ configurable per tenant)
+- **Envelope encryption**: AES-256-GCM with KMS data keys for gradient blobs
+- **Quality-weighted averaging**: Higher-quality tenants contribute more; outliers rejected by z-score
+- **Minimum 3 participants**: Rounds fail if fewer than 3 valid gradients
+- **Non-fatal integration**: Dream cycle completes even if gradient upload fails
+
+### Files Created (8)
+| File | Purpose |
+|------|---------|
+| `migrations/V2026_02_15_001__global_brain.sql` | DB schema (4 tables) |
+| `lambda/shared/services/global-brain/gradient-upload.service.ts` | DP gradient upload |
+| `lambda/shared/services/global-brain/federated-averaging.service.ts` | Weighted averaging engine |
+| `lambda/shared/services/global-brain/cartridge-pipeline.service.ts` | Base cartridge generation |
+| `lambda/admin/global-brain.ts` | Admin API (10 endpoints) |
+| `admin-dashboard/lib/hooks/use-global-brain.ts` | React Query hooks |
+| `admin-dashboard/app/(dashboard)/global-brain/page.tsx` | Enrollment page |
+| `admin-dashboard/app/(dashboard)/global-brain/rounds/page.tsx` | Rounds page |
+| `admin-dashboard/app/(dashboard)/global-brain/pipeline/page.tsx` | Pipeline page |
+
+### Files Modified (5)
+| File | Changes |
+|------|---------|
+| `cartridge-storage-manager.service.ts` | Added `'global_brain'` category + `buildGlobalBrainPath()` |
+| `dream-scheduler.service.ts` | Added gradient upload step 6 after Soft ROM export |
+| `lambda/admin/handler.ts` | Route `global-brain` → `global-brain.js` |
+| `lib/stacks/storage-stack.ts` | Added `globalBrainBucket` |
+| `components/layout/sidebar.tsx` | Added Global Brain section (3 entries) |
+| `cartridge.types.ts` | Added 15 Global Brain types |
+| `migrations/manifest.json` | Entry #177 |
+
+## [7.48.0] - 2026-02-11
+
+### OMEGA Cartridge Integration (PROMPT-52)
+
+Rewires the OMEGA Consciousness Engine for cartridge-first operation. All hardcoded brain defaults replaced with cartridge-loaded configurations. All S3 operations routed through the cartridge storage manager.
+
+#### New OMEGA Services (5 files)
+- **omega-cartridge-boot.service.ts**: 8-step boot sequence — loads resolved cartridge state from DB, firmware (veto thresholds, parameter bounds), Q-Node weights, Soft ROM delta, knowledge facts, ambition config, development schedule, action gate config. Factory defaults fallback if cartridge state corrupted.
+- **omega-firmware-enforcer.service.ts**: Runtime veto threshold enforcement using min() rule (most restrictive wins). Parameter bounds clamping. Self-optimization adjustment gating.
+- **omega-ambition.service.ts**: Chemical system (dopamine, entropy, curiosity, frustration, satisfaction) driven by cartridge `ambition_config.json`. Replaces all hardcoded ambition constants. Includes self-optimization config and internet research triggers.
+- **omega-soft-rom.service.ts**: Soft ROM delta read/write via cartridge storage manager. Computes weight deltas (current − cartridge base), connection deltas, sub-cluster maps, preferences. All S3 through `cartridgeStorageManager.storeContent()` / `retrieveContent()`.
+- **omega-cartridge-events.service.ts**: EventBridge listener for `CortexModelUpdate`, `CatoConfigUpdate`, `CartridgeInstalled`, `CartridgeUninstalled`, `CartridgeResolved`, `FirmwareUpdate`. Triggers hot-reload of OMEGA brain state.
+
+#### Modified Files (3)
+| File | Changes |
+|------|---------|
+| `quantum-brain.service.ts` | Removed direct `S3Client`; added `bootFromCartridges()`, `writeSoftRomDelta()`, `checkCartridgeHealth()`, `getFirmwareEnforcer()`, `getAmbitionService()`, `getKnowledgeFacts()`; checkpoint now includes cartridge base ref; `getStateSummary()` reports cartridge boot status, firmware enforcement count, Soft ROM version, knowledge facts, ambition chemicals |
+| `dream-scheduler.service.ts` | Added Soft ROM export at Dream Cycle Phase 8 (step 5) — writes learning delta to S3 via storage manager after active verification |
+| `cartridge.types.ts` | Added 14 OMEGA cartridge integration types: `OmegaCartridgeBootStatus`, `OmegaChemicalConfig`, `OmegaAmbitionConfig`, `OmegaFirmwareConfig`, `OmegaDevelopmentScheduleConfig`, `OmegaActionGateConfig`, `OmegaSoftRomDelta`, `OmegaSoftRomPreferences`, `OmegaCartridgeHealthCheck`, `OmegaKnowledgeFact`, `OmegaBrainStateSummary`, `OmegaCartridgeEvent` |
+
+#### Key Design Decisions
+- **Firmware min() rule**: Veto thresholds can only be TIGHTENED by cartridges, never loosened. `FirmwareEnforcer.enforceVetoThreshold()` returns `Math.min(requested, firmware_floor)`.
+- **Soft ROM = delta**: Stored as `current_weights − cartridge_base_weights`, not absolute values. On boot, delta is applied additively on top of cartridge base.
+- **Factory defaults fallback**: If cartridge state is corrupted or missing, brain boots with safe factory defaults and sets status to `factory_defaults`.
+- **No direct S3**: All storage operations go through `cartridgeStorageManager` singleton.
+- **Metrics**: `cartridge_boot_duration_ms`, `firmware_enforcement_count`, `soft_rom_delta_size_bytes` tracked in brain state summary and checkpoint.
+
+## [7.47.0] - 2026-02-10
+
+### Universal Cartridge System (PROMPT-50)
+
+Complete implementation of the RADIANT Universal Cartridge System (.RADz) — portable AI intelligence packages that can target OMEGA, CORTEX, CATO, and tenant services.
+
+#### Database
+- **Migration V2026_02_10_022**: 7 new tables (`cartridge_target_services`, `cartridge_target_section_specs`, `cartridge_universal`, `cartridge_installations`, `cartridge_resolved_state`, `cartridge_audit_log`, `cato_cartridge_config`)
+- RLS policies on all tables using `app.current_tenant_id`
+- Seed data for 5 target services (omega, cortex, cato, tenant, global) with 14 section specs
+- Full JSON schema validation specs for firmware and personality sections
+
+#### CDK Infrastructure
+- **storage-stack.ts**: New `cartridgeBucket` S3 bucket with KMS encryption, versioning, Glacier lifecycle, access logging
+
+#### Lambda Services
+- **cartridge-storage-manager.service.ts**: Central storage manager for all cartridge S3 operations (no direct S3 access). Pre-signed URL generation, binary content store/retrieve, content registry tracking
+- **cartridge-universal.ts**: Admin API Lambda with 14 endpoints (list, detail, upload, validate, install, uninstall, stack, reorder, resolved, export-soft-rom, targets, target-specs, register-target, audit)
+- **cartridge-validator.ts**: SQS worker — ZSTD decompression, Ed25519/ECDSA signature verification, manifest validation, section file validation against DB specs, JSON schema validation, checksum verification
+- **cartridge-loader.ts**: SQS worker — extracts and dispatches sections to target services (OMEGA Q-Nodes, CORTEX ONNX, CATO personality → `cato_cartridge_config`, tenant config). All writes through storage manager
+- **cartridge-resolution.ts**: SQS worker — runs stacking resolution engine and persists result
+
+#### Signing & Resolution
+- **signing.ts**: Ed25519 + ECDSA verification, KMS signing, SHA-256 checksums, manifest checksum verification
+- **resolution.ts**: Tenant-prevails stacking engine. Firmware uses min() (most restrictive wins). Memory priority: tenant_facts(5.0x) > soft_rom(3.0x) > domain(2.0x) > cato_user(1.5x) > base(1.0x) > internet(0.6x)
+
+#### Shared Types
+- 15 new types in `@radiant/shared`: `UniversalCartridgeType`, `UniversalCartridgeStatus`, `CartridgeTargetService`, `CartridgeTargetSectionSpec`, `UniversalCartridge`, `CartridgeInstallation`, `CartridgeResolvedState`, `CartridgeAuditEntry`, etc.
+
+#### Admin Dashboard
+- **Sidebar**: New "Cartridge System" section with 5 entries
+- **Installed page** (`/cartridge-system`): Grid view of all cartridges with status badges, type filters, upload dialog, validate/install/uninstall actions
+- **Marketplace page** (`/cartridge-system/marketplace`): Browse validated cartridges available for installation
+- **Stack & Resolution page** (`/cartridge-system/stack`): Reorderable stack, resolved state viewer, Soft ROM export
+- **Target Registry page** (`/cartridge-system/targets`): Expandable target cards with section spec details
+- **Audit page** (`/cartridge-system/audit`): Full audit trail with action-specific icons and colors
+- **React Query hooks** (`use-cartridge-system.ts`): 12 hooks for all cartridge system operations
+
+#### Handler Wiring
+- **handler.ts**: Route `cartridge-system` → `cartridge-universal.js`
+
+### Files Created (14)
+| File | Purpose |
+|------|---------|
+| `migrations/V2026_02_10_022__universal_cartridge_system.sql` | DB schema + seed data |
+| `lambda/shared/services/cartridge-storage-manager.service.ts` | Storage manager (no direct S3) |
+| `lambda/shared/cartridge/signing.ts` | Ed25519/ECDSA/KMS signing |
+| `lambda/shared/cartridge/resolution.ts` | Stacking resolution engine |
+| `lambda/admin/cartridge-universal.ts` | Admin API (14 endpoints) |
+| `lambda/workers/cartridge-validator.ts` | Validation SQS worker |
+| `lambda/workers/cartridge-loader.ts` | Installation SQS worker |
+| `lambda/workers/cartridge-resolution.ts` | Resolution SQS worker |
+| `admin-dashboard/lib/hooks/use-cartridge-system.ts` | React Query hooks |
+| `admin-dashboard/app/(dashboard)/cartridge-system/page.tsx` | Installed cartridges page |
+| `admin-dashboard/app/(dashboard)/cartridge-system/marketplace/page.tsx` | Marketplace page |
+| `admin-dashboard/app/(dashboard)/cartridge-system/stack/page.tsx` | Stack & resolution page |
+| `admin-dashboard/app/(dashboard)/cartridge-system/targets/page.tsx` | Target registry page |
+| `admin-dashboard/app/(dashboard)/cartridge-system/audit/page.tsx` | Audit log page |
+
+### Files Modified (4)
+| File | Changes |
+|------|---------|
+| `lib/stacks/storage-stack.ts` | Added `cartridgeBucket` with KMS, versioning, Glacier lifecycle |
+| `lambda/admin/handler.ts` | Added `cartridge-system` route to `cartridge-universal.js` |
+| `components/layout/sidebar.tsx` | Added Cartridge System section (5 entries) |
+| `packages/shared/src/types/cartridge.types.ts` | Added 15 Universal Cartridge System types |
+
+## [7.46.0] - 2026-02-08
+
+### Core Service Gap Closure — tenantId Threading, Dojo AI Pipeline, Video Converter
+
+#### Bug Fix: tenantId Threading (5 Services, 10 Call Sites)
+- **agi-complete.service.ts**: Thread `tenantId` through `findAnalogies`, `generateAnalogy`, `applyAnalogy`, `applyAdaptations`
+- **multi-agent.service.ts**: Thread `tenantId` through `agentThink` and `agentRespond` context objects + 13 internal call sites in `runDebate`, `runConsensus`, `runDivideAndConquer`, `runCriticalReview`
+- **multimedia-sidecar.service.ts**: Thread `tenantId` through `generateSidecar`, `generateEmbedding`, `generateDescription`, `synthesizeStreams`
+- **hallucination-detection.service.ts**: Thread `tenantId` through `extractAndVerifyClaims` → `verifyClaim`
+- **agi-extensions.service.ts**: Thread `tenantId` through `analyzeDialogueTurn`
+- **Impact**: Enables drift enforcement (v7.37.0) and spend governor (v7.39.0) on all model invocations
+
+#### Dojo AI Pipeline — 9 Endpoints Fully Implemented
+- **Theme Discovery**: LLM analyzes document chunks to extract 10-15 Central Themes with difficulty tiers
+- **Lesson Generation**: Sensei agent synthesizes lesson blocks with source citations from theme chunks
+- **Sparring Questions**: Adversarial agent generates difficulty-scaled questions grounded in source material
+- **Mobot Knowledge Agent**: Citation-grounded conversational responses from library content
+- **Scenario Response**: Persona-based role-play with emotional shifts and consequence scoring
+- **Competency Extraction**: LLM-powered competency graph extraction from library themes
+- **Dialectic Response**: Multi-agent Socratic system (thesis/antithesis/moderator) with fallacy detection
+- **Multimodal Generation**: Mermaid diagrams, glossary, key takeaways, learning style adaptations
+- **Archytas Suggestions**: Context-aware tool suggestions based on session history
+- **Helper**: `invokeDojoLLM()` utility uses tenant-configured AI model with proper tenantId threading
+
+#### Video Converter — ffmpeg Fallback
+- **New Strategy 2**: Local ffmpeg frame extraction before falling back to placeholder frames
+- Checks `FFMPEG_PATH`, `/opt/bin/ffmpeg` (Lambda layer), `/usr/bin/ffmpeg`, `/usr/local/bin/ffmpeg`
+- Per-frame extraction with 30s timeout and temp file cleanup
+- Placeholder frames preserved as Strategy 3 (last resort)
+
+### Files Modified
+| File | Changes |
+|------|---------|
+| `lambda/shared/services/agi-complete.service.ts` | +tenantId param to 4 methods |
+| `lambda/shared/services/multi-agent.service.ts` | +tenantId in context objects, 15 call sites |
+| `lambda/shared/services/workflow/multimedia-sidecar.service.ts` | +tenantId to 3 public + 2 private methods |
+| `lambda/shared/services/hallucination-detection.service.ts` | +tenantId threading through claim verification chain |
+| `lambda/shared/services/agi-extensions.service.ts` | +tenantId to analyzeDialogueTurn |
+| `lambda/admin/dojo.ts` | +modelRouterService import, invokeDojoLLM helper, 9 endpoint implementations |
+| `lambda/shared/services/converters/video-converter.ts` | +extractFramesWithFfmpeg, 3-strategy extraction |
+
+## [7.45.0] - 2026-02-08
+
+### Think Tank (Mac) — Full Feature Parity Gap Closure [Mac]
+
+Comprehensive gap closure bringing the Mac app to full feature parity with the web app (minus Polymorphic Interface).
+
+#### New Types (CoreTypes.swift — 1,406 lines, +800 lines)
+- **Governor Dashboard**: GovernorDashboard, GovernorConfig, CostMetrics, FuelGauge, ModeIndicator, SavingsSparkline, SavingsBreakdown, GovernorModelTier, ArbitrageRule, RuleCondition, RuleAction, ModelRecommendation, BudgetStatus, SavingsHistoryEntry
+- **Derivation History**: DerivationNode, DerivationChain, ProvenanceReport, DerivationNodeType
+- **Flash Facts**: FlashFact, FlashFactCategory, VerificationMethod, FlashFactExtraction, FlashFactCollection
+- **Grimoire**: Spell, SpellCategory, SpellVariable, SpellVariableType, SpellExecution, SpellResult
+- **Ideas**: Idea, IdeaStatus, IdeaPriority, IdeaAttachment, IdeaAttachmentType, IdeaBoard, IdeaBoardColumn
+- **Cartridges**: ActiveCartridge, CartridgeScope
+- **Cato Mood**: CatoMood (balanced/scout/sage/spark/guide)
+- **AXIOM Extended**: ClarificationMode, ClarionPreferences, AxiomWorkflowStep, AxiomWorkflowProgress, AxiomDomainFull, ClarionQuestionFull, QuestionType, ModelScoreFull, AxiomFeedbackData, AxiomChemistryMoment
+- **Collaboration Full**: CollaborationSession, Participant, ParticipantRole, CursorPosition, SessionSettings, CollaborationInvite, CollaborationMessage
+- **i18n**: SupportedLocale (10 languages)
+
+#### New Services (PlatformServices.swift — 860 lines, +500 lines)
+- **DerivationHistoryService**: 6 endpoints — chains, provenance reports, challenge nodes, evidence sources
+- **FlashFactsService**: 9 endpoints — extract, list, verify, confirm, delete, collections, search
+- **GrimoireService**: 8 endpoints — spell CRUD, execute, featured, rate
+- **IdeasService**: 10 endpoints — idea CRUD, capture from message, boards, develop with AI, link
+- **CartridgeService**: Active cartridges, toggle
+- **FullCollaborationService**: Session CRUD, join, leave, invite, end
+- **DelightPreferencesService**: Fetch/update backend personality preferences
+- **GovernorService expanded**: 14 endpoints (was 2) — dashboard, config, mode, recommend, metrics, budget, tiers, arbitrage rules, decisions, savings history
+
+#### New Services (Standalone)
+- **AxiomSessionService**: Full AXIOM session lifecycle with SSE streaming, feedback (rate session/prompt/correction), question tree caching, observable state machine (AxiomSessionState)
+- **AuthService**: Keychain-based token storage, login/logout, automatic token refresh with scheduling, session persistence
+- **LocalizationService**: i18n with 5 languages (EN/ES/FR/DE/JA), 100+ translation keys, locale persistence
+
+#### New Views (8 feature views)
+- **FlashFactsView**: Category filtering, search, fact cards with verify/copy/delete, collection management
+- **GrimoireView**: Spell grid with category filter, featured/my spells tabs, spell detail sheet with variable input and execution
+- **IdeasView**: Status-based filtering, idea cards with priority/tags, create sheet, AI-powered idea development
+- **DerivationHistoryView**: HSplitView chain browser, node cards with type icons, challenge mechanism, provenance reports
+- **GovernorDashboardView**: Fuel gauge (circular), mode selector, savings breakdown, 4-tab detail (metrics/tiers/rules/decisions)
+- **CartridgeIndicatorView**: Active .RADz bundle indicator with scope icons, popover detail, compact variant
+- **CatoMoodSelectorView**: 5 moods with dropdown/inline/compact variants, color-coded
+- **LoginView**: Full auth UI with email/password, show/hide password, remember me, error display
+
+#### New Views (AXIOM sub-views)
+- **AxiomWorkflowProgressView**: Step-by-step progress with icons and connecting lines
+- **ConfidenceMeterView**: Circular confidence indicator
+- **AxiomDomainDisplayView**: Domain path breadcrumbs with confidence
+- **ModelScoreBarsView**: Animated model comparison bars with delta indicators
+- **ClarificationCardView**: Type-specific question input (choice/multi/text/scale/boolean)
+- **CompiledPromptPreviewView**: System/user prompt toggle with copy and rating
+- **AxiomFeedbackCaptureView**: 5-star session rating
+- **ClarionPreferencesPanelView**: AXIOM preferences form (mode, max questions, display, learning)
+
+#### Other Changes
+- **ActivityHeatmapView**: GitHub-style contribution heatmap for profile
+- **SettingsStore**: Added catoMood, selectedLocale, clarionPreferences, soundEnabled, Delight sync (debounced push to backend)
+- **SettingsView**: 8 tabs (was 5) — added Personality (mood selector), Language (10 locales), AXIOM (Clarion preferences)
+- **AppState/Navigation**: 10 sections (was 6) — added Grimoire, Ideas, Flash Facts, Governor
+- **MainView**: Wired all new views into routing
+- **ChatView**: Integrated CartridgeIndicatorView and CatoMoodSelectorView into header
+- **ThinkTankApp**: Auth gate (LoginView when unauthenticated), LocalizationService environment object
+- **APIClient**: Added setToken(), buildURL() methods for auth and SSE support
+
+## [7.44.0] - 2026-02-08
+
+### Think Tank (Mac) — Native macOS Client [Mac]
+
+Full native macOS SwiftUI application replicating the Think Tank web experience (minus the Polymorphic Interface).
+
+#### Swift App (`apps/thinktank-mac/`)
+- **Package.swift**: Swift 5.9+, macOS 14+, dependencies: swift-markdown, Highlightr, SwiftyJSON
+- **Core Types**: All TypeScript types ported to Swift Codable structs (CoreTypes.swift — 400+ lines)
+- **API Client**: Actor-based URLSession client with SSE streaming, auth, JSON coding
+- **Services**: ChatService, ModelService, RulesService, SettingsService, AnalyticsService, ArtifactService, BrainPlanService, GovernorService, TimeTravelService, AxiomService, CrucibleService, CollaborationService, ComplianceExportService, DomainModeService, VoiceService
+- **Stores**: AppState, ChatStore, SettingsStore — all @MainActor @ObservableObject
+- **Design System**: GlassCard (glassmorphism), AuroraBackground, GradientButton, BadgeView, TypingIndicator, EmptyStateView, ShimmerView
+- **Chat Views**: ChatView, ChatInputView, MessageBubbleView, ModelSelectorView, DomainSelectorView
+- **Sidebar**: NavigationSplitView with grouped conversations, search, nav sections
+- **Settings**: Native macOS Settings window with 5 tabs (General, Display, Voice, Shortcuts, Privacy)
+- **My Rules**: Full CRUD + preset browser + rule card UI
+- **History**: Sortable/searchable conversation history
+- **Artifacts**: Split-view browser with type filtering + detail preview + save/copy
+- **Profile**: Analytics dashboard with stats, achievements, usage charts
+- **Time Machine**: Timeline + playback + bookmarks + branches + restore
+- **AXIOM Forge**: 4-step prompt optimization (Classify → Clarify → Compile → Route)
+- **Brain Plan Viewer**: Orchestration mode, domain, steps, governor status
+- **Crucible Deliberation**: Event timeline with expandable Q&A cards
+- **Voice Input**: AVAudioEngine recording with level visualization + Whisper transcription
+- **File Attachments**: NSOpenPanel + drag-and-drop with type validation (25MB limit)
+- **Keyboard Shortcuts**: ⌘N (new chat), ⇧⌘D (advanced), ⇧⌘F (focus), ⌘\\ (sidebar)
+
+#### Policies & Documentation
+- **Bidirectional Sync Policy v2.0**: Rewrote `/.windsurf/workflows/thinktank-dual-platform.md` with 7 hard rules, blocking gate, anti-patterns — changes to Web MUST mirror to Mac and vice versa
+- **Portability Manifest**: Created `docs/THINKTANK-MAC-PORTABILITY-MANIFEST.md` — 33 features tracked across 3 tiers, technology adaptation map, known gaps
+- **Mac User Guide**: Created `docs/THINKTANK-MAC-GUIDE.md` — 20-section user documentation
+- **docs-update-all v2.1**: Added bidirectional Think Tank requirements + Mac-specific entries
+- **docs-assemble-complete**: Added Mac Guide + Portability Manifest to assembly structure
+- **Assembly script**: Added Mac docs to DOCUMENT_STRUCTURE in assemble-complete-documentation.py
+
+#### Excluded from Mac (by design)
+- **Polymorphic Interface** (LiquidMorphPanel) — excluded per scope
+- **Admin features** — remain web-only
+
+**Files Created**: 27 Swift source files, 2 documentation files, 1 Package.swift
+**Files Modified**: 4 policy/workflow files, 1 assembly script, CHANGELOG.md
+
+## [7.43.4] - 2026-02-08
+
+### Application Hub & URL Configuration
+
+#### Admin Dashboard
+- **New `/apps` page**: Platform Applications hub showing all 9 RADIANT apps (Think Tank, Curator, Dojo, Cato Trainer, OMEGA Lab, OMEGA Forge, OMEGA API, Admin, API) with descriptions, tier badges, tech stack info, configured URL launch links, and health check buttons
+- **New "Applications" sidebar section**: Added at top of navigation with "All Apps" and "URL Configuration" entries for discoverability
+
+#### Swift Deployer
+- **URLConfigurationView**: Added missing URL fields for Cato Trainer, Curator, OMEGA Lab, OMEGA Forge, and OMEGA API to the form, ViewModel, and URLConfiguration model
+- **URLConfiguration model**: Added `catoTrainerUrl`, `curatorUrl`, `omegaLabUrl`, `omegaForgeUrl`, `omegaApiUrl` with default subdomain-based URLs
+- **Validation**: All new URL fields included in validation pass
+
 ## [7.43.3] - 2026-02-08
 
 ### Comprehensive Glossary Audit — v3.0.0
@@ -196266,7 +194176,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Full audit of `docs/17-GLOSSARY.md` against all 18 consolidated docs, 280+ source code services, 42 CDK stacks, admin dashboard sidebar (360+ entries), and CHANGELOG (v7.18–7.43.2).
 
 #### New Sections Added (3)
-- **§5 RADIANT Applications**: 6 platform apps (Admin Dashboard, Swift Deployer, Aurelius Dojo, Cato Trainer, Genesis Forge, Genesis Lab) + 6 user/tenant management terms (System Admin Separation, Tenant Provisioning, Unified User Profile, Admin Role Hierarchy, Licensing System, Guest Collaboration)
+- **§5 RADIANT Applications**: 6 platform apps (Admin Dashboard, Swift Deployer, Aurelius Dojo, Cato Trainer, OMEGA Forge, OMEGA Lab) + 6 user/tenant management terms (System Admin Separation, Tenant Provisioning, Unified User Profile, Admin Role Hierarchy, Licensing System, Guest Collaboration)
 - **§6 Security & Intrusion Detection**: RIDPS (13 terms), Spend Governor (6 terms)
 - **§7 Operations & Monitoring**: SENTINEL (10 terms), Log Retention (5 terms), Data Lake Offload (8 terms)
 
@@ -197981,7 +195891,7 @@ Created dedicated user guide and administrator guide for the OMEGA Synthetic Bio
 
 #### New Documents
 
-- **`docs/OMEGA-USER-GUIDE.md`** (v2.0.0) — Comprehensive user guide covering: Bicameral Mind architecture, Q-Nodes (complex-valued quantum oscillators), Helix Kernel (deterministic safety), Cryogenic Engine (serverless time-warping), Neural Bridge (telepathy layer), Resonant Memory (O(1) lookup), Homeostatic Dreaming, Shadow Protocol, Genesis Lab, Genesis Forge, .bio firmware standard, file structure, thermal status
+- **`docs/OMEGA-USER-GUIDE.md`** (v2.0.0) — Comprehensive user guide covering: Bicameral Mind architecture, Q-Nodes (complex-valued quantum oscillators), Helix Kernel (deterministic safety), Cryogenic Engine (serverless time-warping), Neural Bridge (telepathy layer), Resonant Memory (O(1) lookup), Homeostatic Dreaming, Shadow Protocol, OMEGA Lab, OMEGA Forge, .bio firmware standard, file structure, thermal status
 - **`docs/OMEGA-ADMIN-GUIDE.md`** (v2.0.0) — Administrator operations guide covering: 20+ admin API endpoints (dashboard, config, shadow mode, cortex management, firmware CRUD, URL config), brain management (snapshots, restore, lobotomy), firmware administration (hot-swap, versioning, rollback), Shadow Mode config and monitoring, Neural Bridge settings, dream cycle administration, AWS infrastructure (Lambda, EFS, S3), instance registry, WebSocket tether, troubleshooting, security
 
 #### Documentation Policy Updates
@@ -198200,9 +196110,9 @@ New standalone web application (`apps/dojo/`) for agent-powered training on orga
 
 ## [7.15.0] - 2026-02-06
 
-### 🔥 Genesis Forge v3.0 — "The Glass Foundry"
+### 🔥 OMEGA Forge v3.0 — "The Glass Foundry"
 
-Complete rebuild of Genesis Forge from a basic firmware editor into a **Behavioral ROM Forge** permanently tethered to Shadow Omega. Firmware is now immutable behavioral directives (instincts, fears, morals, ambitions, boundaries) burned into the brain's ROM — not hardware firmware.
+Complete rebuild of OMEGA Forge from a basic firmware editor into a **Behavioral ROM Forge** permanently tethered to Shadow Omega. Firmware is now immutable behavioral directives (instincts, fears, morals, ambitions, boundaries) burned into the brain's ROM — not hardware firmware.
 
 #### Core Architecture
 
@@ -199680,12 +197590,12 @@ Complete implementation of the OMEGA serverless cryogenic architecture - a bio-m
 | `omega_heartbeat.py` | Pacemaker for scheduled maintenance and dream cycles |
 | `omega_admin.py` | Cortex Explorer admin API for brain management |
 
-#### Genesis Frontend (`apps/genesis/`)
+#### OMEGA Lab Frontend (`apps/omega-lab/`)
 
 New Next.js application with three main views:
 - **Dashboard**: Real-time brain monitoring with thermal distribution
 - **Cortex Explorer**: Brain inspection, snapshots, and lobotomy
-- **Genesis Forge**: Firmware editor with Helix rules, ambition, and personality sliders
+- **OMEGA Forge**: Firmware editor with Helix rules, ambition, and personality sliders
 
 #### Infrastructure
 
@@ -199719,8 +197629,8 @@ New tier in `ApplicationTier`:
 #### Admin Dashboard URL Configuration
 
 New URL fields in `url-configuration-client.tsx`:
-- `genesisLabUrl` - Genesis Lab monitoring URL
-- `genesisForgeUrl` - Genesis Forge firmware URL
+- `omegaLabUrl` - OMEGA Lab monitoring URL
+- `omegaForgeUrl` - OMEGA Forge firmware URL
 - `omegaApiUrl` - OMEGA inference API URL
 
 #### CDK Admin Routes
@@ -200834,7 +198744,7 @@ Complete implementation of the **RADIANT Autonomous Organism Architecture** - a 
 - Error rate and latency-aware routing
 - Constraint-based filtering (capabilities, cost, latency)
 
-**Genesis Auto-Tool Pipeline**:
+**Tool Forge Pipeline**:
 - API discovery via OpenAPI, GraphQL, HTML scraping
 - AI-powered MCP server code generation
 - Zod schema generation for type safety
@@ -201395,13 +199305,13 @@ Two-tier defense against AI "lying" behaviors that mirror human organizational f
 
 ### Added
 
-#### Genesis Vault - Keyhole Pattern (v1.0.0)
+#### Cartridge Vault - Keyhole Pattern (v1.0.0)
 
 Secrets management for cartridges using the Keyhole Pattern - cartridges declare required secrets but never contain actual credentials.
 
 **Architecture**:
 - Cartridges include `vault.req` manifest declaring required secrets
-- Service Layer fetches secrets from Genesis Vault at runtime
+- Service Layer fetches secrets from Cartridge Vault at runtime
 - Secrets encrypted with AWS KMS, never passed to AI models
 - Full audit trail for compliance (HIPAA, SOC2, GDPR)
 - Secret rotation with version history
@@ -201717,7 +199627,7 @@ Cartridges are now cryptographically signed on export and verified on import per
 
 **New Types** (`packages/shared/src/types/cartridge-pki.types.ts`):
 - `RootCACertificate`: Radiant Root CA, generated at Genesis, stored offline/HSM
-- `TenantCACertificate`: Signed by Root CA, stored in Genesis Vault
+- `TenantCACertificate`: Signed by Root CA, stored in Cartridge Vault
 - `CartridgeSigningKey`: Active signing keys for author/platform
 - `CartridgeSignature`: Individual signature with key fingerprint, algorithm
 - `CartridgeSignatureBlock`: Complete signature block stored as `signature.sig`
@@ -214345,7 +212255,7 @@ Major refactoring to move consciousness from "simulation" to "functional emergen
 
 \newpage
 
-## 19.2 Technical Debt
+## 16.2 Technical Debt
 
 
 *Source: `TECHNICAL_DEBT.md` (385 lines)*
@@ -214743,7 +212653,7 @@ When resolving technical debt:
 
 \newpage
 
-## 19.3 Security Policy
+## 16.3 Security Policy
 
 
 *Source: `SECURITY.md` (133 lines)*
@@ -214889,7 +212799,7 @@ Subscribe to security updates:
 
 \newpage
 
-## 19.4 Contributing Guide
+## 16.4 Contributing Guide
 
 
 *Source: `CONTRIBUTING.md` (258 lines)*
@@ -215160,7 +213070,7 @@ By contributing, you agree that your contributions will be licensed under the MI
 
 \newpage
 
-## 19.5 Code of Conduct
+## 16.5 Code of Conduct
 
 
 *Source: `CODE_OF_CONDUCT.md` (30 lines)*
@@ -215203,7 +213113,7 @@ This Code of Conduct is adapted from the [Contributor Covenant](https://www.cont
 
 \newpage
 
-## 19.6 README
+## 16.6 README
 
 
 *Source: `README.md` (313 lines)*
@@ -215533,12 +213443,12 @@ MIT
 
 | Metric | Value |
 |--------|-------|
-| **Parts** | 19 |
-| **Chapters** | 24 |
-| **Documents Included** | 24 |
+| **Parts** | 16 |
+| **Chapters** | 21 |
+| **Documents Included** | 21 |
 | **Documents Missing** | 0 |
-| **Total Source Lines** | 214,983 |
-| **Generated** | February 08, 2026 |
+| **Total Source Lines** | 212,965 |
+| **Generated** | February 10, 2026 |
 | **RADIANT Version** | v6.6.0 |
 
 ---

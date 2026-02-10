@@ -2056,7 +2056,7 @@ To see how Think Tank processed your question:
 | **Liquid Compute** | Data sovereignty system ensuring processing in compliant jurisdictions |
 | **Ghost Simulation** | Digital twin that learns preferences without storing actual prompts |
 | **Economic Cortex** | Autonomous budget management with hierarchical cost controls |
-| **Genesis Auto-Tool** | System that automatically creates new capabilities on demand |
+| **Tool Forge** | System that automatically creates new capabilities on demand |
 | **Neural Affinity Routing** | AI model selection based on semantic similarity and proficiency |
 | **Tensor-Link** | High-efficiency vector-based communication protocol for AI systems |
 
@@ -2183,7 +2183,7 @@ Think Tank v6.6.0 introduces the **Autonomous Organism Architecture** — a coll
 │  🌍 LIQUID COMPUTE       - Your data stays in your jurisdiction            │
 │  👻 GHOST SIMULATION     - AI learns your style without storing prompts    │
 │  💰 ECONOMIC CORTEX      - Smart budgeting keeps costs predictable         │
-│  🔧 GENESIS AUTO-TOOL    - New capabilities appear automatically           │
+│  🔧 TOOL FORGE           - New capabilities appear automatically           │
 │  🧠 NEURAL ROUTING       - Best AI model selected for each question        │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
@@ -2280,13 +2280,13 @@ Economic Cortex automatically manages AI costs while ensuring quality:
 3. Enable "Smart Downgrade" to auto-select cheaper models when appropriate
 4. Review your weekly cost report (emailed Mondays)
 
-### Genesis Auto-Tool - Automatic Capability Expansion
+### Tool Forge - Automatic Capability Expansion
 
-When you need a capability that doesn't exist, Genesis can create it:
+When you need a capability that doesn't exist, Tool Forge can create it:
 
 **How It Works:**
 1. You ask Think Tank to do something it can't do
-2. Genesis analyzes the request and builds a new tool
+2. Tool Forge analyzes the request and builds a new tool
 3. The tool is validated in a sandbox
 4. Within minutes, the capability is available
 
@@ -2294,7 +2294,7 @@ When you need a capability that doesn't exist, Genesis can create it:
 ```
 You: "Can you analyze this CSV and create a pivot table?"
 
-Think Tank: "I don't have a pivot table tool, but Genesis is building one..."
+Think Tank: "I don't have a pivot table tool, but Tool Forge is building one..."
 
 [2 minutes later]
 
@@ -2302,7 +2302,7 @@ Think Tank: "Done! Here's your pivot table. This capability is now
             available for future requests."
 ```
 
-**Note:** Genesis-created tools are reviewed by administrators before becoming permanent.
+**Note:** Tool Forge-created tools are reviewed by administrators before becoming permanent.
 
 ### Neural Affinity Routing
 
@@ -2339,7 +2339,7 @@ To see how these systems are working for you:
 | Version | Date | Changes |
 |---------|------|---------|
 | 7.9.0 | Feb 5, 2026 | **LIVS-M 2.0 Policy Modes**: Added comprehensive documentation for "Defcon-style" AI governance with Brainstorming, Standard, and Strict Audit policy modes. Updated Settings → Advanced → LIVS-M Policy access path. |
-| 6.6.0 | Feb 3, 2026 | **Autonomous Organism Architecture (Project Metamorphosis)**: Added Section 29 covering Liquid Compute (data sovereignty), Ghost Simulation (personalized safety), Economic Cortex (budget management), Genesis Auto-Tool (capability expansion), and Neural Affinity Routing (model selection) |
+| 6.6.0 | Feb 3, 2026 | **Autonomous Organism Architecture (Project Metamorphosis)**: Added Section 29 covering Liquid Compute (data sovereignty), Ghost Simulation (personalized safety), Economic Cortex (budget management), Tool Forge (capability expansion), and Neural Affinity Routing (model selection) |
 | 6.0.0 | Jan 31, 2026 | **Neural Architecture v6.0.0**: Added RADIANT Cartridges section, Domain Selector guide, Cartridge Indicator documentation, Three Learning Tiers explanation, expanded Glossary with neural architecture terms |
 | 5.52.58 | Jan 31, 2026 | Added Workflows & Orchestration Methods section (multi-AI selection, stream evaluation, workflow templates, configurable parameters) |
 | 5.52.52 | Jan 28, 2026 | Major update: Added Time Machine, Grimoire, Flash Facts, Sentinel Agents, Economic Governor, Council of Rivals, Voice Input & File Attachments sections |
@@ -4247,7 +4247,7 @@ The AGI Brain learns persistently from user interactions:
 | `lambda/shared/services/agi-ideas.service.ts` | Main service (570 lines) |
 | `lambda/thinktank/ideas.ts` | API handler |
 | `packages/shared/src/types/agi-ideas.types.ts` | Type definitions |
-| `migrations/049_agi_ideas.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 
 ### 14.10 Troubleshooting
 
@@ -7647,8 +7647,8 @@ The viewer provides:
 | `lambda/shared/services/artifact-engine/index.ts` | Public exports |
 | `lambda/thinktank/artifact-engine.ts` | API handlers |
 | `apps/admin-dashboard/components/thinktank/artifact-viewer.tsx` | Viewer component |
-| `apps/admin-dashboard/components/thinktank/chat-with-artifacts.tsx` | Split-screen chat |
-| `apps/admin-dashboard/app/(dashboard)/thinktank/artifacts/page.tsx` | Admin dashboard |
+| `apps/thinktank-admin/app/(dashboard)/artifacts/page.tsx` | Split-screen chat |
+| `apps/thinktank-admin/app/(dashboard)/artifacts/page.tsx` | Admin dashboard |
 
 ---
 
@@ -9661,16 +9661,16 @@ CREATE TABLE user_workflow_templates (
 
 | File | Purpose |
 |------|---------|
-| `migrations/066_orchestration_patterns_registry.sql` | Base schema with `is_system_method`/`is_system_workflow` |
-| `migrations/157_orchestration_methods_part1.sql` | Schema updates, display/scientific names |
-| `migrations/157_orchestration_methods_part2.sql` | Ensemble, verification methods |
-| `migrations/157_orchestration_methods_part3.sql` | Uncertainty, routing, neural methods |
+| `migrations/000_consolidated_schema.sql` | Base schema with `is_system_method`/`is_system_workflow` |
+| `migrations/000_consolidated_schema.sql` | Schema updates, display/scientific names |
+| `migrations/000_consolidated_schema.sql` | Ensemble, verification methods |
+| `migrations/000_consolidated_schema.sql` | Uncertainty, routing, neural methods |
 | `lambda/shared/services/orchestration-methods.service.ts` | **20 algorithm implementations** including SE Probes, Kernel Entropy, Pareto, C3PO, AutoMix |
 | `lambda/shared/services/cato/neural-decision.service.ts` | Cato Neural Decision Engine |
 | `lambda/admin/orchestration-methods.ts` | Methods API with system method protection |
 | `lambda/admin/orchestration-user-templates.ts` | User templates CRUD API |
 | `apps/admin-dashboard/app/(dashboard)/orchestration/methods/page.tsx` | Admin method config with system badge |
-| `apps/admin-dashboard/app/(dashboard)/thinktank/workflow-templates/page.tsx` | User templates UI |
+| `apps/thinktank-admin/app/(dashboard)/workflow-templates/page.tsx` | User templates UI |
 
 ---
 
@@ -9732,7 +9732,7 @@ Access via **Think Tank → Polymorphic UI** in admin dashboard.
 | `governor/economic-governor.ts` | `determineViewType()`, `determinePolymorphicRoute()` |
 | `consciousness/mcp-server.ts` | `render_interface`, `escalate_to_war_room` tools |
 | `python/cato/cognitive/workflows.py` | Flyte tasks for view selection |
-| `migrations/160_polymorphic_ui.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `components/thinktank/polymorphic/` | React view components |
 | `app/(dashboard)/thinktank/polymorphic/page.tsx` | Admin page |
 
@@ -9930,9 +9930,9 @@ policy_framework:
 | File | Purpose |
 |------|---------|
 | `lambda/shared/services/policy-framework.service.ts` | Policy context injection |
-| `lambda/shared/services/citation-manager.service.ts` | Citation tracking and validation |
-| `lambda/thinktank/policy-context.ts` | API handler for policy queries |
-| `migrations/164_policy_framework.sql` | Database schema |
+| `lambda/shared/services/fact-anchor.service.ts` | Citation tracking and fact anchoring |
+| `lambda/thinktank/handler.ts` | API handler (includes policy context) |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `config/policy/cato-principles.yaml` | Cato Institute policy principles |
 
 ---
@@ -10279,12 +10279,12 @@ Base: `/api/thinktank/security`
 
 | File | Purpose |
 |------|---------|
-| `lambda/shared/services/ssf-thinktank.service.ts` | SSF emitter/receiver for Think Tank |
-| `lambda/shared/services/caep-session.service.ts` | CAEP session management |
-| `lambda/shared/services/identity-remediation-thinktank.service.ts` | Think Tank remediation agent |
-| `lambda/thinktank/security-events.ts` | Security event API handler |
+| `lambda/shared/services/security-signals.service.ts` | Security signal processing for Think Tank |
+| `lambda/shared/services/security-protection.service.ts` | Security session protection |
+| `lambda/shared/services/identity-core.service.ts` | Identity remediation agent |
+| `lambda/thinktank/handler.ts` | Think Tank API handler (includes security events) |
 | `components/thinktank/ghost-indicator.tsx` | Ghost UI component |
-| `migrations/165_agentic_orchestration.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 | `config/security/ssf-events.yaml` | SSF event definitions |
 | `config/security/caep-policies.yaml` | CAEP policy configuration |
 
@@ -10909,7 +10909,7 @@ my-liquid-app/
 | `lambda/shared/services/liquid-interface/eject.service.ts` | App export service |
 | `lambda/shared/services/liquid-interface/component-registry.ts` | 50+ components |
 | `lambda/thinktank/liquid-interface.ts` | API handler |
-| `migrations/161_liquid_interface.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 
 ---
 
@@ -11208,7 +11208,7 @@ Base path: `/api/thinktank/reality-engine`
 | `lambda/shared/services/reality-engine/quantum-futures.service.ts` | Branching |
 | `lambda/shared/services/reality-engine/pre-cognition.service.ts` | Predictions |
 | `lambda/thinktank/reality-engine.ts` | API handler |
-| `migrations/162_reality_engine.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 
 ### 40.11 The "Code Curtain" Rule
 
@@ -11404,7 +11404,7 @@ Base path: `/api/thinktank/magic-carpet`
 |------|---------|
 | `packages/shared/src/types/magic-carpet.types.ts` | Type definitions |
 | `lambda/shared/services/magic-carpet/magic-carpet.service.ts` | Main service |
-| `migrations/163_magic_carpet.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 
 ### 41.12 Integration with Reality Engine
 
@@ -11651,7 +11651,7 @@ Three merge strategies are available:
 | `packages/shared/src/types/concurrent-execution.types.ts` | Type definitions |
 | `lambda/shared/services/concurrent-execution.service.ts` | Core service |
 | `lambda/thinktank/concurrent-execution.ts` | API handler |
-| `migrations/170_concurrent_execution.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 
 ---
 
@@ -11806,7 +11806,7 @@ const clusters = await parseWhiteboard(elements);
 | `packages/shared/src/types/structure-from-chaos.types.ts` | Type definitions |
 | `lambda/shared/services/structure-from-chaos.service.ts` | Core service |
 | `lambda/thinktank/structure-from-chaos.ts` | API handler |
-| `migrations/171_structure_from_chaos.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 
 ---
 
@@ -11867,7 +11867,7 @@ The Think Tank Code Quality page displays:
 | `lambda/shared/services/__tests__/delight.service.test.ts` | Core service tests |
 | `lambda/shared/services/__tests__/delight-orchestration.service.test.ts` | Orchestration tests |
 | `lambda/shared/services/__tests__/delight-events.service.test.ts` | Events service tests |
-| `apps/admin-dashboard/app/(dashboard)/thinktank/code-quality/page.tsx` | Dashboard UI |
+| `apps/admin-dashboard/app/(dashboard)/code-quality/page.tsx` | Dashboard UI |
 
 ---
 
@@ -11955,7 +11955,7 @@ HITL Orchestration implements industry best practices to reduce unnecessary ques
 
 | File | Purpose |
 |------|---------|
-| `apps/thinktank-admin/app/hitl-orchestration/page.tsx` | Dashboard page |
+| `apps/thinktank-admin/app/(dashboard)/hitl-orchestration/page.tsx` | Dashboard page |
 | `apps/thinktank-admin/components/layout/sidebar.tsx` | Navigation item |
 
 ---
@@ -12026,7 +12026,7 @@ Questions are prioritized based on domain-specific impact:
 
 | File | Purpose |
 |------|---------|
-| `apps/thinktank-admin/app/scout-hitl/page.tsx` | Dashboard page |
+| `apps/thinktank-admin/app/(dashboard)/scout-hitl/page.tsx` | Dashboard page |
 | `apps/thinktank-admin/components/layout/sidebar.tsx` | Navigation item |
 
 ---
@@ -12368,7 +12368,7 @@ Base: `/api/admin/dynamic-reports`
 | `apps/thinktank-admin/app/(dashboard)/reports/page.tsx` | Reports page |
 | `packages/infrastructure/lambda/shared/services/schema-adaptive-reports.service.ts` | Backend service |
 | `packages/infrastructure/lambda/admin/dynamic-reports.ts` | API handler |
-| `packages/infrastructure/migrations/V2026_01_21_003__dynamic_reports.sql` | Database migration |
+| `migrations/000_consolidated_schema.sql` | Database migration |
 
 ---
 
@@ -12652,9 +12652,9 @@ Base: `/api/thinktank/decision-artifacts`
 | `packages/infrastructure/lambda/shared/services/dia/` | Backend services |
 | `packages/infrastructure/lambda/thinktank/decision-artifacts.ts` | API handler |
 | `packages/infrastructure/lib/stacks/dia-stack.ts` | CDK infrastructure |
-| `packages/infrastructure/migrations/V2026_01_22_001__decision_artifacts.sql` | Core schema |
-| `packages/infrastructure/migrations/V2026_01_22_002__decision_artifact_versioning.sql` | Versioning functions |
-| `packages/infrastructure/migrations/V2026_01_22_003__decision_artifact_config.sql` | Config & templates |
+| `migrations/000_consolidated_schema.sql` | Core schema |
+| `migrations/000_consolidated_schema.sql` | Versioning functions |
+| `migrations/000_consolidated_schema.sql` | Config & templates |
 | `apps/thinktank-admin/app/(dashboard)/decision-records/` | Admin UI |
 | `apps/thinktank-admin/app/(dashboard)/decision-records/components/` | UI components |
 
@@ -13913,7 +13913,7 @@ The Topology Scorer evaluates these 9 orchestration modes:
 | `lambda/shared/services/axiom.service.ts` | AXIOM pipeline (uses Model/Topology scorers) |
 | `lambda/shared/services/clarion.service.ts` | CLARION (uses CLARION Scorer) |
 | `packages/shared/src/types/axiom-clarion.types.ts` | Scorer type definitions |
-| `migrations/V2026_02_01_001__axiom_neural_cortex.sql` | Database schema |
+| `migrations/000_consolidated_schema.sql` | Database schema |
 
 ### 56.9 Training Integration
 
@@ -15503,7 +15503,7 @@ The Zero-Cost Ego System provides persistent AI personality through database sta
 ### Implementation
 
 - **Lambda**: `lambda/admin/ego.ts`
-- **Service**: `lambda/shared/services/ego-context.service.ts`
+- **Service**: `lambda/shared/services/local-ego.service.ts`
 - **Database**: `ego_config`, `ego_identity`, `ego_affect`
 
 ---
@@ -15564,7 +15564,7 @@ Sovereign Mesh provides decentralized AI agent management and transparency for T
 
 ### Implementation
 
-- **App Files**: `apps/thinktank-admin/app/(dashboard)/sovereign-mesh/*.tsx`
+- **App Files**: `apps/thinktank-admin/app/(dashboard)/sovereign-mesh/ (agents, ai-helper, approvals, apps, transparency)`
 - **Navigation**: All pages linked in sidebar under "Sovereign Mesh" section
 
 ---
@@ -16297,7 +16297,7 @@ apps/thinktank/
 ## 25. GDPR & Compliance APIs
 
 **Path**: `/compliance`  
-**App File**: `apps/admin-dashboard/app/(dashboard)/thinktank/compliance/page.tsx`
+**App File**: `apps/admin-dashboard/app/(dashboard)/compliance/page.tsx`
 
 ### Features
 
@@ -16520,7 +16520,7 @@ See `/.windsurf/workflows/docs-update-all.md` for documentation policy.
 
 ## Overview
 
-The **Think Tank Tenant Admin** app is a dedicated administration interface for company/team-level settings. Unlike the Platform Admin (RADIANT Admin) which manages infrastructure across all tenants, and unlike the Think Tank Admin which is for Radiant super-admins configuring Think Tank features, the **Tenant Admin** is for organization administrators to manage their own tenant's settings, users, and content.
+The **Think Tank Tenant Administration** app is a dedicated administration interface for company/team-level settings. Unlike the Platform Admin (RADIANT Admin) which manages infrastructure across all tenants, and unlike the Think Tank Admin which is for Radiant super-admins configuring Think Tank features, the **Tenant Administration** app is for organization administrators to manage their own tenant's settings, users, and content.
 
 ### App Hierarchy
 
@@ -16528,12 +16528,12 @@ The **Think Tank Tenant Admin** app is a dedicated administration interface for 
 |-----|----------|-------|----------|
 | **RADIANT Admin** | Platform operators | All tenants, infrastructure | `apps/admin-dashboard/` |
 | **Think Tank Admin** | Radiant super-admins | Think Tank platform config | Documented in `THINKTANK-ADMIN-GUIDE.md` |
-| **Think Tank Tenant Admin** | Organization admins | Single tenant, team settings | `apps/thinktank-tenant-admin/` |
+| **Think Tank Tenant Administration** | Organization admins | Single tenant, team settings | `apps/thinktank-tenant-admin/` |
 | **Think Tank** | End users | Chat, workflows | `apps/thinktank/` |
 
 ### Key Principle: Tenant Isolation
 
-The Tenant Admin app sits **BEHIND the service layer**. All requests are automatically tenant-isolated:
+The Tenant Administration app sits **BEHIND the service layer**. All requests are automatically tenant-isolated:
 - Admins can only see/modify their own tenant's data
 - System-level resources appear as read-only
 - No cross-tenant access is possible
@@ -17358,8 +17358,8 @@ Use Bearer token from Think Tank session or API key with `tenant:admin` scope.
 
 | Component | Path | Status |
 |-----------|------|--------|
-| **Tenant API** | `lambda/tenant/handler.ts` | 🔲 Pending |
-| **Tenant Service** | `lambda/shared/services/tenant-admin.service.ts` | 🔲 Pending |
+| **Tenant API** | `lambda/thinktank-tenant-admin/handler.ts` | 🔲 Pending |
+| **Tenant Service** | `lambda/shared/services/tenant-provisioning.service.ts` | 🔲 Pending |
 
 ### Database Tables
 
@@ -21988,800 +21988,930 @@ Not per-session. The Compliance Auto-Restrict toggle is tenant-wide. If you disa
 
 ---
 
-*Consolidated from 12 source documents (0 not found). 21,932 source lines.*
-# Think Tank Real-Time Collaboration - Complete Guide
-
-> **The Only Consumer AI Platform with True Real-Time Multi-User Collaboration**
->
-> **Version**: 6.6.0 | **Last Updated**: February 4, 2026  
-> **Classification**: Internal + Investor Distribution
-
 ---
+
+## Part XI: Think Tank macOS Native Client — User Guide
+
+> *Merged from `THINKTANK-MAC-GUIDE.md` — complete Mac app user guide consolidated here.*
 
 ## Table of Contents
 
-1. [Executive Summary](#executive-summary)
-2. [Why This Matters: The Market Gap](#why-this-matters-the-market-gap)
-3. [Architecture Overview](#architecture-overview)
-4. [Core Features](#core-features)
-5. [Technical Implementation](#technical-implementation)
-6. [User Experience](#user-experience)
-7. [Competitive Analysis](#competitive-analysis)
-8. [Marketing & Sales Points](#marketing--sales-points)
-9. [Engineering Reference](#engineering-reference)
-10. [Deployment & Configuration](#deployment--configuration)
-11. [API Reference](#api-reference)
-12. [Security & Compliance](#security--compliance)
-13. [Roadmap](#roadmap)
+1. [Welcome](#1-welcome)
+2. [Getting Started](#2-getting-started)
+3. [The Interface](#3-the-interface)
+4. [Conversations](#4-conversations)
+5. [Chat Features](#5-chat-features)
+6. [My Rules](#6-my-rules)
+7. [Advanced Mode](#7-advanced-mode)
+8. [AXIOM Forge](#8-axiom-forge)
+9. [Brain Plans](#9-brain-plans)
+10. [Time Machine](#10-time-machine)
+11. [Crucible Deliberation](#11-crucible-deliberation)
+12. [Voice Input](#12-voice-input)
+13. [File Attachments](#13-file-attachments)
+14. [Artifacts](#14-artifacts)
+15. [History](#15-history)
+16. [Profile & Analytics](#16-profile--analytics)
+17. [Settings](#17-settings)
+18. [Keyboard Shortcuts](#18-keyboard-shortcuts)
+19. [Troubleshooting](#19-troubleshooting)
+20. [Platform Differences from Web](#20-platform-differences-from-web)
 
 ---
 
-## Executive Summary
+## 1. Welcome
 
-Think Tank's Real-Time Collaboration system represents the **largest feature gap in the consumer AI market**. While ChatGPT, Claude, and Gemini offer text-only, single-user experiences with at best asynchronous sharing, Think Tank delivers:
+Think Tank (Mac) is the native macOS client for RADIANT's Think Tank AI platform. It provides the same powerful AI conversation capabilities as the web app, built with SwiftUI for a fast, native macOS experience.
 
-- **True real-time co-editing** with Yjs CRDT (Conflict-free Replicated Data Types)
-- **Live presence indicators** showing who's in the conversation
-- **Typing attribution** so you know who's contributing
-- **Conversation branching** for parallel exploration of ideas
-- **AI Roundtables** with multiple AI models debating in real-time
-- **Knowledge Graph visualization** that builds as you collaborate
-- **Guest access** without requiring account creation
-- **Session recording and playback** for async review
-
-This is not an incremental improvement—it's a category-defining capability that no competitor can match without 12-18 months of development.
+**Key advantages of the Mac app:**
+- **Native performance** — Built with SwiftUI, launches instantly
+- **macOS integration** — Keyboard shortcuts, menu bar, native file dialogs, Notification Center
+- **Glassmorphism UI** — Translucent materials using macOS vibrancy
+- **Offline settings** — Preferences persist locally via UserDefaults
+- **Secure auth** — Token storage via macOS Keychain
 
 ---
 
-## Why This Matters: The Market Gap
+## 2. Getting Started
 
-### The Problem with Current AI Platforms
+### System Requirements
 
-Every major AI platform today operates on the same fundamental model: **one user, one conversation, one context**. This creates significant friction for teams:
+- macOS 14.0 (Sonoma) or later
+- Apple Silicon or Intel Mac
+- Internet connection (for API access)
+- Microphone access (optional, for voice input)
 
-| Scenario | ChatGPT/Claude/Gemini | Impact |
-|----------|----------------------|--------|
-| Team brainstorming | Share link, lose context | Ideas fragmented |
-| Project planning | Copy-paste between chats | Information silos |
-| Decision making | Sequential, not parallel | Slower decisions |
-| Knowledge capture | Buried in individual chats | Institutional memory lost |
+### First Launch
 
-### The Think Tank Solution
+1. Open Think Tank from your Applications folder or Launchpad
+2. The app opens to the **Welcome screen** with quick actions
+3. Configure your API server URL in **Settings** (⌘,) if not using the default
+4. Sign in with your RADIANT credentials
+5. Start chatting!
 
-Think Tank treats AI conversations as **collaborative workspaces**, not isolated chat threads:
+### Connecting to Your Server
 
-| Capability | How It Works | Business Value |
-|------------|--------------|----------------|
-| Real-time sync | Yjs CRDT ensures all participants see the same state | No "which version is correct?" confusion |
-| Presence awareness | Live indicators of who's active | Know when to jump in vs. wait |
-| Conversation branching | Fork a conversation to explore alternatives | Test ideas without derailing the main thread |
-| AI Roundtables | Multiple AI models debate a topic | Get diverse perspectives without prompt switching |
-| Knowledge Graph | Visual concept map builds automatically | See the shape of your team's thinking |
-| Guest access | Share a link, join instantly | Include stakeholders without IT friction |
+Go to **Think Tank > Settings > General > API** and enter your RADIANT API base URL (e.g., `https://api.radiant.yourcompany.com`).
 
 ---
 
-## Architecture Overview
+## 3. The Interface
 
-### System Components
+Think Tank (Mac) uses a **NavigationSplitView** layout:
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                    COLLABORATION ARCHITECTURE                     │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                   │
-│  ┌─────────────┐     ┌─────────────┐     ┌─────────────┐        │
-│  │   Client    │────▶│  WebSocket  │────▶│    Y.js     │        │
-│  │  (React)    │     │   Gateway   │     │  Provider   │        │
-│  └─────────────┘     └─────────────┘     └─────────────┘        │
-│         │                   │                   │                │
-│         │                   │                   ▼                │
-│         │                   │           ┌─────────────┐          │
-│         │                   │           │   Aurora    │          │
-│         │                   │           │ PostgreSQL  │          │
-│         │                   │           └─────────────┘          │
-│         │                   │                   │                │
-│         ▼                   ▼                   ▼                │
-│  ┌─────────────┐     ┌─────────────┐     ┌─────────────┐        │
-│  │  REST API   │────▶│  Lambda     │────▶│    S3       │        │
-│  │  (Next.js)  │     │  Handlers   │     │  Storage    │        │
-│  └─────────────┘     └─────────────┘     └─────────────┘        │
-│                                                                   │
-└─────────────────────────────────────────────────────────────────┘
++------------------+------------------------------------------+
+|                  |                                          |
+|    SIDEBAR       |              DETAIL VIEW                 |
+|                  |                                          |
+|  [New Chat]      |  [Header Bar]                           |
+|  [Search]        |  [Domain] [Model] [Advanced] [Focus]    |
+|  [Nav Sections]  |                                          |
+|  [Conversations] |  [Messages Area]                         |
+|                  |                                          |
+|                  |  [Chat Input]                            |
++------------------+------------------------------------------+
 ```
 
-### Data Flow
+### Sidebar
+- **New Chat** button (⌘N)
+- **Search** conversations
+- **Navigation sections**: My Rules, History, Artifacts, Settings, Profile
+- **Conversations** grouped by date (Today, Yesterday, This Week, etc.)
 
-1. **Connection**: Client establishes WebSocket connection with JWT authentication
-2. **Sync**: Yjs provider syncs local CRDT state with server
-3. **Presence**: Heartbeats broadcast participant status every 30 seconds
-4. **Messages**: Each message is a CRDT operation, ensuring conflict-free merge
-5. **Persistence**: All state persisted to Aurora PostgreSQL for durability
-6. **Media**: Attachments and recordings stored in S3 with signed URLs
-
-### Key Technologies
-
-| Component | Technology | Why This Choice |
-|-----------|------------|-----------------|
-| CRDT Engine | Yjs | Industry-leading CRDT library, used by Notion, Figma |
-| WebSocket | API Gateway WebSocket | Managed, scales to millions |
-| Database | Aurora PostgreSQL | ACID transactions, RLS for multi-tenancy |
-| Object Storage | S3 | Unlimited scale, lifecycle policies |
-| CDN | CloudFront | Global edge caching |
-| Authentication | Cognito + Guest Tokens | Secure but friction-free |
+### Detail View
+Changes based on the selected section — Chat, Rules, History, Artifacts, Settings, or Profile.
 
 ---
 
-## Core Features
+## 4. Conversations
 
-### 1. Real-Time Presence System
+### Creating a Conversation
+- Click **New Chat** in the sidebar, or press **⌘N**
+- Type your message and press **Return**
 
-**What It Does**: Shows who's currently in a collaboration session with live status updates.
+### Managing Conversations
+- **Rename**: Hover over a conversation, click the pencil icon
+- **Delete**: Hover over a conversation, click the trash icon
+- **Search**: Use the search bar at the top of the sidebar
+- **Favorites**: Starred conversations show a yellow star icon
 
-**Technical Details**:
-- WebSocket heartbeat every 30 seconds
-- Presence broadcast to all participants
-- Automatic "away" detection after 5 minutes of inactivity
-- Color-coded avatars with initials for quick identification
-
-**User Experience**:
-```
-┌─────────────────────────────────────────┐
-│ 🟢 Alice (you)    │ Viewing            │
-│ 🟢 Bob            │ Typing...          │
-│ 🟡 Carol          │ Away (5m)          │
-│ 🔴 David          │ Offline            │
-└─────────────────────────────────────────┘
-```
-
-**Implementation Files**:
-- Service: `lambda/shared/services/enhanced-collaboration.service.ts`
-- WebSocket: `lambda/websocket/collaboration-handler.ts`
-- UI: `components/collaboration/ParticipantsSidebar.tsx`
+### Conversation Grouping
+Conversations are automatically grouped:
+- **Today** — conversations updated today
+- **Yesterday** — updated yesterday
+- **This Week** — within the last 7 days
+- **This Month** — within the last 30 days
+- **Older** — everything else
 
 ---
 
-### 2. Typing Indicators with Attribution
+## 5. Chat Features
 
-**What It Does**: Shows when participants are typing, with their name and avatar visible.
+### Sending Messages
+- Type in the input area at the bottom
+- Press **Return** to send
+- Press **Shift+Return** for a new line
+- Click the send button (arrow icon)
 
-**Technical Details**:
-- Debounced typing events (250ms)
-- Auto-clear after 3 seconds of no input
-- Multiple simultaneous typers supported
-- Animated indicator with participant's color
+### Streaming Responses
+Responses stream in real-time via Server-Sent Events. You'll see a typing indicator and a blinking cursor as the AI generates its response. Toggle streaming in Settings > General.
 
-**User Experience**:
-```
-┌─────────────────────────────────────────┐
-│ 💬 Bob and Carol are typing...         │
-│ ●●●                                     │
-└─────────────────────────────────────────┘
-```
+### Model Selection
+Click the model selector in the header bar to choose which AI model to use. Models are grouped by category and show capability badges.
 
----
+### Domain Selection
+In Advanced Mode, a domain selector appears. Choose **Auto** for automatic domain detection, or manually select a domain (e.g., Medical, Legal, Engineering).
 
-### 3. Conversation Branching
+### Message Actions
+Hover over an assistant message to reveal:
+- **Copy** — copies the message to clipboard
+- **Thumbs Up/Down** — rate the response
+- **Regenerate** — get a new response
+- **Brain Plan** — view the AI's reasoning (Advanced Mode)
 
-**What It Does**: Fork a conversation at any point to explore alternative directions without losing the original thread.
-
-**Why It's Revolutionary**: No other AI platform offers this. When you're in a team brainstorm and someone says "what if we tried X instead?", you can literally branch the conversation and explore both paths simultaneously.
-
-**Technical Details**:
-- Git-like branching model with parent references
-- Messages belong to specific branches
-- Merge capability with AI-assisted conflict resolution
-- Branch comparison view ("diff" between branches)
-
-**User Experience**:
-```
-Main Branch
-    │
-    ├── Message 1: "Let's plan the product launch"
-    │
-    ├── Message 2: "AI: Here's a timeline..."
-    │
-    ├── 🔀 Branch: "Aggressive Timeline"
-    │   ├── Message 3a: "What if we launch in 2 weeks?"
-    │   └── Message 4a: "AI: That's tight but possible..."
-    │
-    └── Message 3: "Let's stick to the original plan"
-        └── Message 4: "AI: Good choice, here's why..."
-```
-
-**Merge Flow**:
-1. Select source branch
-2. AI analyzes both branches for insights
-3. Generates synthesis combining best ideas
-4. Optional: keep branches as historical record
-
-**Implementation Files**:
-- Service: `lambda/shared/services/enhanced-collaboration.service.ts` (createBranch, mergeBranch)
-- UI: `components/collaboration/BranchVisualization.tsx`
-- API: `lambda/thinktank/enhanced-collaboration.ts`
+### Message Metadata
+In Advanced Mode, messages show:
+- Model used
+- Token count
+- Latency (ms)
+- Cost estimate ($)
 
 ---
 
-### 4. Guest Access (No Account Required)
+## 6. My Rules
 
-**What It Does**: Generate a secure invite link that allows anyone to join a collaboration session without creating an account.
+Personalize how the AI responds to you with rules.
 
-**Why It Matters**: Reduces friction for:
-- Client meetings
-- Cross-company collaboration
-- Quick stakeholder input
-- User research sessions
+### Creating Rules
+1. Go to **My Rules** in the sidebar
+2. Click **Add Rule**
+3. Choose a rule type (Restriction, Preference, Format, Source, Tone, Topic, Privacy)
+4. Write your rule text
+5. Click **Save Rule**
 
-**Technical Details**:
-- Cryptographically secure invite tokens (UUID v4 + HMAC)
-- Configurable expiration (1 hour to 30 days)
-- Usage limits (single-use or unlimited)
-- Permission scoping (viewer, contributor, full access)
-- Audit trail for all guest actions
+### Rule Presets
+Browse curated rule presets by clicking **Presets**. Categories include professional, academic, creative, and more. Click the + button to add a preset to your rules.
 
-**User Experience**:
-```
-Share this link with your collaborators:
-┌─────────────────────────────────────────┐
-│ https://thinktank.app/join/abc123xyz   │
-│                                         │
-│ ⏱️ Expires: In 7 days                   │
-│ 👥 Uses: Unlimited                      │
-│ 🔒 Access: Contributor                  │
-│                                         │
-│ [Copy Link]  [Create New]  [Revoke]    │
-└─────────────────────────────────────────┘
-```
-
-**Implementation Files**:
-- Service: `createGuestInvite`, `joinAsGuest`, `getSessionGuests`
-- UI: `components/collaboration/dialogs/InviteDialog.tsx`
+### Managing Rules
+- **Toggle** — enable/disable rules with the switch
+- **Edit** — click the pencil icon to modify
+- **Delete** — click the trash icon to remove
+- **Priority** — set priority (1-100) to control which rules take precedence
 
 ---
 
-### 5. AI Facilitator
+## 7. Advanced Mode
 
-**What It Does**: An AI moderator that helps guide collaborative conversations, suggests discussion topics, identifies when the group is stuck, and synthesizes key decisions.
+Toggle Advanced Mode with the brain icon in the header bar, or press **⇧⌘D**.
 
-**Facilitator Behaviors**:
-
-| Behavior | Trigger | Action |
-|----------|---------|--------|
-| Topic suggestion | Silence > 2 minutes | "Perhaps we should discuss..." |
-| Consensus detection | 3+ participants agree | "It sounds like we've agreed on..." |
-| Conflict resolution | Opposing viewpoints | "Let me summarize both perspectives..." |
-| Time awareness | Meeting halfway point | "We have 15 minutes left. Key open items..." |
-| Action extraction | Decision language detected | "I'm capturing this as an action item..." |
-
-**Configuration Options**:
-- Intervention frequency (passive, balanced, active)
-- Personality style (formal, casual, Socratic)
-- Focus areas (decisions, actions, brainstorming)
-- Model selection (which AI powers the facilitator)
-
-**Implementation Files**:
-- Service: `enableFacilitator`, `getFacilitatorConfig`
-- UI: `components/collaboration/dialogs/FacilitatorSettingsDialog.tsx`
+Advanced Mode reveals:
+- **Message metadata** (model, tokens, latency, cost)
+- **Domain selector** in the header
+- **Time Machine** button
+- **AXIOM Forge** button
+- **Brain Plan viewer** on messages
 
 ---
 
-### 6. AI Roundtables
+## 8. AXIOM Forge
 
-**What It Does**: Summon multiple AI models to debate a topic, each bringing their unique perspective and capabilities.
+AXIOM Forge is a 4-step prompt optimization workflow.
 
-**Why It's Powerful**: Instead of asking one AI and accepting its answer, you can:
-- Get diverse perspectives (Claude's nuance, GPT's breadth, Gemini's reasoning)
-- Identify consensus across models
-- Spot disagreements that warrant human judgment
-- Avoid single-model bias
+### Steps
+1. **Classify** — AXIOM detects the domain of your prompt
+2. **Clarify** — AXIOM asks targeted questions to refine intent
+3. **Compile** — Your answers are compiled into an optimized prompt
+4. **Route** — The best model is selected based on scoring
 
-**Debate Styles**:
-
-| Style | Description | Best For |
-|-------|-------------|----------|
-| Collaborative | Models build on each other's ideas | Brainstorming, ideation |
-| Adversarial | Models challenge each other | Decision validation, risk assessment |
-| Socratic | Question-based exploration | Learning, complex topics |
-| Brainstorm | Free-form ideation | Creative projects |
-| Devil's Advocate | Counter-arguments for every point | Stress-testing decisions |
-
-**Roundtable Flow**:
-1. Define the topic and select participating models
-2. Choose debate style and number of rounds
-3. AI models take turns contributing
-4. Each can reference and respond to previous contributions
-5. Final synthesis summarizes consensus and disagreements
-
-**Output Structure**:
-```json
-{
-  "synthesis": "After 3 rounds of debate, the models agreed that...",
-  "consensusPoints": [
-    "Customer acquisition should prioritize organic channels",
-    "MVP scope should include core features only"
-  ],
-  "disagreementPoints": [
-    "Pricing strategy: Claude favors freemium, GPT-4 suggests premium-only"
-  ],
-  "recommendations": [
-    "Test both pricing models with user research before deciding"
-  ]
-}
-```
-
-**Implementation Files**:
-- Service: `createRoundtable`, `addRoundtableContribution`, `completeRoundtable`
-- UI: `components/collaboration/AIRoundtableView.tsx`
+### Using AXIOM
+1. Click the wand icon in the header (Advanced Mode)
+2. Enter your prompt
+3. Answer clarification questions
+4. Review model scores and the compiled prompt
+5. Click **Use This Prompt** to copy it
 
 ---
 
-### 7. Knowledge Graph Visualization
+## 9. Brain Plans
 
-**What It Does**: Automatically builds a visual concept map as the conversation progresses, showing how ideas connect.
+Brain Plans show the AI's decision-making process.
 
-**Node Types**:
+### What You See
+- **Orchestration mode** (Thinking, Extended Thinking, Coding, Creative, etc.)
+- **Domain detection** with confidence score
+- **Selected model** and reasoning
+- **Execution steps** with timing
+- **Spend Governor** status and savings
 
-| Type | Icon | Description |
+### Accessing Brain Plans
+Click the brain icon on any assistant message (visible in Advanced Mode).
+
+---
+
+## 10. Time Machine
+
+Scrub through conversation state snapshots.
+
+### Features
+- **Timeline** — visual track of all snapshots
+- **Playback** — auto-play through snapshots
+- **Bookmarks** — mark important points
+- **Branches** — create a new conversation branch from any snapshot
+- **Restore** — revert the conversation to a previous state
+
+### Using Time Machine
+1. Click the clock icon in the header (Advanced Mode)
+2. Browse snapshots in the list or timeline
+3. Click a snapshot to preview
+4. Use **Restore** to revert, or **Branch** to fork
+
+---
+
+## 11. Crucible Deliberation
+
+View multi-model verification when the AI cross-checks its answers.
+
+### What You See
+- Questions asked between models
+- Answers and quality scores
+- Circular citation detection warnings
+- Configuration (max questions, cost mode)
+
+---
+
+## 12. Voice Input
+
+Speak instead of typing using the built-in voice transcription.
+
+### Requirements
+- Microphone access (grant in System Settings > Privacy & Security > Microphone)
+- Active internet connection (uses Whisper API)
+
+### Using Voice
+1. Click the microphone icon in the input area
+2. Click the red record button
+3. Speak your message
+4. Click the green checkmark to transcribe
+5. The transcribed text appears in the input area
+
+### Audio Level Indicator
+A visual bar display shows your audio levels in real-time during recording.
+
+---
+
+## 13. File Attachments
+
+Attach files to your messages for context.
+
+### Supported File Types
+- **Documents**: PDF, TXT, RTF, HTML
+- **Images**: PNG, JPEG, GIF, SVG, WebP
+- **Data**: CSV, JSON, XML
+
+### Maximum File Size
+25 MB per file
+
+### How to Attach
+- Click the **paperclip icon** in the input area
+- Click **Browse Files** to use the native file picker
+- **Drag and drop** files into the attachment area
+- Files appear as chips above the input; click X to remove
+
+---
+
+## 14. Artifacts
+
+View code, documents, charts, and other generated content.
+
+### Browsing Artifacts
+1. Go to **Artifacts** in the sidebar
+2. Filter by type: All, Code, Document, Image, Chart
+3. Click an artifact to preview in the detail pane
+
+### Artifact Actions
+- **Copy** — copy content to clipboard
+- **Save** — export to a file using the native Save dialog
+
+---
+
+## 15. History
+
+Browse and search all your past conversations.
+
+### Features
+- **Search** by title or message content
+- **Sort** by newest, oldest, or most messages
+- **Domain filter** — filter by conversation domain
+- **Quick open** — click to jump to any conversation
+
+---
+
+## 16. Profile & Analytics
+
+### Overview Tab
+- Total conversations, messages, tokens, cost
+- Achievement count
+- Favorite models
+- Top domains
+
+### Achievements Tab
+- View all achievements with progress
+- Rarity levels: Common, Uncommon, Rare, Epic, Legendary
+- Points system
+
+### Usage Tab
+- Daily activity chart (last 30 days)
+
+---
+
+## 17. Settings
+
+Access via **Think Tank > Settings** (⌘,) or the sidebar.
+
+### General
+- **AI Personality** — Auto, Professional, Subtle, Expressive, Playful
+- **Streaming** — toggle real-time response streaming
+- **Notifications** — enable/disable
+- **API Server URL** — configure your RADIANT endpoint
+
+### Display
+- **Compact mode** — reduce spacing
+- **Show token count** — display in message metadata
+- **Show cost estimate** — display in message metadata
+- **Sound effects** — toggle
+
+### Voice
+- **Enable voice input** — toggle microphone access
+- **Open System Settings** — configure microphone permissions
+
+### Shortcuts
+- View all keyboard shortcuts
+- Enable/disable keyboard shortcuts globally
+
+### Privacy
+- Data storage information
+- Clear local settings
+
+---
+
+## 18. Keyboard Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| **⌘N** | New Conversation |
+| **⇧⌘D** | Toggle Advanced Mode |
+| **⇧⌘F** | Toggle Focus Mode |
+| **⌘\\** | Toggle Sidebar |
+| **⌘,** | Settings |
+| **Return** | Send Message |
+| **⇧Return** | New Line in Input |
+
+---
+
+## 19. Troubleshooting
+
+### Cannot Connect to Server
+1. Check your API URL in Settings > General > API
+2. Verify your internet connection
+3. Ensure the RADIANT server is running
+4. Check if your authentication token has expired
+
+### Microphone Not Working
+1. Go to System Settings > Privacy & Security > Microphone
+2. Ensure Think Tank has microphone access
+3. Check that no other app is using the microphone exclusively
+
+### Slow Performance
+1. Close unused conversations
+2. Disable streaming if experiencing network issues
+3. Check Activity Monitor for resource usage
+
+### Messages Not Loading
+1. Check your internet connection
+2. Try creating a new conversation
+3. Restart the app
+
+---
+
+## 20. Platform Differences from Web
+
+Think Tank (Mac) provides the same core functionality as the web app with platform-appropriate adaptations:
+
+| Feature | Web | Mac |
+|---------|-----|-----|
+| Styling | Tailwind CSS + glassmorphism | SwiftUI `.ultraThinMaterial` |
+| Animations | Framer Motion springs | SwiftUI `.spring()` animation |
+| State Management | Zustand stores | `@Observable` / `@Published` |
+| Clipboard | `navigator.clipboard` | `NSPasteboard` |
+| File Picker | `<input type="file">` | `NSOpenPanel` |
+| Audio Recording | `MediaRecorder` | `AVAudioEngine` |
+| Streaming | `ReadableStream` | `URLSession.bytes` |
+| Settings Storage | `localStorage` | `UserDefaults` |
+| Navigation | Next.js file routing | `NavigationSplitView` |
+
+### Excluded from Mac App
+- **Polymorphic Interface** — The morphing UI (Data Grid, Chart, Kanban, etc.) is excluded from Mac scope
+- **Admin features** — Admin dashboard remains web-only
+
+For the complete portability breakdown, see `docs/THINKTANK-MAC-PORTABILITY-MANIFEST.md`.
+
+---
+
+*This guide is maintained under the Think Tank Dual-Platform Sync Policy (`/.windsurf/workflows/thinktank-dual-platform.md`). Any change to the Mac app requires a corresponding update to this document.*
+
+
+
+---
+
+## Part XII: Think Tank — Mac Portability Manifest
+
+> *Merged from `THINKTANK-MAC-PORTABILITY-MANIFEST.md` — feature parity matrix and technology adaptation map.*
+
+This document is the **authoritative record** of every Think Tank web feature, its Mac portability status, and the technology adaptation required. It MUST be updated whenever a feature is added, removed, or changed on either platform.
+
+---
+
+## Feature Parity Matrix
+
+### Legend
+
+| Status | Meaning |
+|--------|---------|
+| ✅ Ported | Feature exists on Mac with full parity |
+| 🔄 Adapted | Feature exists on Mac with platform-appropriate adaptation |
+| ❌ Excluded | Feature intentionally excluded from Mac scope |
+| 🔲 Planned | Feature exists on web, Mac implementation planned |
+| ⚠️ Partial | Feature partially ported, gaps documented below |
+
+---
+
+### Tier 1: Core Features (Must Have)
+
+| # | Feature | Web | Mac | Status | Notes |
+|---|---------|-----|-----|--------|-------|
+| 1 | Chat Interface | `ModernChatInterface.tsx` | `ChatView.swift` | ✅ Ported | Full parity |
+| 2 | Message Bubbles | `MessageBubble.tsx` | `MessageBubbleView.swift` | ✅ Ported | Full parity |
+| 3 | Chat Input | `ChatInput.tsx` | `ChatInputView.swift` | ✅ Ported | Full parity |
+| 4 | Sidebar / Navigation | `Sidebar.tsx` | `SidebarView.swift` | ✅ Ported | NavigationSplitView |
+| 5 | Conversation List | `Sidebar.tsx` | `SidebarView.swift` | ✅ Ported | Grouped by date |
+| 6 | Conversation CRUD | `chat.ts` (API) | `ChatService.swift` | ✅ Ported | Full parity |
+| 7 | Message Streaming (SSE) | `ReadableStream` | `URLSession.bytes` | 🔄 Adapted | Different API, same result |
+| 8 | Model Selection | `ModernChatInterface.tsx` | `ModelSelectorView.swift` | ✅ Ported | Native Menu picker |
+| 9 | Domain Selection | `ModernChatInterface.tsx` | `DomainSelectorView.swift` | ✅ Ported | Native Menu picker |
+| 10 | Message Copy | `navigator.clipboard` | `NSPasteboard` | 🔄 Adapted | Platform clipboard API |
+| 11 | Message Rating | `MessageBubble.tsx` | `MessageBubbleView.swift` | ✅ Ported | Thumbs up/down |
+| 12 | Message Regeneration | `chat.ts` | `ChatStore.swift` | ✅ Ported | Full parity |
+| 13 | Search Conversations | `Sidebar.tsx` | `SidebarView.swift` | ✅ Ported | Full parity |
+| 14 | Keyboard Shortcuts | Web key handlers | SwiftUI `.keyboardShortcut` | 🔄 Adapted | Native macOS shortcuts |
+| 15 | Authentication | Cookie/JWT | URLSession + Keychain | 🔄 Adapted | Secure token storage |
+
+### Tier 2: Important Features
+
+| # | Feature | Web | Mac | Status | Notes |
+|---|---------|-----|-----|--------|-------|
+| 16 | My Rules | Rules page | `RulesView.swift` | ✅ Ported | Full CRUD + presets |
+| 17 | Rule Presets | Presets browser | `PresetsSheet` | ✅ Ported | Full parity |
+| 18 | Settings | Settings page | `SettingsView.swift` | ✅ Ported | Native macOS Settings window |
+| 19 | History | History page | `HistoryView.swift` | ✅ Ported | Sort + filter |
+| 20 | Artifacts | Artifacts page | `ArtifactsView.swift` | ✅ Ported | Split view with detail |
+| 21 | Profile / Analytics | Profile page | `ProfileView.swift` | ✅ Ported | Stats + achievements |
+| 22 | Advanced Mode | Toggle in header | Toggle in header | ✅ Ported | UserDefaults persisted |
+| 23 | Focus Mode | Toggle in header | Toggle in header | ✅ Ported | Full parity |
+| 24 | Voice Input | `MediaRecorder` | `AVAudioEngine` | 🔄 Adapted | Native audio capture |
+| 25 | File Attachments | HTML5 drag-and-drop | `NSOpenPanel` + `.onDrop` | 🔄 Adapted | Native file handling |
+| 26 | Brain Plan Viewer | Brain plan modal | `BrainPlanViewer.swift` | ✅ Ported | Sheet presentation |
+| 27 | Spend Governor | Governor display | `BrainPlanViewer.swift` | ✅ Ported | Integrated in Brain Plan |
+
+### Tier 3: Advanced Features
+
+| # | Feature | Web | Mac | Status | Notes |
+|---|---------|-----|-----|--------|-------|
+| 28 | Time Machine | `time-machine.tsx` | `TimeMachineView.swift` | ✅ Ported | Timeline + playback |
+| 29 | AXIOM Forge | `AxiomForge.tsx` | `AxiomForgeView.swift` | ✅ Ported | 4-step workflow |
+| 30 | Crucible Deliberation | `CrucibleDeliberationPanel.tsx` | `CrucibleView.swift` | ✅ Ported | Event timeline |
+| 31 | Guest Restrictions | `GuestRestrictionBanner.tsx` | (API only) | ⚠️ Partial | API support, no banner UI yet |
+| 32 | Compliance Export | Export API | `ComplianceExportService.swift` | ✅ Ported | API + NSSavePanel |
+| 33 | Delight System | `DelightSystem.tsx` | Personality mode only | ⚠️ Partial | Mode selection ported; animations/toasts need native adaptation |
+
+### Excluded Features
+
+| # | Feature | Web Component | Reason for Exclusion |
+|---|---------|--------------|---------------------|
+| E1 | **Polymorphic Interface** | `LiquidMorphPanel.tsx` | **Explicitly excluded by scope** — the morphing UI (Data Grid, Chart, Kanban, Calculator, Code Editor, Document sub-views) is web-specific and not part of Mac app scope |
+| E2 | **Admin UI** | Admin dashboard pages | Mac app is consumer-only; admin features remain web-only |
+| E3 | **CSS Glassmorphism** | Tailwind `backdrop-blur` | Replaced by native `.ultraThinMaterial` — equivalent effect, not a gap |
+
+---
+
+## Technology Adaptation Map
+
+| Web Technology | Swift/macOS Equivalent | Adaptation Complexity | Notes |
+|---------------|----------------------|----------------------|-------|
+| React (Next.js 14) | SwiftUI | **Medium** | Different paradigm; declarative in both cases |
+| TypeScript interfaces | Swift structs + Codable | **Low** | Direct 1:1 mapping |
+| Zustand stores | `@Observable` / `@Published` | **Low** | SwiftUI native state management |
+| Framer Motion | SwiftUI `.animation()` / `.spring()` | **Low** | Native animation system is excellent |
+| Tailwind CSS | SwiftUI ViewModifiers + custom styles | **Medium** | No utility classes; use modifier chains |
+| Radix UI primitives | Native macOS controls | **Low** | macOS controls are more capable |
+| `fetch` / `ReadableStream` | `URLSession` / `URLSession.bytes` | **Low** | Excellent async/await support |
+| `localStorage` / `persist` | `UserDefaults` | **Low** | Direct equivalent |
+| `navigator.clipboard` | `NSPasteboard` | **Low** | Direct equivalent |
+| `MediaRecorder` | `AVAudioEngine` / `AVFoundation` | **Medium** | More powerful but different API |
+| HTML5 drag-and-drop | SwiftUI `.onDrop` / `NSOpenPanel` | **Low** | Better native support |
+| `react-markdown` | `swift-markdown` + `AttributedString` | **Medium** | Rendering pipeline differs |
+| `recharts` | Swift Charts | **Low** | Native, beautiful charts |
+| `react-syntax-highlighter` | `Highlightr` | **Low** | Direct equivalent |
+| Server-Sent Events | `URLSession.bytes` line parsing | **Low** | Custom SSE parser (~40 lines) |
+| CSS Grid / Flexbox | SwiftUI `LazyVGrid` / `HStack` / `VStack` | **Low** | Declarative layout |
+| Web Push Notifications | `UserNotifications` framework | **Low** | Better native support |
+| Service Workers (offline) | Not implemented | **N/A** | Mac app requires network connectivity |
+| Browser URL routing | `NavigationSplitView` / state-based | **Low** | SwiftUI navigation |
+
+---
+
+## Known Gaps & Planned Work
+
+| Gap ID | Feature | Current State | Target | Priority | Est. Effort |
+|--------|---------|--------------|--------|----------|-------------|
+| G1 | Guest Restriction Banner | API service only | Full SwiftUI banner | Medium | 1 day |
+| G2 | Delight Animations | Mode selection only | Full toast + haptic system | Low | 3 days |
+| G3 | Markdown Rendering | Plain text display | Rich `AttributedString` rendering | High | 2 days |
+| G4 | Code Syntax Highlighting | Highlightr integrated (Package.swift) | Wire into message bubbles | High | 1 day |
+| G5 | Offline Caching | None | SwiftData local cache for conversations | Low | 3 days |
+| G6 | Notification Integration | None | macOS `UserNotifications` for achievements | Low | 1 day |
+
+---
+
+## Maintenance Policy
+
+**This manifest MUST be updated when:**
+
+1. A new feature is added to **either** the web or Mac Think Tank app
+2. A feature is removed or deprecated on **either** platform
+3. A technology adaptation is discovered to be insufficient
+4. A gap is resolved or a new gap is identified
+5. A Tier 1/2 feature's status changes
+
+**Update process:**
+1. Add/update the row in the appropriate Feature Parity Matrix table
+2. If adding a new technology, add a row to the Technology Adaptation Map
+3. If discovering a gap, add a row to Known Gaps & Planned Work
+4. Update the version number and date at the top
+5. Update `docs/01-THINK-TANK.md` Mac section if user-facing
+
+**Policy enforcement**: `/.windsurf/workflows/thinktank-dual-platform.md`
+
+
+---
+
+---
+
+## Part XIII: Aurelius Dojo — Training System
+
+> *Merged from `03-DOJO.md` — complete Dojo training platform reference.*
+
+## Table of Contents
+
+- **Part I: User Guide**
+
+---
+
+
+---
+
+## Part I: User Guide
+
+> **Classification**: RADIANT INTERNAL  
+> **Version**: 1.2.0 | **Date**: February 6, 2026  
+> **Status**: FULLY WIRED — Frontend + Lambda + Database + CDK  
+> **Part of**: RADIANT Think Tank Ecosystem  
+> **Port**: 3004
+
+---
+
+## 1. What is the Dojo?
+
+The Aurelius Dojo is an **agent-powered training platform** that transforms private document libraries into structured, thematic mastery experiences. It is designed for:
+
+- **New employee onboarding** — order taking rules, policies, procedures
+- **Cross-training** — learn a different area of the business
+- **Compliance training** — regulations, safety protocols, legal requirements
+- **Product knowledge** — product lists, pricing, specifications
+
+The Dojo is **not a chatbot**. It is a structured learning environment with AI-driven lesson generation, adversarial testing, and mastery tracking.
+
+---
+
+## 2. Core Concepts
+
+### 2.1 Thematic Gating Protocol (TGP)
+
+Users **never see the raw document library**. Instead, the AI analyzes all documents and discovers 10-15 **Central Themes** — the core knowledge pillars. Training is gated to selected themes only, ensuring:
+
+- **No cognitive overload** — focused learning, not library browsing
+- **100% thematic purity** — AI only retrieves content matching your selected themes
+- **Deep mastery** — forced to internalize, not just skim
+
+### 2.2 The Conservation Cycle
+
+Every training session follows a four-step cycle:
+
+| Step | Name | What Happens |
 |------|------|-------------|
-| Concept | 🔵 | Core ideas and topics |
-| Question | 🟡 | Open questions to resolve |
-| Decision | 🟢 | Decisions that have been made |
-| Insight | 🟣 | Key realizations or aha moments |
-| Action | 🔴 | Tasks or next steps |
-| Person | 🩷 | People mentioned or responsible |
+| 1 | **Follow** | Select 1-3 Central Themes from the theme HUD |
+| 2 | **Call** | Sensei delivers synthesized lessons (Lecture Mode) |
+| 3 | **Tranq** | Adversarial agent challenges you (Sparring Mode) |
+| 4 | **Collect** | Earn XP, advance rank, unlock harder themes |
 
-**Edge Types**:
+### 2.3 Rank System
 
-| Type | Visual | Meaning |
-|------|--------|---------|
-| relates_to | Solid gray | General relationship |
-| leads_to | Solid green | Causal or sequential |
-| contradicts | Dashed red | Conflicting ideas |
-| supports | Solid blue | Supporting evidence |
-| defines | Solid purple | Definition or specification |
-| questions | Dashed amber | Raises questions about |
-
-**Interactive Features**:
-- Zoom, pan, and explore
-- Click nodes to see related messages
-- Add nodes manually
-- Draw connections between concepts
-- Filter by node type
-- Export as image or JSON
-
-**Auto-Generation**: The system uses NLP to:
-- Extract key concepts from messages
-- Identify relationships between concepts
-- Suggest node types based on context
-- Update the graph in real-time
-
-**Implementation Files**:
-- Service: `getOrCreateKnowledgeGraph`, `addNode`, `addEdge`
-- UI: `components/collaboration/KnowledgeGraphVisualization.tsx`
+| Rank | XP Required | Badge Color | Access |
+|------|-------------|-------------|--------|
+| **Novice** | 0 | Slate | Fundamental themes only |
+| **Initiate** | 500 | Green | Intermediate themes unlock |
+| **Adept** | 2,000 | Blue | Advanced themes unlock |
+| **Master** | 5,000 | Purple | Expert themes + certification exams |
+| **Radiant** | 10,000 | Gold | Full mastery — all content unlocked |
 
 ---
 
-### 8. Session Recording and Playback
+## 3. Using the Dojo
 
-**What It Does**: Record collaboration sessions for later review, with full playback including message timing, presence changes, and AI interactions.
+### 3.1 Library Tab
 
-**Recording Captures**:
-- All messages with exact timestamps
-- Participant join/leave events
-- Typing indicators (reconstructed)
-- Branch creation and merges
-- AI model invocations
-- Media attachments
+1. Click **New Library** to create a knowledge base
+2. Give it a name (e.g., "Order Taking Procedures") and description
+3. **Upload documents** — drag-and-drop or browse for PDF, MD, TXT, CSV files
+4. Wait for ingestion (status indicators: pending → ingesting → analyzing → ready)
+5. Click **Discover Themes** to let the AI analyze and extract Central Themes
 
-**Playback Features**:
-- Variable speed (0.5x to 4x)
-- Jump to specific timestamp
-- Search within recording
-- Export transcript
-- Share specific moments via timestamp links
+### 3.2 Themes Tab
 
-**Use Cases**:
-- Onboard team members by showing past decisions
-- Review complex discussions at your own pace
-- Create training materials from real sessions
-- Audit trail for compliance
+1. Browse the discovered Central Themes — each shows difficulty tier, required rank, and chunk count
+2. **Select 1-3 themes** to focus your training
+3. Themes are color-coded by difficulty: green (fundamental), blue (intermediate), purple (advanced), gold (expert)
+4. Click **Start Training** to enter the arena
 
-**Implementation Files**:
-- Service: `startRecording`, `stopRecording`, `addRecordingEvent`
-- UI: `components/collaboration/panels/PlaybackPanel.tsx`
+### 3.3 Training Tab — Lecture Mode
 
----
+1. Choose **Lecture Mode** to learn from the Sensei
+2. The AI generates synthesized lesson blocks from your library, grounded in citations
+3. Click the **sources** link on any lesson to see the exact document excerpts
+4. Click **Next Lesson** to continue progressing
+5. Click **End Session** when done
 
-### 9. Voice and Media Notes
+### 3.4 Training Tab — Sparring Mode
 
-**What It Does**: Record voice notes, share images, and attach files directly in the collaboration.
+1. Choose **Sparring Mode** to be challenged
+2. The adversarial testing agent generates questions:
+   - **Multiple choice** — select the best answer
+   - **Scenario-based** — apply library principles to a situation
+   - **Open-ended** — explain your reasoning
+   - **True/False** — quick knowledge checks
+3. Submit your answer to receive:
+   - Correct/incorrect verdict with partial credit
+   - The correct answer with full explanation
+   - Reasoning analysis of your response
+   - Source citations proving the answer
+   - XP awarded
+4. Click **Next Question** to continue
 
-**Supported Media**:
-- Voice notes (MP3, WAV, up to 10 minutes)
-- Images (JPEG, PNG, GIF, WebP, up to 25MB)
-- Documents (PDF, DOCX, XLSX, up to 50MB)
-- Code snippets (syntax highlighted)
+### 3.5 Progress Tab
 
-**AI Processing**:
-- Voice notes: Transcribed automatically
-- Images: Described by vision models
-- Documents: Summarized and searchable
-- Code: Explained and annotated
+- View your **overall rank** and XP progress bar
+- See **per-theme mastery** with accuracy, strengths, and weaknesses
+- Track **streak days**, session count, and total time
+- View earned **certifications**
 
-**Implementation Files**:
-- Service: `uploadMediaNote`, `getMediaNoteUrl`
-- UI: Voice recording in `RealTimeChat.tsx`
+### 3.6 Mobot Sidebar
 
----
+Click the **Mobot** button in the top bar to open the Knowledge Agent:
 
-### 10. Annotations and Reactions
-
-**What It Does**: React to messages and add annotations without cluttering the main conversation.
-
-**Reaction Types**:
-- Quick emoji reactions (👍 ❤️ 😂 😮 😢)
-- Custom reactions
-- Threaded replies
-- Highlight and annotate
-
-**Annotation Types**:
-- Inline comments (like Google Docs)
-- Bookmark for later
-- Flag for review
-- Link to external resources
-
-**Implementation Files**:
-- Service: `createAnnotation`
-- UI: Reactions in `RealTimeChat.tsx`
+- Ask any question about your training topics
+- Answers are grounded in your library with hoverable citations
+- Mobot is context-aware — it knows your current session and selected themes
+- Use it for quick reference without leaving the training workflow
 
 ---
 
-## Technical Implementation
+## 4. API Architecture
 
-### Database Schema
+**All communication goes through the service layer.** The Dojo frontend never accesses data directly.
 
-The collaboration system uses the following core tables:
+| Endpoint Group | Base Path | Purpose |
+|---------------|-----------|---------|
+| Libraries | `/api/admin/dojo/libraries/` | CRUD, document upload, theme discovery |
+| Sessions | `/api/admin/dojo/sessions/` | Training sessions, lessons, sparring |
+| Progress | `/api/admin/dojo/progress/` | User progress, theme mastery |
+| Certifications | `/api/admin/dojo/certifications/` | Proctored exams |
+| Mobot | `/api/admin/dojo/mobot/` | Knowledge Agent |
+| Config | `/api/admin/dojo/config/` | Admin settings |
+| Decay | `/api/admin/dojo/decay/` | Ebbinghaus decay curves & reinforcement |
+| Scenarios | `/api/admin/dojo/scenarios/` | Adversarial scenario synthesis |
+| Competencies | `/api/admin/dojo/competencies/` | Predictive competency mesh |
+| Dialectic | `/api/admin/dojo/dialectic/` | Socratic dialectic engine |
+| Multimodal | `/api/admin/dojo/multimodal/` | Audio, diagrams, glossary generation |
+| Pulse | `/api/admin/dojo/pulse/` | Org-wide knowledge health dashboard |
+| Archytas | `/api/admin/dojo/archytas/` | Tool Master config, invocation, suggestions |
 
-```sql
--- Collaboration Sessions
-CREATE TABLE collaboration_sessions (
-    id UUID PRIMARY KEY,
-    tenant_id UUID NOT NULL REFERENCES tenants(id),
-    name VARCHAR(255) NOT NULL,
-    conversation_id UUID REFERENCES conversations(id),
-    status session_status DEFAULT 'active',
-    settings JSONB DEFAULT '{}',
-    created_by UUID NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW()
-);
+### Backend Infrastructure
 
--- Session Participants
-CREATE TABLE session_participants (
-    id UUID PRIMARY KEY,
-    session_id UUID NOT NULL REFERENCES collaboration_sessions(id),
-    user_id UUID REFERENCES users(id),
-    role participant_role DEFAULT 'contributor',
-    color VARCHAR(7) NOT NULL,
-    is_online BOOLEAN DEFAULT false,
-    last_seen_at TIMESTAMPTZ,
-    joined_at TIMESTAMPTZ DEFAULT NOW()
-);
+| Component | File | Details |
+|-----------|------|---------|
+| **Lambda Handler** | `packages/infrastructure/lambda/admin/dojo.ts` | 35+ endpoints, path-based routing |
+| **Database Migration** | `packages/infrastructure/migrations/V2026_02_06_005__aurelius_dojo.sql` | 19 tables, 13 enums, 3 functions |
+| **CDK Stack** | `packages/infrastructure/lib/stacks/admin-stack.ts` | DojoFunction + proxy resource |
 
--- Guest Invites
-CREATE TABLE collaboration_guest_invites (
-    id UUID PRIMARY KEY,
-    tenant_id UUID NOT NULL,
-    session_id UUID NOT NULL REFERENCES collaboration_sessions(id),
-    token VARCHAR(255) UNIQUE NOT NULL,
-    permissions JSONB DEFAULT '{}',
-    expires_at TIMESTAMPTZ,
-    max_uses INT,
-    use_count INT DEFAULT 0,
-    created_by UUID NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT NOW()
-);
+**Note**: All AI-dependent features (theme discovery, lesson generation, sparring questions, scenario responses, dialectic responses, multimodal generation, mobot, competency extraction, Archytas suggestions) are implemented inline via `modelRouterService` using the tenant-configured AI model. The `invokeDojoLLM()` helper routes all calls through drift enforcement and spend governance.
 
--- Guests (no account required)
-CREATE TABLE collaboration_guests (
-    id UUID PRIMARY KEY,
-    session_id UUID NOT NULL REFERENCES collaboration_sessions(id),
-    invite_id UUID REFERENCES collaboration_guest_invites(id),
-    display_name VARCHAR(100) NOT NULL,
-    guest_token VARCHAR(255) UNIQUE NOT NULL,
-    color VARCHAR(7) NOT NULL,
-    is_online BOOLEAN DEFAULT false,
-    last_seen_at TIMESTAMPTZ,
-    created_at TIMESTAMPTZ DEFAULT NOW()
-);
+---
 
--- Conversation Branches
-CREATE TABLE conversation_branches (
-    id UUID PRIMARY KEY,
-    tenant_id UUID NOT NULL,
-    session_id UUID NOT NULL REFERENCES collaboration_sessions(id),
-    parent_branch_id UUID REFERENCES conversation_branches(id),
-    source_message_id UUID,
-    name VARCHAR(255) NOT NULL,
-    status branch_status DEFAULT 'active',
-    created_by UUID NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT NOW()
-);
+## 5. Design System
 
--- AI Roundtables
-CREATE TABLE ai_roundtables (
-    id UUID PRIMARY KEY,
-    tenant_id UUID NOT NULL,
-    session_id UUID NOT NULL REFERENCES collaboration_sessions(id),
-    topic TEXT NOT NULL,
-    debate_style VARCHAR(50) NOT NULL,
-    participating_models TEXT[] NOT NULL,
-    max_rounds INT DEFAULT 3,
-    current_round INT DEFAULT 0,
-    status roundtable_status DEFAULT 'active',
-    synthesis TEXT,
-    consensus_points JSONB DEFAULT '[]',
-    disagreement_points JSONB DEFAULT '[]',
-    created_at TIMESTAMPTZ DEFAULT NOW()
-);
+The Dojo uses a **warm gold/amber "discipline" palette** distinct from the cool cyan of OMEGA Forge:
 
--- Knowledge Graph
-CREATE TABLE knowledge_graphs (
-    id UUID PRIMARY KEY,
-    session_id UUID NOT NULL REFERENCES collaboration_sessions(id),
-    nodes JSONB DEFAULT '[]',
-    edges JSONB DEFAULT '[]',
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW()
-);
+| Token | Value | Usage |
+|-------|-------|-------|
+| Background | `rgb(15, 12, 8)` | Near-black warm base |
+| Primary | `dojo-500` (#f59e0b) | Amber — discipline, mastery |
+| Accent | `omega-500` (#0ea5e9) | Cyan — platform continuity |
+| Glass Panel | `bg-[#0a0806]/85 backdrop-blur-md` | Frosted glass |
+| Font | Inter + JetBrains Mono | Display + monospaced |
+| Pattern | Tatami grid | 40px amber gridlines at 2% opacity |
 
--- Session Recordings
-CREATE TABLE session_recordings (
-    id UUID PRIMARY KEY,
-    session_id UUID NOT NULL REFERENCES collaboration_sessions(id),
-    status recording_status DEFAULT 'recording',
-    started_at TIMESTAMPTZ DEFAULT NOW(),
-    ended_at TIMESTAMPTZ,
-    duration_seconds INT,
-    s3_key VARCHAR(500)
-);
+### Rank Colors
+
+| Rank | Color | Tailwind |
+|------|-------|----------|
+| Novice | Slate | `text-slate-400` |
+| Initiate | Green | `text-green-400` |
+| Adept | Blue | `text-blue-400` |
+| Master | Purple | `text-purple-400` |
+| Radiant | Gold | `text-dojo-400` |
+
+---
+
+## 6. Leapfrog Features (v1.1.0)
+
+These 6 features put Dojo **3-5 years ahead** of every competitor (Docebo, Virti, Second Nature, Axonify, Sana Labs, Cornerstone, Degreed).
+
+### 6.1 Ebbinghaus Decay Engine (Retention Tab)
+
+Unlike Axonify's simple flashcard scheduling, the Decay Engine tracks a **per-concept neural decay model**:
+
+- Each "knowledge atom" has its own **half-life** (how fast you forget it)
+- **Retention probability** is calculated per-atom, per-user, per-theme
+- Correct answers **increase** the half-life → next review pushed further out
+- Incorrect answers **shorten** the half-life → more frequent reinforcement
+- Dashboard shows at-risk concepts, average retention, and per-theme decay bars
+- **Reinforcement sessions** are triggered at the optimal recall moment
+
+### 6.2 Adversarial Scenario Synthesis (Scenarios Tab)
+
+Unlike Second Nature's scripted sales roleplay, Dojo generates **branching multi-turn scenarios** from your actual policies:
+
+- **9 persona archetypes**: Confused Customer, Angry Customer, VIP Escalation, Compliance Auditor, Hostile Negotiator, etc.
+- Each persona has hidden objectives, emotional state, and communication style
+- Every response is scored: **optimal**, **acceptable**, **suboptimal**, or **critical error**
+- Personas react dynamically — emotional shifts based on your responses
+- Debrief includes: Emotional Intelligence, Policy Adherence, Resolution scores + per-turn timeline
+
+### 6.3 Socratic Dialectic Engine (Dialectic Tab)
+
+**No competitor has this.** Three AI agents debate a proposition from your library:
+
+- **Thesis Agent** (green) — Presents the proposition with evidence
+- **Antithesis Agent** (red) — Challenges with counterarguments and edge cases
+- **Synthesis Agent** (purple) — Reconciles positions after you take a stand
+- You participate by submitting Claims, Evidence, Rebuttals, Concessions, or Syntheses
+- Scored on: Reasoning Chain, Argument Quality, Evidence Usage, Critical Thinking
+- **Logical fallacy detection** — identifies ad hominem, straw man, false dichotomy, etc.
+
+### 6.4 Predictive Competency Mesh (Competency Tab)
+
+Unlike Degreed's manual skill tagging, Dojo **auto-extracts competencies** from your library:
+
+- AI discovers competency graph with proficiency levels and prerequisites
+- Per-user proficiency tracking with confidence scoring and trend (improving/stable/declining)
+- **Role readiness scores** — "You are 73% ready for Senior Customer Service Rep"
+- Missing competencies identified with estimated time-to-ready
+- **Recommended learning path** with priority ranking (critical → high → medium → low)
+- Team-level gap analysis for managers
+
+### 6.5 Multimodal Lesson Synthesis (Types + API)
+
+Auto-generates rich content from lesson blocks:
+
+- Audio narration of lessons
+- 6 diagram types: flowchart, mindmap, timeline, comparison, hierarchy, process (Mermaid)
+- Auto-extracted glossary with definitions and related terms
+- Key takeaways summary
+- Learning style adaptations (visual/auditory/kinesthetic/reading-writing)
+
+### 6.6 Organizational Knowledge Pulse (Pulse Tab)
+
+**No competitor offers real-time org-wide knowledge health monitoring:**
+
+- **Overall health score** (0-100%) with trend indicator
+- **Department health breakdown** — scores, accuracy, at-risk counts, training hours
+- **Decay alerts** — "Sales team hasn't been tested on Return Policy in 90 days" (critical/warning/info)
+- **Theme compliance coverage** — trained users, mastery, decay risk, compliance status
+- **ROI metrics**: cost savings/month, avg time-to-competency, cert pass rate, retention rate, hours saved vs traditional
+
+---
+
+## 7. File Structure
+
 ```
-
-### WebSocket Protocol
-
-**Connection**:
-```
-wss://ws.thinktank.app/collaboration?token=<JWT>&sessionId=<UUID>
-```
-
-**Message Types**:
-
-| Type | Direction | Payload |
-|------|-----------|---------|
-| `join` | Client→Server | `{ sessionId, userId }` |
-| `leave` | Client→Server | `{ sessionId }` |
-| `presence` | Bidirectional | `{ participants: [...] }` |
-| `typing_start` | Client→Server | `{ sessionId }` |
-| `typing_stop` | Client→Server | `{ sessionId }` |
-| `typing_indicator` | Server→Client | `{ userId, isTyping }` |
-| `message` | Bidirectional | `{ id, content, role, ... }` |
-| `yjs_sync` | Bidirectional | `{ update: Uint8Array }` |
-| `branch_created` | Server→Client | `{ branchId, name, ... }` |
-| `roundtable_update` | Server→Client | `{ roundtableId, ... }` |
-
-### CRDT Integration
-
-We use Yjs for conflict-free synchronization:
-
-```typescript
-import * as Y from 'yjs';
-import { WebsocketProvider } from 'y-websocket';
-
-// Create a Yjs document for the session
-const ydoc = new Y.Doc();
-
-// Connect to the server
-const provider = new WebsocketProvider(
-  'wss://ws.thinktank.app',
-  sessionId,
-  ydoc
-);
-
-// Shared data structures
-const yMessages = ydoc.getArray('messages');
-const yPresence = ydoc.getMap('presence');
-const yBranches = ydoc.getMap('branches');
-
-// Listen for changes
-yMessages.observe((event) => {
-  // Handle new messages
-  event.changes.added.forEach((item) => {
-    const message = item.content.getContent()[0];
-    renderMessage(message);
-  });
-});
-
-// Add a message (automatically synced to all clients)
-yMessages.push([{
-  id: generateId(),
-  content: 'Hello, team!',
-  userId: currentUser.id,
-  timestamp: Date.now()
-}]);
+apps/dojo/
+├── app/
+│   ├── globals.css          # Dojo design system CSS
+│   ├── layout.tsx           # Root layout with providers
+│   ├── page.tsx             # Main page with 9-tab routing
+│   └── providers.tsx        # React Query provider
+├── components/
+│   ├── DojoSidebar.tsx      # Left navigation sidebar (9 tabs)
+│   ├── LibraryView.tsx      # Document library management
+│   ├── ThemeSelector.tsx    # Central theme discovery & selection
+│   ├── TrainingArena.tsx    # Lecture + Sparring modes
+│   ├── ProgressDashboard.tsx # Rank, XP, certifications
+│   ├── MobotPanel.tsx       # Knowledge Agent sidebar
+│   ├── DecayEngine.tsx      # Ebbinghaus decay dashboard + reinforcement
+│   ├── ScenarioArena.tsx    # Digital twin scenario synthesis
+│   ├── DialecticArena.tsx   # Socratic multi-agent debate
+│   ├── CompetencyMesh.tsx   # Predictive competency mesh
+│   └── KnowledgePulse.tsx   # Org-wide knowledge health dashboard
+├── lib/
+│   ├── api.ts               # Service layer — 60+ typed endpoints
+│   ├── dojo-store.ts        # Zustand state management
+│   └── utils.ts             # Rank metadata, formatting helpers
+├── package.json             # @radiant/dojo — port 3004
+├── tailwind.config.ts       # Dojo color palette & animations
+├── tsconfig.json
+├── next.config.js
+└── postcss.config.js
 ```
 
 ---
 
-## Competitive Analysis
+## 7. Running the Dojo
 
-### Feature-by-Feature Comparison
+```bash
+# From the monorepo root
+pnpm dev --filter @radiant/dojo
 
-| Feature | ChatGPT | Claude | Gemini | Think Tank |
-|---------|---------|--------|--------|------------|
-| **Real-time sync** | ❌ | ❌ | ❌ | ✅ Yjs CRDT |
-| **Presence indicators** | ❌ | ❌ | ❌ | ✅ Live |
-| **Typing attribution** | ❌ | ❌ | ❌ | ✅ Animated |
-| **Conversation branching** | ❌ | ❌ | ❌ | ✅ Git-like |
-| **Guest access** | ❌ | ❌ | ❌ | ✅ No signup |
-| **AI Facilitator** | ❌ | ❌ | ❌ | ✅ Configurable |
-| **Multi-model roundtables** | ❌ | ❌ | ❌ | ✅ 5 styles |
-| **Knowledge graph** | ❌ | ❌ | ❌ | ✅ Auto-build |
-| **Session recording** | ❌ | ❌ | ❌ | ✅ Full playback |
-| **Voice notes** | ✅ | ❌ | ✅ | ✅ Transcribed |
-| **Share conversations** | ✅ Async | ✅ Async | ❌ | ✅ Real-time |
+# Or directly
+cd apps/dojo && pnpm dev
+```
 
-### Competitive Moat Depth
-
-| Moat | Time to Replicate | Why It's Hard |
-|------|-------------------|---------------|
-| Yjs CRDT integration | 6-9 months | Deep integration with AI systems, edge cases |
-| Guest access | 3-6 months | Security, abuse prevention, scaling |
-| AI Roundtables | 9-12 months | Multi-model orchestration, synthesis |
-| Knowledge Graph | 6-9 months | NLP extraction, visualization |
-| Session Recording | 3-6 months | Storage, playback, search |
-
-**Total estimated time for a competitor to reach feature parity: 12-18 months**
+The app runs on **http://localhost:3004**.
 
 ---
 
-## Marketing & Sales Points
+---
 
-### Elevator Pitch (30 seconds)
+## 8. Database Schema
 
-> "Think Tank is the only AI platform where your team can think together. While ChatGPT and Claude are single-player experiences, Think Tank lets your entire team collaborate in real-time—like Google Docs for AI conversations. Branch ideas, have AI models debate, and capture everything in a living knowledge graph. No more copy-pasting between chat windows or wondering 'what did we decide?'"
+The Dojo uses **19 RLS-protected tables** (migration `V2026_02_06_005`):
 
-### Key Differentiators (Bullet Points)
-
-- **Real-time collaboration**: Multiple users in the same AI conversation, simultaneously
-- **Conversation branching**: Explore "what if" scenarios without losing the main thread
-- **AI Roundtables**: Let Claude, GPT-4, and Gemini debate—you get the synthesis
-- **Guest access**: Share a link, they're in—no signup required
-- **Knowledge graphs**: See your team's thinking visualized
-- **Session recording**: Playback any collaboration, onboard new team members
-
-### Use Case Stories
-
-**1. Product Team Sprint Planning**
-
-> "Before Think Tank, our sprint planning meant one person sharing their screen with ChatGPT while everyone else watched. Now, all 8 engineers are in the same session. When we hit a technical decision, we branch the conversation and have two teams explore different approaches. The AI facilitator keeps us on track and captures action items. We cut planning time by 40%."
-> — VP Engineering, Series B SaaS
-
-**2. Investor Due Diligence**
-
-> "We needed to analyze a target company with our legal team, finance team, and external advisors. With Think Tank, everyone joined via guest links—no accounts needed. We had Claude and GPT-4 debate the key risks in a roundtable. The knowledge graph showed us exactly how the issues connected. What used to take 3 weeks of back-and-forth took 4 hours."
-> — Managing Partner, PE Fund
-
-**3. Customer Research Synthesis**
-
-> "After 50 user interviews, our team was drowning in notes. We uploaded everything to a Think Tank session and collaborated on synthesis. The AI extracted themes while we debated interpretations. The branching feature let us explore contradictory findings without losing context. Our CPO said it was 'like having a research assistant with perfect memory.'"
-> — Head of Research, Consumer App
-
-### Sales Objection Handling
-
-| Objection | Response |
-|-----------|----------|
-| "We already use ChatGPT Teams" | "ChatGPT Teams is async—you share links, not experiences. Think Tank is real-time. You'll see your colleagues typing, branch conversations, and have AI models debate. It's the difference between email and Google Docs." |
-| "It's expensive" | "Consider the cost of miscommunication. A typical enterprise loses 40+ hours/week to 'which version is correct?' and 'what did we decide?' Think Tank eliminates that with real-time sync and knowledge graphs." |
-| "Security concerns" | "We're SOC2 Type II certified, HIPAA compliant, and GDPR ready. All data is encrypted at rest and in transit. Guest access uses short-lived tokens with audit trails. Enterprise customers can bring their own encryption keys." |
-| "Learning curve" | "If your team can use Slack and Google Docs, they can use Think Tank. The interface is familiar, but with AI superpowers. We offer white-glove onboarding for enterprise." |
+| Table | Purpose |
+|-------|---------|
+| `dojo_libraries` | Document library containers |
+| `dojo_documents` | Uploaded files with S3 keys |
+| `dojo_themes` | AI-discovered Central Themes |
+| `dojo_sessions` | Training sessions |
+| `dojo_lesson_blocks` | Generated lessons with citations |
+| `dojo_sparring_questions` | Adversarial questions |
+| `dojo_sparring_results` | Answer results with XP |
+| `dojo_user_progress` | Overall rank & XP |
+| `dojo_theme_progress` | Per-theme mastery |
+| `dojo_certifications` | Exam results |
+| `dojo_mobot_messages` | Knowledge Agent chat |
+| `dojo_knowledge_atoms` | Decay engine concepts |
+| `dojo_decay_curves` | Per-atom decay tracking |
+| `dojo_scenario_sessions` | Scenario instances |
+| `dojo_scenario_branches` | Branching trees |
+| `dojo_competencies` | Competency graph |
+| `dojo_user_competency_scores` | Proficiency scores |
+| `dojo_dialectic_sessions` | Dialectic sessions |
+| `dojo_dialectic_turns` | Debate turns |
+| `dojo_multimodal_content` | Audio/diagrams/glossary |
+| `dojo_knowledge_pulse` | Org health snapshots |
+| `dojo_archytas_tool_calls` | Tool execution log |
+| `dojo_config` | Per-tenant configuration |
 
 ---
 
-## Security & Compliance
+**Document maintained under RADIANT documentation policy.**
 
-### Data Protection
 
-| Layer | Protection |
-|-------|------------|
-| Transport | TLS 1.3 for all connections |
-| At Rest | AES-256-GCM encryption |
-| Keys | AWS KMS with tenant isolation |
-| Access | JWT + fine-grained RBAC |
-| Audit | Full audit trail, tamper-evident |
-
-### Compliance Certifications
-
-- **SOC2 Type II**: Annual audit
-- **HIPAA**: BAA available for healthcare
-- **GDPR**: Right to erasure, data portability
-- **ISO 27001**: In progress
-
-### Guest Access Security
-
-- Cryptographically random tokens (UUID v4 + HMAC-SHA256)
-- Configurable expiration (1 hour minimum, 30 days maximum)
-- IP-based rate limiting
-- Action audit trail for all guest activities
-- Session owner can revoke access instantly
 
 ---
 
-## Roadmap
+*Consolidated from 1 source documents (0 not found). 325 source lines.*
 
-### Q1 2026 (Current)
-- ✅ Real-time sync with Yjs CRDT
-- ✅ Presence and typing indicators
-- ✅ Conversation branching
-- ✅ Guest access
-- ✅ AI Facilitator
-- ✅ AI Roundtables
-- ✅ Knowledge Graph
-- ✅ Session recording
-
-### Q2 2026
-- 🔄 Video/audio calls within sessions
-- 🔄 Whiteboard integration
-- 🔄 Mobile apps (iOS/Android)
-- 🔄 Slack/Teams integration
-
-### Q3 2026
-- 📋 Templates library (meeting types, workflows)
-- 📋 Custom AI personas for facilitation
-- 📋 Advanced analytics dashboard
-- 📋 API for third-party integrations
-
-### Q4 2026
-- 📋 Cross-organization collaboration
-- 📋 AI-generated session summaries
-- 📋 Automated follow-up actions
-- 📋 Enterprise SSO (SAML, OIDC)
 
 ---
 
-## Appendix: Implementation File Reference
-
-### Backend Services
-
-| File | Purpose |
-|------|---------|
-| `lambda/shared/services/enhanced-collaboration.service.ts` | Core collaboration logic |
-| `lambda/shared/services/workflow/crdt-workflow.service.ts` | CRDT operations |
-| `lambda/thinktank/enhanced-collaboration.ts` | API handler |
-| `lambda/websocket/collaboration-handler.ts` | WebSocket events |
-
-### Frontend Components
-
-| File | Purpose |
-|------|---------|
-| `components/collaboration/RealTimeChat.tsx` | Chat with reactions, replies |
-| `components/collaboration/ParticipantsSidebar.tsx` | Presence display |
-| `components/collaboration/BranchVisualization.tsx` | Branch tree/timeline |
-| `components/collaboration/AIRoundtableView.tsx` | Multi-model debates |
-| `components/collaboration/KnowledgeGraphVisualization.tsx` | Concept mapping |
-| `components/collaboration/dialogs/CreateSessionDialog.tsx` | Session creation |
-| `components/collaboration/dialogs/InviteDialog.tsx` | Guest invites |
-| `components/collaboration/dialogs/FacilitatorSettingsDialog.tsx` | AI facilitator config |
-
-### Database Migrations
-
-| File | Purpose |
-|------|---------|
-| `migrations/056_enhanced_collaboration.sql` | Core collaboration tables |
-| `migrations/057_collaboration_branches.sql` | Branching support |
-| `migrations/058_ai_roundtables.sql` | Roundtable tables |
-| `migrations/059_knowledge_graphs.sql` | Graph storage |
-
----
-
-*This document is maintained by the RADIANT Platform Team. For questions, contact platform@radiant.ai*
----
+*Think Tank Complete Reference — consolidated from original 01 + Mac Guide + Mac Portability Manifest + Dojo.*

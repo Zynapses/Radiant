@@ -167,10 +167,10 @@ export interface ToolExecution {
 }
 
 // ============================================================================
-// GENESIS AUTO-TOOL PIPELINE
+// TOOL FORGE PIPELINE (formerly Genesis Auto-Tool)
 // ============================================================================
 
-export type GenesisToolStatus = 
+export type ToolForgeStatus = 
   | 'queued' 
   | 'scraping' 
   | 'generating' 
@@ -181,9 +181,9 @@ export type GenesisToolStatus =
   | 'deployed' 
   | 'failed';
 
-export type GenesisValidationResult = 'pass' | 'fail' | 'warn';
+export type ToolForgeValidationResult = 'pass' | 'fail' | 'warn';
 
-export interface GenesisToolRequest {
+export interface ToolForgeRequest {
   requestId: string;
   tenantId: string;
   userId: string;
@@ -204,13 +204,13 @@ export interface GenesisToolRequest {
   securityLevel: ToolSensitivity;
   
   // Status
-  status: GenesisToolStatus;
+  status: ToolForgeStatus;
   createdAt: Date;
   updatedAt: Date;
   completedAt?: Date;
 }
 
-export interface GenesisToolResult {
+export interface ToolForgeResult {
   requestId: string;
   toolId?: string;
   
@@ -225,8 +225,8 @@ export interface GenesisToolResult {
     passed: boolean;
     executionTimeMs: number;
     memoryUsageMb: number;
-    securityScan: GenesisValidationResult;
-    functionalTests: GenesisValidationResult;
+    securityScan: ToolForgeValidationResult;
+    functionalTests: ToolForgeValidationResult;
     errorMessages?: string[];
   };
   
@@ -240,29 +240,29 @@ export interface GenesisToolResult {
   estimatedCost: number;
 }
 
-export interface GenesisAPIDiscovery {
+export interface ToolForgeAPIDiscovery {
   serviceUrl: string;
   discoveryMethod: 'openapi' | 'graphql' | 'grpc' | 'html_scrape' | 'documentation';
   
   // Discovered info
-  endpoints: GenesisEndpoint[];
-  authRequirements?: GenesisAuthRequirement;
-  rateLimits?: GenesisRateLimit;
+  endpoints: ToolForgeEndpoint[];
+  authRequirements?: ToolForgeAuthRequirement;
+  rateLimits?: ToolForgeRateLimit;
   
   // Metadata
   lastScrapedAt: Date;
   confidenceScore: number;
 }
 
-export interface GenesisEndpoint {
+export interface ToolForgeEndpoint {
   path: string;
   method: string;
   description: string;
-  parameters: GenesisParameter[];
+  parameters: ToolForgeParameter[];
   responseSchema?: Record<string, unknown>;
 }
 
-export interface GenesisParameter {
+export interface ToolForgeParameter {
   name: string;
   type: string;
   required: boolean;
@@ -270,13 +270,13 @@ export interface GenesisParameter {
   defaultValue?: unknown;
 }
 
-export interface GenesisAuthRequirement {
+export interface ToolForgeAuthRequirement {
   type: 'api_key' | 'oauth2' | 'basic' | 'bearer' | 'custom';
   location: 'header' | 'query' | 'body';
   keyName?: string;
 }
 
-export interface GenesisRateLimit {
+export interface ToolForgeRateLimit {
   requestsPerMinute?: number;
   requestsPerDay?: number;
   concurrentRequests?: number;
@@ -759,7 +759,7 @@ export interface OrganismTelemetry {
     overallScore: number;
     mcpServersHealthy: number;
     mcpServersTotal: number;
-    genesisQueueDepth: number;
+    toolForgeQueueDepth: number;
     ghostSimulationLatency: number;
     economicBudgetUtilization: number;
   };
@@ -772,8 +772,8 @@ export interface OrganismTelemetry {
     averageAffinityScore: number;
   };
   
-  // Genesis metrics
-  genesisMetrics: {
+  // Tool Forge metrics
+  toolForgeMetrics: {
     toolsGeneratedToday: number;
     toolsDeployedToday: number;
     averageGenerationTime: number;
@@ -978,9 +978,9 @@ export interface AutonomousOrganismState {
   mcpServers: MCPServerConfig[];
   toolSchemas: ToolSchema[];
   
-  // Genesis pipeline
-  pendingGenesisRequests: GenesisToolRequest[];
-  deployedGenesisTools: GenesisToolResult[];
+  // Tool Forge pipeline
+  pendingToolForgeRequests: ToolForgeRequest[];
+  deployedToolForgeTools: ToolForgeResult[];
   
   // Compute topology
   computeTopology: ComputeTopology;

@@ -519,20 +519,26 @@ import { useState } from 'react';
 ${propsInterface}
 
 export function ${comp.name}(props: ${comp.name}Props) {
-  // Component implementation
-  // Original Radiant component: ${comp.id}
-  // Category: ${comp.category}
-  
+  const [expanded, setExpanded] = useState(false);
+
   return (
     <div className="p-4 border rounded-lg bg-white shadow-sm">
       <div className="flex items-center gap-2 mb-4">
         <span className="text-2xl">${comp.icon}</span>
         <h3 className="font-semibold">${comp.name}</h3>
       </div>
-      <div className="text-gray-500">
-        {/* TODO: Implement ${comp.name} */}
-        <p>${comp.description}</p>
-      </div>
+      <p className="text-gray-600 text-sm mb-3">${comp.description}</p>
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+      >
+        {expanded ? 'Hide Props' : 'Show Props'}
+      </button>
+      {expanded && (
+        <pre className="mt-2 p-3 bg-gray-50 rounded text-xs overflow-auto">
+          {JSON.stringify(props, null, 2)}
+        </pre>
+      )}
     </div>
   );
 }

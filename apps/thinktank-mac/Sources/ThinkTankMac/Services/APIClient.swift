@@ -8,6 +8,7 @@ actor APIClient {
     private let session: URLSession
     private var accessToken: String?
     private var refreshToken: String?
+    private(set) var devMode = false
 
     init(baseURL: URL? = nil) {
         let url = baseURL ?? URL(string: UserDefaults.standard.string(forKey: "apiBaseURL") ?? "https://api.radiant.local")!
@@ -33,6 +34,10 @@ actor APIClient {
         self.accessToken = token
     }
 
+    func enableDevMode() {
+        self.devMode = true
+    }
+
     func buildURL(_ path: String) -> URL {
         _baseURL.appendingPathComponent(path)
     }
@@ -53,6 +58,9 @@ actor APIClient {
     }
 
     func get<T: Decodable>(_ path: String, params: [String: String]? = nil) async throws -> T {
+        if devMode, let mockData = MockDataProvider.resolve(path: path, method: "GET") {
+            return try JSONDecoder.radiant.decode(T.self, from: mockData)
+        }
         let request = buildRequest(path: path, params: params)
         let (data, response) = try await session.data(for: request)
         try validateResponse(response)
@@ -60,6 +68,9 @@ actor APIClient {
     }
 
     func post<T: Decodable>(_ path: String, body: some Encodable) async throws -> T {
+        if devMode, let mockData = MockDataProvider.resolve(path: path, method: "POST") {
+            return try JSONDecoder.radiant.decode(T.self, from: mockData)
+        }
         let bodyData = try JSONEncoder.radiant.encode(body)
         let request = buildRequest(path: path, method: "POST", body: bodyData)
         let (data, response) = try await session.data(for: request)
@@ -68,6 +79,9 @@ actor APIClient {
     }
 
     func put<T: Decodable>(_ path: String, body: some Encodable) async throws -> T {
+        if devMode, let mockData = MockDataProvider.resolve(path: path, method: "PUT") {
+            return try JSONDecoder.radiant.decode(T.self, from: mockData)
+        }
         let bodyData = try JSONEncoder.radiant.encode(body)
         let request = buildRequest(path: path, method: "PUT", body: bodyData)
         let (data, response) = try await session.data(for: request)
@@ -76,13 +90,29 @@ actor APIClient {
     }
 
     func delete(_ path: String) async throws {
+        if devMode { return }
         let request = buildRequest(path: path, method: "DELETE")
         let (_, response) = try await session.data(for: request)
         try validateResponse(response)
     }
 
     func stream(_ path: String, body: some Encodable) -> AsyncThrowingStream<StreamChunk, Error> {
-        AsyncThrowingStream { continuation in
+        if devMode {
+            return AsyncThrowingStream { continuation in
+                Task {
+                    // Simulate streaming response in dev mode
+                    let words = ["I'd ", "be ", "happy ", "to ", "help ", "with ", "that. ", "Let ", "me ", "think ", "through ", "this ", "carefully...\n\n", "Here's ", "my ", "analysis ", "of ", "the ", "problem:\n\n", "The ", "key ", "insight ", "is ", "that ", "you ", "need ", "to ", "consider ", "both ", "the ", "performance ", "and ", "cost ", "implications. ", "I'd ", "recommend ", "starting ", "with ", "a ", "balanced ", "approach ", "and ", "iterating ", "from ", "there."]
+                    for word in words {
+                        try await Task.sleep(nanoseconds: 30_000_000) // 30ms per word
+                        continuation.yield(.content(word))
+                    }
+                    continuation.yield(.metadata(MessageMetadata(tokensUsed: 156, latencyMs: 620, orchestrationMode: "thinking", costEstimate: 0.0005, modelUsed: "claude-4-sonnet")))
+                    continuation.yield(.done)
+                    continuation.finish()
+                }
+            }
+        }
+        return AsyncThrowingStream { continuation in
             Task {
                 do {
                     let bodyData = try JSONEncoder.radiant.encode(body)
