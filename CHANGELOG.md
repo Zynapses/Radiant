@@ -72,7 +72,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated `OMEGA-ENGINEERING-LOG.md`: 19/20 components now ✅ Implemented
 - Resolved Q-002 (Shadow Vector), Q-004 (Auto-tuning), Q-005 (Conscious/subconscious recovery)
 
-#### Documentation Expansion (17 Documents: 15 Consolidated + 2 Standalone)
+#### Documentation Expansion (18 Documents: 15 Consolidated + 3 Standalone)
+- **NEW** `docs/22-COMPLIANCE-STANDARDS-GUIDE.md`: Standalone compliance certifications & regulatory standards guide
+  - 11 parts covering 8 standards: SOC 2 Type 2, GDPR, HIPAA, ISO 27701, ISO 42001, HDS, Data Privacy Framework, PCI DSS
+  - Quick reference by category, detailed requirements, enforcement/penalties, upcoming deadlines, cross-framework trends, RADIANT platform alignment matrix
+  - Combined from 3 source documents (Standards List, Certifications Guide, Regulatory Reference)
 - **NEW** `docs/20-OMEGA-ENGINEERING.md`: Standalone OMEGA engineering, architecture & marketing reference
   - 19 parts covering all subsystems: CryoLiquidLayer, HelixKernel, BehavioralCodebook, Watcher, ResonantIndex, HomeostaticLoop, Shadow Vector, Attribution, Multi-Session, Tunable Parameters, Training (Wirtinger e-prop), CDK Infrastructure, full API reference (40+ endpoints), marketing pitches, decision log, roadmap
 - **NEW** `docs/21-TEXT-TO-SPEECH.md`: Standalone TTS complete reference

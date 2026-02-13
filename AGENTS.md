@@ -80,7 +80,7 @@ DYNAMIC: New policies in /.windsurf/workflows/ are AUTOMATICALLY enforced.
 **Master Policy**: `/.windsurf/workflows/docs-update-all.md`
 **Documentation Manifest**: `/docs/DOCUMENTATION-MANIFEST.json`
 
-### Quick Reference - Always Update These (17 Docs: 15 Consolidated + 2 Standalone):
+### Quick Reference - Always Update These (18 Docs: 15 Consolidated + 3 Standalone):
 
 | Change Type | Required Documentation |
 |-------------|----------------------|
@@ -106,6 +106,7 @@ DYNAMIC: New policies in /.windsurf/workflows/ are AUTOMATICALLY enforced.
 | **New terms/acronyms** | `docs/17-GLOSSARY.md` |
 | **UI/UX/Dependencies** | `docs/18-UI-UX-LIBRARIES.md` |
 | **Credential lifecycle/security** | `docs/19-STRATEGIC-SECURITY.md` |
+| **Compliance/regulatory** | `docs/22-COMPLIANCE-STANDARDS-GUIDE.md` *(standalone: SOC 2, GDPR, HIPAA, ISO 27701, ISO 42001, HDS, DPF, PCI DSS)* |
 
 ### The Golden Rule
 
@@ -220,7 +221,7 @@ Extension specs in: `radiant-cascade-extension-v4.18.0/docs/phases/`
 ## 📖 Documentation References
 
 - **15 consolidated docs**: `docs/01-THINK-TANK.md` through `docs/18-UI-UX-LIBRARIES.md` (gaps at 03, 08, 11 — merged into other docs)
-- **2 standalone docs**: `docs/20-OMEGA-ENGINEERING.md` (OMEGA engineering/architecture/marketing), `docs/21-TEXT-TO-SPEECH.md` (radiant-tts complete reference)
+- **3 standalone docs**: `docs/20-OMEGA-ENGINEERING.md` (OMEGA engineering/architecture/marketing), `docs/21-TEXT-TO-SPEECH.md` (radiant-tts complete reference), `docs/22-COMPLIANCE-STANDARDS-GUIDE.md` (SOC 2, GDPR, HIPAA, ISO 27701, ISO 42001, HDS, DPF, PCI DSS)
 - **Complete assembled doc**: `docs/publications/RADIANT-THINKTANK-COMPLETE-DOCUMENTATION.md` (.pdf)
 - **Documentation manifest**: `docs/DOCUMENTATION-MANIFEST.json`
 - **Archive of originals**: `docs/archive/pre-consolidation/`
