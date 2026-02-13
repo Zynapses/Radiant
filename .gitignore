@@ -88,3 +88,4 @@ docs/archive/
 
 # Exported bundles
 radiant-gemini-export.zip
+__pycache__/

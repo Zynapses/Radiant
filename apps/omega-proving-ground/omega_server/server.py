@@ -75,8 +75,9 @@ logger = logging.getLogger('omega_server')
 app = Flask(__name__)
 CORS(app)
 
-# Paths to datasets
-DATASET_DIR = Path(__file__).parent.parent / 'demo' / 'datasets'
+# Paths to datasets (each proving-ground app keeps its own data)
+APPS_DIR = Path(__file__).parent.parent / 'apps'
+DATASET_DIR = APPS_DIR / 'mcdonalds-drive-thru' / 'datasets'
 KNOWLEDGE_PATH = DATASET_DIR / 'mcdonalds-knowledge.json'
 TRAINING_PATH = DATASET_DIR / 'mcdonalds-behavioral-training.jsonl'
 
