@@ -137,12 +137,22 @@ export class OmegaStack extends cdk.Stack {
     });
 
     // ==========================================================================
-    // LAMBDA LAYER
+    // LAMBDA LAYERS
     // ==========================================================================
     const omegaCoreLayer = new lambda.LayerVersion(this, 'OmegaCoreLayer', {
       layerVersionName: `omega-core-${environment}`,
-      description: 'OMEGA core libraries (PyTorch CPU, numpy, omega_core)',
+      description: 'OMEGA compat shims (omega_core → radiant_omega re-exports)',
       code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda/omega_core')),
+      compatibleRuntimes: [lambda.Runtime.PYTHON_3_11],
+      compatibleArchitectures: [lambda.Architecture.ARM_64],
+    });
+
+    // Canonical radiant_omega shared package — see packages/omega-core/python/README.md
+    // Extracts to /opt/radiant_omega/ ; PYTHONPATH includes /opt so imports resolve.
+    const radiantOmegaLayer = new lambda.LayerVersion(this, 'RadiantOmegaPackageLayer', {
+      layerVersionName: `radiant-omega-${environment}`,
+      description: 'radiant_omega shared package (see .windsurf/workflows/omega-package-policy.md)',
+      code: lambda.Code.fromAsset(path.join(__dirname, '../../../omega-core/python')),
       compatibleRuntimes: [lambda.Runtime.PYTHON_3_11],
       compatibleArchitectures: [lambda.Architecture.ARM_64],
     });
@@ -156,7 +166,7 @@ export class OmegaStack extends cdk.Stack {
       OMEGA_BACKUP_BUCKET: this.backupBucket.bucketName,
       OMEGA_FIRMWARE_BUCKET: this.firmwareBucket.bucketName,
       RADIANT_DOMAIN: radiantDomain,
-      PYTHONPATH: '/opt/python',
+      PYTHONPATH: '/opt/python:/opt',
     };
 
     // ==========================================================================
@@ -169,7 +179,7 @@ export class OmegaStack extends cdk.Stack {
       architecture: lambda.Architecture.ARM_64,
       handler: 'handlers.omega_inference.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda')),
-      layers: [omegaCoreLayer],
+      layers: [omegaCoreLayer, radiantOmegaLayer],
       timeout: cdk.Duration.minutes(5),
       memorySize: 3008,
       vpc,
@@ -192,7 +202,7 @@ export class OmegaStack extends cdk.Stack {
       architecture: lambda.Architecture.ARM_64,
       handler: 'handlers.omega_heartbeat.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda')),
-      layers: [omegaCoreLayer],
+      layers: [omegaCoreLayer, radiantOmegaLayer],
       timeout: cdk.Duration.minutes(15),
       memorySize: 2048,
       vpc,
@@ -222,7 +232,7 @@ export class OmegaStack extends cdk.Stack {
       architecture: lambda.Architecture.ARM_64,
       handler: 'handlers.omega_admin.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda')),
-      layers: [omegaCoreLayer],
+      layers: [omegaCoreLayer, radiantOmegaLayer],
       timeout: cdk.Duration.seconds(60),
       memorySize: 1024,
       vpc,

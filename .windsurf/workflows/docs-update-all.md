@@ -2,11 +2,11 @@
 description: MANDATORY - Update ALL relevant documentation on ANY code change. This is the MASTER documentation policy.
 ---
 
-# Master Documentation Policy (v3.1 — Merged)
+# Master Documentation Policy (v4.0 — Expanded)
 
 > ⚠️ **THIS POLICY IS MANDATORY AND HAS NO EXCEPTIONS** ⚠️
 >
-> **Every code change requires documentation updates.** Documentation merged from 22 files into 16 documents (2026-02-10).
+> **Every code change requires documentation updates.** 17 documents total: 15 consolidated (merged 2026-02-10) + 2 standalone (added 2026-02-13).
 
 ---
 
@@ -22,7 +22,7 @@ Do NOT:
 
 ---
 
-## The 16 Consolidated Documents
+## The 17 Documents (15 Consolidated + 2 Standalone)
 
 ### App Documents (one per app)
 | # | Document | What It Covers |
@@ -35,7 +35,7 @@ Do NOT:
 ### System Documents
 | # | Document | What It Covers |
 |---|----------|---------------|
-| 06 | `docs/06-ARCHITECTURE-ENGINEERING.md` | Architecture, CDK, engineering vision, gateway, app isolation, **Data & Storage (UDS, RAWS, retention)** |
+| 06 | `docs/06-ARCHITECTURE-ENGINEERING.md` | Architecture, CDK, engineering vision, gateway, app isolation, **Data & Storage (UDS, RAWS, retention)**, **Shared Python packages (radiant-omega, radiant-tts)** |
 | 07 | `docs/07-AI-SYSTEMS.md` | AGI brain, consciousness, cognitive, Cortex, expert adapters, **CATO safety, ethics, GPU infra** |
 | 09 | `docs/09-OMEGA-GENESIS.md` | OMEGA complete: user/admin guides, Genesis, **Five Pillars, quantum brain, Helix, firmware, model routing, Global Brain** |
 | 10 | `docs/10-ORCHESTRATION-WORKFLOWS.md` | Orchestration methods/patterns, UEP specification |
@@ -47,6 +47,12 @@ Do NOT:
 | 17 | `docs/17-GLOSSARY.md` | Terms, definitions, acronyms |
 | 18 | `docs/18-UI-UX-LIBRARIES.md` | Design patterns, open source libraries |
 | 19 | `docs/19-STRATEGIC-SECURITY.md` | Credential lifecycle security, NIST/CIS/SOC2/PCI/ISO compliance, rotation automation, Swift Deployer + Admin + SDK |
+
+### Standalone Documents (domain-specific deep dives)
+| # | Document | What It Covers |
+|---|----------|---------------|
+| 20 | `docs/20-OMEGA-ENGINEERING.md` | OMEGA engineering, architecture, marketing: all subsystems, proving ground, Lambda architecture, training, competitive moats, decision log, full API reference |
+| 21 | `docs/21-TEXT-TO-SPEECH.md` | TTS complete reference: radiant-tts package, ElevenLabs streaming, voice presets, language mapping, provider interface, interrupt support, integration guides, competitive analysis |
 
 ---
 
@@ -168,8 +174,17 @@ Before making ANY code change, identify what type of change it is:
 ```
 ✅ CHANGELOG.md
 ✅ docs/09-OMEGA-GENESIS.md (PRIMARY — all OMEGA content here)
+✅ docs/20-OMEGA-ENGINEERING.md (engineering, architecture, marketing, API reference)
 ✅ docs/06-ARCHITECTURE-ENGINEERING.md (if architectural)
 ⚠️  Policy: /.windsurf/workflows/omega-docs-policy.md
+```
+
+### TTS / Voice / Speech Changes
+```
+✅ CHANGELOG.md
+✅ docs/21-TEXT-TO-SPEECH.md (PRIMARY — all TTS content here)
+✅ docs/06-ARCHITECTURE-ENGINEERING.md (if architectural)
+⚠️  Policy: /.windsurf/workflows/tts-package-policy.md
 ```
 
 ### Orchestration / UEP Changes
@@ -259,7 +274,9 @@ Before marking task complete, verify:
 □ CHANGELOG.md updated
 □ Relevant app doc updated (01–05) if app-facing change
 □ Architecture doc (06) updated if architectural change
-□ Relevant system doc updated (06–18) if system-level change
+□ Relevant system doc updated (06–21) if system-level change
+□ OMEGA engineering doc (20) updated if OMEGA architecture/training/API change
+□ TTS doc (21) updated if TTS/voice/speech change
 □ Glossary (17) updated if new terms/acronyms
 □ Strategy (15) updated if competitive advantage
 □ Version numbers updated in all touched docs
@@ -302,6 +319,8 @@ See policy: `/.windsurf/workflows/docs-assemble-complete.md`
 │  ARCHITECTURE+DATA:✅ docs/06-ARCHITECTURE-ENGINEERING.md  │
 │  AI+CATO SAFETY:   ✅ docs/07-AI-SYSTEMS.md               │
 │  OMEGA/GENESIS:    ✅ docs/09-OMEGA-GENESIS.md             │
+│  OMEGA ENGINEERING:✅ docs/20-OMEGA-ENGINEERING.md           │
+│  TTS/SPEECH:       ✅ docs/21-TEXT-TO-SPEECH.md              │
 │  ORCHESTRATION:    ✅ docs/10-ORCHESTRATION-WORKFLOWS.md   │
 │  API REFERENCE:    ✅ docs/12-API-REFERENCE.md             │
 │  SECURITY/AUTH:    ✅ docs/13-SECURITY-AUTH-COMPLIANCE.md   │

@@ -44,7 +44,7 @@ const edgeTypes = {
   catenary: CatenaryEdge,
 };
 
-export function GlassFoundry() {
+export function GlassFoundry({ onBack }: { onBack?: () => void } = {}) {
   const {
     nodes,
     edges,
@@ -128,6 +128,18 @@ export function GlassFoundry() {
                         bg-[#050505]/70 backdrop-blur-md border-b border-white/[0.04]">
           {/* Left: Logo + Instance Selector */}
           <div className="flex items-center gap-4">
+            {onBack && (
+              <button
+                onClick={onBack}
+                title="Back to OMEGA Lab"
+                className="flex items-center justify-center w-7 h-7 rounded-md
+                           bg-white/[0.04] border border-white/[0.08] text-white/40
+                           hover:text-white/70 hover:border-white/15 hover:bg-white/[0.07]
+                           transition-all cursor-pointer"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+              </button>
+            )}
             <div className="flex items-center gap-2">
               <div
                 className="w-3 h-3 rounded-full animate-pulse"

@@ -18,6 +18,7 @@
 - **Part VIII: Firmware Hot-Swap — Marketing & Positioning (v6.4.0)**
 - **Part IX: Firmware Hot-Swap — Strategic Investor Brief (v6.4.0)**
 - **Part X: Beyond Copilots — The Seven RADIANT Principles (v7.51.0)**
+- **Part XI: OMEGA Physics Moats — Why Phase Dynamics Beat Transformers (v7.56.0)**
 
 ---
 
@@ -4104,7 +4105,7 @@ Active Inference-based safety system that replaces traditional reward maximizati
 - **Replication Barrier**: Requires the complete OMEGA physics engine, Shadow Omega simulation kernel, custom React Flow node types, and the catenary edge physics — none of which exist in any competitor product
 
 **Implementation**:
-- Core: `omega_core/bridge.py`, `omega_core/reflection.py`, `omega_core/physics.py`
+- Core: `radiant_omega/bridge.py`, `radiant_omega/reflection.py`, `radiant_omega/physics.py` (canonical: `packages/omega-core/python/radiant_omega/`)
 - Handler: `handlers/omega_vllm_server.py`, `handlers/omega_inference.py`
 - Glass Foundry: `apps/omega-lab/components/forge/` (GlassFoundry, TheArmory, TheOracle, OmegaSelector, ReactorCore, 3 node types, catenary edge)
 - State: `apps/omega-lab/lib/forge-store.ts` (Zustand), `hooks/useShadowOmega.ts` (WebSocket)
@@ -9214,6 +9215,99 @@ Tenant ($10,000/month)
 | Tools | 50 static | ∞ dynamic |
 | Architecture | Cloud-locked | Liquid Compute |
 | Interface | JSON-RPC | Tensor-Link (100x faster) |
+
+---
+
+## Part XI: OMEGA Physics Moats — Why Phase Dynamics Beat Transformers (v7.61.0)
+
+> **Classification**: RADIANT INTERNAL // STRATEGIC  
+> **Version**: 7.61.0 | **Date**: February 13, 2026  
+> **Full technical detail**: `docs/09-OMEGA-GENESIS.md` Parts XI & XII  
+> **Full engineering detail**: `docs/20-OMEGA-ENGINEERING.md`
+
+---
+
+### 1. The Paradigm Shift
+
+OMEGA operates in a fundamentally different mathematical space than every competitor. While the industry races to scale Transformers (more parameters, more tokens, more GPUs), OMEGA achieves behavioral intelligence through **phase dynamics** — complex-valued parameters that learn via wave interference, not gradient descent.
+
+This is not an optimization of existing technology. It is a **category creation**.
+
+### 2. Five Physics Moats — ALL 🟢 LIVE (v7.61.0)
+
+As of v7.61.0, all five OMEGA moats are live on **both** AWS Lambda production and the local proving ground. The training architecture (Wirtinger e-prop) has been ported to the Lambda heartbeat handler, and state persistence has been implemented locally via `LocalStorageManager`.
+
+| # | Moat | Defensibility | Why Competitors Can't Copy | Env |
+|---|------|---------------|---------------------------|-----|
+| 1 | **Physics-Native Learning** | HIGH | Wirtinger e-prop requires re-deriving learning rules from complex calculus. Can't be added to PyTorch/TensorFlow — their entire training stack assumes real-valued params | 🟢 AWS + Local |
+| 2 | **Deterministic Safety** | HIGH | HelixKernel makes forbidden outputs mathematically impossible (destructive interference). Shadow Vector extends this safety to LLM-generated text. RLHF is probabilistic — "usually safe." OMEGA is provably safe | 🟢 AWS + Local |
+| 3 | **Zero-Cost Idle** | MEDIUM | Cryogenic time-warp: `S_new = S_old · e^(-λΔt)`. No compute when idle. Short-term memory fades naturally; long-term persists. Now works both on AWS (EFS) and locally (LocalStorageManager) | 🟢 AWS + Local |
+| 4 | **Biological Lock-In** | HIGH | Learned phase patterns are meaningless outside OMEGA. Unlike LoRA (portable), OMEGA knowledge compounds and becomes irreplaceable. State now persists across restarts on both platforms | 🟢 AWS + Local |
+| 5 | **Memory Efficiency** | MEDIUM | E-prop = O(params) memory. Backprop = O(params × activations). 32MB vs 1GB+ for same architecture. Lambda heartbeat trains with e-prop on CPU/Graviton | 🟢 AWS + Local |
+
+> **Legend**: 🟢 = Live on both AWS Lambda production AND local proving ground
+
+### 2.1 New Capabilities (v7.61.0)
+
+In addition to the five core moats, the following capabilities have been implemented:
+
+| Capability | Description | Moat Implication |
+|-----------|-------------|------------------|
+| **Shadow Vector Safety** | Post-LLM safety gating. Re-embeds Llama output in OMEGA phase space, checks against HelixKernel. Blocks unsafe outputs deterministically. | Extends Moat #2 to cover LLM-generated content |
+| **Watcher Self-Awareness** | Predictive processing MLP that predicts cortex output, computes surprise. Feeds dopamine/error signals into HomeostaticLoop. Trains during dream cycles. | Unique — no competitor has physics-based self-awareness |
+| **Attribution Proof** | Every inference returns provenance: what OMEGA decided vs what Llama generated. Human-readable proof of value. | Investor demos, regulatory explainability |
+| **Multi-Session Isolation** | Independent brain instances per user session with isolated state directories. | Enables multi-tenant proving ground testing |
+| **Tunable Parameters** | All physics (dt, decay_rate), ambition (entropy, dopamine), and watcher params are hot-swappable at runtime via API. | Real-time optimization without restarts |
+| **Resonant Memory** | O(1) phase-quantized memory lookup. Index documents by dominant phase angle. Retrieve by phase resonance. | Unique — no cosine similarity needed, O(1) vs O(N) |
+| **State Persistence** | Atomic saves, atexit hook, time_warp on wake. Conscious stream fades, subconscious survives. | Biological-fidelity state management |
+| **radiant-tts Integration** | Provider-agnostic TTS streaming with ElevenLabs WebSocket. Barge-in support via Silero VAD. | Voice-enabled OMEGA interactions |
+
+### 3. Marketing Pitches
+
+**Elevator (30 seconds)**:
+> "OMEGA thinks with physics, not statistics. It guarantees safety, costs nothing when idle, and builds intelligence that's uniquely yours."
+
+**Technical buyer (2 minutes)**:
+> "Wirtinger e-prop replaces backprop with O(1) memory eligibility traces on both GPU and CPU. Safety is destructive interference in the Helix Kernel — zero probability of forbidden output, even for LLM-generated text via Shadow Vector. Self-awareness via predictive processing. Full state persistence with biological conscious/subconscious recovery."
+
+**C-Suite (1 minute)**:
+> "Your AI forgets everything between conversations. OMEGA doesn't — it remembers like a brain, with short-term memory fading naturally and long-term knowledge persisting forever. It costs nothing when idle, has safety guarantees your legal team will love, and every response comes with attribution proof showing exactly what value OMEGA added."
+
+### 4. Strategic Proposals Under Evaluation
+
+Three proposals from competitive analysis would extend OMEGA's moats:
+
+| Proposal | Impact | Effort | Status |
+|----------|--------|--------|--------|
+| **Semantic Sampling** — OMEGA biases LLM token probabilities via phase alignment | Deterministic schema compliance, agent reliability | 1-2 weeks | Recommended (highest ROI) |
+| **Sidecar Architecture** — Inject OMEGA control vectors into LLM residual stream | Real-time behavioral steering invisible to API consumers | 2-3 weeks | Recommended (enables other two) |
+| **Soft Global Attention** — Replace RAG with linear attention over entire corpus | Global context in 1 vector vs. 5K words of chunks | 1-2 weeks | Recommended (complement to RAG) |
+
+**Combined value proposition**: "The only AI platform that controls the Model, not just the Prompt." No competitor offers physics-based model steering + deterministic safety + global context injection.
+
+### 5. Honest Risks
+
+| Risk | Severity | Mitigation |
+|------|----------|------------|
+| E-prop convergence unverified at scale | HIGH | Running proving ground experiments now. Lambda heartbeat training active. |
+| Holographic capacity ~45 patterns (theory) | MEDIUM | Hierarchical phase spaces under research |
+| No head-to-head benchmarks yet | HIGH | Priority: OMEGA+Llama vs. LoRA-tuned Llama |
+
+### 6. TTS Voice Capability (v7.60.0)
+
+**Package**: `radiant-tts` (`packages/tts-core/python/radiant_tts/`)
+**Full reference**: `docs/21-TEXT-TO-SPEECH.md`
+
+RADIANT now includes a canonical TTS streaming package that enables voice-enabled AI interactions:
+
+| Capability | Description | Competitive Edge |
+|-----------|-------------|-----------------|
+| **WebSocket streaming** | <100ms TTFB from ElevenLabs turbo models | Real-time voice from LLM token streams |
+| **Barge-in support** | Silero VAD + asyncio.Event cancel — instant interrupt | Natural conversation flow |
+| **9 voice presets** | Rachel, Adam, Bella, Josh, Arnold, Matilda, George, Charlotte, Callum | Personality-matched voices |
+| **10 language mappings** | en-US, en-GB, es, fr, de, it, pt, ja, ko, zh | Multilingual out of the box |
+| **Provider-agnostic** | Abstract `TTSProvider` interface. ElevenLabs today, OpenAI/Piper tomorrow | No vendor lock-in |
+| **Graceful degradation** | No API key = text-only mode. All intelligence works without audio | Zero-config fallback |
 
 ---
 

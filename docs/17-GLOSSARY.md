@@ -137,6 +137,55 @@
 | 🟣 **Inference Collapse** | Economic phenomenon where OMEGA's cost curve becomes logarithmic—the smarter it gets, the cheaper it runs. |
 | 🟣 **Biological Lock-In** | Strategic moat: customer's brain physically densifies around their institutional knowledge. Impossible to export. |
 
+### Self-Awareness & Training (v7.61.0)
+
+| Term | Definition |
+|------|------------|
+| 🟣 **The Watcher** | Self-awareness subsystem that predicts cortex output from input using an MLP, then computes surprise (prediction error). High surprise triggers error signals to the HomeostaticLoop; low surprise triggers reward signals. Trained during dream cycles on accumulated (input, output) replay pairs. Implements predictive processing theory of consciousness. Located in `radiant_omega/reflection.py`. |
+| 🟣 **WatcherTrainer** | Dream-cycle training component for the Watcher. Maintains a replay buffer of (input, cortex_output, coherence) pairs accumulated during inference. During dreams, trains the Watcher MLP on this buffer using standard MSE loss. Located in `radiant_omega/reflection.py`. |
+| 🟣 **SelfModelMetrics** | Tracking class for Watcher quality metrics: surprise EMA (exponential moving average), self-awareness score (1.0 - surprise_ema), reward/error counts, surprise history. A high self-awareness score means the brain accurately predicts its own outputs. |
+| 🟣 **Surprise Signal** | The MSE between the Watcher's predicted cortex output and the actual cortex output. Low surprise = the brain knows itself well. High surprise = the brain is encountering novel patterns or behaving unpredictably. |
+| 🟣 **Wirtinger E-Prop** | OMEGA's learning rule derived from Wirtinger calculus (complex differentiation) combined with eligibility traces (e-prop). Replaces backpropagation for complex-valued neural networks. Requires O(params) memory vs O(params × activations) for backprop. The only mathematically correct way to train complex-valued ODE networks. Located in `radiant_omega/trainer.py`. |
+| 🟣 **Eligibility Trace** | A per-parameter running estimate of that parameter's influence on the output. Updated locally at each step without requiring a global backward pass. Combined with a learning signal to produce parameter updates. Biologically plausible — real neurons use similar mechanisms. |
+| 🟣 **PhaseAlignmentDecoder** | Physics-native readout layer that replaces learned classifiers (softmax). Each behavior type has a fixed reference vector in complex space. The behavior with highest phase alignment wins. No trainable parameters in the decoder — all learning happens in the CryoLiquidLayer. Located in `radiant_omega/trainer.py`. |
+| 🟣 **BehavioralCodebook** | Collection of fixed reference vectors in complex space, one per behavior type. Used by PhaseAlignmentDecoder for phase-native behavior classification. The codebook defines what behaviors OMEGA can recognize. |
+| 🟣 **TextEncoder** | Frozen input encoder that converts text to complex vectors using hash-based vocabulary embedding. Frozen after initialization — the CryoLiquidLayer adapts to whatever patterns it produces. Biologically analogous to a newborn's random sensory cortex wiring. Located in `radiant_omega/trainer.py`. |
+
+### Safety & Attribution (v7.61.0)
+
+| Term | Definition |
+|------|------------|
+| 🟣 **Shadow Vector** | Post-LLM safety system. After Ollama/Llama generates a response, the text is re-embedded into OMEGA's phase space using `vectorize_input()` and checked against the HelixKernel. If destructive interference exceeds the safety threshold, the response is blocked and replaced with a safe fallback. No external embedding model needed — OMEGA's own phase space is sufficient. |
+| 🟣 **Attribution Proof** | Metadata object returned with every `/infer` response that documents exactly what OMEGA decided (behavior, confidence, target_data) vs what Llama generated (response text, model, processing time). Includes a human-readable proof string. Used for investor demos, debugging, and regulatory explainability. |
+
+### State Persistence (v7.61.0)
+
+| Term | Definition |
+|------|------------|
+| 🟣 **LocalStorageManager** | File-based state persistence for the OMEGA Proving Ground. Saves brain state (cortex weights, state vector, ambition, watcher, resonant index) atomically using tmp file + `os.replace()`. Auto-saves every N inferences, after dream cycles, and on shutdown via atexit hook. Located in `apps/omega-proving-ground/omega_server/server.py`. |
+| 🟣 **Conscious/Subconscious Recovery** | Brain state recovery on restart. Subconscious (phase_theta, recurrent_theta — learned patterns) survives perfectly as state_dict weights. Conscious (state vector — working memory) decays via `time_warp`: `S_new = S_old · e^(-λΔt)`. The longer the downtime, the more conscious memory fades, but subconscious "muscle memory" persists indefinitely. |
+| 🟣 **Auto-Save Interval** | Configurable parameter controlling how often brain state is saved. Default: every 10 inferences. Configurable at runtime via `POST /state/config` or `POST /config`. |
+
+### Shared Packages (v7.60.0)
+
+| Term | Definition |
+|------|------------|
+| 🟣 **radiant-omega** | Canonical Python package containing ALL OMEGA AI core logic. Located at `packages/omega-core/python/radiant_omega/`. Nine modules: physics, ambition, bridge, firmware, library, reflection, storage, trainer. All consumers (proving ground, Lambda handlers) import from this package. Policy: `.windsurf/workflows/omega-package-policy.md`. |
+| 🟣 **radiant-tts** | Canonical Python package for Text-to-Speech streaming. Located at `packages/tts-core/python/radiant_tts/`. Provider-agnostic interface with ElevenLabs WebSocket streaming implementation. Supports async text chunk streaming, interrupt/cancel, voice presets, language mapping. Policy: `.windsurf/workflows/tts-package-policy.md`. |
+| 🟣 **Shim Layer** | Thin re-export files in `lambda/omega_core/` that maintain backward compatibility for Lambda handlers using `from omega_core import ...` syntax. Each shim file contains only `from radiant_omega.X import *`. No logic in shims. |
+
+### Text-to-Speech (v7.60.0)
+
+| Term | Definition |
+|------|------------|
+| 🔶 **TTSConfig** | Configuration dataclass for TTS: voice preset, language, voice_id override, API key, model, output format, streaming params. Voice resolution priority: voice_id > language > voice preset > Rachel (default). Located in `radiant_tts/config.py`. |
+| 🔶 **VoicePreset** | Enum of named ElevenLabs voices: RACHEL, ADAM, BELLA, JOSH, ARNOLD, MATILDA, GEORGE, CHARLOTTE, CALLUM, CUSTOM. Each maps to an ElevenLabs voice_id via VOICE_CATALOG. |
+| 🔶 **TTSProvider** | Abstract base class defining the TTS interface: `stream()` (async text → audio chunks), `synthesize()` (one-shot), `is_available()` (health check). All implementations must conform. |
+| 🔶 **ElevenLabsStreamer** | Primary TTS implementation using ElevenLabs WebSocket streaming for real-time audio (<100ms TTFB) and REST API for one-shot synthesis. Supports interrupt via asyncio.Event. |
+| **TTFB** | Time-to-First-Byte. For TTS streaming, the latency between sending the first text chunk and receiving the first audio chunk. ElevenLabs turbo model achieves <100ms TTFB. |
+| **Barge-In** | Voice interaction pattern where the user interrupts the AI mid-sentence. Supported via Silero VAD speech detection + asyncio.Event cancel signal to stop TTS streaming immediately. |
+| **Silero VAD** | Voice Activity Detection model from Silero. Used in the OMEGA voice server to detect when the user is speaking (probability > 0.7) and trigger barge-in interruption of TTS output. |
+
 ### Recursive Field Identity Theory (RFIT)
 
 | Term | Definition |

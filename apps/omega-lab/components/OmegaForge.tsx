@@ -105,7 +105,7 @@ const emptyDraft: FirmwareDraft = {
 // ============================================================================
 
 export function OmegaForge() {
-  const [tenantId, setTenantId] = useState<string>('');
+  const [tenantId, setTenantId] = useState<string>('local-proving-ground');
   const [draft, setDraft] = useState<FirmwareDraft>({ ...emptyDraft });
   const [activeTab, setActiveTab] = useState<'directives' | 'drives' | 'personality'>('directives');
   const [showBurnConfirm, setShowBurnConfirm] = useState(false);

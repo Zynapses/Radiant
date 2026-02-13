@@ -1,0 +1,91 @@
+THIS IS BATCH C. You already have the system context from the first message.
+
+Generate exactly 700 JSONL lines for this batch:
+- meal_upgrade: 210 examples
+- customize: 175 examples
+- order_modify: 175 examples
+- sauce_selection: 140 examples
+
+=== meal_upgrade (210 lines) ===
+
+REMEMBER: meal_upgrade = upgrading an EXISTING ordered item to a combo. NOT ordering a new meal.
+
+Non-contextual (customer explicitly asks to upgrade):
+- "make it a combo" (30+ variants: "combo that", "meal deal please", "upgrade to combo", "turn that into a meal", "add fries and drink to that", "I'll take the meal version", "yeah the combo", "meal-ify that", "upsize it", "make it a full meal")
+- Cover upgrades for every combo-eligible item (Big Mac, QPC, McCrispy, etc.)
+
+Context-dependent (MUST have context field — generate 120+ of these):
+After "Big Mac is $5.69. Want to make that a combo for $8.99?":
+- "yes" -> meal_upgrade, {"item": "Big Mac", "meal_price": 8.99}
+- "yeah" -> meal_upgrade
+- "sure" -> meal_upgrade
+- "why not" -> meal_upgrade
+- "yeah do it" -> meal_upgrade
+- "go ahead" -> meal_upgrade
+- "yes please" -> meal_upgrade
+
+Do this for EVERY combo-eligible item (Big Mac, QPC, Double QPC, McDouble, Double Cheeseburger, Hamburger, Cheeseburger, McCrispy, Filet-O-Fish, 10pc McNuggets, 6pc McNuggets) — 10+ context variants each.
+
+Also include DECLINING combo (these are take_order, NOT meal_upgrade — but DON'T generate these, they go in batch A):
+
+=== customize (175 lines) ===
+
+REMEMBER: customize = modifying an item's INGREDIENTS. Key signals: "hold", "remove", "no [ingredient]", "extra", "without", "plain", "add [topping]", "on the side"
+
+Ingredients: pickles, onions, lettuce, tomato, cheese, mayo, ketchup, mustard, special sauce, bacon, jalapeños, salt
+
+Generate for multiple items:
+- "no pickles on my Big Mac" (and variants for every item)
+- "extra cheese on that"
+- "hold the mayo"
+- "plain, nothing on it"
+- "add bacon to my McDouble"
+- "remove the onions"
+- "no salt on the fries"
+- "sauce on the side"
+- "extra pickles"
+- "light on the ketchup"
+- "double the cheese"
+- "no lettuce no tomato"
+- "I want it plain"
+- "just meat and cheese"
+- "everything except onions"
+
+=== order_modify (175 lines) ===
+
+REMEMBER: order_modify = changing/removing items ALREADY on the order. Key signals: "cancel", "remove from order", "scratch that", "take that back", "undo", "change my", "get rid of"
+
+- "actually cancel the Big Mac" (remove)
+- "take that off my order" (remove_last)
+- "scratch that last item" (remove_last)
+- "I don't want that anymore" (remove_last)
+- "change the McDouble to a Big Mac" (change)
+- "actually make that two Big Macs" (change_qty)
+- "add another cheeseburger" (add)
+- "what do I have so far" (readback)
+- "cancel everything" (cancel_all)
+- "never mind the fries" (remove)
+- "wait go back" (remove_last)
+- "I changed my mind on the nuggets" (remove)
+
+=== sauce_selection (140 lines) ===
+
+Cover all sauces: BBQ, Sweet & Sour, Honey Mustard, Hot Mustard, Ranch, Tangy BBQ, Spicy Buffalo
+
+- "BBQ sauce please" (and variants for every sauce)
+- "can I get ranch"
+- "honey mustard and BBQ"
+- "two BBQ sauces"
+- "give me some sweet and sour"
+- "hot mustard please"
+- "buffalo sauce"
+- "tangy BBQ"
+- "all the sauces" 
+- "whatever sauce is good with nuggets"
+
+Include context-dependent (after "Any sauce with your nuggets?"):
+- "BBQ" -> sauce_selection
+- "ranch please" -> sauce_selection
+- "honey mustard and sweet and sour" -> sauce_selection
+
+Output ONLY the JSONL lines. No commentary. Start now.

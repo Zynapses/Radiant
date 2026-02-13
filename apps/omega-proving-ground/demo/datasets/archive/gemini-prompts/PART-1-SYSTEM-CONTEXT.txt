@@ -1,0 +1,195 @@
+You are generating behavioral training data for OMEGA, a quantum-inspired neural network that classifies McDonald's drive-thru customer speech into one of 26 behavioral categories. OMEGA does NOT generate responses — it only classifies WHAT behavior to execute.
+
+You will generate 3,500 training examples total across multiple batches. Output ONLY valid JSONL — one JSON object per line. No commentary, no markdown, no code fences, no line numbers.
+
+=== OUTPUT FORMAT ===
+
+Each line is one JSON object:
+{"input": "can I get a Big Mac", "behavior": "take_order", "target_action": "take_order", "target_data": {"item": "Big Mac", "price": 5.69, "meal_price": 8.99}, "expected_response_contains": [], "context": null}
+
+Fields:
+- input (string): Customer utterance as speech recognition captures it
+- behavior (string): One of the 26 types below
+- target_action (string): Same as behavior
+- target_data (object): Structured data for the behavior
+- expected_response_contains (array): Always empty []
+- context (string or null): Previous crew message IF this is a contextual response
+
+=== THE 26 BEHAVIOR TYPES ===
+
+1. greet — Customer greets. target_data: {}
+2. take_order — Orders lunch/dinner item. target_data: {"item": "<exact name>", "price": <num>, "meal_price": <num or null>}
+3. take_order_breakfast — Orders breakfast item. Same target_data as take_order.
+4. meal_upgrade — Accepts combo/meal upgrade OR explicitly asks to upgrade. target_data: {"item": "<item>", "meal_price": <num>}
+5. drink_selection — Picks a drink for their meal. target_data: {"drink": "<drink name>", "size": "medium"}
+6. sauce_selection — Picks sauce(s). target_data: {"sauce": "<sauce name>"}
+7. size_selection — Picks a size for their meal/combo (NOT ordering a drink by size). target_data: {"size": "small|medium|large"}
+8. customize — Modifies an item's ingredients (no pickles, extra cheese, hold the mayo). target_data: {"modification": "add|remove|plain|only", "ingredient": "<ingredient>"}
+9. order_modify — Changes/removes an already-ordered item from the order. target_data: {"action": "remove|change|change_qty|add|remove_last|readback|cancel_all", "item": "<item>", "qty": <num>}
+10. meal_substitution — Swaps a meal side or drink. target_data: {"from": "<original>", "to": "<replacement>"}
+11. happy_meal_options — Orders a Happy Meal. target_data: {"item": "<happy meal type>", "price": <num>}
+12. add_on_suggestion — Accepts an offered add-on (dessert, cookie, pie). target_data: {"item": "<item>", "price": <num>}
+13. order_complete — Customer signals they are DONE ordering (no more food). target_data: {}
+14. order_confirmed — Customer confirms the order READBACK is correct. target_data: {}
+15. payment — Customer specifies payment method. target_data: {"method": "card|cash|mobile|app|coupon"}
+16. menu_inquiry — Asks WHAT items are available on the menu. target_data: {"category": "<cat>"} or {}
+17. price_inquiry — Asks HOW MUCH something costs (price/total). target_data: {"item": "<item>", "price": <num>} or {"query": "order_total"}
+18. nutrition_inquiry — Asks about CALORIES, FAT, PROTEIN, NUTRITION facts. target_data: {"item": "<item>"}
+19. allergen_inquiry — Asks if an item CONTAINS a specific allergen. target_data: {"item": "<item>", "allergen": "<allergen>"}
+20. allergen_alert — Customer DECLARES they have an allergy. target_data: {"allergen": "<allergen>"}
+21. dietary_inquiry — Asks about dietary OPTIONS (gluten-free, vegan, keto). target_data: {"diet": "<diet type>"}
+22. recommend — Asks for a SUGGESTION or recommendation. target_data: {} or {"category": "<cat>"}
+23. value_recommendation — Asks for DEALS, CHEAP options, best value. target_data: {}
+24. complaint — Has a PROBLEM (wrong order, cold food, long wait). target_data: {"type": "wrong_order|cold_food|long_wait|missing_items|quality|escalation|foreign_object|refund"}
+25. machine_down — Tries to order ice cream or milkshake (machine is always broken). target_data: {"item": "<item>"}
+26. time_check — Asks about WAIT TIME, HOURS, or BREAKFAST availability. target_data: {"query": "wait_time|hours|breakfast_hours"}
+
+=== CRITICAL DISAMBIGUATION RULES ===
+
+These pairs are commonly confused. Follow these rules strictly:
+
+CUSTOMIZE vs TAKE_ORDER:
+- "no pickles on my Big Mac" = customize (modifying ingredients)
+- "I'll have a Big Mac" = take_order (ordering an item)
+- KEY: "hold", "remove", "no [ingredient]", "extra", "plain", "add [ingredient]", "without" = customize
+
+ORDER_MODIFY vs TAKE_ORDER:
+- "take that off my order" = order_modify (changing the order)
+- "give me a cheeseburger" = take_order (adding new item)
+- KEY: "cancel", "remove from order", "scratch that", "change my", "undo", "take back" = order_modify
+
+MEAL_UPGRADE vs TAKE_ORDER:
+- "make it a combo" = meal_upgrade (upgrading existing item)
+- "I want a Big Mac meal" = take_order (ordering meal from scratch)
+- KEY: "upgrade", "make it a meal", "combo that", "turn it into" = meal_upgrade
+
+SIZE_SELECTION vs DRINK_SELECTION:
+- "large please" (after "what size?") = size_selection
+- "large Coke" = drink_selection (specific drink)
+- KEY: Just size word alone = size_selection. Size + drink name = drink_selection.
+
+ORDER_CONFIRMED vs ORDER_COMPLETE:
+- "yes that's correct" (after readback) = order_confirmed
+- "that's all I want" = order_complete
+- KEY: Confirming accuracy = order_confirmed. Indicating finished = order_complete.
+
+MENU_INQUIRY vs PRICE_INQUIRY:
+- "what burgers do you have" = menu_inquiry (WHAT is available)
+- "how much is a Big Mac" = price_inquiry (HOW MUCH it costs)
+
+NUTRITION_INQUIRY vs PRICE_INQUIRY:
+- "how many calories" = nutrition_inquiry (health)
+- "how much does it cost" = price_inquiry (money)
+
+RECOMMEND vs MENU_INQUIRY:
+- "what should I get" = recommend (suggestion)
+- "what do you have" = menu_inquiry (listing)
+
+TIME_CHECK vs PRICE_INQUIRY:
+- "how long is the wait" = time_check (time)
+- "how much is everything" = price_inquiry (money)
+
+ALLERGEN_INQUIRY vs PRICE_INQUIRY:
+- "does it have gluten" = allergen_inquiry (allergens)
+- "how much is it" = price_inquiry (price)
+
+=== COMPLETE MENU WITH EXACT PRICES ===
+
+BURGERS:
+Big Mac — $5.69 (meal $8.99)
+Quarter Pounder with Cheese — $5.99 (meal $9.29)
+Double Quarter Pounder with Cheese — $7.49 (meal $10.79)
+McDouble — $2.79 (meal $5.99)
+Double Cheeseburger — $3.39 (meal $6.59)
+Hamburger — $1.89 (meal $5.09)
+Cheeseburger — $2.29 (meal $5.49)
+
+CHICKEN:
+McCrispy — $5.49 (meal $8.79)
+Filet-O-Fish — $4.79 (meal $7.99)
+10-piece Chicken McNuggets — $5.29 (meal $8.49)
+6-piece Chicken McNuggets — $3.69 (meal $6.89)
+4-piece Chicken McNuggets — $2.49 (no meal)
+20-piece Chicken McNuggets — $8.99 (no meal)
+McChicken — $1.89 (no meal)
+
+BREAKFAST:
+Egg McMuffin — $4.49 (meal $6.49)
+Sausage McMuffin — $2.29 (meal $4.99)
+Sausage McMuffin with Egg — $4.79 (meal $6.79)
+Bacon, Egg & Cheese Biscuit — $4.89 (meal $6.89)
+Sausage Burrito — $2.49 (no meal)
+Hotcakes — $3.99 (meal $5.99)
+Hash Browns — $1.89 (no meal)
+
+DRINKS:
+Coca-Cola, Diet Coke, Sprite, Dr Pepper, Fanta Orange, Hi-C Orange Lavaburst, Sweet Tea, Unsweetened Iced Tea — S:$1.39 / M:$1.79 / L:$2.09
+Lemonade — S:$1.79 / M:$2.29 / L:$2.69
+Hot Coffee (Premium Roast) — S:$1.49 / M:$1.89 / L:$2.19
+Iced Coffee — S:$2.49 / M:$3.29 / L:$3.79
+Dasani Water — $1.39
+Milk (1% Low Fat) — $1.59
+Chocolate Milk — $1.79
+
+McCAFE:
+Caramel Frappe, Mocha Frappe — S:$3.99 / M:$4.79 / L:$5.39
+Caramel Macchiato, Mocha Latte — S:$3.69 / M:$4.39 / L:$4.99
+
+DESSERTS:
+McFlurry with OREO Cookies — regular $4.89, snack $3.69
+McFlurry with M&M'S Candies — regular $4.89, snack $3.69
+Hot Fudge Sundae — $2.89
+Caramel Sundae — $2.89
+Vanilla Cone — $1.89
+Chocolate Chip Cookie — $1.29
+Baked Apple Pie — $1.69
+
+HAPPY MEALS:
+Hamburger Happy Meal — $4.99
+4-piece McNuggets Happy Meal — $5.29
+6-piece McNuggets Happy Meal — $5.79
+
+SAUCES: BBQ, Sweet & Sour, Honey Mustard, Hot Mustard, Ranch, Tangy BBQ, Spicy Buffalo
+
+COMBO NUMBERS: 1=Big Mac, 2=Quarter Pounder with Cheese, 3=Double Quarter Pounder with Cheese, 4=McCrispy, 5=Filet-O-Fish, 6=10-piece Chicken McNuggets, 7=McDouble, 8=Cheeseburger, 9=6-piece Chicken McNuggets, 10=McChicken
+
+=== PHRASING VARIETY ===
+
+For EACH menu item, generate 10-15 variants:
+- Formal: "May I please have a Big Mac?"
+- Casual: "Lemme get a Big Mac"
+- Terse: "Big Mac"
+- Slang: "Hit me with a Big Mac"
+- Indirect: "I think I'll go with the Big Mac"
+- With quantity: "Two Big Macs please"
+- Colloquial: "the number one", "nuggets", "the fish sandwich"
+- Speech errors: "big mack", "mc double", "file a fish"
+- Mumbled: "uh yeah the Big Mac thing"
+- With filler: "um can I get like a Big Mac"
+
+=== SPEECH RECOGNITION ERRORS ===
+
+big mack, bigmac -> Big Mac
+quarter pounder cheese, QP, corner pounder -> Quarter Pounder with Cheese
+mc double, mick double -> McDouble
+mc chicken, mick chicken -> McChicken
+mc crispy, mick crispy -> McCrispy
+file a fish, fillet of fish, fish fillet -> Filet-O-Fish
+mc nuggets, mic nuggets -> Chicken McNuggets
+mc flurry, make flurry -> McFlurry
+egg mc muffin, mcmuffin -> Egg McMuffin
+doctor pepper -> Dr Pepper
+hi c, high c -> Hi-C Orange Lavaburst
+
+=== QUALITY RULES ===
+
+1. Every target_data.item MUST match an exact menu name from above
+2. Every target_data.price MUST match the exact price from above
+3. No duplicate input strings across any batch
+4. input strings: 1-20 words, realistic speech
+5. Mix cases naturally (lowercase dominant)
+6. No HTML, no emojis
+7. Include filler words occasionally: "um", "uh", "like"
+8. Every line must be valid JSON with double quotes only
+
+NOW READ THE NEXT MESSAGE FOR YOUR SPECIFIC BATCH INSTRUCTIONS.

@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "radiant-tts"
+version = "1.0.0"
+description = "Reusable TTS streaming core — ElevenLabs wrapper with provider interface, language configs, and interrupt support"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "RADIANT", email = "dev@radiant.ai"}]
+
+dependencies = [
+    "websockets>=12.0",
+    "httpx>=0.25.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "pytest-asyncio"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["radiant_tts*"]

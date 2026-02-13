@@ -1,0 +1,1004 @@
+{"input": "how much is a McCrispy", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {"item": "McCrispy", "price": 5.49}, "expected_response_contains": [], "context": null}
+{"input": "wait no take that off", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove_last"}, "expected_response_contains": [], "context": null}
+{"input": "large please", "behavior": "size_selection", "target_action": "size_selection", "target_data": {"size": "large"}, "expected_response_contains": [], "context": null}
+{"input": "you guys open 24 hours", "behavior": "time_check", "target_action": "time_check", "target_data": {"query": "hours"}, "expected_response_contains": [], "context": null}
+{"input": "clear the whole thing", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "cancel_all"}, "expected_response_contains": [], "context": null}
+{"input": "McDouble plain", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "plain", "ingredient": "all"}, "expected_response_contains": [], "context": null}
+{"input": "something filling but cheap", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "skip the onions", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "onions"}, "expected_response_contains": [], "context": null}
+{"input": "I want Hot Mustard sauce", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Hot Mustard"}, "expected_response_contains": [], "context": null}
+{"input": "put extra special sauce on the hamburger", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "add", "ingredient": "special sauce"}, "expected_response_contains": [], "context": null}
+{"input": "how long will my order take", "behavior": "time_check", "target_action": "time_check", "target_data": {"query": "wait_time"}, "expected_response_contains": [], "context": null}
+{"input": "hiya", "behavior": "greet", "target_action": "greet", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "extra onions please", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "add", "ingredient": "onions"}, "expected_response_contains": [], "context": null}
+{"input": "what should I feed my kids", "behavior": "recommend", "target_action": "recommend", "target_data": {"category": "kids"}, "expected_response_contains": [], "context": null}
+{"input": "I don't want special sauce on that", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "special sauce"}, "expected_response_contains": [], "context": null}
+{"input": "I'll take Honey Mustard", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Honey Mustard"}, "expected_response_contains": [], "context": null}
+{"input": "I'll go medium", "behavior": "size_selection", "target_action": "size_selection", "target_data": {"size": "medium"}, "expected_response_contains": [], "context": null}
+{"input": "that's my order", "behavior": "order_complete", "target_action": "order_complete", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "anything under 3 dollars", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "I need something gluten-free", "behavior": "dietary_inquiry", "target_action": "dietary_inquiry", "target_data": {"diet": "gluten-free"}, "expected_response_contains": [], "context": null}
+{"input": "substitute the French Fries with Fruit Bag", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {"from": "French Fries", "to": "Fruit Bag"}, "expected_response_contains": [], "context": null}
+{"input": "is there wheat in the Big Mac", "behavior": "allergen_inquiry", "target_action": "allergen_inquiry", "target_data": {"item": "Big Mac", "allergen": "wheat"}, "expected_response_contains": [], "context": null}
+{"input": "Honey Mustard sauce please", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Honey Mustard"}, "expected_response_contains": [], "context": null}
+{"input": "sure", "behavior": "meal_upgrade", "target_action": "meal_upgrade", "target_data": {"item": "Double Quarter Pounder with Cheese", "meal_price": 10.79}, "expected_response_contains": [], "context": "That Double Quarter Pounder with Cheese is $7.49. Want to make it a combo for $10.79?"}
+{"input": "I want to start from scratch", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "cancel_all"}, "expected_response_contains": [], "context": null}
+{"input": "what do you have", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "chip please", "behavior": "payment", "target_action": "payment", "target_data": {"method": "card"}, "expected_response_contains": [], "context": null}
+{"input": "cash please", "behavior": "payment", "target_action": "payment", "target_data": {"method": "cash"}, "expected_response_contains": [], "context": null}
+{"input": "if you had to pick one thing", "behavior": "recommend", "target_action": "recommend", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "that's correct", "behavior": "order_confirmed", "target_action": "order_confirmed", "target_data": {}, "expected_response_contains": [], "context": "OK so I have a Big Mac combo with a Coke. Your total is $8.99. Does that sound right?"}
+{"input": "what do you recommend", "behavior": "recommend", "target_action": "recommend", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "how much is a Filet-O-Fish", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {"item": "Filet-O-Fish", "price": 4.79}, "expected_response_contains": [], "context": null}
+{"input": "skip the ketchup", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "ketchup"}, "expected_response_contains": [], "context": null}
+{"input": "price on Big Mac", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {"item": "Big Mac", "price": 5.69}, "expected_response_contains": [], "context": null}
+{"input": "what's trending", "behavior": "recommend", "target_action": "recommend", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "I don't want the the drink anymore", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove", "item": "the drink"}, "expected_response_contains": [], "context": null}
+{"input": "what's cheap and good", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "without cheese", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "cheese"}, "expected_response_contains": [], "context": null}
+{"input": "forget all of it", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "cancel_all"}, "expected_response_contains": [], "context": null}
+{"input": "least expensive burger", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "shamrock shake", "behavior": "machine_down", "target_action": "machine_down", "target_data": {"item": "shake"}, "expected_response_contains": [], "context": null}
+{"input": "evening", "behavior": "greet", "target_action": "greet", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "cash", "behavior": "payment", "target_action": "payment", "target_data": {"method": "cash"}, "expected_response_contains": [], "context": "Will that be cash, card, or mobile pay?"}
+{"input": "any combos on sale", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "scratch that last item", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove_last"}, "expected_response_contains": [], "context": null}
+{"input": "sweet & sour", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Sweet & Sour"}, "expected_response_contains": [], "context": "Any sauce with your nuggets?"}
+{"input": "um Tangy BBQ", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Tangy BBQ"}, "expected_response_contains": [], "context": null}
+{"input": "what's the value menu", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "no pickles no mayo", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "pickles, mayo"}, "expected_response_contains": [], "context": null}
+{"input": "I can't have shellfish", "behavior": "allergen_alert", "target_action": "allergen_alert", "target_data": {"allergen": "shellfish"}, "expected_response_contains": [], "context": null}
+{"input": "what's low-calorie on the menu", "behavior": "dietary_inquiry", "target_action": "dietary_inquiry", "target_data": {"diet": "low-calorie"}, "expected_response_contains": [], "context": null}
+{"input": "the app", "behavior": "payment", "target_action": "payment", "target_data": {"method": "app"}, "expected_response_contains": [], "context": "Will that be cash, card, or mobile pay?"}
+{"input": "good afternoon", "behavior": "greet", "target_action": "greet", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "list my order", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "readback"}, "expected_response_contains": [], "context": null}
+{"input": "Sweet & Sour please", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Sweet & Sour"}, "expected_response_contains": [], "context": null}
+{"input": "my order has been wrong three times", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "escalation"}, "expected_response_contains": [], "context": null}
+{"input": "how many calories in the McCrispy", "behavior": "nutrition_inquiry", "target_action": "nutrition_inquiry", "target_data": {"item": "McCrispy"}, "expected_response_contains": [], "context": null}
+{"input": "we're all set", "behavior": "order_complete", "target_action": "order_complete", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "I can't have peanuts", "behavior": "allergen_alert", "target_action": "allergen_alert", "target_data": {"allergen": "peanuts"}, "expected_response_contains": [], "context": null}
+{"input": "extra mustard on that", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "add", "ingredient": "mustard"}, "expected_response_contains": [], "context": null}
+{"input": "my kid has a gluten allergy", "behavior": "allergen_alert", "target_action": "allergen_alert", "target_data": {"allergen": "gluten"}, "expected_response_contains": [], "context": null}
+{"input": "go with medium", "behavior": "size_selection", "target_action": "size_selection", "target_data": {"size": "medium"}, "expected_response_contains": [], "context": null}
+{"input": "this isn't fresh", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "quality"}, "expected_response_contains": [], "context": null}
+{"input": "yes hi good morning", "behavior": "greet", "target_action": "greet", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "I can't have dairy", "behavior": "allergen_alert", "target_action": "allergen_alert", "target_data": {"allergen": "dairy"}, "expected_response_contains": [], "context": null}
+{"input": "any vegan options", "behavior": "dietary_inquiry", "target_action": "dietary_inquiry", "target_data": {"diet": "vegan"}, "expected_response_contains": [], "context": null}
+{"input": "yeah Honey Mustard", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Honey Mustard"}, "expected_response_contains": [], "context": null}
+{"input": "how much is a Egg McMuffin", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {"item": "Egg McMuffin", "price": 4.49}, "expected_response_contains": [], "context": null}
+{"input": "I need to talk to someone", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "escalation"}, "expected_response_contains": [], "context": null}
+{"input": "that should do it", "behavior": "order_complete", "target_action": "order_complete", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "I've been waiting 20 minutes", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "long_wait"}, "expected_response_contains": [], "context": null}
+{"input": "without pickles", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "pickles"}, "expected_response_contains": [], "context": null}
+{"input": "drop the Coke", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove", "item": "Coke"}, "expected_response_contains": [], "context": null}
+{"input": "does the McNuggets have nuts", "behavior": "allergen_inquiry", "target_action": "allergen_inquiry", "target_data": {"item": "McNuggets", "allergen": "nuts"}, "expected_response_contains": [], "context": null}
+{"input": "what's the best deal on burgers", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "yeah one apple pie", "behavior": "add_on_suggestion", "target_action": "add_on_suggestion", "target_data": {"item": "Baked Apple Pie", "price": 1.69}, "expected_response_contains": [], "context": "Would you like to add a dessert?"}
+{"input": "nothing else", "behavior": "order_complete", "target_action": "order_complete", "target_data": {}, "expected_response_contains": [], "context": "Anything else today?"}
+{"input": "go with large", "behavior": "size_selection", "target_action": "size_selection", "target_data": {"size": "large"}, "expected_response_contains": [], "context": null}
+{"input": "how many calories in the Filet-O-Fish", "behavior": "nutrition_inquiry", "target_action": "nutrition_inquiry", "target_data": {"item": "Filet-O-Fish"}, "expected_response_contains": [], "context": null}
+{"input": "remove the tomato", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "tomato"}, "expected_response_contains": [], "context": null}
+{"input": "replace the Coca-Cola with Sprite", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {"from": "Coca-Cola", "to": "Sprite"}, "expected_response_contains": [], "context": null}
+{"input": "yeah add a Baked Apple Pie", "behavior": "add_on_suggestion", "target_action": "add_on_suggestion", "target_data": {"item": "Baked Apple Pie", "price": 1.69}, "expected_response_contains": [], "context": null}
+{"input": "afternoon", "behavior": "greet", "target_action": "greet", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "yeah add a McFlurry with OREO Cookies", "behavior": "add_on_suggestion", "target_action": "add_on_suggestion", "target_data": {"item": "McFlurry with OREO Cookies", "price": 4.89}, "expected_response_contains": [], "context": null}
+{"input": "what sauces do you have", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {"category": "sauces"}, "expected_response_contains": [], "context": null}
+{"input": "McFlurry with M&Ms", "behavior": "machine_down", "target_action": "machine_down", "target_data": {"item": "McFlurry"}, "expected_response_contains": [], "context": null}
+{"input": "add fries and a drink", "behavior": "meal_upgrade", "target_action": "meal_upgrade", "target_data": {"item": "McDouble", "meal_price": 5.99}, "expected_response_contains": [], "context": null}
+{"input": "what comes on the Quarter Pounder", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {"item": "Quarter Pounder with Cheese"}, "expected_response_contains": [], "context": null}
+{"input": "load up on jalape\u00f1os", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "add", "ingredient": "jalape\u00f1os"}, "expected_response_contains": [], "context": null}
+{"input": "skip the jalape\u00f1os", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "jalape\u00f1os"}, "expected_response_contains": [], "context": null}
+{"input": "yeah add a Chocolate Chip Cookie", "behavior": "add_on_suggestion", "target_action": "add_on_suggestion", "target_data": {"item": "Chocolate Chip Cookie", "price": 1.29}, "expected_response_contains": [], "context": null}
+{"input": "I want the McDouble with nothing on it", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "plain", "ingredient": "all"}, "expected_response_contains": [], "context": null}
+{"input": "can I get the cheeseburger without lettuce", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "lettuce"}, "expected_response_contains": [], "context": null}
+{"input": "we're done", "behavior": "order_complete", "target_action": "order_complete", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "no cheese no lettuce", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "cheese, lettuce"}, "expected_response_contains": [], "context": null}
+{"input": "make it large", "behavior": "size_selection", "target_action": "size_selection", "target_data": {"size": "large"}, "expected_response_contains": [], "context": null}
+{"input": "scratch the fries", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove", "item": "fries"}, "expected_response_contains": [], "context": null}
+{"input": "credit", "behavior": "payment", "target_action": "payment", "target_data": {"method": "card"}, "expected_response_contains": [], "context": null}
+{"input": "Apple Slices instead of French Fries", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {"from": "French Fries", "to": "Apple Slices"}, "expected_response_contains": [], "context": null}
+{"input": "Fruit Bag instead of French Fries", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {"from": "French Fries", "to": "Fruit Bag"}, "expected_response_contains": [], "context": null}
+{"input": "best deal on nuggets", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "add some pickles", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "add", "ingredient": "pickles"}, "expected_response_contains": [], "context": null}
+{"input": "just large", "behavior": "size_selection", "target_action": "size_selection", "target_data": {"size": "large"}, "expected_response_contains": [], "context": null}
+{"input": "what's the best deal", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "do you have breakfast sandwiches", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {"category": "breakfast"}, "expected_response_contains": [], "context": null}
+{"input": "is the McCrispy healthy", "behavior": "nutrition_inquiry", "target_action": "nutrition_inquiry", "target_data": {"item": "McCrispy"}, "expected_response_contains": [], "context": null}
+{"input": "the chicken is undercooked", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "quality"}, "expected_response_contains": [], "context": null}
+{"input": "I can't have eggs", "behavior": "allergen_alert", "target_action": "allergen_alert", "target_data": {"allergen": "eggs"}, "expected_response_contains": [], "context": null}
+{"input": "any deals going on", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "yeah the combo", "behavior": "meal_upgrade", "target_action": "meal_upgrade", "target_data": {"item": "Quarter Pounder with Cheese", "meal_price": 9.29}, "expected_response_contains": [], "context": null}
+{"input": "put extra salt on the McChicken", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "add", "ingredient": "salt"}, "expected_response_contains": [], "context": null}
+{"input": "I need something vegan", "behavior": "dietary_inquiry", "target_action": "dietary_inquiry", "target_data": {"diet": "vegan"}, "expected_response_contains": [], "context": null}
+{"input": "is the ice cream machine working", "behavior": "machine_down", "target_action": "machine_down", "target_data": {"item": "ice cream"}, "expected_response_contains": [], "context": null}
+{"input": "cancel that last one", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove_last"}, "expected_response_contains": [], "context": null}
+{"input": "regular size", "behavior": "size_selection", "target_action": "size_selection", "target_data": {"size": "medium"}, "expected_response_contains": [], "context": null}
+{"input": "actually cancel the Quarter Pounder", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove", "item": "Quarter Pounder"}, "expected_response_contains": [], "context": null}
+{"input": "is the Big Mac dairy free", "behavior": "allergen_inquiry", "target_action": "allergen_inquiry", "target_data": {"item": "Big Mac", "allergen": "dairy"}, "expected_response_contains": [], "context": null}
+{"input": "where's my food", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "long_wait"}, "expected_response_contains": [], "context": null}
+{"input": "no nothing else", "behavior": "order_complete", "target_action": "order_complete", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "no thanks", "behavior": "order_complete", "target_action": "order_complete", "target_data": {}, "expected_response_contains": [], "context": "Anything else today?"}
+{"input": "add the Baked Apple Pie", "behavior": "add_on_suggestion", "target_action": "add_on_suggestion", "target_data": {"item": "Baked Apple Pie", "price": 1.69}, "expected_response_contains": [], "context": null}
+{"input": "upgrade to the combo", "behavior": "meal_upgrade", "target_action": "meal_upgrade", "target_data": {"item": "Double Cheeseburger", "meal_price": 6.59}, "expected_response_contains": [], "context": null}
+{"input": "actually cancel the nuggets", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove", "item": "nuggets"}, "expected_response_contains": [], "context": null}
+{"input": "this is burnt", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "quality"}, "expected_response_contains": [], "context": null}
+{"input": "put extra pickles on the McDouble", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "add", "ingredient": "pickles"}, "expected_response_contains": [], "context": null}
+{"input": "just do the combo", "behavior": "meal_upgrade", "target_action": "meal_upgrade", "target_data": {"item": "McDouble", "meal_price": 5.99}, "expected_response_contains": [], "context": null}
+{"input": "how many calories in the cheeseburger", "behavior": "nutrition_inquiry", "target_action": "nutrition_inquiry", "target_data": {"item": "cheeseburger"}, "expected_response_contains": [], "context": null}
+{"input": "one more Happy Meal with nuggets", "behavior": "happy_meal_options", "target_action": "happy_meal_options", "target_data": {"item": "6-piece McNuggets Happy Meal", "price": 5.79}, "expected_response_contains": [], "context": null}
+{"input": "what's kosher on the menu", "behavior": "dietary_inquiry", "target_action": "dietary_inquiry", "target_data": {"diet": "kosher"}, "expected_response_contains": [], "context": null}
+{"input": "what McCafe drinks do you have", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {"category": "mccafe"}, "expected_response_contains": [], "context": null}
+{"input": "I'll take a McFlurry with OREO Cookies too", "behavior": "add_on_suggestion", "target_action": "add_on_suggestion", "target_data": {"item": "McFlurry with OREO Cookies", "price": 4.89}, "expected_response_contains": [], "context": null}
+{"input": "what can I eat if I'm keto", "behavior": "dietary_inquiry", "target_action": "dietary_inquiry", "target_data": {"diet": "keto"}, "expected_response_contains": [], "context": null}
+{"input": "severe eggs allergy", "behavior": "allergen_alert", "target_action": "allergen_alert", "target_data": {"allergen": "eggs"}, "expected_response_contains": [], "context": null}
+{"input": "sure throw in a Hot Fudge Sundae", "behavior": "add_on_suggestion", "target_action": "add_on_suggestion", "target_data": {"item": "Hot Fudge Sundae", "price": 2.89}, "expected_response_contains": [], "context": null}
+{"input": "um small", "behavior": "size_selection", "target_action": "size_selection", "target_data": {"size": "small"}, "expected_response_contains": [], "context": null}
+{"input": "cheap family meal", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "hamburger please", "behavior": "happy_meal_options", "target_action": "happy_meal_options", "target_data": {"item": "Hamburger Happy Meal", "price": 4.99}, "expected_response_contains": [], "context": "What kind of Happy Meal?"}
+{"input": "perfect", "behavior": "order_confirmed", "target_action": "order_confirmed", "target_data": {}, "expected_response_contains": [], "context": "OK so I have a Big Mac combo with a Coke. Your total is $8.99. Does that sound right?"}
+{"input": "I'll take BBQ", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "BBQ"}, "expected_response_contains": [], "context": null}
+{"input": "any breakfast items left", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {"category": "breakfast"}, "expected_response_contains": [], "context": null}
+{"input": "just Honey Mustard", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Honey Mustard"}, "expected_response_contains": [], "context": null}
+{"input": "price on McChicken", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {"item": "McChicken", "price": 1.89}, "expected_response_contains": [], "context": null}
+{"input": "what does the Quarter Pounder with Cheese cost", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {"item": "Quarter Pounder with Cheese", "price": 5.99}, "expected_response_contains": [], "context": null}
+{"input": "Diet Coke instead of Sprite", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {"from": "Sprite", "to": "Diet Coke"}, "expected_response_contains": [], "context": null}
+{"input": "nutrition info for cheeseburger", "behavior": "nutrition_inquiry", "target_action": "nutrition_inquiry", "target_data": {"item": "cheeseburger"}, "expected_response_contains": [], "context": null}
+{"input": "what's the damage", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {"query": "order_total"}, "expected_response_contains": [], "context": null}
+{"input": "I don't want tomato on that", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "tomato"}, "expected_response_contains": [], "context": null}
+{"input": "one Baked Apple Pie please", "behavior": "add_on_suggestion", "target_action": "add_on_suggestion", "target_data": {"item": "Baked Apple Pie", "price": 1.69}, "expected_response_contains": [], "context": null}
+{"input": "Happy Meal with 4 piece nuggets", "behavior": "happy_meal_options", "target_action": "happy_meal_options", "target_data": {"item": "6-piece McNuggets Happy Meal", "price": 5.79}, "expected_response_contains": [], "context": null}
+{"input": "is the lobby open", "behavior": "time_check", "target_action": "time_check", "target_data": {"query": "hours"}, "expected_response_contains": [], "context": null}
+{"input": "this isn't what I ordered", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "wrong_order"}, "expected_response_contains": [], "context": null}
+{"input": "is there shellfish in the fries", "behavior": "allergen_inquiry", "target_action": "allergen_inquiry", "target_data": {"item": "fries", "allergen": "shellfish"}, "expected_response_contains": [], "context": null}
+{"input": "how much is a 10-piece Chicken McNuggets", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {"item": "10-piece Chicken McNuggets", "price": 5.29}, "expected_response_contains": [], "context": null}
+{"input": "add pickles to my Double Quarter Pounder", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "add", "ingredient": "pickles"}, "expected_response_contains": [], "context": null}
+{"input": "spicy buffalo", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Spicy Buffalo"}, "expected_response_contains": [], "context": "Any sauce with your nuggets?"}
+{"input": "meal-ify that", "behavior": "meal_upgrade", "target_action": "meal_upgrade", "target_data": {"item": "McDouble", "meal_price": 5.99}, "expected_response_contains": [], "context": null}
+{"input": "substitute the French Fries with Apple Slices", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {"from": "French Fries", "to": "Apple Slices"}, "expected_response_contains": [], "context": null}
+{"input": "BBQ and hot mustard", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "multiple"}, "expected_response_contains": [], "context": null}
+{"input": "you forgot my fries", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "missing_items"}, "expected_response_contains": [], "context": null}
+{"input": "discount meals", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "can I get a Happy Meal with nuggets", "behavior": "happy_meal_options", "target_action": "happy_meal_options", "target_data": {"item": "6-piece McNuggets Happy Meal", "price": 5.79}, "expected_response_contains": [], "context": null}
+{"input": "I have a eggs allergy", "behavior": "allergen_alert", "target_action": "allergen_alert", "target_data": {"allergen": "eggs"}, "expected_response_contains": [], "context": null}
+{"input": "I don't want bacon on that", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "bacon"}, "expected_response_contains": [], "context": null}
+{"input": "do you still have the McRib", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {"item": "McRib"}, "expected_response_contains": [], "context": null}
+{"input": "uh yeah hi", "behavior": "greet", "target_action": "greet", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "do you guys have mozzarella sticks", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {"item": "mozzarella sticks"}, "expected_response_contains": [], "context": null}
+{"input": "best breakfast item", "behavior": "recommend", "target_action": "recommend", "target_data": {"category": "breakfast"}, "expected_response_contains": [], "context": null}
+{"input": "add the Hot Fudge Sundae", "behavior": "add_on_suggestion", "target_action": "add_on_suggestion", "target_data": {"item": "Hot Fudge Sundae", "price": 2.89}, "expected_response_contains": [], "context": null}
+{"input": "can I swap the Coca-Cola for a Dr Pepper", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {"from": "Coca-Cola", "to": "Dr Pepper"}, "expected_response_contains": [], "context": null}
+{"input": "hello can you hear me", "behavior": "greet", "target_action": "greet", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "um Hot Mustard", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Hot Mustard"}, "expected_response_contains": [], "context": null}
+{"input": "never mind the cheeseburger", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove", "item": "cheeseburger"}, "expected_response_contains": [], "context": null}
+{"input": "there's a bug in my food", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "foreign_object"}, "expected_response_contains": [], "context": null}
+{"input": "is there wheat in the fries", "behavior": "allergen_inquiry", "target_action": "allergen_inquiry", "target_data": {"item": "fries", "allergen": "wheat"}, "expected_response_contains": [], "context": null}
+{"input": "I want something affordable", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "Lemonade instead of Coca-Cola", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {"from": "Coca-Cola", "to": "Lemonade"}, "expected_response_contains": [], "context": null}
+{"input": "ring me up", "behavior": "order_complete", "target_action": "order_complete", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "howdy", "behavior": "greet", "target_action": "greet", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "how many calories in the Big Mac", "behavior": "nutrition_inquiry", "target_action": "nutrition_inquiry", "target_data": {"item": "Big Mac"}, "expected_response_contains": [], "context": null}
+{"input": "soft serve cone", "behavior": "machine_down", "target_action": "machine_down", "target_data": {"item": "ice cream"}, "expected_response_contains": [], "context": null}
+{"input": "how long is the wait", "behavior": "time_check", "target_action": "time_check", "target_data": {"query": "wait_time"}, "expected_response_contains": [], "context": null}
+{"input": "looks good", "behavior": "order_confirmed", "target_action": "order_confirmed", "target_data": {}, "expected_response_contains": [], "context": "That's one Quarter Pounder meal with a Sprite. $9.29 total. Is that correct?"}
+{"input": "turn that into a meal", "behavior": "meal_upgrade", "target_action": "meal_upgrade", "target_data": {"item": "McDouble", "meal_price": 5.99}, "expected_response_contains": [], "context": null}
+{"input": "I got cash", "behavior": "payment", "target_action": "payment", "target_data": {"method": "cash"}, "expected_response_contains": [], "context": null}
+{"input": "what are the options", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "I ordered a Big Mac not a McDouble", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "wrong_order"}, "expected_response_contains": [], "context": null}
+{"input": "do you have anything low-calorie", "behavior": "dietary_inquiry", "target_action": "dietary_inquiry", "target_data": {"diet": "low-calorie"}, "expected_response_contains": [], "context": null}
+{"input": "substitute the Sprite with Diet Coke", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {"from": "Sprite", "to": "Diet Coke"}, "expected_response_contains": [], "context": null}
+{"input": "what's good", "behavior": "greet", "target_action": "greet", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "take that back", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove_last"}, "expected_response_contains": [], "context": null}
+{"input": "the medium one", "behavior": "size_selection", "target_action": "size_selection", "target_data": {"size": "medium"}, "expected_response_contains": [], "context": null}
+{"input": "choose for me", "behavior": "recommend", "target_action": "recommend", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "delete everything", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "cancel_all"}, "expected_response_contains": [], "context": null}
+{"input": "severe sesame allergy", "behavior": "allergen_alert", "target_action": "allergen_alert", "target_data": {"allergen": "sesame"}, "expected_response_contains": [], "context": null}
+{"input": "surprise me with a sauce", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "multiple"}, "expected_response_contains": [], "context": null}
+{"input": "is the McFlurry machine down again", "behavior": "machine_down", "target_action": "machine_down", "target_data": {"item": "McFlurry"}, "expected_response_contains": [], "context": null}
+{"input": "load up on pickles", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "add", "ingredient": "pickles"}, "expected_response_contains": [], "context": null}
+{"input": "just medium", "behavior": "size_selection", "target_action": "size_selection", "target_data": {"size": "medium"}, "expected_response_contains": [], "context": null}
+{"input": "I'll go large", "behavior": "size_selection", "target_action": "size_selection", "target_data": {"size": "large"}, "expected_response_contains": [], "context": null}
+{"input": "what's new on the menu", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "recommend something sweet", "behavior": "recommend", "target_action": "recommend", "target_data": {"category": "desserts"}, "expected_response_contains": [], "context": null}
+{"input": "affordable lunch", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "why not", "behavior": "meal_upgrade", "target_action": "meal_upgrade", "target_data": {"item": "Big Mac", "meal_price": 8.99}, "expected_response_contains": [], "context": "That Big Mac is $5.69. Want to make it a combo for $8.99?"}
+{"input": "I want a McFlurry", "behavior": "machine_down", "target_action": "machine_down", "target_data": {"item": "McFlurry"}, "expected_response_contains": [], "context": null}
+{"input": "scratch the McCrispy", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove", "item": "McCrispy"}, "expected_response_contains": [], "context": null}
+{"input": "nutrition info for Big Mac", "behavior": "nutrition_inquiry", "target_action": "nutrition_inquiry", "target_data": {"item": "Big Mac"}, "expected_response_contains": [], "context": null}
+{"input": "yo can I order", "behavior": "greet", "target_action": "greet", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "6 piece", "behavior": "happy_meal_options", "target_action": "happy_meal_options", "target_data": {"item": "4-piece McNuggets Happy Meal", "price": 5.29}, "expected_response_contains": [], "context": "What kind of Happy Meal?"}
+{"input": "no toppings at all", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "plain", "ingredient": "all"}, "expected_response_contains": [], "context": null}
+{"input": "do you have anything vegetarian", "behavior": "dietary_inquiry", "target_action": "dietary_inquiry", "target_data": {"diet": "vegetarian"}, "expected_response_contains": [], "context": null}
+{"input": "yeah the apple pie", "behavior": "add_on_suggestion", "target_action": "add_on_suggestion", "target_data": {"item": "Baked Apple Pie", "price": 1.69}, "expected_response_contains": [], "context": "Would you like to add a dessert?"}
+{"input": "Samsung Pay", "behavior": "payment", "target_action": "payment", "target_data": {"method": "mobile"}, "expected_response_contains": [], "context": null}
+{"input": "let's start over completely", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "cancel_all"}, "expected_response_contains": [], "context": null}
+{"input": "what's the least expensive", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "tell me about the Big Mac", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {"item": "Big Mac"}, "expected_response_contains": [], "context": null}
+{"input": "substitute the Coca-Cola with Dr Pepper", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {"from": "Coca-Cola", "to": "Dr Pepper"}, "expected_response_contains": [], "context": null}
+{"input": "combo please", "behavior": "meal_upgrade", "target_action": "meal_upgrade", "target_data": {"item": "6-piece Chicken McNuggets", "meal_price": 6.89}, "expected_response_contains": [], "context": null}
+{"input": "how much is a McChicken", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {"item": "McChicken", "price": 1.89}, "expected_response_contains": [], "context": null}
+{"input": "the hamburger Happy Meal", "behavior": "happy_meal_options", "target_action": "happy_meal_options", "target_data": {"item": "Hamburger Happy Meal", "price": 4.99}, "expected_response_contains": [], "context": null}
+{"input": "hi I'm ready", "behavior": "greet", "target_action": "greet", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "hamburger no special sauce", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "special sauce"}, "expected_response_contains": [], "context": null}
+{"input": "nothing on it", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "plain", "ingredient": "all"}, "expected_response_contains": [], "context": null}
+{"input": "pay with my phone", "behavior": "payment", "target_action": "payment", "target_data": {"method": "mobile"}, "expected_response_contains": [], "context": null}
+{"input": "replace the French Fries with Side Salad", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {"from": "French Fries", "to": "Side Salad"}, "expected_response_contains": [], "context": null}
+{"input": "no salt no mustard", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "salt, mustard"}, "expected_response_contains": [], "context": null}
+{"input": "nutrition info for Filet-O-Fish", "behavior": "nutrition_inquiry", "target_action": "nutrition_inquiry", "target_data": {"item": "Filet-O-Fish"}, "expected_response_contains": [], "context": null}
+{"input": "I'm good with that", "behavior": "order_complete", "target_action": "order_complete", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "actually no", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove_last"}, "expected_response_contains": [], "context": null}
+{"input": "yes", "behavior": "meal_upgrade", "target_action": "meal_upgrade", "target_data": {"item": "Big Mac", "meal_price": 8.99}, "expected_response_contains": [], "context": "That Big Mac is $5.69. Want to make it a combo for $8.99?"}
+{"input": "can I get something for under 4 dollars", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "does the McCrispy have peanuts", "behavior": "allergen_inquiry", "target_action": "allergen_inquiry", "target_data": {"item": "McCrispy", "allergen": "peanuts"}, "expected_response_contains": [], "context": null}
+{"input": "what chicken sandwiches do you make", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {"category": "chicken"}, "expected_response_contains": [], "context": null}
+{"input": "can I get the McCrispy without jalape\u00f1os", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "jalape\u00f1os"}, "expected_response_contains": [], "context": null}
+{"input": "medium please", "behavior": "size_selection", "target_action": "size_selection", "target_data": {"size": "medium"}, "expected_response_contains": [], "context": null}
+{"input": "hi there good evening", "behavior": "greet", "target_action": "greet", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "there's hair in my food", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "foreign_object"}, "expected_response_contains": [], "context": null}
+{"input": "I'll take a Hot Fudge Sundae too", "behavior": "add_on_suggestion", "target_action": "add_on_suggestion", "target_data": {"item": "Hot Fudge Sundae", "price": 2.89}, "expected_response_contains": [], "context": null}
+{"input": "what does the Big Mac cost", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {"item": "Big Mac", "price": 5.69}, "expected_response_contains": [], "context": null}
+{"input": "no that's it", "behavior": "order_complete", "target_action": "order_complete", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "undo the last one", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove_last"}, "expected_response_contains": [], "context": null}
+{"input": "Spicy Buffalo please", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Spicy Buffalo"}, "expected_response_contains": [], "context": null}
+{"input": "replace the Coca-Cola with Water", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {"from": "Coca-Cola", "to": "Water"}, "expected_response_contains": [], "context": null}
+{"input": "I don't want onions on that", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "onions"}, "expected_response_contains": [], "context": null}
+{"input": "what's on sale", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "hey yo", "behavior": "greet", "target_action": "greet", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "yeah Ranch", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Ranch"}, "expected_response_contains": [], "context": null}
+{"input": "substitute the French Fries with Side Salad", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {"from": "French Fries", "to": "Side Salad"}, "expected_response_contains": [], "context": null}
+{"input": "any frozen treats", "behavior": "machine_down", "target_action": "machine_down", "target_data": {"item": "ice cream"}, "expected_response_contains": [], "context": null}
+{"input": "this doesn't taste right", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "quality"}, "expected_response_contains": [], "context": null}
+{"input": "I heard the machine is broken", "behavior": "machine_down", "target_action": "machine_down", "target_data": {"item": "ice cream"}, "expected_response_contains": [], "context": null}
+{"input": "two for one deals", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "no onions no salt", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "onions, salt"}, "expected_response_contains": [], "context": null}
+{"input": "Happy Meal no onions", "behavior": "happy_meal_options", "target_action": "happy_meal_options", "target_data": {"item": "6-piece McNuggets Happy Meal", "price": 5.79}, "expected_response_contains": [], "context": null}
+{"input": "I need two of those", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "change_qty", "qty": 2}, "expected_response_contains": [], "context": null}
+{"input": "okay sure", "behavior": "add_on_suggestion", "target_action": "add_on_suggestion", "target_data": {"item": "Chocolate Chip Cookie", "price": 1.29}, "expected_response_contains": [], "context": "Would you like to add a dessert?"}
+{"input": "I need something kosher", "behavior": "dietary_inquiry", "target_action": "dietary_inquiry", "target_data": {"diet": "kosher"}, "expected_response_contains": [], "context": null}
+{"input": "economy picks", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "I need something dairy-free", "behavior": "dietary_inquiry", "target_action": "dietary_inquiry", "target_data": {"diet": "dairy-free"}, "expected_response_contains": [], "context": null}
+{"input": "go ahead", "behavior": "meal_upgrade", "target_action": "meal_upgrade", "target_data": {"item": "Double Quarter Pounder with Cheese", "meal_price": 10.79}, "expected_response_contains": [], "context": "That Double Quarter Pounder with Cheese is $7.49. Want to make it a combo for $10.79?"}
+{"input": "any wheat in the McFlurry", "behavior": "allergen_inquiry", "target_action": "allergen_inquiry", "target_data": {"item": "McFlurry", "allergen": "wheat"}, "expected_response_contains": [], "context": null}
+{"input": "my kid has a dairy allergy", "behavior": "allergen_alert", "target_action": "allergen_alert", "target_data": {"allergen": "dairy"}, "expected_response_contains": [], "context": null}
+{"input": "can I get BBQ", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "BBQ"}, "expected_response_contains": [], "context": null}
+{"input": "run it back for me", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "readback"}, "expected_response_contains": [], "context": null}
+{"input": "I'm allergic to shellfish", "behavior": "allergen_alert", "target_action": "allergen_alert", "target_data": {"allergen": "shellfish"}, "expected_response_contains": [], "context": null}
+{"input": "substitute the Coca-Cola with Lemonade", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {"from": "Coca-Cola", "to": "Lemonade"}, "expected_response_contains": [], "context": null}
+{"input": "no more items", "behavior": "order_complete", "target_action": "order_complete", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "do you have salads", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {"category": "salads"}, "expected_response_contains": [], "context": null}
+{"input": "yeah let's do that", "behavior": "meal_upgrade", "target_action": "meal_upgrade", "target_data": {"item": "Big Mac", "meal_price": 8.99}, "expected_response_contains": [], "context": "That Big Mac is $5.69. Want to make it a combo for $8.99?"}
+{"input": "contactless", "behavior": "payment", "target_action": "payment", "target_data": {"method": "card"}, "expected_response_contains": [], "context": null}
+{"input": "that's right", "behavior": "order_confirmed", "target_action": "order_confirmed", "target_data": {}, "expected_response_contains": [], "context": "OK so I have a Big Mac combo with a Coke. Your total is $8.99. Does that sound right?"}
+{"input": "Sweet Tea instead of Coca-Cola", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {"from": "Coca-Cola", "to": "Sweet Tea"}, "expected_response_contains": [], "context": null}
+{"input": "can I order", "behavior": "greet", "target_action": "greet", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "can I get the cheeseburger without onions", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "onions"}, "expected_response_contains": [], "context": null}
+{"input": "I'm allergic to eggs", "behavior": "allergen_alert", "target_action": "allergen_alert", "target_data": {"allergen": "eggs"}, "expected_response_contains": [], "context": null}
+{"input": "do you have anything keto", "behavior": "dietary_inquiry", "target_action": "dietary_inquiry", "target_data": {"diet": "keto"}, "expected_response_contains": [], "context": null}
+{"input": "I want two of each", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "change_qty", "qty": 2}, "expected_response_contains": [], "context": null}
+{"input": "a 4-piece McNuggets Happy Meal please", "behavior": "happy_meal_options", "target_action": "happy_meal_options", "target_data": {"item": "4-piece McNuggets Happy Meal", "price": 5.29}, "expected_response_contains": [], "context": null}
+{"input": "how much is a McDouble", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {"item": "McDouble", "price": 2.79}, "expected_response_contains": [], "context": null}
+{"input": "remove the cheeseburger from my order", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove", "item": "cheeseburger"}, "expected_response_contains": [], "context": null}
+{"input": "what's on the breakfast menu", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {"category": "breakfast"}, "expected_response_contains": [], "context": null}
+{"input": "when do you start serving breakfast", "behavior": "time_check", "target_action": "time_check", "target_data": {"query": "breakfast_hours"}, "expected_response_contains": [], "context": null}
+{"input": "I need something vegetarian", "behavior": "dietary_inquiry", "target_action": "dietary_inquiry", "target_data": {"diet": "vegetarian"}, "expected_response_contains": [], "context": null}
+{"input": "what's dairy-free on the menu", "behavior": "dietary_inquiry", "target_action": "dietary_inquiry", "target_data": {"diet": "dairy-free"}, "expected_response_contains": [], "context": null}
+{"input": "what time do you close", "behavior": "time_check", "target_action": "time_check", "target_data": {"query": "hours"}, "expected_response_contains": [], "context": null}
+{"input": "what's good and cheap", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "yes that's my order", "behavior": "order_confirmed", "target_action": "order_confirmed", "target_data": {}, "expected_response_contains": [], "context": "That's one Quarter Pounder meal with a Sprite. $9.29 total. Is that correct?"}
+{"input": "mobile pay", "behavior": "payment", "target_action": "payment", "target_data": {"method": "mobile"}, "expected_response_contains": [], "context": null}
+{"input": "um Spicy Buffalo", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Spicy Buffalo"}, "expected_response_contains": [], "context": null}
+{"input": "what's good for kids", "behavior": "recommend", "target_action": "recommend", "target_data": {"category": "kids"}, "expected_response_contains": [], "context": null}
+{"input": "strawberry milkshake", "behavior": "machine_down", "target_action": "machine_down", "target_data": {"item": "shake"}, "expected_response_contains": [], "context": null}
+{"input": "cheap eats", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "that is correct", "behavior": "order_confirmed", "target_action": "order_confirmed", "target_data": {}, "expected_response_contains": [], "context": "OK so I have a Big Mac combo with a Coke. Your total is $8.99. Does that sound right?"}
+{"input": "without bacon", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "bacon"}, "expected_response_contains": [], "context": null}
+{"input": "is there eggs in the Filet-O-Fish", "behavior": "allergen_inquiry", "target_action": "allergen_inquiry", "target_data": {"item": "Filet-O-Fish", "allergen": "eggs"}, "expected_response_contains": [], "context": null}
+{"input": "any keto options", "behavior": "dietary_inquiry", "target_action": "dietary_inquiry", "target_data": {"diet": "keto"}, "expected_response_contains": [], "context": null}
+{"input": "any soy in the Filet-O-Fish", "behavior": "allergen_inquiry", "target_action": "allergen_inquiry", "target_data": {"item": "Filet-O-Fish", "allergen": "soy"}, "expected_response_contains": [], "context": null}
+{"input": "sure thing", "behavior": "meal_upgrade", "target_action": "meal_upgrade", "target_data": {"item": "Big Mac", "meal_price": 8.99}, "expected_response_contains": [], "context": "That Big Mac is $5.69. Want to make it a combo for $8.99?"}
+{"input": "top seller", "behavior": "recommend", "target_action": "recommend", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "upsize to large", "behavior": "size_selection", "target_action": "size_selection", "target_data": {"size": "large"}, "expected_response_contains": [], "context": null}
+{"input": "sure add a cookie", "behavior": "add_on_suggestion", "target_action": "add_on_suggestion", "target_data": {"item": "Chocolate Chip Cookie", "price": 1.29}, "expected_response_contains": [], "context": "Would you like to add a dessert?"}
+{"input": "throw some onions on there", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "add", "ingredient": "onions"}, "expected_response_contains": [], "context": null}
+{"input": "Double Quarter Pounder no special sauce", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "special sauce"}, "expected_response_contains": [], "context": null}
+{"input": "what desserts are there", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {"category": "desserts"}, "expected_response_contains": [], "context": null}
+{"input": "is the McChicken healthy", "behavior": "nutrition_inquiry", "target_action": "nutrition_inquiry", "target_data": {"item": "McChicken"}, "expected_response_contains": [], "context": null}
+{"input": "that's everything", "behavior": "order_complete", "target_action": "order_complete", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "drop the Quarter Pounder", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove", "item": "Quarter Pounder"}, "expected_response_contains": [], "context": null}
+{"input": "what's the cheapest meal you got", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "extremely long wait", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "long_wait"}, "expected_response_contains": [], "context": null}
+{"input": "what's the cheapest thing", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "biggest you got", "behavior": "size_selection", "target_action": "size_selection", "target_data": {"size": "large"}, "expected_response_contains": [], "context": null}
+{"input": "I have a nuts allergy", "behavior": "allergen_alert", "target_action": "allergen_alert", "target_data": {"allergen": "nuts"}, "expected_response_contains": [], "context": null}
+{"input": "one McFlurry with OREO Cookies please", "behavior": "add_on_suggestion", "target_action": "add_on_suggestion", "target_data": {"item": "McFlurry with OREO Cookies", "price": 4.89}, "expected_response_contains": [], "context": null}
+{"input": "BBQ and ranch", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "multiple"}, "expected_response_contains": [], "context": null}
+{"input": "recommend something spicy", "behavior": "recommend", "target_action": "recommend", "target_data": {"category": "spicy"}, "expected_response_contains": [], "context": null}
+{"input": "ok yes", "behavior": "meal_upgrade", "target_action": "meal_upgrade", "target_data": {"item": "Double Quarter Pounder with Cheese", "meal_price": 10.79}, "expected_response_contains": [], "context": "That Double Quarter Pounder with Cheese is $7.49. Want to make it a combo for $10.79?"}
+{"input": "Side Salad instead of French Fries", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {"from": "French Fries", "to": "Side Salad"}, "expected_response_contains": [], "context": null}
+{"input": "is the McDouble healthy", "behavior": "nutrition_inquiry", "target_action": "nutrition_inquiry", "target_data": {"item": "McDouble"}, "expected_response_contains": [], "context": null}
+{"input": "what do you like best", "behavior": "recommend", "target_action": "recommend", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "I'll swipe", "behavior": "payment", "target_action": "payment", "target_data": {"method": "card"}, "expected_response_contains": [], "context": null}
+{"input": "plain Double Quarter Pounder", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "plain", "ingredient": "all"}, "expected_response_contains": [], "context": null}
+{"input": "this is disgusting", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "quality"}, "expected_response_contains": [], "context": null}
+{"input": "nope that's it", "behavior": "order_complete", "target_action": "order_complete", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "make it the meal", "behavior": "meal_upgrade", "target_action": "meal_upgrade", "target_data": {"item": "Filet-O-Fish", "meal_price": 7.99}, "expected_response_contains": [], "context": null}
+{"input": "Tangy BBQ sauce please", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Tangy BBQ"}, "expected_response_contains": [], "context": null}
+{"input": "low cost meal", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "how much is that so far", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {"query": "order_total"}, "expected_response_contains": [], "context": null}
+{"input": "supersize it", "behavior": "size_selection", "target_action": "size_selection", "target_data": {"size": "large"}, "expected_response_contains": [], "context": null}
+{"input": "remove the special sauce", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "special sauce"}, "expected_response_contains": [], "context": null}
+{"input": "Tangy BBQ please", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Tangy BBQ"}, "expected_response_contains": [], "context": null}
+{"input": "I don't want mustard on that", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "mustard"}, "expected_response_contains": [], "context": null}
+{"input": "one Chocolate Chip Cookie please", "behavior": "add_on_suggestion", "target_action": "add_on_suggestion", "target_data": {"item": "Chocolate Chip Cookie", "price": 1.29}, "expected_response_contains": [], "context": null}
+{"input": "what's the grand total", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {"query": "order_total"}, "expected_response_contains": [], "context": null}
+{"input": "is there shellfish in the McFlurry", "behavior": "allergen_inquiry", "target_action": "allergen_inquiry", "target_data": {"item": "McFlurry", "allergen": "shellfish"}, "expected_response_contains": [], "context": null}
+{"input": "load up on onions", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "add", "ingredient": "onions"}, "expected_response_contains": [], "context": null}
+{"input": "large", "behavior": "size_selection", "target_action": "size_selection", "target_data": {"size": "large"}, "expected_response_contains": [], "context": "What size would you like?"}
+{"input": "Ranch sauce please", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Ranch"}, "expected_response_contains": [], "context": null}
+{"input": "hi can I get some food please", "behavior": "greet", "target_action": "greet", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "I'm done ordering", "behavior": "order_complete", "target_action": "order_complete", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "deal of the day", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "I want more pickles", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "add", "ingredient": "pickles"}, "expected_response_contains": [], "context": null}
+{"input": "is the fries eggs free", "behavior": "allergen_inquiry", "target_action": "allergen_inquiry", "target_data": {"item": "fries", "allergen": "eggs"}, "expected_response_contains": [], "context": null}
+{"input": "hamburger", "behavior": "happy_meal_options", "target_action": "happy_meal_options", "target_data": {"item": "Hamburger Happy Meal", "price": 4.99}, "expected_response_contains": [], "context": "What kind of Happy Meal?"}
+{"input": "yeah hi I'd like to order please", "behavior": "greet", "target_action": "greet", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "what can I get for 5 bucks", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "I want more jalape\u00f1os", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "add", "ingredient": "jalape\u00f1os"}, "expected_response_contains": [], "context": null}
+{"input": "thrifty option", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "my fries are cold", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "cold_food"}, "expected_response_contains": [], "context": null}
+{"input": "best bang for my buck", "behavior": "recommend", "target_action": "recommend", "target_data": {"category": "value"}, "expected_response_contains": [], "context": null}
+{"input": "yeah add a Vanilla Cone", "behavior": "add_on_suggestion", "target_action": "add_on_suggestion", "target_data": {"item": "Vanilla Cone", "price": 1.89}, "expected_response_contains": [], "context": null}
+{"input": "I have a wheat allergy", "behavior": "allergen_alert", "target_action": "allergen_alert", "target_data": {"allergen": "wheat"}, "expected_response_contains": [], "context": null}
+{"input": "my kid has a shellfish allergy", "behavior": "allergen_alert", "target_action": "allergen_alert", "target_data": {"allergen": "shellfish"}, "expected_response_contains": [], "context": null}
+{"input": "four piece Happy Meal", "behavior": "happy_meal_options", "target_action": "happy_meal_options", "target_data": {"item": "4-piece McNuggets Happy Meal", "price": 5.29}, "expected_response_contains": [], "context": null}
+{"input": "what did you say", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "I'm allergic to nuts", "behavior": "allergen_alert", "target_action": "allergen_alert", "target_data": {"allergen": "nuts"}, "expected_response_contains": [], "context": null}
+{"input": "add mayo to my hamburger", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "add", "ingredient": "mayo"}, "expected_response_contains": [], "context": null}
+{"input": "do you have anything vegan", "behavior": "dietary_inquiry", "target_action": "dietary_inquiry", "target_data": {"diet": "vegan"}, "expected_response_contains": [], "context": null}
+{"input": "put extra tomato on the cheeseburger", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "add", "ingredient": "tomato"}, "expected_response_contains": [], "context": null}
+{"input": "make it small", "behavior": "size_selection", "target_action": "size_selection", "target_data": {"size": "small"}, "expected_response_contains": [], "context": null}
+{"input": "oreo McFlurry please", "behavior": "machine_down", "target_action": "machine_down", "target_data": {"item": "McFlurry"}, "expected_response_contains": [], "context": null}
+{"input": "the Tangy BBQ sauce", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Tangy BBQ"}, "expected_response_contains": [], "context": null}
+{"input": "yeah that's it", "behavior": "order_complete", "target_action": "order_complete", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "I don't have much money", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "you charged me wrong", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "refund"}, "expected_response_contains": [], "context": null}
+{"input": "what's good and not too heavy", "behavior": "recommend", "target_action": "recommend", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "surprise me", "behavior": "recommend", "target_action": "recommend", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "without onions", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "onions"}, "expected_response_contains": [], "context": null}
+{"input": "price on McDouble", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {"item": "McDouble", "price": 2.79}, "expected_response_contains": [], "context": null}
+{"input": "one of each", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "multiple"}, "expected_response_contains": [], "context": null}
+{"input": "what's the difference between McDouble and Double Cheeseburger", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "actually make it three", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "change_qty", "qty": 2}, "expected_response_contains": [], "context": null}
+{"input": "hi how are ya", "behavior": "greet", "target_action": "greet", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "price on Cheeseburger", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {"item": "Cheeseburger", "price": 2.29}, "expected_response_contains": [], "context": null}
+{"input": "the large one", "behavior": "size_selection", "target_action": "size_selection", "target_data": {"size": "large"}, "expected_response_contains": [], "context": null}
+{"input": "I want three of those", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "change_qty", "qty": 2}, "expected_response_contains": [], "context": null}
+{"input": "the shake tastes weird", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "quality"}, "expected_response_contains": [], "context": null}
+{"input": "yeah Tangy BBQ", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Tangy BBQ"}, "expected_response_contains": [], "context": null}
+{"input": "suggest something", "behavior": "recommend", "target_action": "recommend", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "what does the McCrispy cost", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {"item": "McCrispy", "price": 5.49}, "expected_response_contains": [], "context": null}
+{"input": "what's the spiciest thing you have", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "what kind of nuggets do you have", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {"category": "chicken"}, "expected_response_contains": [], "context": null}
+{"input": "I'm allergic to wheat", "behavior": "allergen_alert", "target_action": "allergen_alert", "target_data": {"allergen": "wheat"}, "expected_response_contains": [], "context": null}
+{"input": "I can't decide", "behavior": "recommend", "target_action": "recommend", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "what's on your menu", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "I want Ranch sauce", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Ranch"}, "expected_response_contains": [], "context": null}
+{"input": "tap", "behavior": "payment", "target_action": "payment", "target_data": {"method": "mobile"}, "expected_response_contains": [], "context": "Will that be cash, card, or mobile pay?"}
+{"input": "I'm allergic to soy", "behavior": "allergen_alert", "target_action": "allergen_alert", "target_data": {"allergen": "soy"}, "expected_response_contains": [], "context": null}
+{"input": "I can't have soy", "behavior": "allergen_alert", "target_action": "allergen_alert", "target_data": {"allergen": "soy"}, "expected_response_contains": [], "context": null}
+{"input": "leave off the jalape\u00f1os", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "jalape\u00f1os"}, "expected_response_contains": [], "context": null}
+{"input": "my kid has a wheat allergy", "behavior": "allergen_alert", "target_action": "allergen_alert", "target_data": {"allergen": "wheat"}, "expected_response_contains": [], "context": null}
+{"input": "skip the pickles", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "pickles"}, "expected_response_contains": [], "context": null}
+{"input": "budget breakfast", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "any soy in the bun", "behavior": "allergen_inquiry", "target_action": "allergen_inquiry", "target_data": {"item": "bun", "allergen": "soy"}, "expected_response_contains": [], "context": null}
+{"input": "what's halal on the menu", "behavior": "dietary_inquiry", "target_action": "dietary_inquiry", "target_data": {"diet": "halal"}, "expected_response_contains": [], "context": null}
+{"input": "yeah BBQ", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "BBQ"}, "expected_response_contains": [], "context": null}
+{"input": "extra salt please", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "add", "ingredient": "salt"}, "expected_response_contains": [], "context": null}
+{"input": "take off the special sauce", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "special sauce"}, "expected_response_contains": [], "context": null}
+{"input": "wait go back", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove_last"}, "expected_response_contains": [], "context": null}
+{"input": "actually cancel the McCrispy", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove", "item": "McCrispy"}, "expected_response_contains": [], "context": null}
+{"input": "yeah add a Hot Fudge Sundae", "behavior": "add_on_suggestion", "target_action": "add_on_suggestion", "target_data": {"item": "Hot Fudge Sundae", "price": 2.89}, "expected_response_contains": [], "context": null}
+{"input": "extra mayo on that", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "add", "ingredient": "mayo"}, "expected_response_contains": [], "context": null}
+{"input": "hey real quick can I order", "behavior": "greet", "target_action": "greet", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "plain McCrispy", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "plain", "ingredient": "all"}, "expected_response_contains": [], "context": null}
+{"input": "greetings", "behavior": "greet", "target_action": "greet", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "any halal options", "behavior": "dietary_inquiry", "target_action": "dietary_inquiry", "target_data": {"diet": "halal"}, "expected_response_contains": [], "context": null}
+{"input": "extra jalape\u00f1os on that", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "add", "ingredient": "jalape\u00f1os"}, "expected_response_contains": [], "context": null}
+{"input": "sure throw in a Chocolate Chip Cookie", "behavior": "add_on_suggestion", "target_action": "add_on_suggestion", "target_data": {"item": "Chocolate Chip Cookie", "price": 1.29}, "expected_response_contains": [], "context": null}
+{"input": "my nuggets are missing", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "missing_items"}, "expected_response_contains": [], "context": null}
+{"input": "swap the cheeseburger for a Quarter Pounder", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "change"}, "expected_response_contains": [], "context": null}
+{"input": "I have a sesame allergy", "behavior": "allergen_alert", "target_action": "allergen_alert", "target_data": {"allergen": "sesame"}, "expected_response_contains": [], "context": null}
+{"input": "best thing on the menu", "behavior": "recommend", "target_action": "recommend", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "give me Tangy BBQ", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Tangy BBQ"}, "expected_response_contains": [], "context": null}
+{"input": "anything on special", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "let's do the combo", "behavior": "meal_upgrade", "target_action": "meal_upgrade", "target_data": {"item": "Quarter Pounder with Cheese", "meal_price": 9.29}, "expected_response_contains": [], "context": null}
+{"input": "no wait undo that", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove_last"}, "expected_response_contains": [], "context": null}
+{"input": "what's the most filling", "behavior": "recommend", "target_action": "recommend", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "the biggest size", "behavior": "size_selection", "target_action": "size_selection", "target_data": {"size": "large"}, "expected_response_contains": [], "context": null}
+{"input": "what comes in the combo", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "load up on bacon", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "add", "ingredient": "bacon"}, "expected_response_contains": [], "context": null}
+{"input": "all the sauces", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "multiple"}, "expected_response_contains": [], "context": null}
+{"input": "what should I get", "behavior": "recommend", "target_action": "recommend", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "how many calories in the Quarter Pounder", "behavior": "nutrition_inquiry", "target_action": "nutrition_inquiry", "target_data": {"item": "Quarter Pounder"}, "expected_response_contains": [], "context": null}
+{"input": "hey um can I get some stuff", "behavior": "greet", "target_action": "greet", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "the Ranch sauce", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Ranch"}, "expected_response_contains": [], "context": null}
+{"input": "paying cash", "behavior": "payment", "target_action": "payment", "target_data": {"method": "cash"}, "expected_response_contains": [], "context": null}
+{"input": "best value meal", "behavior": "recommend", "target_action": "recommend", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "can you repeat that", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "budget friendly meal", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "yeah medium", "behavior": "size_selection", "target_action": "size_selection", "target_data": {"size": "medium"}, "expected_response_contains": [], "context": null}
+{"input": "ranch", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Ranch"}, "expected_response_contains": [], "context": "Any sauce with your nuggets?"}
+{"input": "you messed up my order again", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "wrong_order"}, "expected_response_contains": [], "context": null}
+{"input": "remove the fries from my order", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove", "item": "fries"}, "expected_response_contains": [], "context": null}
+{"input": "nutrition info for fries", "behavior": "nutrition_inquiry", "target_action": "nutrition_inquiry", "target_data": {"item": "fries"}, "expected_response_contains": [], "context": null}
+{"input": "my food is cold", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "cold_food"}, "expected_response_contains": [], "context": null}
+{"input": "plain hamburger", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "plain", "ingredient": "all"}, "expected_response_contains": [], "context": null}
+{"input": "how many calories in the McNuggets", "behavior": "nutrition_inquiry", "target_action": "nutrition_inquiry", "target_data": {"item": "McNuggets"}, "expected_response_contains": [], "context": null}
+{"input": "affordable options", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "add the Caramel Sundae", "behavior": "add_on_suggestion", "target_action": "add_on_suggestion", "target_data": {"item": "Caramel Sundae", "price": 2.89}, "expected_response_contains": [], "context": null}
+{"input": "the small one", "behavior": "size_selection", "target_action": "size_selection", "target_data": {"size": "small"}, "expected_response_contains": [], "context": null}
+{"input": "replace the Coca-Cola with Sweet Tea", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {"from": "Coca-Cola", "to": "Sweet Tea"}, "expected_response_contains": [], "context": null}
+{"input": "no lettuce no jalape\u00f1os", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "lettuce, jalape\u00f1os"}, "expected_response_contains": [], "context": null}
+{"input": "can I get extra pickles", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "add", "ingredient": "pickles"}, "expected_response_contains": [], "context": null}
+{"input": "I think we're good", "behavior": "order_complete", "target_action": "order_complete", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "double that order", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "change_qty", "qty": 2}, "expected_response_contains": [], "context": null}
+{"input": "hi yes I want to order", "behavior": "greet", "target_action": "greet", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "leave off the mayo", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "mayo"}, "expected_response_contains": [], "context": null}
+{"input": "the app charged me but no food", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "refund"}, "expected_response_contains": [], "context": null}
+{"input": "hit me with your best", "behavior": "recommend", "target_action": "recommend", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "wait never mind", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove_last"}, "expected_response_contains": [], "context": null}
+{"input": "my kid has a eggs allergy", "behavior": "allergen_alert", "target_action": "allergen_alert", "target_data": {"allergen": "eggs"}, "expected_response_contains": [], "context": null}
+{"input": "do you have anything dairy-free", "behavior": "dietary_inquiry", "target_action": "dietary_inquiry", "target_data": {"diet": "dairy-free"}, "expected_response_contains": [], "context": null}
+{"input": "hey um yeah I want to order", "behavior": "greet", "target_action": "greet", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "can we add a Happy Meal", "behavior": "happy_meal_options", "target_action": "happy_meal_options", "target_data": {"item": "Hamburger Happy Meal", "price": 4.99}, "expected_response_contains": [], "context": null}
+{"input": "give me BBQ", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "BBQ"}, "expected_response_contains": [], "context": null}
+{"input": "cash money", "behavior": "payment", "target_action": "payment", "target_data": {"method": "cash"}, "expected_response_contains": [], "context": null}
+{"input": "half my order is missing", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "missing_items"}, "expected_response_contains": [], "context": null}
+{"input": "no I'm good", "behavior": "order_complete", "target_action": "order_complete", "target_data": {}, "expected_response_contains": [], "context": "Anything else today?"}
+{"input": "debit card", "behavior": "payment", "target_action": "payment", "target_data": {"method": "card"}, "expected_response_contains": [], "context": null}
+{"input": "the fries are stale", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "quality"}, "expected_response_contains": [], "context": null}
+{"input": "ice cream cone please", "behavior": "machine_down", "target_action": "machine_down", "target_data": {"item": "ice cream"}, "expected_response_contains": [], "context": null}
+{"input": "does the McNuggets have eggs", "behavior": "allergen_inquiry", "target_action": "allergen_inquiry", "target_data": {"item": "McNuggets", "allergen": "eggs"}, "expected_response_contains": [], "context": null}
+{"input": "give me Hot Mustard", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Hot Mustard"}, "expected_response_contains": [], "context": null}
+{"input": "I'll take a pie", "behavior": "add_on_suggestion", "target_action": "add_on_suggestion", "target_data": {"item": "Baked Apple Pie", "price": 1.69}, "expected_response_contains": [], "context": "Would you like to add a dessert?"}
+{"input": "yes please", "behavior": "meal_upgrade", "target_action": "meal_upgrade", "target_data": {"item": "Quarter Pounder with Cheese", "meal_price": 9.29}, "expected_response_contains": [], "context": "That Quarter Pounder with Cheese is $5.99. Want to make it a combo for $9.29?"}
+{"input": "hi I'd like to place an order", "behavior": "greet", "target_action": "greet", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "Dr Pepper instead of Coca-Cola", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {"from": "Coca-Cola", "to": "Dr Pepper"}, "expected_response_contains": [], "context": null}
+{"input": "frozen lemonade", "behavior": "machine_down", "target_action": "machine_down", "target_data": {"item": "ice cream"}, "expected_response_contains": [], "context": null}
+{"input": "can I get Spicy Buffalo", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Spicy Buffalo"}, "expected_response_contains": [], "context": null}
+{"input": "no", "behavior": "order_complete", "target_action": "order_complete", "target_data": {}, "expected_response_contains": [], "context": "Anything else today?"}
+{"input": "I'm all set", "behavior": "order_complete", "target_action": "order_complete", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "I want Spicy Buffalo sauce", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Spicy Buffalo"}, "expected_response_contains": [], "context": null}
+{"input": "Water instead of Coca-Cola", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {"from": "Coca-Cola", "to": "Water"}, "expected_response_contains": [], "context": null}
+{"input": "something inexpensive", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "all done", "behavior": "order_complete", "target_action": "order_complete", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "what do you serve for breakfast", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {"category": "breakfast"}, "expected_response_contains": [], "context": null}
+{"input": "the small", "behavior": "size_selection", "target_action": "size_selection", "target_data": {"size": "small"}, "expected_response_contains": [], "context": "What size would you like?"}
+{"input": "change the quantity to three", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "change_qty", "qty": 2}, "expected_response_contains": [], "context": null}
+{"input": "the large", "behavior": "size_selection", "target_action": "size_selection", "target_data": {"size": "large"}, "expected_response_contains": [], "context": "What size would you like?"}
+{"input": "what comes with the meal", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "ayo", "behavior": "greet", "target_action": "greet", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "hold on scratch that", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove_last"}, "expected_response_contains": [], "context": null}
+{"input": "ring that up", "behavior": "order_complete", "target_action": "order_complete", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "penny pincher special", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "put extra tomato on the hamburger", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "add", "ingredient": "tomato"}, "expected_response_contains": [], "context": null}
+{"input": "any kosher options", "behavior": "dietary_inquiry", "target_action": "dietary_inquiry", "target_data": {"diet": "kosher"}, "expected_response_contains": [], "context": null}
+{"input": "Honey Mustard please", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Honey Mustard"}, "expected_response_contains": [], "context": null}
+{"input": "what's popular", "behavior": "recommend", "target_action": "recommend", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "yeah small", "behavior": "size_selection", "target_action": "size_selection", "target_data": {"size": "small"}, "expected_response_contains": [], "context": null}
+{"input": "no mustard on my McDouble", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "mustard"}, "expected_response_contains": [], "context": null}
+{"input": "got any promotions", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "price on Egg McMuffin", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {"item": "Egg McMuffin", "price": 4.49}, "expected_response_contains": [], "context": null}
+{"input": "when does breakfast end", "behavior": "time_check", "target_action": "time_check", "target_data": {"query": "breakfast_hours"}, "expected_response_contains": [], "context": null}
+{"input": "instead of the fish give me a Big Mac", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "change"}, "expected_response_contains": [], "context": null}
+{"input": "I don't want the McCrispy anymore", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove", "item": "McCrispy"}, "expected_response_contains": [], "context": null}
+{"input": "I need something keto", "behavior": "dietary_inquiry", "target_action": "dietary_inquiry", "target_data": {"diet": "keto"}, "expected_response_contains": [], "context": null}
+{"input": "that's all I want", "behavior": "order_complete", "target_action": "order_complete", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "what drinks do you have", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {"category": "drinks"}, "expected_response_contains": [], "context": null}
+{"input": "no jalape\u00f1os no ketchup", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "jalape\u00f1os, ketchup"}, "expected_response_contains": [], "context": null}
+{"input": "no special sauce no ketchup", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "special sauce, ketchup"}, "expected_response_contains": [], "context": null}
+{"input": "Yogurt instead of French Fries", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {"from": "French Fries", "to": "Yogurt"}, "expected_response_contains": [], "context": null}
+{"input": "is the McNuggets healthy", "behavior": "nutrition_inquiry", "target_action": "nutrition_inquiry", "target_data": {"item": "McNuggets"}, "expected_response_contains": [], "context": null}
+{"input": "actually make that a McCrispy instead", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "change"}, "expected_response_contains": [], "context": null}
+{"input": "I'm allergic to dairy", "behavior": "allergen_alert", "target_action": "allergen_alert", "target_data": {"allergen": "dairy"}, "expected_response_contains": [], "context": null}
+{"input": "save me some money", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "repeat my order", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "readback"}, "expected_response_contains": [], "context": null}
+{"input": "what does the Egg McMuffin cost", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {"item": "Egg McMuffin", "price": 4.49}, "expected_response_contains": [], "context": null}
+{"input": "um Honey Mustard", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Honey Mustard"}, "expected_response_contains": [], "context": null}
+{"input": "can I get Hot Mustard", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Hot Mustard"}, "expected_response_contains": [], "context": null}
+{"input": "all set", "behavior": "order_complete", "target_action": "order_complete", "target_data": {}, "expected_response_contains": [], "context": "Anything else today?"}
+{"input": "is the McCrispy eggs free", "behavior": "allergen_inquiry", "target_action": "allergen_inquiry", "target_data": {"item": "McCrispy", "allergen": "eggs"}, "expected_response_contains": [], "context": null}
+{"input": "the medium", "behavior": "size_selection", "target_action": "size_selection", "target_data": {"size": "medium"}, "expected_response_contains": [], "context": "What size would you like?"}
+{"input": "add lettuce to my Quarter Pounder", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "add", "ingredient": "lettuce"}, "expected_response_contains": [], "context": null}
+{"input": "severe gluten allergy", "behavior": "allergen_alert", "target_action": "allergen_alert", "target_data": {"allergen": "gluten"}, "expected_response_contains": [], "context": null}
+{"input": "what kind of fries do you have", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {"category": "sides"}, "expected_response_contains": [], "context": null}
+{"input": "I'll take a Vanilla Cone too", "behavior": "add_on_suggestion", "target_action": "add_on_suggestion", "target_data": {"item": "Vanilla Cone", "price": 1.89}, "expected_response_contains": [], "context": null}
+{"input": "what are your hours", "behavior": "time_check", "target_action": "time_check", "target_data": {"query": "hours"}, "expected_response_contains": [], "context": null}
+{"input": "I'm on a budget", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "yep", "behavior": "meal_upgrade", "target_action": "meal_upgrade", "target_data": {"item": "McDouble", "meal_price": 5.99}, "expected_response_contains": [], "context": "That McDouble is $2.79. Want to make it a combo for $5.99?"}
+{"input": "extra tomato please", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "add", "ingredient": "tomato"}, "expected_response_contains": [], "context": null}
+{"input": "replace the Coca-Cola with Dr Pepper", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {"from": "Coca-Cola", "to": "Dr Pepper"}, "expected_response_contains": [], "context": null}
+{"input": "what time does breakfast start", "behavior": "time_check", "target_action": "time_check", "target_data": {"query": "breakfast_hours"}, "expected_response_contains": [], "context": null}
+{"input": "add bacon to my Big Mac", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "add", "ingredient": "bacon"}, "expected_response_contains": [], "context": null}
+{"input": "card", "behavior": "payment", "target_action": "payment", "target_data": {"method": "card"}, "expected_response_contains": [], "context": "Will that be cash, card, or mobile pay?"}
+{"input": "the sandwich is falling apart", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "quality"}, "expected_response_contains": [], "context": null}
+{"input": "get me a Happy Meal", "behavior": "happy_meal_options", "target_action": "happy_meal_options", "target_data": {"item": "Hamburger Happy Meal", "price": 4.99}, "expected_response_contains": [], "context": null}
+{"input": "nuggets Happy Meal", "behavior": "happy_meal_options", "target_action": "happy_meal_options", "target_data": {"item": "4-piece McNuggets Happy Meal", "price": 5.29}, "expected_response_contains": [], "context": null}
+{"input": "are you still serving breakfast", "behavior": "time_check", "target_action": "time_check", "target_data": {"query": "breakfast_hours"}, "expected_response_contains": [], "context": null}
+{"input": "this is way too salty", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "quality"}, "expected_response_contains": [], "context": null}
+{"input": "what are your sides", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {"category": "sides"}, "expected_response_contains": [], "context": null}
+{"input": "is the McChicken peanuts free", "behavior": "allergen_inquiry", "target_action": "allergen_inquiry", "target_data": {"item": "McChicken", "allergen": "peanuts"}, "expected_response_contains": [], "context": null}
+{"input": "cheapest chicken option", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "just meat and cheese", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "plain", "ingredient": "all"}, "expected_response_contains": [], "context": null}
+{"input": "load up on salt", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "add", "ingredient": "salt"}, "expected_response_contains": [], "context": null}
+{"input": "my Big Mac has no meat", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "missing_items"}, "expected_response_contains": [], "context": null}
+{"input": "what can I eat if I'm gluten-free", "behavior": "dietary_inquiry", "target_action": "dietary_inquiry", "target_data": {"diet": "gluten-free"}, "expected_response_contains": [], "context": null}
+{"input": "my kid has a nuts allergy", "behavior": "allergen_alert", "target_action": "allergen_alert", "target_data": {"allergen": "nuts"}, "expected_response_contains": [], "context": null}
+{"input": "what's the signature item", "behavior": "recommend", "target_action": "recommend", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "when does lunch start", "behavior": "time_check", "target_action": "time_check", "target_data": {"query": "hours"}, "expected_response_contains": [], "context": null}
+{"input": "any low-carb options", "behavior": "dietary_inquiry", "target_action": "dietary_inquiry", "target_data": {"diet": "low-carb"}, "expected_response_contains": [], "context": null}
+{"input": "add the McFlurry with OREO Cookies", "behavior": "add_on_suggestion", "target_action": "add_on_suggestion", "target_data": {"item": "McFlurry with OREO Cookies", "price": 4.89}, "expected_response_contains": [], "context": null}
+{"input": "hold everything", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "plain", "ingredient": "all"}, "expected_response_contains": [], "context": null}
+{"input": "severe dairy allergy", "behavior": "allergen_alert", "target_action": "allergen_alert", "target_data": {"allergen": "dairy"}, "expected_response_contains": [], "context": null}
+{"input": "caramel shake", "behavior": "machine_down", "target_action": "machine_down", "target_data": {"item": "shake"}, "expected_response_contains": [], "context": null}
+{"input": "add some ketchup", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "add", "ingredient": "ketchup"}, "expected_response_contains": [], "context": null}
+{"input": "I need a Happy Meal for my kid", "behavior": "happy_meal_options", "target_action": "happy_meal_options", "target_data": {"item": "6-piece McNuggets Happy Meal", "price": 5.79}, "expected_response_contains": [], "context": null}
+{"input": "nutrition info for McDouble", "behavior": "nutrition_inquiry", "target_action": "nutrition_inquiry", "target_data": {"item": "McDouble"}, "expected_response_contains": [], "context": null}
+{"input": "the Honey Mustard sauce", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Honey Mustard"}, "expected_response_contains": [], "context": null}
+{"input": "double the mustard", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "add", "ingredient": "mustard"}, "expected_response_contains": [], "context": null}
+{"input": "I want BBQ sauce", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "BBQ"}, "expected_response_contains": [], "context": null}
+{"input": "undo that", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove_last"}, "expected_response_contains": [], "context": null}
+{"input": "any vegetarian options", "behavior": "dietary_inquiry", "target_action": "dietary_inquiry", "target_data": {"diet": "vegetarian"}, "expected_response_contains": [], "context": null}
+{"input": "what can I eat if I'm vegan", "behavior": "dietary_inquiry", "target_action": "dietary_inquiry", "target_data": {"diet": "vegan"}, "expected_response_contains": [], "context": null}
+{"input": "nuggets please", "behavior": "happy_meal_options", "target_action": "happy_meal_options", "target_data": {"item": "4-piece McNuggets Happy Meal", "price": 5.29}, "expected_response_contains": [], "context": "What kind of Happy Meal?"}
+{"input": "value combos", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "any new items", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "scratch the cheeseburger", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove", "item": "cheeseburger"}, "expected_response_contains": [], "context": null}
+{"input": "best meal deal", "behavior": "recommend", "target_action": "recommend", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "that's it", "behavior": "order_complete", "target_action": "order_complete", "target_data": {}, "expected_response_contains": [], "context": "Anything else today?"}
+{"input": "a Happy Meal please", "behavior": "happy_meal_options", "target_action": "happy_meal_options", "target_data": {"item": "6-piece McNuggets Happy Meal", "price": 5.79}, "expected_response_contains": [], "context": null}
+{"input": "how late are you open", "behavior": "time_check", "target_action": "time_check", "target_data": {"query": "hours"}, "expected_response_contains": [], "context": null}
+{"input": "wassup", "behavior": "greet", "target_action": "greet", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "do you have wraps", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {"category": "wraps"}, "expected_response_contains": [], "context": null}
+{"input": "only that", "behavior": "order_complete", "target_action": "order_complete", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "extra tomato on that", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "add", "ingredient": "tomato"}, "expected_response_contains": [], "context": null}
+{"input": "tangy bbq", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Tangy BBQ"}, "expected_response_contains": [], "context": "Any sauce with your nuggets?"}
+{"input": "what's vegetarian on the menu", "behavior": "dietary_inquiry", "target_action": "dietary_inquiry", "target_data": {"diet": "vegetarian"}, "expected_response_contains": [], "context": null}
+{"input": "can I get Tangy BBQ", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Tangy BBQ"}, "expected_response_contains": [], "context": null}
+{"input": "leave off the ketchup", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "ketchup"}, "expected_response_contains": [], "context": null}
+{"input": "I'm missing items", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "missing_items"}, "expected_response_contains": [], "context": null}
+{"input": "good night can I order", "behavior": "greet", "target_action": "greet", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "any suggestions", "behavior": "recommend", "target_action": "recommend", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "any gluten-free options", "behavior": "dietary_inquiry", "target_action": "dietary_inquiry", "target_data": {"diet": "gluten-free"}, "expected_response_contains": [], "context": null}
+{"input": "I'll take a Baked Apple Pie too", "behavior": "add_on_suggestion", "target_action": "add_on_suggestion", "target_data": {"item": "Baked Apple Pie", "price": 1.69}, "expected_response_contains": [], "context": null}
+{"input": "4 piece nuggets", "behavior": "happy_meal_options", "target_action": "happy_meal_options", "target_data": {"item": "6-piece McNuggets Happy Meal", "price": 5.79}, "expected_response_contains": [], "context": "What kind of Happy Meal?"}
+{"input": "nope", "behavior": "order_complete", "target_action": "order_complete", "target_data": {}, "expected_response_contains": [], "context": "Anything else today?"}
+{"input": "yeah Spicy Buffalo", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Spicy Buffalo"}, "expected_response_contains": [], "context": null}
+{"input": "I want it plain", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "plain", "ingredient": "all"}, "expected_response_contains": [], "context": null}
+{"input": "skip the lettuce", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "lettuce"}, "expected_response_contains": [], "context": null}
+{"input": "I want Tangy BBQ sauce", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Tangy BBQ"}, "expected_response_contains": [], "context": null}
+{"input": "just Spicy Buffalo", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Spicy Buffalo"}, "expected_response_contains": [], "context": null}
+{"input": "one Hot Fudge Sundae please", "behavior": "add_on_suggestion", "target_action": "add_on_suggestion", "target_data": {"item": "Hot Fudge Sundae", "price": 2.89}, "expected_response_contains": [], "context": null}
+{"input": "just small", "behavior": "size_selection", "target_action": "size_selection", "target_data": {"size": "small"}, "expected_response_contains": [], "context": null}
+{"input": "what's the best combo", "behavior": "recommend", "target_action": "recommend", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "how many calories in the McChicken", "behavior": "nutrition_inquiry", "target_action": "nutrition_inquiry", "target_data": {"item": "McChicken"}, "expected_response_contains": [], "context": null}
+{"input": "can I swap the Coca-Cola for a Sprite", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {"from": "Coca-Cola", "to": "Sprite"}, "expected_response_contains": [], "context": null}
+{"input": "value picks", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "I don't want the nuggets anymore", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove", "item": "nuggets"}, "expected_response_contains": [], "context": null}
+{"input": "substitute the French Fries with Yogurt", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {"from": "French Fries", "to": "Yogurt"}, "expected_response_contains": [], "context": null}
+{"input": "tap to pay", "behavior": "payment", "target_action": "payment", "target_data": {"method": "mobile"}, "expected_response_contains": [], "context": null}
+{"input": "what specials do you have", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "I have a gluten allergy", "behavior": "allergen_alert", "target_action": "allergen_alert", "target_data": {"allergen": "gluten"}, "expected_response_contains": [], "context": null}
+{"input": "drop the cheeseburger", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove", "item": "cheeseburger"}, "expected_response_contains": [], "context": null}
+{"input": "can I swap the French Fries for a Fruit Bag", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {"from": "French Fries", "to": "Fruit Bag"}, "expected_response_contains": [], "context": null}
+{"input": "severe shellfish allergy", "behavior": "allergen_alert", "target_action": "allergen_alert", "target_data": {"allergen": "shellfish"}, "expected_response_contains": [], "context": null}
+{"input": "just BBQ", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "BBQ"}, "expected_response_contains": [], "context": null}
+{"input": "yeah um hello", "behavior": "greet", "target_action": "greet", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "add the Vanilla Cone", "behavior": "add_on_suggestion", "target_action": "add_on_suggestion", "target_data": {"item": "Vanilla Cone", "price": 1.89}, "expected_response_contains": [], "context": null}
+{"input": "actually make that two Big Macs", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "change_qty", "qty": 2}, "expected_response_contains": [], "context": null}
+{"input": "I don't want jalape\u00f1os on that", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "jalape\u00f1os"}, "expected_response_contains": [], "context": null}
+{"input": "I want my money back", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "refund"}, "expected_response_contains": [], "context": null}
+{"input": "cancel everything", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "cancel_all"}, "expected_response_contains": [], "context": null}
+{"input": "I'll take a Chocolate Chip Cookie too", "behavior": "add_on_suggestion", "target_action": "add_on_suggestion", "target_data": {"item": "Chocolate Chip Cookie", "price": 1.29}, "expected_response_contains": [], "context": null}
+{"input": "correct", "behavior": "order_confirmed", "target_action": "order_confirmed", "target_data": {}, "expected_response_contains": [], "context": "So two Big Macs and a 10-piece McNuggets. Total is $16.67. Sound good?"}
+{"input": "make it a combo", "behavior": "meal_upgrade", "target_action": "meal_upgrade", "target_data": {"item": "6-piece Chicken McNuggets", "meal_price": 6.89}, "expected_response_contains": [], "context": null}
+{"input": "hamburger no lettuce", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "lettuce"}, "expected_response_contains": [], "context": null}
+{"input": "credit card please", "behavior": "payment", "target_action": "payment", "target_data": {"method": "card"}, "expected_response_contains": [], "context": null}
+{"input": "the nugget one", "behavior": "happy_meal_options", "target_action": "happy_meal_options", "target_data": {"item": "4-piece McNuggets Happy Meal", "price": 5.29}, "expected_response_contains": [], "context": "What kind of Happy Meal?"}
+{"input": "can I get a vanilla cone", "behavior": "machine_down", "target_action": "machine_down", "target_data": {"item": "ice cream"}, "expected_response_contains": [], "context": null}
+{"input": "what burgers do you have", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {"category": "burgers"}, "expected_response_contains": [], "context": null}
+{"input": "can I get Sweet & Sour", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Sweet & Sour"}, "expected_response_contains": [], "context": null}
+{"input": "just that", "behavior": "order_complete", "target_action": "order_complete", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "saving money today", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "the kids meal", "behavior": "happy_meal_options", "target_action": "happy_meal_options", "target_data": {"item": "6-piece McNuggets Happy Meal", "price": 5.79}, "expected_response_contains": [], "context": null}
+{"input": "double the onions", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "add", "ingredient": "onions"}, "expected_response_contains": [], "context": null}
+{"input": "I'll use my app", "behavior": "payment", "target_action": "payment", "target_data": {"method": "app"}, "expected_response_contains": [], "context": null}
+{"input": "this is unacceptable", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "escalation"}, "expected_response_contains": [], "context": null}
+{"input": "I have a soy allergy", "behavior": "allergen_alert", "target_action": "allergen_alert", "target_data": {"allergen": "soy"}, "expected_response_contains": [], "context": null}
+{"input": "how many calories in the Egg McMuffin", "behavior": "nutrition_inquiry", "target_action": "nutrition_inquiry", "target_data": {"item": "Egg McMuffin"}, "expected_response_contains": [], "context": null}
+{"input": "Ranch please", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Ranch"}, "expected_response_contains": [], "context": null}
+{"input": "can I get this replaced", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "wrong_order"}, "expected_response_contains": [], "context": null}
+{"input": "I can't have nuts", "behavior": "allergen_alert", "target_action": "allergen_alert", "target_data": {"allergen": "nuts"}, "expected_response_contains": [], "context": null}
+{"input": "skip the bacon", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "bacon"}, "expected_response_contains": [], "context": null}
+{"input": "double the jalape\u00f1os", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "add", "ingredient": "jalape\u00f1os"}, "expected_response_contains": [], "context": null}
+{"input": "the BBQ sauce", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "BBQ"}, "expected_response_contains": [], "context": null}
+{"input": "I'm feeling adventurous suggest something", "behavior": "recommend", "target_action": "recommend", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "I want a McDouble instead of the cheeseburger", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "change"}, "expected_response_contains": [], "context": null}
+{"input": "price on Quarter Pounder with Cheese", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {"item": "Quarter Pounder with Cheese", "price": 5.99}, "expected_response_contains": [], "context": null}
+{"input": "yeah why not", "behavior": "add_on_suggestion", "target_action": "add_on_suggestion", "target_data": {"item": "Chocolate Chip Cookie", "price": 1.29}, "expected_response_contains": [], "context": "Would you like to add a dessert?"}
+{"input": "what do most people order", "behavior": "recommend", "target_action": "recommend", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "take the fries off", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove", "item": "fries"}, "expected_response_contains": [], "context": null}
+{"input": "I need something halal", "behavior": "dietary_inquiry", "target_action": "dietary_inquiry", "target_data": {"diet": "halal"}, "expected_response_contains": [], "context": null}
+{"input": "my kid has a peanuts allergy", "behavior": "allergen_alert", "target_action": "allergen_alert", "target_data": {"allergen": "peanuts"}, "expected_response_contains": [], "context": null}
+{"input": "bump that to two", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "change_qty", "qty": 2}, "expected_response_contains": [], "context": null}
+{"input": "mmhmm", "behavior": "meal_upgrade", "target_action": "meal_upgrade", "target_data": {"item": "McCrispy", "meal_price": 8.79}, "expected_response_contains": [], "context": "That McCrispy is $5.49. Want to make it a combo for $8.79?"}
+{"input": "what's the best chicken sandwich", "behavior": "recommend", "target_action": "recommend", "target_data": {"category": "chicken"}, "expected_response_contains": [], "context": null}
+{"input": "what's the most popular item", "behavior": "recommend", "target_action": "recommend", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "I want Honey Mustard sauce", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Honey Mustard"}, "expected_response_contains": [], "context": null}
+{"input": "give me two of those instead", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "change_qty", "qty": 2}, "expected_response_contains": [], "context": null}
+{"input": "yo lemme order", "behavior": "greet", "target_action": "greet", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "honey mustard", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Honey Mustard"}, "expected_response_contains": [], "context": "Any sauce with your nuggets?"}
+{"input": "replace the Coca-Cola with Lemonade", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {"from": "Coca-Cola", "to": "Lemonade"}, "expected_response_contains": [], "context": null}
+{"input": "is the fries healthy", "behavior": "nutrition_inquiry", "target_action": "nutrition_inquiry", "target_data": {"item": "fries"}, "expected_response_contains": [], "context": null}
+{"input": "can I swap the Sprite for a Diet Coke", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {"from": "Sprite", "to": "Diet Coke"}, "expected_response_contains": [], "context": null}
+{"input": "I think that's everything", "behavior": "order_complete", "target_action": "order_complete", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "hey hey", "behavior": "greet", "target_action": "greet", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "I have a peanuts allergy", "behavior": "allergen_alert", "target_action": "allergen_alert", "target_data": {"allergen": "peanuts"}, "expected_response_contains": [], "context": null}
+{"input": "skip the cheese", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "cheese"}, "expected_response_contains": [], "context": null}
+{"input": "what does the Filet-O-Fish cost", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {"item": "Filet-O-Fish", "price": 4.79}, "expected_response_contains": [], "context": null}
+{"input": "no special sauce no pickles", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "special sauce, pickles"}, "expected_response_contains": [], "context": null}
+{"input": "can you read that back", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "readback"}, "expected_response_contains": [], "context": null}
+{"input": "plain Filet-O-Fish", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "plain", "ingredient": "all"}, "expected_response_contains": [], "context": null}
+{"input": "can I swap the Coca-Cola for a Water", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {"from": "Coca-Cola", "to": "Water"}, "expected_response_contains": [], "context": null}
+{"input": "BBQ please", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "BBQ"}, "expected_response_contains": [], "context": null}
+{"input": "this burger is raw", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "quality"}, "expected_response_contains": [], "context": null}
+{"input": "I'm allergic to gluten", "behavior": "allergen_alert", "target_action": "allergen_alert", "target_data": {"allergen": "gluten"}, "expected_response_contains": [], "context": null}
+{"input": "go back", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove_last"}, "expected_response_contains": [], "context": null}
+{"input": "can I get the Big Mac without bacon", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "bacon"}, "expected_response_contains": [], "context": null}
+{"input": "what's the most affordable combo", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "yeah sure", "behavior": "meal_upgrade", "target_action": "meal_upgrade", "target_data": {"item": "Big Mac", "meal_price": 8.99}, "expected_response_contains": [], "context": "That Big Mac is $5.69. Want to make it a combo for $8.99?"}
+{"input": "is the bun shellfish free", "behavior": "allergen_inquiry", "target_action": "allergen_inquiry", "target_data": {"item": "bun", "allergen": "shellfish"}, "expected_response_contains": [], "context": null}
+{"input": "total it up", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {"query": "order_total"}, "expected_response_contains": [], "context": null}
+{"input": "I'll take Ranch", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Ranch"}, "expected_response_contains": [], "context": null}
+{"input": "you got it", "behavior": "order_confirmed", "target_action": "order_confirmed", "target_data": {}, "expected_response_contains": [], "context": "OK so I have a Big Mac combo with a Coke. Your total is $8.99. Does that sound right?"}
+{"input": "is the Filet-O-Fish healthy", "behavior": "nutrition_inquiry", "target_action": "nutrition_inquiry", "target_data": {"item": "Filet-O-Fish"}, "expected_response_contains": [], "context": null}
+{"input": "yeah Hot Mustard", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Hot Mustard"}, "expected_response_contains": [], "context": null}
+{"input": "Visa", "behavior": "payment", "target_action": "payment", "target_data": {"method": "card"}, "expected_response_contains": [], "context": null}
+{"input": "I'm broke what can I get", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "the machine working today", "behavior": "machine_down", "target_action": "machine_down", "target_data": {"item": "ice cream"}, "expected_response_contains": [], "context": null}
+{"input": "do you have fish", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {"category": "fish"}, "expected_response_contains": [], "context": null}
+{"input": "switch the nuggets to a McCrispy", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "change"}, "expected_response_contains": [], "context": null}
+{"input": "does the bun have nuts", "behavior": "allergen_inquiry", "target_action": "allergen_inquiry", "target_data": {"item": "bun", "allergen": "nuts"}, "expected_response_contains": [], "context": null}
+{"input": "dollar menu items", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "yes one cookie", "behavior": "add_on_suggestion", "target_action": "add_on_suggestion", "target_data": {"item": "Chocolate Chip Cookie", "price": 1.29}, "expected_response_contains": [], "context": "Would you like to add a dessert?"}
+{"input": "no that's everything", "behavior": "order_complete", "target_action": "order_complete", "target_data": {}, "expected_response_contains": [], "context": "Anything else today?"}
+{"input": "what does the McChicken cost", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {"item": "McChicken", "price": 1.89}, "expected_response_contains": [], "context": null}
+{"input": "throw some tomato on there", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "add", "ingredient": "tomato"}, "expected_response_contains": [], "context": null}
+{"input": "what have I ordered so far", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "readback"}, "expected_response_contains": [], "context": null}
+{"input": "do you have ice cream", "behavior": "machine_down", "target_action": "machine_down", "target_data": {"item": "ice cream"}, "expected_response_contains": [], "context": null}
+{"input": "can I get Ranch", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Ranch"}, "expected_response_contains": [], "context": null}
+{"input": "how much is a Cheeseburger", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {"item": "Cheeseburger", "price": 2.29}, "expected_response_contains": [], "context": null}
+{"input": "add some cheese", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "add", "ingredient": "cheese"}, "expected_response_contains": [], "context": null}
+{"input": "load up on mustard", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "add", "ingredient": "mustard"}, "expected_response_contains": [], "context": null}
+{"input": "can you make that a combo", "behavior": "meal_upgrade", "target_action": "meal_upgrade", "target_data": {"item": "Big Mac", "meal_price": 8.99}, "expected_response_contains": [], "context": null}
+{"input": "I have a dairy allergy", "behavior": "allergen_alert", "target_action": "allergen_alert", "target_data": {"allergen": "dairy"}, "expected_response_contains": [], "context": null}
+{"input": "is the Quarter Pounder healthy", "behavior": "nutrition_inquiry", "target_action": "nutrition_inquiry", "target_data": {"item": "Quarter Pounder"}, "expected_response_contains": [], "context": null}
+{"input": "no lettuce please", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "lettuce"}, "expected_response_contains": [], "context": null}
+{"input": "nuggets", "behavior": "happy_meal_options", "target_action": "happy_meal_options", "target_data": {"item": "4-piece McNuggets Happy Meal", "price": 5.29}, "expected_response_contains": [], "context": "What kind of Happy Meal?"}
+{"input": "yep that's all", "behavior": "order_complete", "target_action": "order_complete", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "yeah do it", "behavior": "meal_upgrade", "target_action": "meal_upgrade", "target_data": {"item": "Quarter Pounder with Cheese", "meal_price": 9.29}, "expected_response_contains": [], "context": "That Quarter Pounder with Cheese is $5.99. Want to make it a combo for $9.29?"}
+{"input": "hold the tomato", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "tomato"}, "expected_response_contains": [], "context": null}
+{"input": "yeah a kids meal", "behavior": "happy_meal_options", "target_action": "happy_meal_options", "target_data": {"item": "4-piece McNuggets Happy Meal", "price": 5.29}, "expected_response_contains": [], "context": null}
+{"input": "substitute the Coca-Cola with Water", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {"from": "Coca-Cola", "to": "Water"}, "expected_response_contains": [], "context": null}
+{"input": "go ahead and combo it", "behavior": "meal_upgrade", "target_action": "meal_upgrade", "target_data": {"item": "Cheeseburger", "meal_price": 5.49}, "expected_response_contains": [], "context": null}
+{"input": "I changed my mind on the McCrispy", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove", "item": "McCrispy"}, "expected_response_contains": [], "context": null}
+{"input": "cheapest meal", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "Google Pay", "behavior": "payment", "target_action": "payment", "target_data": {"method": "mobile"}, "expected_response_contains": [], "context": null}
+{"input": "my little one wants a Happy Meal", "behavior": "happy_meal_options", "target_action": "happy_meal_options", "target_data": {"item": "6-piece McNuggets Happy Meal", "price": 5.79}, "expected_response_contains": [], "context": null}
+{"input": "Happy Meal with nuggets", "behavior": "happy_meal_options", "target_action": "happy_meal_options", "target_data": {"item": "Hamburger Happy Meal", "price": 4.99}, "expected_response_contains": [], "context": null}
+{"input": "give me Honey Mustard", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Honey Mustard"}, "expected_response_contains": [], "context": null}
+{"input": "is the Big Mac healthy", "behavior": "nutrition_inquiry", "target_action": "nutrition_inquiry", "target_data": {"item": "Big Mac"}, "expected_response_contains": [], "context": null}
+{"input": "cheap breakfast option", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "take off the onions", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "onions"}, "expected_response_contains": [], "context": null}
+{"input": "what's fire here", "behavior": "recommend", "target_action": "recommend", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "severe peanuts allergy", "behavior": "allergen_alert", "target_action": "allergen_alert", "target_data": {"allergen": "peanuts"}, "expected_response_contains": [], "context": null}
+{"input": "do you have anything low-carb", "behavior": "dietary_inquiry", "target_action": "dietary_inquiry", "target_data": {"diet": "low-carb"}, "expected_response_contains": [], "context": null}
+{"input": "Hot Mustard sauce please", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Hot Mustard"}, "expected_response_contains": [], "context": null}
+{"input": "what should I try if it's my first time", "behavior": "recommend", "target_action": "recommend", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "upgrade it", "behavior": "meal_upgrade", "target_action": "meal_upgrade", "target_data": {"item": "Quarter Pounder with Cheese", "meal_price": 9.29}, "expected_response_contains": [], "context": null}
+{"input": "I'll take the meal version", "behavior": "meal_upgrade", "target_action": "meal_upgrade", "target_data": {"item": "Double Quarter Pounder with Cheese", "meal_price": 10.79}, "expected_response_contains": [], "context": null}
+{"input": "give me Sweet & Sour", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Sweet & Sour"}, "expected_response_contains": [], "context": null}
+{"input": "substitute the Coca-Cola with Sprite", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {"from": "Coca-Cola", "to": "Sprite"}, "expected_response_contains": [], "context": null}
+{"input": "wrong sauce", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "wrong_order"}, "expected_response_contains": [], "context": null}
+{"input": "yo anyone there", "behavior": "greet", "target_action": "greet", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "hot mustard", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Hot Mustard"}, "expected_response_contains": [], "context": "Any sauce with your nuggets?"}
+{"input": "actually cancel the cheeseburger", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove", "item": "cheeseburger"}, "expected_response_contains": [], "context": null}
+{"input": "um medium", "behavior": "size_selection", "target_action": "size_selection", "target_data": {"size": "medium"}, "expected_response_contains": [], "context": null}
+{"input": "can you change the McChicken to a McCrispy", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "change"}, "expected_response_contains": [], "context": null}
+{"input": "Hot Mustard please", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Hot Mustard"}, "expected_response_contains": [], "context": null}
+{"input": "I don't want the fries anymore", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove", "item": "fries"}, "expected_response_contains": [], "context": null}
+{"input": "hold the pickles", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "pickles"}, "expected_response_contains": [], "context": null}
+{"input": "can I get Honey Mustard", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Honey Mustard"}, "expected_response_contains": [], "context": null}
+{"input": "is the Egg McMuffin healthy", "behavior": "nutrition_inquiry", "target_action": "nutrition_inquiry", "target_data": {"item": "Egg McMuffin"}, "expected_response_contains": [], "context": null}
+{"input": "tell me about your chicken options", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {"category": "chicken"}, "expected_response_contains": [], "context": null}
+{"input": "how many calories in the McDouble", "behavior": "nutrition_inquiry", "target_action": "nutrition_inquiry", "target_data": {"item": "McDouble"}, "expected_response_contains": [], "context": null}
+{"input": "the Sweet & Sour sauce", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Sweet & Sour"}, "expected_response_contains": [], "context": null}
+{"input": "saving money what should I get", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "oops cancel that", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove_last"}, "expected_response_contains": [], "context": null}
+{"input": "forget the Big Mac", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove", "item": "Big Mac"}, "expected_response_contains": [], "context": null}
+{"input": "I don't want the cheeseburger anymore", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove", "item": "cheeseburger"}, "expected_response_contains": [], "context": null}
+{"input": "any low-calorie options", "behavior": "dietary_inquiry", "target_action": "dietary_inquiry", "target_data": {"diet": "low-calorie"}, "expected_response_contains": [], "context": null}
+{"input": "any limited time items", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "add tomato to my McChicken", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "add", "ingredient": "tomato"}, "expected_response_contains": [], "context": null}
+{"input": "I'll take Tangy BBQ", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Tangy BBQ"}, "expected_response_contains": [], "context": null}
+{"input": "scratch the McChicken", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove", "item": "McChicken"}, "expected_response_contains": [], "context": null}
+{"input": "sure throw in a Baked Apple Pie", "behavior": "add_on_suggestion", "target_action": "add_on_suggestion", "target_data": {"item": "Baked Apple Pie", "price": 1.69}, "expected_response_contains": [], "context": null}
+{"input": "estimated wait time", "behavior": "time_check", "target_action": "time_check", "target_data": {"query": "wait_time"}, "expected_response_contains": [], "context": null}
+{"input": "cancel the whole order", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "cancel_all"}, "expected_response_contains": [], "context": null}
+{"input": "feed me for 5 dollars", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "Sweet & Sour sauce please", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Sweet & Sour"}, "expected_response_contains": [], "context": null}
+{"input": "card please", "behavior": "payment", "target_action": "payment", "target_data": {"method": "card"}, "expected_response_contains": [], "context": null}
+{"input": "do you have anything halal", "behavior": "dietary_inquiry", "target_action": "dietary_inquiry", "target_data": {"diet": "halal"}, "expected_response_contains": [], "context": null}
+{"input": "is your shake machine broken", "behavior": "machine_down", "target_action": "machine_down", "target_data": {"item": "shake"}, "expected_response_contains": [], "context": null}
+{"input": "how much longer for my food", "behavior": "time_check", "target_action": "time_check", "target_data": {"query": "wait_time"}, "expected_response_contains": [], "context": null}
+{"input": "price on McCrispy", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {"item": "McCrispy", "price": 5.49}, "expected_response_contains": [], "context": null}
+{"input": "yep you nailed it", "behavior": "order_confirmed", "target_action": "order_confirmed", "target_data": {}, "expected_response_contains": [], "context": "OK so I have a Big Mac combo with a Coke. Your total is $8.99. Does that sound right?"}
+{"input": "small please", "behavior": "size_selection", "target_action": "size_selection", "target_data": {"size": "small"}, "expected_response_contains": [], "context": null}
+{"input": "is the McRib back", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {"item": "McRib"}, "expected_response_contains": [], "context": null}
+{"input": "price on Filet-O-Fish", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {"item": "Filet-O-Fish", "price": 4.79}, "expected_response_contains": [], "context": null}
+{"input": "Sprite instead of Coca-Cola", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {"from": "Coca-Cola", "to": "Sprite"}, "expected_response_contains": [], "context": null}
+{"input": "chocolate shake please", "behavior": "machine_down", "target_action": "machine_down", "target_data": {"item": "shake"}, "expected_response_contains": [], "context": null}
+{"input": "nutrition info for McCrispy", "behavior": "nutrition_inquiry", "target_action": "nutrition_inquiry", "target_data": {"item": "McCrispy"}, "expected_response_contains": [], "context": null}
+{"input": "I have a shellfish allergy", "behavior": "allergen_alert", "target_action": "allergen_alert", "target_data": {"allergen": "shellfish"}, "expected_response_contains": [], "context": null}
+{"input": "give me Ranch", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Ranch"}, "expected_response_contains": [], "context": null}
+{"input": "throw in a cookie", "behavior": "add_on_suggestion", "target_action": "add_on_suggestion", "target_data": {"item": "Chocolate Chip Cookie", "price": 1.29}, "expected_response_contains": [], "context": "Would you like to add a dessert?"}
+{"input": "what can I eat if I'm low-calorie", "behavior": "dietary_inquiry", "target_action": "dietary_inquiry", "target_data": {"diet": "low-calorie"}, "expected_response_contains": [], "context": null}
+{"input": "how long until my food", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "long_wait"}, "expected_response_contains": [], "context": null}
+{"input": "change the McDouble to a Big Mac", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "change"}, "expected_response_contains": [], "context": null}
+{"input": "I'll take Hot Mustard", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Hot Mustard"}, "expected_response_contains": [], "context": null}
+{"input": "leave off the cheese", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "cheese"}, "expected_response_contains": [], "context": null}
+{"input": "hey uh can I order", "behavior": "greet", "target_action": "greet", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "do you take Apple Pay", "behavior": "payment", "target_action": "payment", "target_data": {"method": "mobile"}, "expected_response_contains": [], "context": null}
+{"input": "my son wants the burger one", "behavior": "happy_meal_options", "target_action": "happy_meal_options", "target_data": {"item": "Hamburger Happy Meal", "price": 4.99}, "expected_response_contains": [], "context": null}
+{"input": "what can I eat if I'm kosher", "behavior": "dietary_inquiry", "target_action": "dietary_inquiry", "target_data": {"diet": "kosher"}, "expected_response_contains": [], "context": null}
+{"input": "my kid has a soy allergy", "behavior": "allergen_alert", "target_action": "allergen_alert", "target_data": {"allergen": "soy"}, "expected_response_contains": [], "context": null}
+{"input": "six piece nugget Happy Meal", "behavior": "happy_meal_options", "target_action": "happy_meal_options", "target_data": {"item": "6-piece McNuggets Happy Meal", "price": 5.79}, "expected_response_contains": [], "context": null}
+{"input": "sure throw in a Caramel Sundae", "behavior": "add_on_suggestion", "target_action": "add_on_suggestion", "target_data": {"item": "Caramel Sundae", "price": 2.89}, "expected_response_contains": [], "context": null}
+{"input": "what's on my order", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "readback"}, "expected_response_contains": [], "context": null}
+{"input": "what does the 10-piece Chicken McNuggets cost", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {"item": "10-piece Chicken McNuggets", "price": 5.29}, "expected_response_contains": [], "context": null}
+{"input": "hamburger kids meal", "behavior": "happy_meal_options", "target_action": "happy_meal_options", "target_data": {"item": "Hamburger Happy Meal", "price": 4.99}, "expected_response_contains": [], "context": null}
+{"input": "wrap it up", "behavior": "order_complete", "target_action": "order_complete", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "recommend a dessert", "behavior": "recommend", "target_action": "recommend", "target_data": {"category": "desserts"}, "expected_response_contains": [], "context": null}
+{"input": "read me my order", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "readback"}, "expected_response_contains": [], "context": null}
+{"input": "hold the mustard", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "mustard"}, "expected_response_contains": [], "context": null}
+{"input": "never mind the McDouble", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove", "item": "McDouble"}, "expected_response_contains": [], "context": null}
+{"input": "what types of coffee do you have", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {"category": "drinks"}, "expected_response_contains": [], "context": null}
+{"input": "how's it going", "behavior": "greet", "target_action": "greet", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "price on 10-piece Chicken McNuggets", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {"item": "10-piece Chicken McNuggets", "price": 5.29}, "expected_response_contains": [], "context": null}
+{"input": "yeah Sweet & Sour", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Sweet & Sour"}, "expected_response_contains": [], "context": null}
+{"input": "what can I eat if I'm dairy-free", "behavior": "dietary_inquiry", "target_action": "dietary_inquiry", "target_data": {"diet": "dairy-free"}, "expected_response_contains": [], "context": null}
+{"input": "nutrition info for Egg McMuffin", "behavior": "nutrition_inquiry", "target_action": "nutrition_inquiry", "target_data": {"item": "Egg McMuffin"}, "expected_response_contains": [], "context": null}
+{"input": "just Sweet & Sour", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Sweet & Sour"}, "expected_response_contains": [], "context": null}
+{"input": "ranch and spicy buffalo", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "multiple"}, "expected_response_contains": [], "context": null}
+{"input": "I changed my mind about everything", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "cancel_all"}, "expected_response_contains": [], "context": null}
+{"input": "make it medium", "behavior": "size_selection", "target_action": "size_selection", "target_data": {"size": "medium"}, "expected_response_contains": [], "context": null}
+{"input": "scratch what I just said", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove_last"}, "expected_response_contains": [], "context": null}
+{"input": "I specifically said no pickles", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "wrong_order"}, "expected_response_contains": [], "context": null}
+{"input": "you gave me the wrong drink", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "wrong_order"}, "expected_response_contains": [], "context": null}
+{"input": "Spicy Buffalo sauce please", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Spicy Buffalo"}, "expected_response_contains": [], "context": null}
+{"input": "burger please", "behavior": "happy_meal_options", "target_action": "happy_meal_options", "target_data": {"item": "Hamburger Happy Meal", "price": 4.99}, "expected_response_contains": [], "context": "What kind of Happy Meal?"}
+{"input": "the ice cream is melted", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "quality"}, "expected_response_contains": [], "context": null}
+{"input": "the coffee is lukewarm", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "cold_food"}, "expected_response_contains": [], "context": null}
+{"input": "replace the French Fries with Yogurt", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {"from": "French Fries", "to": "Yogurt"}, "expected_response_contains": [], "context": null}
+{"input": "missing the toy in the Happy Meal", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "missing_items"}, "expected_response_contains": [], "context": null}
+{"input": "is there dairy in the McFlurry", "behavior": "allergen_inquiry", "target_action": "allergen_inquiry", "target_data": {"item": "McFlurry", "allergen": "dairy"}, "expected_response_contains": [], "context": null}
+{"input": "how much do I owe", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {"query": "order_total"}, "expected_response_contains": [], "context": null}
+{"input": "my kid wants a Happy Meal", "behavior": "happy_meal_options", "target_action": "happy_meal_options", "target_data": {"item": "Hamburger Happy Meal", "price": 4.99}, "expected_response_contains": [], "context": null}
+{"input": "what would you order", "behavior": "recommend", "target_action": "recommend", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "what's my order look like", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "readback"}, "expected_response_contains": [], "context": null}
+{"input": "here's my card", "behavior": "payment", "target_action": "payment", "target_data": {"method": "card"}, "expected_response_contains": [], "context": null}
+{"input": "um Sweet & Sour", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Sweet & Sour"}, "expected_response_contains": [], "context": null}
+{"input": "remove the onions", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "onions"}, "expected_response_contains": [], "context": null}
+{"input": "what do I have", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "readback"}, "expected_response_contains": [], "context": null}
+{"input": "just Tangy BBQ", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Tangy BBQ"}, "expected_response_contains": [], "context": null}
+{"input": "um BBQ", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "BBQ"}, "expected_response_contains": [], "context": null}
+{"input": "can I swap the French Fries for a Yogurt", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {"from": "French Fries", "to": "Yogurt"}, "expected_response_contains": [], "context": null}
+{"input": "recommend something filling", "behavior": "recommend", "target_action": "recommend", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "I got someone else's order", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "wrong_order"}, "expected_response_contains": [], "context": null}
+{"input": "chocolate milkshake", "behavior": "machine_down", "target_action": "machine_down", "target_data": {"item": "shake"}, "expected_response_contains": [], "context": null}
+{"input": "burger Happy Meal", "behavior": "happy_meal_options", "target_action": "happy_meal_options", "target_data": {"item": "Hamburger Happy Meal", "price": 4.99}, "expected_response_contains": [], "context": null}
+{"input": "economy meal", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "your service is horrible", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "escalation"}, "expected_response_contains": [], "context": null}
+{"input": "is the Filet-O-Fish wheat free", "behavior": "allergen_inquiry", "target_action": "allergen_inquiry", "target_data": {"item": "Filet-O-Fish", "allergen": "wheat"}, "expected_response_contains": [], "context": null}
+{"input": "bbq", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "BBQ"}, "expected_response_contains": [], "context": "Any sauce with your nuggets?"}
+{"input": "my kid has a sesame allergy", "behavior": "allergen_alert", "target_action": "allergen_alert", "target_data": {"allergen": "sesame"}, "expected_response_contains": [], "context": null}
+{"input": "what's in a Big Mac", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {"item": "Big Mac"}, "expected_response_contains": [], "context": null}
+{"input": "pick something for me", "behavior": "recommend", "target_action": "recommend", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "scratch the Big Mac", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove", "item": "Big Mac"}, "expected_response_contains": [], "context": null}
+{"input": "Apple Pay", "behavior": "payment", "target_action": "payment", "target_data": {"method": "mobile"}, "expected_response_contains": [], "context": null}
+{"input": "can I swap the Coca-Cola for a Sweet Tea", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {"from": "Coca-Cola", "to": "Sweet Tea"}, "expected_response_contains": [], "context": null}
+{"input": "do you have anything kosher", "behavior": "dietary_inquiry", "target_action": "dietary_inquiry", "target_data": {"diet": "kosher"}, "expected_response_contains": [], "context": null}
+{"input": "debit", "behavior": "payment", "target_action": "payment", "target_data": {"method": "card"}, "expected_response_contains": [], "context": "Will that be cash, card, or mobile pay?"}
+{"input": "I'm allergic to peanuts", "behavior": "allergen_alert", "target_action": "allergen_alert", "target_data": {"allergen": "peanuts"}, "expected_response_contains": [], "context": null}
+{"input": "medium", "behavior": "size_selection", "target_action": "size_selection", "target_data": {"size": "medium"}, "expected_response_contains": [], "context": "What size would you like?"}
+{"input": "I'll pay with card", "behavior": "payment", "target_action": "payment", "target_data": {"method": "card"}, "expected_response_contains": [], "context": null}
+{"input": "McCrispy minus the special sauce", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "special sauce"}, "expected_response_contains": [], "context": null}
+{"input": "chicken nuggets Happy Meal", "behavior": "happy_meal_options", "target_action": "happy_meal_options", "target_data": {"item": "6-piece McNuggets Happy Meal", "price": 5.79}, "expected_response_contains": [], "context": null}
+{"input": "do the shakes work", "behavior": "machine_down", "target_action": "machine_down", "target_data": {"item": "shake"}, "expected_response_contains": [], "context": null}
+{"input": "hi is this the drive thru", "behavior": "greet", "target_action": "greet", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "sweet and sour and BBQ", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "multiple"}, "expected_response_contains": [], "context": null}
+{"input": "severe soy allergy", "behavior": "allergen_alert", "target_action": "allergen_alert", "target_data": {"allergen": "soy"}, "expected_response_contains": [], "context": null}
+{"input": "what's on the dollar menu", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {"category": "value_menu"}, "expected_response_contains": [], "context": null}
+{"input": "replace the French Fries with Fruit Bag", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {"from": "French Fries", "to": "Fruit Bag"}, "expected_response_contains": [], "context": null}
+{"input": "um large", "behavior": "size_selection", "target_action": "size_selection", "target_data": {"size": "large"}, "expected_response_contains": [], "context": null}
+{"input": "I can't have wheat", "behavior": "allergen_alert", "target_action": "allergen_alert", "target_data": {"allergen": "wheat"}, "expected_response_contains": [], "context": null}
+{"input": "I've been waiting forever", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "long_wait"}, "expected_response_contains": [], "context": null}
+{"input": "do you have shakes", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {"category": "shakes"}, "expected_response_contains": [], "context": null}
+{"input": "I'll go small", "behavior": "size_selection", "target_action": "size_selection", "target_data": {"size": "small"}, "expected_response_contains": [], "context": null}
+{"input": "yeah make it a meal", "behavior": "meal_upgrade", "target_action": "meal_upgrade", "target_data": {"item": "Big Mac", "meal_price": 8.99}, "expected_response_contains": [], "context": null}
+{"input": "give me the cheapest combo", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "what's my total", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {"query": "order_total"}, "expected_response_contains": [], "context": null}
+{"input": "what deals do you have", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "add some jalape\u00f1os", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "add", "ingredient": "jalape\u00f1os"}, "expected_response_contains": [], "context": null}
+{"input": "frugal options", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "is the cheeseburger healthy", "behavior": "nutrition_inquiry", "target_action": "nutrition_inquiry", "target_data": {"item": "cheeseburger"}, "expected_response_contains": [], "context": null}
+{"input": "what's keto on the menu", "behavior": "dietary_inquiry", "target_action": "dietary_inquiry", "target_data": {"diet": "keto"}, "expected_response_contains": [], "context": null}
+{"input": "just Hot Mustard", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Hot Mustard"}, "expected_response_contains": [], "context": null}
+{"input": "any specials today", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "what can I eat if I'm low-carb", "behavior": "dietary_inquiry", "target_action": "dietary_inquiry", "target_data": {"diet": "low-carb"}, "expected_response_contains": [], "context": null}
+{"input": "Big Mac minus the tomato", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "tomato"}, "expected_response_contains": [], "context": null}
+{"input": "tell me what I ordered", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "readback"}, "expected_response_contains": [], "context": null}
+{"input": "I can't have gluten", "behavior": "allergen_alert", "target_action": "allergen_alert", "target_data": {"allergen": "gluten"}, "expected_response_contains": [], "context": null}
+{"input": "I need something low-calorie", "behavior": "dietary_inquiry", "target_action": "dietary_inquiry", "target_data": {"diet": "low-calorie"}, "expected_response_contains": [], "context": null}
+{"input": "there's something in my burger", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "foreign_object"}, "expected_response_contains": [], "context": null}
+{"input": "skip the tomato", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "tomato"}, "expected_response_contains": [], "context": null}
+{"input": "drop the the drink", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove", "item": "the drink"}, "expected_response_contains": [], "context": null}
+{"input": "what's the best burger", "behavior": "recommend", "target_action": "recommend", "target_data": {"category": "burgers"}, "expected_response_contains": [], "context": null}
+{"input": "that'll do it", "behavior": "order_complete", "target_action": "order_complete", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "large everything", "behavior": "size_selection", "target_action": "size_selection", "target_data": {"size": "medium"}, "expected_response_contains": [], "context": null}
+{"input": "what can I eat if I'm vegetarian", "behavior": "dietary_inquiry", "target_action": "dietary_inquiry", "target_data": {"diet": "vegetarian"}, "expected_response_contains": [], "context": null}
+{"input": "y'all got milkshakes", "behavior": "machine_down", "target_action": "machine_down", "target_data": {"item": "shake"}, "expected_response_contains": [], "context": null}
+{"input": "just Ranch", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Ranch"}, "expected_response_contains": [], "context": null}
+{"input": "sup can I order real quick", "behavior": "greet", "target_action": "greet", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "nutrition info for McNuggets", "behavior": "nutrition_inquiry", "target_action": "nutrition_inquiry", "target_data": {"item": "McNuggets"}, "expected_response_contains": [], "context": null}
+{"input": "cheeseburger no salt", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "salt"}, "expected_response_contains": [], "context": null}
+{"input": "um Ranch", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Ranch"}, "expected_response_contains": [], "context": null}
+{"input": "just the basics", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "plain", "ingredient": "all"}, "expected_response_contains": [], "context": null}
+{"input": "add the Chocolate Chip Cookie", "behavior": "add_on_suggestion", "target_action": "add_on_suggestion", "target_data": {"item": "Chocolate Chip Cookie", "price": 1.29}, "expected_response_contains": [], "context": null}
+{"input": "best price for food", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "replace the French Fries with Apple Slices", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {"from": "French Fries", "to": "Apple Slices"}, "expected_response_contains": [], "context": null}
+{"input": "what's your favorite", "behavior": "recommend", "target_action": "recommend", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "I found plastic in my food", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "foreign_object"}, "expected_response_contains": [], "context": null}
+{"input": "is there nuts in the McCrispy", "behavior": "allergen_inquiry", "target_action": "allergen_inquiry", "target_data": {"item": "McCrispy", "allergen": "nuts"}, "expected_response_contains": [], "context": null}
+{"input": "is there dairy in the McNuggets", "behavior": "allergen_inquiry", "target_action": "allergen_inquiry", "target_data": {"item": "McNuggets", "allergen": "dairy"}, "expected_response_contains": [], "context": null}
+{"input": "no cheese no pickles", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "cheese, pickles"}, "expected_response_contains": [], "context": null}
+{"input": "yeah large", "behavior": "size_selection", "target_action": "size_selection", "target_data": {"size": "large"}, "expected_response_contains": [], "context": null}
+{"input": "cheapest burger", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "wipe it all", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "cancel_all"}, "expected_response_contains": [], "context": null}
+{"input": "any dairy-free options", "behavior": "dietary_inquiry", "target_action": "dietary_inquiry", "target_data": {"diet": "dairy-free"}, "expected_response_contains": [], "context": null}
+{"input": "one 6-piece McNuggets Happy Meal", "behavior": "happy_meal_options", "target_action": "happy_meal_options", "target_data": {"item": "6-piece McNuggets Happy Meal", "price": 5.79}, "expected_response_contains": [], "context": null}
+{"input": "actually forget that", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove_last"}, "expected_response_contains": [], "context": null}
+{"input": "my drink is flat", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "quality"}, "expected_response_contains": [], "context": null}
+{"input": "hold the mayo", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "mayo"}, "expected_response_contains": [], "context": null}
+{"input": "what's gluten-free on the menu", "behavior": "dietary_inquiry", "target_action": "dietary_inquiry", "target_data": {"diet": "gluten-free"}, "expected_response_contains": [], "context": null}
+{"input": "kids meal with nuggets", "behavior": "happy_meal_options", "target_action": "happy_meal_options", "target_data": {"item": "6-piece McNuggets Happy Meal", "price": 5.79}, "expected_response_contains": [], "context": null}
+{"input": "add some lettuce", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "add", "ingredient": "lettuce"}, "expected_response_contains": [], "context": null}
+{"input": "what do I have so far", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "readback"}, "expected_response_contains": [], "context": null}
+{"input": "am I too late for breakfast", "behavior": "time_check", "target_action": "time_check", "target_data": {"query": "breakfast_hours"}, "expected_response_contains": [], "context": null}
+{"input": "does the McChicken have soy", "behavior": "allergen_inquiry", "target_action": "allergen_inquiry", "target_data": {"item": "McChicken", "allergen": "soy"}, "expected_response_contains": [], "context": null}
+{"input": "is the frozen stuff available", "behavior": "machine_down", "target_action": "machine_down", "target_data": {"item": "ice cream"}, "expected_response_contains": [], "context": null}
+{"input": "one Vanilla Cone please", "behavior": "add_on_suggestion", "target_action": "add_on_suggestion", "target_data": {"item": "Vanilla Cone", "price": 1.89}, "expected_response_contains": [], "context": null}
+{"input": "drop the McCrispy", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove", "item": "McCrispy"}, "expected_response_contains": [], "context": null}
+{"input": "let me hear the whole order", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "readback"}, "expected_response_contains": [], "context": null}
+{"input": "hi um yeah", "behavior": "greet", "target_action": "greet", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "most popular breakfast", "behavior": "recommend", "target_action": "recommend", "target_data": {"category": "breakfast"}, "expected_response_contains": [], "context": null}
+{"input": "combo that please", "behavior": "meal_upgrade", "target_action": "meal_upgrade", "target_data": {"item": "Quarter Pounder with Cheese", "meal_price": 9.29}, "expected_response_contains": [], "context": null}
+{"input": "I can't have sesame", "behavior": "allergen_alert", "target_action": "allergen_alert", "target_data": {"allergen": "sesame"}, "expected_response_contains": [], "context": null}
+{"input": "most food for least money", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "yeah", "behavior": "meal_upgrade", "target_action": "meal_upgrade", "target_data": {"item": "McDouble", "meal_price": 5.99}, "expected_response_contains": [], "context": "That McDouble is $2.79. Want to make it a combo for $5.99?"}
+{"input": "I'm allergic to sesame", "behavior": "allergen_alert", "target_action": "allergen_alert", "target_data": {"allergen": "sesame"}, "expected_response_contains": [], "context": null}
+{"input": "change my burger to a Big Mac", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "change"}, "expected_response_contains": [], "context": null}
+{"input": "go with small", "behavior": "size_selection", "target_action": "size_selection", "target_data": {"size": "small"}, "expected_response_contains": [], "context": null}
+{"input": "I want the meal", "behavior": "meal_upgrade", "target_action": "meal_upgrade", "target_data": {"item": "Big Mac", "meal_price": 8.99}, "expected_response_contains": [], "context": null}
+{"input": "how much is a Big Mac", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {"item": "Big Mac", "price": 5.69}, "expected_response_contains": [], "context": null}
+{"input": "dealer's choice", "behavior": "recommend", "target_action": "recommend", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "good morning I'd like to order", "behavior": "greet", "target_action": "greet", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "my daughter wants the nuggets Happy Meal", "behavior": "happy_meal_options", "target_action": "happy_meal_options", "target_data": {"item": "4-piece McNuggets Happy Meal", "price": 5.29}, "expected_response_contains": [], "context": null}
+{"input": "take off the tomato", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "tomato"}, "expected_response_contains": [], "context": null}
+{"input": "one Caramel Sundae please", "behavior": "add_on_suggestion", "target_action": "add_on_suggestion", "target_data": {"item": "Caramel Sundae", "price": 2.89}, "expected_response_contains": [], "context": null}
+{"input": "start over", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "cancel_all"}, "expected_response_contains": [], "context": null}
+{"input": "nah", "behavior": "order_complete", "target_action": "order_complete", "target_data": {}, "expected_response_contains": [], "context": "Anything else today?"}
+{"input": "yeah add a Caramel Sundae", "behavior": "add_on_suggestion", "target_action": "add_on_suggestion", "target_data": {"item": "Caramel Sundae", "price": 2.89}, "expected_response_contains": [], "context": null}
+{"input": "something quick and good", "behavior": "recommend", "target_action": "recommend", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "I want Sweet & Sour sauce", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Sweet & Sour"}, "expected_response_contains": [], "context": null}
+{"input": "I want a refund", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "refund"}, "expected_response_contains": [], "context": null}
+{"input": "replace the Sprite with Diet Coke", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {"from": "Sprite", "to": "Diet Coke"}, "expected_response_contains": [], "context": null}
+{"input": "under 5 dollars", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "two BBQ sauces", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "multiple"}, "expected_response_contains": [], "context": null}
+{"input": "I'll take Spicy Buffalo", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Spicy Buffalo"}, "expected_response_contains": [], "context": null}
+{"input": "just card", "behavior": "payment", "target_action": "payment", "target_data": {"method": "card"}, "expected_response_contains": [], "context": null}
+{"input": "nah remove that", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove_last"}, "expected_response_contains": [], "context": null}
+{"input": "give me Spicy Buffalo", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Spicy Buffalo"}, "expected_response_contains": [], "context": null}
+{"input": "whatever the default is", "behavior": "size_selection", "target_action": "size_selection", "target_data": {"size": "medium"}, "expected_response_contains": [], "context": null}
+{"input": "BBQ sauce please", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "BBQ"}, "expected_response_contains": [], "context": null}
+{"input": "meal deal please", "behavior": "meal_upgrade", "target_action": "meal_upgrade", "target_data": {"item": "10-piece Chicken McNuggets", "meal_price": 8.49}, "expected_response_contains": [], "context": null}
+{"input": "take the the drink off", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove", "item": "the drink"}, "expected_response_contains": [], "context": null}
+{"input": "mobile", "behavior": "payment", "target_action": "payment", "target_data": {"method": "mobile"}, "expected_response_contains": [], "context": "Will that be cash, card, or mobile pay?"}
+{"input": "substitute the Coca-Cola with Sweet Tea", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {"from": "Coca-Cola", "to": "Sweet Tea"}, "expected_response_contains": [], "context": null}
+{"input": "double the lettuce", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "add", "ingredient": "lettuce"}, "expected_response_contains": [], "context": null}
+{"input": "sounds good", "behavior": "order_confirmed", "target_action": "order_confirmed", "target_data": {}, "expected_response_contains": [], "context": "OK so I have a Big Mac combo with a Coke. Your total is $8.99. Does that sound right?"}
+{"input": "severe nuts allergy", "behavior": "allergen_alert", "target_action": "allergen_alert", "target_data": {"allergen": "nuts"}, "expected_response_contains": [], "context": null}
+{"input": "leave off the bacon", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "bacon"}, "expected_response_contains": [], "context": null}
+{"input": "the bun is stale", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "quality"}, "expected_response_contains": [], "context": null}
+{"input": "severe wheat allergy", "behavior": "allergen_alert", "target_action": "allergen_alert", "target_data": {"allergen": "wheat"}, "expected_response_contains": [], "context": null}
+{"input": "what does the Cheeseburger cost", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {"item": "Cheeseburger", "price": 2.29}, "expected_response_contains": [], "context": null}
+{"input": "how many calories in the fries", "behavior": "nutrition_inquiry", "target_action": "nutrition_inquiry", "target_data": {"item": "fries"}, "expected_response_contains": [], "context": null}
+{"input": "I'm finished", "behavior": "order_complete", "target_action": "order_complete", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "nobody's at the window", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "long_wait"}, "expected_response_contains": [], "context": null}
+{"input": "yeah hi what's up", "behavior": "greet", "target_action": "greet", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "what happy meal toys do you have", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {"category": "happy_meal"}, "expected_response_contains": [], "context": null}
+{"input": "is the McChicken sesame free", "behavior": "allergen_inquiry", "target_action": "allergen_inquiry", "target_data": {"item": "McChicken", "allergen": "sesame"}, "expected_response_contains": [], "context": null}
+{"input": "throw some cheese on there", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "add", "ingredient": "cheese"}, "expected_response_contains": [], "context": null}
+{"input": "two Happy Meals", "behavior": "happy_meal_options", "target_action": "happy_meal_options", "target_data": {"item": "4-piece McNuggets Happy Meal", "price": 5.29}, "expected_response_contains": [], "context": null}
+{"input": "sure throw in a McFlurry with OREO Cookies", "behavior": "add_on_suggestion", "target_action": "add_on_suggestion", "target_data": {"item": "McFlurry with OREO Cookies", "price": 4.89}, "expected_response_contains": [], "context": null}
+{"input": "no pickles no onions", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "remove", "ingredient": "pickles, onions"}, "expected_response_contains": [], "context": null}
+{"input": "what's good here", "behavior": "recommend", "target_action": "recommend", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "that'll be all", "behavior": "order_complete", "target_action": "order_complete", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "value menu options", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "what's vegan on the menu", "behavior": "dietary_inquiry", "target_action": "dietary_inquiry", "target_data": {"diet": "vegan"}, "expected_response_contains": [], "context": null}
+{"input": "do you have anything gluten-free", "behavior": "dietary_inquiry", "target_action": "dietary_inquiry", "target_data": {"diet": "gluten-free"}, "expected_response_contains": [], "context": null}
+{"input": "honey mustard and sweet and sour", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "multiple"}, "expected_response_contains": [], "context": null}
+{"input": "banana milkshake", "behavior": "machine_down", "target_action": "machine_down", "target_data": {"item": "shake"}, "expected_response_contains": [], "context": null}
+{"input": "hello hello", "behavior": "greet", "target_action": "greet", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "the nugget one for kids", "behavior": "happy_meal_options", "target_action": "happy_meal_options", "target_data": {"item": "4-piece McNuggets Happy Meal", "price": 5.29}, "expected_response_contains": [], "context": null}
+{"input": "I have a coupon", "behavior": "payment", "target_action": "payment", "target_data": {"method": "coupon"}, "expected_response_contains": [], "context": null}
+{"input": "I'll take Sweet & Sour", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Sweet & Sour"}, "expected_response_contains": [], "context": null}
+{"input": "can you undo that", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove_last"}, "expected_response_contains": [], "context": null}
+{"input": "six piece Happy Meal", "behavior": "happy_meal_options", "target_action": "happy_meal_options", "target_data": {"item": "6-piece McNuggets Happy Meal", "price": 5.79}, "expected_response_contains": [], "context": null}
+{"input": "take back what I just said", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove_last"}, "expected_response_contains": [], "context": null}
+{"input": "can I speak to a manager", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "escalation"}, "expected_response_contains": [], "context": null}
+{"input": "is there nuts in the Big Mac", "behavior": "allergen_inquiry", "target_action": "allergen_inquiry", "target_data": {"item": "Big Mac", "allergen": "nuts"}, "expected_response_contains": [], "context": null}
+{"input": "best deal for a family", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "what does the McDouble cost", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {"item": "McDouble", "price": 2.79}, "expected_response_contains": [], "context": null}
+{"input": "what's the fan favorite", "behavior": "recommend", "target_action": "recommend", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "best late night option", "behavior": "recommend", "target_action": "recommend", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "what's on a McCrispy", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {"item": "McCrispy"}, "expected_response_contains": [], "context": null}
+{"input": "no thank you", "behavior": "order_complete", "target_action": "order_complete", "target_data": {}, "expected_response_contains": [], "context": "Anything else today?"}
+{"input": "sure throw in a Vanilla Cone", "behavior": "add_on_suggestion", "target_action": "add_on_suggestion", "target_data": {"item": "Vanilla Cone", "price": 1.89}, "expected_response_contains": [], "context": null}
+{"input": "my order is wrong", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "wrong_order"}, "expected_response_contains": [], "context": null}
+{"input": "can I swap the French Fries for a Side Salad", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {"from": "French Fries", "to": "Side Salad"}, "expected_response_contains": [], "context": null}
+{"input": "that completes my order", "behavior": "order_complete", "target_action": "order_complete", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "what's the go-to order", "behavior": "recommend", "target_action": "recommend", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "the Hot Mustard sauce", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Hot Mustard"}, "expected_response_contains": [], "context": null}
+{"input": "small", "behavior": "size_selection", "target_action": "size_selection", "target_data": {"size": "small"}, "expected_response_contains": [], "context": "What size would you like?"}
+{"input": "can I get a milkshake", "behavior": "machine_down", "target_action": "machine_down", "target_data": {"item": "shake"}, "expected_response_contains": [], "context": null}
+{"input": "sup", "behavior": "greet", "target_action": "greet", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "um one Happy Meal", "behavior": "happy_meal_options", "target_action": "happy_meal_options", "target_data": {"item": "4-piece McNuggets Happy Meal", "price": 5.29}, "expected_response_contains": [], "context": null}
+{"input": "normal size", "behavior": "size_selection", "target_action": "size_selection", "target_data": {"size": "medium"}, "expected_response_contains": [], "context": null}
+{"input": "nutrition info for Quarter Pounder", "behavior": "nutrition_inquiry", "target_action": "nutrition_inquiry", "target_data": {"item": "Quarter Pounder"}, "expected_response_contains": [], "context": null}
+{"input": "coupons available", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "can I swap the Coca-Cola for a Lemonade", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {"from": "Coca-Cola", "to": "Lemonade"}, "expected_response_contains": [], "context": null}
+{"input": "can I swap the French Fries for a Apple Slices", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {"from": "French Fries", "to": "Apple Slices"}, "expected_response_contains": [], "context": null}
+{"input": "hey there how you doing", "behavior": "greet", "target_action": "greet", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "I need something low-carb", "behavior": "dietary_inquiry", "target_action": "dietary_inquiry", "target_data": {"diet": "low-carb"}, "expected_response_contains": [], "context": null}
+{"input": "vanilla shake", "behavior": "machine_down", "target_action": "machine_down", "target_data": {"item": "shake"}, "expected_response_contains": [], "context": null}
+{"input": "nutrition info for McChicken", "behavior": "nutrition_inquiry", "target_action": "nutrition_inquiry", "target_data": {"item": "McChicken"}, "expected_response_contains": [], "context": null}
+{"input": "something cheap please", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "the food is terrible", "behavior": "complaint", "target_action": "complaint", "target_data": {"type": "quality"}, "expected_response_contains": [], "context": null}
+{"input": "go ahead and total it", "behavior": "order_complete", "target_action": "order_complete", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "that's all", "behavior": "order_complete", "target_action": "order_complete", "target_data": {}, "expected_response_contains": [], "context": "Anything else today?"}
+{"input": "I'll take a Caramel Sundae too", "behavior": "add_on_suggestion", "target_action": "add_on_suggestion", "target_data": {"item": "Caramel Sundae", "price": 2.89}, "expected_response_contains": [], "context": null}
+{"input": "take that off", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove_last"}, "expected_response_contains": [], "context": null}
+{"input": "definitely", "behavior": "meal_upgrade", "target_action": "meal_upgrade", "target_data": {"item": "Big Mac", "meal_price": 8.99}, "expected_response_contains": [], "context": "That Big Mac is $5.69. Want to make it a combo for $8.99?"}
+{"input": "nah we're good", "behavior": "order_complete", "target_action": "order_complete", "target_data": {}, "expected_response_contains": [], "context": "Anything else today?"}
+{"input": "nugget Happy Meal for my son", "behavior": "happy_meal_options", "target_action": "happy_meal_options", "target_data": {"item": "6-piece McNuggets Happy Meal", "price": 5.79}, "expected_response_contains": [], "context": null}
+{"input": "how much is a Quarter Pounder with Cheese", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {"item": "Quarter Pounder with Cheese", "price": 5.99}, "expected_response_contains": [], "context": null}
+{"input": "the Spicy Buffalo sauce", "behavior": "sauce_selection", "target_action": "sauce_selection", "target_data": {"sauce": "Spicy Buffalo"}, "expected_response_contains": [], "context": null}
+{"input": "yeah we're good", "behavior": "order_complete", "target_action": "order_complete", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "I'm good", "behavior": "order_complete", "target_action": "order_complete", "target_data": {}, "expected_response_contains": [], "context": "Anything else today?"}
+{"input": "absolutely", "behavior": "meal_upgrade", "target_action": "meal_upgrade", "target_data": {"item": "Quarter Pounder with Cheese", "meal_price": 9.29}, "expected_response_contains": [], "context": "That Quarter Pounder with Cheese is $5.99. Want to make it a combo for $9.29?"}
+{"input": "hold on let me change that", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "remove_last"}, "expected_response_contains": [], "context": null}
+{"input": "what can I eat if I'm halal", "behavior": "dietary_inquiry", "target_action": "dietary_inquiry", "target_data": {"diet": "halal"}, "expected_response_contains": [], "context": null}
+{"input": "plain please", "behavior": "customize", "target_action": "customize", "target_data": {"modification": "plain", "ingredient": "all"}, "expected_response_contains": [], "context": null}
+{"input": "what's low-carb on the menu", "behavior": "dietary_inquiry", "target_action": "dietary_inquiry", "target_data": {"diet": "low-carb"}, "expected_response_contains": [], "context": null}
+{"input": "nothing else thanks", "behavior": "order_complete", "target_action": "order_complete", "target_data": {}, "expected_response_contains": [], "context": null}
+{"input": "change it to two cheeseburgers", "behavior": "order_modify", "target_action": "order_modify", "target_data": {"action": "change_qty", "qty": 2}, "expected_response_contains": [], "context": null}

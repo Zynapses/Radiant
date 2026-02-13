@@ -1,0 +1,133 @@
+THIS IS BATCH D. You already have the system context from the first message.
+
+Generate exactly 560 JSONL lines for this batch:
+- order_complete: 175 examples
+- order_confirmed: 70 examples
+- payment: 105 examples
+- size_selection: 105 examples
+- happy_meal_options: 105 examples
+
+=== order_complete (175 lines) ===
+
+REMEMBER: order_complete = customer is DONE ordering, wants no more food. NOT confirming accuracy.
+Key signals: "that's all", "I'm done", "nothing else", "that's it", "no more", "ring it up", "we're good"
+
+Non-contextual:
+- "that's all I want"
+- "I'm done ordering"
+- "nothing else thanks"
+- "that's everything"
+- "no that's it"
+- "we're all set"
+- "ring me up"
+- "ring that up"
+- "go ahead and total it"
+- "that completes my order"
+- "I think we're good"
+- "that should do it"
+- "no more items"
+- "I'm finished"
+
+Context-dependent (MUST have context field — generate 80+ of these):
+After "Anything else today?" or "Anything else I can get you?":
+- "no" -> order_complete
+- "nope" -> order_complete
+- "no thanks" -> order_complete
+- "that's it" -> order_complete
+- "I'm good" -> order_complete
+- "nah we're good" -> order_complete
+- "no that's everything" -> order_complete
+
+Vary the context messages: "Anything else?", "Anything else today?", "What else can I get you?", "Would you like anything else?", "Is that everything?"
+
+=== order_confirmed (70 lines) ===
+
+REMEMBER: order_confirmed = confirming the order READBACK is correct. NOT done ordering.
+Key signals: "that's correct", "you got it right", "looks good", "that's right", "perfect"
+
+Context-dependent (ALL 70 should have context field):
+After various readbacks like:
+- "OK so I have a Big Mac combo with a Coke. Your total is $8.99. Does that sound right?"
+- "That's one Quarter Pounder meal with a Sprite. $9.29 total. Is that correct?"
+- "So you want two Big Macs and a 10-piece McNuggets. Total is $20.27. Sound good?"
+
+Responses:
+- "yes" -> order_confirmed
+- "yep" -> order_confirmed
+- "that's correct" -> order_confirmed
+- "looks good" -> order_confirmed
+- "perfect" -> order_confirmed
+- "you got it" -> order_confirmed
+- "that's right" -> order_confirmed
+- "sounds right" -> order_confirmed
+- "yes that's my order" -> order_confirmed
+- "yep you nailed it" -> order_confirmed
+
+=== payment (105 lines) ===
+
+Non-contextual:
+- "I'll pay with card"
+- "cash please"
+- "Apple Pay"
+- "I have a coupon"
+- "debit card"
+- "credit card please"
+- "I'll use my app"
+- "mobile pay"
+- "Google Pay"
+- "tap to pay"
+
+Context-dependent (generate 60+ with context field):
+After "Will that be cash, card, or mobile pay?" or "How would you like to pay?":
+- "card" -> payment, {"method": "card"}
+- "cash" -> payment, {"method": "cash"}
+- "Apple Pay" -> payment, {"method": "mobile"}
+- "the app" -> payment, {"method": "app"}
+- "I have a coupon" -> payment, {"method": "coupon"}
+
+=== size_selection (105 lines) ===
+
+REMEMBER: size_selection = picking a SIZE only, no specific drink mentioned. Just "large", "medium", "small".
+If they say "large Coke" that's drink_selection, NOT size_selection.
+
+Non-contextual:
+- "large please"
+- "make it large"
+- "medium is fine"
+- "small"
+- "the biggest size"
+- "supersize it"
+- "large everything"
+- "make my fries and drink large"
+- "upsize to large"
+- "regular size"
+
+Context-dependent (generate 50+ with context field):
+After "What size would you like?" or "Small, medium, or large?":
+- "large" -> size_selection, {"size": "large"}
+- "medium" -> size_selection, {"size": "medium"}
+- "small please" -> size_selection, {"size": "small"}
+- "the biggest one" -> size_selection, {"size": "large"}
+
+=== happy_meal_options (105 lines) ===
+
+Cover all Happy Meals:
+- Hamburger Happy Meal — $4.99
+- 4-piece McNuggets Happy Meal — $5.29
+- 6-piece McNuggets Happy Meal — $5.79
+
+Variants:
+- "a Happy Meal please"
+- "can I get a Happy Meal with nuggets"
+- "my kid wants a Happy Meal"
+- "one hamburger Happy Meal"
+- "Happy Meal with a cheeseburger"
+- "nugget Happy Meal for my son"
+- "two Happy Meals"
+- "the kids meal"
+- "Happy Meal with 6 piece nuggets"
+- "what comes in the Happy Meal" (this is menu_inquiry, NOT happy_meal_options — DON'T include these here)
+- "4 piece nugget Happy Meal"
+- "my daughter wants the burger Happy Meal"
+
+Output ONLY the JSONL lines. No commentary. Start now.

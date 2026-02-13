@@ -1,0 +1,165 @@
+THIS IS BATCH E (FINAL BATCH). You already have the system context from the first message.
+
+Generate exactly 735 JSONL lines for this batch:
+- menu_inquiry: 105 examples
+- price_inquiry: 105 examples
+- nutrition_inquiry: 52 examples
+- allergen_inquiry: 70 examples
+- allergen_alert: 52 examples
+- dietary_inquiry: 52 examples
+- recommend: 70 examples
+- value_recommendation: 70 examples
+- add_on_suggestion: 70 examples
+- meal_substitution: 52 examples
+- complaint: 70 examples
+- machine_down: 35 examples
+- time_check: 35 examples
+
+=== menu_inquiry (105 lines) ===
+Asks WHAT items are available. Key: "what do you have", "what's on the menu", "what kinds of"
+- "what do you have" -> {}
+- "what burgers do you have" -> {"category": "burgers"}
+- "what's on the breakfast menu" -> {"category": "breakfast"}
+- "what chicken sandwiches do you make" -> {"category": "chicken"}
+- "what drinks do you have" -> {"category": "drinks"}
+- "do you have salads" -> {"category": "salads"}
+- "what desserts are there" -> {"category": "desserts"}
+- "what's on the dollar menu" -> {"category": "value_menu"}
+- "tell me about the Big Mac" -> {"item": "Big Mac"}
+- "what comes on the Quarter Pounder" -> {"item": "Quarter Pounder with Cheese"}
+- "what are your sides" -> {"category": "sides"}
+- "can you repeat that" -> {} (repeat/clarification requests = menu_inquiry)
+- "what did you say" -> {}
+
+=== price_inquiry (105 lines) ===
+Asks HOW MUCH something costs. Key: "how much", "what's the price", "cost"
+- "how much is a Big Mac" -> {"item": "Big Mac", "price": 5.69}
+- "what does a Quarter Pounder cost" -> {"item": "Quarter Pounder with Cheese", "price": 5.99}
+- "how much for 10 nuggets" -> {"item": "10-piece Chicken McNuggets", "price": 5.29}
+- "what's my total" -> {"query": "order_total"}
+- "how much is that so far" -> {"query": "order_total"}
+- "what's the damage" -> {"query": "order_total"}
+- "how much for the combo" -> {"item": "Big Mac", "price": 8.99}
+Cover every major menu item. Always use exact prices from the menu.
+
+=== nutrition_inquiry (52 lines) ===
+Asks about CALORIES, FAT, PROTEIN, NUTRITION. Key: "calories", "protein", "fat", "sodium", "nutrition", "healthy"
+- "how many calories in a Big Mac" -> {"item": "Big Mac"}
+- "what's the protein in the nuggets" -> {"item": "10-piece Chicken McNuggets"}
+- "is the McCrispy healthy" -> {"item": "McCrispy"}
+- "calorie count on the Quarter Pounder" -> {"item": "Quarter Pounder with Cheese"}
+- "how much fat in the fries" -> {"item": "French Fries"}
+- "nutritional info for the McChicken" -> {"item": "McChicken"}
+- "what's the healthiest thing" -> {}
+- "how fattening is the Double Quarter Pounder" -> {"item": "Double Quarter Pounder with Cheese"}
+
+=== allergen_inquiry (70 lines) ===
+Asks if item CONTAINS allergen. Key: "does it have", "contain", "allergen", "gluten", "dairy", "nuts"
+- "does the Big Mac have gluten" -> {"item": "Big Mac", "allergen": "gluten"}
+- "is there dairy in the McFlurry" -> {"item": "McFlurry", "allergen": "dairy"}
+- "are the fries gluten free" -> {"item": "French Fries", "allergen": "gluten"}
+- "does the bun have sesame" -> {"item": "Big Mac", "allergen": "sesame"}
+- "what contains peanuts" -> {"allergen": "peanuts"}
+- "is the McCrispy dairy free" -> {"item": "McCrispy", "allergen": "dairy"}
+- "any allergens in the nuggets" -> {"item": "10-piece Chicken McNuggets"}
+
+=== allergen_alert (52 lines) ===
+Customer DECLARES an allergy (not asking, telling).
+- "I have a peanut allergy" -> {"allergen": "peanuts"}
+- "my kid has a nut allergy" -> {"allergen": "nuts"}
+- "I'm lactose intolerant" -> {"allergen": "dairy"}
+- "I can't have gluten" -> {"allergen": "gluten"}
+- "I'm allergic to shellfish" -> {"allergen": "shellfish"}
+- "severe peanut allergy" -> {"allergen": "peanuts"}
+- "I have celiac disease" -> {"allergen": "gluten"}
+- "no dairy for me" -> {"allergen": "dairy"}
+- "wheat allergy" -> {"allergen": "wheat"}
+- "my son is allergic to eggs" -> {"allergen": "eggs"}
+
+=== dietary_inquiry (52 lines) ===
+Asks about dietary OPTIONS. Key: "gluten free", "vegetarian", "vegan", "keto", "low calorie"
+- "do you have anything gluten free" -> {"diet": "gluten-free"}
+- "what's vegetarian on the menu" -> {"diet": "vegetarian"}
+- "any vegan options" -> {"diet": "vegan"}
+- "what's low calorie" -> {"diet": "low-calorie"}
+- "any keto options" -> {"diet": "keto"}
+- "I'm on a low carb diet" -> {"diet": "low-carb"}
+- "what can I get that's dairy free" -> {"diet": "dairy-free"}
+
+=== recommend (70 lines) ===
+Asks for SUGGESTION. Key: "recommend", "suggest", "what's good", "popular", "best", "what should I"
+- "what do you recommend" -> {}
+- "what's popular" -> {}
+- "what should I get" -> {}
+- "what's the best burger" -> {"category": "burgers"}
+- "I can't decide" -> {}
+- "suggest something" -> {}
+- "what's your favorite" -> {}
+- "what's good for kids" -> {"category": "kids"}
+- "recommend a dessert" -> {"category": "desserts"}
+- "what's the best chicken sandwich" -> {"category": "chicken"}
+
+=== value_recommendation (70 lines) ===
+Asks for DEALS/CHEAP options. Key: "cheap", "deal", "budget", "dollar menu", "best value", "under $5"
+- "what's the best deal" -> {}
+- "what's cheap and good" -> {}
+- "I'm on a budget" -> {}
+- "what's the cheapest thing" -> {}
+- "dollar menu items" -> {}
+- "under 5 dollars" -> {}
+- "best bang for my buck" -> {}
+- "cheapest meal" -> {}
+
+=== add_on_suggestion (70 lines) ===
+Customer ACCEPTS an offered add-on. Usually desserts, cookies, pies.
+Non-contextual:
+- "sure throw in a cookie" -> {"item": "Chocolate Chip Cookie", "price": 1.29}
+- "yeah add an apple pie" -> {"item": "Baked Apple Pie", "price": 1.69}
+- "why not, add a sundae too" -> {"item": "Hot Fudge Sundae", "price": 2.89}
+- "add a McFlurry" -> {"item": "McFlurry with OREO Cookies", "price": 4.89}
+
+Context-dependent (after "Would you like to add a dessert? We have apple pies for $1.69"):
+- "sure" -> add_on_suggestion
+- "yeah the apple pie" -> add_on_suggestion
+- "throw in a cookie" -> add_on_suggestion
+
+=== meal_substitution (52 lines) ===
+Swaps a meal SIDE or DRINK. Key: "swap", "substitute", "instead of", "replace the"
+- "can I swap the fries for a salad" -> {"from": "French Fries", "to": "Side Salad"}
+- "apple slices instead of fries" -> {"from": "French Fries", "to": "Apple Slices"}
+- "substitute the Coke for a Sprite" -> {"from": "Coca-Cola", "to": "Sprite"}
+- "can I get sweet tea instead of Coke" -> {"from": "Coca-Cola", "to": "Sweet Tea"}
+- "replace the fries with a fruit bag" -> {"from": "French Fries", "to": "Fruit Bag"}
+
+=== complaint (70 lines) ===
+- "my order is wrong" -> {"type": "wrong_order"}
+- "this isn't what I ordered" -> {"type": "wrong_order"}
+- "my food is cold" -> {"type": "cold_food"}
+- "I've been waiting 20 minutes" -> {"type": "long_wait"}
+- "I'm missing items" -> {"type": "missing_items"}
+- "this burger is raw" -> {"type": "quality"}
+- "can I speak to a manager" -> {"type": "escalation"}
+- "I want a refund" -> {"type": "refund"}
+- "there's hair in my food" -> {"type": "foreign_object"}
+- "the fries are stale" -> {"type": "quality"}
+
+=== machine_down (35 lines) ===
+Tries to order ice cream/milkshake (machine always broken).
+- "is the ice cream machine working" -> {"item": "ice cream"}
+- "can I get a milkshake" -> {"item": "shake"}
+- "is the McFlurry machine down again" -> {"item": "McFlurry"}
+- "chocolate shake please" -> {"item": "shake"}
+- "vanilla shake" -> {"item": "shake"}
+- "do you have ice cream" -> {"item": "ice cream"}
+
+=== time_check (35 lines) ===
+Asks about WAIT TIME, HOURS, BREAKFAST. Key: "how long", "wait", "hours", "when", "breakfast end"
+- "how long is the wait" -> {"query": "wait_time"}
+- "what time do you close" -> {"query": "hours"}
+- "are you still serving breakfast" -> {"query": "breakfast_hours"}
+- "when does breakfast end" -> {"query": "breakfast_hours"}
+- "how late are you open" -> {"query": "hours"}
+- "how much longer for my food" -> {"query": "wait_time"}
+- "when does lunch start" -> {"query": "hours"}
+
+Output ONLY the JSONL lines. No commentary. Start now.

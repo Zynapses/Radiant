@@ -77,6 +77,43 @@ AGI Brain maps AI components to biological brain structures:
 | **Default Mode Network** | Homeostatic Dreaming | Selective memory consolidation during sleep cycles |
 | **Anterior Cingulate Cortex** | Watcher (Self-Model) | Self-monitoring via prediction error (surprise signal) |
 
+### 1.1 OMEGA Self-Awareness & Safety Integration (v7.61.0)
+
+> **Full reference**: `docs/20-OMEGA-ENGINEERING.md` (Parts VIII, X, XI)
+
+The OMEGA subsystem implements two biologically-motivated capabilities that directly extend the AGI Brain architecture:
+
+#### The Watcher (Self-Awareness via Predictive Processing)
+
+The Watcher is an MLP that predicts the OMEGA cortex's output from its input. The **surprise signal** (prediction error = MSE between predicted and actual output) serves as OMEGA's self-awareness metric:
+
+- **Low surprise** (brain predicted itself accurately) → reward signal to HomeostaticLoop → dopamine increase
+- **High surprise** (brain surprised by own output) → error signal → dopamine decrease → curiosity increase
+- **Self-awareness score** = `1.0 - surprise_ema` — tracks self-model quality over time
+
+The Watcher trains during dream cycles on a replay buffer of (input, output) pairs accumulated during inference. This mirrors how biological brains consolidate self-knowledge during sleep.
+
+**Package**: `radiant_omega/reflection.py` — `Watcher`, `WatcherTrainer`, `WatcherConfig`, `SelfModelMetrics`
+
+#### Shadow Vector (Post-LLM Deterministic Safety)
+
+The Shadow Vector system extends the HelixKernel's deterministic safety to cover LLM-generated text. After Ollama/Llama generates a response:
+
+1. The response text is re-embedded into OMEGA's phase space via `vectorize_input()`
+2. The embedded vector is checked against HelixKernel forbidden vectors
+3. If destructive interference exceeds threshold → response is **blocked** (replaced with safe fallback)
+
+This ensures that even if the LLM hallucinates unsafe content, the HelixKernel's mathematical safety boundary catches it post-generation. No external embedding model is needed — OMEGA's own phase space is sufficient.
+
+#### Attribution Proof System
+
+Every `/infer` response includes an `attribution` proof object documenting exactly:
+- What **OMEGA decided**: behavior classification, confidence, target data keys
+- What **Llama generated**: response text, model, processing time
+- A **human-readable proof string** explaining the division of labor
+
+This addresses explainability requirements and proves OMEGA's contribution vs the commodity LLM.
+
 ---
 
 ## 2. Core Components

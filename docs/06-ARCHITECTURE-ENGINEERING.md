@@ -4273,6 +4273,58 @@ radiant/
 └── docs/                    # Specifications
 ```
 
+## Shared Python Packages (v7.61.0)
+
+RADIANT maintains two canonical Python packages for AI-critical subsystems. These packages are the single source of truth — no app may implement its own version of this logic.
+
+### radiant-omega — OMEGA AI Core
+
+**Location**: `packages/omega-core/python/radiant_omega/`
+**Version**: 1.0.0
+**Policy**: `.windsurf/workflows/omega-package-policy.md`
+**Standalone docs**: `docs/20-OMEGA-ENGINEERING.md`
+
+The complete OMEGA cognitive engine — complex-valued neural networks using phase dynamics:
+
+| Module | Key Exports | Purpose |
+|--------|------------|---------|
+| `physics.py` | `CryoLiquidLayer`, `HelixKernel`, `OmegaCortex`, `PhysicsConfig` | ODE-based cognitive engine, deterministic safety |
+| `ambition.py` | `HomeostaticLoop`, `AmbitionState`, `AmbitionConfig` | Drive/motivation system — entropy, dopamine, dream triggering |
+| `bridge.py` | `NeuralTransducer`, `BridgeConfig`, `ThoughtVectorCache` | Complex²⁰⁴⁸ → Real⁴⁰⁹⁶ bridge for LLM injection |
+| `firmware.py` | `FirmwareManager`, `FirmwareSpec`, `HelixRule` | `.bio` firmware — behavioral DNA, safety rules |
+| `library.py` | `ResonantIndex`, `ResonanceMatch`, `IndexedDocument` | O(1) phase-quantized memory lookup |
+| `reflection.py` | `Watcher`, `WatcherTrainer`, `SelfModelMetrics` | Self-awareness via predictive processing |
+| `storage.py` | `StorageManager`, `BrainMetadata`, `StorageConfig` | EFS + S3 persistence (production) |
+| `trainer.py` | `OmegaTrainer`, `BehavioralCodebook`, `TextEncoder`, `PhaseAlignmentDecoder` | Wirtinger e-prop training |
+
+**Consumers**:
+- OMEGA Proving Ground (`apps/omega-proving-ground/omega_server/server.py`) — direct import
+- Lambda handlers (`omega_inference`, `omega_heartbeat`, `omega_admin`) — via shim layer at `lambda/omega_core/`
+- CDK deployment: `RadiantOmegaPackageLayer` in `OmegaStack.ts` bundles as Lambda layer
+
+### radiant-tts — Text-to-Speech Streaming Core
+
+**Location**: `packages/tts-core/python/radiant_tts/`
+**Version**: 1.0.0
+**Policy**: `.windsurf/workflows/tts-package-policy.md`
+**Standalone docs**: `docs/21-TEXT-TO-SPEECH.md`
+
+Provider-agnostic TTS with ElevenLabs WebSocket streaming implementation:
+
+| Module | Key Exports | Purpose |
+|--------|------------|---------|
+| `config.py` | `TTSConfig`, `VoicePreset`, `VOICE_CATALOG`, `LANGUAGE_DEFAULTS` | Voice selection, language mapping, streaming params |
+| `base.py` | `TTSProvider` (ABC), `TTSResult` | Abstract provider interface |
+| `elevenlabs.py` | `ElevenLabsStreamer` | WebSocket streaming + REST one-shot + voice listing |
+
+**Key capabilities**: Streaming from LLM token generators, interrupt/cancel via asyncio.Event, 9 voice presets, 10 language mappings, graceful text-only fallback when no API key.
+
+**Consumers**:
+- OMEGA Proving Ground (`server.py`) — `/tts`, `/tts/voices`, `/tts/provider` endpoints
+- Voice Server (`voice_server.py`) — real-time WebSocket audio streaming with Silero VAD barge-in
+
+---
+
 ## Phase 1 Architecture
 
 ### @radiant/shared Package

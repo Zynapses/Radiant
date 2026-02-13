@@ -14,15 +14,18 @@ import {
   Activity,
   ChevronRight,
   Search,
+  Cpu,
 } from 'lucide-react';
 import {
   fetchBrains,
   fetchBrain,
   createSnapshot,
+  listSnapshots,
   restoreBrain,
   lobotomizeBrain,
   type BrainInfo,
 } from '@/lib/api';
+import { getHealth } from '@/lib/proving-ground';
 
 export function CortexExplorer() {
   const [selectedTenant, setSelectedTenant] = useState<string | null>(null);
@@ -190,10 +193,25 @@ function BrainDetail({
     refetchInterval: 5000,
   });
 
+  const { data: snapshots, refetch: refetchSnapshots } = useQuery({
+    queryKey: ['snapshots', tenantId],
+    queryFn: () => listSnapshots(tenantId),
+    retry: 1,
+  });
+
   const snapshotMutation = useMutation({
     mutationFn: () => createSnapshot(tenantId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['brain', tenantId] });
+      refetchSnapshots();
+    },
+  });
+
+  const restoreMutation = useMutation({
+    mutationFn: (s3Key: string) => restoreBrain(tenantId, s3Key),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['brain', tenantId] });
+      queryClient.invalidateQueries({ queryKey: ['brains'] });
     },
   });
 
@@ -314,6 +332,38 @@ function BrainDetail({
             <span>-π</span>
             <span>0</span>
             <span>+π</span>
+          </div>
+        </div>
+      )}
+
+      {/* Snapshots */}
+      {snapshots?.snapshots && snapshots.snapshots.length > 0 && (
+        <div className="bg-omega-900/50 rounded-xl border border-omega-800/50 p-6">
+          <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <Camera className="w-5 h-5 text-omega-400" />
+            Saved Snapshots
+          </h3>
+          <div className="space-y-2">
+            {snapshots.snapshots.map((snap) => (
+              <div key={snap.key} className="flex items-center justify-between px-4 py-2 bg-omega-800/30 rounded-lg">
+                <div className="flex-1 min-w-0">
+                  <span className="text-sm text-white font-mono truncate">{snap.key}</span>
+                  <div className="text-xs text-omega-500">
+                    {snap.size_mb} MB • {new Date(snap.last_modified).toLocaleString()}
+                  </div>
+                </div>
+                <button
+                  onClick={() => restoreMutation.mutate(snap.key)}
+                  disabled={restoreMutation.isPending}
+                  className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-omega-700/50
+                             hover:bg-omega-600/50 text-omega-300 text-xs transition-colors
+                             disabled:opacity-50"
+                >
+                  <RotateCcw className="w-3 h-3" />
+                  {restoreMutation.isPending ? 'Restoring...' : 'Restore'}
+                </button>
+              </div>
+            ))}
           </div>
         </div>
       )}

@@ -80,7 +80,7 @@ DYNAMIC: New policies in /.windsurf/workflows/ are AUTOMATICALLY enforced.
 **Master Policy**: `/.windsurf/workflows/docs-update-all.md`
 **Documentation Manifest**: `/docs/DOCUMENTATION-MANIFEST.json`
 
-### Quick Reference - Always Update These (15 Consolidated Docs):
+### Quick Reference - Always Update These (17 Docs: 15 Consolidated + 2 Standalone):
 
 | Change Type | Required Documentation |
 |-------------|----------------------|
@@ -90,10 +90,12 @@ DYNAMIC: New policies in /.windsurf/workflows/ are AUTOMATICALLY enforced.
 | **Dojo change** | `docs/01-THINK-TANK.md` (Part XIII) |
 | **Platform/Admin feature** | `docs/04-RADIANT-ADMIN.md` (admin, deploy, health, spend governor) |
 | **Swift Deployer change** | `docs/05-SWIFT-DEPLOYER.md` |
-| **Architecture/CDK/Lambda** | `docs/06-ARCHITECTURE-ENGINEERING.md` (+ Data & Storage) |
+| **Architecture/CDK/Lambda** | `docs/06-ARCHITECTURE-ENGINEERING.md` (+ Data & Storage + Shared Python Packages) |
 | **AI Brain/Consciousness** | `docs/07-AI-SYSTEMS.md` (Brain + CATO Safety combined) |
 | **CATO Safety** | `docs/07-AI-SYSTEMS.md` (CATO section) |
 | **OMEGA/Genesis change** | `docs/09-OMEGA-GENESIS.md` *(all OMEGA content — quantum, firmware, Global Brain)* |
+| **OMEGA engineering/arch** | `docs/20-OMEGA-ENGINEERING.md` *(standalone: engineering, architecture, marketing, API ref, decision log)* |
+| **TTS/Voice/Speech** | `docs/21-TEXT-TO-SPEECH.md` *(standalone: radiant-tts package, ElevenLabs, voice presets, streaming)* |
 | **Orchestration/UEP** | `docs/10-ORCHESTRATION-WORKFLOWS.md` |
 | **Data/Storage** | `docs/06-ARCHITECTURE-ENGINEERING.md` (Data & Storage section) |
 | **API/Service layer** | `docs/12-API-REFERENCE.md` |
@@ -217,7 +219,8 @@ Extension specs in: `radiant-cascade-extension-v4.18.0/docs/phases/`
 
 ## 📖 Documentation References
 
-- **15 consolidated docs**: `docs/01-THINK-TANK.md` through `docs/18-UI-UX-LIBRARIES.md` (gaps at 03, 08, 11, 19 — merged into other docs)
+- **15 consolidated docs**: `docs/01-THINK-TANK.md` through `docs/18-UI-UX-LIBRARIES.md` (gaps at 03, 08, 11 — merged into other docs)
+- **2 standalone docs**: `docs/20-OMEGA-ENGINEERING.md` (OMEGA engineering/architecture/marketing), `docs/21-TEXT-TO-SPEECH.md` (radiant-tts complete reference)
 - **Complete assembled doc**: `docs/publications/RADIANT-THINKTANK-COMPLETE-DOCUMENTATION.md` (.pdf)
 - **Documentation manifest**: `docs/DOCUMENTATION-MANIFEST.json`
 - **Archive of originals**: `docs/archive/pre-consolidation/`

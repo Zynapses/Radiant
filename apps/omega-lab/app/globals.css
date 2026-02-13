@@ -164,6 +164,15 @@ body {
   animation: emergency-pulse 1s ease-in-out infinite;
 }
 
+/* Hide scrollbar for nav overflow */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 /* Void Mode — pitch black with minimal chrome */
 .void-mode {
   background: #000000 !important;

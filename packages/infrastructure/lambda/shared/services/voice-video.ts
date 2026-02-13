@@ -1,5 +1,7 @@
 // RADIANT v4.18.0 - Voice & Video Service
 // Handles audio input/output integration for Think Tank platform
+// TODO: Migrate ElevenLabs TTS calls to @radiant/tts-core (TypeScript) when available
+// See packages/tts-core/python/README.md and .windsurf/workflows/tts-package-policy.md
 
 import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';

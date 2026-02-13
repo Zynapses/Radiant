@@ -1,4 +1,4 @@
-const API_BASE = process.env.OMEGA_API_URL || 'http://localhost:3001/api/admin/omega';
+const API_BASE = process.env.NEXT_PUBLIC_OMEGA_PG_URL || 'http://localhost:11435';
 
 export interface DashboardData {
   success: boolean;

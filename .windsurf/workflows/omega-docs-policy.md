@@ -1,5 +1,5 @@
 ---
-description: Policy - All OMEGA-related documentation must reside in docs/09-OMEGA-GENESIS.md. No OMEGA content in other documents.
+description: Policy - All OMEGA-related documentation must reside in docs/09-OMEGA-GENESIS.md (primary) and docs/20-OMEGA-ENGINEERING.md (engineering/architecture/marketing). No OMEGA content in other documents.
 ---
 
 # OMEGA Documentation Policy
@@ -8,9 +8,9 @@ description: Policy - All OMEGA-related documentation must reside in docs/09-OME
 
 ## The Rule
 
-**ALL OMEGA-related documentation MUST be written to `docs/09-OMEGA-GENESIS.md`.**
+**ALL OMEGA-related documentation MUST be written to `docs/09-OMEGA-GENESIS.md` (primary) and/or `docs/20-OMEGA-ENGINEERING.md` (engineering standalone).**
 
-As of 2026-02-10, doc 19 was merged INTO doc 09. There is now ONE authoritative OMEGA document.
+As of 2026-02-10, doc 19 was merged INTO doc 09. As of 2026-02-13, doc 20 was created as a standalone engineering, architecture, and marketing reference. Doc 09 remains the primary specification; doc 20 is the engineering deep-dive.
 
 This includes but is not limited to:
 
@@ -40,6 +40,13 @@ This includes but is not limited to:
 | **Global Brain / federated** | `docs/09-OMEGA-GENESIS.md` |
 | **Genesis Forge application** | `docs/09-OMEGA-GENESIS.md` |
 | **Genesis Lab** | `docs/09-OMEGA-GENESIS.md` |
+| **OMEGA engineering details** | `docs/20-OMEGA-ENGINEERING.md` |
+| **OMEGA proving ground API** | `docs/20-OMEGA-ENGINEERING.md` |
+| **OMEGA training pipeline** | `docs/20-OMEGA-ENGINEERING.md` |
+| **OMEGA marketing/pitches** | `docs/20-OMEGA-ENGINEERING.md` |
+| **OMEGA decision log** | `docs/20-OMEGA-ENGINEERING.md` |
+| **OMEGA competitive moats** | `docs/20-OMEGA-ENGINEERING.md` + `docs/15-STRATEGY-COMPETITIVE.md` |
+| **TTS / voice / speech** | `docs/21-TEXT-TO-SPEECH.md` |
 | Non-OMEGA architecture | `docs/06-ARCHITECTURE-ENGINEERING.md` |
 | Non-OMEGA brain/consciousness | `docs/07-AI-SYSTEMS.md` |
 
@@ -51,7 +58,8 @@ This includes but is not limited to:
 
 ```
 ✅ CHANGELOG.md
-✅ docs/09-OMEGA-GENESIS.md (PRIMARY — all OMEGA content here)
+✅ docs/09-OMEGA-GENESIS.md (PRIMARY — specification, guides, Five Pillars)
+✅ docs/20-OMEGA-ENGINEERING.md (engineering, architecture, marketing, API, decisions)
 ✅ docs/06-ARCHITECTURE-ENGINEERING.md (if architectural change)
 ✅ docs/17-GLOSSARY.md (if new terms)
 ✅ docs/15-STRATEGY-COMPETITIVE.md (if competitive advantage)

@@ -1,0 +1,37 @@
+THIS IS BATCH B. You already have the system context from the first message.
+
+Generate exactly 525 JSONL lines for this batch:
+- take_order_breakfast: 245 examples
+- drink_selection: 280 examples
+
+For take_order_breakfast, cover EVERY breakfast item with 10+ variants each:
+- Egg McMuffin (15 variants — "egg mcmuffin", "mcmuffin", "egg mc muffin")
+- Sausage McMuffin (12 variants)
+- Sausage McMuffin with Egg (12 variants — "sausage egg mcmuffin")
+- Bacon, Egg & Cheese Biscuit (15 variants — "bacon egg cheese", "the biscuit sandwich")
+- Sausage Burrito (10 variants — "breakfast burrito", "sausage wrap")
+- Hotcakes (12 variants — "pancakes", "flapjacks", "hot cakes")
+- Hash Browns (10 variants — "hash brown", "hashbrowns")
+- Breakfast combos: "egg mcmuffin meal", "number 1 breakfast combo"
+- Morning greetings that include orders: "good morning can I get an egg mcmuffin"
+
+For drink_selection, cover ALL drinks with variety:
+- Coca-Cola (20 variants — "Coke", "a Coke", "Coca Cola", "coke please", "large Coke")
+- Diet Coke (15 variants)
+- Sprite (15 variants)
+- Dr Pepper (15 variants — "doctor pepper", "DP")
+- Fanta Orange (12 variants — "Fanta", "orange Fanta", "orange soda")
+- Hi-C Orange Lavaburst (12 variants — "hi c", "high c", "the orange drink")
+- Sweet Tea (12 variants — "sweet tea", "iced tea sweetened")
+- Unsweetened Iced Tea (10 variants)
+- Lemonade (10 variants)
+- Hot Coffee (12 variants — "coffee", "black coffee", "just a coffee")
+- Iced Coffee (12 variants — "iced coffee", "cold coffee")
+- Dasani Water (10 variants — "water", "just water", "bottle of water")
+- Milk / Chocolate Milk (8 variants)
+- McCafe drinks (20 variants — "caramel frappe", "mocha frappe", "frappe", "frappy", "macchiato", "latte")
+
+Include size variants: "large Coke", "small Sprite", "medium Dr Pepper"
+Include context-dependent (with context field): after "What drink would you like?" — "Coke", "sprite please", "just water", "iced tea"
+
+Output ONLY the JSONL lines. No commentary. Start now.

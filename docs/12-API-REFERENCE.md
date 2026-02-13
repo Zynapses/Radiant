@@ -4695,4 +4695,289 @@ GET /api/v2/omega/swaps?brain_id={brain_id}&limit={n}&offset={n}
 
 ---
 
-*Consolidated from 7 source documents (0 not found). 4,117 source lines.*
+## Part IX: OMEGA Proving Ground API (v7.61.0)
+
+> **Version**: 7.61.0 | **Base URL**: `http://localhost:11435`
+> **Authentication**: None (local development server)
+> **Full reference**: `docs/20-OMEGA-ENGINEERING.md` Part XVI
+
+---
+
+### IX.1 — Brain Lifecycle
+
+#### POST /boot
+Create or restore a brain instance. Loads saved state if available, applies time_warp for elapsed time.
+
+**Request Body:**
+```json
+{
+  "config": {
+    "input_dim": 1024,
+    "hidden_dim": 2048,
+    "firmware_path": "path/to/.bio"
+  }
+}
+```
+
+**Response (200):**
+```json
+{
+  "status": "booted",
+  "state_restored": true,
+  "elapsed_time_seconds": 3600.5,
+  "watcher_params": 1573376,
+  "transducer_params": 8396800
+}
+```
+
+#### POST /think
+Raw inference cycle — process input text through OMEGA cortex.
+
+**Request Body:**
+```json
+{ "text": "I'd like a Big Mac please" }
+```
+
+**Response (200):**
+```json
+{
+  "behavior": "order_burger",
+  "confidence": 0.9234,
+  "coherence": 0.8765,
+  "state_entropy": 0.4523,
+  "thought_vector_norm": 1.0001
+}
+```
+
+#### POST /dream
+Trigger dream consolidation cycle. Runs 3-stage dream + Watcher training.
+
+**Response (200):**
+```json
+{
+  "stages_completed": 3,
+  "watcher_training": { "steps": 45, "avg_loss": 0.0234 },
+  "post_coherence": 0.9123
+}
+```
+
+### IX.2 — Full Inference (OMEGA + Llama)
+
+#### POST /infer
+Full pipeline: OMEGA think → Llama generation → Shadow Vector safety → Attribution proof.
+
+**Request Body:**
+```json
+{ "text": "What's in a Big Mac?" }
+```
+
+**Response (200):**
+```json
+{
+  "response": "A Big Mac contains two 100% beef patties...",
+  "behavior": "menu_inquiry",
+  "confidence": 0.9456,
+  "shadow_safety": {
+    "checked": true,
+    "is_safe": true,
+    "max_helix_alignment": 0.1234,
+    "verdict": "PASS"
+  },
+  "attribution": {
+    "omega_decided": {
+      "behavior": "menu_inquiry",
+      "confidence": 0.9456,
+      "target_data_keys": ["item_name", "ingredients", "calories"],
+      "processing_ms": 3.45
+    },
+    "llama_generated": {
+      "response_length": 247,
+      "model": "llama3.2",
+      "processing_ms": 1234.56
+    },
+    "proof": "OMEGA classified input as 'menu_inquiry'..."
+  }
+}
+```
+
+### IX.3 — Self-Awareness (Watcher)
+
+#### GET /watcher
+Returns Watcher self-model metrics, configuration, and trainer buffer state.
+
+**Response (200):**
+```json
+{
+  "self_awareness_score": 0.8234,
+  "surprise_ema": 0.1766,
+  "total_observations": 1234,
+  "reward_count": 890,
+  "error_count": 45,
+  "config": { "input_dim": 1024, "cortex_dim": 2048, "hidden_dim": 512 },
+  "trainer": { "buffer_size": 456, "total_steps": 1200, "loss_history_length": 1200 }
+}
+```
+
+#### POST /watcher/train
+Manually trigger Watcher training on the replay buffer.
+
+**Response (200):**
+```json
+{
+  "steps": 456,
+  "avg_loss": 0.0189,
+  "total_steps": 1656,
+  "buffer_size": 456
+}
+```
+
+### IX.4 — Resonant Memory
+
+#### GET /memory/stats
+Index statistics including document count, bucket utilization, and capacity metrics.
+
+#### POST /memory/store
+Store a document in the Resonant Index by its phase.
+
+**Request Body:**
+```json
+{
+  "doc_id": "menu-bigmac",
+  "text": "Big Mac - two all-beef patties...",
+  "title": "Big Mac Menu Item",
+  "source_uri": "knowledge://menu/bigmac"
+}
+```
+
+#### POST /memory/retrieve
+Retrieve documents by phase resonance.
+
+**Request Body:**
+```json
+{ "text": "I want a burger", "top_k": 5, "fuzzy_radius": 2 }
+```
+
+#### GET /memory/heatmap
+Returns 1000-element array of phase bucket sizes for visualization.
+
+### IX.5 — State Persistence
+
+#### POST /state/save
+Manually save brain state to disk (atomic write).
+
+#### GET /state/info
+Returns metadata about the saved state file (path, size, last save time, inference count).
+
+#### POST /state/config
+Configure auto-save interval.
+
+**Request Body:**
+```json
+{ "auto_save_interval": 5 }
+```
+
+### IX.6 — Tunable Parameters
+
+#### GET /config
+Returns all tunable parameters (physics, ambition, watcher, storage, resonant_index).
+
+#### POST /config
+Hot-swap parameters at runtime.
+
+**Request Body:**
+```json
+{
+  "physics": { "dt": 0.005, "decay_rate": 0.15 },
+  "ambition": { "entropy_threshold": 0.7 }
+}
+```
+
+### IX.7 — Multi-Session
+
+#### GET /sessions
+List all active brain sessions with summary state.
+
+#### POST /sessions/{session_id}/boot
+Boot an independent brain for the given session ID.
+
+#### POST /sessions/{session_id}/think
+Think with the session's brain (isolated state).
+
+**Request Body:**
+```json
+{ "text": "input text" }
+```
+
+#### GET /sessions/{session_id}/state
+Get the session brain's full state.
+
+#### POST /sessions/{session_id}/destroy
+Destroy the session (saves state first, then removes from memory).
+
+---
+
+## Part X: TTS API (v7.61.0)
+
+> **Version**: 7.61.0 | **Base URL**: `http://localhost:11435`
+> **Provider**: ElevenLabs (via `radiant-tts` package)
+> **Full reference**: `docs/21-TEXT-TO-SPEECH.md` Part XIII
+
+---
+
+### X.1 — Speech Synthesis
+
+#### POST /tts
+One-shot text-to-speech synthesis.
+
+**Request Body:**
+```json
+{
+  "text": "Welcome to McDonald's! What can I get for you?",
+  "voice": "rachel",
+  "language": "en-US",
+  "output_format": "mp3_44100_128"
+}
+```
+
+**Response**: Audio binary (Content-Type: audio/mpeg)
+
+### X.2 — Provider Status
+
+#### GET /tts/provider
+Check TTS provider configuration and availability.
+
+**Response (200):**
+```json
+{
+  "provider": "elevenlabs",
+  "available": true,
+  "model": "eleven_turbo_v2_5",
+  "voice": "rachel",
+  "output_format": "mp3_44100_128"
+}
+```
+
+### X.3 — Voice Listing
+
+#### GET /tts/voices
+List all available ElevenLabs voices (library + cloned).
+
+**Response (200):**
+```json
+{
+  "voices": [
+    {
+      "voice_id": "21m00Tcm4TlvDq8ikWAM",
+      "name": "Rachel",
+      "category": "premade",
+      "description": "Warm, conversational",
+      "preview_url": "https://..."
+    }
+  ],
+  "count": 42
+}
+```
+
+---
+
+*Consolidated from 7 source documents (0 not found). 4,117 source lines. Updated with OMEGA Proving Ground and TTS API (v7.61.0).*

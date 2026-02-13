@@ -5,6 +5,142 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.61.0] - 2026-02-13
+
+### OMEGA Proving Ground — Full Feature Integration
+
+#### State Persistence (LocalStorageManager)
+- **`apps/omega-proving-ground/omega_server/server.py`**: Added `LocalStorageManager` class for local brain state persistence
+  - Atomic writes (tmp + `os.replace`) for crash safety
+  - Auto-save every N inferences (configurable via `POST /state/config`)
+  - Auto-save after every dream cycle
+  - `atexit` shutdown hook saves all sessions
+  - `POST /state/save` — manual save, `GET /state/info` — metadata
+- **Conscious/subconscious recovery**: On boot, auto-loads saved state and applies `time_warp` for elapsed time
+  - Conscious stream (state vector) decays naturally with time
+  - Subconscious stream (phase_theta/recurrent_theta) survives perfectly
+
+#### Watcher (Self-Awareness via Predictive Processing)
+- Watcher MLP initialized in `LocalBrain.boot()`, predicts cortex output from input
+- `think()`: predict-and-surprise → feeds dopamine/error signals into HomeostaticLoop
+- `dream()`: trains Watcher on replay buffer (self-model improvement)
+- `GET /watcher` — metrics, config, trainer buffer state
+- `POST /watcher/train` — manual Watcher training trigger
+
+#### ResonantIndex (O(1) Phase-Based Memory)
+- Initialized in `LocalBrain.boot()` with 1000-bucket resolution
+- `think()`: auto-indexes every inference output by phase
+- `GET /memory/stats` — index statistics
+- `POST /memory/store` — manual document storage
+- `POST /memory/retrieve` — phase-resonance retrieval
+- `GET /memory/heatmap` — phase bucket visualization
+
+#### HomeostaticLoop (Dream Callback)
+- `dream_callback` wired into `HomeostaticLoop` constructor
+- Entropy-triggered dream cycles now actually execute `brain.dream()`
+
+#### Shadow Vector (Post-LLM Safety)
+- `/infer` endpoint: after Llama generates response, re-embeds text into OMEGA phase space
+- Checks against HelixKernel for destructive interference
+- Blocks unsafe responses with safe fallback message
+- Returns `shadow_safety` object: `{checked, is_safe, max_helix_alignment, verdict}`
+
+#### OMEGA vs Ollama Attribution
+- `/infer` endpoint: returns `attribution` proof object
+- Shows exactly what OMEGA decided (behavior, confidence, target_data) vs what Llama generated
+- Human-readable proof string explaining the division of labor
+
+#### Multi-User Sessions
+- `GET /sessions` — list all active brain sessions
+- `POST /sessions/<id>/boot` — boot independent brain with own state directory
+- `POST /sessions/<id>/think` — think with session brain
+- `GET /sessions/<id>/state` — session state
+- `POST /sessions/<id>/destroy` — destroy session (saves state first)
+
+#### Tunable Parameters
+- `GET /config` — all tunable params (physics, ambition, watcher, storage, resonant_index)
+- `POST /config` — hot-swap params at runtime (dt, decay_rate, entropy_threshold, etc.)
+
+#### Lambda Heartbeat E-Prop Training
+- **`packages/infrastructure/lambda/handlers/omega_heartbeat.py`**: Added Phase 4 — Wirtinger e-prop training
+  - Imports `OmegaTrainer`, `BehavioralCodebook`, `TextEncoder`, `PhaseAlignmentDecoder` from `radiant_omega.trainer`
+  - Runs limited epochs (env: `DREAM_TRAINING_EPOCHS`, default 5) to stay within Lambda timeout
+  - CPU/Graviton optimized (no GPU required)
+  - Training data path configurable via `OMEGA_TRAINING_DATA_PATH` env var
+
+#### Engineering Log
+- Updated `OMEGA-ENGINEERING-LOG.md`: 19/20 components now ✅ Implemented
+- Resolved Q-002 (Shadow Vector), Q-004 (Auto-tuning), Q-005 (Conscious/subconscious recovery)
+
+#### Documentation Expansion (17 Documents: 15 Consolidated + 2 Standalone)
+- **NEW** `docs/20-OMEGA-ENGINEERING.md`: Standalone OMEGA engineering, architecture & marketing reference
+  - 19 parts covering all subsystems: CryoLiquidLayer, HelixKernel, BehavioralCodebook, Watcher, ResonantIndex, HomeostaticLoop, Shadow Vector, Attribution, Multi-Session, Tunable Parameters, Training (Wirtinger e-prop), CDK Infrastructure, full API reference (40+ endpoints), marketing pitches, decision log, roadmap
+- **NEW** `docs/21-TEXT-TO-SPEECH.md`: Standalone TTS complete reference
+  - 18 parts covering radiant-tts package: TTSConfig, VoicePreset, TTSProvider interface, ElevenLabsStreamer (WebSocket streaming + REST), interrupt/barge-in support, voice catalog (9 presets), language mapping (10 locales), integration guides (proving ground + voice server), provider comparison matrix, package policy, competitive analysis, roadmap
+- **Updated** `docs/06-ARCHITECTURE-ENGINEERING.md`: Added Shared Python Packages section (radiant-omega + radiant-tts)
+- **Updated** `docs/07-AI-SYSTEMS.md`: Added Section 1.1 — OMEGA Self-Awareness & Safety Integration (Watcher, Shadow Vector, Attribution)
+- **Updated** `docs/09-OMEGA-GENESIS.md`: Updated compatibility matrix (19 ✅ entries), porting sections (both directions ✅ COMPLETE), moat statuses (all 🟢), limitations table
+- **Updated** `docs/12-API-REFERENCE.md`: Added Part IX (OMEGA Proving Ground API — 40+ endpoints) and Part X (TTS API — 3 endpoints)
+- **Updated** `docs/15-STRATEGY-COMPETITIVE.md`: Updated Part XI to v7.61.0 — all 5 moats 🟢, added 8 new capabilities table, updated marketing pitches, added TTS section
+- **Updated** `docs/17-GLOSSARY.md`: Added 30+ new terms across 5 new subsections (Self-Awareness & Training, Safety & Attribution, State Persistence, Shared Packages, Text-to-Speech)
+- **Updated** `docs/DOCUMENTATION-MANIFEST.json`: v4.0.0 — 17 documents, new trigger matrix entries (omega, tts, omega_engineering)
+- **Updated** `.windsurf/workflows/docs-update-all.md`: v4.0 — 17-doc policy with standalone document sections and updated quick reference card
+- **Updated** `AGENTS.md`: 17-doc quick reference table, updated documentation references section
+
+## [7.60.0] - 2026-02-13
+
+### Shared Package Architecture — radiant-omega & radiant-tts
+
+#### radiant-omega Package Extraction
+- **`packages/omega-core/python/radiant_omega/`**: Created canonical shared package for ALL OMEGA AI core logic
+  - `physics.py` — CryoLiquidLayer (Q-Node), HelixKernel (Bio-ROM), OmegaCortex, PhysicsConfig
+  - `ambition.py` — HomeostaticLoop, AmbitionState, DriveSignal
+  - `bridge.py` — NeuralTransducer, ThoughtVectorCache, BridgeTrainer
+  - `firmware.py` — FirmwareManager, FirmwareSpec, HelixRule
+  - `library.py` — ResonantIndex (O(1) phase-based lookups)
+  - `reflection.py` — Watcher, SelfModelMetrics
+  - `storage.py` — StorageManager, BrainMetadata
+  - `trainer.py` — TextEncoder, PhaseAlignmentDecoder, BehavioralCodebook, OmegaTrainer
+  - `pyproject.toml`, `README.md`, comprehensive `__init__.py`
+- **`packages/infrastructure/lambda/omega_core/`**: All 8 files replaced with thin re-export shims → `radiant_omega`
+- **`apps/omega-proving-ground/omega_server/trainer.py`**: Replaced with shim re-export
+- **`apps/omega-proving-ground/omega_server/server.py`**: Updated imports from `omega_core` → `radiant_omega`
+- **Lambda backward compatibility**: Handlers (`omega_inference`, `omega_heartbeat`, `omega_admin`) work via shims
+
+#### radiant-tts Package Enhancements
+- **`packages/tts-core/python/radiant_tts/elevenlabs.py`**: Added `list_voices()` method
+- **`apps/omega-proving-ground/omega_server/server.py`**: `/tts/voices` now uses `_server_tts.list_voices()` (was direct API call)
+- **`apps/omega-proving-ground/omega_server/voice_server.py`**: Greeting block migrated to `_safe_send()`, `clear_order` resets conversation history
+
+#### CDK Deployment (OmegaStack.ts)
+- **`packages/infrastructure/lib/stacks/OmegaStack.ts`**: Added `RadiantOmegaPackageLayer` — bundles `packages/omega-core/python/` as Lambda layer
+- **PYTHONPATH**: Updated from `/opt/python` to `/opt/python:/opt` so Lambda finds `radiant_omega` at `/opt/radiant_omega/`
+- All 3 OMEGA Lambda functions (`omega-inference`, `omega-heartbeat`, `omega-admin`) now receive both `omegaCoreLayer` (shims) and `radiantOmegaLayer` (canonical package)
+
+#### Package Policies
+- **`.windsurf/workflows/omega-package-policy.md`**: Created — same rigor as TTS policy (no local copies, change warnings, reference injection, shim rules)
+- Both `radiant-omega` and `radiant-tts` enforce: changes go INTO the package, never copied into apps
+
+## [7.59.0] - 2026-02-10
+
+### OMEGA Documentation & Strategic Analysis
+
+#### Part XI: Physics Engine Technical Deep Dive
+- **`docs/09-OMEGA-GENESIS.md`**: Added Part XI covering Wirtinger e-prop learning rule, PhaseAlignmentDecoder, CryoLiquidLayer ODE math, frozen TextEncoder, complete data flow, GPU acceleration, and implementation status
+- **`apps/omega-proving-ground/OMEGA-ENGINEERING-LOG.md`**: Updated v0.2.0 — DEC-001 (e-prop), DEC-003 (classical ML reversion), DEC-005 (phase-native readout), DEC-006 (frozen TextEncoder) all marked IMPLEMENTED; Q-001 RESOLVED; system chain updated to PhaseAlignmentDecoder
+
+#### Environment Scope Annotations (AWS vs Proving Ground)
+- **`docs/09-OMEGA-GENESIS.md`**: Added ⚠️ ENVIRONMENT SCOPE banners to Parts XI & XII clarifying that Wirtinger e-prop, PhaseAlignmentDecoder, and frozen TextEncoder are proving-ground-only (not yet on AWS Lambda)
+- **`docs/09-OMEGA-GENESIS.md` §XI.10**: Added full compatibility matrix — 14 components compared across proving ground (MPS/Ollama) vs AWS Lambda (Graviton ARM64/vLLM), with porting checklists in both directions
+- **`docs/15-STRATEGY-COMPETITIVE.md`**: Added 🟢/🟡/🔵 environment annotations to all 5 OMEGA moats
+
+#### Part XII: Competitive Analysis & Gemini Proposal Evaluation
+- **`docs/09-OMEGA-GENESIS.md`**: Added Part XII — 5 competitive moats (physics-native learning, deterministic safety, zero-cost idle, biological lock-in, memory efficiency), honest limitations assessment, marketing positioning (elevator/technical/C-suite pitches), and full Gemini proposal analysis
+- **Gemini Sidecar Architecture**: Recommended YES — natural evolution of Neural Transducer, 2-3 weeks effort
+- **Gemini Soft Global Attention**: Recommended YES as RAG complement — major token savings, 1-2 weeks effort
+- **Gemini Semantic Sampling**: Recommended YES (highest ROI) — deterministic safety at token level, 1-2 weeks effort
+- **Implementation priority**: Semantic Sampling → Sidecar → Soft Global Attention (5-7 weeks total)
+
 ## [7.58.0] - 2026-02-10
 
 ### Credential Lifecycle Security Framework

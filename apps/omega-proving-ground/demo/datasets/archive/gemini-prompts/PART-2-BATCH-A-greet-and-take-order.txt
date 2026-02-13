@@ -1,0 +1,38 @@
+THIS IS BATCH A. You already have the system context from the previous message.
+
+Generate exactly 980 JSONL lines for this batch:
+- greet: 105 examples
+- take_order: 875 examples (ALL burger, chicken, nugget, and fish items)
+
+For take_order, cover EVERY lunch/dinner menu item with 10-15 phrasing variants each:
+- Big Mac (15 variants)
+- Quarter Pounder with Cheese (15 variants)
+- Double Quarter Pounder with Cheese (12 variants)
+- McDouble (12 variants)
+- Double Cheeseburger (12 variants)
+- Hamburger (10 variants)
+- Cheeseburger (12 variants)
+- McCrispy (12 variants)
+- Filet-O-Fish (15 variants — lots of speech errors like "file a fish", "fish fillet")
+- 10-piece Chicken McNuggets (15 variants — "10 piece", "nuggets", "mc nuggets")
+- 6-piece Chicken McNuggets (12 variants)
+- 4-piece Chicken McNuggets (10 variants)
+- 20-piece Chicken McNuggets (12 variants)
+- McChicken (12 variants)
+
+ALSO include in take_order:
+- Combo number references: "number 1", "number 2", etc. (50+ variants)
+- Multi-quantity: "two Big Macs", "three cheeseburgers" (50+ variants)
+- Colloquial names: "the fish sandwich", "a quarter pounder", "nuggets" (50+ variants)
+- Speech recognition errors: "big mack", "mc double", "file a fish" (80+ variants)
+- With-customization orders: "Big Mac no pickles" = take_order (NOT customize, since it's a new order with modification stated upfront)
+- Meal references: "Big Mac meal", "number 1 combo" = take_order
+
+For greet, include:
+- "hi", "hello", "hey", "what's up", "good morning", "good evening"
+- "hi can I order", "yeah I'd like to place an order", "I'm ready to order"
+- Mumbled/casual: "uh hi yeah", "hey there", "yo"
+- With name: "hi I'm picking up an order"
+- Drive-thru specific: "hi is this the drive thru", "hello can you hear me"
+
+Output ONLY the JSONL lines. No commentary. Start now.

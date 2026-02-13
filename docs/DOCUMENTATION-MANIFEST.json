@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "version": "3.0.0",
-  "lastUpdated": "2026-02-10",
-  "description": "Master manifest of ALL documentation files in RADIANT. 15 consolidated documents (merged from 22 on 2026-02-10). AI agents MUST update relevant docs when making code changes.",
+  "version": "4.0.0",
+  "lastUpdated": "2026-02-13",
+  "description": "Master manifest of ALL documentation files in RADIANT. 17 documents (15 consolidated + 2 standalone). AI agents MUST update relevant docs when making code changes.",
 
   "consolidatedDocs": {
     "description": "The 15 consolidated documentation files. Each is self-contained and covers a specific domain.",
@@ -104,12 +104,24 @@
         "priority": "HIGH",
         "triggers": ["credential_lifecycle", "key_rotation", "dormant_key", "api_key_security", "iam_audit", "secrets_manager_rotation", "security_compliance", "nist_800_57", "cis_aws", "soc2_cc6"],
         "description": "Strategic Security Implementation: credential lifecycle framework, NIST/CIS/SOC2/PCI/ISO compliance, rotation automation, Swift Deployer + Admin UI + SDK integration"
+      },
+      {
+        "path": "docs/20-OMEGA-ENGINEERING.md",
+        "priority": "HIGH",
+        "triggers": ["omega", "omega_engineering", "omega_architecture", "omega_marketing", "omega_proving_ground", "omega_package", "radiant_omega", "shadow_vector", "watcher", "wirtinger", "eprop", "resonant_index", "homeostatic_loop", "phase_dynamics", "cryoliquid"],
+        "description": "OMEGA Engineering, Architecture & Marketing: standalone reference for all OMEGA subsystems, proving ground server, Lambda architecture, training pipeline, competitive moats, decision log, API reference"
+      },
+      {
+        "path": "docs/21-TEXT-TO-SPEECH.md",
+        "priority": "HIGH",
+        "triggers": ["tts", "text_to_speech", "radiant_tts", "elevenlabs", "voice_preset", "voice_streaming", "speech_synthesis", "barge_in", "silero_vad"],
+        "description": "TTS Complete Reference: radiant-tts package, ElevenLabs streaming, voice presets, language mapping, provider interface, interrupt support, integration guides, competitive analysis"
       }
     ]
   },
 
   "triggerMatrix": {
-    "description": "Maps code change types to required documentation updates (v3.1 — 16-doc structure)",
+    "description": "Maps code change types to required documentation updates (v4.0 — 17-doc structure)",
     "matrix": {
       "any_change": ["CHANGELOG.md"],
       "database": ["CHANGELOG.md", "docs/06-ARCHITECTURE-ENGINEERING.md", "docs/16-IMPLEMENTATION-SPECS.md"],
@@ -140,7 +152,9 @@
       "curator": ["CHANGELOG.md", "docs/02-CURATOR.md", "docs/15-STRATEGY-COMPETITIVE.md"],
       "deployer": ["CHANGELOG.md", "docs/05-SWIFT-DEPLOYER.md", "docs/19-STRATEGIC-SECURITY.md"],
       "dojo": ["CHANGELOG.md", "docs/01-THINK-TANK.md", "docs/04-RADIANT-ADMIN.md"],
-      "omega": ["CHANGELOG.md", "docs/09-OMEGA-GENESIS.md", "docs/06-ARCHITECTURE-ENGINEERING.md"],
+      "omega": ["CHANGELOG.md", "docs/09-OMEGA-GENESIS.md", "docs/20-OMEGA-ENGINEERING.md", "docs/06-ARCHITECTURE-ENGINEERING.md"],
+      "tts": ["CHANGELOG.md", "docs/21-TEXT-TO-SPEECH.md", "docs/06-ARCHITECTURE-ENGINEERING.md"],
+      "omega_engineering": ["CHANGELOG.md", "docs/20-OMEGA-ENGINEERING.md", "docs/09-OMEGA-GENESIS.md"],
       "omega_quantum": ["CHANGELOG.md", "docs/09-OMEGA-GENESIS.md"],
       "quantum_brain": ["CHANGELOG.md", "docs/09-OMEGA-GENESIS.md"],
       "omega_lab": ["CHANGELOG.md", "docs/09-OMEGA-GENESIS.md"],
@@ -167,7 +181,7 @@
   },
 
   "versionedDocs": {
-    "description": "All 15 consolidated documents need version number updates when modified",
+    "description": "All 17 documents need version number updates when modified",
     "docs": [
       "docs/01-THINK-TANK.md",
       "docs/02-CURATOR.md",
@@ -183,7 +197,9 @@
       "docs/15-STRATEGY-COMPETITIVE.md",
       "docs/16-IMPLEMENTATION-SPECS.md",
       "docs/17-GLOSSARY.md",
-      "docs/18-UI-UX-LIBRARIES.md"
+      "docs/18-UI-UX-LIBRARIES.md",
+      "docs/20-OMEGA-ENGINEERING.md",
+      "docs/21-TEXT-TO-SPEECH.md"
     ]
   },
 
@@ -204,7 +220,7 @@
       }
     ],
     "regenerateCommand": "python3 tools/scripts/assemble-complete-documentation.py",
-    "parts": 15,
+    "parts": 17,
     "note": "Output files are build artifacts — generated from source docs, not edited directly"
   },
 

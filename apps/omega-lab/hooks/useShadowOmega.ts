@@ -185,54 +185,63 @@ export function useShadowOmega(instance: OmegaInstance | null) {
     }));
   }, [nodes, edges, instance]);
 
-  // Polling fallback — intentional graceful degradation when Shadow Omega WebSocket is unavailable
+  // Polling fallback — polls real /state data when WebSocket is unavailable
   const pollingRef = useRef<NodeJS.Timeout | null>(null);
 
   const startPollingFallback = useCallback((inst: OmegaInstance) => {
-    console.log(`[ShadowOmega] Using polling fallback for ${inst.name}`);
-    setConnected(true); // Treat as "connected" in dev mode
+    console.log(`[ShadowOmega] Using REST polling for ${inst.name}`);
+    setConnected(true);
 
     if (pollingRef.current) clearInterval(pollingRef.current);
 
-    pollingRef.current = setInterval(() => {
-      // Generate simulated telemetry
-      const simTelemetry: OmegaTelemetry = {
-        instanceId: inst.id,
-        timestamp: Date.now(),
-        cpuTemp: 50 + Math.random() * 35,
-        ramUsage: 0.3 + Math.random() * 0.4,
-        stabilityScore: Math.max(0.2, Math.min(1.0, 0.7 + (Math.random() - 0.5) * 0.4)),
-        coherenceScore: 0.5 + Math.random() * 0.5,
-        entropyLevel: Math.random() * 0.7,
-        powerBudgetHours: 2 + Math.random() * 6,
-        thermalMap: Array.from({ length: 64 }, () => 25 + Math.random() * 55),
-        activeConnections: nodes.length,
-        inferenceLatencyMs: 10 + Math.random() * 80,
-        bridgeInjectionNorm: Math.random() * 4,
-        watcherSurprise: Math.random() * 0.6,
-      };
-      setTelemetry(simTelemetry);
-    }, 1000);
-  }, [nodes.length, setTelemetry]);
+    // Import dynamically to avoid circular deps
+    const { fetchInstanceTelemetry } = require('@/lib/omega-registry');
 
-  // Dev-mode forge fallback — runs locally when Shadow Omega WebSocket is unavailable
+    // Poll real telemetry from the proving ground server
+    const poll = async () => {
+      try {
+        const telemetry: OmegaTelemetry = await fetchInstanceTelemetry(inst.id);
+        setTelemetry(telemetry);
+      } catch (err) {
+        console.warn('[ShadowOmega] Telemetry poll failed:', err);
+      }
+    };
+
+    poll(); // Immediate first poll
+    pollingRef.current = setInterval(poll, 2000);
+  }, [setTelemetry]);
+
+  // Real forge — saves a checkpoint via the proving ground server
   const simulateForge = useCallback(() => {
     const { startForge, setForgeProgress: setProgress, completeForge: complete } = useForgeStore.getState();
     startForge();
 
+    const pgBase = process.env.NEXT_PUBLIC_OMEGA_PG_URL || 'http://localhost:11435';
+
+    // Show progress while the real save happens
     let progress = 0;
-    const interval = setInterval(() => {
-      progress += 0.05 + Math.random() * 0.08;
-      if (progress >= 1) {
-        clearInterval(interval);
+    const progressInterval = setInterval(() => {
+      progress = Math.min(progress + 0.03, 0.9);
+      setProgress(progress);
+    }, 150);
+
+    fetch(`${pgBase}/train/save`, { method: 'POST' })
+      .then(async (res) => {
+        clearInterval(progressInterval);
+        if (!res.ok) throw new Error(`Save failed: ${res.status}`);
+        const data = await res.json();
         complete({
           success: true,
-          binUrl: `data:application/octet-stream;base64,${btoa('OMEGA_FIRMWARE_' + Date.now())}`,
+          binUrl: data.checkpoint_path || data.path || undefined,
         });
-      } else {
-        setProgress(progress);
-      }
-    }, 200);
+      })
+      .catch((err) => {
+        clearInterval(progressInterval);
+        complete({
+          success: false,
+          error: err.message || 'Forge failed — checkpoint save error',
+        });
+      });
   }, []);
 
   // Connect when instance changes

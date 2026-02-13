@@ -31,6 +31,10 @@ from omega_core.ambition import HomeostaticLoop, AmbitionState, DriveSignal
 from omega_core.firmware import FirmwareManager
 from omega_core.bridge import get_trainer as get_bridge_trainer
 from omega_core.reflection import get_watcher_trainer
+from omega_core.trainer import (
+    OmegaTrainer, BehavioralCodebook, TextEncoder,
+    PhaseAlignmentDecoder, load_training_data, BEHAVIOR_TYPES,
+)
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -180,6 +184,49 @@ async def run_dream_cycle(tenant_id: str, storage: StorageManager) -> Dict[str, 
         except Exception as bt_err:
             logger.warning(f"Bridge training check failed (non-fatal): {bt_err}")
         
+        # PHASE 4: Wirtinger E-Prop Training (CPU/Graviton)
+        # Port of the proving ground's training architecture for production
+        # Uses eligibility traces instead of backprop — no computation graph needed
+        eprop_result = {'epochs': 0, 'accuracy': 0.0, 'status': 'skipped'}
+        training_data_path = os.environ.get('OMEGA_TRAINING_DATA_PATH')
+        if training_data_path and os.path.exists(training_data_path):
+            try:
+                training_examples = load_training_data(training_data_path)
+                if training_examples:
+                    config = state_dict.get('config', {})
+                    hidden_dim = config.get('hidden_dim', 2048)
+                    codebook = BehavioralCodebook(
+                        hidden_dim=hidden_dim,
+                        device='cpu',  # Graviton ARM64 — no GPU
+                    )
+                    trainer = OmegaTrainer(
+                        cortex=cortex,
+                        codebook=codebook,
+                        lr=0.005,  # Conservative LR for production
+                    )
+                    # Run limited epochs to stay within Lambda timeout
+                    max_dream_epochs = int(os.environ.get('DREAM_TRAINING_EPOCHS', '5'))
+                    metrics = trainer.train(
+                        training_examples,
+                        epochs=max_dream_epochs,
+                        target_accuracy=0.85,
+                    )
+                    if metrics:
+                        final = metrics[-1]
+                        eprop_result = {
+                            'epochs': len(metrics),
+                            'accuracy': round(final.behavior_accuracy, 4),
+                            'avg_loss': round(final.avg_loss, 6),
+                            'status': 'completed',
+                        }
+                        logger.info(
+                            f"E-prop training for {tenant_id}: "
+                            f"{len(metrics)} epochs, accuracy={final.behavior_accuracy:.2%}"
+                        )
+            except Exception as ep_err:
+                eprop_result = {'epochs': 0, 'status': 'error', 'error': str(ep_err)}
+                logger.warning(f"E-prop training failed (non-fatal): {ep_err}")
+        
         # Get new coherence
         coherence_score = post_coherence
         
@@ -212,6 +259,7 @@ async def run_dream_cycle(tenant_id: str, storage: StorageManager) -> Dict[str, 
             'replay_logs_processed': len(replay_logs),
             'watcher_training': watcher_result,
             'bridge_training': bridge_result,
+            'eprop_training': eprop_result,
         }
         
     except Exception as e:
