@@ -2,11 +2,11 @@
 description: MANDATORY - Update ALL relevant documentation on ANY code change. This is the MASTER documentation policy.
 ---
 
-# Master Documentation Policy (v4.0 — Expanded)
+# Master Documentation Policy (v4.1 — Expanded)
 
 > ⚠️ **THIS POLICY IS MANDATORY AND HAS NO EXCEPTIONS** ⚠️
 >
-> **Every code change requires documentation updates.** 17 documents total: 15 consolidated (merged 2026-02-10) + 2 standalone (added 2026-02-13).
+> **Every code change requires documentation updates.** 18 documents total: 15 consolidated (merged 2026-02-10) + 3 standalone (added 2026-02-13).
 
 ---
 
@@ -22,7 +22,7 @@ Do NOT:
 
 ---
 
-## The 17 Documents (15 Consolidated + 2 Standalone)
+## The 18 Documents (15 Consolidated + 3 Standalone)
 
 ### App Documents (one per app)
 | # | Document | What It Covers |
@@ -53,6 +53,7 @@ Do NOT:
 |---|----------|---------------|
 | 20 | `docs/20-OMEGA-ENGINEERING.md` | OMEGA engineering, architecture, marketing: all subsystems, proving ground, Lambda architecture, training, competitive moats, decision log, full API reference |
 | 21 | `docs/21-TEXT-TO-SPEECH.md` | TTS complete reference: radiant-tts package, ElevenLabs streaming, voice presets, language mapping, provider interface, interrupt support, integration guides, competitive analysis |
+| 22 | `docs/22-COMPLIANCE-STANDARDS-GUIDE.md` | Compliance certifications & regulatory standards: SOC 2, GDPR, HIPAA, ISO 27701, ISO 42001, HDS, DPF, PCI DSS — versions, requirements, enforcement, timelines, cross-framework analysis, RADIANT alignment |
 
 ---
 
@@ -76,6 +77,7 @@ Before making ANY code change, identify what type of change it is:
 | `brain` | consciousness, cognitive, cortex, expert system |
 | `cato` | safety, ethics, CBF, grounding |
 | `omega` | OMEGA Protocol, Genesis, Helix Kernel, firmware |
+| `compliance` | SOC 2, GDPR, HIPAA, ISO 27701, ISO 42001, HDS, DPF, PCI DSS, regulatory |
 | `orchestration` | workflow, method, pipeline, UEP |
 | `data_storage` | UDS, RAWS, retention, file conversion |
 | `competitive_advantage` | moat, unique feature, differentiator |
@@ -210,7 +212,16 @@ Before making ANY code change, identify what type of change it is:
 ```
 ✅ CHANGELOG.md
 ✅ docs/13-SECURITY-AUTH-COMPLIANCE.md
+✅ docs/22-COMPLIANCE-STANDARDS-GUIDE.md (if regulatory standard impact)
 ✅ docs/04-RADIANT-ADMIN.md (if admin-configurable)
+```
+
+### Compliance / Regulatory Standards Changes
+```
+✅ CHANGELOG.md
+✅ docs/22-COMPLIANCE-STANDARDS-GUIDE.md (PRIMARY — SOC 2, GDPR, HIPAA, ISO 27701, ISO 42001, HDS, DPF, PCI DSS)
+✅ docs/13-SECURITY-AUTH-COMPLIANCE.md (if auth/access control impact)
+✅ docs/19-STRATEGIC-SECURITY.md (if credential/rotation impact)
 ```
 
 ### Operations / Runbook Changes
@@ -274,9 +285,10 @@ Before marking task complete, verify:
 □ CHANGELOG.md updated
 □ Relevant app doc updated (01–05) if app-facing change
 □ Architecture doc (06) updated if architectural change
-□ Relevant system doc updated (06–21) if system-level change
+□ Relevant system doc updated (06–22) if system-level change
 □ OMEGA engineering doc (20) updated if OMEGA architecture/training/API change
 □ TTS doc (21) updated if TTS/voice/speech change
+□ Compliance doc (22) updated if regulatory/certification/compliance change
 □ Glossary (17) updated if new terms/acronyms
 □ Strategy (15) updated if competitive advantage
 □ Version numbers updated in all touched docs
@@ -306,7 +318,7 @@ See policy: `/.windsurf/workflows/docs-assemble-complete.md`
 
 ```
 ┌──────────────────────────────────────────────────────────┐
-│           DOCUMENTATION UPDATE CHECKLIST (v3.0)          │
+│           DOCUMENTATION UPDATE CHECKLIST (v4.1)          │
 ├──────────────────────────────────────────────────────────┤
 │                                                          │
 │  EVERY CHANGE:     ✅ CHANGELOG.md                       │
@@ -329,6 +341,8 @@ See policy: `/.windsurf/workflows/docs-assemble-complete.md`
 │  IMPL SPECS:       ✅ docs/16-IMPLEMENTATION-SPECS.md      │
 │  GLOSSARY:         ✅ docs/17-GLOSSARY.md                  │
 │  UI/UX:            ✅ docs/18-UI-UX-LIBRARIES.md           │
+│  STRAT SECURITY:   ✅ docs/19-STRATEGIC-SECURITY.md        │
+│  COMPLIANCE:       ✅ docs/22-COMPLIANCE-STANDARDS-GUIDE.md │
 │                                                          │
 │  THEN: python3 tools/scripts/                            │
 │        assemble-complete-documentation.py                │
