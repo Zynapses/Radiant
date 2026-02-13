@@ -370,3 +370,47 @@ export async function getMcDeals(storeId?: string): Promise<McDealsResult> {
   const params = storeId ? `?storeId=${storeId}` : '';
   return pgFetch(`/mcdonalds/deals${params}`);
 }
+
+// ============================================================================
+// Proving Ground App Management
+// ============================================================================
+
+export interface PGAppDataset {
+  name: string;
+  size_mb: number;
+}
+
+export interface PGApp {
+  name: string;
+  datasets: PGAppDataset[];
+  dataset_count: number;
+  image_count: number;
+  readme: string;
+  has_datasets: boolean;
+  has_images: boolean;
+}
+
+export interface PGAppListResult {
+  success: boolean;
+  apps: PGApp[];
+}
+
+export async function listApps(): Promise<PGAppListResult> {
+  return pgFetch('/apps');
+}
+
+export async function getApp(name: string): Promise<{ success: boolean } & PGApp> {
+  return pgFetch(`/apps/${encodeURIComponent(name)}`);
+}
+
+export async function createApp(name: string): Promise<{ success: boolean; name: string; path: string }> {
+  return pgFetch('/apps', { method: 'POST', body: JSON.stringify({ name }) });
+}
+
+export async function renameApp(oldName: string, newName: string): Promise<{ success: boolean; old_name: string; new_name: string }> {
+  return pgFetch(`/apps/${encodeURIComponent(oldName)}`, { method: 'PUT', body: JSON.stringify({ name: newName }) });
+}
+
+export async function deleteApp(name: string): Promise<{ success: boolean; archived_as: string }> {
+  return pgFetch(`/apps/${encodeURIComponent(name)}`, { method: 'DELETE' });
+}

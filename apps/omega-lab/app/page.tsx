@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Brain, Cpu, Dna, Activity, Settings, FlaskConical, Waves, Flame, UtensilsCrossed, Shield } from 'lucide-react';
+import { Brain, Cpu, Dna, Activity, Settings, FlaskConical, Waves, Flame, UtensilsCrossed, Shield, FolderOpen } from 'lucide-react';
 import { getHealth } from '@/lib/proving-ground';
 import { CortexExplorer } from '@/components/CortexExplorer';
 import { OmegaForge } from '@/components/OmegaForge';
@@ -10,6 +10,7 @@ import { GlassFoundry } from '@/components/forge/GlassFoundry';
 import { Dashboard } from '@/components/Dashboard';
 import { QNodeViz } from '@/components/QNodeViz';
 import { GenesisForge } from '@/components/GenesisForge';
+import { AppManager } from '@/components/AppManager';
 import dynamic from 'next/dynamic';
 
 const DriveThrough = dynamic(
@@ -17,7 +18,7 @@ const DriveThrough = dynamic(
   { ssr: false },
 );
 
-type Tab = 'dashboard' | 'qnode' | 'cortex' | 'genesis' | 'firmware' | 'forge' | 'drivethru';
+type Tab = 'dashboard' | 'qnode' | 'cortex' | 'genesis' | 'firmware' | 'forge' | 'drivethru' | 'apps';
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<Tab>('dashboard');
@@ -102,6 +103,12 @@ export default function Home() {
                 icon={<UtensilsCrossed className="w-4 h-4" />}
                 label="McDonald's Drive-Thru"
               />
+              <TabButton
+                active={activeTab === 'apps'}
+                onClick={() => setActiveTab('apps')}
+                icon={<FolderOpen className="w-4 h-4" />}
+                label="Apps"
+              />
             </nav>
 
             {/* Status */}
@@ -144,6 +151,7 @@ export default function Home() {
         {activeTab === 'cortex' && <CortexExplorer />}
         {activeTab === 'genesis' && <GenesisForge />}
         {activeTab === 'firmware' && <OmegaForge />}
+        {activeTab === 'apps' && <AppManager />}
       </div>
     </main>
   );

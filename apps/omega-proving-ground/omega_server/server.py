@@ -2825,6 +2825,137 @@ def _get_local_menu():
 
 
 # ============================================================================
+# PROVING GROUND APP MANAGEMENT
+# ============================================================================
+
+@app.route('/apps', methods=['GET'])
+def list_apps():
+    """List all proving ground apps."""
+    apps_dir = APPS_DIR
+    if not apps_dir.exists():
+        return jsonify({'success': True, 'apps': []})
+
+    apps = []
+    for d in sorted(apps_dir.iterdir()):
+        if d.is_dir() and not d.name.startswith('.'):
+            info = _get_app_info(d)
+            apps.append(info)
+
+    return jsonify({'success': True, 'apps': apps})
+
+
+@app.route('/apps/<app_name>', methods=['GET'])
+def get_app(app_name):
+    """Get details for a specific proving ground app."""
+    app_dir = APPS_DIR / app_name
+    if not app_dir.exists():
+        return jsonify({'error': f'App not found: {app_name}'}), 404
+    return jsonify({'success': True, **_get_app_info(app_dir)})
+
+
+@app.route('/apps', methods=['POST'])
+def create_app():
+    """Create a new proving ground app with standard directory structure."""
+    data = request.json or {}
+    name = data.get('name', '').strip()
+    if not name:
+        return jsonify({'error': 'App name is required'}), 400
+
+    slug = name.lower().replace(' ', '-').replace('_', '-')
+    slug = ''.join(c for c in slug if c.isalnum() or c == '-')
+    slug = slug.strip('-')
+    if not slug:
+        return jsonify({'error': 'Invalid app name'}), 400
+
+    app_dir = APPS_DIR / slug
+    if app_dir.exists():
+        return jsonify({'error': f'App already exists: {slug}'}), 409
+
+    app_dir.mkdir(parents=True)
+    (app_dir / 'datasets').mkdir()
+    (app_dir / 'menu-img').mkdir()
+
+    readme = app_dir / 'README.md'
+    readme.write_text(f"# {name}\n\nOMEGA Proving Ground App\n\nCreated: {time.strftime('%Y-%m-%d %H:%M:%S')}\n")
+
+    logger.info(f"Created proving ground app: {slug}")
+    return jsonify({'success': True, 'name': slug, 'path': str(app_dir)}), 201
+
+
+@app.route('/apps/<app_name>', methods=['PUT'])
+def rename_app(app_name):
+    """Rename a proving ground app."""
+    data = request.json or {}
+    new_name = data.get('name', '').strip()
+    if not new_name:
+        return jsonify({'error': 'New name is required'}), 400
+
+    new_slug = new_name.lower().replace(' ', '-').replace('_', '-')
+    new_slug = ''.join(c for c in new_slug if c.isalnum() or c == '-')
+    new_slug = new_slug.strip('-')
+    if not new_slug:
+        return jsonify({'error': 'Invalid new name'}), 400
+
+    old_dir = APPS_DIR / app_name
+    new_dir = APPS_DIR / new_slug
+    if not old_dir.exists():
+        return jsonify({'error': f'App not found: {app_name}'}), 404
+    if new_dir.exists():
+        return jsonify({'error': f'App already exists: {new_slug}'}), 409
+
+    old_dir.rename(new_dir)
+    logger.info(f"Renamed proving ground app: {app_name} -> {new_slug}")
+    return jsonify({'success': True, 'old_name': app_name, 'new_name': new_slug})
+
+
+@app.route('/apps/<app_name>', methods=['DELETE'])
+def delete_app(app_name):
+    """Delete a proving ground app (moves to .archived/)."""
+    app_dir = APPS_DIR / app_name
+    if not app_dir.exists():
+        return jsonify({'error': f'App not found: {app_name}'}), 404
+
+    archive_dir = APPS_DIR / '.archived'
+    archive_dir.mkdir(exist_ok=True)
+    dest = archive_dir / f"{app_name}_{int(time.time())}"
+    app_dir.rename(dest)
+    logger.info(f"Archived proving ground app: {app_name} -> {dest.name}")
+    return jsonify({'success': True, 'archived_as': dest.name})
+
+
+def _get_app_info(app_dir: Path) -> dict:
+    """Build info dict for a proving ground app directory."""
+    datasets_dir = app_dir / 'datasets'
+    img_dir = app_dir / 'menu-img'
+
+    dataset_files = []
+    if datasets_dir.exists():
+        for f in sorted(datasets_dir.iterdir()):
+            if f.is_file() and not f.name.startswith('.'):
+                size_mb = f.stat().st_size / (1024 * 1024)
+                dataset_files.append({'name': f.name, 'size_mb': round(size_mb, 2)})
+
+    image_count = 0
+    if img_dir.exists():
+        image_count = sum(1 for f in img_dir.iterdir() if f.suffix.lower() in ('.png', '.jpg', '.jpeg', '.webp'))
+
+    readme_text = ''
+    readme = app_dir / 'README.md'
+    if readme.exists():
+        readme_text = readme.read_text()[:500]
+
+    return {
+        'name': app_dir.name,
+        'datasets': dataset_files,
+        'dataset_count': len(dataset_files),
+        'image_count': image_count,
+        'readme': readme_text,
+        'has_datasets': datasets_dir.exists(),
+        'has_images': img_dir.exists(),
+    }
+
+
+# ============================================================================
 # MAIN
 # ============================================================================
 
