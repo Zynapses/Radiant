@@ -51,17 +51,33 @@ class LlamaBridge:
     def _build_menu_index(self) -> Dict[str, Dict[str, Any]]:
         """Index all menu items by name (lowercase) for fast lookup."""
         index = {}
+
+        def _strip(name: str) -> str:
+            """Normalize name: lowercase, strip ® ™ * symbols."""
+            return name.lower().replace('®', '').replace('™', '').replace('*', '').strip()
+
+        # Legacy format: top-level 'menu' dict { category: [items] }
         for category, items in self.kb.get('menu', {}).items():
             if isinstance(items, list):
                 for item in items:
-                    name = item.get('name', '').lower()
+                    name = _strip(item.get('name', ''))
                     item['_category'] = category
                     index[name] = item
+
+        # Current format: 'tabs' → categories → items
+        for tab in self.kb.get('tabs', []):
+            for cat in tab.get('categories', []):
+                cat_label = cat.get('label', cat.get('id', ''))
+                for item in cat.get('items', []):
+                    name = _strip(item.get('name', ''))
+                    item['_category'] = cat_label
+                    index[name] = item
+
         return index
 
     def find_menu_item(self, query: str) -> Optional[Dict[str, Any]]:
         """Fuzzy match a menu item by name."""
-        q = query.lower().strip()
+        q = query.lower().replace('®', '').replace('™', '').replace('*', '').strip()
         # Exact match
         if q in self.menu_index:
             return self.menu_index[q]
@@ -164,9 +180,10 @@ class LlamaBridge:
             "- NEVER list ingredients, options, or menu items unless explicitly asked.\n"
             "- NEVER read back the order or list what they've ordered so far — save that for when they're DONE ordering.\n"
             "- NEVER repeat the item name and price together after a combo upgrade — just confirm and move on.\n"
-            "- After adding an item: just say 'Anything else?' — do NOT restate what was added.\n"
+            "- After adding an item that has NO meal/combo option: just say 'Anything else?'\n"
+            "- If the item HAS a meal option and the customer did NOT already say 'meal' or 'combo': you MUST ask 'Want to make that a combo for $X.XX?' using the exact MEAL PRICE.\n"
             "- Use EXACT prices from the data below. Never guess or calculate.\n"
-            "- Examples of good responses: 'Got it. Anything else?' / 'Want to make that a combo for $9.49?' / 'What drink with that?' / 'Combo it is. What to drink?'\n\n"
+            "- Examples of good responses: 'Want to make that a combo for $8.99?' / 'Got it. Anything else?' / 'What drink with that?' / 'Combo it is. What to drink?'\n\n"
         )
 
         if behavior == "greet":
@@ -200,24 +217,25 @@ class LlamaBridge:
                 ingredients = item_info.get('default_ingredients', [])
                 customizable = item_info.get('customizable', [])
 
-                instruction += (
-                    f"ITEM ORDERED: {item_info['name']}\n"
-                    f"PRICE: ${price}\n"
-                )
-                if meal_price:
-                    instruction += f"MEAL PRICE: ${meal_price} (includes medium fries + medium drink)\n"
-                    instruction += "INSTRUCTION: Confirm the item, state the price, and ask if they'd like to make it a meal.\n"
-                else:
-                    instruction += "INSTRUCTION: Confirm the item and state the price.\n"
+                instruction += f"ITEM ORDERED: {item_info['name']}\n"
 
-                if customizable:
-                    instruction += f"CUSTOMIZATION OPTIONS: {', '.join(customizable)}\n"
-                    instruction += "Ask: 'Any changes to that?'\n"
+                if meal_price:
+                    instruction += (
+                        f"PRICE: ${price} | MEAL: ${meal_price}\n"
+                        f"INSTRUCTION: Ask if they want the combo. Say EXACTLY something like: "
+                        f"'Want to make that a combo for ${meal_price}?'\n"
+                        f"DO NOT say 'Anything else?' — ask about the combo FIRST.\n"
+                    )
+                else:
+                    instruction += (
+                        f"PRICE: ${price}\n"
+                        "INSTRUCTION: Say 'Got it. Anything else?'\n"
+                    )
 
                 sauce_choices = item_info.get('sauce_choices', [])
                 if sauce_choices:
                     instruction += f"SAUCE OPTIONS: {', '.join(sauce_choices)}\n"
-                    instruction += "Ask which sauce(s) they'd like.\n"
+                    instruction += "Also ask which sauce(s) they'd like.\n"
             else:
                 instruction += (
                     f"Customer asked for: {customer_text}\n"

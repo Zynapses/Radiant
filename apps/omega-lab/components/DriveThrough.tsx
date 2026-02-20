@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { getHealth } from '@/lib/proving-ground';
+import { MenuBrowser } from './MenuBrowser';
 import type { CortexTelemetry } from '@/lib/proving-ground';
 
 const VOICE_WS_URL = process.env.NEXT_PUBLIC_VOICE_WS_URL || 'ws://localhost:11436/ws/drive-thru';
@@ -304,7 +305,6 @@ function GoldenArches({ size = 36 }: { size?: number }) {
 
 export function DriveThrough({ onBack }: { onBack?: () => void } = {}) {
   const [mounted, setMounted] = useState(false);
-  const [menuTab, setMenuTab] = useState<'breakfast' | 'dayMenu'>('dayMenu');
   const [order, setOrder] = useState<OrderItem[]>([]);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isActive, setIsActive] = useState(false);
@@ -318,6 +318,54 @@ export function DriveThrough({ onBack }: { onBack?: () => void } = {}) {
   const [qActivations, setQActivations] = useState<number[]>(Array(NUM_NODES).fill(0));
   const [qInterference, setQInterference] = useState<boolean[]>(Array(NUM_NODES).fill(false));
   const [streamingText, setStreamingText] = useState('');
+
+  // ── Resizable pane state ──
+  const [paneWidths, setPaneWidths] = useState<{ menu: number; order: number; dev: number } | null>(null);
+  const dragRef = useRef<{ which: 'menu-order' | 'order-dev'; startX: number; startMenu: number; startOrder: number; startDev: number } | null>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  const calcDefaults = useCallback((w: number, devVisible: boolean) => {
+    const devW = devVisible ? Math.min(400, Math.max(300, Math.round(w * 0.2))) : 0;
+    const orderW = Math.min(340, Math.max(280, Math.round(w * 0.2)));
+    const menuW = w - orderW - devW;
+    return { menu: menuW, order: orderW, dev: devW };
+  }, []);
+
+  useEffect(() => {
+    const update = () => {
+      const w = window.innerWidth;
+      const devVis = !devDetached && debugOpen;
+      setPaneWidths(calcDefaults(w, devVis));
+    };
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, [debugOpen, devDetached, calcDefaults]);
+
+  const onDragStart = useCallback((which: 'menu-order' | 'order-dev', e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!paneWidths) return;
+    dragRef.current = { which, startX: e.clientX, startMenu: paneWidths.menu, startOrder: paneWidths.order, startDev: paneWidths.dev };
+    const onMove = (ev: MouseEvent) => {
+      if (!dragRef.current) return;
+      const d = dragRef.current;
+      const dx = ev.clientX - d.startX;
+      if (d.which === 'menu-order') {
+        const newMenu = Math.max(400, d.startMenu + dx);
+        const newOrder = Math.max(240, d.startOrder - dx);
+        setPaneWidths(p => p ? { ...p, menu: newMenu, order: newOrder } : p);
+      } else {
+        const newOrder = Math.max(240, d.startOrder + dx);
+        const newDev = Math.max(250, d.startDev - dx);
+        setPaneWidths(p => p ? { ...p, order: newOrder, dev: newDev } : p);
+      }
+    };
+    const onUp = () => { dragRef.current = null; document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); document.body.style.cursor = ''; document.body.style.userSelect = ''; };
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  }, [paneWidths]);
 
   const recognitionRef = useRef<any>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
@@ -1274,10 +1322,9 @@ export function DriveThrough({ onBack }: { onBack?: () => void } = {}) {
   }
 
   return (
-    <div className={`dt-root ${!devDetached && debugOpen ? 'dbg-on' : ''}`}>
-      {/* ═══ LEFT 2/3 — Dark Menu Board ═══ */}
-      <div className="dt-menu">
-        {/* Small logo + name top-left */}
+    <div ref={rootRef} className={`dt-root ${!devDetached && debugOpen ? 'dbg-on' : ''}`}>
+      {/* ═══ Menu Pane ═══ */}
+      <div className="dt-menu" style={paneWidths ? { width: paneWidths.menu, flex: 'none' } : undefined}>
         <div className="dt-logo-bar">
           {onBack && (
             <button onClick={onBack} className="dt-back-btn" title="Back to OMEGA Lab">
@@ -1287,104 +1334,16 @@ export function DriveThrough({ onBack }: { onBack?: () => void } = {}) {
           <GoldenArches size={32} />
           <span className="dt-logo-text">McDonald&apos;s</span>
         </div>
-
-        {/* ─── Menu Category Tabs ─── */}
-        <div className="dt-tabs">
-          <button
-            className={`dt-tab ${menuTab === 'breakfast' ? 'active' : ''}`}
-            onClick={() => setMenuTab('breakfast')}
-          >
-            <span className="dt-tab-icon">☀️</span>
-            <span className="dt-tab-label">Breakfast</span>
-          </button>
-          <button
-            className={`dt-tab ${menuTab === 'dayMenu' ? 'active' : ''}`}
-            onClick={() => setMenuTab('dayMenu')}
-          >
-            <span className="dt-tab-icon">🍔</span>
-            <span className="dt-tab-label">Day Menu</span>
-          </button>
-        </div>
-
-        <div className="dt-menu-scroll">
-          {menuTab === 'breakfast' ? (<>
-            {/* Breakfast Combos */}
-            <div className="dt-sec">
-              <h3 className="dt-sec-title">Breakfast Combos</h3>
-              <div className="dt-combos">
-                {BREAKFAST_COMBOS.map(m => (
-                  <div key={m.num} className="dt-combo">
-                    <span className="dt-combo-num">{m.num}</span>
-                    <div className="dt-combo-img-wrap">
-                      <MenuImg src={m.img} alt={m.name} className="dt-combo-img" fbClass="dt-combo-img-fb" />
-                    </div>
-                    <div className="dt-combo-info">
-                      <span className="dt-combo-name">{m.name} Combo</span>
-                      <span className="dt-combo-desc">Includes: {m.desc}</span>
-                    </div>
-                    <span className="dt-combo-price">${m.price.toFixed(2)}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Breakfast Grid sections */}
-            {BREAKFAST_ITEMS.map(sec => (
-              <div key={sec.title} className="dt-sec">
-                <h3 className="dt-sec-title">{sec.title}</h3>
-                <div className="dt-grid">
-                  {sec.items.map(item => (
-                    <div key={item.name} className="dt-grid-item">
-                      <MenuImg src={item.img} alt={item.name} className="dt-gi-emoji" fbClass="dt-gi-emoji-fb" />
-                      <span className="dt-gi-name">{item.name}</span>
-                      <span className="dt-gi-price">${item.price.toFixed(2)}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </>) : (<>
-            {/* Combo Meals — larger display */}
-            <div className="dt-sec">
-              <h3 className="dt-sec-title">Combo Meals</h3>
-              <div className="dt-combos">
-                {COMBO_MEALS.map(m => (
-                  <div key={m.num} className="dt-combo">
-                    <span className="dt-combo-num">{m.num}</span>
-                    <div className="dt-combo-img-wrap">
-                      <MenuImg src={m.img} alt={m.name} className="dt-combo-img" fbClass="dt-combo-img-fb" />
-                    </div>
-                    <div className="dt-combo-info">
-                      <span className="dt-combo-name">{m.name} Combo</span>
-                      <span className="dt-combo-desc">Includes: {m.desc}</span>
-                    </div>
-                    <span className="dt-combo-price">${m.price.toFixed(2)}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Grid sections */}
-            {MENU_SECTIONS.map(sec => (
-              <div key={sec.title} className="dt-sec">
-                <h3 className="dt-sec-title">{sec.title}</h3>
-                <div className="dt-grid">
-                  {sec.items.map(item => (
-                    <div key={item.name} className="dt-grid-item">
-                      <MenuImg src={item.img} alt={item.name} className="dt-gi-emoji" fbClass="dt-gi-emoji-fb" />
-                      <span className="dt-gi-name">{item.name}</span>
-                      <span className="dt-gi-price">${item.price.toFixed(2)}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </>)}
-        </div>
+        <MenuBrowser />
       </div>
 
-      {/* ═══ RIGHT 1/3 — White Order Pane ═══ */}
-      <div className="dt-order">
+      {/* ═══ Drag Handle: Menu ↔ Order ═══ */}
+      <div className="dt-drag-handle" onMouseDown={(e) => onDragStart('menu-order', e)}>
+        <div className="dt-drag-dots"><span/><span/><span/></div>
+      </div>
+
+      {/* ═══ Order Pane ═══ */}
+      <div className="dt-order" style={paneWidths ? { width: paneWidths.order, flex: 'none' } : undefined}>
         {/* Mic button — icon-only, state shown via color/animation */}
         <div className="dt-mic-area">
           <button
@@ -1466,11 +1425,18 @@ export function DriveThrough({ onBack }: { onBack?: () => void } = {}) {
         </div>
       </div>
 
+      {/* ═══ Drag Handle: Order ↔ Dev ═══ */}
+      {!devDetached && debugOpen && (
+        <div className="dt-drag-handle" onMouseDown={(e) => onDragStart('order-dev', e)}>
+          <div className="dt-drag-dots"><span/><span/><span/></div>
+        </div>
+      )}
+
       {/* ═══ Developer Debug Pane — inline or detached popup ═══ */}
       {devDetached && devMountRef.current
         ? createPortal(devPaneContent, devMountRef.current)
         : debugOpen
-          ? devPaneContent
+          ? <div style={paneWidths ? { width: paneWidths.dev, flexShrink: 0 } : undefined}>{devPaneContent}</div>
           : (
             <div className="dbg-tab" onClick={() => setDebugOpen(true)}>
               <span>D</span><span>E</span><span>V</span>
@@ -1487,9 +1453,9 @@ export function DriveThrough({ onBack }: { onBack?: () => void } = {}) {
           transition: right 0.3s ease;
         }
 
-        /* ── LEFT: Menu ── */
+        /* ── Menu Pane ── */
         .dt-menu {
-          flex: 2; min-width: 0;
+          flex: 3; min-width: 400px;
           background: #27251F;
           display: flex; flex-direction: column;
           overflow: hidden;
@@ -1499,6 +1465,7 @@ export function DriveThrough({ onBack }: { onBack?: () => void } = {}) {
           padding: 10px 24px;
           background: #1a1816;
           border-bottom: 2px solid #FFC72C;
+          flex-shrink: 0;
         }
         .dt-back-btn {
           display: flex; align-items: center; justify-content: center;
@@ -1514,135 +1481,31 @@ export function DriveThrough({ onBack }: { onBack?: () => void } = {}) {
           font-size: 26px; font-weight: 800; color: #FFC72C;
           letter-spacing: -0.3px;
         }
-        /* ── Menu Tabs ── */
-        .dt-tabs {
-          display: flex; gap: 0;
-          padding: 0;
-          background: linear-gradient(180deg, #1a1816 0%, #201e1a 100%);
-          border-bottom: 1px solid rgba(255,199,44,0.1);
-          flex-shrink: 0;
-        }
-        .dt-tab {
-          flex: 1;
-          display: flex; align-items: center; justify-content: center; gap: 8px;
-          padding: 14px 16px;
-          background: transparent;
-          border: none; border-bottom: 3px solid transparent;
-          color: rgba(255,255,255,0.4);
-          font-family: inherit;
-          font-size: 15px; font-weight: 700;
-          letter-spacing: 0.5px;
-          cursor: pointer;
-          transition: all 0.25s ease;
-          position: relative;
-          overflow: hidden;
-        }
-        .dt-tab::before {
-          content: '';
-          position: absolute; inset: 0;
-          background: radial-gradient(ellipse at 50% 100%, rgba(255,199,44,0.08) 0%, transparent 70%);
-          opacity: 0;
-          transition: opacity 0.25s ease;
-        }
-        .dt-tab:hover {
-          color: rgba(255,255,255,0.7);
-        }
-        .dt-tab:hover::before { opacity: 1; }
-        .dt-tab.active {
-          color: #FFC72C;
-          border-bottom-color: #FFC72C;
-        }
-        .dt-tab.active::before { opacity: 1; }
-        .dt-tab.active::after {
-          content: '';
-          position: absolute; bottom: -1px; left: 50%; transform: translateX(-50%);
-          width: 60%; height: 3px;
-          background: #FFC72C;
-          border-radius: 3px 3px 0 0;
-          box-shadow: 0 0 12px rgba(255,199,44,0.5), 0 0 24px rgba(255,199,44,0.2);
-        }
-        .dt-tab-icon {
-          font-size: 18px;
-          line-height: 1;
-          position: relative;
-          z-index: 1;
-        }
-        .dt-tab-label {
-          text-transform: uppercase;
-          letter-spacing: 1.5px;
-          font-size: 13px;
-          position: relative;
-          z-index: 1;
-        }
 
-        .dt-menu-scroll {
-          flex: 1; overflow-y: auto;
-          padding: 16px 24px 40px;
-        }
-        .dt-sec { margin-bottom: 20px; }
-        .dt-sec-title {
-          font-size: 17px; font-weight: 800; color: #FFC72C;
-          text-transform: uppercase; letter-spacing: 1.5px;
-          padding-bottom: 6px;
-          border-bottom: 1px solid rgba(255,199,44,0.15);
-          margin-bottom: 10px;
-        }
-
-        /* Combos */
-        .dt-combos { display: flex; flex-direction: column; gap: 0; }
-        .dt-combo {
-          display: grid;
-          grid-template-columns: 30px 52px 1fr auto;
-          align-items: center;
-          gap: 10px;
-          padding: 6px 10px;
-          border-radius: 8px;
-          min-height: 52px;
-        }
-        .dt-combo:hover { background: rgba(255,199,44,0.06); }
-        .dt-combo-num {
-          width: 30px; height: 30px; border-radius: 50%;
-          background: #DA291C; color: white;
-          font-size: 14px; font-weight: 800;
+        /* ── Drag Handle ── */
+        .dt-drag-handle {
+          width: 8px; flex-shrink: 0;
+          cursor: col-resize;
+          background: #1a1a1a;
           display: flex; align-items: center; justify-content: center;
-          flex-shrink: 0;
-          justify-self: center;
+          transition: background 0.15s;
+          position: relative;
+          z-index: 10;
         }
-        .dt-combo-img-wrap {
-          width: 52px; height: 42px;
-          display: flex; align-items: center; justify-content: center;
-          overflow: hidden; flex-shrink: 0;
+        .dt-drag-handle:hover { background: #FFC72C; }
+        .dt-drag-handle:hover .dt-drag-dots span { background: #27251F; }
+        .dt-drag-dots { display: flex; flex-direction: column; gap: 4px; }
+        .dt-drag-dots span {
+          display: block; width: 4px; height: 4px; border-radius: 50%;
+          background: rgba(255,255,255,0.25); transition: background 0.15s;
         }
-        .dt-combo-img { max-width: 48px; max-height: 38px; width: auto; height: auto; object-fit: contain; display: block; }
-        .dt-combo-img-fb { font-size: 28px; line-height: 42px; width: 52px; height: 42px; text-align: center; flex-shrink: 0; display: block; }
-        .dt-combo-info { min-width: 0; }
-        .dt-combo-name { display: block; font-size: 16px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .dt-combo-desc { display: block; font-size: 12px; color: rgba(255,255,255,0.55); margin-top: 1px; }
-        .dt-combo-price { font-size: 17px; font-weight: 700; color: #FFC72C; font-variant-numeric: tabular-nums; text-align: right; }
 
-        /* Grid items */
-        .dt-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-          gap: 6px;
-        }
-        .dt-grid-item {
-          display: flex; flex-direction: column; align-items: center;
-          padding: 10px 6px; border-radius: 8px;
-          text-align: center;
-        }
-        .dt-grid-item:hover { background: rgba(255,199,44,0.06); }
-        .dt-gi-emoji { width: 56px; height: 56px; object-fit: contain; margin-bottom: 6px; }
-        .dt-gi-emoji-fb { font-size: 36px; line-height: 56px; width: 56px; height: 56px; text-align: center; display: block; }
-        .dt-gi-name { font-size: 14px; color: rgba(255,255,255,0.9); line-height: 1.3; font-weight: 500; }
-        .dt-gi-price { font-size: 16px; font-weight: 700; color: #FFC72C; margin-top: 3px; }
-
-        /* ── RIGHT: Order Pane (white) ── */
+        /* ── Order Pane ── */
         .dt-order {
-          flex: 1; min-width: 280px;
+          flex: 1; min-width: 240px;
           background: #fafafa;
           display: flex; flex-direction: column;
-          border: 2px solid #222;
+          border-left: none; border-right: none;
         }
 
         /* Streaming text indicator (Enhancement 4) */
@@ -1836,10 +1699,7 @@ export function DriveThrough({ onBack }: { onBack?: () => void } = {}) {
         }
 
         /* Scrollbars */
-        .dt-menu-scroll::-webkit-scrollbar,
         .dt-order-items::-webkit-scrollbar { width: 5px; }
-        .dt-menu-scroll::-webkit-scrollbar-track { background: transparent; }
-        .dt-menu-scroll::-webkit-scrollbar-thumb { background: rgba(255,199,44,0.15); border-radius: 3px; }
         .dt-order-items::-webkit-scrollbar-track { background: transparent; }
         .dt-order-items::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 3px; }
 
@@ -1847,7 +1707,7 @@ export function DriveThrough({ onBack }: { onBack?: () => void } = {}) {
       <style jsx global>{`
         /* ── Dev Pane: light theme monitoring dashboard ── */
         .dbg {
-          width: 400px; flex-shrink: 0;
+          width: 100%; height: 100%;
           background: #fafbfc;
           display: flex; flex-direction: column;
           border-left: 1px solid #e2e8f0;
@@ -1855,7 +1715,6 @@ export function DriveThrough({ onBack }: { onBack?: () => void } = {}) {
           font-size: 12px;
           color: #334155;
           overflow: hidden;
-          transition: width 0.3s ease;
         }
         .dbg.detached { width: 100%; height: 100vh; border-left: none; }
 

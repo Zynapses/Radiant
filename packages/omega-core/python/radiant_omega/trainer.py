@@ -40,23 +40,26 @@ logger = logging.getLogger('omega_trainer')
 # ============================================================================
 
 
+MAX_SEQ_LEN = 64
+
 class TextEncoder(nn.Module):
     """
-    Learned text encoder that maps natural language → complex input vectors.
-
-    Replaces the hash-based vectorization which produced random vectors with
-    no semantic structure. This encoder uses learned word embeddings, average
-    pooling, and a projection to the complex input space.
+    Attention-Based Text Encoder — maps natural language → complex input vectors.
 
     Architecture:
-        text → tokenize → embedding(vocab_size, embed_dim) → avg pool
+        text → tokenize → embedding(vocab_size, embed_dim)
+        → sinusoidal positional encoding
+        → single-head self-attention (Q/K/V)
+        → learned query pooling
         → Linear(embed_dim, input_dim*2) → view as complex(input_dim)
 
-    The encoder is part of OMEGA — trained end-to-end with the CryoLiquidLayer.
+    Required for 13-behavior discrimination (mean-pooling insufficient).
+    The encoder is part of OMEGA — calibrated then frozen before ODE training.
     Llama is NOT involved in encoding.
     """
 
-    def __init__(self, input_dim: int = 1024, embed_dim: int = 256, max_vocab: int = 5000):
+    def __init__(self, input_dim: int = 1024, embed_dim: int = 256,
+                 max_vocab: int = 5000, dropout: float = 0.0):
         super().__init__()
         self.input_dim = input_dim
         self.embed_dim = embed_dim
@@ -67,6 +70,26 @@ class TextEncoder(nn.Module):
         self.vocab_built = False
 
         self.embedding = nn.Embedding(max_vocab, embed_dim, padding_idx=0)
+
+        # Sinusoidal positional encoding
+        pe = torch.zeros(MAX_SEQ_LEN, embed_dim)
+        position = torch.arange(0, MAX_SEQ_LEN, dtype=torch.float).unsqueeze(1)
+        div_term = torch.exp(torch.arange(0, embed_dim, 2).float() * (-math.log(10000.0) / embed_dim))
+        pe[:, 0::2] = torch.sin(position * div_term)
+        pe[:, 1::2] = torch.cos(position * div_term)
+        self.register_buffer('positional_encoding', pe)
+
+        # Single-head self-attention
+        self.q_proj = nn.Linear(embed_dim, embed_dim)
+        self.k_proj = nn.Linear(embed_dim, embed_dim)
+        self.v_proj = nn.Linear(embed_dim, embed_dim)
+        self.attn_scale = embed_dim ** 0.5
+
+        # Learned query pooling vector
+        self.pool_query = nn.Parameter(torch.randn(1, 1, embed_dim) * 0.02)
+
+        self.dropout = nn.Dropout(dropout)
+
         # Project real embeddings → complex input space (output 2x for real+imag)
         self.project = nn.Sequential(
             nn.Linear(embed_dim, embed_dim * 2),
@@ -82,20 +105,24 @@ class TextEncoder(nn.Module):
         return tokens
 
     def build_vocab(self, texts: List[str]):
-        """Build vocabulary from training texts."""
+        """Build vocabulary from training texts. Only adds NEW words — preserves existing indices."""
         counter = Counter()
         for text in texts:
             counter.update(self.tokenize(text))
 
+        added = 0
         for word, _ in counter.most_common(self.max_vocab - 2):  # -2 for PAD/UNK
+            if word in self.word_to_idx:
+                continue  # preserve existing index — critical for checkpoint compatibility
             idx = len(self.word_to_idx)
             if idx >= self.max_vocab:
                 break
             self.word_to_idx[word] = idx
             self.idx_to_word[idx] = word
+            added += 1
 
         self.vocab_built = True
-        logger.info(f"TextEncoder: built vocab with {len(self.word_to_idx)} words")
+        logger.info(f"TextEncoder: built vocab with {len(self.word_to_idx)} words ({added} new, attention pooling)")
 
     def encode_tokens(self, text: str) -> torch.Tensor:
         """Convert text to token indices."""
@@ -103,7 +130,7 @@ class TextEncoder(nn.Module):
         indices = [self.word_to_idx.get(t, 1) for t in tokens]  # 1 = UNK
         if not indices:
             indices = [1]  # at least one token
-        # Device is inherited from module parameters after .to(device)
+        indices = indices[:MAX_SEQ_LEN]
         device = next(self.parameters()).device if list(self.parameters()) else torch.device('cpu')
         return torch.tensor(indices, dtype=torch.long, device=device)
 
@@ -115,17 +142,93 @@ class TextEncoder(nn.Module):
             Complex tensor of shape [input_dim]
         """
         token_ids = self.encode_tokens(text)
+        seq_len = token_ids.shape[0]
         embeds = self.embedding(token_ids)       # [seq_len, embed_dim]
-        pooled = embeds.mean(dim=0)               # [embed_dim]
+
+        # Positional encoding
+        embeds = embeds + self.positional_encoding[:seq_len]
+
+        # Self-attention
+        embeds_3d = embeds.unsqueeze(0)  # [1, seq_len, embed_dim]
+        Q = self.q_proj(embeds_3d)
+        K = self.k_proj(embeds_3d)
+        V = self.v_proj(embeds_3d)
+
+        attn_weights = torch.matmul(Q, K.transpose(-2, -1)) / self.attn_scale
+        attn_weights = torch.softmax(attn_weights, dim=-1)
+        attn_weights = self.dropout(attn_weights)
+        attn_out = torch.matmul(attn_weights, V)  # [1, seq_len, embed_dim]
+
+        # Learned query pooling
+        pool_q = self.pool_query.expand(1, -1, -1)
+        pool_attn = torch.matmul(pool_q, attn_out.transpose(-2, -1)) / self.attn_scale
+        pool_attn = torch.softmax(pool_attn, dim=-1)
+        pooled = torch.matmul(pool_attn, attn_out).squeeze(0).squeeze(0)  # [embed_dim]
+
         projected = self.project(pooled)          # [input_dim * 2]
 
         # Split into real and imaginary parts
         real_part = projected[:self.input_dim]
         imag_part = projected[self.input_dim:]
 
-        # Scale to reasonable complex range
         complex_vec = torch.complex(real_part, imag_part)
         return complex_vec
+
+    def forward_batch(self, texts: List[str]) -> torch.Tensor:
+        """
+        Batched encoding: texts → complex input vectors.
+        Pads sequences to max length in batch for efficient GPU utilization.
+
+        Returns:
+            Complex tensor of shape [B, input_dim]
+        """
+        device = next(self.parameters()).device
+        # Tokenize all texts
+        all_ids = []
+        max_len = 0
+        for text in texts:
+            ids = self.encode_tokens(text)
+            all_ids.append(ids)
+            max_len = max(max_len, ids.shape[0])
+        max_len = min(max_len, MAX_SEQ_LEN)
+
+        # Pad to max_len
+        B = len(texts)
+        padded = torch.zeros(B, max_len, dtype=torch.long, device=device)
+        mask = torch.zeros(B, max_len, dtype=torch.bool, device=device)
+        for i, ids in enumerate(all_ids):
+            length = min(ids.shape[0], max_len)
+            padded[i, :length] = ids[:length]
+            mask[i, :length] = True
+
+        embeds = self.embedding(padded)  # [B, max_len, embed_dim]
+        embeds = embeds + self.positional_encoding[:max_len].unsqueeze(0)
+
+        # Self-attention (batched)
+        Q = self.q_proj(embeds)   # [B, max_len, embed_dim]
+        K = self.k_proj(embeds)
+        V = self.v_proj(embeds)
+
+        attn_weights = torch.matmul(Q, K.transpose(-2, -1)) / self.attn_scale  # [B, max_len, max_len]
+        # Mask padding positions
+        attn_mask = mask.unsqueeze(1).expand(-1, max_len, -1)  # [B, max_len, max_len]
+        attn_weights = attn_weights.masked_fill(~attn_mask, -1e9)
+        attn_weights = torch.softmax(attn_weights, dim=-1)
+        attn_weights = self.dropout(attn_weights)
+        attn_out = torch.matmul(attn_weights, V)  # [B, max_len, embed_dim]
+
+        # Learned query pooling (batched)
+        pool_q = self.pool_query.expand(B, -1, -1)  # [B, 1, embed_dim]
+        pool_attn = torch.matmul(pool_q, attn_out.transpose(-2, -1)) / self.attn_scale  # [B, 1, max_len]
+        pool_mask = mask.unsqueeze(1)  # [B, 1, max_len]
+        pool_attn = pool_attn.masked_fill(~pool_mask, -1e9)
+        pool_attn = torch.softmax(pool_attn, dim=-1)
+        pooled = torch.matmul(pool_attn, attn_out).squeeze(1)  # [B, embed_dim]
+
+        projected = self.project(pooled)  # [B, input_dim * 2]
+        real_part = projected[:, :self.input_dim]
+        imag_part = projected[:, self.input_dim:]
+        return torch.complex(real_part, imag_part)  # [B, input_dim]
 
 
 # ============================================================================
@@ -135,6 +238,8 @@ class TextEncoder(nn.Module):
 # Every behavior type maps to a unique target phase vector in the brain's hidden_dim.
 # OMEGA must learn to produce these specific patterns for each input scenario.
 
+CODEBOOK_VERSION = 3
+
 BEHAVIOR_TYPES = [
     "greet",
     "take_order",
@@ -143,6 +248,12 @@ BEHAVIOR_TYPES = [
     "meal_substitution",
     "combo_entree_swap",
     "split_size_selection",
+    "menu_inquiry",
+    "time_check",
+    "price_inquiry",
+    "take_order_breakfast",
+    "value_recommendation",
+    "order_modify",
 ]
 
 
@@ -312,10 +423,12 @@ class OmegaTrainer:
         self._encoder_calibrated = False
 
         # Training hyperparameters
-        self.training_steps = 20    # ODE integration steps (more = better phase separation)
+        self.training_steps = 8     # ODE integration steps — optimal for 13-behavior convergence
         self.alignment_temperature = 10.0  # amplify small alignment differences for softmax
-        self.batch_size = 64  # mini-batch size for large datasets
+        self.batch_size = 128  # balance: fast epochs (~30s) with enough gradient diversity
         self.class_weights: Optional[torch.Tensor] = None  # inverse-frequency weights
+        self.class_weight_boost: Optional[dict] = None  # {behavior: multiplier} for targeted boosting
+        self.focal_gamma: float = 0.0  # Focal loss gamma (0 = standard CE, 2.0 = strong focus on hard examples)
 
         # Training parameters on device (MPS/CUDA/CPU)
         # PyTorch 2.10+ has reliable MPS complex autograd
@@ -363,10 +476,26 @@ class OmegaTrainer:
 
         Runs on the active device (MPS/CUDA/CPU).
         """
+        import random as _rand
+        import time as _time
+        cal_examples = examples
+        max_cal_examples = 5000
+        if len(examples) > max_cal_examples:
+            # Stratified subsample: proportional representation per behavior
+            by_behavior: Dict[str, List] = {}
+            for ex in examples:
+                by_behavior.setdefault(ex.behavior, []).append(ex)
+            cal_examples = []
+            for beh, exs in by_behavior.items():
+                n = max(50, int(max_cal_examples * len(exs) / len(examples)))
+                cal_examples.extend(_rand.sample(exs, min(n, len(exs))))
+            _rand.shuffle(cal_examples)
+            print(f"  Calibration subsampled: {len(examples)} → {len(cal_examples)} examples (stratified)", flush=True)
+
         # Scale calibration epochs with dataset size
         if epochs is None:
-            epochs = min(600, max(300, len(examples) * 2))
-        logger.info(f"=== Sensory Calibration: Training TextEncoder ({epochs} epochs, {len(examples)} examples) ===")
+            epochs = min(600, max(200, len(cal_examples) * 2))
+        print(f"=== Sensory Calibration: Training TextEncoder ({epochs} epochs, {len(cal_examples)} examples) ===", flush=True)
 
         # Run calibration on the active device (MPS/CUDA/CPU)
         cal_device = self.device
@@ -377,53 +506,87 @@ class OmegaTrainer:
             p.requires_grad = True
         self.text_encoder.train()
 
-        # Temporary classification head (discarded after calibration)
+        # Temporary 2-layer classification head (discarded after calibration)
         input_dim = self.cortex.config.input_dim
         num_behaviors = len(BEHAVIOR_TYPES)
-        classifier = nn.Linear(input_dim * 2, num_behaviors).to(cal_device)
+        classifier = nn.Sequential(
+            nn.Linear(input_dim * 2, 512),
+            nn.ReLU(),
+            nn.Dropout(0.1),
+            nn.Linear(512, num_behaviors),
+        ).to(cal_device)
 
         optimizer = torch.optim.Adam(
             list(self.text_encoder.parameters()) + list(classifier.parameters()),
             lr=lr,
         )
-        loss_fn = nn.CrossEntropyLoss()
+        # Cosine LR annealing — prevents plateau oscillation
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs, eta_min=lr * 0.01)
         behavior_to_idx = {b: i for i, b in enumerate(BEHAVIOR_TYPES)}
 
+        # Class-weighted loss for imbalanced 13-behavior dataset
+        cal_counts = Counter(ex.behavior for ex in cal_examples)
+        cal_weights = torch.ones(num_behaviors, device=cal_device)
+        cal_total = len(cal_examples)
+        for beh, count in cal_counts.items():
+            cal_weights[behavior_to_idx[beh]] = cal_total / (num_behaviors * count)
+        cal_weights = cal_weights / cal_weights.mean()
+        loss_fn = nn.CrossEntropyLoss(weight=cal_weights)
+
+        # Pre-compute targets and text lists for batched encoding
+        all_texts = [ex.input_text for ex in cal_examples]
+        all_targets = torch.tensor(
+            [behavior_to_idx[ex.behavior] for ex in cal_examples],
+            dtype=torch.long, device=cal_device,
+        )
+        cal_batch_size = 512  # encoding batch — saturate GPU
+
         best_acc = 0.0
+        best_encoder_state = None
         for epoch in range(epochs):
-            encodings = []
-            targets = []
-            for ex in examples:
-                enc = self.text_encoder(ex.input_text)  # [input_dim] complex, on CPU
-                features = torch.cat([enc.real, enc.imag])  # [input_dim * 2]
-                encodings.append(features)
-                targets.append(behavior_to_idx[ex.behavior])
+            _ep_start = _time.time()
 
-            features_batch = torch.stack(encodings)  # [B, input_dim * 2]
-            targets_batch = torch.tensor(targets, dtype=torch.long, device=cal_device)
+            # Batched encoding: encode in GPU-friendly chunks, accumulate all features
+            all_features = []
+            for i in range(0, len(all_texts), cal_batch_size):
+                batch_texts = all_texts[i:i+cal_batch_size]
+                enc_batch = self.text_encoder.forward_batch(batch_texts)  # [B, input_dim] complex
+                features = torch.cat([enc_batch.real, enc_batch.imag], dim=-1)  # [B, input_dim*2]
+                all_features.append(features)
 
-            logits = classifier(features_batch)  # [B, num_behaviors]
-            loss = loss_fn(logits, targets_batch)
+            # Full-batch gradient step (preserves original optimization dynamics)
+            features_batch = torch.cat(all_features, dim=0)  # [N, input_dim*2]
+            logits = classifier(features_batch)  # [N, num_behaviors]
+            loss = loss_fn(logits, all_targets)
 
             optimizer.zero_grad()
             loss.backward()
             torch.nn.utils.clip_grad_norm_(self.text_encoder.parameters(), max_norm=5.0)
             optimizer.step()
+            scheduler.step()
 
-            preds = logits.argmax(dim=-1)
-            acc = (preds == targets_batch).float().mean().item()
+            preds = logits.detach().argmax(dim=-1)
+            acc = (preds == all_targets).float().mean().item()
             if acc > best_acc:
                 best_acc = acc
+                best_encoder_state = {k: v.detach().clone() for k, v in self.text_encoder.state_dict().items()}
 
-            if (epoch + 1) % 50 == 0 or epoch == 0:
-                logger.info(
-                    f"  Encoder calibration epoch {epoch+1}/{epochs}: "
-                    f"loss={loss.item():.4f} acc={acc:.1%} best={best_acc:.1%}"
+            cur_lr = scheduler.get_last_lr()[0]
+            if (epoch + 1) % 10 == 0 or epoch == 0:
+                _ep_elapsed = _time.time() - _ep_start
+                print(
+                    f"  Cal epoch {epoch+1}/{epochs}: "
+                    f"loss={loss.item():.4f} acc={acc:.1%} best={best_acc:.1%} lr={cur_lr:.2e} ({_ep_elapsed:.1f}s)",
+                    flush=True,
                 )
 
             if acc >= 0.98:
-                logger.info(f"  Encoder calibration converged at epoch {epoch+1}")
+                print(f"  Encoder calibration converged at epoch {epoch+1}", flush=True)
                 break
+
+        # Restore best encoder weights
+        if best_encoder_state is not None:
+            self.text_encoder.load_state_dict(best_encoder_state)
 
         # Freeze encoder permanently — discard classifier
         self.text_encoder.eval()
@@ -438,8 +601,8 @@ class OmegaTrainer:
             torch.cuda.empty_cache()
 
         self._encoder_calibrated = True
-        logger.info(f"=== Sensory Calibration Complete: best_acc={best_acc:.1%} ===")
-        logger.info("TextEncoder frozen — beginning CryoLiquidLayer e-prop training")
+        print(f"=== Sensory Calibration Complete: best_acc={best_acc:.1%} ===", flush=True)
+        print("TextEncoder frozen — beginning CryoLiquidLayer e-prop training", flush=True)
 
     def _forward_batch(self, input_batch, target_indices, hidden_dim, dt):
         """
@@ -466,13 +629,51 @@ class OmegaTrainer:
         alignment = alignment / (state_norms * ref_norms + 1e-6)
 
         logits = alignment * self.alignment_temperature
-        loss = nn.functional.cross_entropy(logits, target_indices, weight=self.class_weights)
+
+        if self.focal_gamma > 0:
+            # Focal loss: FL(p_t) = -alpha_t * (1-p_t)^gamma * log(p_t)
+            # Down-weights easy examples, focuses on hard ones
+            log_probs = nn.functional.log_softmax(logits, dim=-1)
+            probs = log_probs.exp()
+            targets_one_hot = nn.functional.one_hot(target_indices, num_classes=logits.shape[-1]).float()
+            p_t = (probs * targets_one_hot).sum(dim=-1)  # probability of correct class
+            focal_weight = (1.0 - p_t).pow(self.focal_gamma)
+            # Per-sample CE loss
+            ce_loss = -log_probs.gather(1, target_indices.unsqueeze(1)).squeeze(1)
+            # Apply class weights
+            if self.class_weights is not None:
+                sample_weights = self.class_weights[target_indices]
+                ce_loss = ce_loss * sample_weights
+            loss = (focal_weight * ce_loss).mean()
+        else:
+            loss = nn.functional.cross_entropy(logits, target_indices, weight=self.class_weights)
 
         with torch.no_grad():
             preds = logits.detach().argmax(dim=-1)
             correct = (preds == target_indices).sum().item()
 
         return loss, correct, preds, B
+
+    def _build_encoding_cache(self, examples: List[TrainingExample]):
+        """Cache all text encodings once — encoder is frozen after calibration."""
+        logger.info(f"Building encoding cache for {len(examples)} examples...")
+        t0 = time.time()
+        cache_batch_size = 256
+        with torch.no_grad():
+            all_vecs = []
+            texts = [ex.input_text for ex in examples]
+            for i in range(0, len(texts), cache_batch_size):
+                batch = texts[i:i+cache_batch_size]
+                vecs = self.text_encoder.forward_batch(batch)
+                all_vecs.append(vecs)
+            self._cached_inputs = torch.cat(all_vecs, dim=0).to(self.device)
+            norms = torch.abs(self._cached_inputs).pow(2).sum(dim=-1, keepdim=True).sqrt()
+            self._cached_inputs = self._cached_inputs / (norms + 1e-6)
+            self._cached_targets = torch.tensor(
+                [BEHAVIOR_TYPES.index(ex.behavior) for ex in examples],
+                dtype=torch.long, device=self.device,
+            )
+        logger.info(f"Encoding cache built in {time.time()-t0:.1f}s")
 
     def train_epoch(self, examples: List[TrainingExample]) -> TrainingMetrics:
         """
@@ -487,20 +688,18 @@ class OmegaTrainer:
         dt = self.training_dt
         bs = self.batch_size
 
-        # Shuffle examples each epoch for stochastic training
+        # Build encoding cache on first epoch (encoder is frozen)
+        if not hasattr(self, '_cached_inputs') or self._cached_inputs is None:
+            self._build_encoding_cache(examples)
+
+        # Shuffle order each epoch for stochastic training
         shuffled = list(range(total_examples))
         _random.shuffle(shuffled)
 
-        # ── Phase 1: Encode ALL texts on device (frozen encoder) ──
+        # ── Phase 1: Use cached encodings in shuffled order ──
         with torch.no_grad():
-            all_input_vecs = [self.text_encoder(examples[i].input_text) for i in shuffled]
-            all_inputs = torch.stack(all_input_vecs).to(self.device)
-            input_norms = torch.abs(all_inputs).pow(2).sum(dim=-1, keepdim=True).sqrt()
-            all_inputs = all_inputs / (input_norms + 1e-6)
-            all_targets = torch.tensor(
-                [BEHAVIOR_TYPES.index(examples[i].behavior) for i in shuffled],
-                dtype=torch.long, device=self.device,
-            )
+            all_inputs = self._cached_inputs[shuffled]
+            all_targets = self._cached_targets[shuffled]
 
         # ── Phase 2: Mini-batch training ──
         total_loss = 0.0
@@ -633,21 +832,54 @@ class OmegaTrainer:
         for beh, count in behavior_counts.items():
             idx = BEHAVIOR_TYPES.index(beh)
             weights[idx] = total / (num_classes * count)
+        # Apply targeted boost for weak behaviors
+        if self.class_weight_boost:
+            for beh, multiplier in self.class_weight_boost.items():
+                idx = BEHAVIOR_TYPES.index(beh)
+                weights[idx] *= multiplier
         # Normalize so mean weight = 1.0
         weights = weights / weights.mean()
         self.class_weights = weights
         logger.info(f"Class weights computed: min={weights.min():.2f} max={weights.max():.2f}")
+        if self.class_weight_boost:
+            logger.info(f"Class weight boost applied: {self.class_weight_boost}")
+
+        # Cosine LR annealing: decay from peak LR → ~0 over training
+        base_lr = self.lr
+        best_state = None
+        best_acc_this_run = 0.0
 
         all_metrics = []
         for i in range(epochs):
+            # Cosine anneal: lr = base_lr * 0.5 * (1 + cos(pi * i / epochs))
+            cosine_factor = 0.5 * (1.0 + math.cos(math.pi * i / max(epochs, 1)))
+            new_lr = max(base_lr * cosine_factor, 1e-5)
+            self.set_lr(new_lr)
+
             metrics = self.train_epoch(examples)
             all_metrics.append(metrics)
+
+            # Track best state
+            if metrics.behavior_accuracy > best_acc_this_run:
+                best_acc_this_run = metrics.behavior_accuracy
+                best_state = {
+                    'phase_theta': self._train_phase_theta.detach().clone(),
+                    'recurrent_theta': self._train_recurrent_theta.detach().clone(),
+                }
 
             if metrics.behavior_accuracy >= target_accuracy:
                 logger.info(
                     f"Target accuracy {target_accuracy:.0%} reached at epoch {self.epoch}!"
                 )
                 break
+
+        # Restore best state from this run
+        if best_state is not None and best_acc_this_run > self.best_accuracy:
+            with torch.no_grad():
+                self._train_phase_theta.copy_(best_state['phase_theta'])
+                self._train_recurrent_theta.copy_(best_state['recurrent_theta'])
+            self._sync_to_device()
+            logger.info(f"Restored best state: {best_acc_this_run:.1%}")
 
         return all_metrics
 
@@ -709,6 +941,36 @@ class OmegaTrainer:
             'results': results,
         }
 
+    def infer_single(self, text: str) -> torch.Tensor:
+        """
+        Run a single text through the trained pipeline using the EXACT same
+        ODE dynamics as training (steps, dt, recurrent_scale, normalization).
+
+        Returns the output complex state vector suitable for PhaseAlignmentDecoder.
+        """
+        hidden_dim = self.cortex.config.hidden_dim
+        dt = self.training_dt
+        pfc = self.cortex.pfc
+
+        self.text_encoder.eval()  # disable dropout for inference
+        with torch.no_grad():
+            W = torch.exp(1j * pfc.phase_theta)
+            R = torch.exp(1j * pfc.recurrent_theta)
+
+            state = torch.zeros(hidden_dim, dtype=torch.complex64, device=self.device)
+            input_vec = self.text_encoder(text)
+            input_norm = torch.abs(input_vec).pow(2).sum().sqrt()
+            input_vec = input_vec / (input_norm + 1e-6)
+
+            recurrent_scale = 1.0 / math.sqrt(hidden_dim)
+            for step in range(self.training_steps):
+                z = torch.matmul(input_vec, W.T) + torch.matmul(state, R.T) * recurrent_scale
+                d_state = -state + torch.tanh(z)
+                state = state + d_state * dt
+                state = state / (torch.abs(state) + 1e-6)
+
+        return state
+
 
 # ============================================================================
 # DATA LOADING
@@ -724,9 +986,13 @@ def load_training_data(path: str) -> List[TrainingExample]:
                 continue
             try:
                 obj = json.loads(line)
+                behavior = obj['behavior']
+                if behavior not in BEHAVIOR_TYPES:
+                    logger.warning(f"Skipping line {line_num}: unknown behavior '{behavior}'")
+                    continue
                 examples.append(TrainingExample(
                     input_text=obj['input'],
-                    behavior=obj['behavior'],
+                    behavior=behavior,
                     target_action=obj['target_action'],
                     target_data=obj.get('target_data', {}),
                     expected_response_contains=obj.get('expected_response_contains', []),

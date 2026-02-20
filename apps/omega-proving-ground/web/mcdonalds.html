@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>McDonald's Drive-Thru — OMEGA Test Site</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { theme: { extend: { colors: {
+      mcred: { 50:'#fef2f2', 100:'#fee2e2', 500:'#DA291C', 600:'#bf1f14', 700:'#a01810' },
+      mcyellow: { 400:'#FFC72C', 500:'#FDB913' }
+    }}}}
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    * { font-family: 'Inter', system-ui, sans-serif; }
+    .fade-in { animation: fadeIn .25s ease-out; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+    .item-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,.15); }
+    .item-card { transition: transform .15s, box-shadow .15s; }
+    ::-webkit-scrollbar { width:6px } ::-webkit-scrollbar-thumb { background:#ddd; border-radius:3px; }
+    .cart-bounce { animation: bounce .3s ease; }
+    @keyframes bounce { 0%{transform:scale(1)} 50%{transform:scale(1.15)} 100%{transform:scale(1)} }
+    @keyframes mic-pulse { 0%,100%{box-shadow:0 0 0 0 rgba(218,41,28,.5)} 50%{box-shadow:0 0 0 18px rgba(218,41,28,0)} }
+    .mic-active { animation: mic-pulse 1.2s infinite; }
+    @keyframes ring-expand { 0%{transform:scale(1);opacity:.6} 100%{transform:scale(2.2);opacity:0} }
+    .mic-ring { animation: ring-expand 1.2s infinite; }
+    .debug-panel { transition: width .3s ease, opacity .2s ease; }
+    .order-item-enter { animation: slideIn .3s ease-out; }
+    @keyframes slideIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="bg-mcred-500 text-white shadow-lg shrink-0">
+    <div class="px-4 py-2 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <a href="/" class="text-white/70 hover:text-white text-sm">← OMEGA</a>
+        <div class="w-px h-6 bg-white/20"></div>
+        <div class="flex items-center gap-2">
+          <img src="/mcdonalds-arches.png" alt="McDonald's" class="h-10 w-auto">
+          <div>
+            <div class="font-bold text-lg leading-tight">McDonald's</div>
+            <div class="text-[10px] text-white/70 uppercase tracking-wider">Drive-Thru Test Site</div>
+          </div>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <div id="omega-badge" class="flex items-center gap-2 bg-white/10 rounded-full px-3 py-1">
+          <span class="w-2 h-2 rounded-full bg-gray-400" id="omega-dot"></span>
+          <span class="text-xs" id="omega-status">Connecting...</span>
+        </div>
+        <button onclick="toggleDebugPanel()" id="debug-toggle-btn"
+          class="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 rounded-full px-3 py-1.5 text-xs transition-colors" title="Toggle conversation log">
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span>Log</span>
+        </button>
+        <button onclick="detachDebugPanel()" id="debug-detach-btn"
+          class="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 rounded-full px-3 py-1.5 text-xs transition-colors" title="Pop out conversation log">
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          <span>Pop Out</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="flex flex-1 overflow-hidden">
+    <!-- LEFT SIDE: Menu browsing -->
+    <div class="flex flex-1 overflow-hidden">
+      <!-- Category Sidebar -->
+      <aside class="w-48 bg-white border-r border-gray-200 overflow-y-auto shrink-0">
+        <div class="p-3 text-xs text-gray-400 uppercase tracking-wider font-semibold">Menu</div>
+        <nav id="cat-nav" class="space-y-0.5 px-2 pb-4"></nav>
+      </aside>
+      <!-- Menu Content -->
+      <div class="flex-1 flex flex-col overflow-hidden">
+        <div class="px-6 py-3 bg-white border-b border-gray-100 shrink-0">
+          <h2 id="cat-title" class="text-lg font-bold text-gray-900">Loading menu...</h2>
+          <p id="cat-subtitle" class="text-sm text-gray-500"></p>
+        </div>
+        <div id="menu-grid" class="flex-1 overflow-y-auto p-4">
+          <div class="text-center text-gray-400 py-12">Loading menu data...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT SIDE: Order Display Panel (ALWAYS VISIBLE) -->
+    <aside class="w-[380px] bg-white text-gray-900 flex flex-col shrink-0 border-l border-gray-200">
+      <!-- Order Header -->
+      <div class="bg-white px-5 py-3 flex items-center justify-between border-b border-gray-200">
+        <div class="flex items-center gap-3">
+          <svg class="w-6 h-6 text-mcred-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          <div>
+            <div class="font-bold text-lg text-gray-900">Your Order</div>
+            <div id="order-item-count" class="text-xs text-gray-400">0 items</div>
+          </div>
+        </div>
+        <div id="order-number" class="bg-mcred-500/10 text-mcred-500 rounded-full px-3 py-0.5 text-xs font-mono font-bold hidden">#---</div>
+      </div>
+
+      <!-- Drive-Thru Mic Button (PROMINENT) -->
+      <div class="flex items-center gap-3 px-4 py-3 bg-gray-50 border-b border-gray-200 shrink-0">
+        <div class="relative">
+          <div id="mic-ring" class="absolute inset-0 rounded-full bg-mcred-500/30 hidden mic-ring"></div>
+          <button onclick="toggleVoice()" id="mic-btn"
+            class="relative z-10 w-16 h-16 rounded-full bg-mcred-500 hover:bg-mcred-600 text-white flex items-center justify-center transition-all shadow-lg active:scale-95"
+            title="Click to start/stop ordering">
+            <svg id="mic-icon" viewBox="0 0 24 24" class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="1" width="6" height="12" rx="3"/>
+              <path d="M19 10v1a7 7 0 0 1-14 0v-1"/>
+              <line x1="12" y1="19" x2="12" y2="23"/>
+              <line x1="8" y1="23" x2="16" y2="23"/>
+            </svg>
+          </button>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div id="mic-status" class="text-sm font-medium text-gray-500">Click mic to start ordering</div>
+          <div id="mic-transcript" class="text-xs text-mcred-500 h-4 truncate"></div>
+        </div>
+      </div>
+
+      <!-- Order Items (scrollable, real-time) -->
+      <div class="flex-1 overflow-y-auto" id="order-scroll">
+        <div id="order-items" class="p-4 space-y-2">
+          <div class="flex flex-col items-center justify-center py-12 text-gray-400">
+            <svg class="w-12 h-12 mb-3 text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            <div class="text-sm font-medium text-gray-400">No items yet</div>
+            <div class="text-xs text-gray-500 mt-1">Press the mic or browse the menu</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Totals -->
+      <div class="border-t border-gray-200 px-4 py-3 space-y-1.5 bg-gray-50 shrink-0">
+        <div class="flex justify-between text-xs text-gray-500"><span>Subtotal</span><span id="cart-subtotal">$0.00</span></div>
+        <div class="flex justify-between text-xs text-gray-500"><span>Tax (9.5%)</span><span id="cart-tax">$0.00</span></div>
+        <div class="flex justify-between text-sm font-bold text-gray-900 border-t border-gray-200 pt-2"><span>Total</span><span id="cart-total">$0.00</span></div>
+        <button onclick="placeOrder()" id="place-order-btn"
+          class="w-full bg-mcyellow-400 hover:bg-mcyellow-500 text-gray-900 font-bold py-3 rounded-xl transition-colors disabled:opacity-30 disabled:cursor-not-allowed text-sm mt-1" disabled>
+          Place Order
+        </button>
+      </div>
+
+      <!-- Hidden chat input for programmatic use -->
+      <input id="chat-input" type="hidden" value="">
+    </aside>
+
+    <!-- OMEGA Dev Panel (open by default, detachable) -->
+    <aside id="debug-panel" class="w-[400px] bg-gray-950 text-white flex flex-col shrink-0 border-l border-gray-800">
+      <div class="bg-gray-800 px-4 py-2 flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-2">
+          <span class="text-[10px] font-bold text-mcred-500 tracking-wider uppercase">OMEGA Dev Panel</span>
+          <span id="dev-infer-count" class="text-[10px] text-gray-600"></span>
+        </div>
+        <div class="flex items-center gap-1">
+          <button onclick="detachDebugPanel()" class="p-1 rounded hover:bg-gray-700 text-gray-500 hover:text-gray-300" title="Pop out">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </button>
+          <button onclick="toggleDebugPanel()" class="p-1 rounded hover:bg-gray-700 text-gray-500 hover:text-gray-300" title="Close">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="flex-1 overflow-y-auto p-3 space-y-3" id="dev-scroll">
+        <!-- Classification -->
+        <div id="dev-classification" class="bg-gray-900/80 rounded-lg p-3">
+          <div class="text-[10px] uppercase tracking-wider text-gray-500 font-semibold mb-1">Behavior</div>
+          <div class="text-xs text-gray-600">Waiting for inference...</div>
+        </div>
+        <!-- Top-K Behaviors -->
+        <div id="dev-topk" class="bg-gray-900/80 rounded-lg p-3">
+          <div class="text-[10px] uppercase tracking-wider text-gray-500 font-semibold mb-1">Top Behaviors</div>
+          <div class="text-xs text-gray-600">—</div>
+        </div>
+        <!-- Timing -->
+        <div id="dev-timing" class="bg-gray-900/80 rounded-lg p-3">
+          <div class="text-[10px] uppercase tracking-wider text-gray-500 font-semibold mb-1">Timing</div>
+          <div class="text-xs text-gray-600">—</div>
+        </div>
+        <!-- Cortex -->
+        <div id="dev-cortex" class="bg-gray-900/80 rounded-lg p-3">
+          <div class="text-[10px] uppercase tracking-wider text-gray-500 font-semibold mb-1">Cortex Telemetry</div>
+          <div class="text-xs text-gray-600">—</div>
+        </div>
+        <!-- Safety -->
+        <div id="dev-safety" class="bg-gray-900/80 rounded-lg p-3">
+          <div class="text-[10px] uppercase tracking-wider text-gray-500 font-semibold mb-1">Shadow Safety</div>
+          <div class="text-xs text-gray-600">—</div>
+        </div>
+        <!-- Conversation Log -->
+        <div class="bg-gray-900/80 rounded-lg p-3">
+          <div class="text-[10px] uppercase tracking-wider text-gray-500 font-semibold mb-2">Conversation</div>
+          <div id="chat-messages" class="space-y-2 max-h-[400px] overflow-y-auto">
+            <div class="text-center text-gray-600 text-[10px] py-2">Press mic to start</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Item Detail Modal -->
+  <div id="item-modal" class="fixed inset-0 bg-black/40 z-50 hidden flex items-center justify-center p-4" onclick="if(event.target===this)closeModal()">
+    <div class="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+      <div id="modal-content"></div>
+    </div>
+  </div>
+
+  <!-- Order Confirmation Modal -->
+  <div id="order-modal" class="fixed inset-0 bg-black/40 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-8 text-center shadow-2xl fade-in">
+      <div class="text-5xl mb-4">🎉</div>
+      <h2 class="text-2xl font-bold text-gray-900 mb-2">Order Placed!</h2>
+      <p class="text-gray-500 mb-1">Thank you for your order.</p>
+      <p class="text-gray-500 mb-6 text-sm">Pull forward to the next window.</p>
+      <div id="order-summary" class="text-left bg-gray-50 rounded-xl p-4 mb-6 text-sm space-y-1"></div>
+      <button onclick="closeOrderModal()" class="bg-mcred-500 hover:bg-mcred-600 text-white font-bold py-3 px-8 rounded-xl transition-colors">
+        New Order
+      </button>
+    </div>
+  </div>
+
+<script>
+window.onerror = function(msg, src, line, col, err) {
+  document.body.insertAdjacentHTML('afterbegin',
+    '<div style="position:fixed;top:0;left:0;right:0;z-index:9999;background:#dc2626;color:white;padding:16px;font-family:monospace;font-size:14px">' +
+    '<b>JS Error:</b> ' + msg + '<br>Line ' + line + ':' + col + '<br>' + (err && err.stack ? err.stack.split('\\n').slice(0,3).join('<br>') : '') +
+    '</div>');
+};
+const API = 'http://localhost:11435';
+const IMG_BASE = 'https://s7d1.scene7.com/is/image/mcdonalds/';
+const IMG_PARAMS = '?wid=300&hei=300&fmt=png-alpha';
+
+let menuData = null;
+let currentCategory = null;
+let cart = [];
+let debugPanelOpen = true;
+let debugWindow = null;
+let orderNumber = Math.floor(100 + Math.random() * 900);
+
+// ── Menu Loading ─────────────────────────────────────────────
+async function loadMenu() {
+  try {
+    const r = await fetch('/data/menu');
+    menuData = await r.json();
+    buildCategoryNav();
+    const firstTab = menuData.tabs?.find(t => t.id === 'dayMenu');
+    if (firstTab && firstTab.categories.length) selectCategory(firstTab.categories[0].id);
+  } catch(e) {
+    document.getElementById('menu-grid').innerHTML =
+      '<div class="text-center text-red-500 py-12">Failed to load menu: ' + e.message + '</div>';
+  }
+}
+
+function buildCategoryNav() {
+  const nav = document.getElementById('cat-nav');
+  nav.innerHTML = '';
+  if (!menuData?.tabs) return;
+  for (const tab of menuData.tabs) {
+    const header = document.createElement('div');
+    header.className = 'px-2 pt-3 pb-1 text-[10px] uppercase tracking-wider text-gray-400 font-semibold';
+    header.textContent = tab.label;
+    nav.appendChild(header);
+    for (const cat of tab.categories) {
+      const btn = document.createElement('button');
+      btn.className = 'cat-btn w-full text-left px-3 py-2 rounded-lg text-sm text-gray-700 hover:bg-mcred-50 hover:text-mcred-500 transition-colors';
+      btn.dataset.catId = cat.id;
+      btn.textContent = cat.label;
+      btn.onclick = () => selectCategory(cat.id);
+      nav.appendChild(btn);
+    }
+  }
+}
+
+function selectCategory(catId) {
+  currentCategory = catId;
+  document.querySelectorAll('.cat-btn').forEach(b => {
+    b.classList.toggle('bg-mcred-500', b.dataset.catId === catId);
+    b.classList.toggle('text-white', b.dataset.catId === catId);
+    b.classList.toggle('font-semibold', b.dataset.catId === catId);
+    b.classList.toggle('text-gray-700', b.dataset.catId !== catId);
+  });
+  let category = null;
+  for (const tab of menuData.tabs) { category = tab.categories.find(c => c.id === catId); if (category) break; }
+  if (!category) return;
+  document.getElementById('cat-title').textContent = category.label;
+  document.getElementById('cat-subtitle').textContent = category.items.length + ' items';
+  renderMenuGrid(category.items);
+}
+
+function renderMenuGrid(items) {
+  const grid = document.getElementById('menu-grid');
+  grid.innerHTML = '<div class="grid grid-cols-2 lg:grid-cols-3 gap-4">' + items.map(item => itemCard(item)).join('') + '</div>';
+}
+
+function itemCard(item) {
+  const imgUrl = item.image ? IMG_BASE + item.image + IMG_PARAMS : '';
+  const price = item.price ? '$' + item.price.toFixed(2) : (item.prices ? '$' + Object.values(item.prices)[0].toFixed(2) + '+' : '');
+  const mealPrice = item.meal_price ? '<span class="text-xs text-green-600 ml-1">Meal $' + item.meal_price.toFixed(2) + '</span>' : '';
+  const cals = item.calories ? '<span class="text-xs text-gray-400">' + item.calories + ' cal</span>' : '';
+  return `
+    <div class="item-card bg-white rounded-xl border border-gray-100 overflow-hidden cursor-pointer" onclick='openModal(${JSON.stringify(item).replace(/'/g,"&#39;")})'>
+      <div class="aspect-square bg-gray-50 flex items-center justify-center p-3">
+        ${imgUrl ? `<img src="${imgUrl}" alt="${esc(item.name)}" class="w-full h-full object-contain" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'text-4xl\\'>🍔</div>'">` : '<div class="text-4xl">🍔</div>'}
+      </div>
+      <div class="p-3">
+        <div class="font-semibold text-sm text-gray-900 leading-tight mb-1">${esc(item.name)}</div>
+        <div class="flex items-center gap-2"><span class="font-bold text-mcred-500">${price}</span>${mealPrice}</div>
+        ${cals}
+        <button onclick="event.stopPropagation();addToCart(JSON.parse(decodeURIComponent('${encodeURIComponent(JSON.stringify(item))}')))"
+          class="mt-2 w-full bg-mcred-500 hover:bg-mcred-600 text-white text-xs font-semibold py-2 rounded-lg transition-colors">
+          Add to Order
+        </button>
+      </div>
+    </div>`;
+}
+
+// ── Item Modal ───────────────────────────────────────────────
+function openModal(item) {
+  const imgUrl = item.image ? IMG_BASE + item.image + IMG_PARAMS : '';
+  const price = item.price ? '$' + item.price.toFixed(2) : '';
+  const modal = document.getElementById('modal-content');
+  let customizeHtml = '';
+  if (item.customizable && item.customizable.length) {
+    customizeHtml = `<div class="mt-4"><div class="text-sm font-semibold text-gray-700 mb-2">Customize</div>
+      <div class="space-y-1">${item.customizable.map(c =>
+        `<label class="flex items-center gap-2 text-sm text-gray-600"><input type="checkbox" class="rounded" value="${esc(c)}"> ${esc(c)}</label>`
+      ).join('')}</div></div>`;
+  }
+  let sauceHtml = '';
+  if (item.sauce_choices && item.sauce_choices.length) {
+    sauceHtml = `<div class="mt-4"><div class="text-sm font-semibold text-gray-700 mb-2">Choose Sauce</div>
+      <div class="flex flex-wrap gap-2">${item.sauce_choices.map(s =>
+        `<button onclick="this.classList.toggle('bg-mcred-500');this.classList.toggle('text-white');this.classList.toggle('border-mcred-500')"
+          class="text-xs px-3 py-1.5 rounded-full border border-gray-200 text-gray-600 transition-colors">${esc(s)}</button>`
+      ).join('')}</div></div>`;
+  }
+  let mealToggle = '';
+  if (item.meal_price) {
+    mealToggle = `<div class="mt-4 flex gap-2">
+      <button id="btn-item" onclick="selectMealOption('item')" class="flex-1 py-2 rounded-lg text-sm font-semibold border-2 border-mcred-500 text-mcred-500 bg-mcred-50">Item Only — ${price}</button>
+      <button id="btn-meal" onclick="selectMealOption('meal')" class="flex-1 py-2 rounded-lg text-sm font-semibold border-2 border-gray-200 text-gray-500">Meal — $${item.meal_price.toFixed(2)}</button>
+    </div>`;
+  }
+  modal.innerHTML = `
+    <div class="relative">
+      <button onclick="closeModal()" class="absolute top-3 right-3 z-10 bg-white/80 rounded-full w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-800 text-lg shadow">✕</button>
+      <div class="aspect-video bg-gray-50 flex items-center justify-center">
+        ${imgUrl ? `<img src="${imgUrl}" alt="${esc(item.name)}" class="h-full object-contain">` : '<div class="text-6xl">🍔</div>'}
+      </div>
+      <div class="p-6">
+        <h3 class="text-xl font-bold text-gray-900">${esc(item.name)}</h3>
+        ${item.description ? `<p class="text-sm text-gray-500 mt-1">${esc(item.description)}</p>` : ''}
+        <div class="flex items-center gap-3 mt-3">
+          <span class="text-2xl font-bold text-mcred-500">${price}</span>
+          ${item.calories ? `<span class="text-sm text-gray-400">${item.calories} cal</span>` : ''}
+        </div>
+        ${item.allergens ? `<div class="mt-2"><span class="text-orange-500 text-xs">⚠️ ${item.allergens.join(', ')}</span></div>` : ''}
+        ${mealToggle}${customizeHtml}${sauceHtml}
+        <div class="flex items-center gap-3 mt-6">
+          <div class="flex items-center border border-gray-200 rounded-lg">
+            <button onclick="modalQty(-1)" class="px-3 py-2 text-gray-500 hover:text-gray-800">−</button>
+            <span id="modal-qty" class="px-3 py-2 font-semibold text-gray-900 min-w-[2rem] text-center">1</span>
+            <button onclick="modalQty(1)" class="px-3 py-2 text-gray-500 hover:text-gray-800">+</button>
+          </div>
+          <button onclick="addFromModal()" class="flex-1 bg-mcred-500 hover:bg-mcred-600 text-white font-bold py-3 rounded-xl transition-colors">Add to Order</button>
+        </div>
+      </div>
+    </div>`;
+  window._modalItem = item; window._modalQty = 1; window._modalMeal = false;
+  document.getElementById('item-modal').classList.remove('hidden');
+}
+function closeModal() { document.getElementById('item-modal').classList.add('hidden'); }
+function modalQty(d) { window._modalQty = Math.max(1, (window._modalQty||1)+d); document.getElementById('modal-qty').textContent = window._modalQty; }
+function selectMealOption(opt) {
+  window._modalMeal = opt === 'meal';
+  const bi = document.getElementById('btn-item'), bm = document.getElementById('btn-meal');
+  if (opt==='meal') { bm.className='flex-1 py-2 rounded-lg text-sm font-semibold border-2 border-mcred-500 text-mcred-500 bg-mcred-50'; bi.className='flex-1 py-2 rounded-lg text-sm font-semibold border-2 border-gray-200 text-gray-500'; }
+  else { bi.className='flex-1 py-2 rounded-lg text-sm font-semibold border-2 border-mcred-500 text-mcred-500 bg-mcred-50'; bm.className='flex-1 py-2 rounded-lg text-sm font-semibold border-2 border-gray-200 text-gray-500'; }
+}
+function addFromModal() { const item=window._modalItem, qty=window._modalQty||1, meal=window._modalMeal; for(let i=0;i<qty;i++)addToCart(item,meal); closeModal(); }
+
+// ── Cart / Order ─────────────────────────────────────────────
+function addToCart(item, isMeal=false) {
+  const price = isMeal&&item.meal_price ? item.meal_price : (item.price||(item.prices?Object.values(item.prices)[0]:0));
+  const name = isMeal ? item.name+' Meal' : item.name;
+  const existing = cart.find(c => c.name === name);
+  if (existing) existing.qty++; else cart.push({ id:item.id, name, price, qty:1, image:item.image });
+  updateOrderUI();
+  const text = isMeal ? `I want a ${item.name} meal` : `I want a ${item.name}`;
+  inferChat(text, false);
+}
+
+function removeFromCart(idx) { cart[idx].qty--; if(cart[idx].qty<=0) cart.splice(idx,1); updateOrderUI(); }
+
+function updateOrderUI() {
+  const totalItems = cart.reduce((s,c)=>s+c.qty,0);
+  const subtotal = cart.reduce((s,c)=>s+c.price*c.qty,0);
+  const tax = subtotal*0.095;
+  const total = subtotal+tax;
+
+  // Order header count + number badge visibility
+  document.getElementById('order-item-count').textContent = totalItems + ' item' + (totalItems!==1?'s':'');
+  const orderNumEl = document.getElementById('order-number');
+  if (totalItems > 0) { orderNumEl.classList.remove('hidden'); orderNumEl.textContent = '#' + orderNumber; }
+  else { orderNumEl.classList.add('hidden'); }
+
+  // Totals
+  document.getElementById('cart-subtotal').textContent = '$' + subtotal.toFixed(2);
+  document.getElementById('cart-tax').textContent = '$' + tax.toFixed(2);
+  document.getElementById('cart-total').textContent = '$' + total.toFixed(2);
+  document.getElementById('place-order-btn').disabled = totalItems===0;
+
+  // Order items list
+  const el = document.getElementById('order-items');
+  if (cart.length === 0) {
+    el.innerHTML = `<div class="flex flex-col items-center justify-center py-12 text-gray-400">
+      <svg class="w-12 h-12 mb-3 text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      <div class="text-sm font-medium text-gray-400">No items yet</div>
+      <div class="text-xs text-gray-500 mt-1">Press the mic or browse the menu</div>
+    </div>`;
+    return;
+  }
+  el.innerHTML = cart.map((c,i) => {
+    const img = c.image ? IMG_BASE+c.image+'?wid=60&hei=60&fmt=png-alpha' : '';
+    return `<div class="flex items-center gap-3 bg-gray-50 rounded-lg p-2.5 border border-gray-100 order-item-enter">
+      <div class="w-11 h-11 bg-gray-100 rounded-lg flex items-center justify-center shrink-0">
+        ${img ? `<img src="${img}" class="w-9 h-9 object-contain">` : '<span class="text-lg">🍔</span>'}
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="text-sm font-semibold text-gray-900 truncate">${esc(c.name)}</div>
+        <div class="text-[11px] text-gray-500">$${c.price.toFixed(2)} each</div>
+      </div>
+      <div class="flex items-center gap-1.5">
+        <button onclick="removeFromCart(${i})" class="w-6 h-6 rounded bg-gray-200 text-gray-600 text-xs flex items-center justify-center hover:bg-red-100 hover:text-red-600 transition-colors">−</button>
+        <span class="text-sm font-bold w-4 text-center text-gray-900">${c.qty}</span>
+        <button onclick="cart[${i}].qty++;updateOrderUI()" class="w-6 h-6 rounded bg-gray-200 text-gray-600 text-xs flex items-center justify-center hover:bg-green-100 hover:text-green-600 transition-colors">+</button>
+      </div>
+      <div class="text-sm font-bold text-mcred-500 w-14 text-right">$${(c.price*c.qty).toFixed(2)}</div>
+    </div>`;
+  }).join('');
+  // Scroll to bottom of order
+  const scroll = document.getElementById('order-scroll');
+  scroll.scrollTop = scroll.scrollHeight;
+}
+
+function placeOrder() {
+  const subtotal = cart.reduce((s,c)=>s+c.price*c.qty,0);
+  const total = subtotal + subtotal*0.095;
+  const n = cart.reduce((s,c)=>s+c.qty,0);
+  document.getElementById('order-summary').innerHTML =
+    cart.map(c=>`<div class="flex justify-between"><span>${c.qty}× ${esc(c.name)}</span><span class="font-semibold">$${(c.price*c.qty).toFixed(2)}</span></div>`).join('') +
+    `<div class="border-t pt-1 mt-2 flex justify-between font-bold"><span>Total (${n} items)</span><span>$${total.toFixed(2)}</span></div>`;
+  document.getElementById('order-modal').classList.remove('hidden');
+  inferChat('That will be everything, thanks', true);
+}
+
+function closeOrderModal() {
+  document.getElementById('order-modal').classList.add('hidden');
+  cart = [];
+  orderNumber = Math.floor(100 + Math.random() * 900);
+  updateOrderUI();
+  resetConversation();
+  conversationStarted = false;
+}
+
+// ── Debug / Dev Panel ────────────────────────────────────────
+function toggleDebugPanel() {
+  const panel = document.getElementById('debug-panel');
+  debugPanelOpen = !debugPanelOpen;
+  panel.classList.toggle('hidden', !debugPanelOpen);
+}
+
+function detachDebugPanel() {
+  if (debugWindow && !debugWindow.closed) { debugWindow.focus(); return; }
+  // Position: aligned to the right edge of the current window, same height
+  const winX = window.screenX || window.screenLeft || 0;
+  const winY = window.screenY || window.screenTop || 0;
+  const winW = window.outerWidth || 1200;
+  const winH = window.outerHeight || 800;
+  const popW = 520;
+  const popLeft = winX + winW;
+  const popTop = winY;
+  debugWindow = window.open('', 'mcdonalds_debug',
+    `width=${popW},height=${winH},left=${popLeft},top=${popTop},resizable=yes,scrollbars=yes`);
+  debugWindow.document.write(`<!DOCTYPE html><html><head><title>OMEGA Dev Panel</title>
+    <style>*{font-family:'Inter',system-ui,sans-serif;margin:0;box-sizing:border-box}
+    body{background:#0a0a0a;color:#e5e5e5;padding:0;font-size:13px;overflow-x:hidden}
+    .header{background:linear-gradient(135deg,#111 0%,#1a1a2e 100%);padding:16px 20px;border-bottom:1px solid #DA291C33;
+      display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10;backdrop-filter:blur(8px)}
+    .header .dot{width:8px;height:8px;border-radius:50%;background:#DA291C;box-shadow:0 0 8px #DA291C88;animation:pulse 2s infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+    .header h3{color:#fff;font-size:14px;font-weight:700;flex:1}
+    .header .badge{background:#DA291C22;color:#DA291C;font-size:10px;padding:2px 8px;border-radius:12px;font-weight:600}
+    .content{padding:12px 16px}
+    .section{margin-bottom:12px;padding:14px;background:linear-gradient(180deg,#111827 0%,#0f172a 100%);
+      border-radius:10px;border:1px solid #1e293b;transition:border-color .3s}
+    .section:hover{border-color:#334155}
+    .section h4{color:#FFC72C;font-size:10px;margin-bottom:10px;text-transform:uppercase;letter-spacing:1.5px;font-weight:700}
+    .stat{display:flex;justify-content:space-between;padding:3px 0;font-size:12px}
+    .stat .label{color:#64748b} .stat .val{color:#e2e8f0;font-weight:600}
+    .bar-row{display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:11px}
+    .bar-label{width:90px;color:#94a3b8;text-align:right;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .bar-track{flex:1;height:14px;background:#0f172a;border-radius:4px;overflow:hidden;border:1px solid #1e293b}
+    .bar-fill{height:100%;border-radius:3px;transition:width .4s ease}
+    .bar-val{width:42px;color:#e2e8f0;font-weight:600;text-align:right}
+    .msg{padding:8px 12px;border-radius:10px;margin-bottom:6px;max-width:85%;font-size:12px;line-height:1.4}
+    .user{background:#1e293b;margin-left:auto;border-bottom-right-radius:2px;color:#cbd5e1}
+    .ai{background:#DA291C18;border:1px solid #DA291C22;border-bottom-left-radius:2px;color:#fca5a5}
+    .ts{font-size:9px;color:#475569;margin-bottom:2px}
+    </style></head><body>
+    <div class="header">
+      <div class="dot"></div>
+      <h3>OMEGA Dev Panel</h3>
+      <span class="badge">LIVE</span>
+    </div>
+    <div class="content">
+      <div id="d-omega" class="section"><h4>OMEGA Classification</h4><div id="d-omega-c">Waiting...</div></div>
+      <div id="d-cortex" class="section"><h4>Cortex Telemetry</h4><div id="d-cortex-c">Waiting...</div></div>
+      <div id="d-convo" class="section"><h4>Conversation</h4><div id="d-log"></div></div>
+    </div>
+    </body></html>`);
+  debugWindow.document.close();
+  // Copy existing conversation
+  const msgs = document.getElementById('chat-messages');
+  if (msgs) {
+    const log = debugWindow.document.getElementById('d-log');
+    if (log) log.innerHTML = msgs.innerHTML;
+  }
+  if (_lastInferData) updateDetachedStats(_lastInferData);
+  document.getElementById('debug-panel').classList.add('hidden');
+  debugPanelOpen = false;
+}
+
+// ── Chat Bubbles ─────────────────────────────────────────────
+function addChatBubble(role, text) {
+  const time = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+  const escaped = esc(text);
+  const chat = document.getElementById('chat-messages');
+  // Clear placeholder
+  if (chat.children.length === 1 && chat.firstElementChild?.classList.contains('text-center')) {
+    chat.innerHTML = '';
+  }
+  const div = document.createElement('div');
+  div.className = 'fade-in';
+  if (role === 'user') {
+    div.innerHTML = `<div class="text-[10px] text-gray-600 text-right mb-0.5">${time}</div>
+      <div class="bg-gray-700 text-gray-100 rounded-xl rounded-br-sm px-3 py-2 text-xs ml-8">${escaped}</div>`;
+  } else {
+    div.innerHTML = `<div class="text-[10px] text-gray-600 mb-0.5">${time}</div>
+      <div class="bg-mcred-600/30 text-gray-200 rounded-xl rounded-bl-sm px-3 py-2 text-xs mr-8">${escaped}</div>`;
+  }
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+  // Mirror to detached window
+  if (debugWindow && !debugWindow.closed) {
+    const log = debugWindow.document.getElementById('d-log');
+    if (log) {
+      const d2 = debugWindow.document.createElement('div');
+      d2.innerHTML = `<div class="ts">${time}</div><div class="msg ${role==='user'?'user':'ai'}">${escaped}</div>`;
+      log.appendChild(d2);
+      log.scrollTop = log.scrollHeight;
+    }
+  }
+}
+
+// ── TTS via ElevenLabs (server /tts endpoint) ───────────────
+let ttsEnabled = true;
+let _isSpeaking = false;   // TRUE while TTS is playing — voice input ignored
+let _currentAudio = null;  // currently playing Audio element
+
+let _ttsWarned = false;
+
+function _showTTSWarning(msg) {
+  if (_ttsWarned) return;
+  _ttsWarned = true;
+  const toast = document.createElement('div');
+  toast.className = 'fixed top-16 right-4 z-50 bg-red-600 text-white px-4 py-2 rounded-lg shadow-xl text-xs font-medium';
+  toast.style.animation = 'fadeIn .3s ease-out';
+  toast.innerHTML = '<b>TTS Error:</b> ' + msg;
+  document.body.appendChild(toast);
+  setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity .5s'; setTimeout(() => toast.remove(), 600); }, 8000);
+}
+
+async function speakText(text) {
+  if (!ttsEnabled) return;
+  // Cancel any in-progress audio
+  if (_currentAudio) { try { _currentAudio.pause(); _currentAudio = null; } catch(e) {} }
+  _isSpeaking = true;
+  document.getElementById('mic-status').textContent = isListening ? 'AI speaking...' : 'Click mic to start ordering';
+
+  try {
+    const r = await fetch(API + '/tts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: text.replace(/^["']|["']$/g, '').replace(/\*/g, '') }),
+    });
+    if (!r.ok) {
+      const err = await r.json().catch(() => ({}));
+      const errMsg = err.error || ('HTTP ' + r.status);
+      console.error('TTS error:', errMsg);
+      if (errMsg.includes('401') || errMsg.includes('Unauthorized'))
+        _showTTSWarning('ElevenLabs API key invalid or expired. Update ELEVENLABS_API_KEY in .env and restart the OMEGA server.');
+      else if (errMsg.includes('not configured'))
+        _showTTSWarning('ELEVENLABS_API_KEY not set. Add it to .env and restart the OMEGA server.');
+      else
+        _showTTSWarning(errMsg);
+      _isSpeaking = false;
+      if (isListening) document.getElementById('mic-status').textContent = 'Listening — speak your order...';
+      return;
+    }
+    const blob = await r.blob();
+    const url = URL.createObjectURL(blob);
+    const audio = new Audio(url);
+    _currentAudio = audio;
+    audio.onended = () => {
+      _isSpeaking = false;
+      _currentAudio = null;
+      URL.revokeObjectURL(url);
+      if (isListening) document.getElementById('mic-status').textContent = 'Listening — speak your order...';
+    };
+    audio.onerror = () => {
+      _isSpeaking = false;
+      _currentAudio = null;
+      URL.revokeObjectURL(url);
+      console.error('TTS audio playback error');
+    };
+    audio.play();
+  } catch(e) {
+    console.error('TTS fetch failed:', e);
+    _showTTSWarning('Cannot reach OMEGA TTS endpoint. Is the server running?');
+    _isSpeaking = false;
+    if (isListening) document.getElementById('mic-status').textContent = 'Listening — speak your order...';
+  }
+}
+
+// ── Conversation State & Inference Queue ─────────────────────
+let conversationHistory = [];
+let _lastInferData = null;
+let _inferCount = 0;
+let _inferQueue = [];
+let _inferRunning = false;
+
+function resetConversation() {
+  conversationHistory = [];
+  _inferCount = 0;
+  _lastInferData = null;
+  _inferQueue = [];
+  _inferRunning = false;
+  const chat = document.getElementById('chat-messages');
+  if (chat) chat.innerHTML = '<div class="text-center text-gray-600 text-[10px] py-2">Press mic to start</div>';
+  // Reset dev panel sections
+  document.getElementById('dev-classification').innerHTML = '<div class="text-[10px] uppercase tracking-wider text-gray-500 font-semibold mb-1">Behavior</div><div class="text-xs text-gray-600">Waiting for inference...</div>';
+  document.getElementById('dev-topk').innerHTML = '<div class="text-[10px] uppercase tracking-wider text-gray-500 font-semibold mb-1">Top Behaviors</div><div class="text-xs text-gray-600">—</div>';
+  document.getElementById('dev-timing').innerHTML = '<div class="text-[10px] uppercase tracking-wider text-gray-500 font-semibold mb-1">Timing</div><div class="text-xs text-gray-600">—</div>';
+  document.getElementById('dev-cortex').innerHTML = '<div class="text-[10px] uppercase tracking-wider text-gray-500 font-semibold mb-1">Cortex Telemetry</div><div class="text-xs text-gray-600">—</div>';
+  document.getElementById('dev-safety').innerHTML = '<div class="text-[10px] uppercase tracking-wider text-gray-500 font-semibold mb-1">Shadow Safety</div><div class="text-xs text-gray-600">—</div>';
+}
+
+// Queue-based inference — never drops user speech
+function inferChat(text, showUser=true) {
+  _inferQueue.push({ text, showUser });
+  _processQueue();
+}
+
+async function _processQueue() {
+  if (_inferRunning || _inferQueue.length === 0) return;
+  _inferRunning = true;
+  const { text, showUser } = _inferQueue.shift();
+
+  if (showUser) addChatBubble('user', text);
+
+  try {
+    // Send PAST history only — server appends current text itself to avoid duplication
+    const r = await fetch(API+'/infer', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ text, conversation_history: conversationHistory }),
+    });
+    // NOW add to local history (after sending, so it's not duplicated)
+    conversationHistory.push({ role: 'customer', text: text });
+
+    const d = await r.json();
+    _lastInferData = d;
+    _inferCount++;
+    document.getElementById('dev-infer-count').textContent = '#' + _inferCount;
+
+    if (d.error) {
+      addChatBubble('ai', 'Error: ' + d.error);
+    } else {
+      const aiText = d.response || '';
+      if (aiText) {
+        addChatBubble('ai', aiText);
+        conversationHistory.push({ role: 'crew', text: aiText });
+        speakText(aiText);
+      }
+      if (d.order) syncOrderFromServer(d.order);
+      renderDevPanel(d);
+      if (debugWindow && !debugWindow.closed) updateDetachedStats(d);
+    }
+  } catch(e) {
+    addChatBubble('ai', 'Connection error — is the OMEGA server running?');
+    conversationHistory.push({ role: 'customer', text: text });
+  }
+  _inferRunning = false;
+  if (_inferQueue.length > 0) _processQueue();
+}
+
+function syncOrderFromServer(order) {
+  const items = order.items || [];
+  if (items.length === 0 && cart.length === 0) return;
+  cart = items.map(it => {
+    // Cross-reference with loaded menu data for images and canonical names
+    let image = null, displayName = it.item;
+    if (menuData && menuData.tabs) {
+      for (const tab of menuData.tabs) {
+        for (const cat of (tab.categories || [])) {
+          for (const mi of (cat.items || [])) {
+            const norm = n => n.toLowerCase().replace(/[\u00ae\u2122*]/g, '').trim();
+            if (norm(mi.name) === norm(it.item)) {
+              image = mi.image || null;
+              displayName = mi.name;
+              break;
+            }
+          }
+        }
+      }
+    }
+    return {
+      id: it.item, name: displayName, price: it.unit_price || 0,
+      qty: it.quantity || 1, image, isMeal: it.is_meal || false,
+    };
+  });
+  updateOrderUI();
+}
+
+async function greetCustomer() {
+  // Let OMEGA generate the greeting — not hardcoded
+  try {
+    const r = await fetch(API+'/infer', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ text: '[customer approaching drive-thru]', conversation_history: [] }),
+    });
+    const d = await r.json();
+    _lastInferData = d;
+    _inferCount++;
+    const aiText = d.response || "Welcome to McDonald's, what can I get for you?";
+    addChatBubble('ai', aiText);
+    conversationHistory.push({ role: 'crew', text: aiText });
+    speakText(aiText);
+    if (d.omega) renderDevPanel(d);
+    if (debugWindow && !debugWindow.closed) updateDetachedStats(d);
+  } catch(e) {
+    const fallback = "Welcome to McDonald's! What can I get for you today?";
+    addChatBubble('ai', fallback);
+    conversationHistory.push({ role: 'crew', text: fallback });
+    speakText(fallback);
+  }
+}
+
+// ── Dev Panel Renderers (all-in-one, no tabs) ────────────────
+const BCOLORS = {
+  greet:'#22c55e',menu_inquiry:'#3b82f6',value_recommendation:'#a855f7',
+  take_order:'#ef4444',take_order_breakfast:'#f97316',price_inquiry:'#eab308',
+  customize:'#06b6d4',split_size_selection:'#8b5cf6',complaint:'#dc2626',
+  order_modify:'#f59e0b',meal_substitution:'#10b981',combo_entree_swap:'#6366f1',time_check:'#64748b'
+};
+
+function renderDevPanel(d) {
+  if (!d.omega) return;
+  const o = d.omega, c = d.cortex || {}, l = d.llama || {}, s = d.shadow_safety || {};
+  const topK = o.top_behaviors || [];
+  const confPct = (o.confidence * 100).toFixed(1);
+  const bColor = BCOLORS[o.behavior] || '#64748b';
+  const confColor = o.confidence > 0.9 ? '#22c55e' : o.confidence > 0.7 ? '#eab308' : '#ef4444';
+
+  // Classification
+  document.getElementById('dev-classification').innerHTML = `
+    <div class="flex items-center justify-between mb-1">
+      <span class="text-[10px] uppercase tracking-wider text-gray-500 font-semibold">Behavior</span>
+      <span class="text-[10px] text-gray-600">#${_inferCount}</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <span class="px-2 py-0.5 rounded text-xs font-bold" style="background:${bColor}33;color:${bColor}">${esc(o.behavior)}</span>
+      <span class="text-xs font-bold" style="color:${confColor}">${confPct}%</span>
+      ${o.raw_behavior !== o.behavior ? `<span class="text-[10px] text-yellow-500">← ${esc(o.raw_behavior)}</span>` : ''}
+    </div>`;
+
+  // Top-K
+  document.getElementById('dev-topk').innerHTML = `
+    <div class="text-[10px] uppercase tracking-wider text-gray-500 font-semibold mb-2">Top Behaviors</div>
+    ${topK.map(([b, score]) => {
+      const pct = (score * 100).toFixed(1);
+      const w = Math.min(100, score * 100);
+      const active = b === o.behavior;
+      const bc = BCOLORS[b] || '#64748b';
+      return `<div class="flex items-center gap-2 mb-1">
+        <span class="text-[10px] w-[80px] text-right truncate ${active ? 'font-bold' : 'text-gray-500'}" style="${active?'color:'+bc:''}">${b}</span>
+        <div class="flex-1 h-3 bg-gray-800 rounded overflow-hidden">
+          <div class="h-full rounded" style="width:${w}%;background:${active?bc:'#4b5563'}"></div>
+        </div>
+        <span class="text-[10px] w-10 text-right ${active ? 'text-white font-bold' : 'text-gray-500'}">${pct}%</span>
+      </div>`;
+    }).join('')}`;
+
+  // Timing
+  document.getElementById('dev-timing').innerHTML = `
+    <div class="text-[10px] uppercase tracking-wider text-gray-500 font-semibold mb-2">Timing</div>
+    <div class="grid grid-cols-3 gap-2 text-center">
+      <div><div class="text-xs font-bold text-mcyellow-400">${o.processing_ms?.toFixed(0)||'?'}ms</div><div class="text-[9px] text-gray-500">OMEGA</div></div>
+      <div><div class="text-xs font-bold text-blue-400">${l.processing_ms?.toFixed(0)||'?'}ms</div><div class="text-[9px] text-gray-500">Llama</div></div>
+      <div><div class="text-xs font-bold text-gray-300">${d.total_ms?.toFixed(0)||'?'}ms</div><div class="text-[9px] text-gray-500">Total</div></div>
+    </div>
+    ${l.model ? `<div class="text-[9px] text-gray-600 text-center mt-1">${esc(l.model)}</div>` : ''}`;
+
+  // Cortex
+  if (c.coherence != null) {
+    const cohPct = Math.min(100, Math.max(0, c.coherence * 100));
+    const cohColor = cohPct > 70 ? '#22c55e' : cohPct > 40 ? '#eab308' : '#ef4444';
+    const sparsePct = ((c.output_sparsity||0) * 100).toFixed(1);
+    document.getElementById('dev-cortex').innerHTML = `
+      <div class="text-[10px] uppercase tracking-wider text-gray-500 font-semibold mb-2">Cortex Telemetry</div>
+      <div class="flex items-center gap-3 mb-2">
+        <div class="relative w-14 h-14 shrink-0">
+          <svg viewBox="0 0 36 36" class="w-14 h-14 -rotate-90">
+            <circle cx="18" cy="18" r="15" fill="none" stroke="#1f2937" stroke-width="3"/>
+            <circle cx="18" cy="18" r="15" fill="none" stroke="${cohColor}" stroke-width="3"
+              stroke-dasharray="${cohPct * 0.942} 100" stroke-linecap="round"/>
+          </svg>
+          <div class="absolute inset-0 flex items-center justify-center text-[10px] font-bold" style="color:${cohColor}">${cohPct.toFixed(0)}%</div>
+        </div>
+        <div class="flex-1 space-y-0.5 text-[10px]">
+          <div class="flex justify-between"><span class="text-gray-500">State Norm</span><span class="text-gray-300 font-mono">${c.state_norm?.toFixed(2)}</span></div>
+          <div class="flex justify-between"><span class="text-gray-500">Hidden Dim</span><span class="text-gray-300 font-mono">${c.hidden_dim}</span></div>
+          <div class="flex justify-between"><span class="text-gray-500">Sparsity</span><span class="text-emerald-400 font-mono">${sparsePct}%</span></div>
+        </div>
+      </div>
+      <div class="space-y-1">
+        ${_devBar('Mag Mean', c.output_magnitude_mean, 1, '#3b82f6')}
+        ${_devBar('Mag Max', c.output_magnitude_max, 2, '#f59e0b')}
+        ${_devBar('Mag Std', c.output_magnitude_std, 1, '#8b5cf6')}
+      </div>`;
+  }
+
+  // Safety
+  document.getElementById('dev-safety').innerHTML = `
+    <div class="text-[10px] uppercase tracking-wider text-gray-500 font-semibold mb-1">Shadow Safety</div>
+    <div class="flex items-center gap-2">
+      ${s.checked ? `<span class="text-xs font-bold ${s.is_safe?'text-green-400':'text-red-400'}">${s.verdict}</span>
+        <span class="text-[10px] text-gray-500">Helix: ${s.max_helix_alignment?.toFixed(4)||'N/A'}</span>` :
+        '<span class="text-[10px] text-gray-600">Not checked</span>'}
+    </div>`;
+}
+
+function _devBar(label, value, maxVal, color) {
+  const pct = Math.min(100, (value / maxVal) * 100);
+  return `<div class="flex items-center gap-1.5">
+    <span class="text-[9px] w-14 text-right text-gray-500">${label}</span>
+    <div class="flex-1 h-2.5 bg-gray-800 rounded overflow-hidden">
+      <div class="h-full rounded" style="width:${pct}%;background:${color}"></div>
+    </div>
+    <span class="text-[9px] w-12 text-right text-gray-400 font-mono">${value?.toFixed(4)}</span>
+  </div>`;
+}
+
+function updateDetachedStats(d) {
+  if (!debugWindow || debugWindow.closed) return;
+  const oc = debugWindow.document.getElementById('d-omega-c');
+  const cc = debugWindow.document.getElementById('d-cortex-c');
+  if (!oc) return;
+  const o = d.omega || {}, c = d.cortex || {}, l = d.llama || {}, s = d.shadow_safety || {};
+  const topK = o.top_behaviors || [];
+  oc.innerHTML = `
+    <div class="stat"><span class="label">Behavior</span><span class="val" style="color:${BCOLORS[o.behavior]||'#FFC72C'}">${o.behavior||'?'}</span></div>
+    <div class="stat"><span class="label">Confidence</span><span class="val">${((o.confidence||0)*100).toFixed(1)}%</span></div>
+    <div class="stat"><span class="label">OMEGA</span><span class="val">${o.processing_ms?.toFixed(0)||'?'}ms</span></div>
+    <div class="stat"><span class="label">Llama</span><span class="val">${l.processing_ms?.toFixed(0)||'?'}ms</span></div>
+    <div class="stat"><span class="label">Total</span><span class="val">${d.total_ms?.toFixed(0)||'?'}ms</span></div>
+    <div class="stat"><span class="label">Safety</span><span class="val" style="color:${s.is_safe?'#22c55e':'#ef4444'}">${s.verdict||'N/A'}</span></div>
+    <div style="margin-top:6px">${topK.map(([b,sc]) => `<div class="bar-row">
+      <span class="bar-label">${b}</span>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.min(100,sc*100)}%;background:${b===o.behavior?BCOLORS[b]||'#DA291C':'#4b5563'}"></div></div>
+      <span class="bar-val">${(sc*100).toFixed(1)}%</span>
+    </div>`).join('')}</div>`;
+  if (cc) {
+    cc.innerHTML = `
+      <div class="stat"><span class="label">Coherence</span><span class="val">${((c.coherence||0)*100).toFixed(1)}%</span></div>
+      <div class="stat"><span class="label">State Norm</span><span class="val">${c.state_norm?.toFixed(2)||'?'}</span></div>
+      <div class="stat"><span class="label">Mag Mean</span><span class="val">${c.output_magnitude_mean?.toFixed(4)||'?'}</span></div>
+      <div class="stat"><span class="label">Mag Max</span><span class="val">${c.output_magnitude_max?.toFixed(4)||'?'}</span></div>
+      <div class="stat"><span class="label">Sparsity</span><span class="val">${((c.output_sparsity||0)*100).toFixed(1)}%</span></div>
+      <div class="stat"><span class="label">Hidden Dim</span><span class="val">${c.hidden_dim||'?'}</span></div>`;
+  }
+}
+
+function sendChat() { const i=document.getElementById('chat-input'), t=i.value.trim(); if(!t)return; i.value=''; inferChat(t, true); }
+
+// ── Voice Input (Web Speech API) ─────────────────────────────
+let recognition = null;
+let isListening = false;
+let conversationStarted = false;
+
+function toggleVoice() {
+  if (isListening) stopVoice(); else startVoice();
+}
+
+function startVoice() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { addChatBubble('ai', 'Voice not supported. Use Chrome.'); return; }
+
+  if (!conversationStarted) {
+    conversationStarted = true;
+    greetCustomer();
+  }
+
+  recognition = new SR();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = 'en-US';
+
+  const btn = document.getElementById('mic-btn');
+  btn.classList.add('mic-active', 'bg-mcred-700');
+  btn.classList.remove('bg-mcred-500');
+  document.getElementById('mic-ring').classList.remove('hidden');
+  document.getElementById('mic-status').textContent = 'Listening — speak your order...';
+  document.getElementById('mic-status').classList.remove('text-gray-400');
+  document.getElementById('mic-status').classList.add('text-mcred-500');
+  document.getElementById('mic-transcript').textContent = '';
+  isListening = true;
+
+  let lastFinalIdx = 0;
+
+  recognition.onresult = (e) => {
+    // CRITICAL: Ignore all input while AI is speaking via TTS
+    // This prevents the feedback loop where the mic picks up the AI's voice
+    if (_isSpeaking) return;
+
+    let interim = '';
+    let finalText = '';
+    for (let i = lastFinalIdx; i < e.results.length; i++) {
+      const t = e.results[i][0].transcript;
+      if (e.results[i].isFinal) {
+        finalText += t;
+        lastFinalIdx = i + 1;
+      } else {
+        interim += t;
+      }
+    }
+    document.getElementById('mic-transcript').textContent = interim || finalText;
+
+    if (finalText.trim()) {
+      document.getElementById('mic-transcript').textContent = '';
+      inferChat(finalText.trim(), true);
+    }
+  };
+
+  recognition.onerror = (e) => {
+    console.error('Speech error:', e.error);
+    if (e.error === 'not-allowed') {
+      addChatBubble('ai', 'Microphone access denied. Allow mic in browser settings.');
+      stopVoice();
+    } else if (e.error === 'no-speech') {
+      document.getElementById('mic-transcript').textContent = '(no speech detected)';
+    }
+  };
+
+  recognition.onend = () => {
+    if (isListening) {
+      try { lastFinalIdx = 0; recognition.start(); }
+      catch(e) { stopVoice(); }
+    }
+  };
+
+  recognition.start();
+}
+
+function stopVoice() {
+  isListening = false;
+  _isSpeaking = false;
+  if (_currentAudio) { try { _currentAudio.pause(); _currentAudio = null; } catch(e) {} }
+  const btn = document.getElementById('mic-btn');
+  btn.classList.remove('mic-active', 'bg-mcred-700');
+  btn.classList.add('bg-mcred-500');
+  document.getElementById('mic-ring').classList.add('hidden');
+  document.getElementById('mic-status').textContent = 'Click mic to start ordering';
+  document.getElementById('mic-status').classList.add('text-gray-400');
+  document.getElementById('mic-status').classList.remove('text-mcred-500');
+  document.getElementById('mic-transcript').textContent = '';
+  if (recognition) { try { recognition.stop(); } catch(e) {} recognition = null; }
+}
+
+// ── OMEGA Health ─────────────────────────────────────────────
+async function checkOmega() {
+  try {
+    const r = await fetch(API+'/health'); const d = await r.json();
+    if (d.status==='ok') {
+      document.getElementById('omega-dot').className='w-2 h-2 rounded-full bg-green-400 animate-pulse';
+      document.getElementById('omega-status').textContent='OMEGA Connected';
+      document.getElementById('omega-status').className='text-xs text-green-300';
+    }
+  } catch(e) {
+    document.getElementById('omega-dot').className='w-2 h-2 rounded-full bg-red-400';
+    document.getElementById('omega-status').textContent='OMEGA Offline';
+    document.getElementById('omega-status').className='text-xs text-red-300';
+  }
+}
+
+function esc(s) { const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+// ── Init ─────────────────────────────────────────────────────
+loadMenu();
+checkOmega();
+setInterval(checkOmega, 15000);
+</script>
+</body>
+</html>

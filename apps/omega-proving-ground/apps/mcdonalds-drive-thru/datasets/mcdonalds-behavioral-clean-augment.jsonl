@@ -1,0 +1,125 @@
+{"input": "what's on the menu", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "what burgers do you have", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "show me the menu", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "what do you serve", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "what kind of sandwiches do you have", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "can i see the menu", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "what are my options", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "what chicken items do you have", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "do you have salads", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "what breakfast items are there", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "tell me about your menu", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "what can i order", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "do you have fish sandwiches", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "what sides do you have", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "what drinks are available", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "list the desserts", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "what comes in a happy meal", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "what flavors of mcflurry do you have", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "do you still have the mcrib", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "what wraps do you offer", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "what meals do you have", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "is there anything new on the menu", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "what nugget options are there", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "do you have smoothies", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "what coffees do you serve", "behavior": "menu_inquiry", "target_action": "menu_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "how much is a big mac", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "what does a mcflurry cost", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "how much for a quarter pounder", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "what's the price of nuggets", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "how much are fries", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "what does a happy meal cost", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "price of a mcchicken", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "how much is a large drink", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "what do nuggets cost", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "how much is a meal", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "is a big mac expensive", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "what's the cheapest thing on the menu", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "how much for a double cheeseburger", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "what does a filet o fish cost", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "how much is a shake", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "price check on the big mac meal", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "how much would two big macs be", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "what's a mcflurry run me", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "cost of a large fry", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "how much for an iced coffee", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "what time do you close", "behavior": "time_check", "target_action": "time_check", "target_data": {}, "expected_response_contains": []}
+{"input": "when do you open", "behavior": "time_check", "target_action": "time_check", "target_data": {}, "expected_response_contains": []}
+{"input": "what are your hours", "behavior": "time_check", "target_action": "time_check", "target_data": {}, "expected_response_contains": []}
+{"input": "is it too late for breakfast", "behavior": "time_check", "target_action": "time_check", "target_data": {}, "expected_response_contains": []}
+{"input": "when does breakfast end", "behavior": "time_check", "target_action": "time_check", "target_data": {}, "expected_response_contains": []}
+{"input": "are you still serving breakfast", "behavior": "time_check", "target_action": "time_check", "target_data": {}, "expected_response_contains": []}
+{"input": "what time does lunch start", "behavior": "time_check", "target_action": "time_check", "target_data": {}, "expected_response_contains": []}
+{"input": "how late are you open", "behavior": "time_check", "target_action": "time_check", "target_data": {}, "expected_response_contains": []}
+{"input": "are you open right now", "behavior": "time_check", "target_action": "time_check", "target_data": {}, "expected_response_contains": []}
+{"input": "when does the lobby close", "behavior": "time_check", "target_action": "time_check", "target_data": {}, "expected_response_contains": []}
+{"input": "can i still order breakfast", "behavior": "time_check", "target_action": "time_check", "target_data": {}, "expected_response_contains": []}
+{"input": "is the drive thru open late", "behavior": "time_check", "target_action": "time_check", "target_data": {}, "expected_response_contains": []}
+{"input": "what time do you start serving lunch", "behavior": "time_check", "target_action": "time_check", "target_data": {}, "expected_response_contains": []}
+{"input": "are you open 24 hours", "behavior": "time_check", "target_action": "time_check", "target_data": {}, "expected_response_contains": []}
+{"input": "when is breakfast available", "behavior": "time_check", "target_action": "time_check", "target_data": {}, "expected_response_contains": []}
+{"input": "do you close early on sundays", "behavior": "time_check", "target_action": "time_check", "target_data": {}, "expected_response_contains": []}
+{"input": "what time does the kitchen close", "behavior": "time_check", "target_action": "time_check", "target_data": {}, "expected_response_contains": []}
+{"input": "is it too early for lunch", "behavior": "time_check", "target_action": "time_check", "target_data": {}, "expected_response_contains": []}
+{"input": "are you guys still open", "behavior": "time_check", "target_action": "time_check", "target_data": {}, "expected_response_contains": []}
+{"input": "when do you stop taking orders", "behavior": "time_check", "target_action": "time_check", "target_data": {}, "expected_response_contains": []}
+{"input": "what deals do you have today", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": []}
+{"input": "any specials going on", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": []}
+{"input": "what's on sale", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": []}
+{"input": "any coupons or deals", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": []}
+{"input": "what's your best deal", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": []}
+{"input": "what do you recommend", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": []}
+{"input": "what's the best value", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": []}
+{"input": "are there any promotions", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": []}
+{"input": "what's cheap and good", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": []}
+{"input": "any bundle deals", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": []}
+{"input": "what's the best bang for my buck", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": []}
+{"input": "what would you suggest", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": []}
+{"input": "is there a value menu", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": []}
+{"input": "what's popular right now", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": []}
+{"input": "give me something good and cheap", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": []}
+{"input": "any limited time offers", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": []}
+{"input": "what's the dollar menu looking like", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": []}
+{"input": "recommend something filling", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": []}
+{"input": "what's your most popular item", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": []}
+{"input": "anything good for under five dollars", "behavior": "value_recommendation", "target_action": "value_recommendation", "target_data": {}, "expected_response_contains": []}
+{"input": "i want a sausage mcmuffin", "behavior": "take_order_breakfast", "target_action": "take_order_breakfast", "target_data": {}, "expected_response_contains": []}
+{"input": "can i get an egg mcmuffin", "behavior": "take_order_breakfast", "target_action": "take_order_breakfast", "target_data": {}, "expected_response_contains": []}
+{"input": "i want a mcmuffin", "behavior": "take_order_breakfast", "target_action": "take_order_breakfast", "target_data": {}, "expected_response_contains": []}
+{"input": "can i get a sausage biscuit", "behavior": "take_order_breakfast", "target_action": "take_order_breakfast", "target_data": {}, "expected_response_contains": []}
+{"input": "give me a bacon egg and cheese biscuit", "behavior": "take_order_breakfast", "target_action": "take_order_breakfast", "target_data": {}, "expected_response_contains": []}
+{"input": "two hotcakes please", "behavior": "take_order_breakfast", "target_action": "take_order_breakfast", "target_data": {}, "expected_response_contains": []}
+{"input": "i want a breakfast burrito", "behavior": "take_order_breakfast", "target_action": "take_order_breakfast", "target_data": {}, "expected_response_contains": []}
+{"input": "can i get the big breakfast", "behavior": "take_order_breakfast", "target_action": "take_order_breakfast", "target_data": {}, "expected_response_contains": []}
+{"input": "hash browns please", "behavior": "take_order_breakfast", "target_action": "take_order_breakfast", "target_data": {}, "expected_response_contains": []}
+{"input": "give me a mcgriddle", "behavior": "take_order_breakfast", "target_action": "take_order_breakfast", "target_data": {}, "expected_response_contains": []}
+{"input": "one sausage mcmuffin with egg", "behavior": "take_order_breakfast", "target_action": "take_order_breakfast", "target_data": {}, "expected_response_contains": []}
+{"input": "i want the pancake platter", "behavior": "take_order_breakfast", "target_action": "take_order_breakfast", "target_data": {}, "expected_response_contains": []}
+{"input": "an orange juice and a mcmuffin", "behavior": "take_order_breakfast", "target_action": "take_order_breakfast", "target_data": {}, "expected_response_contains": []}
+{"input": "breakfast sandwich please", "behavior": "take_order_breakfast", "target_action": "take_order_breakfast", "target_data": {}, "expected_response_contains": []}
+{"input": "let me get the sausage mcgriddle meal", "behavior": "take_order_breakfast", "target_action": "take_order_breakfast", "target_data": {}, "expected_response_contains": []}
+{"input": "egg and cheese mcmuffin", "behavior": "take_order_breakfast", "target_action": "take_order_breakfast", "target_data": {}, "expected_response_contains": []}
+{"input": "can i get a fruit and yogurt parfait", "behavior": "take_order_breakfast", "target_action": "take_order_breakfast", "target_data": {}, "expected_response_contains": []}
+{"input": "i want the steak egg and cheese bagel", "behavior": "take_order_breakfast", "target_action": "take_order_breakfast", "target_data": {}, "expected_response_contains": []}
+{"input": "one bacon mcmuffin please", "behavior": "take_order_breakfast", "target_action": "take_order_breakfast", "target_data": {}, "expected_response_contains": []}
+{"input": "scrambled eggs and a biscuit", "behavior": "take_order_breakfast", "target_action": "take_order_breakfast", "target_data": {}, "expected_response_contains": []}
+{"input": "actually remove the drink", "behavior": "order_modify", "target_action": "order_modify", "target_data": {}, "expected_response_contains": []}
+{"input": "wait take off the fries", "behavior": "order_modify", "target_action": "order_modify", "target_data": {}, "expected_response_contains": []}
+{"input": "cancel the mcflurry", "behavior": "order_modify", "target_action": "order_modify", "target_data": {}, "expected_response_contains": []}
+{"input": "can i change my order", "behavior": "order_modify", "target_action": "order_modify", "target_data": {}, "expected_response_contains": []}
+{"input": "add another big mac to my order", "behavior": "order_modify", "target_action": "order_modify", "target_data": {}, "expected_response_contains": []}
+{"input": "actually i don't want the nuggets anymore", "behavior": "order_modify", "target_action": "order_modify", "target_data": {}, "expected_response_contains": []}
+{"input": "remove the apple pie", "behavior": "order_modify", "target_action": "order_modify", "target_data": {}, "expected_response_contains": []}
+{"input": "wait i want to add a cookie", "behavior": "order_modify", "target_action": "order_modify", "target_data": {}, "expected_response_contains": []}
+{"input": "scratch that last item", "behavior": "order_modify", "target_action": "order_modify", "target_data": {}, "expected_response_contains": []}
+{"input": "can you take off the shake", "behavior": "order_modify", "target_action": "order_modify", "target_data": {}, "expected_response_contains": []}
+{"input": "i changed my mind about the mcchicken", "behavior": "order_modify", "target_action": "order_modify", "target_data": {}, "expected_response_contains": []}
+{"input": "never mind on the sundae", "behavior": "order_modify", "target_action": "order_modify", "target_data": {}, "expected_response_contains": []}
+{"input": "actually add a sprite too", "behavior": "order_modify", "target_action": "order_modify", "target_data": {}, "expected_response_contains": []}
+{"input": "hold on let me take something off", "behavior": "order_modify", "target_action": "order_modify", "target_data": {}, "expected_response_contains": []}
+{"input": "throw in an extra sauce", "behavior": "order_modify", "target_action": "order_modify", "target_data": {}, "expected_response_contains": []}
+{"input": "delete the last item i ordered", "behavior": "order_modify", "target_action": "order_modify", "target_data": {}, "expected_response_contains": []}
+{"input": "actually make that two quarter pounders instead of one", "behavior": "order_modify", "target_action": "order_modify", "target_data": {}, "expected_response_contains": []}
+{"input": "add a mcflurry to my order", "behavior": "order_modify", "target_action": "order_modify", "target_data": {}, "expected_response_contains": []}
+{"input": "wait can i get an extra hash brown", "behavior": "order_modify", "target_action": "order_modify", "target_data": {}, "expected_response_contains": []}
+{"input": "remove the cheeseburger from my order", "behavior": "order_modify", "target_action": "order_modify", "target_data": {}, "expected_response_contains": []}

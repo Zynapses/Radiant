@@ -5,6 +5,35 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.62.1] - 2026-02-14
+
+### Documentation
+
+- **`docs/15-STRATEGY-COMPETITIVE.md`**: Added Gemini quote to marketing (Part I) and pitch deck (Part III) sections
+- **`docs/23-ENGINEERING-ROADMAP.md`**: Created new Engineering Roadmap document (19th doc in the comprehensive set)
+- **`docs/DOCUMENTATION-MANIFEST.json`**: Updated to v4.1.0 — 19 documents (15 consolidated + 4 standalone), added roadmap triggers
+
+## [7.62.0] - 2026-02-13
+
+### OMEGA Proving Ground — Attention Encoder & LlamaBridge Handlers
+
+#### TextEncoder v3: Attention-Based Pooling
+- **`packages/omega-core/python/radiant_omega/trainer.py`**: Replaced mean-pooling with attention-based encoder
+  - Sinusoidal positional encoding (MAX_SEQ_LEN=64) preserves word order
+  - Single-head self-attention (Q/K/V projections) for context-aware token representations
+  - Learned query pooling for classification-optimized sequence aggregation
+  - Breaks through 98.45% accuracy ceiling → **98.72%** best accuracy
+  - `menu_inquiry` +4.2% (82.2% → 86.4%), `take_order` +1.5% (92.5% → 94.0%)
+  - CODEBOOK_VERSION bumped 2 → 3 (v2 checkpoints incompatible)
+
+#### LlamaBridge: Dedicated v2 Behavior Handlers
+- **`apps/omega-proving-ground/omega_server/llama_bridge.py`**: Added 4 dedicated instruction builders
+  - `take_order_breakfast` — injects breakfast menu data, meal upsell (hash browns + coffee)
+  - `value_recommendation` — pulls McValue deals, BOGO offers, Eats items from knowledge base
+  - `order_modify` — injects restriction rules and common customer Q&A
+  - `time_check` — injects store hours, breakfast cutoff times, daypart restrictions
+  - Previously these fell through to the generic fallback with no knowledge injection
+
 ## [7.61.0] - 2026-02-13
 
 ### OMEGA Proving Ground — Full Feature Integration

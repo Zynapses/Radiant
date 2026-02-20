@@ -70,7 +70,7 @@ SAMPLE_RATE = 16000
 
 # ── Load McDonald's Knowledge Base ──
 _KNOWLEDGE_PROMPT = ""
-_kb_path = Path(__file__).resolve().parent / "mcdonalds-knowledge.json"
+_kb_path = Path(__file__).resolve().parent.parent / "apps" / "mcdonalds-drive-thru" / "datasets" / "mcdonalds-knowledge.json"
 if _kb_path.exists():
     try:
         _kb = json.loads(_kb_path.read_text())

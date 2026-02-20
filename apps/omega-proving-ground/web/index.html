@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OMEGA Proving Ground</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { darkMode:'class', theme:{ extend:{ colors:{
+      omega:{400:'#38bdf8',500:'#0ea5e9',600:'#0284c7'},
+      mcred:{500:'#DA291C',600:'#bf1f14'},
+      mcyellow:{400:'#FFC72C'}
+    }}}}
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    *{font-family:'Inter',system-ui,sans-serif}
+    .card{transition:transform .15s,box-shadow .15s} .card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,.4)}
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-200 min-h-screen flex flex-col items-center justify-center p-8">
+  <div class="text-center mb-12">
+    <div class="inline-flex items-center gap-3 mb-4">
+      <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-omega-400 to-omega-600 flex items-center justify-center text-white font-bold text-xl">Ω</div>
+    </div>
+    <h1 class="text-4xl font-bold text-white mb-2">OMEGA Proving Ground</h1>
+    <p class="text-slate-400">Select a test environment</p>
+    <div id="status" class="mt-3 text-xs text-slate-500">Checking backend...</div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl w-full">
+    <!-- OMEGA Labs Card -->
+    <a href="/labs.html" class="card block bg-slate-900/80 border border-slate-800 rounded-2xl p-8 hover:border-omega-500/50">
+      <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-omega-400 to-omega-600 flex items-center justify-center text-2xl mb-5">🧠</div>
+      <h2 class="text-xl font-bold text-white mb-2">OMEGA Labs</h2>
+      <p class="text-sm text-slate-400 leading-relaxed">Brain status, inference playground, and state viewer. Test the CryoLiquidLayer ODE brain directly.</p>
+      <div class="mt-4 text-omega-400 text-sm font-medium">Open Labs →</div>
+    </a>
+
+    <!-- McDonald's Test Site Card -->
+    <a href="/mcdonalds.html" class="card block bg-slate-900/80 border border-slate-800 rounded-2xl p-8 hover:border-mcred-500/50">
+      <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-mcred-500 to-mcyellow-400 flex items-center justify-center text-2xl mb-5">🍔</div>
+      <h2 class="text-xl font-bold text-white mb-2">McDonald's Drive-Thru</h2>
+      <p class="text-sm text-slate-400 leading-relaxed">Visual menu, ordering cart, and drive-thru AI chat. OMEGA behavioral inference on every interaction.</p>
+      <div class="mt-4 text-mcred-500 text-sm font-medium">Open Test Site →</div>
+    </a>
+  </div>
+
+  <script>
+    fetch('http://localhost:11435/health').then(r=>r.json()).then(d=>{
+      document.getElementById('status').innerHTML=d.status==='ok'
+        ?'<span class="text-emerald-400">● Connected</span> — '+d.device+' • PyTorch '+d.torch_version
+        :'<span class="text-red-400">● Disconnected</span>';
+    }).catch(()=>{
+      document.getElementById('status').innerHTML='<span class="text-red-400">● OMEGA server offline</span> — start omega_server/server.py';
+    });
+  </script>
+</body>
+</html>

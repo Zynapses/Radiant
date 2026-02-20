@@ -1262,19 +1262,30 @@ def train_load_checkpoint():
         if not path.exists():
             return jsonify({'error': 'No checkpoint found. Train first.'}), 404
 
-        checkpoint = torch.load(str(path), weights_only=False)
+        device = brain.config.device
+        checkpoint = torch.load(str(path), weights_only=False, map_location=device)
         brain.cortex.load_state_dict(checkpoint['cortex_state'])
-        brain.cortex.state = checkpoint['brain_state']
+        brain_state = checkpoint['brain_state']
+        if hasattr(brain_state, 'to'):
+            brain_state = brain_state.to(device)
+        brain.cortex.state = brain_state
         brain.is_trained = checkpoint.get('is_trained', True)
 
-        # Re-initialize codebook and bridge if needed
+        # Re-initialize codebook if needed
         if not brain.codebook:
-            brain.codebook = BehavioralCodebook(hidden_dim=brain.config.hidden_dim)
+            brain.codebook = BehavioralCodebook(hidden_dim=brain.config.hidden_dim, device=device)
         if checkpoint.get('readout_state'):
             brain.codebook.readout.load_state_dict(checkpoint['readout_state'])
+
+        # Create trainer if needed so we can restore text_encoder
+        if not brain.trainer:
+            brain.trainer = OmegaTrainer(cortex=brain.cortex, codebook=brain.codebook, lr=0.01)
+
         # Restore TextEncoder if available
-        if checkpoint.get('text_encoder_state') and brain.trainer:
+        if checkpoint.get('text_encoder_state'):
             brain.trainer.text_encoder.load_state_dict(checkpoint['text_encoder_state'])
+            brain.trainer.text_encoder.to(device)
+            brain.trainer._encoder_calibrated = True
             if checkpoint.get('text_encoder_vocab'):
                 brain.trainer.text_encoder.word_to_idx = checkpoint['text_encoder_vocab']
                 brain.trainer.text_encoder.idx_to_word = {v: k for k, v in checkpoint['text_encoder_vocab'].items()}
@@ -1416,16 +1427,23 @@ def _find_menu_item_fuzzy(bridge, text: str):
                 return found
 
     # Last resort: word overlap scoring against all menu items
-    t_words = set(t.split())
+    # Require >=2 meaningful word overlap to avoid false positives on common words
+    _stop_words = {'a','an','the','i','my','me','we','and','or','with','for','to','of',
+                   'it','is','in','on','no','not','get','have','want','like','can',
+                   'some','that','this','one','two','just','please','thanks','would',
+                   'could','should','do','does','small','medium','large'}
+    t_words = set(t.split()) - _stop_words
+    if not t_words:
+        return None
     best_item = None
     best_score = 0
     for name, item in bridge.menu_index.items():
-        name_words = set(name.split())
+        name_words = set(name.lower().split()) - _stop_words
         overlap = len(t_words & name_words)
-        if overlap > best_score and overlap >= 1:
+        if overlap > best_score and overlap >= 2:
             best_score = overlap
             best_item = item
-    if best_item and best_score >= 1:
+    if best_item and best_score >= 2:
         return best_item
 
     return None
@@ -1580,6 +1598,60 @@ def _update_server_order(bridge, behavior: str, target_data: dict, text: str, co
                             bridge.running_total += upcharge
                     break
 
+    elif behavior == 'order_modify':
+        # Order-level modifications: remove items, change quantities, add items, change sizes
+        text_lower_mod = text.lower()
+
+        # Remove item: "take off the McChicken", "remove the fries", "scratch the nuggets"
+        remove_match = re.search(
+            r'(?:take off|remove|scratch|cancel|drop|lose|nix|never ?mind(?: on)?|don\'?t want|no longer want)\s+(?:the |my |a |an )?(.+?)(?:\s+(?:please|thanks|for me|if you can|bro|right now|instead))?$',
+            text_lower_mod
+        )
+        if remove_match and bridge.order_state:
+            remove_target = remove_match.group(1).strip()
+            for i, entry in enumerate(bridge.order_state):
+                if remove_target in entry.get('item', '').lower():
+                    bridge.running_total -= entry.get('line_total', 0)
+                    bridge.order_state.pop(i)
+                    break
+
+        # Change quantity: "make that two", "I want three of those", "double that"
+        elif re.search(r'\b(make (?:that|it)|change (?:that|it) to|i want)\s+(\d+|two|three|four|five|six)', text_lower_mod) or \
+             re.search(r'\bdouble that\b', text_lower_mod):
+            if bridge.order_state:
+                last = bridge.order_state[-1]
+                old_total = last['line_total']
+                qty = _parse_qty(text_lower_mod)
+                if 'double' in text_lower_mod:
+                    qty = last['quantity'] * 2
+                last['quantity'] = qty
+                last['line_total'] = last['unit_price'] * qty
+                bridge.running_total += (last['line_total'] - old_total)
+
+        # Upsize/downsize: "upsize to large", "make my fries large", "downsize the drink"
+        elif re.search(r'\b(upsize|upgrade|make .+ large|large fries|large drink)\b', text_lower_mod):
+            if bridge.order_state:
+                for entry in reversed(bridge.order_state):
+                    if entry.get('is_meal'):
+                        mods = entry.setdefault('customizations', [])
+                        mods.append('Upsized to large')
+                        entry['line_total'] += 1.00
+                        bridge.running_total += 1.00
+                        break
+        elif re.search(r'\b(downsize|make .+ small|small fries|small drink)\b', text_lower_mod):
+            if bridge.order_state:
+                for entry in reversed(bridge.order_state):
+                    if entry.get('is_meal'):
+                        mods = entry.setdefault('customizations', [])
+                        mods.append('Downsized to small')
+                        break
+
+        # Add item: "also add a McChicken", "tack on a sundae", "throw in a pie"
+        elif re.search(r'\b(add|tack on|throw in|also|put .+ on)\b', text_lower_mod):
+            found = _find_menu_item_fuzzy(bridge, text)
+            if found:
+                _add_item_to_order(bridge, found.get('name', ''), text_lower_mod)
+
     elif behavior == 'complaint':
         # No order state changes for complaints
         pass
@@ -1612,6 +1684,11 @@ def infer():
         conversation_history = data.get('conversation_history', [])
         if not text:
             return jsonify({'error': 'text is required'}), 400
+
+        # Auto-reset order when a new conversation starts (empty history = new session)
+        if not conversation_history and brain.llama_bridge:
+            brain.llama_bridge.clear_order()
+            logger.info("New session detected (empty history) — order state cleared")
 
         start = time.time()
 
@@ -1663,6 +1740,46 @@ def infer():
         behavior = _detect_contextual_behavior(text, conversation_history, raw_behavior)
         if behavior != raw_behavior:
             logger.info(f"Context override: '{raw_behavior}' → '{behavior}' for input '{text[:50]}'")
+
+        # 3c. Confidence-gated ordering fallback.
+        # When OMEGA is uncertain (confidence < 60%) AND the text contains clear
+        # ordering intent + a real menu item, reclassify as take_order.
+        # This is standard ML practice (confidence threshold + fallback), not a hack.
+        # The augmented training data will eliminate the need for this once retrained.
+        _ORDER_INTENT_RE = re.compile(
+            r"(?:i'?d like|i would like|i'?ll have|i'?ll take|i'?ll do|i'?ll go with|"
+            r"give me|i want|i need|could i (?:get|have)|may i (?:get|have)|"
+            r"let me get|let's do|how about|get me|throw in|add)"
+        )
+        _text_lower = text.lower()
+        if (confidence < 0.65
+                and behavior not in ('take_order', 'take_order_breakfast')
+                and brain.llama_bridge
+                and _ORDER_INTENT_RE.search(_text_lower)):
+            _menu_probe = _find_menu_item_fuzzy(brain.llama_bridge, text)
+            if _menu_probe:
+                logger.info(
+                    f"Low-confidence fallback ({confidence:.1%}): '{behavior}' → 'take_order' — "
+                    f"ordering intent + '{_menu_probe.get('name', '?')}' in '{text[:50]}'"
+                )
+                behavior = 'take_order'
+
+        # 3d. Breakfast→regular normalization.
+        # If classified as take_order_breakfast but the menu item is NOT breakfast,
+        # reclassify as take_order. Prevents McChicken/nuggets from hitting breakfast path.
+        _BREAKFAST_KEYWORDS = {'mcgriddle', 'mcmuffin', 'hotcakes', 'biscuit', 'bagel',
+                               'breakfast', 'sausage burrito', 'hash brown', 'fruit & maple'}
+        if behavior == 'take_order_breakfast' and brain.llama_bridge:
+            _bp = _find_menu_item_fuzzy(brain.llama_bridge, text)
+            if _bp:
+                _item_name = _bp.get('name', '').lower()
+                _is_breakfast = any(bk in _item_name for bk in _BREAKFAST_KEYWORDS)
+                if not _is_breakfast:
+                    logger.info(
+                        f"Breakfast→regular normalization: '{_item_name}' is not breakfast — "
+                        f"take_order_breakfast → take_order"
+                    )
+                    behavior = 'take_order'
 
         # 4. Find matching training example for target_data
         target_data = {}
@@ -3039,6 +3156,23 @@ if __name__ == '__main__':
     brain.boot()
     restored = "RESTORED" if brain.storage.has_saved_state() else "FRESH"
     print(f"\n[OMEGA] Brain auto-booted ({restored}): {brain.config.hidden_dim}-dim cortex on {brain.config.device}")
+
+    # Auto-load training checkpoint if available
+    ckpt_path = Path(__file__).parent / 'state' / 'checkpoints' / 'omega_mcdonalds.pt'
+    if ckpt_path.exists():
+        try:
+            with app.test_client() as client:
+                resp = client.post('/train/load-checkpoint')
+                data = resp.get_json()
+                if data.get('loaded'):
+                    print(f"[OMEGA] Training checkpoint loaded: epoch={data.get('epoch',0)}, accuracy={data.get('best_accuracy',0)*100:.1f}%")
+                else:
+                    logger.warning(f"Checkpoint load returned: {data}")
+        except Exception as e:
+            logger.warning(f"Failed to auto-load training checkpoint: {e}")
+    else:
+        print("[OMEGA] No training checkpoint found — brain is untrained")
+
     print(f"[OMEGA] Watcher: {brain.watcher.param_count():,} params (self-awareness)")
     print(f"[OMEGA] Transducer: {brain.transducer.param_count():,} params")
     print(f"[OMEGA] ResonantIndex: {brain.resonant_index.resolution} buckets")

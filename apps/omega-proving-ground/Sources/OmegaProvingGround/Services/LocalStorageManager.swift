@@ -85,6 +85,8 @@ final class LocalStorageManager: Sendable {
     func findDemoDirectory() -> String? {
         let cwd = FileManager.default.currentDirectoryPath
         let candidates = [
+            "\(cwd)/apps/mcdonalds-drive-thru/datasets",
+            "\(cwd)/../apps/mcdonalds-drive-thru/datasets",
             "\(cwd)/demo/datasets",
             "\(cwd)/../demo/datasets",
         ]
@@ -92,6 +94,8 @@ final class LocalStorageManager: Sendable {
         let execPath = ProcessInfo.processInfo.arguments.first ?? ""
         let execDir = (execPath as NSString).deletingLastPathComponent
         let execCandidates = [
+            "\(execDir)/../../../apps/mcdonalds-drive-thru/datasets",
+            "\(execDir)/../../../../apps/mcdonalds-drive-thru/datasets",
             "\(execDir)/../../../demo/datasets",
             "\(execDir)/../../../../demo/datasets",
         ]

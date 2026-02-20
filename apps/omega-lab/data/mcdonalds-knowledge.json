@@ -1,0 +1,2221 @@
+{
+  "restaurant": "McDonald's",
+  "version": "2025-US",
+  "image_base": "https://s7d1.scene7.com/is/image/mcdonalds/",
+  "image_params": "?wid=460&hei=460&fmt=png-alpha",
+  "sop": {
+    "greeting": [
+      "Welcome to McDonald's! What can I get started for you today?",
+      "Hi there! Ready to order?",
+      "Welcome in! What sounds good today?"
+    ],
+    "order_flow": [
+      "1. Greet the customer warmly",
+      "2. Take the order — listen carefully, repeat each item back",
+      "3. For each entrée, ask: 'Would you like to make that a meal?'",
+      "4. If meal: ask drink choice and size (small, medium, large)",
+      "5. Ask about customizations: 'Any changes to that?'",
+      "6. Suggest one upsell: dessert, extra item, or larger size",
+      "7. Ask: 'Will that be everything?'",
+      "8. Read back the complete order with item count",
+      "9. State the total price",
+      "10. Ask: 'Will that be cash, card, or mobile pay?'",
+      "11. Thank the customer"
+    ],
+    "upsell_rules": [
+      "Always offer to make a sandwich a meal",
+      "Suggest a size upgrade once per order",
+      "Offer a dessert or McCafé drink at end of order",
+      "Never push more than one upsell per interaction",
+      "If customer declines, say 'No problem!' and move on"
+    ],
+    "customization_prompt": "Any changes to that? We can remove or add ingredients.",
+    "confirmation_format": "OK so I have: [list items with quantities and customizations]. Your total comes to $[total]. Does that look right?",
+    "closing": [
+      "Thank you! Your order will be ready shortly.",
+      "Thanks for choosing McDonald's! Pull forward to the next window.",
+      "Awesome, we'll have that right out for you!"
+    ]
+  },
+  "tabs": [
+    {
+      "id": "dayMenu",
+      "label": "Lunch & Dinner",
+      "icon": "🍔",
+      "categories": [
+        {
+          "id": "featured",
+          "label": "Featured Favorites",
+          "nav_image": "https://s7d1.scene7.com/is/image/mcdonalds/FeaturedFavorites_NavImage:category-panel-left-desktop",
+          "items": [
+            {
+              "id": "ff0",
+              "name": "Big Mac®",
+              "image": "DC_202302_0005-999_BigMac_1564x1564-1",
+              "price": 5.69,
+              "meal_price": 8.99,
+              "calories": 550,
+              "description": "Two 100% beef patties, special sauce, lettuce, cheese, pickles, onions on a sesame seed bun"
+            },
+            {
+              "id": "ff1",
+              "name": "Quarter Pounder®* with Cheese",
+              "image": "DC_202201_0007-005_QuarterPounderwithCheese_1564x1564-1",
+              "price": 5.99,
+              "meal_price": 9.29,
+              "calories": 520
+            },
+            {
+              "id": "ff2",
+              "name": "McCrispy®",
+              "image": "DC_202012_0383_CrispyChickenSandwich_PotatoBun_1564x1564-1",
+              "price": 5.49,
+              "meal_price": 8.79,
+              "calories": 470
+            },
+            {
+              "id": "ff3",
+              "name": "4 Piece McNuggets®",
+              "image": "DC_202502_0483_4McNuggets_Stacked_McValueRegistered_1564x1564",
+              "price": 2.49,
+              "calories": 170
+            },
+            {
+              "id": "ff4",
+              "name": "Ranch Snack Wrap®",
+              "image": "DC_202504_25254_RanchSnackWrap_1564x1564",
+              "price": 3.49,
+              "calories": 360
+            },
+            {
+              "id": "ff5",
+              "name": "Egg McMuffin®",
+              "image": "DC_202004_0046_EggMcMuffin_1564x1564-1",
+              "price": 4.49,
+              "meal_price": 6.49,
+              "calories": 300
+            },
+            {
+              "id": "ff6",
+              "name": "McCafé® Iced Coffee",
+              "image": "DC_201906_1212_MediumIcedCoffee_Glass_A1_1564x1564-1",
+              "prices": {
+                "small": 2.49,
+                "medium": 3.29,
+                "large": 3.79
+              }
+            },
+            {
+              "id": "ff7",
+              "name": "Sausage Burrito",
+              "image": "DC_202411_0334_SausageBurrito_Alt_McValueRegistered_1564x1564",
+              "price": 2.49,
+              "calories": 310
+            }
+          ]
+        },
+        {
+          "id": "extravalue",
+          "label": "Extra Value Meals",
+          "nav_image": "https://s7d1.scene7.com/is/image/mcdonalds/LeftRail_BurgersPCP_160x160:category-panel-left-desktop",
+          "items": [
+            {
+              "id": "ev0",
+              "name": "Big Mac® Meal",
+              "image": "DC_202302_0005-999_BigMac_1564x1564-1",
+              "price": 8.99,
+              "calories": 1080,
+              "description": "Big Mac, Medium Fries, Medium Drink",
+              "allergens": [
+                "wheat",
+                "soy",
+                "milk",
+                "sesame"
+              ],
+              "includes": [
+                "Big Mac®",
+                "Medium Fries",
+                "Medium Drink"
+              ]
+            },
+            {
+              "id": "ev1",
+              "name": "Quarter Pounder®* Meal",
+              "image": "DC_202201_0007-005_QuarterPounderwithCheese_1564x1564-1",
+              "price": 9.29,
+              "calories": 1060,
+              "description": "Quarter Pounder with Cheese, Medium Fries, Medium Drink",
+              "allergens": [
+                "wheat",
+                "milk",
+                "sesame"
+              ],
+              "includes": [
+                "Quarter Pounder®* with Cheese",
+                "Medium Fries",
+                "Medium Drink"
+              ]
+            },
+            {
+              "id": "ev2",
+              "name": "Double QPC®* Meal",
+              "image": "DC_202201_3426-005_DoubleQuarterPounderwithCheese_1564x1564-1",
+              "price": 10.79,
+              "calories": 1280,
+              "description": "Double Quarter Pounder with Cheese, Medium Fries, Medium Drink",
+              "allergens": [
+                "wheat",
+                "milk",
+                "sesame"
+              ],
+              "includes": [
+                "Double Quarter Pounder®* with Cheese",
+                "Medium Fries",
+                "Medium Drink"
+              ]
+            },
+            {
+              "id": "ev3",
+              "name": "10pc McNuggets® Meal",
+              "image": "DC_202502_0483_4McNuggets_Stacked_McValueRegistered_1564x1564",
+              "price": 8.49,
+              "calories": 860,
+              "description": "10 Chicken McNuggets, Medium Fries, Medium Drink",
+              "allergens": [
+                "wheat"
+              ],
+              "sauce_choices": [
+                "BBQ",
+                "Sweet & Sour",
+                "Honey Mustard",
+                "Hot Mustard",
+                "Ranch"
+              ],
+              "includes": [
+                "10pc Chicken McNuggets®",
+                "Medium Fries",
+                "Medium Drink"
+              ]
+            },
+            {
+              "id": "ev4",
+              "name": "McCrispy® Meal",
+              "image": "DC_202012_0383_CrispyChickenSandwich_PotatoBun_1564x1564-1",
+              "price": 8.79,
+              "calories": 1010,
+              "description": "McCrispy Sandwich, Medium Fries, Medium Drink",
+              "allergens": [
+                "wheat",
+                "milk"
+              ],
+              "includes": [
+                "McCrispy®",
+                "Medium Fries",
+                "Medium Drink"
+              ]
+            },
+            {
+              "id": "ev5",
+              "name": "Filet-O-Fish® Meal",
+              "image": "DC_202302_5926-999_Filet-O-Fish_HalfSlice_Alt_1564x1564-1",
+              "price": 7.99,
+              "calories": 930,
+              "description": "Filet-O-Fish, Medium Fries, Medium Drink",
+              "allergens": [
+                "wheat",
+                "milk",
+                "fish"
+              ],
+              "includes": [
+                "Filet-O-Fish®",
+                "Medium Fries",
+                "Medium Drink"
+              ]
+            },
+            {
+              "id": "ev6",
+              "name": "McDouble® Meal",
+              "image": "DC_202302_0592-999_McDouble_Alt_1564x1564-1",
+              "price": 5.99,
+              "calories": 940,
+              "description": "McDouble, Medium Fries, Medium Drink",
+              "allergens": [
+                "wheat",
+                "milk"
+              ],
+              "includes": [
+                "McDouble®",
+                "Medium Fries",
+                "Medium Drink"
+              ]
+            },
+            {
+              "id": "ev7",
+              "name": "Cheeseburger Meal",
+              "image": "DC_202502_0003-999_CheeseburgerAlt_McValueRegistered_1564x1564",
+              "price": 5.49,
+              "calories": 840,
+              "description": "Cheeseburger, Medium Fries, Medium Drink",
+              "allergens": [
+                "wheat",
+                "milk"
+              ],
+              "includes": [
+                "Cheeseburger",
+                "Medium Fries",
+                "Medium Drink"
+              ]
+            },
+            {
+              "id": "ev8",
+              "name": "McChicken® Meal",
+              "image": "DC_202411_4314-999_McChicken_McValueRegistered_1564x1564",
+              "price": 5.09,
+              "calories": 940,
+              "description": "McChicken, Medium Fries, Medium Drink",
+              "allergens": [
+                "wheat",
+                "soy"
+              ],
+              "includes": [
+                "McChicken®",
+                "Medium Fries",
+                "Medium Drink"
+              ]
+            },
+            {
+              "id": "ev9",
+              "name": "Bacon QPC®* Meal",
+              "image": "DC_202201_4295-005_BaconQPC_1564x1564-1",
+              "price": 10.49,
+              "calories": 1160,
+              "description": "Bacon Quarter Pounder with Cheese, Medium Fries, Medium Drink",
+              "allergens": [
+                "wheat",
+                "milk",
+                "sesame"
+              ],
+              "includes": [
+                "Bacon QPC®*",
+                "Medium Fries",
+                "Medium Drink"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "mcvalue",
+          "label": "McValue",
+          "nav_image": "https://s7d1.scene7.com/is/image/mcdonalds/DC_Category_202411_McValue_160x160:category-panel-left-desktop",
+          "items": [
+            {
+              "id": "mv0",
+              "name": "McChicken® Meal Deal",
+              "image": "DC_202411_4314-999_McChicken_McValueRegistered_1564x1564",
+              "price": 5.00,
+              "calories": 860,
+              "description": "McChicken, Small Fries, Small Drink — limited time $5 Meal Deal",
+              "section": "Meal Deals, starting at $5*",
+              "tags": ["mcvalue", "meal_deal", "lunch_dinner"],
+              "allergens": ["wheat", "soy"],
+              "includes": ["McChicken®", "Small Fries", "Small Drink"]
+            },
+            {
+              "id": "mv1",
+              "name": "McDouble® Meal Deal",
+              "image": "DC_202302_0592-999_McDouble_Alt_1564x1564-1",
+              "price": 5.00,
+              "calories": 860,
+              "description": "McDouble, Small Fries, Small Drink — limited time $5 Meal Deal",
+              "section": "Meal Deals, starting at $5*",
+              "tags": ["mcvalue", "meal_deal", "lunch_dinner"],
+              "allergens": ["wheat", "milk"],
+              "includes": ["McDouble®", "Small Fries", "Small Drink"]
+            },
+            {
+              "id": "mv2",
+              "name": "Daily Double Meal Deal",
+              "image": "DC_202307_5101-999_DailyDouble_1564x1564-1",
+              "price": 6.00,
+              "calories": 890,
+              "description": "Daily Double, Small Fries, Small Drink — limited time $6 Meal Deal",
+              "section": "Meal Deals, starting at $5*",
+              "tags": ["mcvalue", "meal_deal", "lunch_dinner"],
+              "allergens": ["wheat", "milk", "soy"],
+              "includes": ["Daily Double", "Small Fries", "Small Drink"]
+            },
+            {
+              "id": "mv3",
+              "name": "Double Cheeseburger",
+              "image": "DC_202411_0004-999_DoubleCheeseburger_Alt_McValueRegistered_1564x1564",
+              "price": 3.39,
+              "calories": 450,
+              "description": "Buy one, add one for $1 — two beef patties with two slices of cheese, pickles, onions",
+              "section": "Buy one, Add one for $1*",
+              "tags": ["mcvalue", "buy_one_add_one", "lunch_dinner"],
+              "allergens": ["wheat", "milk"]
+            },
+            {
+              "id": "mv4",
+              "name": "McChicken®",
+              "image": "DC_202411_4314-999_McChicken_McValueRegistered_1564x1564",
+              "price": 1.89,
+              "calories": 400,
+              "description": "Buy one, add one for $1 — crispy chicken patty with lettuce and mayo",
+              "section": "Buy one, Add one for $1*",
+              "tags": ["mcvalue", "buy_one_add_one", "lunch_dinner"],
+              "allergens": ["wheat", "soy"]
+            },
+            {
+              "id": "mv5",
+              "name": "6 Piece McNuggets®",
+              "image": "DC_202502_0483_4McNuggets_Stacked_McValueRegistered_1564x1564",
+              "price": 3.89,
+              "calories": 250,
+              "description": "Buy one, add one for $1 — 6 pieces of chicken McNuggets",
+              "section": "Buy one, Add one for $1*",
+              "tags": ["mcvalue", "buy_one_add_one", "lunch_dinner"],
+              "allergens": ["wheat"]
+            },
+            {
+              "id": "mv6",
+              "name": "Small French Fries",
+              "image": "DC_202411_6050_SmallFrenchFries_Standing_McValueRegistered_1564x1564",
+              "price": 2.19,
+              "calories": 230,
+              "description": "Buy one, add one for $1 — golden, crispy fries made from real potatoes",
+              "section": "Buy one, Add one for $1*",
+              "tags": ["mcvalue", "buy_one_add_one", "lunch_dinner"],
+              "allergens": ["wheat"]
+            },
+            {
+              "id": "mv7",
+              "name": "Cheeseburger",
+              "image": "DC_202502_0003-999_CheeseburgerAlt_McValueRegistered_1564x1564",
+              "price": 1.39,
+              "calories": 300,
+              "description": "McValue Eats — beef patty with a slice of cheese, pickles, onions, ketchup, mustard",
+              "section": "Eats",
+              "tags": ["mcvalue", "eats", "lunch_dinner"],
+              "allergens": ["wheat", "milk"]
+            },
+            {
+              "id": "mv8",
+              "name": "4 Piece McNuggets®",
+              "image": "DC_202502_0483_4McNuggets_Stacked_McValueRegistered_1564x1564",
+              "price": 2.49,
+              "calories": 170,
+              "description": "McValue Eats — 4 pieces of chicken McNuggets",
+              "section": "Eats",
+              "tags": ["mcvalue", "eats", "lunch_dinner"],
+              "allergens": ["wheat"]
+            },
+            {
+              "id": "mv9",
+              "name": "McFlurry® with OREO® Cookies",
+              "image": "DC_202002_3832_OREOMcFlurry_1564x1564-1",
+              "price": 3.69,
+              "calories": 340,
+              "description": "McValue Eats — snack size vanilla soft serve mixed with OREO cookie pieces",
+              "section": "Eats",
+              "tags": ["mcvalue", "eats", "lunch_dinner"],
+              "allergens": ["milk", "wheat", "soy"]
+            },
+            {
+              "id": "mv10",
+              "name": "McFlurry® with M&M'S® Candies",
+              "image": "DC_202505_3830_MandMMcFlurry_1564x1564",
+              "price": 3.69,
+              "calories": 430,
+              "description": "McValue Eats — snack size vanilla soft serve mixed with M&M's candy pieces",
+              "section": "Eats",
+              "tags": ["mcvalue", "eats", "lunch_dinner"],
+              "allergens": ["milk", "soy", "peanut"]
+            }
+          ]
+        },
+        {
+          "id": "mccrispymeal",
+          "label": "McCrispy™ Meal",
+          "nav_image": "https://s7d1.scene7.com/is/image/mcdonalds/DC_Category_202508_McCrispyMeal_160x160:category-panel-left-desktop",
+          "items": [
+            {
+              "id": "cm0",
+              "name": "McCrispy®",
+              "image": "DC_202012_0383_CrispyChickenSandwich_PotatoBun_1564x1564-1",
+              "price": 5.49,
+              "meal_price": 8.79,
+              "calories": 470,
+              "description": "Southern-style crispy chicken fillet with crinkle-cut pickles on a potato roll",
+              "allergens": [
+                "wheat",
+                "milk"
+              ]
+            },
+            {
+              "id": "cm1",
+              "name": "Deluxe McCrispy®",
+              "image": "DC_202012_0370_DeluxeCrispyChicken_PotatoBun_1564x1564-1",
+              "price": 6.29,
+              "meal_price": 9.59,
+              "calories": 530,
+              "description": "Crispy chicken fillet with shredded lettuce, tomatoes and mayo on a potato roll",
+              "allergens": [
+                "wheat",
+                "milk",
+                "soy"
+              ]
+            },
+            {
+              "id": "cm2",
+              "name": "Spicy McCrispy®",
+              "image": "DC_202012_0116_SpicyCrispyChicken_PotatoBun_1564x1564-1",
+              "price": 5.79,
+              "meal_price": 9.09,
+              "calories": 470,
+              "description": "Southern-style spicy chicken fillet with crinkle-cut pickles on a potato roll",
+              "allergens": [
+                "wheat",
+                "milk"
+              ]
+            },
+            {
+              "id": "cm3",
+              "name": "Spicy Deluxe McCrispy®",
+              "image": "DC_202104_0100_DeluxeSpicyCrispyChickenSandwich_PotatoBun_1564x1564-1",
+              "price": 6.59,
+              "meal_price": 9.89,
+              "calories": 530,
+              "description": "Spicy chicken fillet with lettuce, tomatoes and mayo on a potato roll",
+              "allergens": [
+                "wheat",
+                "milk",
+                "soy"
+              ]
+            },
+            {
+              "id": "cm4",
+              "name": "McCrispy® Strips (3 pc)",
+              "image": "DC_202504_25157_3PieceMcCrispyStrips_1564x1564",
+              "price": 4.49,
+              "meal_price": 7.79,
+              "calories": 370,
+              "description": "3 pieces of McCrispy chicken strips — tender inside, crispy outside",
+              "allergens": [
+                "wheat",
+                "milk"
+              ],
+              "sauce_choices": [
+                "BBQ",
+                "Sweet & Sour",
+                "Honey Mustard",
+                "Creamy Ranch",
+                "Spicy Buffalo",
+                "Creamy Chili"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "burgers",
+          "label": "Burgers",
+          "nav_image": "https://s7d1.scene7.com/is/image/mcdonalds/LeftRail_BurgersPCP_160x160:category-panel-left-desktop",
+          "items": [
+            {
+              "id": "b0",
+              "name": "Big Mac®",
+              "image": "DC_202302_0005-999_BigMac_1564x1564-1",
+              "price": 5.69,
+              "meal_price": 8.99,
+              "calories": 550,
+              "description": "Two 100% beef patties, special sauce, lettuce, cheese, pickles, onions on a sesame seed bun",
+              "allergens": [
+                "wheat",
+                "soy",
+                "milk",
+                "sesame"
+              ],
+              "default_ingredients": [
+                "two beef patties",
+                "special sauce",
+                "lettuce",
+                "American cheese",
+                "pickles",
+                "onions",
+                "sesame seed bun (3 pieces)"
+              ],
+              "customizable": [
+                "no pickles",
+                "no onions",
+                "no lettuce",
+                "no special sauce",
+                "extra sauce",
+                "add bacon +$1.29",
+                "add egg +$1.49"
+              ]
+            },
+            {
+              "id": "b1",
+              "name": "Quarter Pounder®* with Cheese",
+              "image": "DC_202201_0007-005_QuarterPounderwithCheese_1564x1564-1",
+              "price": 5.99,
+              "meal_price": 9.29,
+              "calories": 520,
+              "description": "Fresh beef patty, two slices of melted cheese, onions, pickles, ketchup, mustard on a sesame seed bun",
+              "allergens": [
+                "wheat",
+                "milk",
+                "sesame"
+              ]
+            },
+            {
+              "id": "b2",
+              "name": "Double Quarter Pounder®*",
+              "image": "DC_202201_3426-005_DoubleQuarterPounderwithCheese_1564x1564-1",
+              "price": 7.49,
+              "meal_price": 10.79,
+              "calories": 740,
+              "description": "Two quarter-pound beef patties with cheese, onions, pickles, ketchup, mustard",
+              "allergens": [
+                "wheat",
+                "milk",
+                "sesame"
+              ]
+            },
+            {
+              "id": "b3",
+              "name": "QPC®* Deluxe",
+              "image": "DC_202309_4282_QuarterPounderCheeseDeluxe_Shredded_1564x1564-1",
+              "price": 6.29,
+              "meal_price": 9.59,
+              "calories": 630,
+              "description": "Quarter pound fresh beef, cheese, lettuce, tomato, onion, pickles on a sesame seed bun",
+              "allergens": [
+                "wheat",
+                "milk",
+                "sesame"
+              ]
+            },
+            {
+              "id": "b4",
+              "name": "McDouble®",
+              "image": "DC_202302_0592-999_McDouble_Alt_1564x1564-1",
+              "price": 2.79,
+              "meal_price": 5.99,
+              "calories": 400,
+              "description": "Two beef patties with one slice of cheese, pickles, onions, ketchup, mustard",
+              "allergens": [
+                "wheat",
+                "milk"
+              ]
+            },
+            {
+              "id": "b5",
+              "name": "Daily Double",
+              "image": "DC_202307_5101-999_DailyDouble_1564x1564-1",
+              "price": 3.19,
+              "calories": 430,
+              "description": "Two beef patties, slivered onions, leaf lettuce, tomato, mayo, American cheese",
+              "allergens": [
+                "wheat",
+                "milk",
+                "soy"
+              ]
+            },
+            {
+              "id": "b6",
+              "name": "Bacon QPC®*",
+              "image": "DC_202201_4295-005_BaconQPC_1564x1564-1",
+              "price": 7.19,
+              "meal_price": 10.49,
+              "calories": 620,
+              "description": "Quarter pound fresh beef with thick-cut applewood smoked bacon, two slices of American cheese",
+              "allergens": [
+                "wheat",
+                "milk",
+                "sesame"
+              ]
+            },
+            {
+              "id": "b7",
+              "name": "Cheeseburger",
+              "image": "DC_202502_0003-999_CheeseburgerAlt_McValueRegistered_1564x1564",
+              "price": 2.29,
+              "meal_price": 5.49,
+              "calories": 300,
+              "description": "Beef patty with a slice of cheese, pickles, onions, ketchup, mustard",
+              "allergens": [
+                "wheat",
+                "milk"
+              ]
+            },
+            {
+              "id": "b8",
+              "name": "Double Cheeseburger",
+              "image": "DC_202411_0004-999_DoubleCheeseburger_Alt_McValueRegistered_1564x1564",
+              "price": 3.39,
+              "meal_price": 6.59,
+              "calories": 450,
+              "description": "Two beef patties with two slices of cheese, pickles, onions",
+              "allergens": [
+                "wheat",
+                "milk"
+              ]
+            },
+            {
+              "id": "b9",
+              "name": "Hamburger",
+              "image": "DC_202302_0001-999_Hamburger_Alt_1564x1564-1",
+              "price": 1.89,
+              "meal_price": 5.09,
+              "calories": 250,
+              "description": "100% beef patty with pickles, onions, ketchup, mustard on a regular bun",
+              "allergens": [
+                "wheat"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "chicken",
+          "label": "Chicken & Fish Sandwiches",
+          "nav_image": "https://s7d1.scene7.com/is/image/mcdonalds/LeftRail_ChickenFishPCP_160x160:category-panel-left-desktop",
+          "items": [
+            {
+              "id": "c0",
+              "name": "McCrispy®",
+              "image": "DC_202012_0383_CrispyChickenSandwich_PotatoBun_1564x1564-1",
+              "price": 5.49,
+              "meal_price": 8.79,
+              "calories": 470,
+              "description": "Southern-style crispy chicken fillet with crinkle-cut pickles on a potato roll",
+              "allergens": [
+                "wheat",
+                "milk"
+              ]
+            },
+            {
+              "id": "c1",
+              "name": "Deluxe McCrispy®",
+              "image": "DC_202012_0370_DeluxeCrispyChicken_PotatoBun_1564x1564-1",
+              "price": 6.29,
+              "meal_price": 9.59,
+              "calories": 530,
+              "description": "Crispy chicken fillet with shredded lettuce, tomatoes and mayo on a potato roll",
+              "allergens": [
+                "wheat",
+                "milk",
+                "soy"
+              ]
+            },
+            {
+              "id": "c2",
+              "name": "Spicy McCrispy®",
+              "image": "DC_202012_0116_SpicyCrispyChicken_PotatoBun_1564x1564-1",
+              "price": 5.79,
+              "meal_price": 9.09,
+              "calories": 470,
+              "description": "Southern-style spicy chicken fillet with crinkle-cut pickles on a potato roll",
+              "allergens": [
+                "wheat",
+                "milk"
+              ]
+            },
+            {
+              "id": "c3",
+              "name": "Spicy Deluxe McCrispy®",
+              "image": "DC_202104_0100_DeluxeSpicyCrispyChickenSandwich_PotatoBun_1564x1564-1",
+              "price": 6.59,
+              "calories": 530,
+              "description": "Spicy chicken fillet with lettuce, tomatoes and mayo on a potato roll",
+              "allergens": [
+                "wheat",
+                "milk",
+                "soy"
+              ]
+            },
+            {
+              "id": "c4",
+              "name": "Filet-O-Fish®",
+              "image": "DC_202302_5926-999_Filet-O-Fish_HalfSlice_Alt_1564x1564-1",
+              "price": 4.79,
+              "meal_price": 7.99,
+              "calories": 390,
+              "description": "Fish filet with tartar sauce and half a slice of cheese on a steamed bun",
+              "allergens": [
+                "wheat",
+                "milk",
+                "fish"
+              ]
+            },
+            {
+              "id": "c5",
+              "name": "McChicken®",
+              "image": "DC_202411_4314-999_McChicken_McValueRegistered_1564x1564",
+              "price": 1.89,
+              "meal_price": 5.09,
+              "calories": 400,
+              "description": "Crispy chicken patty with lettuce and mayo on a regular bun",
+              "allergens": [
+                "wheat",
+                "soy"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "nuggets",
+          "label": "McNuggets® & McCrispy® Strips",
+          "nav_image": "https://s7d1.scene7.com/is/image/mcdonalds/NavImage_McStripsAndMcNuggets_160x160_NEW:category-panel-left-desktop",
+          "items": [
+            {
+              "id": "n0",
+              "name": "4 Piece McNuggets®",
+              "image": "DC_202502_0483_4McNuggets_Stacked_McValueRegistered_1564x1564",
+              "price": 2.49,
+              "calories": 170,
+              "description": "4 pieces of chicken McNuggets — choose your dipping sauce",
+              "allergens": [
+                "wheat"
+              ],
+              "sauce_choices": [
+                "BBQ",
+                "Sweet & Sour",
+                "Honey Mustard",
+                "Hot Mustard",
+                "Ranch"
+              ]
+            },
+            {
+              "id": "n1",
+              "name": "6 Piece McNuggets®",
+              "image": "DC_202502_0483_4McNuggets_Stacked_McValueRegistered_1564x1564",
+              "price": 3.89,
+              "calories": 250,
+              "description": "6 pieces of chicken McNuggets — choose your dipping sauce",
+              "allergens": [
+                "wheat"
+              ],
+              "sauce_choices": [
+                "BBQ",
+                "Sweet & Sour",
+                "Honey Mustard",
+                "Hot Mustard",
+                "Ranch"
+              ]
+            },
+            {
+              "id": "n2",
+              "name": "10 Piece McNuggets®",
+              "image": "DC_202502_0483_4McNuggets_Stacked_McValueRegistered_1564x1564",
+              "price": 5.49,
+              "meal_price": 8.49,
+              "calories": 410,
+              "description": "10 pieces of chicken McNuggets — choose your dipping sauces",
+              "allergens": [
+                "wheat"
+              ],
+              "sauce_choices": [
+                "BBQ",
+                "Sweet & Sour",
+                "Honey Mustard",
+                "Hot Mustard",
+                "Ranch"
+              ]
+            },
+            {
+              "id": "n3",
+              "name": "20 Piece McNuggets®",
+              "image": "DC_202502_0483_4McNuggets_Stacked_McValueRegistered_1564x1564",
+              "price": 9.99,
+              "calories": 830,
+              "description": "20 pieces of chicken McNuggets — perfect for sharing",
+              "allergens": [
+                "wheat"
+              ],
+              "sauce_choices": [
+                "BBQ",
+                "Sweet & Sour",
+                "Honey Mustard",
+                "Hot Mustard",
+                "Ranch"
+              ]
+            },
+            {
+              "id": "n4",
+              "name": "McCrispy® Strips (3 pc)",
+              "image": "DC_202504_25157_3PieceMcCrispyStrips_1564x1564",
+              "price": 4.49,
+              "calories": 370,
+              "description": "3 pieces of McCrispy chicken strips — tender inside, crispy outside",
+              "allergens": [
+                "wheat",
+                "milk"
+              ],
+              "sauce_choices": [
+                "BBQ",
+                "Sweet & Sour",
+                "Honey Mustard",
+                "Creamy Ranch",
+                "Spicy Buffalo",
+                "Creamy Chili"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "snackwrap",
+          "label": "Snack Wrap®",
+          "nav_image": "https://s7d1.scene7.com/is/image/mcdonalds/NEW_DC_Category_202504_SnackWraps_160x160v2:category-panel-left-desktop",
+          "items": [
+            {
+              "id": "sw0",
+              "name": "Ranch Snack Wrap®",
+              "image": "DC_202504_25254_RanchSnackWrap_1564x1564",
+              "price": 3.49,
+              "calories": 360,
+              "description": "Crispy chicken, lettuce, cheddar jack cheese, and ranch sauce in a flour tortilla",
+              "allergens": [
+                "wheat",
+                "milk",
+                "soy"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "fries",
+          "label": "Fries & Sides",
+          "nav_image": "https://s7d1.scene7.com/is/image/mcdonalds/Category_202408_FriesandSides_160x160:category-panel-left-desktop",
+          "items": [
+            {
+              "id": "f0",
+              "name": "World Famous Fries®",
+              "image": "DC_202411_6050_SmallFrenchFries_Standing_McValueRegistered_1564x1564",
+              "prices": {
+                "small": 2.19,
+                "medium": 3.09,
+                "large": 3.79
+              },
+              "calories": {
+                "small": 230,
+                "medium": 320,
+                "large": 480
+              },
+              "description": "Golden, crispy fries made from real potatoes",
+              "allergens": [
+                "wheat"
+              ],
+              "note": "Included as medium in meals"
+            },
+            {
+              "id": "f1",
+              "name": "Apple Slices",
+              "image": "DC_202002_2794_AppleSlices_NoBag_1564x1564-1",
+              "price": 1.49,
+              "calories": 15,
+              "description": "Fresh apple slices — available as a side substitution in meals"
+            }
+          ]
+        },
+        {
+          "id": "happy",
+          "label": "Happy Meal®",
+          "nav_image": "https://s7d1.scene7.com/is/image/mcdonalds/nav_happy_meal_160x160:category-panel-left-desktop",
+          "items": [
+            {
+              "id": "h0",
+              "name": "Hamburger Happy Meal®",
+              "image": "DC_202307_6975_HamburgerHappyMeal_AppleSlices_WhiteMilkJug_Left_1564x1564-1",
+              "price": 4.99,
+              "description": "Includes Hamburger, Small Fries or Apple Slices, Drink, and a Toy",
+              "includes": [
+                "Hamburger",
+                "Small Fries or Apple Slices",
+                "Drink (milk, juice, or water)",
+                "Toy"
+              ]
+            },
+            {
+              "id": "h1",
+              "name": "4pc McNuggets® Happy Meal®",
+              "image": "DC_202103_7002_4McNuggetsHappyMeal_AppleSlices_WhiteMilkJug_Left_1564x1564-1",
+              "price": 5.29,
+              "description": "Includes 4pc McNuggets, Small Fries or Apple Slices, Drink, and a Toy",
+              "includes": [
+                "4pc McNuggets",
+                "Small Fries or Apple Slices",
+                "Drink (milk, juice, or water)",
+                "Toy"
+              ]
+            },
+            {
+              "id": "h2",
+              "name": "6pc McNuggets® Happy Meal®",
+              "image": "DC_202103_7780_6McNuggetsHappyMeal_AppleSlices_WhiteMilkJug_Left_1564x1564-1",
+              "price": 5.79,
+              "description": "Includes 6pc McNuggets, Small Fries or Apple Slices, Drink, and a Toy",
+              "includes": [
+                "6pc McNuggets",
+                "Small Fries or Apple Slices",
+                "Drink (milk, juice, or water)",
+                "Toy"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "sweets",
+          "label": "Sweets & Treats",
+          "nav_image": "https://s7d1.scene7.com/is/image/mcdonalds/desserts_shakes_300x300:category-panel-left-desktop",
+          "items": [
+            {
+              "id": "s0",
+              "name": "McFlurry® with OREO®",
+              "image": "DC_202002_3832_OREOMcFlurry_1564x1564-1",
+              "prices": {
+                "regular": 4.89,
+                "snack": 3.69
+              },
+              "calories": {
+                "regular": 510,
+                "snack": 340
+              },
+              "description": "Vanilla soft serve mixed with OREO cookie pieces",
+              "allergens": [
+                "milk",
+                "wheat",
+                "soy"
+              ]
+            },
+            {
+              "id": "s1",
+              "name": "McFlurry® with M&M'S®",
+              "image": "DC_202505_3830_MandMMcFlurry_1564x1564",
+              "prices": {
+                "regular": 4.89,
+                "snack": 3.69
+              },
+              "calories": {
+                "regular": 640,
+                "snack": 430
+              },
+              "description": "Vanilla soft serve mixed with M&M's candy pieces",
+              "allergens": [
+                "milk",
+                "soy",
+                "peanut"
+              ]
+            },
+            {
+              "id": "s2",
+              "name": "Vanilla Cone",
+              "image": "DC_202106_0336_LargeVanillaCone_1564x1564-1",
+              "price": 1.89,
+              "calories": 200,
+              "description": "Creamy vanilla soft serve in a cone",
+              "allergens": [
+                "milk",
+                "wheat"
+              ]
+            },
+            {
+              "id": "s3",
+              "name": "Chocolate Shake",
+              "image": "DC_201907_1509_MediumChocolateShake_Glass_A1_1564x1564-1",
+              "prices": {
+                "small": 3.49,
+                "medium": 4.29,
+                "large": 4.89
+              },
+              "description": "Creamy chocolate shake made with vanilla soft serve",
+              "allergens": [
+                "milk"
+              ]
+            },
+            {
+              "id": "s4",
+              "name": "Vanilla Shake",
+              "image": "DC_201907_1598_MediumVanillaShake_Glass_A1_1564x1564-1",
+              "prices": {
+                "small": 3.49,
+                "medium": 4.29,
+                "large": 4.89
+              },
+              "description": "Creamy vanilla shake",
+              "allergens": [
+                "milk"
+              ]
+            },
+            {
+              "id": "s5",
+              "name": "Strawberry Shake",
+              "image": "DC_201907_1513_MediumStrawberryShake_Glass_A1_1564x1564-1",
+              "prices": {
+                "small": 3.49,
+                "medium": 4.29,
+                "large": 4.89
+              },
+              "description": "Creamy strawberry shake",
+              "allergens": [
+                "milk"
+              ]
+            },
+            {
+              "id": "s6",
+              "name": "Hot Fudge Sundae",
+              "image": "DC_201907_0337_HotFudgeSundae_1564x1564-1",
+              "price": 2.89,
+              "calories": 330,
+              "description": "Vanilla soft serve topped with hot fudge",
+              "allergens": [
+                "milk",
+                "soy"
+              ]
+            },
+            {
+              "id": "s7",
+              "name": "Hot Caramel Sundae",
+              "image": "DC_201907_0345_CaramelSundae_1564x1564-1",
+              "price": 2.89,
+              "calories": 340,
+              "description": "Vanilla soft serve topped with caramel",
+              "allergens": [
+                "milk"
+              ]
+            },
+            {
+              "id": "s8",
+              "name": "Baked Apple Pie",
+              "image": "DC_202004_0706_BakedApplePie_Broken_1564x1564-1",
+              "price": 1.69,
+              "calories": 230,
+              "description": "Warm baked pie with apple filling in a flaky crust",
+              "allergens": [
+                "wheat",
+                "milk"
+              ]
+            },
+            {
+              "id": "s9",
+              "name": "Chocolate Chip Cookie",
+              "image": "DC_202211_1852_ChocolateChipCookie_Upright_1564x1564-1",
+              "price": 1.29,
+              "calories": 170,
+              "description": "Warm chocolate chip cookie",
+              "allergens": [
+                "wheat",
+                "milk",
+                "egg",
+                "soy"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "mccafe",
+          "label": "McCafé® Coffees",
+          "nav_image": "https://s7d1.scene7.com/is/image/mcdonalds/mccafe_300x300:category-panel-left-desktop",
+          "items": [
+            {
+              "id": "mc0",
+              "name": "McCafé® Caramel Macchiato",
+              "image": "DC_201906_2804_MediumCaramelMacchiato_Glass_A1_HL_1564x1564-1",
+              "prices": {
+                "small": 3.69,
+                "medium": 4.39,
+                "large": 4.99
+              },
+              "allergens": [
+                "milk"
+              ]
+            },
+            {
+              "id": "mc1",
+              "name": "McCafé® Cappuccino",
+              "image": "DC_201906_2692_MediumCappuccino_Glass_A1_HL_1564x1564-1",
+              "prices": {
+                "small": 3.29,
+                "medium": 3.99,
+                "large": 4.59
+              },
+              "allergens": [
+                "milk"
+              ]
+            },
+            {
+              "id": "mc2",
+              "name": "McCafé® Caramel Cappuccino",
+              "image": "DC_201906_1517_MediumCaramelCappuccino_Glass_A1_HL_1564x1564-1",
+              "prices": {
+                "small": 3.69,
+                "medium": 4.39,
+                "large": 4.99
+              },
+              "allergens": [
+                "milk"
+              ]
+            },
+            {
+              "id": "mc3",
+              "name": "McCafé® French Vanilla Cappuccino",
+              "image": "DC_201906_1372_MediumVanillaCappuccino_Glass_A1_HL_1564x1564-1",
+              "prices": {
+                "small": 3.69,
+                "medium": 4.39,
+                "large": 4.99
+              },
+              "allergens": [
+                "milk"
+              ]
+            },
+            {
+              "id": "mc4",
+              "name": "McCafé® Mocha Latte",
+              "image": "DC_201906_2731_MediumMocha_Glass_A1_HL_832x472",
+              "prices": {
+                "small": 3.69,
+                "medium": 4.39,
+                "large": 4.99
+              },
+              "allergens": [
+                "milk"
+              ]
+            },
+            {
+              "id": "mc5",
+              "name": "Americano",
+              "image": "DC_201906_1318_MediumAmericano_Glass_A1_HL_1564x1564-1",
+              "prices": {
+                "small": 2.29,
+                "medium": 2.99,
+                "large": 3.49
+              }
+            },
+            {
+              "id": "mc6",
+              "name": "McCafé® Premium Roast Coffee",
+              "image": "DC_201906_0321_MediumCoffee_Glass_A1_HL_1564x1564-1",
+              "prices": {
+                "small": 1.49,
+                "medium": 1.89,
+                "large": 2.19
+              }
+            },
+            {
+              "id": "mc7",
+              "name": "McCafé® Iced Caramel Macchiato",
+              "image": "DC_201906_0379_MediumIcedCaramelLatte_Glass_A1_1564x1564-1",
+              "prices": {
+                "small": 3.99,
+                "medium": 4.69,
+                "large": 5.29
+              },
+              "allergens": [
+                "milk"
+              ]
+            },
+            {
+              "id": "mc8",
+              "name": "McCafé® Iced Mocha Latte",
+              "image": "DC_201906_0187_MediumIcedFrenchVanillaLatte_Glass_A1_1564x1564-1",
+              "prices": {
+                "small": 3.69,
+                "medium": 4.39,
+                "large": 4.99
+              },
+              "allergens": [
+                "milk"
+              ]
+            },
+            {
+              "id": "mc9",
+              "name": "McCafé® Iced Coffee",
+              "image": "DC_201906_1212_MediumIcedCoffee_Glass_A1_1564x1564-1",
+              "prices": {
+                "small": 2.49,
+                "medium": 3.29,
+                "large": 3.79
+              },
+              "flavors": [
+                "Regular",
+                "French Vanilla",
+                "Caramel"
+              ]
+            },
+            {
+              "id": "mc10",
+              "name": "McCafé® Iced Caramel Coffee",
+              "image": "DC_201906_1207_MediumIcedCaramelCoffee_Glass_A1_1564x1564-1",
+              "prices": {
+                "small": 2.79,
+                "medium": 3.59,
+                "large": 4.09
+              }
+            },
+            {
+              "id": "mc11",
+              "name": "McCafé® Iced French Vanilla Coffee",
+              "image": "DC_201906_1216_MediumIcedFrenchVanillaCoffee_Glass_A1_1564x1564-1",
+              "prices": {
+                "small": 2.79,
+                "medium": 3.59,
+                "large": 4.09
+              }
+            },
+            {
+              "id": "mc12",
+              "name": "McCafé® Latte",
+              "image": "DC_201906_2698_MediumLatte_Glass_A1_HL_1564x1564-1",
+              "prices": {
+                "small": 3.29,
+                "medium": 3.99,
+                "large": 4.59
+              },
+              "allergens": [
+                "milk"
+              ]
+            },
+            {
+              "id": "mc13",
+              "name": "McCafé® Iced Latte",
+              "image": "DC_201906_0187_MediumIcedFrenchVanillaLatte_Glass_A1_1564x1564-1",
+              "prices": {
+                "small": 3.29,
+                "medium": 3.99,
+                "large": 4.59
+              },
+              "allergens": [
+                "milk"
+              ]
+            },
+            {
+              "id": "mc14",
+              "name": "McCafé® Caramel Latte",
+              "image": "DC_201906_1324_MediumCaramelLatte_Glass_A1_HL_1564x1564-1",
+              "prices": {
+                "small": 3.69,
+                "medium": 4.39,
+                "large": 4.99
+              },
+              "allergens": [
+                "milk"
+              ]
+            },
+            {
+              "id": "mc15",
+              "name": "McCafé® Iced Caramel Latte",
+              "image": "DC_201906_0379_MediumIcedCaramelLatte_Glass_A1_1564x1564-1",
+              "prices": {
+                "small": 3.69,
+                "medium": 4.39,
+                "large": 4.99
+              },
+              "allergens": [
+                "milk"
+              ]
+            },
+            {
+              "id": "mc16",
+              "name": "McCafé® French Vanilla Latte",
+              "image": "DC_201906_1331_MediumFrenchVanillaLatte_Glass_A1_HL_1564x1564-1",
+              "prices": {
+                "small": 3.69,
+                "medium": 4.39,
+                "large": 4.99
+              },
+              "allergens": [
+                "milk"
+              ]
+            },
+            {
+              "id": "mc17",
+              "name": "McCafé® Iced French Vanilla Latte",
+              "image": "DC_201906_0187_MediumIcedFrenchVanillaLatte_Glass_A1_1564x1564-1",
+              "prices": {
+                "small": 3.69,
+                "medium": 4.39,
+                "large": 4.99
+              },
+              "allergens": [
+                "milk"
+              ]
+            },
+            {
+              "id": "mc18",
+              "name": "McCafé® Caramel Frappé",
+              "image": "DC_201906_2842_MediumCaramelFrappe_Glass_A1_1564x1564-1",
+              "prices": {
+                "small": 3.99,
+                "medium": 4.79,
+                "large": 5.39
+              },
+              "description": "Blended with ice, caramel syrup, whipped cream and caramel drizzle",
+              "allergens": [
+                "milk"
+              ]
+            },
+            {
+              "id": "mc19",
+              "name": "McCafé® Mocha Frappé",
+              "image": "DC_201906_3491_MediumMochaFrappe_Glass_A1_1564x1564-1",
+              "prices": {
+                "small": 3.99,
+                "medium": 4.79,
+                "large": 5.39
+              },
+              "description": "Blended with ice, mocha syrup, whipped cream and chocolate drizzle",
+              "allergens": [
+                "milk"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "beverages",
+          "label": "Beverages",
+          "nav_image": "https://s7d1.scene7.com/is/image/mcdonalds/NavImage_Beverages_160x160:category-panel-left-desktop",
+          "items": [
+            {
+              "id": "bv0",
+              "name": "Coca-Cola®",
+              "image": "DC_202402_0521_MediumCoke_ContourGlassv1_1564x1564",
+              "prices": {
+                "small": 1.39,
+                "medium": 1.79,
+                "large": 2.09
+              },
+              "note": "Included as medium in meals"
+            },
+            {
+              "id": "bv1",
+              "name": "Sprite®",
+              "image": "DC_202212_0721_MediumSprite_Glass_1564x1564-1",
+              "prices": {
+                "small": 1.39,
+                "medium": 1.79,
+                "large": 2.09
+              }
+            },
+            {
+              "id": "bv2",
+              "name": "Dr Pepper®",
+              "image": "DC_201905_0421_MediumDrPepper_Glass_1564x1564-1",
+              "prices": {
+                "small": 1.39,
+                "medium": 1.79,
+                "large": 2.09
+              }
+            },
+            {
+              "id": "bv3",
+              "name": "Fanta® Orange",
+              "image": "DC_202212_1262_MediumFantaOrange_Glass_1564x1564-1",
+              "prices": {
+                "small": 1.39,
+                "medium": 1.79,
+                "large": 2.09
+              }
+            },
+            {
+              "id": "bv4",
+              "name": "Diet Coke®",
+              "image": "DC_202112_0652_MediumDietCoke_Glass_1564x1564-1",
+              "prices": {
+                "small": 1.39,
+                "medium": 1.79,
+                "large": 2.09
+              }
+            },
+            {
+              "id": "bv5",
+              "name": "Hi-C® Orange Lavaburst®",
+              "image": "DC_202012_0621_MediumHi-COrange_1564x1564-1",
+              "prices": {
+                "small": 1.39,
+                "medium": 1.79,
+                "large": 2.09
+              }
+            },
+            {
+              "id": "bv6",
+              "name": "Frozen Fanta® Blue Raspberry",
+              "image": "DC_202301_7959_MediumFrozenFantaBlueRaspberry_Glass_1564x1564-1",
+              "prices": {
+                "small": 2.19,
+                "medium": 2.79,
+                "large": 3.29
+              }
+            },
+            {
+              "id": "bv7",
+              "name": "Frozen Coca-Cola® Classic",
+              "image": "DC_202301_7963_MediumFrozenCocaColaClassic_Glass_1564x1564-1",
+              "prices": {
+                "small": 2.19,
+                "medium": 2.79,
+                "large": 3.29
+              }
+            },
+            {
+              "id": "bv8",
+              "name": "Strawberry Banana Smoothie",
+              "image": "DC_201906_2725_MediumStrawberryBananaSmoothie_Glass_A1_1564x1564-1",
+              "prices": {
+                "small": 3.49,
+                "medium": 4.19,
+                "large": 4.79
+              },
+              "allergens": [
+                "milk"
+              ]
+            },
+            {
+              "id": "bv9",
+              "name": "Mango Pineapple Smoothie",
+              "image": "DC_201906_2790_MediumMangoPineappleSmoothie_Glass_A1_1564x1564-1",
+              "prices": {
+                "small": 3.49,
+                "medium": 4.19,
+                "large": 4.79
+              },
+              "allergens": [
+                "milk"
+              ]
+            },
+            {
+              "id": "bv10",
+              "name": "Lemonade",
+              "image": "DC_202511_14878_Medium_SignatureLemonade_1564x1564v2",
+              "prices": {
+                "small": 1.79,
+                "medium": 2.29,
+                "large": 2.69
+              }
+            },
+            {
+              "id": "bv11",
+              "name": "Sweet Tea",
+              "image": "DC_202105_3429_SweetTea_Glass_A1_1564x1564-1",
+              "prices": {
+                "small": 1.39,
+                "medium": 1.79,
+                "large": 2.09
+              }
+            },
+            {
+              "id": "bv12",
+              "name": "Unsweetened Iced Tea",
+              "image": "DC_201909_9449_UnsweetTea_Glass_A1_1564x1564-1",
+              "prices": {
+                "small": 1.39,
+                "medium": 1.79,
+                "large": 2.09
+              }
+            },
+            {
+              "id": "bv13",
+              "name": "Hot Tea",
+              "image": "DC_201906_0573_MediumHotTea_Glass_A1_HL_1564x1564-1",
+              "prices": {
+                "small": 1.29,
+                "medium": 1.59,
+                "large": 1.89
+              }
+            },
+            {
+              "id": "bv14",
+              "name": "Minute Maid® Orange Juice",
+              "image": "Header_MediumMinuteMaidPremiumOrangeJuice_832x472",
+              "price": 2.29
+            },
+            {
+              "id": "bv15",
+              "name": "Honest Kids® Apple Juice",
+              "image": "DC_202008_0322_HonestKidsAppleJuice_1564x1564-1",
+              "price": 1.59
+            },
+            {
+              "id": "bv16",
+              "name": "1% Low Fat Milk Jug",
+              "image": "DC_202103_0066_MilkJug_1564x1564-1",
+              "price": 1.59,
+              "allergens": [
+                "milk"
+              ]
+            },
+            {
+              "id": "bv17",
+              "name": "Chocolate Milk Jug",
+              "image": "DC_202103_3179_ReducedSugarLowFatChocolateMilk_1564x1564-1",
+              "price": 1.79,
+              "allergens": [
+                "milk"
+              ]
+            },
+            {
+              "id": "bv18",
+              "name": "McCafé® Hot Chocolate",
+              "image": "DC_201906_1697_MediumPremiumHotChocolate_Glass_A1_HL_1564x1564-1",
+              "prices": {
+                "small": 2.09,
+                "medium": 2.69,
+                "large": 3.19
+              },
+              "allergens": [
+                "milk"
+              ]
+            },
+            {
+              "id": "bv19",
+              "name": "DASANI® Water",
+              "image": "DC_202402_5474_DasaniBottledWater_1564x1564-1",
+              "price": 1.39
+            }
+          ]
+        },
+        {
+          "id": "sauces",
+          "label": "Sauces & Condiments",
+          "nav_image": "https://s7d1.scene7.com/is/image/mcdonalds/DC_Ingredient_Condiment_202312_02679-243__0912_Ketchup_160x160:category-panel-left-desktop",
+          "items": [
+            {
+              "id": "sc0",
+              "name": "Creamy Chili Sauce",
+              "image": "DC_Ingredient_Condiment_202504_03248-072__25195_CreamyChiliSauce_1564x1564",
+              "price": 0.25,
+              "description": "Creamy Chili McCrispy® Strip Dip"
+            },
+            {
+              "id": "sc1",
+              "name": "Tangy Barbeque Sauce",
+              "image": "DC_Ingredient_Condiment_202312_00408-144__0900_TangyBBQ_1564x1564-1",
+              "price": 0.25
+            },
+            {
+              "id": "sc2",
+              "name": "Spicy Buffalo Sauce",
+              "image": "DC_Ingredient_Condiment_202203_07812-045__9089_SpicyBuffalo_1564x1564-1",
+              "price": 0.25
+            },
+            {
+              "id": "sc3",
+              "name": "Creamy Ranch Sauce",
+              "image": "DC_Ingredient_Condiment_202203_02861-036__0922_CreamyRanch_1564x1564-1",
+              "price": 0.25
+            },
+            {
+              "id": "sc4",
+              "name": "Honey Mustard Sauce",
+              "image": "DC_Ingredient_Condiment_202203_08731-024__9088_HoneyMustard_1564x1564-1",
+              "price": 0.25
+            },
+            {
+              "id": "sc5",
+              "name": "Sweet 'N Sour Sauce",
+              "image": "DC_Ingredient_Condiment_202203_00409-120__0901_SweetNSour_1564x1564-1",
+              "price": 0.25
+            },
+            {
+              "id": "sc6",
+              "name": "Ketchup Packet",
+              "image": "DC_Ingredient_Condiment_202203_02679-243__0912_Ketchup_1564x1564-1",
+              "price": 0
+            },
+            {
+              "id": "sc7",
+              "name": "Mayonnaise Packet",
+              "image": "DC_Ingredient_Condiment_202203_11668-000__9008_Mayonnaise_1564x1564-1",
+              "price": 0
+            },
+            {
+              "id": "sc8",
+              "name": "Mustard Packet",
+              "image": "DC_Ingredient_Condiment_202203_00046-048__9004_Mustard_1564x1564-1",
+              "price": 0
+            },
+            {
+              "id": "sc9",
+              "name": "Honey",
+              "image": "DC_Ingredient_Condiment_202312_00411-012__0902_Honey_1564x1564-1",
+              "price": 0.25
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "breakfast",
+      "label": "Breakfast",
+      "icon": "☀️",
+      "categories": [
+        {
+          "id": "brk_main",
+          "label": "Breakfast",
+          "nav_image": "https://s7d1.scene7.com/is/image/mcdonalds/breakfast_300x300:category-panel-left-desktop",
+          "items": [
+            {
+              "id": "bk0",
+              "name": "Bacon, Egg & Cheese Biscuit",
+              "image": "DC_202405_0085_BaconEggCheeseBiscuit_1564x1564-1",
+              "price": 4.89,
+              "meal_price": 6.89,
+              "calories": 460,
+              "description": "Thick-cut applewood smoked bacon, egg, and cheese on a warm biscuit",
+              "allergens": [
+                "wheat",
+                "milk",
+                "egg",
+                "soy"
+              ]
+            },
+            {
+              "id": "bk1",
+              "name": "Egg McMuffin®",
+              "image": "DC_202004_0046_EggMcMuffin_1564x1564-1",
+              "price": 4.49,
+              "meal_price": 6.49,
+              "calories": 300,
+              "description": "Egg, Canadian bacon, American cheese on a toasted English muffin",
+              "allergens": [
+                "wheat",
+                "milk",
+                "egg"
+              ]
+            },
+            {
+              "id": "bk2",
+              "name": "Sausage McMuffin®",
+              "image": "DC_202411_0078_SausageMcMuffin_McValueRegistered_1564x1564",
+              "price": 2.29,
+              "meal_price": 4.99,
+              "calories": 400,
+              "description": "Pork sausage patty with American cheese on a toasted English muffin",
+              "allergens": [
+                "wheat",
+                "milk"
+              ]
+            },
+            {
+              "id": "bk3",
+              "name": "Sausage McMuffin® with Egg",
+              "image": "DC_201907_0083_SausageEggMcMuffin_1564x1564-1",
+              "price": 4.79,
+              "meal_price": 6.79,
+              "calories": 480,
+              "description": "Sausage, egg, and cheese on a toasted English muffin",
+              "allergens": [
+                "wheat",
+                "milk",
+                "egg"
+              ]
+            },
+            {
+              "id": "bk4",
+              "name": "Sausage Biscuit",
+              "image": "DC_202411_0062_SausageBiscuit_McValueRegistered_1564x1564",
+              "price": 2.19,
+              "calories": 460,
+              "description": "Seasoned pork sausage patty on a warm biscuit",
+              "allergens": [
+                "wheat",
+                "milk",
+                "soy"
+              ]
+            },
+            {
+              "id": "bk5",
+              "name": "Sausage Biscuit with Egg",
+              "image": "DC_201907_0092_SausageEggBiscuit_1564x1564-1",
+              "price": 3.49,
+              "calories": 530,
+              "description": "Seasoned sausage, egg on a warm biscuit",
+              "allergens": [
+                "wheat",
+                "milk",
+                "egg",
+                "soy"
+              ]
+            },
+            {
+              "id": "bk6",
+              "name": "Bacon, Egg & Cheese McGriddles®",
+              "image": "DC_201908_9839_BEC_McGriddle_1564x1564-1",
+              "price": 5.19,
+              "meal_price": 7.19,
+              "calories": 430,
+              "description": "Bacon, egg, cheese between two griddle cakes with maple flavor",
+              "allergens": [
+                "wheat",
+                "milk",
+                "egg",
+                "soy"
+              ]
+            },
+            {
+              "id": "bk7",
+              "name": "Sausage McGriddles®",
+              "image": "DC_201911_6110_SausageMcGriddle_1564x1564-1",
+              "price": 3.29,
+              "meal_price": 5.29,
+              "calories": 430,
+              "description": "Sausage between two griddle cakes with maple flavor",
+              "allergens": [
+                "wheat",
+                "milk",
+                "soy"
+              ]
+            },
+            {
+              "id": "bk8",
+              "name": "Sausage, Egg & Cheese McGriddles®",
+              "image": "DC_201907_9841_SausageEggCheeseMcGriddle_1564x1564-2",
+              "price": 5.49,
+              "meal_price": 7.49,
+              "calories": 550,
+              "description": "Sausage, egg, cheese between two griddle cakes with maple flavor",
+              "allergens": [
+                "wheat",
+                "milk",
+                "egg",
+                "soy"
+              ]
+            },
+            {
+              "id": "bk9",
+              "name": "Bacon, Egg & Cheese Bagel",
+              "image": "DC_202103_1603_BaconEggCheeseBagel_1564x1564-1",
+              "price": 5.49,
+              "calories": 550,
+              "description": "Thick-cut applewood bacon, egg, cheese on a toasted bagel",
+              "allergens": [
+                "wheat",
+                "milk",
+                "egg",
+                "soy",
+                "sesame"
+              ]
+            },
+            {
+              "id": "bk10",
+              "name": "Sausage, Egg & Cheese Bagel",
+              "image": "DC_202403_1604_SausageEggCheeseBagel_1564x1564-1",
+              "price": 5.49,
+              "calories": 620,
+              "description": "Sausage, egg, cheese on a toasted bagel",
+              "allergens": [
+                "wheat",
+                "milk",
+                "egg",
+                "soy",
+                "sesame"
+              ]
+            },
+            {
+              "id": "bk11",
+              "name": "Steak, Egg & Cheese Bagel",
+              "image": "DC_202103_5918_SteakEggCheeseBagel_1564x1564-1",
+              "price": 6.29,
+              "calories": 670,
+              "allergens": [
+                "wheat",
+                "milk",
+                "egg",
+                "soy",
+                "sesame"
+              ]
+            },
+            {
+              "id": "bk12",
+              "name": "Bagel (plain)",
+              "image": "DC_201909_5428_PlainBagel_1564x1564-1",
+              "price": 1.99,
+              "calories": 260,
+              "allergens": [
+                "wheat",
+                "sesame"
+              ]
+            },
+            {
+              "id": "bk13",
+              "name": "Egg & Cheese Bagel",
+              "image": "DC_202410_4210_EggCheeseBagel_1564x1564",
+              "price": 4.29,
+              "calories": 400,
+              "allergens": [
+                "wheat",
+                "milk",
+                "egg",
+                "sesame"
+              ]
+            },
+            {
+              "id": "bk14",
+              "name": "Big Breakfast®",
+              "image": "DC_202405_0107_BigBreakfast._1564x1564-1",
+              "price": 5.99,
+              "calories": 740,
+              "description": "Scrambled eggs, sausage patty, biscuit, and hash browns",
+              "allergens": [
+                "wheat",
+                "milk",
+                "egg",
+                "soy"
+              ]
+            },
+            {
+              "id": "bk15",
+              "name": "Big Breakfast® with Hotcakes",
+              "image": "DC_202208_3590_BigBreakfast_HotCakes_1564x1564-1",
+              "price": 7.49,
+              "calories": 1340,
+              "allergens": [
+                "wheat",
+                "milk",
+                "egg",
+                "soy"
+              ]
+            },
+            {
+              "id": "bk16",
+              "name": "Hotcakes",
+              "image": "DC_202405_0031_3HotCakes_1564x1564-1",
+              "price": 3.99,
+              "calories": 580,
+              "description": "3 golden hotcakes with butter and syrup",
+              "allergens": [
+                "wheat",
+                "milk",
+                "egg"
+              ]
+            },
+            {
+              "id": "bk17",
+              "name": "Hotcakes and Sausage",
+              "image": "DC_202405_0032_3HotCakes_Sausage_1564x1564-1",
+              "price": 5.29,
+              "calories": 780,
+              "allergens": [
+                "wheat",
+                "milk",
+                "egg"
+              ]
+            },
+            {
+              "id": "bk18",
+              "name": "Sausage Burrito",
+              "image": "DC_202411_0334_SausageBurrito_Alt_McValueRegistered_1564x1564",
+              "price": 2.49,
+              "calories": 310,
+              "description": "Scrambled eggs, sausage, green chiles, onion, and cheese in a flour tortilla",
+              "allergens": [
+                "wheat",
+                "milk",
+                "egg",
+                "soy"
+              ]
+            },
+            {
+              "id": "bk19",
+              "name": "Hash Browns",
+              "image": "DC_202411_0035_HashBrowns_Upright_McValueRegistered_1564x1564",
+              "price": 1.89,
+              "calories": 140,
+              "description": "Crispy shredded potato hash brown",
+              "allergens": [
+                "wheat"
+              ]
+            },
+            {
+              "id": "bk20",
+              "name": "Fruit & Maple Oatmeal",
+              "image": "DC_202002_1500_Oatmeal_Fruit_1564x1564-1",
+              "price": 3.49,
+              "calories": 310,
+              "description": "Whole-grain oatmeal with diced apples, cranberry raisin blend, and cream",
+              "allergens": [
+                "wheat",
+                "milk"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "brk_extravalue",
+          "label": "Extra Value Meals",
+          "nav_image": "https://s7d1.scene7.com/is/image/mcdonalds/DC_202004_0046_EggMcMuffin_1564x1564-1:category-panel-left-desktop",
+          "items": [
+            {
+              "id": "bev0",
+              "name": "Sausage McMuffin® with Egg Meal",
+              "image": "DC_201907_0083_SausageEggMcMuffin_1564x1564-1",
+              "price": 6.79,
+              "calories": 620,
+              "description": "Sausage McMuffin® with Egg, Hash Browns, and Small Premium Roast Coffee",
+              "tags": ["extra_value", "breakfast"],
+              "allergens": ["wheat", "milk", "egg"],
+              "includes": [
+                "Sausage McMuffin® with Egg",
+                "Hash Browns",
+                "Small Premium Roast Coffee"
+              ]
+            },
+            {
+              "id": "bev1",
+              "name": "Egg McMuffin® Meal",
+              "image": "DC_202004_0046_EggMcMuffin_1564x1564-1",
+              "price": 6.49,
+              "calories": 440,
+              "description": "Egg McMuffin®, Hash Browns, and Small Premium Roast Coffee",
+              "tags": ["extra_value", "breakfast"],
+              "allergens": ["wheat", "milk", "egg"],
+              "includes": [
+                "Egg McMuffin®",
+                "Hash Browns",
+                "Small Premium Roast Coffee"
+              ]
+            },
+            {
+              "id": "bev2",
+              "name": "Bacon, Egg & Cheese Biscuit Meal",
+              "image": "DC_202405_0085_BaconEggCheeseBiscuit_1564x1564-1",
+              "price": 6.89,
+              "calories": 600,
+              "description": "Bacon, Egg & Cheese Biscuit, Hash Browns, and Small Premium Roast Coffee",
+              "tags": ["extra_value", "breakfast"],
+              "allergens": ["wheat", "milk", "egg", "soy"],
+              "includes": [
+                "Bacon, Egg & Cheese Biscuit",
+                "Hash Browns",
+                "Small Premium Roast Coffee"
+              ]
+            },
+            {
+              "id": "bev3",
+              "name": "Sausage Biscuit with Egg Meal",
+              "image": "DC_201907_0092_SausageEggBiscuit_1564x1564-1",
+              "price": 5.49,
+              "calories": 670,
+              "description": "Sausage Biscuit with Egg, Hash Browns, and Small Premium Roast Coffee",
+              "tags": ["extra_value", "breakfast"],
+              "allergens": ["wheat", "milk", "egg", "soy"],
+              "includes": [
+                "Sausage Biscuit with Egg",
+                "Hash Browns",
+                "Small Premium Roast Coffee"
+              ]
+            },
+            {
+              "id": "bev4",
+              "name": "Sausage, Egg & Cheese McGriddles® Meal",
+              "image": "DC_201907_9841_SausageEggCheeseMcGriddle_1564x1564-2",
+              "price": 7.49,
+              "calories": 690,
+              "description": "Sausage, Egg & Cheese McGriddles®, Hash Browns, and Small Premium Roast Coffee",
+              "tags": ["extra_value", "breakfast"],
+              "allergens": ["wheat", "milk", "egg", "soy"],
+              "includes": [
+                "Sausage, Egg & Cheese McGriddles®",
+                "Hash Browns",
+                "Small Premium Roast Coffee"
+              ]
+            },
+            {
+              "id": "bev5",
+              "name": "Bacon, Egg & Cheese McGriddles® Meal",
+              "image": "DC_201908_9839_BEC_McGriddle_1564x1564-1",
+              "price": 7.19,
+              "calories": 570,
+              "description": "Bacon, Egg & Cheese McGriddles®, Hash Browns, and Small Premium Roast Coffee",
+              "tags": ["extra_value", "breakfast"],
+              "allergens": ["wheat", "milk", "egg", "soy"],
+              "includes": [
+                "Bacon, Egg & Cheese McGriddles®",
+                "Hash Browns",
+                "Small Premium Roast Coffee"
+              ]
+            },
+            {
+              "id": "bev6",
+              "name": "Sausage Burrito Meal",
+              "image": "DC_202411_0334_SausageBurrito_Alt_McValueRegistered_1564x1564",
+              "price": 4.49,
+              "calories": 450,
+              "description": "Sausage Burrito, Hash Browns, and Small Premium Roast Coffee",
+              "tags": ["extra_value", "breakfast"],
+              "allergens": ["wheat", "milk", "egg", "soy"],
+              "includes": [
+                "Sausage Burrito",
+                "Hash Browns",
+                "Small Premium Roast Coffee"
+              ]
+            },
+            {
+              "id": "bev7",
+              "name": "Bacon, Egg & Cheese Bagel Meal",
+              "image": "DC_202103_1603_BaconEggCheeseBagel_1564x1564-1",
+              "price": 7.49,
+              "calories": 690,
+              "description": "Bacon, Egg & Cheese Bagel, Hash Browns, and Small Premium Roast Coffee",
+              "tags": ["extra_value", "breakfast"],
+              "allergens": ["wheat", "milk", "egg", "soy", "sesame"],
+              "includes": [
+                "Bacon, Egg & Cheese Bagel",
+                "Hash Browns",
+                "Small Premium Roast Coffee"
+              ]
+            },
+            {
+              "id": "bev8",
+              "name": "Steak, Egg & Cheese Bagel Meal",
+              "image": "DC_202103_5918_SteakEggCheeseBagel_1564x1564-1",
+              "price": 8.29,
+              "calories": 810,
+              "description": "Steak, Egg & Cheese Bagel, Hash Browns, and Small Premium Roast Coffee",
+              "tags": ["extra_value", "breakfast"],
+              "allergens": ["wheat", "milk", "egg", "soy", "sesame"],
+              "includes": [
+                "Steak, Egg & Cheese Bagel",
+                "Hash Browns",
+                "Small Premium Roast Coffee"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "brk_mcvalue",
+          "label": "McValue",
+          "nav_image": "https://s7d1.scene7.com/is/image/mcdonalds/DC_Category_202411_McValue_160x160:category-panel-left-desktop",
+          "items": [
+            {
+              "id": "bmv0",
+              "name": "Sausage Biscuit",
+              "image": "DC_202411_0062_SausageBiscuit_McValueRegistered_1564x1564",
+              "price": 2.19,
+              "calories": 460,
+              "description": "Buy one, add one for $1 — seasoned pork sausage patty on a warm biscuit",
+              "section": "Buy one, Add one for $1*",
+              "tags": ["mcvalue", "buy_one_add_one", "breakfast"],
+              "allergens": ["wheat", "milk", "soy"]
+            },
+            {
+              "id": "bmv1",
+              "name": "Sausage McMuffin®",
+              "image": "DC_202411_0078_SausageMcMuffin_McValueRegistered_1564x1564",
+              "price": 2.29,
+              "calories": 400,
+              "description": "Buy one, add one for $1 — pork sausage patty with American cheese on a toasted English muffin",
+              "section": "Buy one, Add one for $1*",
+              "tags": ["mcvalue", "buy_one_add_one", "breakfast"],
+              "allergens": ["wheat", "milk"]
+            },
+            {
+              "id": "bmv2",
+              "name": "Sausage Burrito",
+              "image": "DC_202411_0334_SausageBurrito_Alt_McValueRegistered_1564x1564",
+              "price": 2.49,
+              "calories": 310,
+              "description": "Buy one, add one for $1 — scrambled eggs, sausage, green chiles, onion, and cheese in a flour tortilla",
+              "section": "Buy one, Add one for $1*",
+              "tags": ["mcvalue", "buy_one_add_one", "breakfast"],
+              "allergens": ["wheat", "milk", "egg", "soy"]
+            },
+            {
+              "id": "bmv3",
+              "name": "Hash Browns",
+              "image": "DC_202411_0035_HashBrowns_Upright_McValueRegistered_1564x1564",
+              "price": 1.89,
+              "calories": 140,
+              "description": "Buy one, add one for $1 — crispy shredded potato hash brown",
+              "section": "Buy one, Add one for $1*",
+              "tags": ["mcvalue", "buy_one_add_one", "breakfast"],
+              "allergens": ["wheat"]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "meal_details": {
+    "whats_included": "A meal includes the entrée, medium fries, and a medium drink",
+    "drink_options": "Coke, Diet Coke, Sprite, Dr Pepper, Fanta, Hi-C, Sweet Tea, Unsweet Tea, Lemonade, Coffee",
+    "size_upgrade": {
+      "large_fries": "+$0.70",
+      "large_drink": "+$0.30"
+    },
+    "side_substitution": "Apple slices can replace fries at no charge"
+  },
+  "allergen_policy": {
+    "statement": "I want to make sure you're aware that our [item] contains [allergens]. If you have any allergies, I can suggest an alternative.",
+    "common_allergens": [
+      "wheat/gluten",
+      "milk/dairy",
+      "egg",
+      "soy",
+      "fish",
+      "sesame",
+      "peanut/tree nut"
+    ],
+    "cross_contamination_warning": "All items are prepared in a shared kitchen. We cannot guarantee any item is completely free of allergens.",
+    "sesame_note": "Most burger buns contain sesame. Regular bun (Hamburger, McDouble) does NOT contain sesame."
+  },
+  "pricing_notes": {
+    "disclaimer": "Prices are approximate US averages as of 2025. Actual prices vary by location.",
+    "tax": "Prices shown before tax. Tax varies by state/locality.",
+    "combo_savings": "Meals save approximately $1.50-$2.00 versus ordering items separately."
+  },
+  "mcvalue_rules": {
+    "general": [
+      "Only ONE McValue offer may be applied per order",
+      "Prices and participation may vary by location",
+      "McValue offers cannot be combined with other promotions or coupons",
+      "All McValue pricing is before tax"
+    ],
+    "meal_deals": {
+      "description": "Meal Deals starting at $5 — limited time only",
+      "rules": [
+        "Meal Deal includes entrée, small fries, and small drink",
+        "McChicken Meal Deal and McDouble Meal Deal are $5",
+        "Daily Double Meal Deal is $6 (some markets)",
+        "Limited time offer — not permanent menu pricing",
+        "Cannot be upgraded to medium or large sizes at the deal price",
+        "One Meal Deal per order"
+      ],
+      "ai_handling": "If a customer asks for a Meal Deal, confirm which one they want and remind them it includes small fries and a small drink. If they ask to upgrade the size, let them know the deal price only covers small sizes — upgrading would be at regular meal pricing."
+    },
+    "buy_one_add_one": {
+      "description": "Buy one, Add one for $1 — get a second qualifying item for $1",
+      "rules": [
+        "Buy one item at full price, add a second qualifying item for $1",
+        "The $1 add-on must be of equal or lesser value than the purchased item",
+        "Breakfast items: Sausage Biscuit, Sausage McMuffin, Sausage Burrito, Hash Browns",
+        "Lunch & Dinner items: Double Cheeseburger, McChicken, 6 Piece McNuggets, Small French Fries",
+        "Only one Buy One Add One offer per order",
+        "Cannot mix breakfast and lunch/dinner items in the same BOGO offer"
+      ],
+      "ai_handling": "When a customer orders a BOGO-eligible item, ask: 'Would you like to add a second [item category] for just $1?' If they want two of the same item, that works. If they want a different item, confirm it's on the qualifying list and is equal or lesser value."
+    },
+    "eats": {
+      "description": "McValue Eats — everyday low prices on select items",
+      "rules": [
+        "Eats items are available at everyday low prices, no special offer needed",
+        "Qualifying items: Cheeseburger, 4 Piece McNuggets, snack-size McFlurry (OREO or M&M's)",
+        "These are individual items, not meals — no fries/drink included",
+        "Eats pricing is not an 'offer' and does not conflict with other McValue promotions"
+      ],
+      "ai_handling": "Eats items can be added to any order at their listed price. They do NOT count as 'using your McValue offer' since they're just everyday pricing. A customer CAN get a Meal Deal AND an Eats item in the same order."
+    },
+    "time_restrictions": {
+      "breakfast_cutoff": "Breakfast McValue items (BOGO Breakfast) available during breakfast hours only (typically until 10:30 AM, 11:00 AM on weekends)",
+      "lunch_dinner_start": "Lunch & Dinner McValue items available after breakfast hours",
+      "meal_deals_availability": "Meal Deals available during lunch and dinner hours"
+    },
+    "common_customer_questions": {
+      "can_i_get_two_deals": "No — only one McValue offer (Meal Deal or BOGO) per order. But you CAN add Eats items alongside any offer.",
+      "can_i_upgrade_meal_deal": "The $5/$6 Meal Deal price covers small sizes only. If you'd like medium or large, I can ring that up as a regular meal instead.",
+      "can_i_mix_breakfast_and_lunch_bogo": "The Buy One Add One items are separated by daypart — breakfast items pair with breakfast items, lunch/dinner with lunch/dinner.",
+      "is_mcvalue_in_the_app": "Yes! McValue offers are available in the McDonald's app, at the counter, drive-thru, and kiosk.",
+      "can_i_use_rewards_with_mcvalue": "MyMcDonald's Rewards points can still be earned on McValue orders, but reward redemptions cannot be stacked with McValue offers."
+    }
+  }
+}

@@ -4365,17 +4365,23 @@ Decode:
 
 **Why no MLP?** A classical readout head (Linear → ReLU → Linear → Softmax) was the previous approach. It required backprop to train, adding a classical dependency. The PhaseAlignmentDecoder has **zero learned parameters** — the CryoLiquidLayer must learn to produce states that naturally align with the correct reference. This is physics-native: it's equivalent to measuring which "resonant frequency" the output is vibrating at.
 
-### XI.5 — TextEncoder (Frozen Sensory Organ)
+### XI.5 — TextEncoder (Attention-Based Sensory Organ)
 
-**Location**: `apps/omega-proving-ground/omega_server/trainer.py`
+**Location**: `packages/omega-core/python/radiant_omega/trainer.py`
 
-The TextEncoder converts natural language text to complex input vectors. It uses:
-- Learned word embeddings (initialized randomly, frozen after vocab build)
-- Average pooling over tokens
-- Linear projection to complex space: `output = proj_real + i·proj_imag`
-- Normalization to unit magnitude
+The TextEncoder converts natural language text to complex input vectors. **v3** (CODEBOOK_VERSION=3) uses an attention-based architecture that preserves word order:
 
-**Crucially, the TextEncoder is frozen** (`requires_grad=False`). It acts as a "sensory organ" — the brain adapts to whatever patterns the sensor produces, not the other way around. This is biologically analogous: a newborn's retina has fixed wiring; the visual cortex learns to interpret its signals.
+1. **Learned word embeddings** (256-dim, max vocab 5000)
+2. **Sinusoidal positional encoding** (MAX_SEQ_LEN=64) — deterministic, not learned
+3. **Single-head self-attention** (Q/K/V linear projections) — context-aware token representations
+4. **Learned query pooling** — a trainable query vector attends over contextualized tokens to produce the final representation
+5. **Linear projection** to complex space: `output = proj_real + i·proj_imag`
+
+This replaced the v2 mean-pooling architecture which lost word order information. The attention encoder can distinguish "what burgers do you have" (`menu_inquiry`) from "give me a burger" (`take_order`) — phrases that share vocabulary but differ in intent based on word position and structure.
+
+**Training**: The TextEncoder is calibrated via `calibrate_encoder()` using a temporary classification head, then frozen during CryoLiquidLayer ODE training. It acts as a "sensory organ" — the brain adapts to whatever patterns the sensor produces.
+
+**v3 accuracy**: 98.72% overall (up from 98.45% with v2 mean-pooling). `menu_inquiry` improved +4.2%, `take_order` improved +1.5%.
 
 ### XI.6 — Complete Data Flow
 
@@ -4383,9 +4389,10 @@ The TextEncoder converts natural language text to complex input vectors. It uses
 Text Input: "I'd like a Big Mac"
     │
     ▼
-┌─ TextEncoder (frozen) ──────────────────────────┐
-│  tokens → embeddings → avg pool → complex proj  │
-│  Output: complex vector [2048]                   │
+┌─ TextEncoder (frozen after calibration) ────────┐
+│  tokens → embeddings + pos_enc → self_attention  │
+│  → learned query pool → complex proj             │
+│  Output: complex vector [1024]                   │
 └──────────────────────┬───────────────────────────┘
                        │
                        ▼
@@ -4444,7 +4451,7 @@ All training examples are processed in a single GPU batch. The ODE integration (
 | CryoLiquidLayer | ✅ | 8.4M angles |
 | Wirtinger e-prop | ✅ | — (updates CryoLiquidLayer) |
 | PhaseAlignmentDecoder | ✅ | 0 |
-| TextEncoder | ✅ (frozen) | ~524K (frozen) |
+| TextEncoder (v3 attention) | ✅ (frozen after calibration) | ~660K (frozen) |
 | HelixKernel | ✅ | 0 (immutable) |
 | Batched GPU training | ✅ | — |
 | Q-Node Live visualization | ✅ | — |
@@ -4457,7 +4464,7 @@ All training examples are processed in a single GPU batch. The ODE integration (
 |-------|--------|-------|
 | E-prop convergence unverified | ⏳ Pending | Need to run 50 epochs and check accuracy |
 | Holographic capacity ~45 patterns | 🔬 Theoretical | HRR theory: O(√n) for n=2048 |
-| Frozen TextEncoder may limit input quality | 🔬 Theoretical | CryoLiquidLayer may compensate |
+| ~~Frozen TextEncoder may limit input quality~~ | ✅ RESOLVED | v3 attention encoder (98.72% accuracy) broke through mean-pooling ceiling |
 | No state persistence across restarts | ❌ Not built | Conscious/subconscious serialization |
 | No post-LLM safety verification | ❌ Not built | Shadow Vector proposal pending |
 
@@ -4473,7 +4480,7 @@ All training examples are processed in a single GPU batch. The ODE integration (
 | **HelixKernel** (safety) | ✅ | ✅ | ✅ Same module |
 | **Wirtinger e-prop training** | ✅ `trainer.py` | ✅ Heartbeat Phase 4 | ✅ Same `radiant_omega/trainer.py` |
 | **PhaseAlignmentDecoder** | ✅ `trainer.py` | ✅ Via OmegaTrainer | ✅ Same module |
-| **TextEncoder** (frozen) | ✅ `trainer.py` | ✅ Via OmegaTrainer | ✅ Same module |
+| **TextEncoder** (v3 attention, frozen) | ✅ `trainer.py` | ✅ Via OmegaTrainer | ✅ Same module |
 | **BehavioralCodebook** | ✅ `trainer.py` | ✅ Via OmegaTrainer | ✅ Same module |
 | **GPU acceleration** (MPS/CUDA) | ✅ 46× speedup | ❌ CPU only (Graviton) | ❌ |
 | **LLM integration** | Ollama (local `llama.cpp`) | `NeuralTransducer` → vLLM | ❌ Different bridges |
@@ -4495,7 +4502,7 @@ All training architecture has been ported to production:
 
 1. ✅ **Wirtinger e-prop** → Ported as Phase 4 in heartbeat handler. CPU/Graviton optimized. Uses `OmegaTrainer` from `radiant_omega.trainer`.
 2. ✅ **PhaseAlignmentDecoder** → Available via `OmegaTrainer` import in heartbeat handler.
-3. ✅ **Frozen TextEncoder** → Available via `OmegaTrainer` import. Training data path configurable via `OMEGA_TRAINING_DATA_PATH` env var.
+3. ✅ **TextEncoder (v3 attention)** → Available via `OmegaTrainer` import. Training data path configurable via `OMEGA_TRAINING_DATA_PATH` env var.
 4. ✅ **Training loop** → Heartbeat handler Phase 4 runs limited epochs (env: `DREAM_TRAINING_EPOCHS`, default 5) to stay within Lambda timeout.
 
 #### What Needs Porting: AWS → Proving Ground ✅ COMPLETE (v7.61.0)
@@ -4588,7 +4595,7 @@ E-prop requires O(parameters) memory — no activation cache, no computation gra
 | **E-prop convergence unknown** | HIGH | Backprop achieved 4% (random). E-prop theory is sound but we haven't verified convergence yet |
 | **Holographic capacity ~45 patterns** | MEDIUM | HRR theory limits superimposed patterns. May need hierarchical phase spaces for production |
 | **No benchmarks vs. fine-tuned models** | HIGH | Need direct comparison: OMEGA+Llama vs. LoRA-tuned Llama on same task |
-| **TextEncoder is frozen** | LOW | CryoLiquidLayer compensates, but better encoding would help |
+| ~~Frozen TextEncoder may limit input quality~~ | ✅ RESOLVED | v3 attention encoder broke through 98.45% ceiling → 98.72% |
 | **MPS complex tensor limitations** | LOW | `.norm()`, `.conj()` workarounds needed; functional but inelegant |
 | **~~Single-tenant proving ground~~** | ~~MEDIUM~~ | ✅ RESOLVED — `/sessions` API provides independent brain instances per session |
 

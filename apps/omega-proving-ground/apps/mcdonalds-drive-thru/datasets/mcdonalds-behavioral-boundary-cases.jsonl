@@ -1,0 +1,75 @@
+{"input": "how much does a quarter pounder meal cost", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "what does the big mac meal run", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "how much is the nugget meal", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "price on the filet o fish meal", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "what does a happy meal run", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "how much for the combo meal", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "what is the price of a meal deal", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "how much would a meal be", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "can you tell me what the big mac meal costs", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "what is the price of a quarter pounder with cheese meal", "behavior": "price_inquiry", "target_action": "price_inquiry", "target_data": {}, "expected_response_contains": []}
+{"input": "could you put extra sauce on it", "behavior": "customize", "target_action": "customize", "target_data": {}, "expected_response_contains": []}
+{"input": "put extra ketchup on that", "behavior": "customize", "target_action": "customize", "target_data": {}, "expected_response_contains": []}
+{"input": "could you add extra mayo", "behavior": "customize", "target_action": "customize", "target_data": {}, "expected_response_contains": []}
+{"input": "put more sauce on the sandwich", "behavior": "customize", "target_action": "customize", "target_data": {}, "expected_response_contains": []}
+{"input": "extra ranch dressing please", "behavior": "customize", "target_action": "customize", "target_data": {}, "expected_response_contains": []}
+{"input": "can i get extra sauce packets", "behavior": "customize", "target_action": "customize", "target_data": {}, "expected_response_contains": []}
+{"input": "double the pickles", "behavior": "customize", "target_action": "customize", "target_data": {}, "expected_response_contains": []}
+{"input": "light on the onions", "behavior": "customize", "target_action": "customize", "target_data": {}, "expected_response_contains": []}
+{"input": "go heavy on the lettuce", "behavior": "customize", "target_action": "customize", "target_data": {}, "expected_response_contains": []}
+{"input": "put some hot sauce on there", "behavior": "customize", "target_action": "customize", "target_data": {}, "expected_response_contains": []}
+{"input": "make it a meal", "behavior": "split_size_selection", "target_action": "split_size_selection", "target_data": {}, "expected_response_contains": []}
+{"input": "make that a combo", "behavior": "split_size_selection", "target_action": "split_size_selection", "target_data": {}, "expected_response_contains": []}
+{"input": "turn it into a meal", "behavior": "split_size_selection", "target_action": "split_size_selection", "target_data": {}, "expected_response_contains": []}
+{"input": "make it a combo meal", "behavior": "split_size_selection", "target_action": "split_size_selection", "target_data": {}, "expected_response_contains": []}
+{"input": "i want the meal version", "behavior": "split_size_selection", "target_action": "split_size_selection", "target_data": {}, "expected_response_contains": []}
+{"input": "combo that for me", "behavior": "split_size_selection", "target_action": "split_size_selection", "target_data": {}, "expected_response_contains": []}
+{"input": "upgrade to the meal", "behavior": "split_size_selection", "target_action": "split_size_selection", "target_data": {}, "expected_response_contains": []}
+{"input": "make it the meal deal", "behavior": "split_size_selection", "target_action": "split_size_selection", "target_data": {}, "expected_response_contains": []}
+{"input": "supersize that", "behavior": "split_size_selection", "target_action": "split_size_selection", "target_data": {}, "expected_response_contains": []}
+{"input": "go large on everything", "behavior": "split_size_selection", "target_action": "split_size_selection", "target_data": {}, "expected_response_contains": []}
+{"input": "you guys messed up my order", "behavior": "complaint", "target_action": "complaint", "target_data": {}, "expected_response_contains": []}
+{"input": "this is all wrong", "behavior": "complaint", "target_action": "complaint", "target_data": {}, "expected_response_contains": []}
+{"input": "you got my order wrong again", "behavior": "complaint", "target_action": "complaint", "target_data": {}, "expected_response_contains": []}
+{"input": "my food is messed up", "behavior": "complaint", "target_action": "complaint", "target_data": {}, "expected_response_contains": []}
+{"input": "this is not what i ordered at all", "behavior": "complaint", "target_action": "complaint", "target_data": {}, "expected_response_contains": []}
+{"input": "the order is completely wrong", "behavior": "complaint", "target_action": "complaint", "target_data": {}, "expected_response_contains": []}
+{"input": "my burger tastes terrible", "behavior": "complaint", "target_action": "complaint", "target_data": {}, "expected_response_contains": []}
+{"input": "this food is disgusting", "behavior": "complaint", "target_action": "complaint", "target_data": {}, "expected_response_contains": []}
+{"input": "these fries are soggy and gross", "behavior": "complaint", "target_action": "complaint", "target_data": {}, "expected_response_contains": []}
+{"input": "my drink is flat and warm", "behavior": "complaint", "target_action": "complaint", "target_data": {}, "expected_response_contains": []}
+{"input": "wait also throw in a cookie", "behavior": "order_modify", "target_action": "order_modify", "target_data": {}, "expected_response_contains": []}
+{"input": "oh and also add a pie", "behavior": "order_modify", "target_action": "order_modify", "target_data": {}, "expected_response_contains": []}
+{"input": "throw in some cookies too", "behavior": "order_modify", "target_action": "order_modify", "target_data": {}, "expected_response_contains": []}
+{"input": "wait add a sundae to that", "behavior": "order_modify", "target_action": "order_modify", "target_data": {}, "expected_response_contains": []}
+{"input": "oh also toss in some nuggets", "behavior": "order_modify", "target_action": "order_modify", "target_data": {}, "expected_response_contains": []}
+{"input": "actually add an extra burger", "behavior": "order_modify", "target_action": "order_modify", "target_data": {}, "expected_response_contains": []}
+{"input": "hold on also get me a drink", "behavior": "order_modify", "target_action": "order_modify", "target_data": {}, "expected_response_contains": []}
+{"input": "wait i also want fries with that", "behavior": "order_modify", "target_action": "order_modify", "target_data": {}, "expected_response_contains": []}
+{"input": "throw in an apple pie too", "behavior": "order_modify", "target_action": "order_modify", "target_data": {}, "expected_response_contains": []}
+{"input": "and also put a mcflurry on there", "behavior": "order_modify", "target_action": "order_modify", "target_data": {}, "expected_response_contains": []}
+{"input": "swap the fries for a side salad", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {}, "expected_response_contains": []}
+{"input": "swap my fries out for onion rings", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {}, "expected_response_contains": []}
+{"input": "trade the fries for a fruit cup", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {}, "expected_response_contains": []}
+{"input": "switch the drink for a milkshake", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {}, "expected_response_contains": []}
+{"input": "replace my drink with an iced tea", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {}, "expected_response_contains": []}
+{"input": "swap the coke for a sprite", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {}, "expected_response_contains": []}
+{"input": "change my side to apple slices", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {}, "expected_response_contains": []}
+{"input": "give me a salad instead of fries", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {}, "expected_response_contains": []}
+{"input": "switch out the fries for something healthier", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {}, "expected_response_contains": []}
+{"input": "can i substitute the side", "behavior": "meal_substitution", "target_action": "meal_substitution", "target_data": {}, "expected_response_contains": []}
+{"input": "how late is the drive thru open", "behavior": "time_check", "target_action": "time_check", "target_data": {}, "expected_response_contains": []}
+{"input": "what time does the drive thru close", "behavior": "time_check", "target_action": "time_check", "target_data": {}, "expected_response_contains": []}
+{"input": "how late can i order", "behavior": "time_check", "target_action": "time_check", "target_data": {}, "expected_response_contains": []}
+{"input": "is the drive thru still open right now", "behavior": "time_check", "target_action": "time_check", "target_data": {}, "expected_response_contains": []}
+{"input": "when does the drive thru shut down", "behavior": "time_check", "target_action": "time_check", "target_data": {}, "expected_response_contains": []}
+{"input": "how late do you take orders", "behavior": "time_check", "target_action": "time_check", "target_data": {}, "expected_response_contains": []}
+{"input": "am i too late to order food", "behavior": "time_check", "target_action": "time_check", "target_data": {}, "expected_response_contains": []}
+{"input": "am i too late for a mcmuffin", "behavior": "time_check", "target_action": "time_check", "target_data": {}, "expected_response_contains": []}
+{"input": "is it past breakfast time", "behavior": "time_check", "target_action": "time_check", "target_data": {}, "expected_response_contains": []}
+{"input": "did i miss the breakfast cutoff", "behavior": "time_check", "target_action": "time_check", "target_data": {}, "expected_response_contains": []}
+{"input": "am i too late for the egg mcmuffin", "behavior": "time_check", "target_action": "time_check", "target_data": {}, "expected_response_contains": []}
+{"input": "can i still get a sausage mcmuffin at this hour", "behavior": "time_check", "target_action": "time_check", "target_data": {}, "expected_response_contains": []}
+{"input": "is it too late for hash browns", "behavior": "time_check", "target_action": "time_check", "target_data": {}, "expected_response_contains": []}
+{"input": "am i too late for breakfast sandwiches", "behavior": "time_check", "target_action": "time_check", "target_data": {}, "expected_response_contains": []}
+{"input": "did breakfast end already", "behavior": "time_check", "target_action": "time_check", "target_data": {}, "expected_response_contains": []}

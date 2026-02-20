@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OMEGA Labs — Proving Ground</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { darkMode:'class', theme:{ extend:{ colors:{
+      omega:{50:'#f0f9ff',100:'#e0f2fe',200:'#bae6fd',300:'#7dd3fc',400:'#38bdf8',500:'#0ea5e9',600:'#0284c7',700:'#0369a1'}
+    }}}}
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    *{font-family:'Inter',system-ui,sans-serif}
+    .fade-in{animation:fadeIn .25s ease-out}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+    .glass{background:rgba(15,23,42,.7);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.08)}
+    ::-webkit-scrollbar{width:6px} ::-webkit-scrollbar-thumb{background:#334155;border-radius:3px}
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-200 min-h-screen flex flex-col">
+  <nav class="glass border-b border-slate-800 px-6 py-3 flex items-center justify-between shrink-0">
+    <div class="flex items-center gap-4">
+      <a href="/" class="text-slate-400 hover:text-white text-sm">← Home</a>
+      <div class="w-px h-5 bg-slate-700"></div>
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-omega-400 to-omega-600 flex items-center justify-center text-white font-bold text-sm">Ω</div>
+        <span class="font-semibold text-lg text-white">OMEGA Labs</span>
+      </div>
+    </div>
+    <div id="status-indicator" class="flex items-center gap-2 text-xs">
+      <span class="w-2 h-2 rounded-full bg-slate-600 animate-pulse"></span>
+      <span class="text-slate-500">Checking...</span>
+    </div>
+  </nav>
+
+  <main class="flex-1 overflow-y-auto p-6">
+    <div class="max-w-6xl mx-auto space-y-6">
+      <div class="grid grid-cols-3 gap-4">
+        <div class="glass rounded-xl p-5">
+          <div class="text-xs text-slate-500 uppercase tracking-wider mb-2">Brain Status</div>
+          <div id="brain-status" class="text-2xl font-bold text-white">—</div>
+          <div id="brain-device" class="text-sm text-slate-400 mt-1">—</div>
+        </div>
+        <div class="glass rounded-xl p-5">
+          <div class="text-xs text-slate-500 uppercase tracking-wider mb-2">Model Training</div>
+          <div id="train-status" class="text-2xl font-bold text-white">—</div>
+          <div id="train-accuracy" class="text-sm text-slate-400 mt-1">—</div>
+        </div>
+        <div class="glass rounded-xl p-5">
+          <div class="text-xs text-slate-500 uppercase tracking-wider mb-2">Inference</div>
+          <div id="inference-count" class="text-2xl font-bold text-white">—</div>
+          <div id="inference-detail" class="text-sm text-slate-400 mt-1">—</div>
+        </div>
+      </div>
+
+      <div class="glass rounded-xl p-6">
+        <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+          <span class="text-omega-400">⚡</span> Inference Playground
+        </h2>
+        <div class="flex gap-3">
+          <input id="labs-input" type="text" placeholder="Type a query to test the OMEGA brain..."
+            class="flex-1 bg-slate-800/60 border border-slate-700 rounded-lg px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-omega-500/50"
+            onkeydown="if(event.key==='Enter')labsInfer()">
+          <button onclick="labsInfer()" class="px-6 py-3 bg-omega-600 hover:bg-omega-500 text-white rounded-lg text-sm font-medium transition-colors">Infer</button>
+        </div>
+        <div class="flex flex-wrap gap-2 mt-3">
+          <button onclick="quick(this.textContent)" class="text-xs px-3 py-1 rounded-full bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white transition-colors">hi there</button>
+          <button onclick="quick(this.textContent)" class="text-xs px-3 py-1 rounded-full bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white transition-colors">what burgers do you have</button>
+          <button onclick="quick(this.textContent)" class="text-xs px-3 py-1 rounded-full bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white transition-colors">i want a big mac</button>
+          <button onclick="quick(this.textContent)" class="text-xs px-3 py-1 rounded-full bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white transition-colors">no pickles on that</button>
+          <button onclick="quick(this.textContent)" class="text-xs px-3 py-1 rounded-full bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white transition-colors">how much is a mcflurry</button>
+          <button onclick="quick(this.textContent)" class="text-xs px-3 py-1 rounded-full bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white transition-colors">make it a meal</button>
+          <button onclick="quick(this.textContent)" class="text-xs px-3 py-1 rounded-full bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white transition-colors">my fries are cold</button>
+          <button onclick="quick(this.textContent)" class="text-xs px-3 py-1 rounded-full bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white transition-colors">any deals today</button>
+          <button onclick="quick(this.textContent)" class="text-xs px-3 py-1 rounded-full bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white transition-colors">what time do you close</button>
+        </div>
+        <div id="labs-results" class="mt-4 space-y-3"></div>
+      </div>
+
+      <div class="glass rounded-xl p-6">
+        <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+          <span class="text-omega-400">📊</span> Brain State
+        </h2>
+        <pre id="brain-state-json" class="bg-slate-900/80 rounded-lg p-4 text-xs text-slate-400 overflow-auto max-h-64 font-mono">Loading...</pre>
+      </div>
+    </div>
+  </main>
+
+<script>
+const API = 'http://localhost:11435';
+const BEHAVIOR_COLORS = {
+  greet:'#22c55e',menu_inquiry:'#3b82f6',value_recommendation:'#a855f7',
+  take_order:'#ef4444',take_order_breakfast:'#f97316',price_inquiry:'#eab308',
+  customize:'#06b6d4',split_size_selection:'#8b5cf6',complaint:'#dc2626',
+  order_modify:'#f59e0b',meal_substitution:'#10b981',combo_entree_swap:'#6366f1',time_check:'#64748b'
+};
+const BEHAVIOR_ICONS = {
+  greet:'👋',menu_inquiry:'📋',value_recommendation:'💰',take_order:'🛒',
+  take_order_breakfast:'🌅',price_inquiry:'💲',customize:'⚙️',
+  split_size_selection:'📏',complaint:'😤',order_modify:'✏️',
+  meal_substitution:'🔄',combo_entree_swap:'🔀',time_check:'🕐'
+};
+
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}
+function quick(t){document.getElementById('labs-input').value=t;labsInfer()}
+
+async function checkHealth(){
+  try{
+    const r=await fetch(API+'/health');const d=await r.json();
+    const el=document.getElementById('status-indicator');
+    if(d.status==='ok'){
+      el.innerHTML='<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span><span class="text-emerald-400">Connected</span><span class="text-slate-600">•</span><span class="text-slate-500">'+d.device+' • PyTorch '+d.torch_version+'</span>';
+    }
+  }catch(e){
+    document.getElementById('status-indicator').innerHTML='<span class="w-2 h-2 rounded-full bg-red-500"></span><span class="text-red-400">Disconnected</span>';
+  }
+}
+
+async function loadBrainState(){
+  try{
+    const r=await fetch(API+'/state');const d=await r.json();
+    document.getElementById('brain-status').textContent=d.booted?'🟢 Active':'⚪ Idle';
+    document.getElementById('brain-device').textContent=(d.config?.hidden_dim||'?')+'-dim cortex on '+(d.config?.device||'?');
+    document.getElementById('train-status').textContent=d.is_trained?'✅ Trained':'⏳ Untrained';
+    document.getElementById('train-accuracy').textContent=d.is_trained?'Model loaded with checkpoint':'Run training first';
+    document.getElementById('inference-count').textContent=d.inference_count||0;
+    document.getElementById('inference-detail').textContent='Total inferences this session';
+    document.getElementById('brain-state-json').textContent=JSON.stringify(d,null,2);
+  }catch(e){document.getElementById('brain-state-json').textContent='Error: '+e.message}
+}
+
+async function labsInfer(){
+  const input=document.getElementById('labs-input');
+  const text=input.value.trim();if(!text)return;input.value='';
+  const container=document.getElementById('labs-results');
+  const card=document.createElement('div');
+  card.className='glass rounded-lg p-4 fade-in';
+  card.innerHTML='<div class="text-sm text-slate-300 mb-2">"'+esc(text)+'"</div><div class="text-xs text-slate-500">Inferring...</div>';
+  container.prepend(card);
+  try{
+    const start=performance.now();
+    const r=await fetch(API+'/infer',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text})});
+    const d=await r.json();const ms=(performance.now()-start).toFixed(0);
+    const behavior=d.behavior||d.predicted_behavior||'?';
+    const confidence=d.confidence!=null?(d.confidence*100).toFixed(1):'?';
+    const color=BEHAVIOR_COLORS[behavior]||'#64748b';
+    const icon=BEHAVIOR_ICONS[behavior]||'❓';
+    card.innerHTML=`<div class="flex items-start justify-between"><div>
+      <div class="text-sm text-slate-300 mb-2">"${esc(text)}"</div>
+      <div class="flex items-center gap-2"><span class="text-lg">${icon}</span>
+      <span class="text-sm font-semibold" style="color:${color}">${behavior}</span>
+      <span class="text-xs text-slate-500">${confidence}% confidence</span></div></div>
+      <div class="text-xs text-slate-600">${ms}ms</div></div>
+      ${d.llm_response?'<div class="mt-3 text-xs text-slate-400 bg-slate-800/50 rounded p-3">'+esc(d.llm_response)+'</div>':''}`;
+  }catch(e){card.innerHTML='<div class="text-red-400 text-sm">Error: '+esc(e.message)+'</div>'}
+}
+
+checkHealth().then(()=>loadBrainState());
+setInterval(checkHealth,15000);
+document.getElementById('labs-input').focus();
+</script>
+</body>
+</html>

@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "version": "4.0.0",
-  "lastUpdated": "2026-02-13",
-  "description": "Master manifest of ALL documentation files in RADIANT. 18 documents (15 consolidated + 3 standalone). AI agents MUST update relevant docs when making code changes.",
+  "version": "4.1.0",
+  "lastUpdated": "2026-02-14",
+  "description": "Master manifest of ALL documentation files in RADIANT. 19 documents (15 consolidated + 4 standalone). AI agents MUST update relevant docs when making code changes.",
 
   "consolidatedDocs": {
     "description": "The 15 consolidated documentation files. Each is self-contained and covers a specific domain.",
@@ -122,12 +122,18 @@
         "priority": "HIGH",
         "triggers": ["compliance", "regulatory", "soc2", "gdpr", "hipaa", "iso_27701", "iso_42001", "hds", "dpf", "pci_dss", "data_privacy", "certification"],
         "description": "Compliance Standards Guide: SOC 2, GDPR, HIPAA, ISO 27701, ISO 42001, HDS, DPF, PCI DSS — versions, requirements, enforcement, timelines, cross-framework analysis, RADIANT alignment"
+      },
+      {
+        "path": "docs/23-ENGINEERING-ROADMAP.md",
+        "priority": "MEDIUM",
+        "triggers": ["roadmap", "milestone", "sprint", "priority", "technical_debt", "engineering_planning"],
+        "description": "Engineering Roadmap: milestones, priorities, timeline, dependencies, technical debt, decision log"
       }
     ]
   },
 
   "triggerMatrix": {
-    "description": "Maps code change types to required documentation updates (v4.1 — 18-doc structure)",
+    "description": "Maps code change types to required documentation updates (v4.2 — 19-doc structure)",
     "matrix": {
       "any_change": ["CHANGELOG.md"],
       "database": ["CHANGELOG.md", "docs/06-ARCHITECTURE-ENGINEERING.md", "docs/16-IMPLEMENTATION-SPECS.md"],
@@ -184,12 +190,13 @@
       "safety": ["CHANGELOG.md", "docs/07-AI-SYSTEMS.md"],
       "brain": ["CHANGELOG.md", "docs/07-AI-SYSTEMS.md"],
       "compliance": ["CHANGELOG.md", "docs/22-COMPLIANCE-STANDARDS-GUIDE.md", "docs/13-SECURITY-AUTH-COMPLIANCE.md"],
-      "regulatory": ["CHANGELOG.md", "docs/22-COMPLIANCE-STANDARDS-GUIDE.md"]
+      "regulatory": ["CHANGELOG.md", "docs/22-COMPLIANCE-STANDARDS-GUIDE.md"],
+      "roadmap": ["CHANGELOG.md", "docs/23-ENGINEERING-ROADMAP.md"]
     }
   },
 
   "versionedDocs": {
-    "description": "All 18 documents need version number updates when modified",
+    "description": "All 19 documents need version number updates when modified",
     "docs": [
       "docs/01-THINK-TANK.md",
       "docs/02-CURATOR.md",
@@ -208,7 +215,8 @@
       "docs/18-UI-UX-LIBRARIES.md",
       "docs/20-OMEGA-ENGINEERING.md",
       "docs/21-TEXT-TO-SPEECH.md",
-      "docs/22-COMPLIANCE-STANDARDS-GUIDE.md"
+      "docs/22-COMPLIANCE-STANDARDS-GUIDE.md",
+      "docs/23-ENGINEERING-ROADMAP.md"
     ]
   },
 
@@ -229,7 +237,7 @@
       }
     ],
     "regenerateCommand": "python3 tools/scripts/assemble-complete-documentation.py",
-    "parts": 18,
+    "parts": 19,
     "note": "Output files are build artifacts — generated from source docs, not edited directly"
   },
 
