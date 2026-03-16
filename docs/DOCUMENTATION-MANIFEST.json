@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "version": "4.1.0",
-  "lastUpdated": "2026-02-14",
-  "description": "Master manifest of ALL documentation files in RADIANT. 19 documents (15 consolidated + 4 standalone). AI agents MUST update relevant docs when making code changes.",
+  "version": "4.2.0",
+  "lastUpdated": "2026-03-16",
+  "description": "Master manifest of ALL documentation files in RADIANT. 21 documents (15 consolidated + 6 standalone). AI agents MUST update relevant docs when making code changes.",
 
   "consolidatedDocs": {
     "description": "The 15 consolidated documentation files. Each is self-contained and covers a specific domain.",
@@ -128,12 +128,24 @@
         "priority": "MEDIUM",
         "triggers": ["roadmap", "milestone", "sprint", "priority", "technical_debt", "engineering_planning"],
         "description": "Engineering Roadmap: milestones, priorities, timeline, dependencies, technical debt, decision log"
+      },
+      {
+        "path": "docs/24-CARTRIDGE-SPECIALIZATIONS.md",
+        "priority": "HIGH",
+        "triggers": ["cartridge", "specialization", "radz", "brain_mapped", "pki", "cartridge_vault", "rnir", "cartridge_operations", "cartridge_composition", "thalamus_router"],
+        "description": "Cartridge Specializations: brain-mapped taxonomy, .RADz format, scopes, PKI, vault, RNIR, operations, composition patterns, routing, competitive positioning, API reference"
+      },
+      {
+        "path": "docs/25-PATENTS.md",
+        "priority": "HIGH",
+        "triggers": ["patent", "ip_strategy", "provisional_filing", "cartridge_ip", "omega_ip"],
+        "description": "Patents & IP Strategy: patent portfolio funding decisions, OMEGA Architecture & RADIANT Cartridge System omnibus provisional filing strategy, Phase 1 Cartridges"
       }
     ]
   },
 
   "triggerMatrix": {
-    "description": "Maps code change types to required documentation updates (v4.2 — 19-doc structure)",
+    "description": "Maps code change types to required documentation updates (v4.3 — 20-doc structure)",
     "matrix": {
       "any_change": ["CHANGELOG.md"],
       "database": ["CHANGELOG.md", "docs/06-ARCHITECTURE-ENGINEERING.md", "docs/16-IMPLEMENTATION-SPECS.md"],
@@ -191,12 +203,18 @@
       "brain": ["CHANGELOG.md", "docs/07-AI-SYSTEMS.md"],
       "compliance": ["CHANGELOG.md", "docs/22-COMPLIANCE-STANDARDS-GUIDE.md", "docs/13-SECURITY-AUTH-COMPLIANCE.md"],
       "regulatory": ["CHANGELOG.md", "docs/22-COMPLIANCE-STANDARDS-GUIDE.md"],
-      "roadmap": ["CHANGELOG.md", "docs/23-ENGINEERING-ROADMAP.md"]
+      "roadmap": ["CHANGELOG.md", "docs/23-ENGINEERING-ROADMAP.md"],
+      "cartridge": ["CHANGELOG.md", "docs/24-CARTRIDGE-SPECIALIZATIONS.md", "docs/15-STRATEGY-COMPETITIVE.md", "docs/04-RADIANT-ADMIN.md", "docs/17-GLOSSARY.md"],
+      "cartridge_pki": ["CHANGELOG.md", "docs/24-CARTRIDGE-SPECIALIZATIONS.md", "docs/06-ARCHITECTURE-ENGINEERING.md", "docs/13-SECURITY-AUTH-COMPLIANCE.md"],
+      "cartridge_specialization": ["CHANGELOG.md", "docs/24-CARTRIDGE-SPECIALIZATIONS.md", "docs/17-GLOSSARY.md"],
+      "patent": ["CHANGELOG.md", "docs/25-PATENTS.md", "docs/15-STRATEGY-COMPETITIVE.md"],
+      "ip_strategy": ["CHANGELOG.md", "docs/25-PATENTS.md", "docs/15-STRATEGY-COMPETITIVE.md"],
+      "provisional_filing": ["CHANGELOG.md", "docs/25-PATENTS.md"]
     }
   },
 
   "versionedDocs": {
-    "description": "All 19 documents need version number updates when modified",
+    "description": "All 20 documents need version number updates when modified",
     "docs": [
       "docs/01-THINK-TANK.md",
       "docs/02-CURATOR.md",
@@ -216,7 +234,27 @@
       "docs/20-OMEGA-ENGINEERING.md",
       "docs/21-TEXT-TO-SPEECH.md",
       "docs/22-COMPLIANCE-STANDARDS-GUIDE.md",
-      "docs/23-ENGINEERING-ROADMAP.md"
+      "docs/23-ENGINEERING-ROADMAP.md",
+      "docs/24-CARTRIDGE-SPECIALIZATIONS.md",
+      "docs/25-PATENTS.md"
+    ]
+  },
+
+  "standalonePublications": {
+    "description": "Manually authored publications for sales, marketing, and strategic distribution. Not auto-assembled.",
+    "docs": [
+      {
+        "path": "docs/publications/BEYOND-COPILOTS-RADIANT-PRINCIPLES.md",
+        "type": "Strategic Publication",
+        "triggers": ["competitive_advantage", "marketing", "pitch"],
+        "description": "The Seven RADIANT Principles — why we refuse to build another Copilot"
+      },
+      {
+        "path": "docs/publications/RADIANT-CARTRIDGES-PITCH.md",
+        "type": "Sales & Marketing Pitch",
+        "triggers": ["cartridge", "competitive_advantage", "pitch", "marketing", "cartridge_specialization"],
+        "description": "Sales pitch for RADIANT Cartridges — brain-mapped AI modules, competitive positioning, business case, Think Tank experience"
+      }
     ]
   },
 
@@ -237,7 +275,7 @@
       }
     ],
     "regenerateCommand": "python3 tools/scripts/assemble-complete-documentation.py",
-    "parts": 19,
+    "parts": 20,
     "note": "Output files are build artifacts — generated from source docs, not edited directly"
   },
 

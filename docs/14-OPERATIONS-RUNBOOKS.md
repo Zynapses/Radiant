@@ -2,7 +2,7 @@
 
 **Deployment • Incident Response • Scaling • Performance • Disaster Recovery**
 
-*RADIANT v6.6.0 — Generated February 07, 2026*
+*RADIANT v7.63.0 — Generated March 16, 2026*
 
 ---
 
@@ -3195,7 +3195,7 @@ Or in OMEGA Forge: Firmware Library → click the superseded firmware → **"Rol
 | Key | Purpose | Rotation | Deletion Policy |
 |-----|---------|----------|-----------------|
 | Platform Root CA | Signs tenant CAs | Manual only (asymmetric) | RETAIN in prod |
-| Tenant CA Keys | Signs firmware/cartridges | Manual only | 30-day pending (prod) |
+| Tenant CA Keys | Signs firmware/cartridges (see [24-CARTRIDGE-SPECIALIZATIONS.md](./24-CARTRIDGE-SPECIALIZATIONS.md) § Part VIII for full PKI architecture) | Manual only | 30-day pending (prod) |
 | Signing Keys | Per-purpose signing | Manual only | 7-day pending (dev) |
 
 **Check key health:**

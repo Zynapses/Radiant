@@ -2,7 +2,7 @@
 
 **User Guide • Admin Guide • Tenant Administration • Mac Platform • Licensing**
 
-*RADIANT v6.6.0 — Generated February 07, 2026*
+*RADIANT v7.63.0 — Generated March 16, 2026*
 
 ---
 
@@ -449,7 +449,7 @@ In **Advanced Mode**, you can see which **Knowledge Cartridges** are active:
    - **Personal cartridges** - Your custom knowledge bundles
 3. Each cartridge shows version and priority level
 
-Cartridges provide specialized domain knowledge that enhances AI responses in specific areas.
+Cartridges provide specialized domain knowledge that enhances AI responses in specific areas. Each cartridge maps to a biological brain region (e.g., Reasoning → Prefrontal Cortex, Memory → Hippocampus, Code → Motor Cortex) and can be composed into cognitive pipelines. For the complete specialization taxonomy and brain-mapped architecture, see [24-CARTRIDGE-SPECIALIZATIONS.md](./24-CARTRIDGE-SPECIALIZATIONS.md).
 
 ---
 
@@ -2066,7 +2066,7 @@ To see how Think Tank processed your question:
 
 ### What Are Cartridges?
 
-Think Tank is powered by **RADIANT Cartridges** — portable AI intelligence packages that contain everything the system has learned. Think of them like game cartridges: the hardware (RADIANT) provides the platform, the cartridge provides the intelligence.
+Think Tank is powered by **RADIANT Cartridges** — portable AI intelligence packages that contain everything the system has learned. Think of them like game cartridges: the hardware (RADIANT) provides the platform, the cartridge provides the intelligence. Each cartridge is brain-mapped to a specific cognitive function (Reasoning, Language, Memory, Creativity, Code, Emotion, Routing, or Domain Expertise) — see [24-CARTRIDGE-SPECIALIZATIONS.md](./24-CARTRIDGE-SPECIALIZATIONS.md) for the full taxonomy.
 
 **Why This Matters to You:**
 - Your organization's AI gets smarter over time

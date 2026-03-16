@@ -2,7 +2,7 @@
 
 **AGI Brain • Consciousness • Cognitive Architecture • Cortex Memory**
 
-*RADIANT v6.6.0 — Generated February 07, 2026*
+*RADIANT v7.63.0 — Generated March 16, 2026*
 
 ---
 
@@ -13,7 +13,7 @@
 - **Part III: Expert Systems**
 - **Part IV: Cortex Memory System**
 - **Part V: OMEGA Quantum Brain Architecture (v4.18.0)**
-- **Part VI: OMEGA Cartridge Integration (v7.48.0)**
+- **Part VI: OMEGA Cartridge Integration (v7.48.0)** — See also [24-CARTRIDGE-SPECIALIZATIONS.md](./24-CARTRIDGE-SPECIALIZATIONS.md) for the complete brain-mapped specialization taxonomy
 - **Part VII: Global Brain — Bidirectional Architecture (v7.49.0)**
 
 ---

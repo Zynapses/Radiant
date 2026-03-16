@@ -2,7 +2,7 @@
 
 **OMEGA Protocol • OMEGA Forge • OMEGA Lab • Resonant Index**
 
-*RADIANT v7.55.0 — Updated February 10, 2026*
+*RADIANT v7.63.0 — Updated March 16, 2026*
 
 ---
 
@@ -3154,7 +3154,7 @@ CATO (2am UTC)
 
 ### 7. Cartridge Hot-Swap (.RADz)
 
-Cartridges are portable AI brains that can also be hot-swapped:
+Cartridges are portable AI brains that can also be hot-swapped. Each cartridge is brain-mapped to a cognitive specialization (8 types from Reasoning/Prefrontal Cortex to Domain Expertise/Nucleus) — see [24-CARTRIDGE-SPECIALIZATIONS.md](./24-CARTRIDGE-SPECIALIZATIONS.md) for the full taxonomy, composition patterns, and routing decision matrix:
 
 | Cartridge State | Thermal State | Behavior |
 |----------------|---------------|----------|

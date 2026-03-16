@@ -2,7 +2,7 @@
 
 **Terms, Definitions, Acronyms**
 
-*RADIANT v7.43.2 — Generated February 08, 2026*
+*RADIANT v7.64.0 — Generated March 16, 2026*
 
 ---
 
@@ -448,12 +448,16 @@
 
 | Subsystem | Description | Key Files |
 |-----------|-------------|-----------|
-| 🔷 **Cartridge (.RADz)** | Portable AI brain container packaging neural networks, LoRA adapters, knowledge graphs, and configuration into a single deployable archive | `cartridge.service.ts` |
+| 🔷 **Cartridge (.RADz)** | Portable AI brain container packaging neural networks, LoRA adapters, knowledge graphs, and configuration into a single deployable archive. Each cartridge is brain-mapped to a cognitive specialization (Reasoning/Prefrontal, Language/Broca-Wernicke, Memory/Hippocampus, Creativity/DMN, Code/Motor Cortex, Emotion/Amygdala, Routing/Thalamus, Domain/Nucleus) — see [24-CARTRIDGE-SPECIALIZATIONS.md](./24-CARTRIDGE-SPECIALIZATIONS.md) | `cartridge.service.ts` |
 | 🔷 **Cartridge PKI** | Public key infrastructure for signing cartridges—verifies author identity and prevents tampering during distribution | `cartridge-pki.service.ts` |
 | 🔷 **Cartridge Vault** | Secrets manager using Keyhole Pattern where cartridges declare needed secrets (API keys, credentials) without containing them | `cartridge-vault.service.ts` |
 | 🔷 **Keyhole Pattern** | Security pattern: cartridges specify secret "shapes" (name, type, scope) but actual values are injected at runtime from secure vault | `cartridge-vault.types.ts` |
 | 🔷 **RNIR Compiler** | Radiant Neural Intermediate Representation—model-agnostic training format that compiles to PyTorch, TensorFlow, or ONNX | `cartridge-rnir.service.ts` |
 | 🔷 **Cartridge Operations** | Long-running cartridge deployments with Time Machine checkpointing—can pause, resume, and rollback multi-hour operations | `cartridge-operations.service.ts` |
+| 🔷 **Cartridge Specialization** | Brain-mapped cognitive type assigned to each cartridge — one of 8 types: Reasoning (Prefrontal Cortex), Language (Broca-Wernicke), Memory (Hippocampus), Creativity (DMN), Code (Motor Cortex), Emotion (Amygdala), Routing (Thalamus), Domain (Nucleus). See [24-CARTRIDGE-SPECIALIZATIONS.md](./24-CARTRIDGE-SPECIALIZATIONS.md) | `cartridge.types.ts` |
+| 🔷 **Thalamus Router** | Meta-cartridge that routes queries to the optimal specialization cartridge based on intent classification, confidence scoring, and cognitive load balancing — modeled after the brain's thalamic relay | `cartridge-router.service.ts` |
+| 🔷 **Cartridge Composition** | Pattern for combining multiple specialization cartridges into cognitive pipelines — supports Sequential (chain), Parallel (ensemble), Conditional (router-driven), and Hierarchical (nested) modes | `cartridge-composition.service.ts` |
+| 🔷 **Brain Region Mapping** | Conceptual alignment of cartridge types to biological neural structures — Prefrontal Cortex (reasoning), Broca-Wernicke (language), Hippocampus (memory/RAG), Default Mode Network (creativity), Motor Cortex (code), Amygdala (emotion), Thalamus (routing), Nucleus (domain) | `cartridge-specializations.types.ts` |
 
 ### Economic & Governance
 
@@ -969,6 +973,16 @@
 | 🔶 **AI-BOM/SBOM** | AI Bill of Materials / Software Bill of Materials — comprehensive inventory of all AI components (models, libraries, MCP servers, agent dependencies) for supply chain security (OWASP LLM03:2025). |
 | 🔶 **Cost-Spiking Attack** | Denial-of-wallet attack exploiting untracked token consumption to generate massive AI inference costs — up to $100K/day per NSFOCUS research (OWASP LLM10:2025). |
 
+### Intellectual Property & Patents
+
+| Term | Definition |
+|------|------------|
+| 🔷 **Patent Portfolio** | Collection of patent applications and grants protecting RADIANT and OMEGA intellectual property — managed by Office of the Founder. |
+| 🔷 **Omnibus Provisional Filing** | Strategy for filing a single provisional patent application covering multiple related inventions across the OMEGA Architecture and RADIANT Cartridge System. |
+| 🔷 **Phase 1 Cartridges (IP)** | First phase of patent portfolio funding covering OMEGA Architecture and RADIANT Cartridge System inventions — Board of Directors funding approval required. |
+| **Provisional Patent Application** | USPTO filing that establishes an early filing date without requiring formal claims — provides 12-month window to file non-provisional application. |
+| **IP Strategy** | Strategic plan for identifying, protecting, and leveraging intellectual property assets across the RADIANT platform. |
+
 ---
 
 ## 12. API & Protocol Terms
@@ -1197,6 +1211,7 @@
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 3.2.0 | Mar 16, 2026 | **Patents & IP Strategy (v7.64.0)**: Added Intellectual Property & Patents subsection to §11 with 5 terms (Patent Portfolio, Omnibus Provisional Filing, Phase 1 Cartridges IP, Provisional Patent Application, IP Strategy). New document reference: `docs/25-PATENTS.md`. |
 | 3.1.0 | Feb 10, 2026 | **Endpoint Security Testing Framework (v4.18.1)**: Added 🔷 Endpoint Security Testing subsection to §6 with 14 terms (Endpoint Security Testing, Security Test Battery, SOP, Tool Poisoning, Rug Pull, Agent Session Smuggling, Tool Shadowing, Behavioral Drift, Canary Token, Cross-Protocol Prompt Injection, Sampling Exploitation, Confused Deputy Attack, SecurityTestOrchestrator, SecurityReportGenerator). Added 8 terms to §11 Security & Compliance (BOLA/IDOR, Mass Assignment, SSRF, JWT Algorithm Confusion, ETDI, Zero Data Retention, AI-BOM/SBOM, Cost-Spiking Attack). Enhanced §12 API & Protocol (A2A Protocol expanded, Agent Card, JSON-RPC 2.0, MCP expanded, MCP Sampling, OAuth 2.1+PKCE, SecurityScheme). Added 9 new acronyms to §9 RADIANT-Specific (ETDI, BOLA, IDOR, SSRF, XXE, JWS, PKCE, AI-BOM, SBOM). Added new Security Testing Standards acronym subsection (OWASP, CWE, MITRE ATLAS, NIST AI RMF, NIST SP 800-115, NIST SP 800-53, WSTG, AML, MCPSecBench). |
 | 3.0.0 | Feb 8, 2026 | **Comprehensive Glossary Audit (v7.43.2)**: Full audit of all 18 consolidated docs, 280+ source code services, 42 CDK stacks, admin dashboard sidebar (360+ entries), and CHANGELOG (v7.18–7.43). **New sections**: §5 RADIANT Applications (6 apps, 6 user/tenant management terms), §6 Security & Intrusion Detection (RIDPS 13 terms, Spend Governor 6 terms), §7 Operations & Monitoring (SENTINEL 10 terms, Log Retention 5 terms, Data Lake 8 terms). **New subsystems**: Platform Services (13 entries: Admin AI Helper, Bedrock Model Discovery, Context Assembler, Conversation History Loader, Formal Reasoning, Hallucination Detection, Model Router, MLS Encryption, Organism Integration, State Registry, Tenant Settings, Translation Middleware, Conversation Export). **New acronyms**: RIDPS, IOC, UEBA, MLS, ONNX, DPO, ABAC, NLI, SEV, WORM. **New CDK stacks**: data-lake-stack, deployer-key-rotation-stack, foundation-stack, log-retention-stack, model-sync-scheduler-stack, OmegaStack, sentinel-stack, state-registry-stack. **New AWS services**: Kinesis Data Firehose, Athena, Glue. **New UI/UX**: Delight System. Renumbered sections 5→8 through 11→14. Updated version to 3.0.0. |
 | 2.4.0 | Feb 8, 2026 | **Data Lake Offload (v7.42.0)**: Added zero-database-write event pipeline terms: Data Lake, Event Firehose Service, Data Type Registry, Data Location Index, Glacier Deletion Queue, Glacier Lifecycle Service, Data Lake Lifecycle Manager, Retention Reconciler, Data Lake Query Service, Storage Tier (hot/warm/cold/glacier/deep_archive), Parquet, Glue Catalog, Athena Workgroup, Dynamic Partitioning, Object Lock, Minimum Storage Period, Early Deletion Cost |

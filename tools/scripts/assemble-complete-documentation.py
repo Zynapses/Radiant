@@ -65,6 +65,10 @@ DOCUMENT_STRUCTURE = [
         ("OMEGA — Complete Reference", "docs/09-OMEGA-GENESIS.md"),
     ]),
 
+    ("Cartridge Specializations", [
+        ("Cartridge Specializations — Brain-Mapped AI Modules", "docs/24-CARTRIDGE-SPECIALIZATIONS.md"),
+    ]),
+
     ("Orchestration & Workflows", [
         ("Orchestration & Workflows — Complete Reference", "docs/10-ORCHESTRATION-WORKFLOWS.md"),
     ]),

@@ -5,6 +5,37 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.64.0] - 2026-03-16
+
+### Documentation
+
+#### Patents — Intellectual Property Strategy (doc 25)
+
+**New standalone document: `docs/25-PATENTS.md`**
+
+- **Part I (New)**: Phase 1 — Cartridges: Patent Portfolio Funding Decision — OMEGA Architecture & RADIANT Cartridge System omnibus provisional filing strategy
+- **Document Policy**: CONFIDENTIAL classification, prepared for Board of Directors by Office of the Founder
+- **`docs/DOCUMENTATION-MANIFEST.json`**: Updated to v4.2.0 — 21 documents (15 consolidated + 6 standalone), added patent/IP triggers
+- **`AGENTS.md`**: Added Patents/IP strategy quick reference entry
+
+**Files Modified**: `docs/25-PATENTS.md` (new), `docs/DOCUMENTATION-MANIFEST.json`, `AGENTS.md`, `CHANGELOG.md`
+
+## [7.63.0] - 2026-03-16
+
+### Documentation
+
+#### Cartridge Specializations — Brain-Mapped AI Modules (doc 24)
+
+**New standalone document: `docs/24-CARTRIDGE-SPECIALIZATIONS.md`**
+
+- **Part I–V (New)**: Brain-mapped specialization taxonomy — 8 cognitive cartridge types (Reasoning/Prefrontal Cortex, Language/Broca-Wernicke, Memory/Hippocampus, Creativity/DMN, Code/Motor Cortex, Emotion/Amygdala, Routing/Thalamus, Domain/Nucleus), visual brain map, detailed reference cards, composition patterns, routing decision matrix, TypeScript interface contracts
+- **Part VI–XI (Consolidated)**: Merged existing cartridge documentation — .RADz package format & directory structure, cartridge scopes & stack resolution, thermal state management, PKI & federation (KMS architecture, key hierarchy, security considerations), Cartridge Vault (Keyhole Pattern), RNIR Compiler, Cartridge Operations, competitive positioning (Moats #28–#31), full API reference (Admin/Tenant/Forge endpoints), complete implementation file index
+- **Cross-references added** to 10 existing documents: `01-THINK-TANK.md`, `02-CURATOR.md`, `04-RADIANT-ADMIN.md`, `06-ARCHITECTURE-ENGINEERING.md`, `07-AI-SYSTEMS.md`, `09-OMEGA-GENESIS.md`, `12-API-REFERENCE.md`, `13-SECURITY-AUTH-COMPLIANCE.md`, `14-OPERATIONS-RUNBOOKS.md`, `15-STRATEGY-COMPETITIVE.md`, `17-GLOSSARY.md`
+- **No conflicts** found during merge — all existing documentation was consistent
+- **`docs/15-STRATEGY-COMPETITIVE.md`**: Added LoRA vs Cartridge differentiator quote to Moat #28
+
+**Files Modified**: `docs/24-CARTRIDGE-SPECIALIZATIONS.md` (new), `docs/01-THINK-TANK.md`, `docs/02-CURATOR.md`, `docs/04-RADIANT-ADMIN.md`, `docs/06-ARCHITECTURE-ENGINEERING.md`, `docs/07-AI-SYSTEMS.md`, `docs/09-OMEGA-GENESIS.md`, `docs/12-API-REFERENCE.md`, `docs/13-SECURITY-AUTH-COMPLIANCE.md`, `docs/14-OPERATIONS-RUNBOOKS.md`, `docs/15-STRATEGY-COMPETITIVE.md`, `docs/17-GLOSSARY.md`
+
 ## [7.62.1] - 2026-02-14
 
 ### Documentation

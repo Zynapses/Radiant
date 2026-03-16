@@ -2,7 +2,7 @@
 
 **Platform Administration • Deployment • System Health • Spend Governor**
 
-*RADIANT v6.6.0 — Generated February 07, 2026*
+*RADIANT v7.63.0 — Generated March 16, 2026*
 
 ---
 
@@ -1911,7 +1911,7 @@ To acknowledge an alert, click the checkmark icon.
 
 **Location**: Admin Dashboard → Cartridges
 
-The Cartridge System enables export and import of portable AI brains (.RADz files) containing CORTEX neural networks, LoRA adapters, Curator knowledge, and domain expert configurations.
+The Cartridge System enables export and import of portable AI brains (.RADz files) containing CORTEX neural networks, LoRA adapters, Curator knowledge, and domain expert configurations. Each cartridge is mapped to a biological brain region specialization (e.g., Reasoning → Prefrontal Cortex, Memory → Hippocampus, Routing → Thalamus) and can be composed into cognitive pipelines via the Thalamus router. For the complete brain-mapped specialization taxonomy, composition patterns, and interface contracts, see [24-CARTRIDGE-SPECIALIZATIONS.md](./24-CARTRIDGE-SPECIALIZATIONS.md).
 
 ### 9B.1 What is a Cartridge?
 

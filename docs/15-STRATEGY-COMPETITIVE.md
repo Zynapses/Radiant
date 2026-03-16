@@ -2,7 +2,7 @@
 
 **Vision • Capabilities • Competitive Moats • Revenue • Technical Debt**
 
-*RADIANT v6.6.0 — Generated February 07, 2026*
+*RADIANT v7.63.0 — Generated March 16, 2026*
 
 ---
 
@@ -5117,7 +5117,9 @@ Metadata: fact_id: 892 | verified_by: Chief_Eng_Bob | date: 2026-01-24
 
 **Tier 1 Technical Moat — 18+ Months Engineering Lead**
 
-RADIANT Cartridges are **portable AI brains** — complete neural intelligence packages that can be exported, imported, and transferred between deployments. No competitor offers anything comparable.
+RADIANT Cartridges are **portable AI brains** — complete neural intelligence packages that can be exported, imported, and transferred between deployments. No competitor offers anything comparable. Each cartridge is brain-mapped to one of 8 cognitive specializations (Reasoning/Prefrontal Cortex, Language/Broca-Wernicke, Memory/Hippocampus, Creativity/DMN, Code/Motor Cortex, Emotion/Amygdala, Routing/Thalamus, Domain/Nucleus) — see [24-CARTRIDGE-SPECIALIZATIONS.md](./24-CARTRIDGE-SPECIALIZATIONS.md) for the full taxonomy, composition patterns, and implementation contracts.
+
+> *"Calling RADIANT Cartridges 'like LoRA' would be like calling a human immune system 'like a band-aid.' One adapts, learns, remembers, and evolves. The other sticks on and falls off in the shower."*
 
 | Capability | Competitors | RADIANT |
 |------------|-------------|---------|

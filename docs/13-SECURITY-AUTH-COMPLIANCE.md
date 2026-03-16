@@ -2,7 +2,7 @@
 
 **Auth Architecture • User/Admin/Tenant Guides • MFA • OAuth • Compliance**
 
-*RADIANT v6.6.0 — Generated February 07, 2026*
+*RADIANT v7.63.0 — Generated March 16, 2026*
 
 ---
 
@@ -4990,7 +4990,7 @@ tenant_licenses:
 - **Auth config**: Allowed login methods, MFA, SSO, session timeouts
 - **Compliance**: Enable/disable regulatory features (subject to licensing)
 - **Reporting**: Tenant usage, audit trails, compliance reports
-- **Templates & shared resources**: Tenant-visible templates, cartridges, etc.
+- **Templates & shared resources**: Tenant-visible templates, cartridges (see [24-CARTRIDGE-SPECIALIZATIONS.md](./24-CARTRIDGE-SPECIALIZATIONS.md) for brain-mapped specialization taxonomy and PKI federation), etc.
 
 **What individual apps do NOT have**:
 - No user invite/management UI

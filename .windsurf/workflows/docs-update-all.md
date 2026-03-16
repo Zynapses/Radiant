@@ -6,7 +6,7 @@ description: MANDATORY - Update ALL relevant documentation on ANY code change. T
 
 > ⚠️ **THIS POLICY IS MANDATORY AND HAS NO EXCEPTIONS** ⚠️
 >
-> **Every code change requires documentation updates.** 19 documents total: 15 consolidated (merged 2026-02-10) + 4 standalone.
+> **Every code change requires documentation updates.** 20 documents total: 15 consolidated (merged 2026-02-10) + 5 standalone.
 
 ---
 
@@ -55,6 +55,7 @@ Do NOT:
 | 21 | `docs/21-TEXT-TO-SPEECH.md` | TTS complete reference: radiant-tts package, ElevenLabs streaming, voice presets, language mapping, provider interface, interrupt support, integration guides, competitive analysis |
 | 22 | `docs/22-COMPLIANCE-STANDARDS-GUIDE.md` | Compliance certifications & regulatory standards: SOC 2, GDPR, HIPAA, ISO 27701, ISO 42001, HDS, DPF, PCI DSS — versions, requirements, enforcement, timelines, cross-framework analysis, RADIANT alignment |
 | 23 | `docs/23-ENGINEERING-ROADMAP.md` | Engineering roadmap: milestones, priorities, timeline, dependencies, technical debt, decision log |
+| 24 | `docs/24-CARTRIDGE-SPECIALIZATIONS.md` | Cartridge specializations: brain-mapped taxonomy, .RADz format, scopes, PKI, vault, RNIR, operations, composition patterns, routing, competitive positioning, API reference |
 
 ---
 
@@ -82,6 +83,7 @@ Before making ANY code change, identify what type of change it is:
 | `orchestration` | workflow, method, pipeline, UEP |
 | `data_storage` | UDS, RAWS, retention, file conversion |
 | `competitive_advantage` | moat, unique feature, differentiator |
+| `cartridge` | cartridge, specialization, .RADz, brain-mapped, PKI, vault, RNIR |
 | `ui_component` | component, button, panel, design pattern |
 | `dependency` | npm, package, library |
 | `new_term` | new AI term, subsystem, acronym |
@@ -179,8 +181,18 @@ Before making ANY code change, identify what type of change it is:
 ✅ CHANGELOG.md
 ✅ docs/09-OMEGA-GENESIS.md (PRIMARY — all OMEGA content here)
 ✅ docs/20-OMEGA-ENGINEERING.md (engineering, architecture, marketing, API reference)
+✅ docs/24-CARTRIDGE-SPECIALIZATIONS.md (if cartridge/specialization changes)
 ✅ docs/06-ARCHITECTURE-ENGINEERING.md (if architectural)
 ⚠️  Policy: /.windsurf/workflows/omega-docs-policy.md
+```
+
+### Cartridge / Specialization Changes
+```
+✅ CHANGELOG.md
+✅ docs/24-CARTRIDGE-SPECIALIZATIONS.md (PRIMARY — all cartridge content here)
+✅ docs/15-STRATEGY-COMPETITIVE.md (if competitive advantage)
+✅ docs/04-RADIANT-ADMIN.md (if admin-facing cartridge changes)
+✅ docs/17-GLOSSARY.md (if new cartridge terms)
 ```
 
 ### TTS / Voice / Speech Changes
@@ -352,6 +364,7 @@ See policy: `/.windsurf/workflows/docs-assemble-complete.md`
 │  STRAT SECURITY:   ✅ docs/19-STRATEGIC-SECURITY.md        │
 │  COMPLIANCE:       ✅ docs/22-COMPLIANCE-STANDARDS-GUIDE.md │
 │  ENG ROADMAP:      ✅ docs/23-ENGINEERING-ROADMAP.md         │
+│  CARTRIDGES:       ✅ docs/24-CARTRIDGE-SPECIALIZATIONS.md     │
 │                                                          │
 │  THEN: python3 tools/scripts/                            │
 │        assemble-complete-documentation.py                │

@@ -2,7 +2,7 @@
 
 **Platform Architecture • CDK Stacks • Engineering Vision • Gateway**
 
-*RADIANT v6.6.0 — Generated February 07, 2026*
+*RADIANT v7.63.0 — Generated March 16, 2026*
 
 ---
 
@@ -1669,7 +1669,7 @@ await mlsService.updateKey(group.groupId, "agent-researcher"); // Rotates all se
 
 ## 3.2.1 Cartridge PKI KMS Integration (PROMPT-42)
 
-Real AWS KMS asymmetric signing for `.RADz` cartridge PKI system, replacing placeholder strings with production-ready cryptographic operations.
+Real AWS KMS asymmetric signing for `.RADz` cartridge PKI system, replacing placeholder strings with production-ready cryptographic operations. For the full cartridge architecture including brain-mapped specializations, composition patterns, and the complete PKI federation model, see [24-CARTRIDGE-SPECIALIZATIONS.md](./24-CARTRIDGE-SPECIALIZATIONS.md).
 
 ### Architecture Overview
 

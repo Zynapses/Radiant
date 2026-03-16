@@ -108,6 +108,7 @@ DYNAMIC: New policies in /.windsurf/workflows/ are AUTOMATICALLY enforced.
 | **Credential lifecycle/security** | `docs/19-STRATEGIC-SECURITY.md` |
 | **Compliance/regulatory** | `docs/22-COMPLIANCE-STANDARDS-GUIDE.md` *(standalone: SOC 2, GDPR, HIPAA, ISO 27701, ISO 42001, HDS, DPF, PCI DSS)* |
 | **Engineering roadmap** | `docs/23-ENGINEERING-ROADMAP.md` *(standalone: milestones, priorities, timeline, dependencies, decision log)* |
+| **Patents/IP strategy** | `docs/25-PATENTS.md` *(standalone: patent portfolio funding decisions, OMEGA & Cartridge IP, provisional filings)* |
 
 ### The Golden Rule
 

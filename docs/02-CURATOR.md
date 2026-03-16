@@ -2,7 +2,7 @@
 
 **Knowledge Management • Verification • Engineering**
 
-*RADIANT v6.6.0 — Generated February 07, 2026*
+*RADIANT v7.63.0 — Generated March 16, 2026*
 
 ---
 
@@ -780,7 +780,7 @@ Need to prove something for an audit? Click **"Export as PDF"** to download a si
 | **Domain Experts** | Specialized reasoning capabilities |
 | **Overrides** | Your corrections and rules |
 
-Think of cartridges like a brain backup—everything the AI knows, packaged for transfer.
+Think of cartridges like a brain backup—everything the AI knows, packaged for transfer. Each cartridge maps to a biological brain region (e.g., Memory → Hippocampus for RAG pipelines, Domain Expertise → Nucleus for vertical knowledge). Curator Knowledge is a key component within the Memory (Hippocampus) cartridge specialization. For the full brain-mapped taxonomy, see [24-CARTRIDGE-SPECIALIZATIONS.md](./24-CARTRIDGE-SPECIALIZATIONS.md).
 
 ### Why Use Cartridges?
 

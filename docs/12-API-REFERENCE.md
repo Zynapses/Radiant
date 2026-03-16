@@ -2,7 +2,7 @@
 
 **REST APIs • Service Layer • MCP/A2A • Error Codes**
 
-*RADIANT v6.6.0 — Generated February 07, 2026*
+*RADIANT v7.63.0 — Generated March 16, 2026*
 
 ---
 
@@ -2887,7 +2887,7 @@ The Tenant API provides tenant-isolated access for applications that sit behind 
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/tenant/cartridges` | GET | List tenant's cartridges (includes system read-only) |
+| `/tenant/cartridges` | GET | List tenant's cartridges (includes system read-only) — see [24-CARTRIDGE-SPECIALIZATIONS.md](./24-CARTRIDGE-SPECIALIZATIONS.md) for brain-mapped specialization taxonomy |
 | `/tenant/cartridges` | POST | Create tenant cartridge |
 | `/tenant/cartridges/{id}` | GET | Get cartridge (tenant or system read-only) |
 | `/tenant/cartridges/{id}` | PATCH | Update tenant cartridge |
