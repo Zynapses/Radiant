@@ -5,6 +5,25 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.65.0] - 2026-03-16
+
+### Documentation
+
+#### Workflow Policy Synchronization — Stale Reference Audit
+
+**7 workflow policies updated to reflect current 21-document structure (15 consolidated + 6 standalone)**
+
+- **`docs-update-all.md`**: Fixed counts (was "20/19 documents" → 21), added doc 25 Patents to standalone table, added `patent` change type trigger, added Patent/IP section to Step 2, updated Quick Reference Card
+- **`glossary-sync-policy.md`**: Replaced all pre-consolidation doc names (RADIANT-ADMIN-GUIDE.md, THINKTANK-ADMIN-GUIDE.md, etc.) with current numbered names (01–25), updated glossary section numbering to match current 14-section layout
+- **`docs-assemble-complete.md`**: Updated from old 18-doc structure to current 21-doc structure with standalone docs 20–25
+- **`platform-architecture-sync.md`**: Replaced stale `RADIANT-PLATFORM-ARCHITECTURE.md` with `docs/06-ARCHITECTURE-ENGINEERING.md`
+- **`policy-enforcement.md`**: Replaced `OPEN-SOURCE-LIBRARIES.md` and `UI-UX-PATTERNS.md` with `docs/18-UI-UX-LIBRARIES.md`
+- **`evaluate-moats.md`**: Replaced `RADIANT-MOATS.md`, `THINKTANK-MOATS.md`, `COMPETITIVE-STRATEGY.md` with `docs/15-STRATEGY-COMPETITIVE.md`
+- **`ui-ux-patterns-policy.md`**: Replaced `UI-UX-PATTERNS.md` with `docs/18-UI-UX-LIBRARIES.md`
+- **`open-source-library-policy.md`**: Replaced `OPEN-SOURCE-LIBRARIES.md` with `docs/18-UI-UX-LIBRARIES.md`
+
+**Files Modified**: `.windsurf/workflows/docs-update-all.md`, `.windsurf/workflows/glossary-sync-policy.md`, `.windsurf/workflows/docs-assemble-complete.md`, `.windsurf/workflows/platform-architecture-sync.md`, `.windsurf/workflows/policy-enforcement.md`, `.windsurf/workflows/evaluate-moats.md`, `.windsurf/workflows/ui-ux-patterns-policy.md`, `.windsurf/workflows/open-source-library-policy.md`, `CHANGELOG.md`
+
 ## [7.64.0] - 2026-03-16
 
 ### Documentation

@@ -109,17 +109,17 @@ Score each criterion 1-5:
 
 | Moat Type | Primary Document | Secondary Document |
 |-----------|------------------|-------------------|
-| **RADIANT Platform** (Infrastructure, Architecture) | `docs/RADIANT-MOATS.md` | `docs/COMPETITIVE-STRATEGY.md` |
-| **Think Tank** (Consumer Features, UX) | `docs/THINKTANK-MOATS.md` | `docs/COMPETITIVE-STRATEGY.md` |
-| **Cross-System** (Affects both) | Both moat documents | `docs/COMPETITIVE-STRATEGY.md` |
+| **RADIANT Platform** (Infrastructure, Architecture) | `docs/15-STRATEGY-COMPETITIVE.md` (RADIANT Moats section) | `docs/15-STRATEGY-COMPETITIVE.md` |
+| **Think Tank** (Consumer Features, UX) | `docs/15-STRATEGY-COMPETITIVE.md` (Think Tank Moats section) | `docs/15-STRATEGY-COMPETITIVE.md` |
+| **Cross-System** (Affects both) | `docs/15-STRATEGY-COMPETITIVE.md` (both moat sections) | `docs/15-STRATEGY-COMPETITIVE.md` |
 
 ### For Standalone Moats (Score 18+)
 
-1. Add to the appropriate moat document (`RADIANT-MOATS.md` or `THINKTANK-MOATS.md`)
-2. Add to `docs/COMPETITIVE-STRATEGY.md` as a new Gap section
-3. Update the summary table in the moat document
+1. Add to the appropriate moat section in `docs/15-STRATEGY-COMPETITIVE.md`
+2. Add to the Competitive Strategy / Gap section in `docs/15-STRATEGY-COMPETITIVE.md`
+3. Update the summary table in the moat section
 
-**RADIANT-MOATS.md format**:
+**RADIANT Moats section format** (in `docs/15-STRATEGY-COMPETITIVE.md`):
 ```markdown
 ### Moat #X: [Moat Name]
 
@@ -136,7 +136,7 @@ Score each criterion 1-5:
 - Admin UI: `apps/admin-dashboard/...`
 ```
 
-**THINKTANK-MOATS.md format**:
+**Think Tank Moats section format** (in `docs/15-STRATEGY-COMPETITIVE.md`):
 ```markdown
 ### Moat #X: [Moat Name]
 
@@ -155,7 +155,7 @@ Score each criterion 1-5:
 
 ### For Consolidated Features
 
-Update the parent moat's description in the appropriate moat document to include the new capability.
+Update the parent moat's description in `docs/15-STRATEGY-COMPETITIVE.md` to include the new capability.
 
 ### For Non-Moats
 
@@ -168,8 +168,8 @@ Document in the feature's admin guide section:
 
 **MANDATORY**: When a feature that is part of a moat is modified or deleted:
 
-1. Update the corresponding moat section in `RADIANT-MOATS.md` or `THINKTANK-MOATS.md`
-2. Update `COMPETITIVE-STRATEGY.md` if the Gap section needs changes
+1. Update the corresponding moat section in `docs/15-STRATEGY-COMPETITIVE.md`
+2. Update the Gap/Competitive Strategy section in `docs/15-STRATEGY-COMPETITIVE.md` if needed
 3. Update implementation file paths if they changed
 4. If moat is weakened significantly, re-evaluate its tier placement
 

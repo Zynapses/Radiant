@@ -1,16 +1,16 @@
 ---
-description: Policy - RADIANT-PLATFORM-ARCHITECTURE.md must be updated when architectural changes are made
+description: Policy - docs/06-ARCHITECTURE-ENGINEERING.md must be updated when architectural changes are made
 ---
 
 # Platform Architecture Documentation Sync Policy
 
 ## Purpose
 
-The `docs/RADIANT-PLATFORM-ARCHITECTURE.md` document is the **authoritative reference** for RADIANT's complete system architecture. It must stay synchronized with all architectural changes.
+The `docs/06-ARCHITECTURE-ENGINEERING.md` document is the **authoritative reference** for RADIANT's complete system architecture. It must stay synchronized with all architectural changes.
 
 ## When This Policy Applies
 
-Update `RADIANT-PLATFORM-ARCHITECTURE.md` whenever you:
+Update `docs/06-ARCHITECTURE-ENGINEERING.md` whenever you:
 
 | Change Type | Section to Update |
 |-------------|-------------------|
@@ -67,7 +67,7 @@ Update **Appendix B: FILE STRUCTURE** tree diagram.
 
 Before completing any architectural work, verify:
 
-- [ ] `RADIANT-PLATFORM-ARCHITECTURE.md` updated with new components
+- [ ] `docs/06-ARCHITECTURE-ENGINEERING.md` updated with new components
 - [ ] Version number updated if major feature
 - [ ] API endpoints documented if new
 - [ ] Database tables listed if new migrations

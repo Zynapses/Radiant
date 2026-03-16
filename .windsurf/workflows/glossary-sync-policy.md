@@ -6,7 +6,7 @@ description: Policy - RADIANT Glossary must be synchronized when documentation c
 
 > ⚠️ **MANDATORY POLICY** ⚠️
 >
-> The RADIANT Glossary (`docs/RADIANT-GLOSSARY.md`) must be kept in sync with all other documentation.
+> The RADIANT Glossary (`docs/17-GLOSSARY.md`) must be kept in sync with all other documentation.
 
 ---
 
@@ -16,14 +16,18 @@ This policy is triggered when ANY of these documents are updated:
 
 | Document | Trigger Reason |
 |----------|---------------|
-| `docs/RADIANT-ADMIN-GUIDE.md` | May introduce platform terms/features |
-| `docs/THINKTANK-ADMIN-GUIDE.md` | May introduce Think Tank admin terms |
-| `docs/THINKTANK-USER-GUIDE.md` | May introduce user-facing features |
-| `docs/ENGINEERING-IMPLEMENTATION-VISION.md` | May introduce technical terms/subsystems |
-| `docs/RADIANT-PLATFORM-ARCHITECTURE.md` | May introduce architecture terms/AWS services |
-| `docs/RADIANT-MOATS.md` | May introduce competitive advantage terms |
-| `docs/THINKTANK-MOATS.md` | May introduce feature-specific terms |
-| `docs/SERVICE-LAYER-GUIDE.md` | May introduce API/protocol terms |
+| `docs/01-THINK-TANK.md` | May introduce user-facing features, admin terms |
+| `docs/02-CURATOR.md` | May introduce knowledge graph/verification terms |
+| `docs/04-RADIANT-ADMIN.md` | May introduce platform terms/features |
+| `docs/06-ARCHITECTURE-ENGINEERING.md` | May introduce technical terms/subsystems, architecture terms/AWS services |
+| `docs/07-AI-SYSTEMS.md` | May introduce AI/brain/consciousness terms |
+| `docs/09-OMEGA-GENESIS.md` | May introduce OMEGA/Genesis protocol terms |
+| `docs/12-API-REFERENCE.md` | May introduce API/protocol terms |
+| `docs/13-SECURITY-AUTH-COMPLIANCE.md` | May introduce security/auth terms |
+| `docs/15-STRATEGY-COMPETITIVE.md` | May introduce competitive advantage terms |
+| `docs/20-OMEGA-ENGINEERING.md` | May introduce OMEGA engineering terms |
+| `docs/24-CARTRIDGE-SPECIALIZATIONS.md` | May introduce cartridge/specialization terms |
+| `docs/25-PATENTS.md` | May introduce patent/IP strategy terms |
 
 ---
 
@@ -62,15 +66,20 @@ The glossary has these sections:
 
 | Section | What Goes Here |
 |---------|----------------|
-| 1. AI & Machine Learning Terms | LLM, RAG, embedding, inference, etc. |
-| 2. RADIANT Core Subsystems | Brain, Cato, Cortex, Genesis, etc. |
-| 3. Think Tank Features | Magic Carpet, Polymorphic UI, etc. |
-| 4. AWS Services Used | Lambda, S3, Aurora, Bedrock, etc. |
-| 5. Acronyms & Abbreviations | All abbreviations (MCP, A2A, CBF, etc.) |
-| 6. Database & Storage Terms | pgvector, RDS Proxy, tiers, etc. |
-| 7. Security & Compliance Terms | RLS, RBAC, HIPAA, etc. |
-| 8. API & Protocol Terms | MCP, A2A, SSE, WebSocket, etc. |
-| 9. UI/UX Terms | GenUI, Shadcn, Tailwind, etc. |
+| 1. OMEGA Protocol Terminology | OMEGA, Quantum Brain, Helix, Firmware, etc. |
+| 2. AI & Machine Learning Terms | LLM, RAG, embedding, inference, etc. |
+| 3. RADIANT Core Subsystems | Brain, Cato, Cortex, Genesis, etc. |
+| 4. Think Tank (Consumer AI Platform) | Magic Carpet, Polymorphic UI, etc. |
+| 5. RADIANT Applications | Curator, Dojo, Admin, Swift Deployer, etc. |
+| 6. Security & Intrusion Detection | RIDPS, Spend Governor, etc. |
+| 7. Operations & Monitoring | SENTINEL, Log Retention, Data Lake, etc. |
+| 8. AWS Services Used | Lambda, S3, Aurora, Bedrock, etc. |
+| 9. Acronyms & Abbreviations | All abbreviations (MCP, A2A, CBF, etc.) |
+| 10. Database & Storage Terms | pgvector, RDS Proxy, tiers, etc. |
+| 11. Security & Compliance Terms | RLS, RBAC, HIPAA, IP & Patents, etc. |
+| 12. API & Protocol Terms | MCP, A2A, SSE, WebSocket, etc. |
+| 13. UI/UX Terms | GenUI, Shadcn, Tailwind, etc. |
+| 14. Quick Reference Tables | Protocol summaries, streaming events, etc. |
 
 ### Step 3: Follow Table Format
 
@@ -138,7 +147,7 @@ After significant glossary updates, regenerate the PDF:
 
 ```bash
 // turbo
-pandoc docs/RADIANT-GLOSSARY.md -o docs/RADIANT-GLOSSARY.pdf \
+pandoc docs/17-GLOSSARY.md -o docs/17-GLOSSARY.pdf \
   --pdf-engine=pdflatex \
   -V colorlinks=true \
   -V linkcolor=blue \

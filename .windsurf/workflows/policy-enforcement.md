@@ -87,11 +87,11 @@ The AI scans ALL `.md` files in the workflows directory and checks if their desc
 - [ ] Moat docs updated (if significant feature)
 
 ### Libraries Documented?
-- [ ] Any new dependencies in `docs/OPEN-SOURCE-LIBRARIES.md`
+- [ ] Any new dependencies in `docs/18-UI-UX-LIBRARIES.md`
 - [ ] Flagged libraries have justification
 
 ### UI/UX Documented?
-- [ ] New patterns in `docs/UI-UX-PATTERNS.md`
+- [ ] New patterns in `docs/18-UI-UX-LIBRARIES.md`
 - [ ] Source references included
 - [ ] Modification history updated
 

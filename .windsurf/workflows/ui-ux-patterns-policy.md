@@ -6,8 +6,8 @@ description: Policy - UI/UX patterns must be reviewed before changes and documen
 
 **MANDATORY**: This workflow has TWO requirements:
 
-1. **BEFORE making UI changes**: Review `docs/UI-UX-PATTERNS.md`
-2. **AFTER making UI changes**: Update `docs/UI-UX-PATTERNS.md`
+1. **BEFORE making UI changes**: Review `docs/18-UI-UX-LIBRARIES.md`
+2. **AFTER making UI changes**: Update `docs/18-UI-UX-LIBRARIES.md`
 
 ---
 
@@ -27,7 +27,7 @@ This policy is triggered when:
 
 **BEFORE making any UI/UX changes, you MUST:**
 
-1. Read `docs/UI-UX-PATTERNS.md`
+1. Read `docs/18-UI-UX-LIBRARIES.md`
 2. Identify if an existing pattern covers your use case
 3. If pattern exists:
    - Follow the documented pattern
@@ -38,7 +38,7 @@ This policy is triggered when:
 
 ### Review Checklist
 
-- [ ] Read relevant sections of `docs/UI-UX-PATTERNS.md`
+- [ ] Read relevant sections of `docs/18-UI-UX-LIBRARIES.md`
 - [ ] Checked if existing pattern applies
 - [ ] Identified source reference (if new pattern)
 - [ ] Have justification for any deviations
@@ -75,7 +75,7 @@ If the pattern is derived from an external source, document it:
 
 ### For New Patterns
 
-1. Open `docs/UI-UX-PATTERNS.md`
+1. Open `docs/18-UI-UX-LIBRARIES.md`
 2. Find the appropriate category section
 3. Add pattern documentation:
 
@@ -157,7 +157,7 @@ When creating new patterns, prefer these established sources:
 Before completing UI/UX work, verify:
 
 - [ ] Pre-change review completed
-- [ ] Pattern documented in `docs/UI-UX-PATTERNS.md`
+- [ ] Pattern documented in `docs/18-UI-UX-LIBRARIES.md`
 - [ ] Source reference included (if external)
 - [ ] File paths documented
 - [ ] Modification history updated (if changing existing)
@@ -171,7 +171,7 @@ Before completing UI/UX work, verify:
 
 This policy is **MANDATORY**. AI coders MUST:
 
-1. **Read** `docs/UI-UX-PATTERNS.md` before making UI changes
+1. **Read** `docs/18-UI-UX-LIBRARIES.md` before making UI changes
 2. **Follow** existing patterns when applicable
 3. **Document** new patterns after implementation
 4. **Update** modification history for changes
@@ -222,12 +222,12 @@ When an AI coder is working on UI:
 
 ```
 1. BEFORE changes:
-   - Call read_file on docs/UI-UX-PATTERNS.md
+   - Call read_file on docs/18-UI-UX-LIBRARIES.md
    - Identify relevant patterns
    - Follow documented patterns
 
 2. AFTER changes:
-   - Update docs/UI-UX-PATTERNS.md
+   - Update docs/18-UI-UX-LIBRARIES.md
    - Add source reference if new
    - Update modification history if changed
 ```

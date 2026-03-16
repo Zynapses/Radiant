@@ -6,7 +6,7 @@ description: MANDATORY - Update ALL relevant documentation on ANY code change. T
 
 > ⚠️ **THIS POLICY IS MANDATORY AND HAS NO EXCEPTIONS** ⚠️
 >
-> **Every code change requires documentation updates.** 20 documents total: 15 consolidated (merged 2026-02-10) + 5 standalone.
+> **Every code change requires documentation updates.** 21 documents total: 15 consolidated (merged 2026-02-10) + 6 standalone.
 
 ---
 
@@ -22,7 +22,7 @@ Do NOT:
 
 ---
 
-## The 19 Documents (15 Consolidated + 4 Standalone)
+## The 21 Documents (15 Consolidated + 6 Standalone)
 
 ### App Documents (one per app)
 | # | Document | What It Covers |
@@ -56,6 +56,7 @@ Do NOT:
 | 22 | `docs/22-COMPLIANCE-STANDARDS-GUIDE.md` | Compliance certifications & regulatory standards: SOC 2, GDPR, HIPAA, ISO 27701, ISO 42001, HDS, DPF, PCI DSS — versions, requirements, enforcement, timelines, cross-framework analysis, RADIANT alignment |
 | 23 | `docs/23-ENGINEERING-ROADMAP.md` | Engineering roadmap: milestones, priorities, timeline, dependencies, technical debt, decision log |
 | 24 | `docs/24-CARTRIDGE-SPECIALIZATIONS.md` | Cartridge specializations: brain-mapped taxonomy, .RADz format, scopes, PKI, vault, RNIR, operations, composition patterns, routing, competitive positioning, API reference |
+| 25 | `docs/25-PATENTS.md` | Patents & IP strategy: patent portfolio funding decisions, OMEGA & RADIANT Cartridge System omnibus provisional filing strategy |
 
 ---
 
@@ -89,6 +90,7 @@ Before making ANY code change, identify what type of change it is:
 | `new_term` | new AI term, subsystem, acronym |
 | `operations` | deployment, incident, scaling, performance, DR |
 | `roadmap` | milestone, sprint, priority, timeline, technical debt, engineering planning |
+| `patent` | patent, IP strategy, provisional filing, cartridge IP, OMEGA IP |
 
 ---
 
@@ -268,6 +270,13 @@ Before making ANY code change, identify what type of change it is:
 ✅ docs/23-ENGINEERING-ROADMAP.md
 ```
 
+### Patent / IP Strategy Changes
+```
+✅ CHANGELOG.md
+✅ docs/25-PATENTS.md (PRIMARY — all patent/IP content here)
+✅ docs/15-STRATEGY-COMPETITIVE.md (if competitive advantage)
+```
+
 ---
 
 ## Step 3: Update ALL Identified Docs
@@ -364,7 +373,8 @@ See policy: `/.windsurf/workflows/docs-assemble-complete.md`
 │  STRAT SECURITY:   ✅ docs/19-STRATEGIC-SECURITY.md        │
 │  COMPLIANCE:       ✅ docs/22-COMPLIANCE-STANDARDS-GUIDE.md │
 │  ENG ROADMAP:      ✅ docs/23-ENGINEERING-ROADMAP.md         │
-│  CARTRIDGES:       ✅ docs/24-CARTRIDGE-SPECIALIZATIONS.md     │
+│  CARTRIDGES:       ✅ docs/24-CARTRIDGE-SPECIALIZATIONS.md   │
+│  PATENTS/IP:       ✅ docs/25-PATENTS.md                    │
 │                                                          │
 │  THEN: python3 tools/scripts/                            │
 │        assemble-complete-documentation.py                │

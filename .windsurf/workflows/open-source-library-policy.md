@@ -86,7 +86,7 @@ Gather the following information:
 
 ### For New Libraries
 
-1. Open `docs/OPEN-SOURCE-LIBRARIES.md`
+1. Open `docs/18-UI-UX-LIBRARIES.md`
 2. Find the appropriate category section
 3. Add a new row to the table:
 
@@ -99,7 +99,7 @@ Gather the following information:
 
 ### For Removed Libraries
 
-1. Remove the row from `docs/OPEN-SOURCE-LIBRARIES.md`
+1. Remove the row from `docs/18-UI-UX-LIBRARIES.md`
 2. Add entry to "Removal History" section:
 
 ```markdown
@@ -113,7 +113,7 @@ Gather the following information:
 If you encounter a library with a non-permissive license:
 
 1. **Add to the library table** with appropriate flag
-2. **Add to "Flagged Libraries" section** in `docs/OPEN-SOURCE-LIBRARIES.md`:
+2. **Add to "Flagged Libraries" section** in `docs/18-UI-UX-LIBRARIES.md`:
    ```markdown
    | `library-name` | LICENSE | 🔶 FLAG | Justification for use | Your Name | YYYY-MM-DD |
    ```
@@ -127,7 +127,7 @@ If you encounter a library with a non-permissive license:
 
 Before completing, verify:
 
-- [ ] Library is added to `docs/OPEN-SOURCE-LIBRARIES.md`
+- [ ] Library is added to `docs/18-UI-UX-LIBRARIES.md`
 - [ ] All fields are filled in (Name, Description, License, Date, Flag)
 - [ ] License is identified and flagged appropriately
 - [ ] Category is correct
@@ -158,7 +158,7 @@ Before completing, verify:
 
 ## Policy Enforcement
 
-This policy is **MANDATORY**. Any PR that adds or removes dependencies without updating `docs/OPEN-SOURCE-LIBRARIES.md` will be flagged for review.
+This policy is **MANDATORY**. Any PR that adds or removes dependencies without updating `docs/18-UI-UX-LIBRARIES.md` will be flagged for review.
 
 ### NEVER
 
